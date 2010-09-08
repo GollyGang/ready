@@ -20,36 +20,25 @@ void init(float a[X][Y],float b[X][Y]);
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
-             float r_a,float r_b,float f,float k,
+             float D_a,float D_b,float A,float B,
              float speed,
              bool parameter_space);
 
 int main()
 {
-    // Here we implement the Gray-Scott model, as described here:
-    // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
-    // http://arxiv.org/abs/patt-sol/9304003
+    // Here we implement the Brandeisator; the Lengyel-Epstein model for the 
+    // chlorite-iodide-malonic acid (CIMA) reaction 
+    // http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.34.9043&rep=rep1&type=pdf
+
+    // But I can't get this to work at the moment. Perhaps we need a more sophisticated solver?
+    // Or the initial conditions need to be right to get interesting behaviour?
 
     // -- parameters --
-    float r_a = 0.082f;
-    float r_b = 0.041f;
-
-    // for spots:
-    float k = 0.064f;
-    float f = 0.035f;
-    // for stripes:
-    //float k = 0.06f;
-    //float f = 0.035f;
-    // for long stripes
-    //float k = 0.065f;
-    //float f = 0.056f;
-    // for dots and stripes
-    //float k = 0.064f;
-    //float f = 0.04f;
-    // for spiral waves:
-    //float k = 0.0475f;
-    //float f = 0.0118f;
-    float speed = 1.0f;
+    float A = 12.371f;
+    float B = 16.0f;
+    float D_a = 0.1f;
+    float D_b = 1.0f;
+    float speed = 0.01f;
     // ----------------
     
     // these arrays store the chemical concentrations:
@@ -61,15 +50,15 @@ int main()
     init(a,b);
     
     int iteration = 0;
-    while(true) 
-    {
+    while(true) {
+
         // compute:
-        compute(a,b,da,db,r_a,r_b,f,k,speed,false);
+        compute(a,b,da,db,D_a,D_b,A,B,speed,false);
 
         // display:
         if(iteration%100==0) 
         {
-            if(display(a,a,a,iteration,false,200.0f,2.0f,10,"GrayScott (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,true,200.0f,2,10,"Brandeisator (Esc to quit)")) // did user ask to quit?
                 break;
         }
 
@@ -95,9 +84,9 @@ void init(float a[X][Y],float b[X][Y])
     // figure the values
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-            
-            //if(hypot(i%10-5/*-X/2*/,j%10-5/*-Y/2*/)<=2.0f)//frand(2,3))
-            if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            // start with a uniform field with an approximate circle in the middle
+            //if(hypot(i%20-10/*-X/2*/,j%20-10/*-Y/2*/)<=frand(2,5)) {
+            if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5))
             {
                 a[i][j] = 0.0f;
                 b[i][j] = 1.0f;
@@ -106,18 +95,15 @@ void init(float a[X][Y],float b[X][Y])
                 a[i][j] = 1;
                 b[i][j] = 0;
             }
-            //float v = frand(0.0f,1.0f);
-            //a[i][j] = v;
-            //b[i][j] = 1.0f-v;
-            //a[i][j] += frand(-0.01f,0.01f);
-            //b[i][j] += frand(-0.01f,0.01f);
+            a[i][j] = frand(-2.0f,2.0f);
+            b[i][j] = frand(-2.0f,2.0f);
         }
     }
 }
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
-             float r_a,float r_b,float f,float k,float speed,
+             float D_a,float D_b,float A,float B,float speed,
              bool parameter_space)
 {
     const bool toroidal = false;
@@ -145,11 +131,11 @@ void compute(float a[X][Y],float b[X][Y],
                 jnext = min(Y-1,j+1);
             }
 
-            if(parameter_space)	{
-                const float kmin=0.045f,kmax=0.07f,fmin=0.00f,fmax=0.14f;
+            if(parameter_space) {
+                /*const float kmin=0.03f,kmax=0.07f,fmin=0.00f,fmax=0.06f;
                 // set f and k for this location (ignore the provided values of f and k)
                 k = kmin + i*(kmax-kmin)/X;
-                f = fmin + j*(fmax-fmin)/Y;
+                f = fmin + j*(fmax-fmin)/Y;*/
             }
 
             float aval = a[i][j];
@@ -160,16 +146,16 @@ void compute(float a[X][Y],float b[X][Y],
             float ddb = b[i][jprev] + b[i][jnext] + b[iprev][j] + b[inext][j] - 4*bval;
 
             // compute the new rate of change of a and b
-            da[i][j] = r_a * dda - aval*bval*bval + f*(1-aval);
-            db[i][j] = r_b * ddb + aval*bval*bval - (f+k)*bval;
+            da[i][j] = D_a * dda + A - aval - (aval*bval) / (1+aval*aval);
+            db[i][j] = D_b * ddb + 4*B*aval - B * (aval*bval) / (1+aval*aval);
         }
     }
 
     // effect change
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-            a[i][j] += (speed * da[i][j]);// + frand(-0.001f,0.001f);
-            b[i][j] += (speed * db[i][j]);// + frand(-0.001f,0.001f);
+            a[i][j] += (speed * da[i][j]);
+            b[i][j] += (speed * db[i][j]);
         }
     }
 }

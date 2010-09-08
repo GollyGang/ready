@@ -55,7 +55,7 @@ int main()
         // display:
         if(iteration%10==0)
         {
-            if(display(a,a,b,iteration,false,30.0f,4,2,"TuringSpots (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,false,30.0f,2,20,"TuringSpots (Esc to quit)")) // did user ask to quit?
                 break;
         }
 
@@ -79,10 +79,10 @@ void init(float a[X][Y],float b[X][Y],float beta[X][Y],
         {
             a[i][j] = a_steady;
             b[i][j] = b_steady;
-			if(i<X/2)
-				beta[i][j] = beta_init + frand(-beta_rand, beta_rand);
-			else
-				beta[i][j] = beta_init;
+            //if(i<X/2)
+                beta[i][j] = beta_init + frand(-beta_rand, beta_rand);
+            /*else
+                beta[i][j] = beta_init;*/
         }
     }
 }
