@@ -128,13 +128,13 @@ void compute(float a[X][Y],float b[X][Y],float c[X][Y],float d[X][Y],float e[X][
             float dval = d[i][j];
             float eval = e[i][j];
 
-			// compute the Laplacians of a, b, d and e (we don't need c)
+            // compute the Laplacians of a, b, d and e (we don't need c)
             float dda = a[i][jprev] + a[i][jnext] + a[iprev][j] + a[inext][j] - 4 * aval;
             float ddb = b[i][jprev] + b[i][jnext] + b[iprev][j] + b[inext][j] - 4 * bval;
             float ddd = d[i][jprev] + d[i][jnext] + d[iprev][j] + d[inext][j] - 4 * dval;
             float dde = e[i][jprev] + e[i][jnext] + e[iprev][j] + e[inext][j] - 4 * eval;
 
-			// compute the rates of change of each chemical
+            // compute the rates of change of each chemical
             da[i][j] = 0.01f * aval * aval * eval * beta[i][j] / cval - aval * k_ab + diff1 * dda;
             db[i][j] = 0.01f * bval * bval * dval / cval - bval * k_ab + diff1 * ddb;
             dc[i][j] = 0.01f * aval * aval * eval * beta[i][j] + 0.01f * bval * bval * dval - cval * k_c;
