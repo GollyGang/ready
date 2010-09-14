@@ -28,7 +28,7 @@ int main()
     // http://www.robinengelhardt.info/speciale/main.pdf
 
     // -- parameters --
-    float speed = 0.001f;
+    float speed = 0.0015f;
     // ----------------
     
     // these arrays store the chemical concentrations:
@@ -44,12 +44,13 @@ int main()
     {
         // compute:
         compute(a,b,da,db,speed,false);
-
+        
         // display:
-        if(iteration%10==0) 
+        if(iteration%100==0) 
         {
-            if(display(a,a,b,iteration,true,200.0f,2.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
                 break;
+
         }
 
         iteration++;
@@ -62,11 +63,6 @@ float frand(float lower,float upper)
     return lower + rand()*(upper-lower)/RAND_MAX;
 }
 
-#ifndef max
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
 void init(float a[X][Y],float b[X][Y])
 {
     srand((unsigned int)time(NULL));
@@ -74,8 +70,8 @@ void init(float a[X][Y],float b[X][Y])
     // figure the values
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-            a[i][j] = frand(0.0f,1.0f);
-            b[i][j] = frand(0.0f,0.1f);
+            a[i][j] = frand(0.0f,17.0f);
+            b[i][j] = frand(0.0f,17.0f);
         }
     }
 }
@@ -87,7 +83,7 @@ void compute(float a[X][Y],float b[X][Y],
 {
     const bool toroidal = true;
 
-    const float A=17.04f,B=1.0f,C=2.0f,D=1.39f,F=7.65f;
+    const float A=17.07f,B=1.0f,C=1.0f,D=1.39f,F=7.65f;
 
     int iprev,inext,jprev,jnext;
 
@@ -127,8 +123,8 @@ void compute(float a[X][Y],float b[X][Y],
             float ddb = b[i][jprev] + b[i][jnext] + b[iprev][j] + b[inext][j] - 4*bval;
 
             // compute the new rate of change of a and b
-            da[i][j] = C*(-aval*bval*bval+A*bval-(1+B)*aval) + D*dda/10.0f;
-            db[i][j] = 1.0f/C * (aval*bval*bval - (1+A)*bval+aval+F) + ddb/10.0f;
+            da[i][j] =  C * ( - aval*bval*bval + A*bval - (1+B)*aval ) + D*dda;
+            db[i][j] = (1.0f/C) * ( aval*bval*bval - (1+A)*bval + aval + F ) + ddb;
         }
     }
 
