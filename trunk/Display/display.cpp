@@ -13,7 +13,9 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
              float scale,int delay_ms,const char* window_title)
 {
     static bool need_init = true;
+    
     static bool write_video = false;
+    static bool is_parameter_map = false;
 
     static IplImage *im,*im2,*im3;
     static int border = 0;
@@ -36,7 +38,7 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
         int lineWidth=1;
         cvInitFont(&font,CV_FONT_HERSHEY_COMPLEX,hScale,vScale,0,lineWidth,CV_AA);
 
-        if(write_video)
+        if(is_parameter_map)
         {
             border = 20;
         }
@@ -73,27 +75,30 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
             }
         }
     }
+    float rangeR = max(0.001f,maxR-minR);
+    float rangeG = max(0.001f,maxG-minG);
+    float rangeB = max(0.001f,maxB-minB);
     for(int i=0;i<X;i++)
     {
         for(int j=0;j<Y;j++)
         {
             if(r) {
                 val = r[i][Y-j-1];
-                if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
+                if(auto_brighten) val = 255.0f * (val-minR) / rangeR;
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
                 ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
             }
             if(g) {
                 val = g[i][Y-j-1];
-                if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
+                if(auto_brighten) val = 255.0f * (val-minG) / rangeG;
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
                 ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
             }
             if(b) {
                 val = b[i][Y-j-1];
-                if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
+                if(auto_brighten) val = 255.0f * (val-minB) / rangeB;
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
                 ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 0] = (uchar)val;
@@ -110,14 +115,23 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
         sprintf(txt,"%d",iteration);
         cvPutText(im3,txt,cvPoint(20,20),&font,white);
 
-        // DEBUG:
-        sprintf(txt,"%.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
-        //cvPutText(im3,txt,cvPoint(20,40),&font,white);
+        sprintf(txt,"values in top-left corner: %.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
+        cvPutText(im3,txt,cvPoint(20,40),&font,white);
+        
+        if(auto_brighten)
+        {
+            sprintf(txt,"chemical 1 range: %.4f - %.4f",minR,maxR);
+            cvPutText(im3,txt,cvPoint(20,60),&font,white);
+            sprintf(txt,"chemical 2 range: %.4f - %.4f",minG,maxG);
+            cvPutText(im3,txt,cvPoint(20,80),&font,white);
+            sprintf(txt,"chemical 3 range: %.4f - %.4f",minB,maxB);
+            cvPutText(im3,txt,cvPoint(20,100),&font,white);
+        }
     }
 
-    // DEBUG:
-    if(write_video)
+    if(is_parameter_map)
     {
+        // you'll need to change these labels to your needs
         cvPutText(im3,"0.14",cvPoint(5,15),&font,white);
         cvPutText(im3,"F",cvPoint(5,im2->height/2),&font,white);
         cvPutText(im3,"0.00",cvPoint(5,im2->height),&font,white);
