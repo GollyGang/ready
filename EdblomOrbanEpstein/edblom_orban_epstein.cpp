@@ -20,15 +20,21 @@ void init(float a[X][Y],float b[X][Y]);
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
+             float A,float B,float C,float D,float F,
              float speed,
              bool parameter_space);
 
 int main()
 {
-    // http://www.robinengelhardt.info/speciale/main.pdf
+    // http://www.robinengelhardt.info/speciale/
 
     // -- parameters --
-    float speed = 0.0015f;
+    float A=17.00f;
+    float B=1.0f;
+    float C=1.0f;
+    float D=1.39f;
+    float F=7.65f;
+    float speed = 0.01f;
     // ----------------
     
     // these arrays store the chemical concentrations:
@@ -43,12 +49,12 @@ int main()
     while(true) 
     {
         // compute:
-        compute(a,b,da,db,speed,false);
+        compute(a,b,da,db,A,B,C,D,F,speed,false);
         
         // display:
-        if(iteration%100==0) 
+        if(iteration%1000==0) 
         {
-            if(display(a,a,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
+            if(display(b,b,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
                 break;
 
         }
@@ -72,18 +78,28 @@ void init(float a[X][Y],float b[X][Y])
         for(int j = 0; j < Y; j++) {
             a[i][j] = frand(0.0f,17.0f);
             b[i][j] = frand(0.0f,17.0f);
+            //if(abs(i-X/2)<5)
+            if(abs(i-X/2)>10 && j>Y-3)
+            {
+                a[i][j]=1.8f;
+                b[i][j]=2.8f;
+            }
+            else
+            {
+                a[i][j]=3.8f;
+                b[i][j]=1.8f;
+            }
         }
     }
 }
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
+             float A,float B,float C,float D,float F,
              float speed,
              bool parameter_space)
 {
     const bool toroidal = true;
-
-    const float A=17.07f,B=1.0f,C=1.0f,D=1.39f,F=7.65f;
 
     int iprev,inext,jprev,jnext;
 
@@ -124,7 +140,7 @@ void compute(float a[X][Y],float b[X][Y],
 
             // compute the new rate of change of a and b
             da[i][j] =  C * ( - aval*bval*bval + A*bval - (1+B)*aval ) + D*dda;
-            db[i][j] = (1.0f/C) * ( aval*bval*bval - (1+A)*bval + aval + F ) + ddb;
+            db[i][j] = (1/C) * ( aval*bval*bval - (1+A)*bval + aval + F ) + ddb;
         }
     }
 
