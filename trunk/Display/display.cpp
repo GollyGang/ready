@@ -2,7 +2,7 @@
 #include <cv.h>
 #include <highgui.h>
 
-// stdlib
+// stdlib:
 #include <stdio.h>
 
 // local:
@@ -47,7 +47,35 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
 
         if(write_video)
         {
-            video = cvCreateVideoWriter("out.avi",CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
+            float fps=30.0f;
+            // try to find a codec that works
+            video = cvCreateVideoWriter("out.avi",CV_FOURCC('D','I','V','X'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('M','J','P','G'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','C','1'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('M','P','4','2'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('D','I','V','3'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('V','P','3','1'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('V','P','3','0'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('C','V','I','D'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('f','f','d','s'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.mpg",CV_FOURCC_DEFAULT,fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",-1,fps,cvGetSize(im3)); // ask usr to choose
+            if(video==NULL)
+                video = cvCreateVideoWriter("im_00001.png",0,fps,cvGetSize(im3)); // fall back on image output
+            // to get video output working on linux, you may need to recompile opencv to include ffmpeg,
+            // as described here: http://opencv.willowgarage.com/wiki/InstallGuide (I did on Ubuntu 10.04)
         }
 
     }
@@ -115,7 +143,7 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
         sprintf(txt,"%d",iteration);
         cvPutText(im3,txt,cvPoint(20,20),&font,white);
 
-        sprintf(txt,"values in top-left corner: %.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
+        sprintf(txt,"bottom-left: %.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
         cvPutText(im3,txt,cvPoint(20,40),&font,white);
         
         if(auto_brighten)
