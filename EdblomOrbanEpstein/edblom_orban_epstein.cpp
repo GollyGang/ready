@@ -52,9 +52,9 @@ int main()
         compute(a,b,da,db,A,B,C,D,F,speed,false);
         
         // display:
-        if(iteration%1000==0) 
+        if(iteration%100==0) 
         {
-            if(display(b,b,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
+            if(display(a,b,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
                 break;
 
         }
@@ -78,16 +78,16 @@ void init(float a[X][Y],float b[X][Y])
         for(int j = 0; j < Y; j++) {
             a[i][j] = frand(0.0f,17.0f);
             b[i][j] = frand(0.0f,17.0f);
-            //if(abs(i-X/2)<5)
-            if(abs(i-X/2)>10 && j>Y-3)
+            if(abs(i-X/2)<7) // spreading from a vertical strip
+            //if(abs(i-X/2)>10 && j>Y-6) // spreading from a broken horizontal strip
             {
-                a[i][j]=1.8f;
-                b[i][j]=2.8f;
+                a[i][j]=4.4f;
+                b[i][j]=3.27f;
             }
             else
             {
-                a[i][j]=3.8f;
-                b[i][j]=1.8f;
+                a[i][j]=5.80f;
+                b[i][j]=1.85f;
             }
         }
     }
@@ -99,7 +99,7 @@ void compute(float a[X][Y],float b[X][Y],
              float speed,
              bool parameter_space)
 {
-    const bool toroidal = true;
+    const bool toroidal = false;
 
     int iprev,inext,jprev,jnext;
 
