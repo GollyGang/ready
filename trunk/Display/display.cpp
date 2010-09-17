@@ -138,16 +138,20 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
     cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
 
     char txt[100];
+
+    // show the iteration count
+    sprintf(txt,"%d",iteration);
+    cvPutText(im3,txt,cvPoint(20,20),&font,white);
+
     if(!write_video)
     {
-        sprintf(txt,"%d",iteration);
-        cvPutText(im3,txt,cvPoint(20,20),&font,white);
-
+        // show a sample from the bottom-left corner
         sprintf(txt,"bottom-left: %.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
         cvPutText(im3,txt,cvPoint(20,40),&font,white);
         
         if(auto_brighten)
         {
+            // show the range of chemical concentrations
             sprintf(txt,"chemical 1 range: %.4f - %.4f",minR,maxR);
             cvPutText(im3,txt,cvPoint(20,60),&font,white);
             sprintf(txt,"chemical 2 range: %.4f - %.4f",minG,maxG);

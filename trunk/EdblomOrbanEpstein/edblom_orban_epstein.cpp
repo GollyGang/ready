@@ -34,7 +34,7 @@ int main()
     float C=1.0f;
     float D=1.39f;
     float F=7.65f;
-    float speed = 0.01f;
+    float speed = 0.001f;
     // ----------------
     
     // these arrays store the chemical concentrations:
@@ -48,16 +48,16 @@ int main()
     int iteration = 0;
     while(true) 
     {
-        // compute:
-        compute(a,b,da,db,A,B,C,D,F,speed,false);
-        
         // display:
-        if(iteration%100==0) 
+        if(iteration%1000==0) 
         {
             if(display(a,b,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
                 break;
 
         }
+
+        // compute:
+        compute(a,b,da,db,A,B,C,D,F,speed,false);
 
         iteration++;
     }
@@ -76,9 +76,10 @@ void init(float a[X][Y],float b[X][Y])
     // figure the values
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-            a[i][j] = frand(0.0f,17.0f);
-            b[i][j] = frand(0.0f,17.0f);
+            //a[i][j] = frand(0.0f,17.0f);
+            //b[i][j] = frand(0.0f,17.0f);
             if(abs(i-X/2)<7) // spreading from a vertical strip
+            //if((abs(j-Y/2)<20 && abs(i-X/2+1)<7) || (abs(j-Y/2)>=20 && abs(i-X/2)<7) ) // spreading from a vertical strip with a 1 pixel wiggle
             //if(abs(i-X/2)>10 && j>Y-6) // spreading from a broken horizontal strip
             {
                 a[i][j]=4.4f;
