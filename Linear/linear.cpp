@@ -61,8 +61,9 @@ void init(float a[X][Y],float b[X][Y])
     {
         for(int j = 0; j < Y; j++) 
         {
-            a[i][j] = frand(-1.0f,1.0f);
-            b[i][j] = frand(-1.0f,1.0f);
+            float m = 0.01f;
+            a[i][j] = frand(-m,m);
+            b[i][j] = frand(-m,m);
         }
     }
 }
