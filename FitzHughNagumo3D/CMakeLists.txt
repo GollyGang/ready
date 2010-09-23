@@ -1,7 +1,7 @@
 project(FitzHughNagumo3D)
 
 FIND_PACKAGE(OpenCV REQUIRED)
-INCLUDE_DIRECTORIES( ${OPENCV_INCLUDE_DIR})
+INCLUDE_DIRECTORIES( ${OPENCV_INCLUDE_DIR} )
 
 INCLUDE_DIRECTORIES( "../Display" )
 
@@ -11,4 +11,7 @@ add_executable(FitzHughNagumo3D
   ../Display/display.h
 )
 
-TARGET_LINK_LIBRARIES(FitzHughNagumo3D ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES(FitzHughNagumo3D 
+  ${OpenCV_LIBS} 
+  ${VTK_LIBS} 
+)

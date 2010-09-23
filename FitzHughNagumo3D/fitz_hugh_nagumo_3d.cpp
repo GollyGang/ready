@@ -12,19 +12,206 @@ See README.txt for more details.
 #include <stdlib.h>
 #include <math.h>
 
-// local:
-#include "defs.h"
-#include "display.h"
+// STL:
+#include <vector>
+using namespace std;
 
-#define Z X
+// OpenCV:
+#include <cv.h>
+#include <highgui.h>
 
-void init(float a[X][Y][Z],float b[X][Y][Z]);
+// return a random value between lower and upper
+float frand(float lower,float upper)
+{
+    return lower + rand()*(upper-lower)/RAND_MAX;
+}
 
-void compute(float a[X][Y][Z],float b[X][Y][Z],
-             float da[X][Y][Z],float db[X][Y][Z],
-             float a0,float a1,float epsilon,float delta,float k1,float k2,float k3,
-             float speed,
-             bool parameter_map);
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
+bool display(float *r,float *g,float *b,int S,
+             int iteration,bool auto_brighten,float manual_brighten,
+             float scale,int delay_ms,const char* window_title)
+{
+    static bool need_init = true;
+    
+    static bool write_video = true;
+    static bool is_parameter_map = false;
+
+    static IplImage *im,*im2,*im3;
+    static int border = 0;
+    static CvFont font;
+    static CvVideoWriter *video;
+    static const CvScalar white = cvScalar(255,255,255);
+
+    int k=S/2;
+
+    if(need_init)
+    {
+        need_init = false;
+
+        im = cvCreateImage(cvSize(S,S),IPL_DEPTH_8U,3);
+        cvSet(im,cvScalar(0,0,0));
+        im2 = cvCreateImage(cvSize(int(S*scale),int(S*scale)),IPL_DEPTH_8U,3);
+        
+        cvNamedWindow(window_title,CV_WINDOW_AUTOSIZE);
+        
+        double hScale=0.4;
+        double vScale=0.4;
+        int lineWidth=1;
+        cvInitFont(&font,CV_FONT_HERSHEY_COMPLEX,hScale,vScale,0,lineWidth,CV_AA);
+
+        if(is_parameter_map)
+        {
+            border = 20;
+        }
+
+        im3 = cvCreateImage(cvSize(int(S*scale+border*2),int(S*scale+border)),IPL_DEPTH_8U,3);
+
+        if(write_video)
+        {
+            float fps=30.0f;
+            // try to find a codec that works
+            video = cvCreateVideoWriter("out.avi",CV_FOURCC('D','I','V','X'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('M','J','P','G'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','C','1'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('M','P','4','2'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('D','I','V','3'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('V','P','3','1'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('V','P','3','0'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('C','V','I','D'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",CV_FOURCC('f','f','d','s'),fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.mpg",CV_FOURCC_DEFAULT,fps,cvGetSize(im3));
+            if(video==NULL)
+                video = cvCreateVideoWriter("out.avi",-1,fps,cvGetSize(im3)); // ask usr to choose
+            if(video==NULL)
+                video = cvCreateVideoWriter("im_00001.png",0,fps,cvGetSize(im3)); // fall back on image output
+            // to get video output working on linux, you may need to recompile opencv to include ffmpeg,
+            // as described here: http://opencv.willowgarage.com/wiki/InstallGuide (I did on Ubuntu 10.04)
+        }
+
+    }
+
+    if(!im) return true;
+
+    // convert float arrays to IplImage for OpenCV to display
+    float val,minR=FLT_MAX,maxR=-FLT_MAX,minG=FLT_MAX,maxG=-FLT_MAX,minB=FLT_MAX,maxB=-FLT_MAX;
+    if(auto_brighten)
+    {
+        for(int i=0;i<S;i++)
+        {
+            for(int j=0;j<S;j++)
+            {
+                if(r) {
+                    val = r[(i*S+j)*S+k];
+                    if(val<minR) minR=val; if(val>maxR) maxR=val;
+                }
+                if(g) {
+                    val = g[(i*S+j)*S+k];
+                    if(val<minG) minG=val; if(val>maxG) maxG=val;
+                }
+                if(b) {
+                    val = b[(i*S+j)*S+k];
+                    if(val<minB) minB=val; if(val>maxB) maxB=val;
+                }
+            }
+        }
+    }
+    float rangeR = max(0.001f,maxR-minR);
+    float rangeG = max(0.001f,maxG-minG);
+    float rangeB = max(0.001f,maxB-minB);
+    for(int i=0;i<S;i++)
+    {
+        for(int j=0;j<S;j++)
+        {
+            if(r) {
+                val = r[(i*S+(S-j-1))*S+k];
+                if(auto_brighten) val = 255.0f * (val-minR) / rangeR;
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
+            }
+            if(g) {
+                val = g[(i*S+(S-j-1))*S+k];
+                if(auto_brighten) val = 255.0f * (val-minG) / rangeG;
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
+            }
+            if(b) {
+                val = b[(i*S+(S-j-1))*S+k];
+                if(auto_brighten) val = 255.0f * (val-minB) / rangeB;
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 0] = (uchar)val;
+            }
+        }
+    }
+
+    cvResize(im,im2);
+    cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
+
+    char txt[100];
+
+    // show the iteration count
+    sprintf(txt,"%d",iteration);
+    cvPutText(im3,txt,cvPoint(20,20),&font,white);
+
+    if(!write_video)
+    {
+        if(auto_brighten)
+        {
+            // show the range of chemical concentrations
+            sprintf(txt,"chemical 1 range: %.4f - %.4f",minR,maxR);
+            cvPutText(im3,txt,cvPoint(20,60),&font,white);
+            sprintf(txt,"chemical 2 range: %.4f - %.4f",minG,maxG);
+            cvPutText(im3,txt,cvPoint(20,80),&font,white);
+            sprintf(txt,"chemical 3 range: %.4f - %.4f",minB,maxB);
+            cvPutText(im3,txt,cvPoint(20,100),&font,white);
+        }
+    }
+
+    if(is_parameter_map)
+    {
+        // you'll need to change these labels to your needs
+        cvPutText(im3,"0.14",cvPoint(5,15),&font,white);
+        cvPutText(im3,"F",cvPoint(5,im2->height/2),&font,white);
+        cvPutText(im3,"0.00",cvPoint(5,im2->height),&font,white);
+        cvPutText(im3,"0.045",cvPoint(border*2-10,im2->height+15),&font,white);
+        cvPutText(im3,"K",cvPoint(border*2+im2->width/2,im2->height+15),&font,white);
+        cvPutText(im3,"0.07",cvPoint(im3->width-40,im2->height+15),&font,white);
+    }
+
+    if(write_video)
+        cvWriteFrame(video,im3);
+
+    cvShowImage(window_title,im3);
+    
+    int key = cvWaitKey(delay_ms); // allow time for the image to be drawn
+    if(key==27) // did user ask to quit?
+    {
+        cvDestroyWindow(window_title);
+        cvReleaseImage(&im);
+        cvReleaseImage(&im2);
+        if(write_video)
+            cvReleaseVideoWriter(&video);
+        return true;
+    }
+    return false;
+}
 
 int main()
 {
@@ -33,17 +220,7 @@ int main()
     // From Hagberg and Meron:
     // http://arxiv.org/pdf/patt-sol/9401002
 
-    // for (2D) tip-splitting:
-    /*float a0 = -0.1f;
-    float a1 = 2.0f;
-    float epsilon = 0.05f;
-    float delta = 4.0f;
-    float k1 = 1.0f;
-    float k2 = 0.0f;
-    float k3 = 1.0f;
-    bool spiral_waves = false;*/
-
-    // looking for 3D tip-splitting
+    // tip-splitting
     float a0 = -0.1f;
     float a1 = 2.0f;
     float epsilon = 0.05f;
@@ -53,7 +230,7 @@ int main()
     float k3 = 1.0f;
     bool spiral_waves = false;
 
-    // for (2D) spiral turbulence:
+    // for spiral turbulence:
     /*float a0 = -0.1f;
     float a1 = 2.0f;
     float epsilon = 0.014f;
@@ -94,116 +271,110 @@ int main()
     float k2 = 0.0f;
     float k3 = 1.0f;*/
  
-    float speed = 0.01f;
+    float speed = 0.02f;
     bool parameter_map = false;
     // ----------------
-    
+
+    const int S = 100;
+
     // these arrays store the chemical concentrations:
-    float a[X][Y][Z], b[X][Y][Z];
+    float *a = new float[S*S*S],*b=new float[S*S*S];
     // these arrays store the rate of change of those chemicals:
-    float da[X][Y][Z], db[X][Y][Z];
+    float *da = new float[S*S*S],*db=new float[S*S*S];
 
     // put the initial conditions into each cell
-    init(a,b);
-    
-    int iteration = 0;
-    while(true) 
-    {
-        // compute:
-        compute(a,b,da,db,a0,a1,epsilon,delta,k1,k2,k3,speed,parameter_map);
-
-        // display:
-        if(iteration%50==0) 
-        {
-            if(display(a[13],b[13],b[13],iteration,true,200.0f,3.0f,10,"FitzHughNagumo (Esc to quit)")) // did user ask to quit?
-                break;
-        }
-
-        iteration++;
-    }
-}
- 
-// return a random value between lower and upper
-float frand(float lower,float upper)
-{
-    return lower + rand()*(upper-lower)/RAND_MAX;
-}
-
-void init(float a[X][Y][Z],float b[X][Y][Z])
-{
     srand((unsigned int)time(NULL));
-    
-    // figure the values
-    for(int i = 0; i < X; i++) 
+    for(int i = 0; i < S; i++) 
     {
-        for(int j = 0; j < Y; j++) 
+        for(int j = 0; j < S; j++) 
         {
-            for(int k = 0; k < Z; k++) 
+            for(int k = 0; k < S; k++) 
             {
-                a[i][j][k] = 0.0f;
-                b[i][j][k] = 0.0f;
-                if(abs(i-X/2)<X/3 && abs(j-Y/2)<Y/10 && abs(k-Z/2)<Z/20) // start with a static line in the centre
+                a[(i*S+j)*S+k] = 0.0f;
+                b[(i*S+j)*S+k] = 0.0f;
+                if( abs(i-S/2)<S/4 && abs(j-S/3)<4 && abs(k-S/4)<4 ) // start with a static line in the centre
                 {
-                    a[i][j][k] = 1.0f;
-                    b[i][j][k] = 0.0f;
+                    a[(i*S+j)*S+k] = frand(0.0f,1.0f);
+                    b[(i*S+j)*S+k] = 0.0f;
                 }
             }
         }
     }
-}
-
-#ifndef max
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
-void compute(float a[X][Y][Z],float b[X][Y][Z],
-             float da[X][Y][Z],float db[X][Y][Z],
-             float a0,float a1,float epsilon,float delta,float k1,float k2,float k3,
-             float speed,
-             bool parameter_map)
-{
-    int iprev,inext,jprev,jnext,kprev,knext;
-    bool toroidal = true;
-
-    // compute change in each cell
-    for(int i = 0; i < X; i++) 
+    
+    int iteration = 0;
+    int output_frame = 0;
+    while(true) 
     {
-        if(toroidal) { iprev = (i + X - 1) % X; inext = (i + 1) % X; }
-        else { iprev=max(0,i-1); inext=min(X-1,i+1); }
+        // compute:
+        int iprev,inext,jprev,jnext,kprev,knext;
+        bool toroidal = false;
 
-        for(int j = 0; j < Y; j++) 
+        // compute change in each cell
+        for(int i = 0; i < S; i++) 
         {
-            if(toroidal) { jprev = (j + Y - 1) % Y; jnext = (j + 1) % Y; }
-            else { jprev=max(0,j-1); jnext=min(Y-1,j+1); }
+            if(toroidal) { iprev = (i + S - 1) % S; inext = (i + 1) % S; }
+            else { iprev=max(0,i-1); inext=min(S-1,i+1); }
 
-            for(int k = 0; k < Z; k++) 
+            for(int j = 0; j < S; j++) 
             {
-                if(toroidal) { kprev = (k + Z - 1) % Z; knext = (k + 1) % Z; }
-                else { kprev=max(0,k-1); knext=min(Z-1,k+1); }
+                if(toroidal) { jprev = (j + S - 1) % S; jnext = (j + 1) % S; }
+                else { jprev=max(0,j-1); jnext=min(S-1,j+1); }
 
-                float aval = a[i][j][k];
-                float bval = b[i][j][k];
+                for(int k = 0; k < S; k++) 
+                {
+                    if(toroidal) { kprev = (k + S - 1) % S; knext = (k + 1) % S; }
+                    else { kprev=max(0,k-1); knext=min(S-1,k+1); }
 
-                // compute the Laplacians of a and b
-                float dda = a[i][jprev][k] + a[i][jnext][k] + a[iprev][j][k] + a[inext][j][k] + a[i][j][kprev] + a[i][j][knext] - 6*aval;
-                float ddb = b[i][jprev][k] + b[i][jnext][k] + b[iprev][j][k] + b[inext][j][k] + b[i][j][kprev] + b[i][j][knext] - 6*bval;
+                    float aval = a[(i*S+j)*S+k];
+                    float bval = b[(i*S+j)*S+k];
 
-                // compute the new rate of change of a and b
-                da[i][j][k] = k1*aval - k2*aval*aval - aval*aval*aval - bval + dda;
-                db[i][j][k] = epsilon * (k3*aval - a1*bval - a0) + delta*ddb;
+                    // compute the Laplacians of a and b
+                    float dda = a[(i*S+jprev)*S+k] + a[(i*S+jnext)*S+k] + a[(iprev*S+j)*S+k] + a[(inext*S+j)*S+k] + a[(i*S+j)*S+kprev] + a[(i*S+j)*S+knext] - 6*aval;
+                    float ddb = b[(i*S+jprev)*S+k] + b[(i*S+jnext)*S+k] + b[(iprev*S+j)*S+k] + b[(inext*S+j)*S+k] + b[(i*S+j)*S+kprev] + b[(i*S+j)*S+knext] - 6*bval;
+
+                    // compute the new rate of change of a and b
+                    da[(i*S+j)*S+k] = k1*aval - k2*aval*aval - aval*aval*aval - bval + dda;
+                    db[(i*S+j)*S+k] = epsilon * (k3*aval - a1*bval - a0) + delta*ddb;
+                }
             }
         }
-    }
 
-    // effect change
-    for(int i = 0; i < X; i++) {
-        for(int j = 0; j < Y; j++) {
-            for(int k = 0; k < Z; k++) {
-                a[i][j][k] += (speed * da[i][j][k]);
-                b[i][j][k] += (speed * db[i][j][k]);
+        // effect change
+        for(int i = 0; i < S; i++) {
+            for(int j = 0; j < S; j++) {
+                for(int k = 0; k < S; k++) {
+                    a[(i*S+j)*S+k] += (speed * da[(i*S+j)*S+k]);
+                    b[(i*S+j)*S+k] += (speed * db[(i*S+j)*S+k]);
+                }
             }
         }
+
+        // display
+        if(iteration%50==0)
+        {
+            if(display(a,b,b,S,iteration,true,1.0f,3.0f,10,"FHN 3D (Esc to quit)"))
+                break;
+
+            // output volume in VTK format
+            {
+                char txt[100];
+                sprintf(txt,"vol_%05d.vtk",output_frame);
+                FILE *out = fopen(txt,"wt");
+                fprintf(out,"# vtk DataFile Version 2.0\nVolume example\nASCII\nDATASET STRUCTURED_POINTS\nDIMENSIONS %d %d %d\n",S,S,S);
+                fprintf(out,"ASPECT_RATIO 1 1 1\nORIGIN 0 0 0\nPOINT_DATA %d\nSCALARS volume_scalars float 1\nLOOKUP_TABLE default\n",S*S*S);
+                for(int i=0;i<S*S*S;i++)
+                    fprintf(out,"%.3f ",a[i]);
+                fclose(out);
+                output_frame++;
+            }
+        }
+
+        iteration++;
     }
+
+    // clean up
+    delete []a;
+    delete []b;
+    delete []da;
+    delete []db;
 }
-
