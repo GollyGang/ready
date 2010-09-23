@@ -55,7 +55,7 @@ int main()
         // display:
         if(iteration%10==0)
         {
-            if(display(a,a,b,iteration,false,30.0f,2,20,"TuringSpots (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,false,30.0f,2.0f,"TuringSpots (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

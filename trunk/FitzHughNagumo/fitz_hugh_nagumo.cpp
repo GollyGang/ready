@@ -103,7 +103,7 @@ int main()
         // display:
         if(iteration%50==0) 
         {
-            if(display(a,b,b,iteration,true,200.0f,1,10,"FitzHughNagumo (Esc to quit)")) // did user ask to quit?
+            if(display(a,b,b,iteration,true,200.0f,3,"FitzHughNagumo (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

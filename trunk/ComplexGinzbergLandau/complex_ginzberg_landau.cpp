@@ -55,7 +55,7 @@ int main()
         // display:
         if(iteration%40==0) 
         {
-            if(display(a,a,b,iteration,true,200.0f,2.0f,10,"Complex Ginzberg-Landau (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,true,200.0f,2.0f,"Complex Ginzberg-Landau (Esc to quit)",true)) // did user ask to quit?
                 break;
         }
 

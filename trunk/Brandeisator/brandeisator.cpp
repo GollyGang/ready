@@ -58,7 +58,7 @@ int main()
         // display:
         if(iteration%100==0) 
         {
-            if(display(a,a,b,iteration,true,200.0f,2,10,"Brandeisator (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,true,200.0f,2,"Brandeisator (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

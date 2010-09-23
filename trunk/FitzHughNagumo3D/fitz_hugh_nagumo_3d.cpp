@@ -11,6 +11,7 @@ See README.txt for more details.
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 // STL:
 #include <vector>
@@ -275,7 +276,7 @@ int main()
     bool parameter_map = false;
     // ----------------
 
-    const int S = 100;
+    const int S = 50;
 
     // these arrays store the chemical concentrations:
     float *a = new float[S*S*S],*b=new float[S*S*S];

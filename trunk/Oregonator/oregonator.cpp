@@ -58,7 +58,7 @@ int main()
         // display:
         if(iteration%10==0) 
         {
-            if(display(a,b,c,iteration,true,20.0f,2,100,"Oregonator (Esc to quit)")) // did user ask to quit?
+            if(display(a,b,c,iteration,true,20.0f,2.0f,"Oregonator (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

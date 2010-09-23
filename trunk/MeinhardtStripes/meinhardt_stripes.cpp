@@ -57,7 +57,7 @@ int main()
         // display:
         if(iteration%10==0)
         {
-            if(display(a,a,b,iteration,true,30.0f,2,20,"MeinhardtStripes (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,b,iteration,true,30.0f,2.0f,"MeinhardtStripes (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

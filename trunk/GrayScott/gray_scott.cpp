@@ -69,7 +69,7 @@ int main()
         // display:
         if(iteration%100==0) 
         {
-            if(display(a,a,a,iteration,false,200.0f,2.0f,10,"GrayScott (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,a,iteration,false,200.0f,2.0f,"GrayScott (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

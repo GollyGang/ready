@@ -51,7 +51,7 @@ int main()
         // display:
         if(iteration%100==0) 
         {
-            if(display(a,b,a,iteration,true,20.0f,2,10,"Brusselator (Esc to quit)")) // did user ask to quit?
+            if(display(a,b,a,iteration,true,20.0f,2,"Brusselator (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

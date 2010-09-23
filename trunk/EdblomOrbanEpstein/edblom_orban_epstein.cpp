@@ -34,7 +34,7 @@ int main()
     float C=1.0f;
     float D=1.39f;
     float F=7.65f;
-    float speed = 0.001f;
+    float speed = 0.01f;
     // ----------------
     
     // these arrays store the chemical concentrations:
@@ -49,9 +49,9 @@ int main()
     while(true) 
     {
         // display:
-        if(iteration%1000==0) 
+        if(iteration%100==0) 
         {
-            if(display(a,b,b,iteration,true,200.0f,4.0f,10,"EdblomOrbanEpstein (Esc to quit)")) // did user ask to quit?
+            if(display(b,b,b,iteration,true,200.0f,4.0f,"EdblomOrbanEpstein (Esc to quit)",true)) // did user ask to quit?
                 break;
 
         }
@@ -78,12 +78,15 @@ void init(float a[X][Y],float b[X][Y])
         for(int j = 0; j < Y; j++) {
             //a[i][j] = frand(0.0f,17.0f);
             //b[i][j] = frand(0.0f,17.0f);
-            if(abs(i-X/2)<7) // spreading from a vertical strip
+            if(abs(i-X/2)<2) // spreading from a vertical strip
             //if((abs(j-Y/2)<20 && abs(i-X/2+1)<7) || (abs(j-Y/2)>=20 && abs(i-X/2)<7) ) // spreading from a vertical strip with a 1 pixel wiggle
-            //if(abs(i-X/2)>10 && j>Y-6) // spreading from a broken horizontal strip
+            //if(abs(i-X/2)>10 && j>Y-2) // spreading from a broken horizontal strip at the top edge
+            //if(abs(i-X/2)>10 && j>Y-14) // spreading from a broken horizontal strip at the top edge
+            //if(abs(j-Y/2)<7) // spreading from a horizontal strip in the middle
             {
                 a[i][j]=4.4f;
-                b[i][j]=3.27f;
+                //b[i][j]=3.27f;
+                b[i][j]=4.5f;
             }
             else
             {
@@ -100,7 +103,7 @@ void compute(float a[X][Y],float b[X][Y],
              float speed,
              bool parameter_space)
 {
-    const bool toroidal = false;
+    const bool toroidal = true;
 
     int iprev,inext,jprev,jnext;
 
