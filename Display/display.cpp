@@ -10,11 +10,10 @@
 
 bool display(float r[X][Y],float g[X][Y],float b[X][Y],
              int iteration,bool auto_brighten,float manual_brighten,
-             float scale,int delay_ms,const char* window_title)
+             float scale,const char* window_title,bool write_video)
 {
     static bool need_init = true;
     
-    static bool write_video = false;
     static bool is_parameter_map = false;
 
     static IplImage *im,*im2,*im3;
@@ -177,7 +176,7 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
 
     cvShowImage(window_title,im3);
     
-    int key = cvWaitKey(delay_ms); // allow time for the image to be drawn
+    int key = cvWaitKey(10);
     if(key==27) // did user ask to quit?
     {
         cvDestroyWindow(window_title);

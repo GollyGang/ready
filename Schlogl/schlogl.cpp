@@ -50,7 +50,7 @@ int main()
         // display:
         if(iteration%10==0) 
         {
-            if(display(a,a,a,iteration,true,200.0f,2.0f,10,"Schlogl (Esc to quit)")) // did user ask to quit?
+            if(display(a,a,a,iteration,true,200.0f,2.0f,"Schlogl (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 

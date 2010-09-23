@@ -13,7 +13,8 @@ iren.SetRenderWindow(renWin)
 
 # read the data
 sp = vtk.vtkStructuredPointsReader()
-sp.SetFileName("../../build/FitzHughNagumo3D/vol_00875.vtk")
+build_folder = "../../../build/"
+sp.SetFileName(build_folder + "FitzHughNagumo3D/vol_00000.vtk")
 sp.Update()
 dims = sp.GetOutput().GetDimensions()
 
@@ -63,13 +64,13 @@ iren.Start()
 #pov.SetFileName("out.pov")
 #pov.Write()
 
-#exit()
+exit()
 
 # after user has positioned the scene, run through the frames
 renWin.OffScreenRenderingOn()
 i=0
 while True:
-    filename = "../../build/FitzHughNagumo3D/vol_"+'0'*(5-len(str(i)))+str(i)+".vtk"
+    filename = build_folder + "FitzHughNagumo3D/vol_"+'0'*(5-len(str(i)))+str(i)+".vtk"
     if not os.path.exists(filename):
         break
     sp.SetFileName(filename)

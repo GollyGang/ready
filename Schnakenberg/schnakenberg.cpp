@@ -58,7 +58,7 @@ int main()
         // display:
         if(iteration%100==0) 
         {
-            if(display(a,b,b,iteration,true,200.0f,2.0f,10,"Schnakenberg (Esc to quit)")) // did user ask to quit?
+            if(display(a,b,b,iteration,true,200.0f,2.0f,"Schnakenberg (Esc to quit)",false)) // did user ask to quit?
                 break;
         }
 
