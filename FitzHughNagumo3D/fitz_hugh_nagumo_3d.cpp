@@ -293,7 +293,16 @@ int main()
             {
                 a[(i*S+j)*S+k] = 0.0f;
                 b[(i*S+j)*S+k] = 0.0f;
-                if( abs(i-S/2)<S/4 && abs(j-S/3)<4 && abs(k-S/4)<4 ) // start with a static line in the centre
+                float x=i,y=j,z=k;
+                // rotate
+                {
+                    const float PI=3.1415926535f;
+                    float a1=PI/10,a2=PI/9,a3=PI/12; // angles
+                    x = i * cos(a2)*cos(a3) + j * (-cos(a1)*sin(a3)+sin(a1)*sin(a2)*cos(a3)) + k * (sin(a1)*sin(a3)+cos(a1)*sin(a2)*cos(a3));
+                    y = i * cos(a2)*sin(a3) + j * (cos(a1)*cos(a3)+sin(a1)*sin(a2)*sin(a3)) + k * (-sin(a1)*cos(a3)+cos(a1)*sin(a2)*sin(a3));
+                    z = i*(-sin(a2)) + j * (sin(a1)*cos(a2)) + k * (cos(a1)*cos(a2));
+                }
+                if( abs(x-S/2)<S/4 && abs(y-S/3)<4 && abs(z-S/4)<4 ) // start with a static line in the centre
                 {
                     a[(i*S+j)*S+k] = frand(0.0f,1.0f);
                     b[(i*S+j)*S+k] = 0.0f;
