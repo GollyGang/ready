@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -45,21 +46,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true) 
     {
-        // display:
-        if(iteration%100==0) 
-        {
-            if(display(b,b,b,iteration,true,200.0f,4.0f,"EdblomOrbanEpstein (Esc to quit)",true)) // did user ask to quit?
-                break;
-
-        }
+    	start = clock();
 
         // compute:
-        compute(a,b,da,db,A,B,C,D,F,speed,false);
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,da,db,A,B,C,D,F,speed,false);
+            iteration++;
+        }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"EOE - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(b,b,b,iteration,true,200.0f,4,10,msg)) // did user ask to quit?
+            break;
     }
 }
 
@@ -78,8 +87,8 @@ void init(float a[X][Y],float b[X][Y])
         for(int j = 0; j < Y; j++) {
             //a[i][j] = frand(0.0f,17.0f);
             //b[i][j] = frand(0.0f,17.0f);
-            if(abs(i-X/2)<2) // spreading from a vertical strip
-            //if((abs(j-Y/2)<20 && abs(i-X/2+1)<7) || (abs(j-Y/2)>=20 && abs(i-X/2)<7) ) // spreading from a vertical strip with a 1 pixel wiggle
+            //if(abs(i-X/2)<2) // spreading from a vertical strip
+            if((abs(j-Y/2)<20 && abs(i-X/2+1)<7) || (abs(j-Y/2)>=20 && abs(i-X/2)<7) ) // spreading from a vertical strip with a 1 pixel wiggle
             //if(abs(i-X/2)>10 && j>Y-2) // spreading from a broken horizontal strip at the top edge
             //if(abs(i-X/2)>10 && j>Y-14) // spreading from a broken horizontal strip at the top edge
             //if(abs(j-Y/2)<7) // spreading from a horizontal strip in the middle
@@ -96,6 +105,11 @@ void init(float a[X][Y],float b[X][Y])
         }
     }
 }
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],

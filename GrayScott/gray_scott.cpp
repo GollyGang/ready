@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -60,20 +61,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true) 
     {
-        // compute:
-        compute(a,b,da,db,r_a,r_b,f,k,speed,false);
+		start = clock();
 
-        // display:
-        if(iteration%100==0) 
-        {
-            if(display(a,a,a,iteration,false,200.0f,2.0f,"GrayScott (Esc to quit)",false)) // did user ask to quit?
-                break;
+        // compute:
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,da,db,r_a,r_b,f,k,speed,false);
+            iteration++;
         }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 }
 
@@ -120,30 +130,35 @@ void compute(float a[X][Y],float b[X][Y],
              float r_a,float r_b,float f,float k,float speed,
              bool parameter_space)
 {
-    const bool toroidal = false;
+    //const bool toroidal = false;
 
-    int iprev,inext,jprev,jnext;
+    //int iprev,inext,jprev,jnext;
 
     // compute change in each cell
     for(int i = 0; i < X; i++) {
-        if(toroidal) {
+        int iprev,inext;
+        /*if(toroidal) {
             iprev = (i + X - 1) % X;
             inext = (i + 1) % X;
         }
-        else {
+        else*/ {
             iprev = max(0,i-1);
             inext = min(X-1,i+1);
         }
 
         for(int j = 0; j < Y; j++) {
-            if(toroidal) {
+            int jprev,jnext;
+            /*if(toroidal) {
                 jprev = (j + Y - 1) % Y;
                 jnext = (j + 1) % Y;
             }
-            else {
+            else*/ {
                 jprev = max(0,j-1);
                 jnext = min(Y-1,j+1);
             }
+
+            float aval = a[i][j];
+            float bval = b[i][j];
 
             if(parameter_space)	{
                 const float kmin=0.045f,kmax=0.07f,fmin=0.00f,fmax=0.14f;
@@ -151,9 +166,6 @@ void compute(float a[X][Y],float b[X][Y],
                 k = kmin + i*(kmax-kmin)/X;
                 f = fmin + j*(fmax-fmin)/Y;
             }
-
-            float aval = a[i][j];
-            float bval = b[i][j];
 
             // compute the Laplacians of a and b
             float dda = a[i][jprev] + a[i][jnext] + a[iprev][j] + a[inext][j] - 4*aval;

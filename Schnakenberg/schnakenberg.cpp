@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -49,20 +50,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true) 
     {
-        // compute:
-        compute(a,b,da,db,alpha,beta,gamma,nu,speed,false);
+    	start = clock();
 
-        // display:
-        if(iteration%100==0) 
-        {
-            if(display(a,b,b,iteration,true,200.0f,2.0f,"Schnakenberg (Esc to quit)",false)) // did user ask to quit?
-                break;
+        // compute:
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,da,db,alpha,beta,gamma,nu,speed,false);
+            iteration++;
         }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"Schnakenberg - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,b,b,iteration,true,200.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 }
 
