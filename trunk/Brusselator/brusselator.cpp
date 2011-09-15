@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -42,20 +43,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b,A,B);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
-    while(true) {
+    while(true) 
+    {
+    	start = clock();
 
         // compute:
-        compute(a,b,da,db,A,B,D1,D2,speed,false);
-
-        // display:
-        if(iteration%100==0) 
-        {
-            if(display(a,b,a,iteration,true,20.0f,2,"Brusselator (Esc to quit)",false)) // did user ask to quit?
-                break;
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,da,db,A,B,D1,D2,speed,false);
+            iteration++;
         }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"Brusselator - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,b,a,iteration,true,20.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 }
 

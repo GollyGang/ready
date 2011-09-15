@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -49,20 +50,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b,c);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
-    while(true) {
+    while(true) 
+    {
+    	start = clock();
 
         // compute:
-        compute(a,b,c,da,db,dc,Da,Db,Dc,q,epsilon,f,speed,false);
-
-        // display:
-        if(iteration%10==0) 
-        {
-            if(display(a,b,c,iteration,true,20.0f,2.0f,"Oregonator (Esc to quit)",false)) // did user ask to quit?
-                break;
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,c,da,db,dc,Da,Db,Dc,q,epsilon,f,speed,false);
+            iteration++;
         }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"Oregonator - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,b,c,iteration,true,20.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 }
 

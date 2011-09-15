@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -59,8 +60,7 @@ int main()
     float k1 = -0.1f;
     float k2 = -1.1f;
     float k3 = 0.5f;
-    bool spiral_waves = true;
-    */
+    bool spiral_waves = true;*/
 
     // from Malevanets and Kapral (can't get these to work)
 
@@ -94,21 +94,32 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true) 
     {
-        // compute:
-        compute(a,b,da,db,a0,a1,epsilon,delta,k1,k2,k3,speed,parameter_map);
+    	start = clock();
 
-        // display:
-        if(iteration%50==0) 
-        {
-            if(display(a,b,b,iteration,true,200.0f,3,"FitzHughNagumo (Esc to quit)",false)) // did user ask to quit?
-                break;
+        // compute:
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,da,db,a0,a1,epsilon,delta,k1,k2,k3,speed,parameter_map);
+            iteration++;
         }
 
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"FitzHugh-Nagumo - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,b,b,iteration,true,200.0f,3,10,msg)) // did user ask to quit?
+            break;
+
         // to make more interesting patterns we periodically reset part of the grid
-        if(spiral_waves && (iteration==1000 || (iteration>0 && iteration%10000==0)) )
+        if(spiral_waves && (iteration==1000 || (iteration>0 && iteration%2000==0)) )
         {
             int div = (int)(rand()*Y/(float)RAND_MAX);
             for(int i = 0; i < X; i++) 
@@ -123,8 +134,6 @@ int main()
                 }
             }
         }
-
-        iteration++;
     }
 }
 

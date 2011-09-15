@@ -13,6 +13,7 @@ http://www1.cse.wustl.edu/~faanly/materials/Sketching_RD_Texture.pdf
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 // local:
 #include "defs.h"
@@ -46,20 +47,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b,beta,a_steady,b_steady,beta_init,beta_rand);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true)
     {
-        // compute:
-        compute(a,b,beta,da,db,diff1,diff2,s,speed);
+		start = clock();
 
-        // display:
-        if(iteration%10==0)
-        {
-            if(display(a,a,b,iteration,false,30.0f,2.0f,"TuringSpots (Esc to quit)",false)) // did user ask to quit?
-                break;
+        // compute:
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,beta,da,db,diff1,diff2,s,speed);
+            iteration++;
         }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"Turing spots - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,a,b,iteration,false,30.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 }
 

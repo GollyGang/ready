@@ -10,6 +10,7 @@ See README.txt for more details.
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 // local:
@@ -46,20 +47,29 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
     
+	clock_t start,end;
+
+	const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
-    while(true) {
+    while(true) 
+    {
+    	start = clock();
 
         // compute:
-        compute(a,b,da,db,D_a,D_b,alpha,beta,gamma,delta,speed);
-
-        // display:
-        if(iteration%40==0) 
-        {
-            if(display(a,a,b,iteration,true,200.0f,2.0f,"Complex Ginzberg-Landau (Esc to quit)",true)) // did user ask to quit?
-                break;
+		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+		{
+            compute(a,b,da,db,D_a,D_b,alpha,beta,gamma,delta,speed);
+            iteration++;
         }
 
-        iteration++;
+		end = clock();
+
+		char msg[1000];
+		sprintf(msg,"Complex Ginsberg-Landau - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,a,b,iteration,true,200.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 }
 
