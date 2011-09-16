@@ -1,4 +1,5 @@
-__kernel void grayscott_compute(__global float *A,__global float *B,__global float *A2, __global float *B2) 
+__kernel void grayscott_compute(__global float *A,__global float *B,__global float *A2, __global float *B2,
+    float k,float f,float r_a,float r_b,float speed) 
 {
     // Get the index of the current element
     const int x = get_global_id(0);
@@ -11,28 +12,27 @@ __kernel void grayscott_compute(__global float *A,__global float *B,__global flo
     const float bval = B[i];
     
     // compute the Laplacians of a and b
-    const int iLeft = ((x-1+X)%X)*Y + y;
-    const int iRight = ((x+1)%X)*Y + y;
-    const int iUp = x*Y + (y-1+Y)%Y;
-    const int iDown = x*Y + (y+1)%Y;
-    const float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] - 4*aval;
+    const int xm1 = (x-1+X)%X;
+    const int xp1 = (x+1)%X;
+    const int ym1 = (y-1+X)%Y;
+    const int yp1 = (y+1)%Y;
+    const int iLeft = xm1*Y + y;
+    const int iRight = xp1*Y + y;
+    const int iUp = x*Y + ym1;
+    const int iDown = x*Y + yp1;
+    const int iUpLeft = xm1*Y + ym1;
+    const int iUpRight = xp1*Y + ym1;
+    const int iDownLeft = xm1*Y + yp1;
+    const int iDownRight = xp1*Y + yp1;
+    const float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] - 4*aval; // (faster to use von Neumann neighborhood but sometimes get grid artefacts)
     const float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] - 4*bval;
-    
-    // main parameters:
-    const float k = 0.064f; // spots
-    const float f = 0.035f;
-    
-    // diffusion coefficients (b diffuses slower than a)
-    const float r_a = 0.082f;
-    const float r_b = 0.041f;
+    //const float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] + A[iUpLeft] + A[iUpRight] + A[iDownLeft] + A[iDownRight] - 8*aval;
+    //const float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] + B[iUpLeft] + B[iUpRight] + B[iDownLeft] + B[iDownRight] - 8*bval;
     
     // compute the new rate of change
     const float da = r_a * dda - aval*bval*bval + f*(1-aval);
     const float db = r_b * ddb + aval*bval*bval - (f+k)*bval;
     
-    // timestep size (bigger is faster but more unstable)
-    const float speed = 1.0f;
-
     // apply the change (to the new buffer)
     A2[i] = aval + speed * da;
     B2[i] = bval + speed * db;
