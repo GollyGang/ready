@@ -39,19 +39,19 @@ int main()
     float r_a = 0.082f;
     float r_b = 0.041f;
 
-	// for spots:
+    // for spots:
     float k = 0.064f;
     float f = 0.035f;
-	// for stripes:
+    // for stripes:
     //float k = 0.06f;
     //float f = 0.035f;
-	// for long stripes
-	//float k = 0.065f;
-	//float f = 0.056f;
-	// for dots and stripes
-	//float k = 0.064f;
-	//float f = 0.04f;
-	// for spiral waves:
+    // for long stripes
+    //float k = 0.065f;
+    //float f = 0.056f;
+    // for dots and stripes
+    //float k = 0.064f;
+    //float f = 0.04f;
+    // for spiral waves:
     //float k = 0.0475f;
     //float f = 0.0118f;
     float speed = 1.0f;
@@ -59,12 +59,12 @@ int main()
     
     // these arrays store the chemical concentrations:
     float a[X][Y], b[X][Y];
-	const int MEM_SIZE = sizeof(float)*X*Y;
+    const int MEM_SIZE = sizeof(float)*X*Y;
 
     // put the initial conditions into each cell
     init(a,b);
 
-	clock_t start,end;
+    clock_t start,end;
 
     try { 
         // Get available OpenCL platforms
@@ -114,54 +114,54 @@ int main()
         NDRange global(X*Y);
         NDRange local(1);
 
-		kernel.setArg(4, X);
-		kernel.setArg(5, Y);
+        kernel.setArg(4, X);
+        kernel.setArg(5, Y);
 
-		int iteration = 0;
-		const int N_FRAMES_PER_DISPLAY = 102;  // an even number, because of our double-buffering implementation
-		while(true) 
-		{
-			start = clock();
+        int iteration = 0;
+        const int N_FRAMES_PER_DISPLAY = 102;  // an even number, because of our double-buffering implementation
+        while(true) 
+        {
+            start = clock();
 
-			// run a few iterations (without copying the data back)
-			for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
-			{
-				// buffer-switching
-				if(it%2==0) {
-					kernel.setArg(0, bufferA);
-					kernel.setArg(1, bufferB);
-					kernel.setArg(2, bufferA2);
-					kernel.setArg(3, bufferB2); // output in A2,B2
-				}
-				else {
-					kernel.setArg(0, bufferA2);
-					kernel.setArg(1, bufferB2);
-					kernel.setArg(2, bufferA);
-					kernel.setArg(3, bufferB); // output in A,B
-				}
-				queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
-				iteration++;
-			}
+            // run a few iterations (without copying the data back)
+            for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+            {
+                // buffer-switching
+                if(it%2==0) {
+                    kernel.setArg(0, bufferA);
+                    kernel.setArg(1, bufferB);
+                    kernel.setArg(2, bufferA2);
+                    kernel.setArg(3, bufferB2); // output in A2,B2
+                }
+                else {
+                    kernel.setArg(0, bufferA2);
+                    kernel.setArg(1, bufferB2);
+                    kernel.setArg(2, bufferA);
+                    kernel.setArg(3, bufferB); // output in A,B
+                }
+                queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
+                iteration++;
+            }
 
-			// retrieve the buffers
-			queue.enqueueReadBuffer(bufferA, CL_TRUE, 0, MEM_SIZE, a);
-			queue.enqueueReadBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, b);
+            // retrieve the buffers
+            queue.enqueueReadBuffer(bufferA, CL_TRUE, 0, MEM_SIZE, a);
+            queue.enqueueReadBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, b);
 
-			end = clock();
+            end = clock();
 
-			char msg[1000];
-			float fps = 0.0;
-			if(end-start>0)
-				fps = N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC);
-			sprintf(msg,"GrayScott - %dms = %0.2f fps",end-start,fps);
+            char msg[1000];
+            float fps = 0.0;
+            if(end-start>0)
+                fps = N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC);
+            sprintf(msg,"GrayScott - %dms = %0.2f fps",end-start,fps);
 
-			// display:
-			if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
-				break;
-		}
+            // display:
+            if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
+                break;
+        }
     } 
-	catch(Error error) 
-	{
+    catch(Error error) 
+    {
        std::cout << error.what() << "(" << error.err() << ")" << std::endl;
     }
 }
@@ -179,7 +179,7 @@ void init(float a[X][Y],float b[X][Y])
     // figure the values
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-			// start with a uniform field with an approximate circle in the middle
+            // start with a uniform field with an approximate circle in the middle
             //if(hypot(i%20-10/*-X/2*/,j%20-10/*-Y/2*/)<=frand(2,5)) {
             if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5))
             {
@@ -187,13 +187,13 @@ void init(float a[X][Y],float b[X][Y])
                 b[i][j] = 1.0f;
             }
             else 
-			{
+            {
                 a[i][j] = 1.0f;
                 b[i][j] = 0.0f;
             }
-			/*float v = frand(0.0f,1.0f);
-			a[i][j] = v;
-			b[i][j] = 1.0f-v;*/
+            /*float v = frand(0.0f,1.0f);
+            a[i][j] = v;
+            b[i][j] = 1.0f-v;*/
         }
     }
 }

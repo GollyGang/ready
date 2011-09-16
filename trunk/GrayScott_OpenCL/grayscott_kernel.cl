@@ -11,21 +11,21 @@ __kernel void grayscott_compute(__global float *A, __global float *B,__global fl
     int iDown = x*Y + ((y-1+Y)%Y);
     int iUp = x*Y + ((y+1)%Y);
     
-	float aval = A[i];
-	float bval = B[i];
-	
-	// diffusion coefficients (b diffuses slower than a)
+    float aval = A[i];
+    float bval = B[i];
+    
+    // diffusion coefficients (b diffuses slower than a)
     float r_a = 0.082f;
     float r_b = 0.041f;
     
     // timestep size (bigger is faster but more unstable)
     float speed = 1.0f;
 
-	// main parameters:
+    // main parameters:
     float k = 0.064f; // spots
     float f = 0.035f;
     
-	// compute the Laplacians of a and b
+    // compute the Laplacians of a and b
     float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] - 4.0f*aval;
     float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] - 4.0f*bval;
     
