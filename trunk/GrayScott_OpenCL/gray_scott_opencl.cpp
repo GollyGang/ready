@@ -114,8 +114,14 @@ int main()
         NDRange global(X,Y);
         NDRange local(8,8);
 
+        kernel.setArg(4, k);
+        kernel.setArg(5, f);
+        kernel.setArg(6, r_a);
+        kernel.setArg(7, r_b);
+        kernel.setArg(8, speed);
+
         int iteration = 0;
-        const int N_FRAMES_PER_DISPLAY = 10000;  // an even number, because of our double-buffering implementation
+        const int N_FRAMES_PER_DISPLAY = 1000;  // an even number, because of our double-buffering implementation
         while(true) 
         {
             start = clock();
