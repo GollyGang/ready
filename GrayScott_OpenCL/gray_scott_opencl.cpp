@@ -111,34 +111,34 @@ int main()
         queue.enqueueWriteBuffer(bufferA, CL_TRUE, 0, MEM_SIZE, a);
         queue.enqueueWriteBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, b);
  
-        NDRange global(X*Y);
-        NDRange local(1);
+        NDRange global(X,Y);
+        NDRange local(1,1);
 
         kernel.setArg(4, X);
         kernel.setArg(5, Y);
 
         int iteration = 0;
-        const int N_FRAMES_PER_DISPLAY = 102;  // an even number, because of our double-buffering implementation
+        const int N_FRAMES_PER_DISPLAY = 100;  // an even number, because of our double-buffering implementation
         while(true) 
         {
             start = clock();
 
             // run a few iterations (without copying the data back)
-            for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+            for(int it=0;it<N_FRAMES_PER_DISPLAY/2;it++)
             {
-                // buffer-switching
-                if(it%2==0) {
-                    kernel.setArg(0, bufferA);
-                    kernel.setArg(1, bufferB);
-                    kernel.setArg(2, bufferA2);
-                    kernel.setArg(3, bufferB2); // output in A2,B2
-                }
-                else {
-                    kernel.setArg(0, bufferA2);
-                    kernel.setArg(1, bufferB2);
-                    kernel.setArg(2, bufferA);
-                    kernel.setArg(3, bufferB); // output in A,B
-                }
+                // (buffer-switching)
+
+                kernel.setArg(0, bufferA);
+                kernel.setArg(1, bufferB);
+                kernel.setArg(2, bufferA2);
+                kernel.setArg(3, bufferB2); // output in A2,B2
+                queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
+                iteration++;
+
+                kernel.setArg(0, bufferA2);
+                kernel.setArg(1, bufferB2);
+                kernel.setArg(2, bufferA);
+                kernel.setArg(3, bufferB); // output in A,B
                 queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
                 iteration++;
             }

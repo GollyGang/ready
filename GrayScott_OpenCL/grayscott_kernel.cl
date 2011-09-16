@@ -1,40 +1,37 @@
 __kernel void grayscott_compute(__global float *A, __global float *B,__global float *A2, __global float *B2,int X,int Y) 
 {
     // Get the index of the current element
-    int i = get_global_id(0);
+    const int x = get_global_id(0);
+    const int y = get_global_id(1);
+    const int i = x*Y+y;
     
-    int y = i%Y;
-    int x = (i-y)/Y;
-    
-    int iLeft = ((x-1+X)%X)*Y + y;
-    int iRight = ((x+1)%X)*Y + y;
-    int iDown = x*Y + ((y-1+Y)%Y);
-    int iUp = x*Y + ((y+1)%Y);
-    
-    float aval = A[i];
-    float bval = B[i];
-    
-    // diffusion coefficients (b diffuses slower than a)
-    float r_a = 0.082f;
-    float r_b = 0.041f;
-    
-    // timestep size (bigger is faster but more unstable)
-    float speed = 1.0f;
-
-    // main parameters:
-    float k = 0.064f; // spots
-    float f = 0.035f;
+    const float aval = A[i];
+    const float bval = B[i];
     
     // compute the Laplacians of a and b
-    float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] - 4.0f*aval;
-    float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] - 4.0f*bval;
+    const int iLeft = ((x-1+X)%X)*Y + y;
+    const int iRight = ((x+1)%X)*Y + y;
+    const int iUp = x*Y + (y-1+Y)%Y;
+    const int iDown = x*Y + (y+1)%Y;
+    const float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] - 4*aval;
+    const float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] - 4*bval;
+    
+    // main parameters:
+    const float k = 0.064f; // spots
+    const float f = 0.035f;
+    
+    // diffusion coefficients (b diffuses slower than a)
+    const float r_a = 0.082f;
+    const float r_b = 0.041f;
     
     // compute the new rate of change
-    float da = r_a * dda - aval*bval*bval + f*(1.0f-aval);
-    float db = r_b * ddb + aval*bval*bval - (f+k)*bval;
+    const float da = r_a * dda - aval*bval*bval + f*(1-aval);
+    const float db = r_b * ddb + aval*bval*bval - (f+k)*bval;
     
+    // timestep size (bigger is faster but more unstable)
+    const float speed = 1.0f;
+
     // apply the change (to the new buffer)
     A2[i] = aval + speed * da;
     B2[i] = bval + speed * db;
 }
-
