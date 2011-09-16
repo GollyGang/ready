@@ -1,3 +1,3 @@
 // the size of the world:
-#define X 260
-#define Y 200
+#define X 256
+#define Y 256

@@ -1,8 +1,10 @@
-__kernel void grayscott_compute(__global float *A, __global float *B,__global float *A2, __global float *B2,int X,int Y) 
+__kernel void grayscott_compute(__global float *A,__global float *B,__global float *A2, __global float *B2) 
 {
     // Get the index of the current element
     const int x = get_global_id(0);
     const int y = get_global_id(1);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
     const int i = x*Y+y;
     
     const float aval = A[i];
