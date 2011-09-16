@@ -9,6 +9,7 @@ add_executable(GrayScott
   gray_scott.cpp 
   ../Display/display.cpp
   ../Display/display.h
+  ../Display/defs.h
 )
 
 TARGET_LINK_LIBRARIES(GrayScott ${OpenCV_LIBS} )

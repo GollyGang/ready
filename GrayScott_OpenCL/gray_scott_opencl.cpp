@@ -112,13 +112,10 @@ int main()
         queue.enqueueWriteBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, b);
  
         NDRange global(X,Y);
-        NDRange local(1,1);
-
-        kernel.setArg(4, X);
-        kernel.setArg(5, Y);
+        NDRange local(8,8);
 
         int iteration = 0;
-        const int N_FRAMES_PER_DISPLAY = 100;  // an even number, because of our double-buffering implementation
+        const int N_FRAMES_PER_DISPLAY = 10000;  // an even number, because of our double-buffering implementation
         while(true) 
         {
             start = clock();
@@ -156,7 +153,7 @@ int main()
             sprintf(msg,"GrayScott - %dms = %0.2f fps",end-start,fps);
 
             // display:
-            if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
+            if(display(a,a,a,iteration,false,200.0f,1,10,msg)) // did user ask to quit?
                 break;
         }
     } 
