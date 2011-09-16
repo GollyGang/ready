@@ -37,19 +37,19 @@ int main()
     float r_a = 0.082f;
     float r_b = 0.041f;
 
-	// for spots:
+    // for spots:
     float k = 0.064f;
     float f = 0.035f;
-	// for stripes:
+    // for stripes:
     //float k = 0.06f;
     //float f = 0.035f;
-	// for long stripes
-	//float k = 0.065f;
-	//float f = 0.056f;
-	// for dots and stripes
-	//float k = 0.064f;
-	//float f = 0.04f;
-	// for spiral waves:
+    // for long stripes
+    //float k = 0.065f;
+    //float f = 0.056f;
+    // for dots and stripes
+    //float k = 0.064f;
+    //float f = 0.04f;
+    // for spiral waves:
     //float k = 0.0475f;
     //float f = 0.0118f;
     float speed = 1.0f;
@@ -63,25 +63,25 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
 
-	clock_t start,end;
+    clock_t start,end;
 
-	const int N_FRAMES_PER_DISPLAY = 100;
+    const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true) 
-	{
-		start = clock();
+    {
+        start = clock();
 
         // compute:
-		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
-		{
-			compute(a,b,da,db,r_a,r_b,f,k,speed);
-	        iteration++;
-		}
+        for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+        {
+            compute(a,b,da,db,r_a,r_b,f,k,speed);
+            iteration++;
+        }
 
-		end = clock();
+        end = clock();
 
-		char msg[1000];
-		sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+        char msg[1000];
+        sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
@@ -107,7 +107,7 @@ void init(float a[X][Y],float b[X][Y])
     // figure the values
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-			// start with a uniform field with an approximate circle in the middle
+            // start with a uniform field with an approximate circle in the middle
             //if(hypot(i%20-10/*-X/2*/,j%20-10/*-Y/2*/)<=frand(2,5)) {
             if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5))
             {
@@ -118,9 +118,9 @@ void init(float a[X][Y],float b[X][Y])
                 a[i][j] = 1;
                 b[i][j] = 0;
             }
-			/*float v = frand(0.0f,1.0f);
-			a[i][j] = v;
-			b[i][j] = 1.0f-v;*/
+            /*float v = frand(0.0f,1.0f);
+            a[i][j] = v;
+            b[i][j] = 1.0f-v;*/
         }
     }
 }
@@ -129,37 +129,37 @@ void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
              float r_a,float r_b,float f,float k,float speed)
 {
-	int iprev,inext,jprev,jnext;
+    int iprev,inext,jprev,jnext;
 
     // compute change in each cell
-	#pragma omp parallel for
+    #pragma omp parallel for
     for(int i = 0; i < X; i++) 
-	{
-		// toroidal
-		iprev = (i + X - 1) % X;
-		inext = (i + 1) % X;
+    {
+        // toroidal
+        iprev = (i + X - 1) % X;
+        inext = (i + 1) % X;
 
         for(int j = 0; j < Y; j++) 
-		{
-			// toroidal
-			jprev = (j + Y - 1) % Y;
-			jnext = (j + 1) % Y;
+        {
+            // toroidal
+            jprev = (j + Y - 1) % Y;
+            jnext = (j + 1) % Y;
 
             float aval = a[i][j];
             float bval = b[i][j];
 
-			// compute the Laplacians of a and b
+            // compute the Laplacians of a and b
             float dda = a[i][jprev] + a[i][jnext] + a[iprev][j] + a[inext][j] - 4*aval;
             float ddb = b[i][jprev] + b[i][jnext] + b[iprev][j] + b[inext][j] - 4*bval;
 
-			// compute the new rate of change of a and b
+            // compute the new rate of change of a and b
             da[i][j] = r_a * dda - aval*bval*bval + f*(1-aval);
             db[i][j] = r_b * ddb + aval*bval*bval - (f+k)*bval;
         }
     }
 
     // effect change
-	#pragma omp parallel for
+    #pragma omp parallel for
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
             a[i][j] += (speed * da[i][j]);

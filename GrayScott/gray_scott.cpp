@@ -61,25 +61,25 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
     
-	clock_t start,end;
+    clock_t start,end;
 
-	const int N_FRAMES_PER_DISPLAY = 100;
+    const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
     while(true) 
     {
-		start = clock();
+        start = clock();
 
         // compute:
-		for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
-		{
+        for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
+        {
             compute(a,b,da,db,r_a,r_b,f,k,speed,false);
             iteration++;
         }
 
-		end = clock();
+        end = clock();
 
-		char msg[1000];
-		sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+        char msg[1000];
+        sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
