@@ -86,7 +86,9 @@ int main()
         CommandQueue queue = CommandQueue(context, devices[0]);
  
         // Read source file
-        std::ifstream sourceFile("E:\\CUDA\\reaction-diffusion\\GrayScott_OpenCL\\grayscott_kernel.cl");
+        std::string kfn = CL_SOURCE_DIR;
+        kfn += "/grayscott_kernel.cl";
+        std::ifstream sourceFile(kfn.c_str());
         std::string sourceCode(
             std::istreambuf_iterator<char>(sourceFile),
             (std::istreambuf_iterator<char>()));

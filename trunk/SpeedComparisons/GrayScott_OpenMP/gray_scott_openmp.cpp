@@ -129,21 +129,20 @@ void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
              float r_a,float r_b,float f,float k,float speed)
 {
-    int iprev,inext,jprev,jnext;
 
     // compute change in each cell
     #pragma omp parallel for
     for(int i = 0; i < X; i++) 
     {
         // toroidal
-        iprev = (i + X - 1) % X;
-        inext = (i + 1) % X;
+        int iprev = (i + X - 1) % X;
+        int inext = (i + 1) % X;
 
         for(int j = 0; j < Y; j++) 
         {
             // toroidal
-            jprev = (j + Y - 1) % Y;
-            jnext = (j + 1) % Y;
+            int jprev = (j + Y - 1) % Y;
+            int jnext = (j + 1) % Y;
 
             float aval = a[i][j];
             float bval = b[i][j];

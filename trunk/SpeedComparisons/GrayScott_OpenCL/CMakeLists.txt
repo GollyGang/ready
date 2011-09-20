@@ -6,8 +6,8 @@ link_libraries( ${OpenCV_LIBS} )
 
 
 # only build the OpenCL version if OpenCL was found
-find_package ( OpenCL)
-if(OpenCL_FOUND)
+find_package ( OpenCL )
+if(OPENCL_FOUND)
   include_directories ( ${OPENCL_INCLUDE_DIRS} )
   link_libraries ( ${OPENCL_LIBRARIES} )
 
