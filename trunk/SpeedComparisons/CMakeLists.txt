@@ -4,6 +4,7 @@ project(SpeedComparisons)
 
 add_subdirectory(GrayScott)
 add_subdirectory(GrayScott_double)
+add_subdirectory(GrayScott_SSE)
 add_subdirectory(GrayScott_OpenMP)
 add_subdirectory(GrayScott_OpenCL)
 
