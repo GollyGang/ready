@@ -69,7 +69,6 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
             }
         }
     }
-	#pragma omp parallel for
     for(int i=0;i<X;i++)
     {
         for(int j=0;j<Y;j++)
@@ -106,21 +105,6 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
 	{
 		sprintf(txt,"%d",iteration);
 		cvPutText(im3,txt,cvPoint(20,20),&font,white);
-
-		// DEBUG:
-		sprintf(txt,"%.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
-		//cvPutText(im3,txt,cvPoint(20,40),&font,white);
-	}
-
-	// DEBUG:
-	if(write_video)
-	{
-		cvPutText(im3,"0.06",cvPoint(5,15),&font,white);
-		cvPutText(im3,"F",cvPoint(5,im2->height/2),&font,white);
-		cvPutText(im3,"0.00",cvPoint(5,im2->height),&font,white);
-		cvPutText(im3,"0.03",cvPoint(border*2-10,im2->height+15),&font,white);
-		cvPutText(im3,"K",cvPoint(border*2+im2->width/2,im2->height+15),&font,white);
-		cvPutText(im3,"0.07",cvPoint(im3->width-35,im2->height+15),&font,white);
 	}
 
 	cvPutText(im3,message,cvPoint(20,40),&font,white);

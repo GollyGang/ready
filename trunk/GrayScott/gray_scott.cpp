@@ -22,8 +22,7 @@ void init(float a[X][Y],float b[X][Y]);
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
              float r_a,float r_b,float f,float k,
-             float speed,
-             bool parameter_space);
+             float speed);
 
 int main()
 {
@@ -72,7 +71,7 @@ int main()
         // compute:
         for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
         {
-            compute(a,b,da,db,r_a,r_b,f,k,speed,false);
+            compute(a,b,da,db,r_a,r_b,f,k,speed);
             iteration++;
         }
 
@@ -127,8 +126,7 @@ void init(float a[X][Y],float b[X][Y])
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
-             float r_a,float r_b,float f,float k,float speed,
-             bool parameter_space)
+             float r_a,float r_b,float f,float k,float speed)
 {
     //const bool toroidal = false;
 
@@ -160,13 +158,6 @@ void compute(float a[X][Y],float b[X][Y],
             float aval = a[i][j];
             float bval = b[i][j];
 
-            if(parameter_space)	{
-                const float kmin=0.045f,kmax=0.07f,fmin=0.00f,fmax=0.14f;
-                // set f and k for this location (ignore the provided values of f and k)
-                k = kmin + i*(kmax-kmin)/X;
-                f = fmin + j*(fmax-fmin)/Y;
-            }
-
             // compute the Laplacians of a and b
             float dda = a[i][jprev] + a[i][jnext] + a[iprev][j] + a[inext][j] - 4*aval;
             float ddb = b[i][jprev] + b[i][jnext] + b[iprev][j] + b[inext][j] - 4*bval;
@@ -180,8 +171,8 @@ void compute(float a[X][Y],float b[X][Y],
     // effect change
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
-            a[i][j] += (speed * da[i][j]);// + frand(-0.001f,0.001f);
-            b[i][j] += (speed * db[i][j]);// + frand(-0.001f,0.001f);
+            a[i][j] += speed * da[i][j];
+            b[i][j] += speed * db[i][j];
         }
     }
 }
