@@ -58,8 +58,7 @@ Build instructions:
 
 Tested on Linux and Windows XP. Should work on all operating systems.
 
-There's a GrayScott_OpenCL folder which isn't built by default, edit
-the root CMakeLists.txt to include it if you have OpenCL available.
+There's a SpeedComparisons folder which isn't built by default. If you're interested in OpenMP, OpenCL etc. then you can build it.
 
 ------------------------
 
