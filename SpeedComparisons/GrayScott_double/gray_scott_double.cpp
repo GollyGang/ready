@@ -319,10 +319,17 @@ void compute(double a[X][Y],double b[X][Y],
     }
 
     // effect change
-    for(int i = 0; i < X; i++) {
-        for(int j = 0; j < Y; j++) {
-            a[i][j] += (speed * da[i][j]);// + frand(-0.001f,0.001f);
-            b[i][j] += (speed * db[i][j]);// + frand(-0.001f,0.001f);
+    for(int i = 0; i < X; i++) 
+    {
+        for(int j = 0; j < Y; j++) 
+        {
+            a[i][j] += speed * da[i][j];
+            b[i][j] += speed * db[i][j];
+            // flush denormals to zero (haven't seen a benefit when using doubles)
+            /*if(fabs(a[i][j])<1.0E-5)
+                a[i][j]=0.0;
+            if(fabs(b[i][j])<1.0E-5)
+                b[i][j]=0.0;*/
         }
     }
 }

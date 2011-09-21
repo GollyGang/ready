@@ -106,7 +106,7 @@ void init(float a[X][Y],float b[X][Y])
     for(int i = 0; i < X; i++) {
         for(int j = 0; j < Y; j++) {
             
-            //if(hypot(i%10-5/*-X/2*/,j%10-5/*-Y/2*/)<=2.0f)//frand(2,3))
+            //if(hypot(i%50-25/*-X/2*/,j%50-25/*-Y/2*/)<=frand(2,5))
             if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
             {
                 a[i][j] = 0.0f;
@@ -178,10 +178,17 @@ void compute(float a[X][Y],float b[X][Y],
     }
 
     // effect change
-    for(int i = 0; i < X; i++) {
-        for(int j = 0; j < Y; j++) {
-            a[i][j] += (speed * da[i][j]);// + frand(-0.001f,0.001f);
-            b[i][j] += (speed * db[i][j]);// + frand(-0.001f,0.001f);
+    for(int i = 0; i < X; i++) 
+    {
+        for(int j = 0; j < Y; j++) 
+        {
+            a[i][j] += speed * da[i][j];
+            b[i][j] += speed * db[i][j];
+            // flush denormals to zero (essential for performance with floats and some scenes)
+            if(fabs(a[i][j])<1.0E-5)
+                a[i][j]=0.0f;
+            if(fabs(b[i][j])<1.0E-5)
+                b[i][j]=0.0f;
         }
     }
 }
