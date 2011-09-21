@@ -10,18 +10,18 @@
 
 bool display(float r[X][Y],float g[X][Y],float b[X][Y],
              int iteration,bool auto_brighten,float manual_brighten,
-			 int scale,int delay_ms,const char* message)
+             int scale,int delay_ms,const char* message)
 {
     static bool need_init = true;
-	static bool write_video = false;
+    static bool write_video = false;
 
     static IplImage *im,*im2,*im3;
-	static int border = 0;
+    static int border = 0;
     static CvFont font;
-	static CvVideoWriter *video;
-	static const CvScalar white = cvScalar(255,255,255);
+    static CvVideoWriter *video;
+    static const CvScalar white = cvScalar(255,255,255);
 
-	const char *title = "Press ESC to quit";
+    const char *title = "Press ESC to quit";
 
     if(need_init)
     {
@@ -39,11 +39,11 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
         int lineWidth=1;
         cvInitFont(&font,CV_FONT_HERSHEY_COMPLEX,hScale,vScale,0,lineWidth,CV_AA);
 
-		if(write_video)
-		{
-			video = cvCreateVideoWriter(title,CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
-			border = 20;
-		}
+        if(write_video)
+        {
+            video = cvCreateVideoWriter(title,CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
+            border = 20;
+        }
     }
 
     // convert float arrays to IplImage for OpenCV to display
@@ -54,79 +54,79 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
         {
             for(int j=0;j<Y;j++)
             {
-				if(r) {
-					val = r[i][j];
-					if(val<minR) minR=val; if(val>maxR) maxR=val;
-				}
-				if(g) {
-					val = g[i][j];
-					if(val<minG) minG=val; if(val>maxG) maxG=val;
-				}
-				if(b) {
-					val = b[i][j];
-					if(val<minB) minB=val; if(val>maxB) maxB=val;
-				}
+                if(r) {
+                    val = r[i][j];
+                    if(val<minR) minR=val; if(val>maxR) maxR=val;
+                }
+                if(g) {
+                    val = g[i][j];
+                    if(val<minG) minG=val; if(val>maxG) maxG=val;
+                }
+                if(b) {
+                    val = b[i][j];
+                    if(val<minB) minB=val; if(val>maxB) maxB=val;
+                }
             }
         }
     }
-	#pragma omp parallel for
+    #pragma omp parallel for
     for(int i=0;i<X;i++)
     {
         for(int j=0;j<Y;j++)
         {
-			if(r) {
-				float val = r[i][Y-j-1];
-				if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
-				else val *= manual_brighten;
-				if(val<0) val=0; if(val>255) val=255;
-				((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
-			}
-			if(g) {
-				float val = g[i][Y-j-1];
-				if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
-				else val *= manual_brighten;
-				if(val<0) val=0; if(val>255) val=255;
-				((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
-			}
-			if(b) {
-				float val = b[i][Y-j-1];
-				if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
-				else val *= manual_brighten;
-				if(val<0) val=0; if(val>255) val=255;
-				((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 0] = (uchar)val;
-			}
+            if(r) {
+                float val = r[i][Y-j-1];
+                if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
+            }
+            if(g) {
+                float val = g[i][Y-j-1];
+                if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
+            }
+            if(b) {
+                float val = b[i][Y-j-1];
+                if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 0] = (uchar)val;
+            }
         }
     }
 
     cvResize(im,im2);
-	cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
+    cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
 
-	char txt[100];
-	if(!write_video)
-	{
-		sprintf(txt,"%d",iteration);
-		cvPutText(im3,txt,cvPoint(20,20),&font,white);
+    char txt[100];
+    if(!write_video)
+    {
+        sprintf(txt,"%d",iteration);
+        cvPutText(im3,txt,cvPoint(20,20),&font,white);
 
-		// DEBUG:
-		sprintf(txt,"%.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
-		//cvPutText(im3,txt,cvPoint(20,40),&font,white);
-	}
+        // DEBUG:
+        sprintf(txt,"%.4f,%.4f,%.4f",r[0][0],g[0][0],b[0][0]);
+        //cvPutText(im3,txt,cvPoint(20,40),&font,white);
+    }
 
-	// DEBUG:
-	if(write_video)
-	{
-		cvPutText(im3,"0.06",cvPoint(5,15),&font,white);
-		cvPutText(im3,"F",cvPoint(5,im2->height/2),&font,white);
-		cvPutText(im3,"0.00",cvPoint(5,im2->height),&font,white);
-		cvPutText(im3,"0.03",cvPoint(border*2-10,im2->height+15),&font,white);
-		cvPutText(im3,"K",cvPoint(border*2+im2->width/2,im2->height+15),&font,white);
-		cvPutText(im3,"0.07",cvPoint(im3->width-35,im2->height+15),&font,white);
-	}
+    // DEBUG:
+    if(write_video)
+    {
+        cvPutText(im3,"0.06",cvPoint(5,15),&font,white);
+        cvPutText(im3,"F",cvPoint(5,im2->height/2),&font,white);
+        cvPutText(im3,"0.00",cvPoint(5,im2->height),&font,white);
+        cvPutText(im3,"0.03",cvPoint(border*2-10,im2->height+15),&font,white);
+        cvPutText(im3,"K",cvPoint(border*2+im2->width/2,im2->height+15),&font,white);
+        cvPutText(im3,"0.07",cvPoint(im3->width-35,im2->height+15),&font,white);
+    }
 
-	cvPutText(im3,message,cvPoint(20,40),&font,white);
+    cvPutText(im3,message,cvPoint(20,40),&font,white);
 
-	if(write_video)
-		cvWriteFrame(video,im3);
+    if(write_video)
+        cvWriteFrame(video,im3);
 
     cvShowImage(title,im3);
     
@@ -136,8 +136,8 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
         cvDestroyWindow(title);
         cvReleaseImage(&im);
         cvReleaseImage(&im2);
-		if(write_video)
-			cvReleaseVideoWriter(&video);
+        if(write_video)
+            cvReleaseVideoWriter(&video);
         return true;
     }
     return false;
