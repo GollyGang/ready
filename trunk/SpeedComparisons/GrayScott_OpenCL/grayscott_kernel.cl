@@ -20,12 +20,12 @@ __kernel void grayscott_compute(__global float *A,__global float *B,__global flo
     const int iRight = xp1*Y + y;
     const int iUp = x*Y + ym1;
     const int iDown = x*Y + yp1;
-    const int iUpLeft = xm1*Y + ym1;
-    const int iUpRight = xp1*Y + ym1;
-    const int iDownLeft = xm1*Y + yp1;
-    const int iDownRight = xp1*Y + yp1;
     const float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] - 4*aval; // (faster to use von Neumann neighborhood but sometimes get grid artefacts)
     const float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] - 4*bval;
+    //const int iUpLeft = xm1*Y + ym1;
+    //const int iUpRight = xp1*Y + ym1;
+    //const int iDownLeft = xm1*Y + yp1;
+    //const int iDownRight = xp1*Y + yp1;
     //const float dda = A[iLeft] + A[iRight] + A[iUp] + A[iDown] + A[iUpLeft] + A[iUpRight] + A[iDownLeft] + A[iDownRight] - 8*aval;
     //const float ddb = B[iLeft] + B[iRight] + B[iUp] + B[iDown] + B[iUpLeft] + B[iUpRight] + B[iDownLeft] + B[iDownRight] - 8*bval;
     
