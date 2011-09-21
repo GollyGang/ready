@@ -16,7 +16,15 @@ See README.txt for more details.
 // OpenCL:
 #define __NO_STD_VECTOR // Use cl::vector instead of STL version
 #define __CL_ENABLE_EXCEPTIONS
+
+// cl.hpp is standard but doesn't come with most SDKs, so download it from here:
+// http://www.khronos.org/registry/cl/api/1.1/cl.hpp
+#ifdef __APPLE__
+#include "cl.hpp"
+#else
 #include <CL/cl.hpp>
+#endif
+
 using namespace cl;
 
 // STL:
