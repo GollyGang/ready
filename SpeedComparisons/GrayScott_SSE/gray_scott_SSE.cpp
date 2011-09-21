@@ -12,7 +12,6 @@ See README.txt for more details.
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <malloc.h> // for _mm_malloc() on Windows
 
 // SSE:
 #include <xmmintrin.h>
@@ -43,7 +42,7 @@ int main()
 
 	const int SSELength = length / 4;
 
-	for (int stress = 0; stress < 1000; stress++)
+	for (int stress = 0; stress < 10000; stress++)
 	{
 #define USE_SSE	// Define this if you want to run with SSE
 #ifdef USE_SSE
