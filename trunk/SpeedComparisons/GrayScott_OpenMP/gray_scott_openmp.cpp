@@ -65,7 +65,7 @@ int main()
 
     clock_t start,end;
 
-    const int N_FRAMES_PER_DISPLAY = 100;
+    const int N_FRAMES_PER_DISPLAY = 1000;
     int iteration = 0;
     while(true) 
     {
@@ -159,10 +159,17 @@ void compute(float a[X][Y],float b[X][Y],
 
     // effect change
     #pragma omp parallel for
-    for(int i = 0; i < X; i++) {
-        for(int j = 0; j < Y; j++) {
-            a[i][j] += (speed * da[i][j]);
-            b[i][j] += (speed * db[i][j]);
+    for(int i = 0; i < X; i++) 
+    {
+        for(int j = 0; j < Y; j++) 
+        {
+            a[i][j] += speed * da[i][j];
+            b[i][j] += speed * db[i][j];
+            // flush denormals to zero
+            if(fabs(a[i][j])<1.0E-5)
+                a[i][j]=0.0f;
+            if(fabs(b[i][j])<1.0E-5)
+                b[i][j]=0.0f;
         }
     }
 }

@@ -1,9 +1,11 @@
 project(GrayScott_OpenCL)
 
+set(CMAKE_MODULE_PATH ${GrayScott_OpenCL_SOURCE_DIR})
+# (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
+
 find_package(OpenCV REQUIRED)
 include_directories( ${OPENCV_INCLUDE_DIR})
 link_libraries( ${OpenCV_LIBS} )
-
 
 # only build the OpenCL version if OpenCL was found
 find_package ( OpenCL )
