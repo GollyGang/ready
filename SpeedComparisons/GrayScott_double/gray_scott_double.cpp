@@ -325,11 +325,9 @@ void compute(double a[X][Y],double b[X][Y],
         {
             a[i][j] += speed * da[i][j];
             b[i][j] += speed * db[i][j];
-            // flush denormals to zero (haven't seen a benefit when using doubles)
-            /*if(fabs(a[i][j])<1.0E-5)
-                a[i][j]=0.0;
-            if(fabs(b[i][j])<1.0E-5)
-                b[i][j]=0.0;*/
+            // kill denormals by adding a teeny tiny something (http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.20.1348&rank=4)
+            a[i][j] += 1e-20;
+            b[i][j] += 1e-20;
         }
     }
 }
