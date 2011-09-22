@@ -68,9 +68,9 @@ int main()
     float *b = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *da = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *db = (float*)_mm_malloc(n_cells*sizeof(float),16);
-
+    
     init(a,b);
-
+    
     clock_t start,end;
 
     const int N_FRAMES_PER_DISPLAY = 1000;
@@ -149,7 +149,7 @@ void compute(float *a,float *b,float *da,float *db,
         for(int j=0;j<Y;j++)
         {
             // TODO!
-            da[at(i,j)]=-0.00001f;
+            da[at(i,j)]=0.0f;
             db[at(i,j)]=0.0f;
         }
     }
@@ -230,7 +230,6 @@ bool display(float *r,float *g,float *b,
             }
         }
     }
-    #pragma omp parallel for
     for(int i=0;i<X;i++)
     {
         for(int j=0;j<Y;j++)
