@@ -16,75 +16,275 @@ See README.txt for more details.
 // SSE:
 #include <xmmintrin.h>
 
+// OpenCV:
+#include <cv.h>
+#include <highgui.h>
+
 // local:
-//#include "defs.h"
+#include "defs.h"
 //#include "display.h"
 
-// N.B.! This is not yet a working implementation of Gray-Scott, still just exploring SSE tutorials:
+
+inline int at(int x,int y) { return x*Y+y; }
+
+void init(float *a,float *b);
+void compute(float *a,float *b,float *da,float *db,
+             float r_a,float r_b,float f,float k,
+             float speed);
+bool display(float *r,float *g,float *b,
+             int iteration,bool auto_brighten,float manual_brighten,
+             int scale,int delay_ms,const char* message);
 
 int main()
 {
-    printf("Starting calculation...\n");
+    // Here we implement the Gray-Scott model, as described here:
+    // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
+    // http://arxiv.org/abs/patt-sol/9304003
+
+    // -- parameters --
+    float r_a = 0.082f;
+    float r_b = 0.041f;
+
+    // for spots:
+    float k = 0.064f;
+    float f = 0.035f;
+    // for stripes:
+    //float k = 0.06f;
+    //float f = 0.035f;
+    // for long stripes
+    //float k = 0.065f;
+    //float f = 0.056f;
+    // for dots and stripes
+    //float k = 0.064f;
+    //float f = 0.04f;
+    // for spiral waves:
+    //float k = 0.0475f;
+    //float f = 0.0118f;
+    float speed = 1.0f;
+    // ----------------
+
+    const int n_cells = X*Y;
+    float *a = (float*)_mm_malloc(n_cells*sizeof(float),16);
+    float *b = (float*)_mm_malloc(n_cells*sizeof(float),16);
+    float *da = (float*)_mm_malloc(n_cells*sizeof(float),16);
+    float *db = (float*)_mm_malloc(n_cells*sizeof(float),16);
+
+    init(a,b);
 
     clock_t start,end;
-    start = clock();
 
-    const int length = 64000;
-
-    // We will be calculating Y = sqrt(x) / x, for x = 1->64000
-
-    // If you do not properly align your data for SSE instructions, you may take a huge performance hit.
-    float *pResult = (float*)_mm_malloc(length*sizeof(float),16);
-
-    __m128 x;
-    __m128 xDelta = _mm_set1_ps(4.0f);		// Set the xDelta to (4,4,4,4)
-    __m128 *pResultSSE = (__m128*) pResult;
-
-    const int SSELength = length / 4;
-
-    for (int stress = 0; stress < 100000; stress++)
+    const int N_FRAMES_PER_DISPLAY = 1000;
+    int iteration = 0;
+    while(true) 
     {
-#define USE_SSE	// Define this if you want to run with SSE
-#ifdef USE_SSE
-        x = _mm_set_ps(4.0f, 3.0f, 2.0f, 1.0f);	// Set the initial values of x to (4,3,2,1)
+        start = clock();
 
-        for (int i=0; i < SSELength; i++)
+        // compute:
+        for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
         {
-            __m128 xSqrt = _mm_sqrt_ps(x);
-
-            // Note! Division is slow. It's actually faster to take the reciprocal of a number and multiply
-            // Also note that Division is more accurate than taking the reciprocal and multiplying
-            pResultSSE[i] = _mm_div_ps(xSqrt, x);
-            
-            // NOTE! Sometimes, the order in which things are done in SSE may seem reversed.
-            // When the command above executes, the four floating elements are actually flipped around
-            // We have already compensated for that flipping by setting the initial x vector to (4,3,2,1) instead of (1,2,3,4)
-
-            x = _mm_add_ps(x, xDelta);	// Advance x to the next set of numbers
+            compute(a,b,da,db,r_a,r_b,f,k,speed);
+            iteration++;
         }
-#endif	// USE_SSE
-#ifndef USE_SSE
-        float xFloat = 1.0f;
-        for (int i=0 ; i < length; i++)
-        {
-            pResult[i] = sqrt(xFloat) / xFloat;	// Even though division is slow, there are no intrinsic functions like there are in SSE
-            xFloat += 1.0f;
-        }
-#endif	// !USE_SSE
+
+        end = clock();
+
+        char msg[1000];
+        sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+
+        // display:
+        if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
+            break;
     }
 
-    end = clock();
-
-    // To prove that the program actually worked
-    for (int i=0; i < 20; i++)
-    {
-        printf("Result[%d] = %f\n", i, pResult[i]);
-    }
-
-    printf("%f seconds\n",(end-start)/(float)CLOCKS_PER_SEC);
-
-    _mm_free(pResult);
-
-    return 0;
+    _mm_free(a);
+    _mm_free(b);
+    _mm_free(da);
+    _mm_free(db);
 }
 
+// return a random value between lower and upper
+float frand(float lower,float upper)
+{
+    return lower + rand()*(upper-lower)/RAND_MAX;
+}
+
+void init(float *a,float *b)
+{
+    srand((unsigned int)time(NULL));
+    
+    // figure the values
+    for(int i = 0; i < X; i++) 
+    {
+        for(int j = 0; j < Y; j++) 
+        {
+            //if(hypot(i%50-25/*-X/2*/,j%50-25/*-Y/2*/)<=frand(2,5))
+            if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            {
+                a[at(i,j)] = 0.0f;
+                b[at(i,j)] = 1.0f;
+            }
+            else {
+                a[at(i,j)] = 1;
+                b[at(i,j)] = 0;
+            }
+        }
+    }
+}
+
+void compute(float *a,float *b,float *da,float *db,
+             float r_a,float r_b,float f,float k,
+             float speed)
+{
+    const int VALS_PER_MM128 = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
+    const int n_steps = X*Y / VALS_PER_MM128;
+    __m128 *a_SSE = (__m128*) a;
+    __m128 *b_SSE = (__m128*) b;
+    __m128 *da_SSE = (__m128*) da;
+    __m128 *db_SSE = (__m128*) db;
+    __m128 x;
+
+    // compute the rates of change
+    for(int i=0;i<X;i++)
+    {
+        for(int j=0;j<Y;j++)
+        {
+            // TODO!
+            da[at(i,j)]=-0.00001f;
+            db[at(i,j)]=0.0f;
+        }
+    }
+
+    // apply the rate of change
+    __m128 speed_SSE = _mm_set1_ps(speed); // set speed_SSE to (speed,speed,speed,speed)
+    for(int i=0;i<n_steps;i++)
+    {
+        // a += speed * da;
+        x = _mm_mul_ps(*da_SSE,speed_SSE);
+        *a_SSE = _mm_add_ps(*a_SSE,x);
+        // b += speed * db;
+        x = _mm_mul_ps(*db_SSE,speed_SSE);
+        *b_SSE = _mm_add_ps(*b_SSE,x);
+        a_SSE++;
+        b_SSE++;
+    }
+}
+
+bool display(float *r,float *g,float *b,
+             int iteration,bool auto_brighten,float manual_brighten,
+             int scale,int delay_ms,const char* message)
+{
+    static bool need_init = true;
+    static bool write_video = false;
+
+    static IplImage *im,*im2,*im3;
+    static int border = 0;
+    static CvFont font;
+    static CvVideoWriter *video;
+    static const CvScalar white = cvScalar(255,255,255);
+
+    const char *title = "Press ESC to quit";
+
+    if(need_init)
+    {
+        need_init = false;
+
+        im = cvCreateImage(cvSize(X,Y),IPL_DEPTH_8U,3);
+        cvSet(im,cvScalar(0,0,0));
+        im2 = cvCreateImage(cvSize(X*scale,Y*scale),IPL_DEPTH_8U,3);
+        im3 = cvCreateImage(cvSize(X*scale+border*2,Y*scale+border),IPL_DEPTH_8U,3);
+        
+        cvNamedWindow(title,CV_WINDOW_AUTOSIZE);
+        
+        double hScale=0.4;
+        double vScale=0.4;
+        int lineWidth=1;
+        cvInitFont(&font,CV_FONT_HERSHEY_COMPLEX,hScale,vScale,0,lineWidth,CV_AA);
+
+        if(write_video)
+        {
+            video = cvCreateVideoWriter(title,CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
+            border = 20;
+        }
+    }
+
+    // convert float arrays to IplImage for OpenCV to display
+    float val,minR=FLT_MAX,maxR=-FLT_MAX,minG=FLT_MAX,maxG=-FLT_MAX,minB=FLT_MAX,maxB=-FLT_MAX;
+    if(auto_brighten)
+    {
+        for(int i=0;i<X;i++)
+        {
+            for(int j=0;j<Y;j++)
+            {
+                if(r) {
+                    val = r[at(i,j)];
+                    if(val<minR) minR=val; if(val>maxR) maxR=val;
+                }
+                if(g) {
+                    val = g[at(i,j)];
+                    if(val<minG) minG=val; if(val>maxG) maxG=val;
+                }
+                if(b) {
+                    val = b[at(i,j)];
+                    if(val<minB) minB=val; if(val>maxB) maxB=val;
+                }
+            }
+        }
+    }
+    #pragma omp parallel for
+    for(int i=0;i<X;i++)
+    {
+        for(int j=0;j<Y;j++)
+        {
+            if(r) {
+                float val = r[at(i,Y-j-1)];
+                if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
+            }
+            if(g) {
+                float val = g[at(i,Y-j-1)];
+                if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
+            }
+            if(b) {
+                float val = b[at(i,Y-j-1)];
+                if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
+                else val *= manual_brighten;
+                if(val<0) val=0; if(val>255) val=255;
+                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 0] = (uchar)val;
+            }
+        }
+    }
+
+    cvResize(im,im2);
+    cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
+
+    char txt[100];
+    if(!write_video)
+    {
+        sprintf(txt,"%d",iteration);
+        cvPutText(im3,txt,cvPoint(20,20),&font,white);
+    }
+
+    cvPutText(im3,message,cvPoint(20,40),&font,white);
+
+    if(write_video)
+        cvWriteFrame(video,im3);
+
+    cvShowImage(title,im3);
+    
+    int key = cvWaitKey(delay_ms); // allow time for the image to be drawn
+    if(key==27) // did user ask to quit?
+    {
+        cvDestroyWindow(title);
+        cvReleaseImage(&im);
+        cvReleaseImage(&im2);
+        if(write_video)
+            cvReleaseVideoWriter(&video);
+        return true;
+    }
+    return false;
+}
