@@ -26,8 +26,13 @@ See README.txt for more details.
 
 
 inline int at(int x,int y) { return x*Y+y; }
+const int FLOATS_PER_BLOCK = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
+const int X_BLOCKS = X / FLOATS_PER_BLOCK; // 4 horizontally-neighboring cells form an SSE block
+const int Y_BLOCKS = Y;
+const int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
+inline int block_at(int x,int y) { return x*Y_BLOCKS+y; }
 
-void init(float *a,float *b);
+void init(float *a,float *b,float *da,float *db);
 void compute(float *a,float *b,float *da,float *db,
              float r_a,float r_b,float f,float k,
              float speed);
@@ -69,11 +74,11 @@ int main()
     float *da = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *db = (float*)_mm_malloc(n_cells*sizeof(float),16);
     
-    init(a,b);
+    init(a,b,da,db);
     
     clock_t start,end;
 
-    const int N_FRAMES_PER_DISPLAY = 1000;
+    const int N_FRAMES_PER_DISPLAY = 10000;
     int iteration = 0;
     while(true) 
     {
@@ -108,7 +113,7 @@ float frand(float lower,float upper)
     return lower + rand()*(upper-lower)/RAND_MAX;
 }
 
-void init(float *a,float *b)
+void init(float *a,float *b,float *da,float *db)
 {
     srand((unsigned int)time(NULL));
     
@@ -127,6 +132,16 @@ void init(float *a,float *b)
                 a[at(i,j)] = 1;
                 b[at(i,j)] = 0;
             }
+            if(abs(j-100)<10 && abs(i-80)<12)
+            {
+                da[at(i,j)]=0.00001f;
+                db[at(i,j)]=0.0f;
+            }
+            else
+            {
+                da[at(i,j)]=0.0f;
+                db[at(i,j)]=0.0f;
+            }
         }
     }
 }
@@ -135,37 +150,54 @@ void compute(float *a,float *b,float *da,float *db,
              float r_a,float r_b,float f,float k,
              float speed)
 {
-    const int VALS_PER_MM128 = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
-    const int n_steps = X*Y / VALS_PER_MM128;
     __m128 *a_SSE = (__m128*) a;
     __m128 *b_SSE = (__m128*) b;
     __m128 *da_SSE = (__m128*) da;
     __m128 *db_SSE = (__m128*) db;
-    __m128 x;
+    __m128 x_SSE;
+    __m128 dda_SSE,ddb_SSE;
+    __m128 minus_four_SSE = _mm_set1_ps(-4.0f); // set four to (-4,-4,-4,-4)
 
     // compute the rates of change
-    for(int i=0;i<X;i++)
+    for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks for now (for simplicity)
     {
-        for(int j=0;j<Y;j++)
+        a_SSE += X_BLOCKS+1;
+        b_SSE += X_BLOCKS+1;
+        da_SSE += X_BLOCKS+1;
+        db_SSE += X_BLOCKS+1;
+        for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks for now
         {
-            // TODO!
-            da[at(i,j)]=0.0f;
-            db[at(i,j)]=0.0f;
+            // retrieve a block containing the 4 cells to the left of our 4 cells
+            // find the Laplacian of a (using the von Neumann neighborhood)
+            dda_SSE = _mm_mul_ps(*a_SSE,minus_four_SSE);
+            //dda_SSE = _mm_add_ps(dda_SSE,);
+
+            // find the Laplacian of b
+            // ddb = 
+            // compute the new rates of changes
+            // da_SSE = 
+            // db_SSE = 
         }
     }
 
     // apply the rate of change
     __m128 speed_SSE = _mm_set1_ps(speed); // set speed_SSE to (speed,speed,speed,speed)
-    for(int i=0;i<n_steps;i++)
+    a_SSE = (__m128*) a;
+    b_SSE = (__m128*) b;
+    da_SSE = (__m128*) da;
+    db_SSE = (__m128*) db;
+    for(int i=0;i<TOTAL_BLOCKS;i++)
     {
-        // a += speed * da;
-        x = _mm_mul_ps(*da_SSE,speed_SSE);
-        *a_SSE = _mm_add_ps(*a_SSE,x);
-        // b += speed * db;
-        x = _mm_mul_ps(*db_SSE,speed_SSE);
-        *b_SSE = _mm_add_ps(*b_SSE,x);
+        // a[i] += speed * da[i];
+        x_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
+        *a_SSE = _mm_add_ps(*a_SSE,x_SSE);
         a_SSE++;
+        da_SSE++;
+        // b[i] += speed * db[i];
+        x_SSE = _mm_mul_ps(*db_SSE,speed_SSE);
+        *b_SSE = _mm_add_ps(*b_SSE,x_SSE);
         b_SSE++;
+        db_SSE++;
     }
 }
 
