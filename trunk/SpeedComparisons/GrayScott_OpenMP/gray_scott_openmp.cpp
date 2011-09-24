@@ -11,6 +11,7 @@ See README.txt for more details.
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include <math.h>
 
 // OpenMP:
@@ -26,6 +27,8 @@ void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
              float r_a,float r_b,float f,float k,
              float speed);
+
+static int g_nthreads;
 
 int main()
 {
@@ -63,13 +66,16 @@ int main()
     // put the initial conditions into each cell
     init(a,b);
 
-    clock_t start,end;
-
     const int N_FRAMES_PER_DISPLAY = 1000;
     int iteration = 0;
     while(true) 
     {
-        start = clock();
+        struct timeval tod_record;
+        double tod_before, tod_after, tod_elap;
+
+        gettimeofday(&tod_record, 0);
+        tod_before = ((double) (tod_record.tv_sec))
+                                    + ((double) (tod_record.tv_usec)) / 1.0e6;
 
         // compute:
         for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
@@ -78,10 +84,16 @@ int main()
             iteration++;
         }
 
-        end = clock();
+        gettimeofday(&tod_record, 0);
+        tod_after = ((double) (tod_record.tv_sec))
+                                    + ((double) (tod_record.tv_usec)) / 1.0e6;
+
+        tod_elap = tod_after - tod_before;
 
         char msg[1000];
-        sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+        double fps;
+        fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elap;
+        sprintf(msg,"GrayScott %d threads %0.2f fps", g_nthreads, fps);
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
@@ -102,6 +114,11 @@ float frand(float lower,float upper)
 
 void init(float a[X][Y],float b[X][Y])
 {
+  #pragma omp parallel default(shared)
+  {
+    g_nthreads = omp_get_num_threads();
+  }
+
     srand((unsigned int)time(NULL));
     
     // figure the values
