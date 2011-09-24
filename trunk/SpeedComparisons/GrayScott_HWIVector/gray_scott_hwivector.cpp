@@ -13,8 +13,11 @@ See README.txt for more details.
 #endif
 
 // To convince yourself that the macro library works on any hardware,
-// un-comment this "#define HWIV_EMULATE"
-// #define HWIV_EMULATE
+// un-comment this "#define HWIV_EMULATE", and you'll get the macros inside
+// the #ifdef HWIV_V4F4_EMULATED block in hwi_vector.h.  The emulated
+// macros do everything with normal floats and arrays, and runs about 3 times
+// slower.
+//#define HWIV_EMULATE
 #define HWIV_WANT_V4F4
 #include "hwi_vector.h";
 
@@ -42,7 +45,7 @@ void compute(float a[GRID_HEIGHT][GRID_WIDTH],
              float db[GRID_HEIGHT][GRID_WIDTH],
              float D_u,float D_v,float F,float k,
              float speed,
-             bool parameter_space);
+             int parameter_space);
 
 void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
              float v[GRID_HEIGHT][GRID_WIDTH],
@@ -52,6 +55,8 @@ void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
              float blue[GRID_HEIGHT][GRID_WIDTH]);
 
 static int g_color = 0;
+static int g_paramspace = 0;
+static int g_wrap = 0;
 
 int main(int argc, char * * argv)
 {
@@ -60,6 +65,13 @@ int main(int argc, char * * argv)
     } else if (strcmp(argv[i],"-color")==0) {
       // do output in wonderful technicolor
       g_color = 1;
+    } else if (strcmp(argv[i],"-paramspace")==0) {
+      // do a parameter space plot, like in the Pearson paper
+      g_paramspace = 1;
+    } else if (strcmp(argv[i],"-wrap")==0) {
+      // patterns wrap around ("torus", also called "continuous boundary
+      // condition")
+      g_wrap = 1;
     } else {
       fprintf(stderr, "Unrecognized argument: '%s'\n", argv[i]);
       exit(-1);
@@ -83,16 +95,17 @@ int main(int argc, char * * argv)
   //    (a web exhibit with over 100 videos and 500 images)
 
   // -- parameters --
-  float D_u = 0.082f;
-  float D_v = 0.041f;
+  float D_u = 0.082; // 0.164; // Twice the old value "0.082"
+  float D_v = 0.041; // 0.084; // Twice the old value "0.041"
 
   float k, F;
      k = 0.064;  F = 0.035;  // spots
+  // k = 0.059;  F = 0.022;  // spots that keep killing each other off
   // k = 0.06;   F = 0.035;  // stripes
   // k = 0.065;  F = 0.056;  // long stripes
   // k = 0.064;  F = 0.04;   // dots and stripes
-  // k = 0.0475; F = 0.0118; // spiral waves:
-  float speed = 2.0f;
+  // k = 0.0475; F = 0.0118; // spiral waves
+  float speed = 2.0;
   // ----------------
   
   // these arrays store the chemical concentrations:
@@ -109,7 +122,11 @@ int main(int argc, char * * argv)
   // put the initial conditions into each cell
   init(u,v);
   
+#ifdef HWIV_EMULATE
   const int N_FRAMES_PER_DISPLAY = 500;
+#else
+  const int N_FRAMES_PER_DISPLAY = 2000;
+#endif
   int iteration = 0;
   while(true) 
   {
@@ -123,7 +140,7 @@ int main(int argc, char * * argv)
     // compute:
     for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
     {
-      compute(u,v,du,dv,D_u,D_v,F,k,speed,false);
+      compute(u,v,du,dv,D_u,D_v,F,k,speed,g_paramspace);
       iteration++;
     }
 
@@ -191,7 +208,7 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
              float du[GRID_HEIGHT][GRID_WIDTH],
              float dv[GRID_HEIGHT][GRID_WIDTH],
              float D_u,float D_v,float F,float k,float speed,
-             bool parameter_space)
+             int parameter_space)
 {
 #ifndef HWIV_HAVE_V4F4
   fprintf(stdout, "Did not get vector macros from HWIV\n");
@@ -225,23 +242,34 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
   // Scan per row
   for(int i = 0; i < GRID_HEIGHT; i++) {
     int iprev,inext;
-    iprev = max(0,i-1);
-    inext = min(GRID_HEIGHT-1,i+1);
+    if (g_wrap) {
+      iprev = (i+GRID_HEIGHT-1) % GRID_HEIGHT;
+      inext = (i+1) % GRID_HEIGHT;
+    } else {
+      iprev = max(i-1, 0);
+      inext = min(i+1, GRID_HEIGHT-1);
+    }
 
     for(int j = 0; j < GRID_WIDTH; j+=4) {
       int jprev,jnext;
 
-      jprev = max(0,j-4);
-      jnext = min(GRID_WIDTH-4,j+4);
+      if (g_wrap) {
+        jprev = (j+GRID_WIDTH-4) % GRID_WIDTH;
+        jnext = (j+4) % GRID_WIDTH;
+      } else {
+        jprev = max(j-4, 0);
+        jnext = min(j+4, GRID_HEIGHT-4);
+      }
 
-    //  float uval = u[i][j];
+      // float uval = u[i][j];
       HWIV_LOAD_4F4(v4_u, &(u[i][j]));
-    //  float vval = v[i][j];
+      // float vval = v[i][j];
       HWIV_LOAD_4F4(v4_v, &(v[i][j]));
 
       if (parameter_space) {
-        const float k_min=0.045f,k_max=0.07f,F_min=0.00f,F_max=0.14f;
-        // set F and k for this location (ignore the provided values of f and k)
+        const float k_min=0.045f,k_max=0.07f,F_min=0.01f,F_max=0.09f;
+        // set F and k for this location (ignore the provided values of
+        // f and k)
         k = k_min + i*(k_max-k_min)/GRID_HEIGHT;
         HWIV_FILL_4F4(v4_k, k, k, k, k, talign);
 
@@ -259,9 +287,23 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       // The first two are hard to load because they require unaligned access.
       // We instead need to load a whole vector from the neighboring location
       // and shift (raise or lower) the contents by one index.
-      HWIV_LOAD_4F4(v4_nabu, &(u[i][jprev]));
 
-      HWIV_LOAD_4F4(v4_neighbor, &(u[i][jnext]));
+      // to get the left neighbor we do a 4-element "raise", which means to
+      // take data from locations (x-1, x, x+1, x+2) and move it to
+      // positions (x, x+1, x+2, x+3). The "x-1" element has to come from
+      // the block of 4 values to the left of the current block, and jprev
+      // points to that block.
+      HWIV_LOAD_4F4(v4_du, &(u[i][jprev]));
+      HWIV_RAISE_4F4(v4_nabu, v4_u, v4_du, t);
+
+      // to get the right neighbor we do a 4-element "lower" which means to
+      // take data from locations (x+1, x+2, x+3, x+4) and move it to
+      // positions (x, x+1, x+2, x+3). The "x+4" element has to come from
+      // the block of 4 values to the right of the current block, and jnext
+      // points to that block.
+      HWIV_LOAD_4F4(v4_du, &(u[i][jnext]));
+      HWIV_LOWER_4F4(v4_neighbor, v4_u, v4_du, t);
+
       HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
       HWIV_LOAD_4F4(v4_neighbor, &(u[iprev][j]));
       HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
@@ -270,8 +312,11 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       HWIV_NMSUB_4F4(v4_nabu, v4_4, v4_u, v4_nabu, fma_tmp);
 
      // nabla_v = v[i][jprev] + v[i][jnext] + v[iprev][j] + v[inext][j] - 4*vval;
-      HWIV_LOAD_4F4(v4_nabv, &(v[i][jprev]));
-      HWIV_LOAD_4F4(v4_neighbor, &(v[i][jnext]));
+      HWIV_LOAD_4F4(v4_dv, &(v[i][jprev]));
+      HWIV_RAISE_4F4(v4_nabv, v4_v, v4_dv, t);
+      HWIV_LOAD_4F4(v4_dv, &(v[i][jnext]));
+      HWIV_LOWER_4F4(v4_neighbor, v4_v, v4_dv, t);
+
       HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
       HWIV_LOAD_4F4(v4_neighbor, &(v[iprev][j]));
       HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
