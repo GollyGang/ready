@@ -197,6 +197,30 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
   fprintf(stdout, "Did not get vector macros from HWIV\n");
   exit(-1);
 #endif
+  V4F4 v4_speed; // vectorized version of speed scalar
+  V4F4 v4_F; // vectorized version of F scalar
+  V4F4 v4_k; // vectorized version of k scalar
+  HWIV_4F4_ALIGNED talign; // used by FILL_4F4
+  V4F4 v4_u; V4F4 v4_du;
+  V4F4 v4_v; V4F4 v4_dv;
+  HWIV_INIT_MUL0_4F4(mul_tmp); // used by MUL (on targets that need it)
+  HWIV_INIT_MTMP_4F4(fma_tmp); // used by MADD (on targets that need it)
+  V4F4 v4_neighbor;
+  V4F4 v4_Du;
+  V4F4 v4_Dv;
+  V4F4 v4_nabu;
+  V4F4 v4_nabv;
+  V4F4 v4_1;
+  V4F4 v4_4;
+
+  // Initialize our vectorized scalars
+  HWIV_FILL_4F4(v4_speed, speed, speed, speed, speed, talign);
+  HWIV_FILL_4F4(v4_F, F, F, F, F, talign);
+  HWIV_FILL_4F4(v4_k, k, k, k, k, talign);
+  HWIV_FILL_4F4(v4_Du, D_u, D_u, D_u, D_u, talign);
+  HWIV_FILL_4F4(v4_Dv, D_v, D_v, D_v, D_v, talign);
+  HWIV_FILL_4F4(v4_1, 1.0, 1.0, 1.0, 1.0, talign);
+  HWIV_FILL_4F4(v4_4, 4.0, 4.0, 4.0, 4.0, talign);
 
   // Scan per row
   for(int i = 0; i < GRID_HEIGHT; i++) {
@@ -204,43 +228,78 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
     iprev = max(0,i-1);
     inext = min(GRID_HEIGHT-1,i+1);
 
-    for(int j = 0; j < GRID_WIDTH; j++) {
+    for(int j = 0; j < GRID_WIDTH; j+=4) {
       int jprev,jnext;
 
-      jprev = max(0,j-1);
-      jnext = min(GRID_WIDTH-1,j+1);
+      jprev = max(0,j-4);
+      jnext = min(GRID_WIDTH-4,j+4);
 
-      float uval = u[i][j];
-      float vval = v[i][j];
+    //  float uval = u[i][j];
+      HWIV_LOAD_4F4(v4_u, &(u[i][j]));
+    //  float vval = v[i][j];
+      HWIV_LOAD_4F4(v4_v, &(v[i][j]));
 
       if (parameter_space) {
         const float k_min=0.045f,k_max=0.07f,F_min=0.00f,F_max=0.14f;
         // set F and k for this location (ignore the provided values of f and k)
         k = k_min + i*(k_max-k_min)/GRID_HEIGHT;
+        HWIV_FILL_4F4(v4_k, k, k, k, k, talign);
+
         F = F_min + j*(F_max-F_min)/GRID_WIDTH;
+        // FIXME: This vectorize is an approximation, the F value should
+        // vary slightly between the 4 elements of the vector
+        HWIV_FILL_4F4(v4_F, F, F, F, F, talign);
       }
 
       // compute the Laplacians of u and v. "nabla" is the name of the
       // "upside down delta" symbol used for the Laplacian in equations
-      float nabla_u, nabla_v;
-      nabla_u = u[i][jprev] + u[i][jnext] + u[iprev][j] + u[inext][j] - 4*uval;
-      nabla_v = v[i][jprev] + v[i][jnext] + v[iprev][j] + v[inext][j] - 4*vval;
+     // float nabla_u, nabla_v;
+
+     // nabla_u = u[i][jprev] + u[i][jnext] + u[iprev][j] + u[inext][j] - 4*uval;
+      // The first two are hard to load because they require unaligned access.
+      // We instead need to load a whole vector from the neighboring location
+      // and shift (raise or lower) the contents by one index.
+      HWIV_LOAD_4F4(v4_nabu, &(u[i][jprev]));
+
+      HWIV_LOAD_4F4(v4_neighbor, &(u[i][jnext]));
+      HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
+      HWIV_LOAD_4F4(v4_neighbor, &(u[iprev][j]));
+      HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
+      HWIV_LOAD_4F4(v4_neighbor, &(u[inext][j]));
+      HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
+      HWIV_NMSUB_4F4(v4_nabu, v4_4, v4_u, v4_nabu, fma_tmp);
+
+     // nabla_v = v[i][jprev] + v[i][jnext] + v[iprev][j] + v[inext][j] - 4*vval;
+      HWIV_LOAD_4F4(v4_nabv, &(v[i][jprev]));
+      HWIV_LOAD_4F4(v4_neighbor, &(v[i][jnext]));
+      HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
+      HWIV_LOAD_4F4(v4_neighbor, &(v[iprev][j]));
+      HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
+      HWIV_LOAD_4F4(v4_neighbor, &(v[inext][j]));
+      HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
+      HWIV_NMSUB_4F4(v4_nabv, v4_4, v4_v, v4_nabv, fma_tmp);
 
       // compute the new rate of change of u and v
-      du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
-      dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
+     // du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
+              // D_u * nabla_u - (uval*vval*vval - (-(F*uval-F)) )
+      HWIV_NMSUB_4F4(v4_neighbor, v4_F, v4_u, v4_F, fma_tmp);
+      HWIV_MUL_4F4(v4_dv, v4_v, v4_v, mul_tmp);
+      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor, fma_tmp);
+      HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabu, v4_neighbor, fma_tmp);
+      HWIV_SAVE_4F4(&(du[i][j]), v4_du);
+     // dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
+              // D_v * nabla_v + uval*vval*vval - (F*vval + k*vval);
+      HWIV_MUL_4F4(v4_neighbor, v4_k, v4_v, mul_tmp);
+      HWIV_MADD_4F4(v4_neighbor, v4_F, v4_v, v4_neighbor, fma_tmp);
+      HWIV_MUL_4F4(v4_dv, v4_v, v4_v, mul_tmp);
+      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor, fma_tmp);
+      HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabv, v4_neighbor, fma_tmp);
+      HWIV_SAVE_4F4(&(dv[i][j]), v4_dv);
     }
   }
 
   // effect change
   {
-    V4F4 v4_speed;
-    HWIV_4F4_ALIGNED talign;
-    V4F4 v4_u; V4F4 v4_du;
-    V4F4 v4_v; V4F4 v4_dv;
-    HWIV_INIT_MTMP_4F4(fma_tmp);
-
-    HWIV_FILL_4F4(v4_speed, speed, speed, speed, speed, talign);
 
     for(int i = 0; i < GRID_HEIGHT; i++) {
       for(int j = 0; j < GRID_WIDTH; j+=4) {

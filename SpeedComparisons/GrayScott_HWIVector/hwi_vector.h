@@ -95,7 +95,7 @@ typedef float V4F4[4];
      This opcode loads the 4 scalar values into the vector. The sc0 will be
    loaded into element 0 of the vector, sc1 into element 1, and so on. */
 #define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3, tmp) ({ \
-            (dst)[0]=(sc0); (det)[1]=(sc1); (dst)[2]=(sc2); (dst)[3]=(sc3); })
+            (dst)[0]=(sc0); (dst)[1]=(sc1); (dst)[2]=(sc2); (dst)[3]=(sc3); })
 typedef float HWIV_4F4_ALIGNED[4];
 
 /* SAVE_4F4: dst is a pointer to an array of floats in memory. src is a
@@ -149,6 +149,11 @@ typedef float HWIV_4F4_ALIGNED[4];
                                         (dst)[1]=a[1]*b[1] + c[1]; \
                                         (dst)[2]=a[2]*b[2] + c[2]; \
                                         (dst)[3]=a[3]*b[3] + c[3]; })
+
+#define HWIV_MSUB_4F4(dst, a, b, c, t)  ({ (dst)[0]=a[0]*b[0] - c[0]; \
+                                           (dst)[1]=a[1]*b[1] - c[1]; \
+                                           (dst)[2]=a[2]*b[2] - c[2]; \
+                                           (dst)[3]=a[3]*b[3] - c[3]; })
 
 /* NMSUB_4F4: dst, a, b, and c are each a vector of 4 floats. t is a variable
    declared with the HWIV_INIT_MTMP_4F4 macro.
@@ -209,6 +214,8 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
 
 #define HWIV_MADD_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
                                         (dst) = _mm_add_ps((t), (c)); })
+#define HWIV_MSUB_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
+                                        (dst) = _mm_sub_ps((t), (c)); })
 #define HWIV_NMSUB_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
                                         (dst) = _mm_sub_ps((c), (t)); })
 
