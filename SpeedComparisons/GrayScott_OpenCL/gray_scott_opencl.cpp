@@ -11,6 +11,7 @@ See README.txt for more details.
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include <math.h>
 
 // OpenCL:
@@ -20,9 +21,9 @@ See README.txt for more details.
 // cl.hpp is standard but doesn't come with most SDKs, so download it from here:
 // http://www.khronos.org/registry/cl/api/1.1/cl.hpp
 #ifdef __APPLE__
-#include "cl.hpp"
+# include "cl.hpp"
 #else
-#include <CL/cl.hpp>
+# include <CL/cl.hpp>
 #endif
 
 using namespace cl;
@@ -37,8 +38,25 @@ using namespace cl;
 
 void init(float a[X][Y],float b[X][Y]);
 
-int main()
+static int g_opt_device = 0;
+static int g_color = 0;
+
+int main(int argc, char * * argv)
 {
+    for (int i = 1; i < argc; i++) {
+        if (0) {
+        } else if (strcmp(argv[i],"-color")==0) {
+            // do output in wonderful technicolor
+            g_color = 1;
+        } else if ((i+1<argc) && (strcmp(argv[i],"-device")==0)) {
+            // select an output device
+            i++; g_opt_device = atoi(argv[i]);
+        } else {
+            std::cout << "Unrecognized argument: '" << argv[i] << "'\n";
+            exit(-1);
+        }
+    }
+
     // Here we implement the Gray-Scott model, as described here:
     // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
     // http://arxiv.org/abs/patt-sol/9304003
@@ -47,30 +65,23 @@ int main()
     float r_a = 0.082f;
     float r_b = 0.041f;
 
-    // for spots:
-    float k = 0.064f;
-    float f = 0.035f;
-    // for stripes:
-    //float k = 0.06f;
-    //float f = 0.035f;
-    // for long stripes
-    //float k = 0.065f;
-    //float f = 0.056f;
-    // for dots and stripes
-    //float k = 0.064f;
-    //float f = 0.04f;
-    // for spiral waves:
-    //float k = 0.0475f;
-    //float f = 0.0118f;
-    float speed = 1.0f;
+    float k, f;
+     k = 0.064f; f = 0.035f; // solitons with mitosis (spots that multiply)
+    // k = 0.06f; f = 0.035f; // stripes
+    // k = 0.065f; f = 0.056f; // long stripes
+    // k = 0.064f; f = 0.04f; // dots and stripes
+    // k = 0.0475f; f = 0.0118f; // spiral waves
+    float speed = 2.0f;
     // ----------------
     
-    // these arrays store the chemical concentrations:
-    float a[X][Y], b[X][Y];
+    // the first two will be used to send the initial pattern of
+    // chemical concentrations into the GPU, and then all three arrays
+    // are used to read the colour rendering back out.
+    float red[X][Y], green[X][Y], blue[X][Y];
     const int MEM_SIZE = sizeof(float)*X*Y;
 
     // put the initial conditions into each cell
-    init(a,b);
+    init(red,green);
 
     clock_t start,end;
 
@@ -89,9 +100,21 @@ int main()
  
         // Get a list of devices on this platform
         vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
- 
-        // Create a command queue and use the first device
-        CommandQueue queue = CommandQueue(context, devices[0]);
+
+        // range-check the user's selection
+        int maxdev = devices.size() - 1;
+        g_opt_device = (g_opt_device > maxdev) ? maxdev :
+                                     ((g_opt_device < 0) ? 0 : g_opt_device);
+        std::cout << (maxdev+1) << " device(s) available; using device "
+                                                    << g_opt_device << ".\n";
+
+        // Create a command queue and use the selected device
+        if (maxdev < 0) {
+          std::cerr << "error -- need at least one OpenCL capable device.\n";
+          exit(-1);
+        }
+        CommandQueue queue = CommandQueue(context, devices[g_opt_device]);
+        Event event;
  
         // Read source file
         std::string kfn = CL_SOURCE_DIR; // (defined in CMakeLists.txt to be the source folder)
@@ -110,16 +133,33 @@ int main()
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
+
+        // Same thing, cor colour kernel
+        std::string kfn_2 = CL_SOURCE_DIR;
+        kfn_2 += "/gs_colorkernel.cl";
+        std::ifstream sourceFile_2(kfn_2.c_str());
+        std::string sourceCode_2(
+            std::istreambuf_iterator<char>(sourceFile_2),
+            (std::istreambuf_iterator<char>()));
+        Program::Sources source_2(1,
+              std::make_pair(sourceCode_2.c_str(), sourceCode_2.length()+1));
+        Program program_2 = Program(context, source_2);
+        program_2.build(devices);
+        Kernel k_col(program_2, "grayscott_colour");
  
         // Create memory buffers
-        Buffer bufferA = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
+        Buffer bufferU = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
+        Buffer bufferV = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
+        Buffer bufferU2 = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
+        Buffer bufferV2 = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
+
+        Buffer bufferR = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
+        Buffer bufferG = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
         Buffer bufferB = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
-        Buffer bufferA2 = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
-        Buffer bufferB2 = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
- 
+
         // Copy lists A and B to the memory buffers
-        queue.enqueueWriteBuffer(bufferA, CL_TRUE, 0, MEM_SIZE, a);
-        queue.enqueueWriteBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, b);
+        queue.enqueueWriteBuffer(bufferU, CL_TRUE, 0, MEM_SIZE, red);
+        queue.enqueueWriteBuffer(bufferV, CL_TRUE, 0, MEM_SIZE, green);
  
         NDRange global(X,Y);
         NDRange local(8,8);
@@ -134,43 +174,81 @@ int main()
         const int N_FRAMES_PER_DISPLAY = 1000;  // an even number, because of our double-buffering implementation
         while(true) 
         {
-            start = clock();
+            struct timeval tod_record;
+            double tod_before, tod_after, tod_elap;
+
+            gettimeofday(&tod_record, 0);
+            tod_before = ((double) (tod_record.tv_sec))
+                                    + ((double) (tod_record.tv_usec)) / 1.0e6;
 
             // run a few iterations (without copying the data back)
             for(int it=0;it<N_FRAMES_PER_DISPLAY/2;it++)
             {
                 // (buffer-switching)
 
-                kernel.setArg(0, bufferA);
-                kernel.setArg(1, bufferB);
-                kernel.setArg(2, bufferA2);
-                kernel.setArg(3, bufferB2); // output in A2,B2
+                kernel.setArg(0, bufferU);
+                kernel.setArg(1, bufferV);
+                kernel.setArg(2, bufferU2);
+                kernel.setArg(3, bufferV2); // output in A2,B2
                 queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
                 iteration++;
 
-                kernel.setArg(0, bufferA2);
-                kernel.setArg(1, bufferB2);
-                kernel.setArg(2, bufferA);
-                kernel.setArg(3, bufferB); // output in A,B
+                kernel.setArg(0, bufferU2);
+                kernel.setArg(1, bufferV2);
+                kernel.setArg(2, bufferU);
+                kernel.setArg(3, bufferV); // output in A,B
                 queue.enqueueNDRangeKernel(kernel, NullRange, global, local);
                 iteration++;
             }
 
-            // retrieve the buffers
-            queue.enqueueReadBuffer(bufferA, CL_TRUE, 0, MEM_SIZE, a);
-            queue.enqueueReadBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, b);
+            if (g_color) {
+                // Colorize
+                k_col.setArg(0, bufferU);
+                k_col.setArg(1, bufferV);
+                k_col.setArg(2, bufferU2);
+                k_col.setArg(3, bufferR);
+                k_col.setArg(4, bufferG);
+                k_col.setArg(5, bufferB);
+                queue.enqueueNDRangeKernel(k_col, NullRange, global, local,
+                                           NULL, &event);
 
-            end = clock();
+                // Wait for this last command to finish before reading buffers
+                // back into CPU memory.
+                event.wait();
+
+                // retrieve the buffers
+                queue.enqueueReadBuffer(bufferR, CL_TRUE, 0, MEM_SIZE, red);
+                queue.enqueueReadBuffer(bufferG, CL_TRUE, 0, MEM_SIZE, green);
+                queue.enqueueReadBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, blue);
+            } else {
+                // no colour -- just read the A pattern back into a buffer
+                queue.enqueueReadBuffer(bufferU, CL_TRUE, 0, MEM_SIZE, red);
+            }
+
+            gettimeofday(&tod_record, 0);
+            tod_after = ((double) (tod_record.tv_sec))
+                                    + ((double) (tod_record.tv_usec)) / 1.0e6;
+
+            tod_elap = tod_after - tod_before;
 
             char msg[1000];
             float fps = 0.0;
-            if(end-start>0)
-                fps = N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC);
-            sprintf(msg,"GrayScott - %dms = %0.2f fps",end-start,fps);
+            if (tod_elap > 0)
+                fps = ((float)N_FRAMES_PER_DISPLAY) / tod_elap;
+            sprintf(msg,"GrayScott - %0.2f fps", fps);
 
             // display:
-            if(display(a,a,a,iteration,false,200.0f,1,10,msg)) // did user ask to quit?
-                break;
+            {
+                int quitnow;
+                if (g_color) {
+                    quitnow = display(red,green,blue,iteration,false,200.0f,2,10,msg);
+                } else {
+                    /* Simply show one dimension on all three channels. */
+                    quitnow = display(red,red,red,iteration,false,200.0f,2,10,msg);
+                }
+                if (quitnow)
+                    break;
+            }
         }
     } 
     catch(Error error) 
@@ -196,13 +274,13 @@ void init(float a[X][Y],float b[X][Y])
             //if(hypot(i%20-10/*-X/2*/,j%20-10/*-Y/2*/)<=frand(2,5)) {
             if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5))
             {
-                a[i][j] = 0.0f;
-                b[i][j] = 1.0f;
+                a[i][j] = frand(0.0f,0.1f);
+                b[i][j] = frand(0.9f,1.0f);
             }
             else 
             {
-                a[i][j] = 1.0f;
-                b[i][j] = 0.0f;
+                a[i][j] = frand(0.9f,1.0f);
+                b[i][j] = frand(0.0f,0.1f);
             }
             /*float v = frand(0.0f,1.0f);
             a[i][j] = v;
