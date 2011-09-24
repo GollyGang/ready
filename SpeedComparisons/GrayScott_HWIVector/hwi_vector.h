@@ -166,6 +166,29 @@ typedef float HWIV_4F4_ALIGNED[4];
                                         (dst)[2]=c[2] - a[2]*b[2]; \
                                         (dst)[3]=c[3] - a[3]*b[3]; })
 
+// Declare this if you are doing any raise or lower operation
+#define INIT_RLTMP_4F4(vc) /* nop */
+
+/* RAISE_4F4: dst, src, extra, and tmp are each a vector of 4 floats.
+     This opcode "raises" three of the values from src to the next-higher
+   element of dst. Element 0 of dst is filled with the value from element
+   3 of "extra". The varible t is used on hardware that requires the
+   result to be computed in two pieces and then assembled via a blend
+   operation. ("VSHR_4F4" in old macros) */
+#define HWIV_RAISE_4F4(dst, src, extra, tmp) \
+                                      ({ dst[3]=src[2]; dst[2]=src[1]; \
+                                         dst[1]=src[0]; dst[0]=extra[3]; })
+
+/* LOWER_4F4: dst, src, extra, and tmp are each a vector of 4 floats.
+     This opcode "lowers" three of the values from src to the next-lower
+   element of dst. Element 3 of dst is filled with the value from element
+   0 of "extra". The varible t is used on hardware that requires the
+   result to be computed in two pieces and then assembled via a blend
+   operation. ("VSHL_4F4" in old macros) */
+#define HWIV_LOWER_4F4(dst, src, extra, tmp) \
+                                      ({ dst[0]=src[1]; dst[1]=src[2]; \
+                                         dst[2]=src[3]; dst[3]=extra[0]; })
+
 # endif
 
 
@@ -218,6 +241,19 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
                                         (dst) = _mm_sub_ps((t), (c)); })
 #define HWIV_NMSUB_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
                                         (dst) = _mm_sub_ps((c), (t)); })
+
+#define INIT_RLTMP_4F4(vc) /* nop */
+
+#define HWIV_RAISE_4F4(dest, src, new, vs) ({ \
+                 (dest) = _mm_shuffle_ps((new), (src), 0x0f); \
+                 (dest) = _mm_shuffle_ps((dest), (src), 0x98); \
+                 })
+
+#define VROL_4F4(dest, src, tmp) \
+                 (dest) = _mm_shuffle_ps((src), (src), 0x39)
+#define HWIV_LOWER_4F4(dest, src, new, vs) ({ \
+                 (dest) = _mm_move_ss((src), (new)); \
+                 VROL_4F4(dest, dest, 0); })
 
 # endif
 
