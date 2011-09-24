@@ -12,6 +12,12 @@ See README.txt for more details.
 # include <xmmintrin.h>
 #endif
 
+// To convince yourself that the macro library works on any hardware,
+// un-comment this "#define HWIV_EMULATE"
+// #define HWIV_EMULATE
+#define HWIV_WANT_V4F4
+#include "hwi_vector.h";
+
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
@@ -27,23 +33,23 @@ See README.txt for more details.
 #define GRID_WIDTH  (X)
 #define GRID_HEIGHT (Y)
 
-void init(float a[GRID_WIDTH][GRID_HEIGHT],
-          float b[GRID_WIDTH][GRID_HEIGHT]);
+void init(float a[GRID_HEIGHT][GRID_WIDTH],
+          float b[GRID_HEIGHT][GRID_WIDTH]);
 
-void compute(float a[GRID_WIDTH][GRID_HEIGHT],
-             float b[GRID_WIDTH][GRID_HEIGHT],
-             float da[GRID_WIDTH][GRID_HEIGHT],
-             float db[GRID_WIDTH][GRID_HEIGHT],
+void compute(float a[GRID_HEIGHT][GRID_WIDTH],
+             float b[GRID_HEIGHT][GRID_WIDTH],
+             float da[GRID_HEIGHT][GRID_WIDTH],
+             float db[GRID_HEIGHT][GRID_WIDTH],
              float D_u,float D_v,float F,float k,
              float speed,
              bool parameter_space);
 
-void colorize(float u[GRID_WIDTH][GRID_HEIGHT],
-             float v[GRID_WIDTH][GRID_HEIGHT],
-             float du[GRID_WIDTH][GRID_HEIGHT],
-             float red[GRID_WIDTH][GRID_HEIGHT],
-             float green[GRID_WIDTH][GRID_HEIGHT],
-             float blue[GRID_WIDTH][GRID_HEIGHT]);
+void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
+             float v[GRID_HEIGHT][GRID_WIDTH],
+             float du[GRID_HEIGHT][GRID_WIDTH],
+             float red[GRID_HEIGHT][GRID_WIDTH],
+             float green[GRID_HEIGHT][GRID_WIDTH],
+             float blue[GRID_HEIGHT][GRID_WIDTH]);
 
 static int g_color = 0;
 
@@ -90,15 +96,15 @@ int main(int argc, char * * argv)
   // ----------------
   
   // these arrays store the chemical concentrations:
-  float u[GRID_WIDTH][GRID_HEIGHT];
-  float v[GRID_WIDTH][GRID_HEIGHT];
+  float u[GRID_HEIGHT][GRID_WIDTH];
+  float v[GRID_HEIGHT][GRID_WIDTH];
   // these arrays store the rate of change of those chemicals:
-  float du[GRID_WIDTH][GRID_HEIGHT];
-  float dv[GRID_WIDTH][GRID_HEIGHT];
+  float du[GRID_HEIGHT][GRID_WIDTH];
+  float dv[GRID_HEIGHT][GRID_WIDTH];
 
-  float red[GRID_WIDTH][GRID_HEIGHT];
-  float green[GRID_WIDTH][GRID_HEIGHT];
-  float blue[GRID_WIDTH][GRID_HEIGHT];
+  float red[GRID_HEIGHT][GRID_WIDTH];
+  float green[GRID_HEIGHT][GRID_WIDTH];
+  float blue[GRID_HEIGHT][GRID_WIDTH];
 
   // put the initial conditions into each cell
   init(u,v);
@@ -160,14 +166,14 @@ float frand(float lower,float upper)
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-void init(float a[GRID_WIDTH][GRID_HEIGHT],float b[GRID_WIDTH][GRID_HEIGHT])
+void init(float a[GRID_HEIGHT][GRID_WIDTH],float b[GRID_HEIGHT][GRID_WIDTH])
 {
   srand((unsigned int)time(NULL));
     
   // figure the values
-  for(int i = 0; i < GRID_WIDTH; i++) {
-    for(int j = 0; j < GRID_HEIGHT; j++) {
-      if(hypot(i-GRID_WIDTH/2,(j-GRID_HEIGHT/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+  for(int i = 0; i < GRID_HEIGHT; i++) {
+    for(int j = 0; j < GRID_WIDTH; j++) {
+      if(hypot(i-GRID_HEIGHT/2,(j-GRID_WIDTH/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
       {
         a[i][j] = frand(0.0,0.1);
         b[i][j] = frand(0.9,1.0);
@@ -180,24 +186,29 @@ void init(float a[GRID_WIDTH][GRID_HEIGHT],float b[GRID_WIDTH][GRID_HEIGHT])
   }
 }
 
-void compute(float u[GRID_WIDTH][GRID_HEIGHT],
-             float v[GRID_WIDTH][GRID_HEIGHT],
-             float du[GRID_WIDTH][GRID_HEIGHT],
-             float dv[GRID_WIDTH][GRID_HEIGHT],
+void compute(float u[GRID_HEIGHT][GRID_WIDTH],
+             float v[GRID_HEIGHT][GRID_WIDTH],
+             float du[GRID_HEIGHT][GRID_WIDTH],
+             float dv[GRID_HEIGHT][GRID_WIDTH],
              float D_u,float D_v,float F,float k,float speed,
              bool parameter_space)
 {
+#ifndef HWIV_HAVE_V4F4
+  fprintf(stdout, "Did not get vector macros from HWIV\n");
+  exit(-1);
+#endif
+
   // Scan per row
-  for(int i = 0; i < GRID_WIDTH; i++) {
+  for(int i = 0; i < GRID_HEIGHT; i++) {
     int iprev,inext;
     iprev = max(0,i-1);
-    inext = min(GRID_WIDTH-1,i+1);
+    inext = min(GRID_HEIGHT-1,i+1);
 
-    for(int j = 0; j < GRID_HEIGHT; j++) {
+    for(int j = 0; j < GRID_WIDTH; j++) {
       int jprev,jnext;
 
       jprev = max(0,j-1);
-      jnext = min(GRID_HEIGHT-1,j+1);
+      jnext = min(GRID_WIDTH-1,j+1);
 
       float uval = u[i][j];
       float vval = v[i][j];
@@ -205,8 +216,8 @@ void compute(float u[GRID_WIDTH][GRID_HEIGHT],
       if (parameter_space) {
         const float k_min=0.045f,k_max=0.07f,F_min=0.00f,F_max=0.14f;
         // set F and k for this location (ignore the provided values of f and k)
-        k = k_min + i*(k_max-k_min)/GRID_WIDTH;
-        F = F_min + j*(F_max-F_min)/GRID_HEIGHT;
+        k = k_min + i*(k_max-k_min)/GRID_HEIGHT;
+        F = F_min + j*(F_max-F_min)/GRID_WIDTH;
       }
 
       // compute the Laplacians of u and v. "nabla" is the name of the
@@ -222,23 +233,44 @@ void compute(float u[GRID_WIDTH][GRID_HEIGHT],
   }
 
   // effect change
-  for(int i = 0; i < GRID_WIDTH; i++) {
-    for(int j = 0; j < GRID_HEIGHT; j++) {
-      u[i][j] += speed * du[i][j];
-      v[i][j] += speed * dv[i][j];
+  {
+    V4F4 v4_speed;
+    HWIV_4F4_ALIGNED talign;
+    V4F4 v4_u; V4F4 v4_du;
+    V4F4 v4_v; V4F4 v4_dv;
+    HWIV_INIT_MTMP_4F4(fma_tmp);
+
+    HWIV_FILL_4F4(v4_speed, speed, speed, speed, speed, talign);
+
+    for(int i = 0; i < GRID_HEIGHT; i++) {
+      for(int j = 0; j < GRID_WIDTH; j+=4) {
+        // u[i][j] = u[i][j] + speed * du[i][j];
+        HWIV_LOAD_4F4(v4_u, &(u[i][j]));
+        HWIV_LOAD_4F4(v4_du, &(du[i][j]));
+        HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u, fma_tmp);
+        HWIV_SAVE_4F4(&(u[i][j]), v4_u);
+
+        // v[i][j] = v[i][j] + speed * dv[i][j];
+        HWIV_LOAD_4F4(v4_v, &(v[i][j]));
+        HWIV_LOAD_4F4(v4_dv, &(dv[i][j]));
+        HWIV_MADD_4F4(v4_v, v4_speed, v4_dv, v4_v, fma_tmp);
+        HWIV_SAVE_4F4(&(v[i][j]), v4_v);
+      }
     }
   }
 }
 
-void colorize(float u[GRID_WIDTH][GRID_HEIGHT],
-             float v[GRID_WIDTH][GRID_HEIGHT],
-             float du[GRID_WIDTH][GRID_HEIGHT],
-             float red[GRID_WIDTH][GRID_HEIGHT],
-             float green[GRID_WIDTH][GRID_HEIGHT],
-             float blue[GRID_WIDTH][GRID_HEIGHT])
+void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
+             float v[GRID_HEIGHT][GRID_WIDTH],
+             float du[GRID_HEIGHT][GRID_WIDTH],
+             float red[GRID_HEIGHT][GRID_WIDTH],
+             float green[GRID_HEIGHT][GRID_WIDTH],
+             float blue[GRID_HEIGHT][GRID_WIDTH])
 {
-  for(int i = 0; i < GRID_WIDTH; i++) {
-    for(int j = 0; j < GRID_HEIGHT; j++) {
+  // Step by row
+  for(int i = 0; i < GRID_HEIGHT; i++) {
+    // step by column
+    for(int j = 0; j < GRID_WIDTH; j++) {
       float uval = u[i][j];
       float vval = v[i][j];
       float delta_u = ((du[i][j]) * 1000.0f) + 0.5f;
