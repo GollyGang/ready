@@ -73,14 +73,14 @@ int main()
     float *b = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *da = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *db = (float*)_mm_malloc(n_cells*sizeof(float),16);
-    
+
     init(a,b,da,db);
-    
+
     clock_t start,end;
 
-    const int N_FRAMES_PER_DISPLAY = 10000;
+    const int N_FRAMES_PER_DISPLAY = 100;
     int iteration = 0;
-    while(true) 
+    while(true)
     {
         start = clock();
 
@@ -94,7 +94,8 @@ int main()
         end = clock();
 
         char msg[1000];
-        sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+        if(end>start)
+            sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
@@ -115,12 +116,21 @@ float frand(float lower,float upper)
 
 void init(float *a,float *b,float *da,float *db)
 {
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__))
+  /* On Intel we disable accurate handling of denorms and zeros. This is an
+     important speed optimization. */
+  int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
+  int newMXCSR = oldMXCSR | 0x8040; // set DAZ and FZ bits
+  _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
+#endif
+
     srand((unsigned int)time(NULL));
-    
+
     // figure the values
-    for(int i = 0; i < X; i++) 
+    float val=1.0f;
+    for(int i = 0; i < X; i++)
     {
-        for(int j = 0; j < Y; j++) 
+        for(int j = 0; j < Y; j++)
         {
             //if(hypot(i%50-25/*-X/2*/,j%50-25/*-Y/2*/)<=frand(2,5))
             if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
@@ -132,16 +142,8 @@ void init(float *a,float *b,float *da,float *db)
                 a[at(i,j)] = 1;
                 b[at(i,j)] = 0;
             }
-            if(abs(j-100)<10 && abs(i-80)<12)
-            {
-                da[at(i,j)]=0.00001f;
-                db[at(i,j)]=0.0f;
-            }
-            else
-            {
-                da[at(i,j)]=0.0f;
-                db[at(i,j)]=0.0f;
-            }
+            da[at(i,j)]=0.0f;
+            db[at(i,j)]=0.0f;
         }
     }
 }
@@ -152,36 +154,73 @@ void compute(float *a,float *b,float *da,float *db,
 {
     __m128 *a_SSE = (__m128*) a;
     __m128 *b_SSE = (__m128*) b;
+    __m128 a_left,a_right,b_left,b_right;
+    __m128 *a_above,*a_below,*b_above,*b_below;
     __m128 *da_SSE = (__m128*) da;
     __m128 *db_SSE = (__m128*) db;
-    __m128 x_SSE;
+    __m128 t1_SSE,t2_SSE,t3_SSE,t4_SSE,t5_SSE,t6_SSE;
     __m128 dda_SSE,ddb_SSE;
-    __m128 minus_four_SSE = _mm_set1_ps(-4.0f); // set four to (-4,-4,-4,-4)
+    __m128 one_SSE = _mm_set1_ps(1.0f); // set to (1,1,1,1)
+    __m128 minus_four_SSE = _mm_set1_ps(-4.0f);
+    __m128 r_a_SSE = _mm_set1_ps(r_a);
+    __m128 r_b_SSE = _mm_set1_ps(r_b);
+    __m128 f_SSE = _mm_set1_ps(f);
+    __m128 k_SSE = _mm_set1_ps(k);
 
     // compute the rates of change
     for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks for now (for simplicity)
     {
-        a_SSE += X_BLOCKS+1;
-        b_SSE += X_BLOCKS+1;
-        da_SSE += X_BLOCKS+1;
-        db_SSE += X_BLOCKS+1;
+        a_SSE = ((__m128*)a)+block_at(i,1);
+        b_SSE = ((__m128*)b)+block_at(i,1);
+        da_SSE = ((__m128*)da)+block_at(i,1);
+        db_SSE = ((__m128*)db)+block_at(i,1);
         for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks for now
         {
-            // retrieve a block containing the 4 cells to the left of our 4 cells
+            // retrieve the neighboring cells
+            a_left = _mm_loadu_ps(((float*)a_SSE)-1);
+            a_right = _mm_loadu_ps(((float*)a_SSE)+1);
+            a_above = a_SSE-X_BLOCKS;
+            a_below = a_SSE+X_BLOCKS;
+            b_left = _mm_loadu_ps(((float*)b_SSE)-1);
+            b_right = _mm_loadu_ps(((float*)b_SSE)+1);
+            b_above = b_SSE-X_BLOCKS;
+            b_below = b_SSE+X_BLOCKS;
             // find the Laplacian of a (using the von Neumann neighborhood)
             dda_SSE = _mm_mul_ps(*a_SSE,minus_four_SSE);
-            //dda_SSE = _mm_add_ps(dda_SSE,);
-
+            dda_SSE = _mm_add_ps(dda_SSE,a_left);
+            dda_SSE = _mm_add_ps(dda_SSE,a_right);
+            dda_SSE = _mm_add_ps(dda_SSE,*a_above);
+            dda_SSE = _mm_add_ps(dda_SSE,*a_below);
             // find the Laplacian of b
-            // ddb = 
+            ddb_SSE = _mm_mul_ps(*b_SSE,minus_four_SSE);
+            ddb_SSE = _mm_add_ps(ddb_SSE,b_left);
+            ddb_SSE = _mm_add_ps(ddb_SSE,b_right);
+            ddb_SSE = _mm_add_ps(ddb_SSE,*b_above);
+            ddb_SSE = _mm_add_ps(ddb_SSE,*b_below);
             // compute the new rates of changes
-            // da_SSE = 
-            // db_SSE = 
+            t1_SSE = _mm_mul_ps(r_a_SSE,dda_SSE); // t1 = r_a * dda
+            t2_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t2 = aval*bval
+            t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = aval*bval*bval
+            t4_SSE = _mm_sub_ps(one_SSE,*a_SSE); // t4 = 1-aval
+            t5_SSE = _mm_mul_ps(f_SSE,t4_SSE); // t5 = f * (1-aval)
+            t6_SSE = _mm_sub_ps(t1_SSE,t3_SSE); // t6 = r_a *dda - aval*bval*bval
+            *da_SSE = _mm_add_ps(t6_SSE,t5_SSE); // da = r_a * dda - aval*bval*bval + f*(1-aval)
+            t1_SSE = _mm_mul_ps(r_b_SSE,ddb_SSE); // t1 = r_b * ddb
+            t2_SSE = _mm_add_ps(f_SSE,k_SSE); // t2 = f + k
+            t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = (f+k) * bval
+            t4_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t4 = aval*bval
+            t5_SSE = _mm_mul_ps(t4_SSE,*b_SSE); // t5 = aval*bval*bval
+            t6_SSE = _mm_add_ps(t1_SSE,t5_SSE); // t6 = r_b*ddb + aval*bval*bval
+            *db_SSE = _mm_sub_ps(t6_SSE,t3_SSE); // db = r_b*ddb + aval*bval*bval - (f+k)*bval
+            a_SSE++;
+            b_SSE++;
+            da_SSE++;
+            db_SSE++;
         }
     }
 
     // apply the rate of change
-    __m128 speed_SSE = _mm_set1_ps(speed); // set speed_SSE to (speed,speed,speed,speed)
+    __m128 speed_SSE = _mm_set1_ps(speed);
     a_SSE = (__m128*) a;
     b_SSE = (__m128*) b;
     da_SSE = (__m128*) da;
@@ -189,13 +228,13 @@ void compute(float *a,float *b,float *da,float *db,
     for(int i=0;i<TOTAL_BLOCKS;i++)
     {
         // a[i] += speed * da[i];
-        x_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
-        *a_SSE = _mm_add_ps(*a_SSE,x_SSE);
+        t1_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
+        *a_SSE = _mm_add_ps(*a_SSE,t1_SSE);
         a_SSE++;
         da_SSE++;
         // b[i] += speed * db[i];
-        x_SSE = _mm_mul_ps(*db_SSE,speed_SSE);
-        *b_SSE = _mm_add_ps(*b_SSE,x_SSE);
+        t1_SSE = _mm_mul_ps(*db_SSE,speed_SSE);
+        *b_SSE = _mm_add_ps(*b_SSE,t1_SSE);
         b_SSE++;
         db_SSE++;
     }
@@ -224,9 +263,9 @@ bool display(float *r,float *g,float *b,
         cvSet(im,cvScalar(0,0,0));
         im2 = cvCreateImage(cvSize(X*scale,Y*scale),IPL_DEPTH_8U,3);
         im3 = cvCreateImage(cvSize(X*scale+border*2,Y*scale+border),IPL_DEPTH_8U,3);
-        
+
         cvNamedWindow(title,CV_WINDOW_AUTOSIZE);
-        
+
         double hScale=0.4;
         double vScale=0.4;
         int lineWidth=1;
@@ -306,7 +345,7 @@ bool display(float *r,float *g,float *b,
         cvWriteFrame(video,im3);
 
     cvShowImage(title,im3);
-    
+
     int key = cvWaitKey(delay_ms); // allow time for the image to be drawn
     if(key==27) // did user ask to quit?
     {
