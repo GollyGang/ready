@@ -15,7 +15,7 @@ See README.txt for more details.
 // To convince yourself that the macro library works on any hardware,
 // un-comment this "#define HWIV_EMULATE", and you'll get the macros inside
 // the #ifdef HWIV_V4F4_EMULATED block in hwi_vector.h.  The emulated
-// macros do everything with normal floats and arrays, and runs about 3 times
+// macros do everything with normal floats and arrays, and run about 3-4 times
 // slower.
 //#define HWIV_EMULATE
 #define HWIV_WANT_V4F4
@@ -226,23 +226,28 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
   V4F4 v4_v; V4F4 v4_dv;
   HWIV_INIT_MUL0_4F4; // used by MUL (on targets that need it)
   HWIV_INIT_MTMP_4F4; // used by MADD (on targets that need it)
+  HWIV_INIT_FILL;     // used by FILL
   HWIV_INIT_RLTMP_4F4; // used by RAISE and LOWER
-  V4F4 v4_neighbor;
+  V4F4 v4_tmp;
   V4F4 v4_Du;
   V4F4 v4_Dv;
-  V4F4 v4_nabu;
-  V4F4 v4_nabv;
+  V4F4 v4_nabla_u;
+  V4F4 v4_nabla_v;
   V4F4 v4_1;
   V4F4 v4_4;
+  const float k_min=0.045f,k_max=0.07f,F_min=0.01f,F_max=0.09f;
+  const float F_diff = (F_max-F_min)/GRID_WIDTH;
+  V4F4 v4_Fdiff;
 
   // Initialize our vectorized scalars
-  HWIV_FILL_4F4(v4_speed, speed, speed, speed, speed, talign);
-  HWIV_FILL_4F4(v4_F, F, F, F, F, talign);
-  HWIV_FILL_4F4(v4_k, k, k, k, k, talign);
-  HWIV_FILL_4F4(v4_Du, D_u, D_u, D_u, D_u, talign);
-  HWIV_FILL_4F4(v4_Dv, D_v, D_v, D_v, D_v, talign);
-  HWIV_FILL_4F4(v4_1, 1.0, 1.0, 1.0, 1.0, talign);
-  HWIV_FILL_4F4(v4_4, 4.0, 4.0, 4.0, 4.0, talign);
+  HWIV_SPLAT_4F4(v4_speed, speed);
+  HWIV_SPLAT_4F4(v4_F, F);
+  HWIV_SPLAT_4F4(v4_k, k);
+  HWIV_SPLAT_4F4(v4_Du, D_u);
+  HWIV_SPLAT_4F4(v4_Dv, D_v);
+  HWIV_SPLAT_4F4(v4_1, 1.0);
+  HWIV_SPLAT_4F4(v4_4, 4.0);
+  HWIV_FILL_4F4(v4_Fdiff, 0, F_diff, 2*F_diff, 3*F_diff);
 
   // Scan per row
   for(int i = 0; i < GRID_HEIGHT; i++) {
@@ -253,6 +258,12 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
     } else {
       iprev = max(i-1, 0);
       inext = min(i+1, GRID_HEIGHT-1);
+    }
+
+    if (parameter_space) {
+      // set k for this row (ignore the provided value)
+      k = k_min + i*(k_max-k_min)/GRID_HEIGHT;
+      HWIV_SPLAT_4F4(v4_k, k);
     }
 
     for(int j = 0; j < GRID_WIDTH; j+=4) {
@@ -272,96 +283,136 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       HWIV_LOAD_4F4(v4_v, &(v[i][j]));
 
       if (parameter_space) {
-        const float k_min=0.045f,k_max=0.07f,F_min=0.01f,F_max=0.09f;
-        // set F and k for this location (ignore the provided values of
-        // f and k)
-        k = k_min + i*(k_max-k_min)/GRID_HEIGHT;
-        HWIV_FILL_4F4(v4_k, k, k, k, k, talign);
-
-        F = F_min + j*(F_max-F_min)/GRID_WIDTH;
-        // FIXME: This vectorize is an approximation, the F value should
-        // vary slightly between the 4 elements of the vector
-        HWIV_FILL_4F4(v4_F, F, F, F, F, talign);
+        // fill F vector
+        F = F_min + j * F_diff;
+        // F increases by F_diff each time j increases by 1, so this vector
+        // needs to contain 4 different F values.
+        HWIV_SPLAT_4F4(v4_tmp, F);
+        HWIV_ADD_4F4(v4_F, v4_tmp, v4_Fdiff);
       }
 
       // compute the Laplacians of u and v. "nabla" is the name of the
       // "upside down delta" symbol used for the Laplacian in equations
-     // float nabla_u, nabla_v;
 
-     // nabla_u = u[i][jprev] + u[i][jnext] + u[iprev][j] + u[inext][j] - 4*uval;
-      // The first two are hard to load because they require unaligned access.
-      // We instead need to load a whole vector from the neighboring location
-      // and shift (raise or lower) the contents by one index. (N.B.: This
-      // is the one part of vector computation that one is pretty much
-      // guaranteed to mess up on the first attempt.)
+      /* Scalar code is:
+         nabla_u = u[i][jprev]+u[i][jnext]+u[iprev][j]+u[inext][j] - 4*uval;
 
-      // to get the left neighbor we do a 4-element "raise", which means to
-      // take data from locations (x-1, x, x+1, x+2) and move it to
-      // positions (x, x+1, x+2, x+3). The data moves to a higher x
-      // coordinate, so its coordinate has been "raised". The "x-1" element
-      // has to come from the block of 4 values to the left of the current
-      // block, and we use jprev (calculated above) as the address of that
-      // block.
+         The first two are hard to load because they require unaligned access.
+         We instead need to load a whole vector from the neighboring location
+         and shift (RAISE or LOWER) the contents by one position. (N.B.: This
+         is the one part of vector computation that is pretty much guaranteed
+         to confuse even experienced vector programmers.)
+
+         Assuming j increases as you move to the right, consider the case of
+         getting the 4 "left neighbors" into a vector. If we're doing the
+         computation for pixels (4,5,6,7) then j=4. To get the "left neighbors"
+         we need to get (3,4,5,6). Ideally we would just do this:
+
+                           j-1
+                            v______
+                      0 1 2{3 4 5 6}7 8 9 10 11
+                             \ \ \ \
+                              v v v v
+                             +-------+
+                             |vector |
+                             +-------+
+
+         But you can't load a vector from position 3, it has to be loaded from
+         a multiple of 4. So instead, we load two vectors like this:
+
+                    jprev     j     jnext
+                      v______ v______ v
+                     {0 1 2 3|4 5 6 7}8 9 10 11
+                      | | | | | | | |
+                      v v v v v v v v
+                     +-------+-------+
+                     | vectr | vectr |
+                     +-------+-------+
+
+         And then "shift" the data within the pair of vectors.
+
+         Although this diagram, and the arrangement of pixels on the screen
+         makes this look like a "right shift", on Intel and other
+         little-endian machines, when these memory locations get loaded into
+         the vectors they actually end up in the vectors arranged like this:
+
+                     +-------+-------+
+                     |3 2 1 0|7 6 5 4| Little-endian: first element of memory
+                     +-------+-------+ ends up in "right" end of register!
+
+         We still want to shift element 3 into the vector containing 4,5,6,7
+         and have the 4,5,6 move over one spot with the 7 getting lost.
+         So instead of "left" or "right", think of it as moving the
+         data "up", because each datum moves to the next higher-numbered
+         position.                                                        */
       HWIV_LOAD_4F4(v4_du, &(u[i][jprev]));
-      HWIV_RAISE_4F4(v4_nabu, v4_u, v4_du, t);
+      HWIV_RAISE_4F4(v4_nabla_u, v4_u, v4_du);
 
-      // to get the right neighbor we do a 4-element "lower" which means to
-      // take data from locations (x+1, x+2, x+3, x+4) and move it to
+      // Similar operation to get "right neighbor". This time the data
+      // from locations (x+1, x+2, x+3, x+4) gets "lowered" one step to
       // positions (x, x+1, x+2, x+3). The "x+4" element has to come from
       // the block of 4 values to the right of the current block, and jnext
       // points to that block.
       HWIV_LOAD_4F4(v4_du, &(u[i][jnext]));
-      HWIV_LOWER_4F4(v4_neighbor, v4_u, v4_du, t);
+      HWIV_LOWER_4F4(v4_tmp, v4_u, v4_du);
+      HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
-      HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
-      HWIV_LOAD_4F4(v4_neighbor, &(u[iprev][j]));
-      HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
-      HWIV_LOAD_4F4(v4_neighbor, &(u[inext][j]));
-      HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
-      HWIV_NMSUB_4F4(v4_nabu, v4_4, v4_u, v4_nabu);
+      // Now we add in the "up" and "down" neighbors
+      HWIV_LOAD_4F4(v4_tmp, &(u[iprev][j]));
+      HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
+      HWIV_LOAD_4F4(v4_tmp, &(u[inext][j]));
+      HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
-     // nabla_v = v[i][jprev] + v[i][jnext] + v[iprev][j] + v[inext][j] - 4*vval;
+      // Now we compute -(4*u-neighbors)  = neighbors - 4*u
+      HWIV_NMSUB_4F4(v4_nabla_u, v4_4, v4_u, v4_nabla_u);
+
+      // Same thing all over again for the v's
       HWIV_LOAD_4F4(v4_dv, &(v[i][jprev]));
-      HWIV_RAISE_4F4(v4_nabv, v4_v, v4_dv, t);
+      HWIV_RAISE_4F4(v4_nabla_v, v4_v, v4_dv);
       HWIV_LOAD_4F4(v4_dv, &(v[i][jnext]));
-      HWIV_LOWER_4F4(v4_neighbor, v4_v, v4_dv, t);
-
-      HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
-      HWIV_LOAD_4F4(v4_neighbor, &(v[iprev][j]));
-      HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
-      HWIV_LOAD_4F4(v4_neighbor, &(v[inext][j]));
-      HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
-      HWIV_NMSUB_4F4(v4_nabv, v4_4, v4_v, v4_nabv);
+      HWIV_LOWER_4F4(v4_tmp, v4_v, v4_dv);
+      HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
+      HWIV_LOAD_4F4(v4_tmp, &(v[iprev][j]));
+      HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
+      HWIV_LOAD_4F4(v4_tmp, &(v[inext][j]));
+      HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
+      HWIV_NMSUB_4F4(v4_nabla_v, v4_4, v4_v, v4_nabla_v);
 
       // compute the new rate of change of u and v
-     // du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
-              // D_u * nabla_u - (uval*vval*vval - (-(F*uval-F)) )
-      HWIV_NMSUB_4F4(v4_neighbor, v4_F, v4_u, v4_F);
-      HWIV_MUL_4F4(v4_dv, v4_v, v4_v);
-      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor);
-      HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabu, v4_neighbor);
+
+      /* Scalar code is:
+           du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
+         We treat it as:
+                      D_u * nabla_u - (uval*vval*vval - (-(F*uval-F)) ) */
+
+      HWIV_NMSUB_4F4(v4_tmp, v4_F, v4_u, v4_F);        // -(F*u-F) = F-F*u = F(1-u)
+      HWIV_MUL_4F4(v4_dv, v4_v, v4_v);                 // v^2
+      HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - F(1-u)
+      HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabla_u, v4_tmp); // D_u*nabla_u - (u*v^2 - F(1-u))
+                                                       // = D_u*nabla_u - u*v^2 + F(1-u)
       HWIV_SAVE_4F4(&(du[i][j]), v4_du);
-     // dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
-              // D_v * nabla_v + uval*vval*vval - (F*vval + k*vval);
-      HWIV_MUL_4F4(v4_neighbor, v4_k, v4_v);
-      HWIV_MADD_4F4(v4_neighbor, v4_F, v4_v, v4_neighbor);
-      HWIV_MUL_4F4(v4_dv, v4_v, v4_v);
-      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor);
-      HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabv, v4_neighbor);
+
+      /* dv formula is similar:
+           dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
+         We treat it as:
+                      D_v * nabla_v + uval*vval*vval - (F*vval + k*vval); */
+      HWIV_MUL_4F4(v4_tmp, v4_k, v4_v);                // k*v
+      HWIV_MADD_4F4(v4_tmp, v4_F, v4_v, v4_tmp);       // F*v+k*v = (F+k)v
+      // HWIV_MUL_4F4(v4_dv, v4_v, v4_v);                 v^2 (unchanged from above)
+      HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - (F+k)v
+      HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabla_v, v4_tmp); // D_v*nabla_v + u*v^2 - (F+k)v
       HWIV_SAVE_4F4(&(dv[i][j]), v4_dv);
     }
   }
 
   // effect change
-  {
-
     for(int i = 0; i < GRID_HEIGHT; i++) {
       for(int j = 0; j < GRID_WIDTH; j+=4) {
         // u[i][j] = u[i][j] + speed * du[i][j];
-        HWIV_LOAD_4F4(v4_u, &(u[i][j]));
-        HWIV_LOAD_4F4(v4_du, &(du[i][j]));
-        HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u);
-        HWIV_SAVE_4F4(&(u[i][j]), v4_u);
+        HWIV_LOAD_4F4(v4_u, &(u[i][j]));            // get u
+        HWIV_LOAD_4F4(v4_du, &(du[i][j]));          // get du
+        HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u); // speed*du + u
+        HWIV_SAVE_4F4(&(u[i][j]), v4_u);            // write it back
 
         // v[i][j] = v[i][j] + speed * dv[i][j];
         HWIV_LOAD_4F4(v4_v, &(v[i][j]));
@@ -370,7 +421,6 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
         HWIV_SAVE_4F4(&(v[i][j]), v4_v);
       }
     }
-  }
 }
 
 void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
