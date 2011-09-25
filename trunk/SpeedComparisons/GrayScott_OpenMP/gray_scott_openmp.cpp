@@ -165,7 +165,7 @@ void init(float a[X][Y],float b[X][Y])
 
 void compute(float a[X][Y],float b[X][Y],
              float da[X][Y],float db[X][Y],
-             float r_a,float r_b,float f,float k,float speed,
+             float r_a,float r_b,float par_f,float par_k,float speed,
              bool parameter_space)
 {
     // compute change in each cell
@@ -173,6 +173,8 @@ void compute(float a[X][Y],float b[X][Y],
     for(int i = 0; i < X; i++) 
     {
         int iprev,inext;
+        float f = par_f;
+        float k = par_k;
         if (g_wrap) {
             iprev = (i + X - 1) % X;
             inext = (i + 1) % X;
@@ -197,7 +199,7 @@ void compute(float a[X][Y],float b[X][Y],
             float bval = b[i][j];
 
             if (parameter_space) {
-                const double kmin=0.045f,kmax=0.07f,fmin=0.01f,fmax=0.09f;
+                const float kmin=0.045f,kmax=0.07f,fmin=0.01f,fmax=0.09f;
                 // set f and k for this location (ignore the provided values of f and k)
                 k = kmin + i*(kmax-kmin)/X;
                 f = fmin + j*(fmax-fmin)/Y;
