@@ -220,8 +220,9 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
   HWIV_4F4_ALIGNED talign; // used by FILL_4F4
   V4F4 v4_u; V4F4 v4_du;
   V4F4 v4_v; V4F4 v4_dv;
-  HWIV_INIT_MUL0_4F4(mul_tmp); // used by MUL (on targets that need it)
-  HWIV_INIT_MTMP_4F4(fma_tmp); // used by MADD (on targets that need it)
+  HWIV_INIT_MUL0_4F4; // used by MUL (on targets that need it)
+  HWIV_INIT_MTMP_4F4; // used by MADD (on targets that need it)
+  HWIV_INIT_RLTMP_4F4; // used by RAISE and LOWER
   V4F4 v4_neighbor;
   V4F4 v4_Du;
   V4F4 v4_Dv;
@@ -286,13 +287,17 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
      // nabla_u = u[i][jprev] + u[i][jnext] + u[iprev][j] + u[inext][j] - 4*uval;
       // The first two are hard to load because they require unaligned access.
       // We instead need to load a whole vector from the neighboring location
-      // and shift (raise or lower) the contents by one index.
+      // and shift (raise or lower) the contents by one index. (N.B.: This
+      // is the one part of vector computation that one is pretty much
+      // guaranteed to mess up on the first attempt.)
 
       // to get the left neighbor we do a 4-element "raise", which means to
       // take data from locations (x-1, x, x+1, x+2) and move it to
-      // positions (x, x+1, x+2, x+3). The "x-1" element has to come from
-      // the block of 4 values to the left of the current block, and jprev
-      // points to that block.
+      // positions (x, x+1, x+2, x+3). The data moves to a higher x
+      // coordinate, so its coordinate has been "raised". The "x-1" element
+      // has to come from the block of 4 values to the left of the current
+      // block, and we use jprev (calculated above) as the address of that
+      // block.
       HWIV_LOAD_4F4(v4_du, &(u[i][jprev]));
       HWIV_RAISE_4F4(v4_nabu, v4_u, v4_du, t);
 
@@ -309,7 +314,7 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
       HWIV_LOAD_4F4(v4_neighbor, &(u[inext][j]));
       HWIV_ADD_4F4(v4_nabu, v4_nabu, v4_neighbor);
-      HWIV_NMSUB_4F4(v4_nabu, v4_4, v4_u, v4_nabu, fma_tmp);
+      HWIV_NMSUB_4F4(v4_nabu, v4_4, v4_u, v4_nabu);
 
      // nabla_v = v[i][jprev] + v[i][jnext] + v[iprev][j] + v[inext][j] - 4*vval;
       HWIV_LOAD_4F4(v4_dv, &(v[i][jprev]));
@@ -322,23 +327,23 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
       HWIV_LOAD_4F4(v4_neighbor, &(v[inext][j]));
       HWIV_ADD_4F4(v4_nabv, v4_nabv, v4_neighbor);
-      HWIV_NMSUB_4F4(v4_nabv, v4_4, v4_v, v4_nabv, fma_tmp);
+      HWIV_NMSUB_4F4(v4_nabv, v4_4, v4_v, v4_nabv);
 
       // compute the new rate of change of u and v
      // du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
               // D_u * nabla_u - (uval*vval*vval - (-(F*uval-F)) )
-      HWIV_NMSUB_4F4(v4_neighbor, v4_F, v4_u, v4_F, fma_tmp);
-      HWIV_MUL_4F4(v4_dv, v4_v, v4_v, mul_tmp);
-      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor, fma_tmp);
-      HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabu, v4_neighbor, fma_tmp);
+      HWIV_NMSUB_4F4(v4_neighbor, v4_F, v4_u, v4_F);
+      HWIV_MUL_4F4(v4_dv, v4_v, v4_v);
+      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor);
+      HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabu, v4_neighbor);
       HWIV_SAVE_4F4(&(du[i][j]), v4_du);
      // dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
               // D_v * nabla_v + uval*vval*vval - (F*vval + k*vval);
-      HWIV_MUL_4F4(v4_neighbor, v4_k, v4_v, mul_tmp);
-      HWIV_MADD_4F4(v4_neighbor, v4_F, v4_v, v4_neighbor, fma_tmp);
-      HWIV_MUL_4F4(v4_dv, v4_v, v4_v, mul_tmp);
-      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor, fma_tmp);
-      HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabv, v4_neighbor, fma_tmp);
+      HWIV_MUL_4F4(v4_neighbor, v4_k, v4_v);
+      HWIV_MADD_4F4(v4_neighbor, v4_F, v4_v, v4_neighbor);
+      HWIV_MUL_4F4(v4_dv, v4_v, v4_v);
+      HWIV_MSUB_4F4(v4_neighbor, v4_u, v4_dv, v4_neighbor);
+      HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabv, v4_neighbor);
       HWIV_SAVE_4F4(&(dv[i][j]), v4_dv);
     }
   }
@@ -351,13 +356,13 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
         // u[i][j] = u[i][j] + speed * du[i][j];
         HWIV_LOAD_4F4(v4_u, &(u[i][j]));
         HWIV_LOAD_4F4(v4_du, &(du[i][j]));
-        HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u, fma_tmp);
+        HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u);
         HWIV_SAVE_4F4(&(u[i][j]), v4_u);
 
         // v[i][j] = v[i][j] + speed * dv[i][j];
         HWIV_LOAD_4F4(v4_v, &(v[i][j]));
         HWIV_LOAD_4F4(v4_dv, &(dv[i][j]));
-        HWIV_MADD_4F4(v4_v, v4_speed, v4_dv, v4_v, fma_tmp);
+        HWIV_MADD_4F4(v4_v, v4_speed, v4_dv, v4_v);
         HWIV_SAVE_4F4(&(v[i][j]), v4_v);
       }
     }

@@ -126,18 +126,18 @@ typedef float HWIV_4F4_ALIGNED[4];
 #define HWIV_ADD_4F4(dst, a, b) ({ (dst)[0]=a[0]+b[0]; (dst)[1]=a[1]+b[1]; \
                                 (dst)[2]=a[2]+b[2]; (dst)[3]=a[3]+b[3]; })
 
-#define HWIV_INIT_MUL0_4F4(varname)
+#define HWIV_INIT_MUL0_4F4 /* nop */
 
 /* MUL_4F4: dst, a, and b are each a vector of 4 floats. v0 is a variable
    declared with the HWIV_INIT_MUL0_4F4 macro.
      This opcode multiplies each of the components of a to the corresponding
    component of b and puts the result into dst. The varible v0 is used on
    hardware that has no 2-argument multiply operation. */
-#define HWIV_MUL_4F4(dst, a, b, v0) \
+#define HWIV_MUL_4F4(dst, a, b) \
                              ({ (dst)[0]=a[0]*b[0]; (dst)[1]=a[1]*b[1]; \
                                 (dst)[2]=a[2]*b[2]; (dst)[3]=a[3]*b[3]; })
 
-#define HWIV_INIT_MTMP_4F4(varname)
+#define HWIV_INIT_MTMP_4F4 /* nop */
 
 /* MADD_4F4: dst, a, b, and c are each a vector of 4 floats. t is a variable
    declared with the HWIV_INIT_MTMP_4F4 macro.
@@ -145,12 +145,12 @@ typedef float HWIV_4F4_ALIGNED[4];
    component of b, then adds the corresponding component of c, and puts the
    result into dst. The varible t is used on hardware that has no 3-argument
    multiply-add operation. */
-#define HWIV_MADD_4F4(dst, a, b, c, t)  ({ (dst)[0]=a[0]*b[0] + c[0]; \
+#define HWIV_MADD_4F4(dst, a, b, c)  ({ (dst)[0]=a[0]*b[0] + c[0]; \
                                         (dst)[1]=a[1]*b[1] + c[1]; \
                                         (dst)[2]=a[2]*b[2] + c[2]; \
                                         (dst)[3]=a[3]*b[3] + c[3]; })
 
-#define HWIV_MSUB_4F4(dst, a, b, c, t)  ({ (dst)[0]=a[0]*b[0] - c[0]; \
+#define HWIV_MSUB_4F4(dst, a, b, c)  ({ (dst)[0]=a[0]*b[0] - c[0]; \
                                            (dst)[1]=a[1]*b[1] - c[1]; \
                                            (dst)[2]=a[2]*b[2] - c[2]; \
                                            (dst)[3]=a[3]*b[3] - c[3]; })
@@ -161,13 +161,13 @@ typedef float HWIV_4F4_ALIGNED[4];
    component of b, then subtracts that product from the corresponding
    component of c, then puts the result into dst. The varible t is used on
    hardware that has no 3-argument multiply-add operation. */
-#define HWIV_NMSUB_4F4(dst, a, b, c, t) ({ (dst)[0]=c[0] - a[0]*b[0]; \
+#define HWIV_NMSUB_4F4(dst, a, b, c) ({ (dst)[0]=c[0] - a[0]*b[0]; \
                                         (dst)[1]=c[1] - a[1]*b[1]; \
                                         (dst)[2]=c[2] - a[2]*b[2]; \
                                         (dst)[3]=c[3] - a[3]*b[3]; })
 
 // Declare this if you are doing any raise or lower operation
-#define INIT_RLTMP_4F4(vc) /* nop */
+#define HWIV_INIT_RLTMP_4F4 /* nop */
 
 /* RAISE_4F4: dst, src, extra, and tmp are each a vector of 4 floats.
      This opcode "raises" three of the values from src to the next-higher
@@ -226,23 +226,23 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
 
 // For INIT_MUL0, on Intel we do nothing because Intel actually has a
 // 2-operand multiply operation.
-#define HWIV_INIT_MUL0_4F4(varname) /* nop */
+#define HWIV_INIT_MUL0_4F4 /* nop */
 
 // For INIT_MTMP, on Intel SSE2 we need to declare a variable because
 // Intel SSE2 has no FMA (fused multiply-add) operations (this is
 // expected to come wth AVX2 on Haskell in 2013)
-#define HWIV_INIT_MTMP_4F4(varname) V4F4 varname = _mm_setzero_ps()
+#define HWIV_INIT_MTMP_4F4     V4F4 HWIV_mtmp_4F4 = _mm_setzero_ps()
 
-#define HWIV_MUL_4F4(dst, a, b, v0)    (dst) = _mm_mul_ps((a), (b))
+#define HWIV_MUL_4F4(dst, a, b)    (dst) = _mm_mul_ps((a), (b))
 
-#define HWIV_MADD_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
-                                        (dst) = _mm_add_ps((t), (c)); })
-#define HWIV_MSUB_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
-                                        (dst) = _mm_sub_ps((t), (c)); })
-#define HWIV_NMSUB_4F4(dst, a, b, c, t) ({ (t) = _mm_mul_ps((a), (b)); \
-                                        (dst) = _mm_sub_ps((c), (t)); })
+#define HWIV_MADD_4F4(dst, a, b, c) ({ HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
+                                    (dst) = _mm_add_ps(HWIV_mtmp_4F4, (c)); })
+#define HWIV_MSUB_4F4(dst, a, b, c) ({ HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
+                                    (dst) = _mm_sub_ps(HWIV_mtmp_4F4, (c)); })
+#define HWIV_NMSUB_4F4(dst, a, b, c) ({ HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
+                                    (dst) = _mm_sub_ps((c), HWIV_mtmp_4F4); })
 
-#define INIT_RLTMP_4F4(vc) /* nop */
+#define HWIV_INIT_RLTMP_4F4 /* nop */
 
 #define HWIV_RAISE_4F4(dest, src, new, vs) ({ \
                  (dest) = _mm_shuffle_ps((new), (src), 0x0f); \
