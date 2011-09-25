@@ -40,6 +40,7 @@ void init(float a[X][Y],float b[X][Y]);
 
 static int g_opt_device = 0;
 static int g_color = 0;
+static int g_wrap = 0;
 
 int main(int argc, char * * argv)
 {
@@ -51,6 +52,10 @@ int main(int argc, char * * argv)
         } else if ((i+1<argc) && (strcmp(argv[i],"-device")==0)) {
             // select an output device
             i++; g_opt_device = atoi(argv[i]);
+        } else if (strcmp(argv[i],"-wrap")==0) {
+            // patterns wrap around ("torus", also called "continuous boundary
+            // condition")
+            g_wrap = 1;
         } else {
             std::cout << "Unrecognized argument: '" << argv[i] << "'\n";
             exit(-1);
@@ -169,8 +174,10 @@ int main(int argc, char * * argv)
         kernel.setArg(6, r_a);
         kernel.setArg(7, r_b);
         kernel.setArg(8, speed);
+        kernel.setArg(9, g_wrap);
 
         int iteration = 0;
+        float fps_avg = 0.0; // decaying average of fps
         const int N_FRAMES_PER_DISPLAY = 1000;  // an even number, because of our double-buffering implementation
         while(true) 
         {
@@ -232,10 +239,12 @@ int main(int argc, char * * argv)
             tod_elap = tod_after - tod_before;
 
             char msg[1000];
-            float fps = 0.0;
+            float fps = 0.0;     // frames per second
             if (tod_elap > 0)
                 fps = ((float)N_FRAMES_PER_DISPLAY) / tod_elap;
-            sprintf(msg,"GrayScott - %0.2f fps", fps);
+            // We display an exponential moving average of the fps measurement
+            fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
+            sprintf(msg,"GrayScott - %0.2f fps", fps_avg);
 
             // display:
             {

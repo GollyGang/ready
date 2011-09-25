@@ -11,6 +11,8 @@ See README.txt for more details.
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/time.h>
 #include <math.h>
 
 // local:
@@ -25,8 +27,26 @@ void compute(float a[X][Y],float b[X][Y],
              float speed,
              bool parameter_space);
 
-int main()
+static int g_wrap = 0;
+static bool g_paramspace = 0;
+
+int main(int argc, char * * argv)
 {
+    for (int i = 1; i < argc; i++) {
+        if (0) {
+        } else if (strcmp(argv[i],"-paramspace")==0) {
+           // do a parameter space plot, like in the Pearson paper
+           g_paramspace = true;
+        } else if (strcmp(argv[i],"-wrap")==0) {
+            // patterns wrap around ("torus", also called "continuous boundary
+            // condition")
+            g_wrap = 1;
+        } else {
+            fprintf(stderr, "Unrecognized argument: '%s'\n", argv[i]);
+            exit(-1);
+        }
+    }
+
     // Here we implement the Gray-Scott model, as described here:
     // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
     // http://arxiv.org/abs/patt-sol/9304003
@@ -60,26 +80,38 @@ int main()
 
     // put the initial conditions into each cell
     init(a,b);
-    
-    clock_t start,end;
 
-    const int N_FRAMES_PER_DISPLAY = 100;
+    const int N_FRAMES_PER_DISPLAY = 200;
     int iteration = 0;
+    double fps_avg = 0.0; // decaying average of fps
     while(true) 
     {
-        start = clock();
+        struct timeval tod_record;
+        double tod_before, tod_after, tod_elapsed;
+        double fps = 0.0;     // frames per second
+
+        gettimeofday(&tod_record, 0);
+        tod_before = ((double) (tod_record.tv_sec))
+                                + ((double) (tod_record.tv_usec)) / 1.0e6;
 
         // compute:
         for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
         {
-            compute(a,b,da,db,r_a,r_b,f,k,speed,false);
+            compute(a,b,da,db,r_a,r_b,f,k,speed,g_paramspace);
             iteration++;
         }
 
-        end = clock();
+        gettimeofday(&tod_record, 0);
+        tod_after = ((double) (tod_record.tv_sec))
+                                + ((double) (tod_record.tv_usec)) / 1.0e6;
+
+        tod_elapsed = tod_after - tod_before;
+        fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
+        // We display an exponential moving average of the fps measurement
+        fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
 
         char msg[1000];
-        sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+        sprintf(msg, "GrayScott - %0.2f fps", fps_avg);
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
@@ -137,22 +169,20 @@ void compute(float a[X][Y],float b[X][Y],
     // compute change in each cell
     for(int i = 0; i < X; i++) {
         int iprev,inext;
-        /*if(toroidal) {
+        if (g_wrap) {
             iprev = (i + X - 1) % X;
             inext = (i + 1) % X;
-        }
-        else*/ {
+        } else {
             iprev = max(0,i-1);
             inext = min(X-1,i+1);
         }
 
         for(int j = 0; j < Y; j++) {
             int jprev,jnext;
-            /*if(toroidal) {
+            if (g_wrap) {
                 jprev = (j + Y - 1) % Y;
                 jnext = (j + 1) % Y;
-            }
-            else*/ {
+            } else {
                 jprev = max(0,j-1);
                 jnext = min(Y-1,j+1);
             }
@@ -161,7 +191,7 @@ void compute(float a[X][Y],float b[X][Y],
             float bval = b[i][j];
 
             if(parameter_space)	{
-                const float kmin=0.045f,kmax=0.07f,fmin=0.00f,fmax=0.14f;
+                const float kmin=0.045f,kmax=0.07f,fmin=0.01f,fmax=0.09f;
                 // set f and k for this location (ignore the provided values of f and k)
                 k = kmin + i*(kmax-kmin)/X;
                 f = fmin + j*(fmax-fmin)/Y;

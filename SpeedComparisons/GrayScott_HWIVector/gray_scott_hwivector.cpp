@@ -128,10 +128,12 @@ int main(int argc, char * * argv)
   const int N_FRAMES_PER_DISPLAY = 2000;
 #endif
   int iteration = 0;
+  double fps_avg = 0.0; // decaying average of fps
   while(true) 
   {
     struct timeval tod_record;
-    double tod_before, tod_after, tod_elapsed, fps;
+    double tod_before, tod_after, tod_elapsed;
+    double fps = 0.0;     // frames per second
 
     gettimeofday(&tod_record, 0);
     tod_before = ((double) (tod_record.tv_sec))
@@ -154,9 +156,11 @@ int main(int argc, char * * argv)
 
     tod_elapsed = tod_after - tod_before;
     fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
+    // We display an exponential moving average of the fps measurement
+    fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
 
     char msg[1000];
-    sprintf(msg,"GrayScott - %0.2f fps", fps);
+    sprintf(msg,"GrayScott - %0.2f fps", fps_avg);
 
     // display:
     {
