@@ -63,7 +63,11 @@ there are usually several more steps:
 /* Scalar code to emulate the V4F4 vector model */
 #define HWIV_HAVE_V4F4
 
+/* The vector register type */
 typedef float V4F4[4];
+
+/* Aligned memory suitable for load to / store from the vector register */
+typedef float HWIV_4F4_ALIGNED[4];
 
 /* LOAD_4F4: dst is a vector of 4 floats. src is a pointer to an array
    of floats in memory. This opcode loads 4 consecutive floats from the
@@ -94,9 +98,11 @@ typedef float V4F4[4];
    be passed as tmp to this and other similar macros.
      This opcode loads the 4 scalar values into the vector. The sc0 will be
    loaded into element 0 of the vector, sc1 into element 1, and so on. */
-#define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3, tmp) ({ \
+#define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3) ({ \
             (dst)[0]=(sc0); (dst)[1]=(sc1); (dst)[2]=(sc2); (dst)[3]=(sc3); })
-typedef float HWIV_4F4_ALIGNED[4];
+#define HWIV_INIT_FILL /* nop */
+
+#define HWIV_SPLAT_4F4(dst, s) HWIV_FILL_4F4((dst), (s), (s), (s), (s))
 
 /* SAVE_4F4: dst is a pointer to an array of floats in memory. src is a
    vector of 4 floats. 
@@ -175,7 +181,7 @@ typedef float HWIV_4F4_ALIGNED[4];
    3 of "extra". The varible t is used on hardware that requires the
    result to be computed in two pieces and then assembled via a blend
    operation. ("VSHR_4F4" in old macros) */
-#define HWIV_RAISE_4F4(dst, src, extra, tmp) \
+#define HWIV_RAISE_4F4(dst, src, extra) \
                                       ({ dst[3]=src[2]; dst[2]=src[1]; \
                                          dst[1]=src[0]; dst[0]=extra[3]; })
 
@@ -185,7 +191,7 @@ typedef float HWIV_4F4_ALIGNED[4];
    0 of "extra". The varible t is used on hardware that requires the
    result to be computed in two pieces and then assembled via a blend
    operation. ("VSHL_4F4" in old macros) */
-#define HWIV_LOWER_4F4(dst, src, extra, tmp) \
+#define HWIV_LOWER_4F4(dst, src, extra) \
                                       ({ dst[0]=src[1]; dst[1]=src[2]; \
                                          dst[2]=src[3]; dst[3]=extra[0]; })
 
@@ -207,15 +213,19 @@ typedef float HWIV_4F4_ALIGNED[4];
 
 typedef __m128 V4F4;
 
+typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
+
 #define HWIV_LOAD_4F4(dst, src)        (dst) = _mm_load_ps(src)
 #define HWIV_LOADO_4F4(dst, src, offset) \
                                        (dst) = _mm_load_ps((src)+(offset)/4)
 #define HWIV_COPY_4F4(dst, src)        (dst) = (src)
 
-#define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3, tmp) ({ (tmp)[0]=(sc0); \
-               (tmp)[1]=(sc1); (tmp)[2]=(sc2); (tmp)[3]=(sc3); \
-               HWIV_LOAD_4F4(dst, tmp); })
-typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
+#define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3) \
+            ({ HWIV_fill_4F4[0]=(sc0); HWIV_fill_4F4[1]=(sc1); \
+               HWIV_fill_4F4[2]=(sc2); HWIV_fill_4F4[3]=(sc3); \
+               HWIV_LOAD_4F4(dst, HWIV_fill_4F4); })
+#define HWIV_INIT_FILL float __attribute__((aligned (16))) HWIV_fill_4F4[4];
+#define HWIV_SPLAT_4F4(dst, s) HWIV_FILL_4F4((dst), (s), (s), (s), (s))
 
 #define HWIV_SAVE_4F4(dst, src)        _mm_store_ps((dst), (src))
 
@@ -244,14 +254,14 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
 
 #define HWIV_INIT_RLTMP_4F4 /* nop */
 
-#define HWIV_RAISE_4F4(dest, src, new, vs) ({ \
+#define HWIV_RAISE_4F4(dest, src, new) ({ \
                  (dest) = _mm_shuffle_ps((new), (src), 0x0f); \
                  (dest) = _mm_shuffle_ps((dest), (src), 0x98); \
                  })
 
 #define VROL_4F4(dest, src, tmp) \
                  (dest) = _mm_shuffle_ps((src), (src), 0x39)
-#define HWIV_LOWER_4F4(dest, src, new, vs) ({ \
+#define HWIV_LOWER_4F4(dest, src, new) ({ \
                  (dest) = _mm_move_ss((src), (new)); \
                  VROL_4F4(dest, dest, 0); })
 
