@@ -13,6 +13,21 @@ See README.txt for more details.
 #include <stdio.h>
 #include <math.h>
 
+#ifdef _WIN32
+    #include <sys/timeb.h>
+    #include <sys/types.h>
+    #include <winsock.h>
+    // http://www.linuxjournal.com/article/5574
+    void gettimeofday(struct timeval* t,void* timezone)
+    {       struct _timeb timebuffer;
+          _ftime( &timebuffer );
+          t->tv_sec=timebuffer.time;
+          t->tv_usec=1000*timebuffer.millitm;
+    }
+#else
+    #include <sys/time.h>
+#endif
+
 // SSE:
 #include <xmmintrin.h>
 
@@ -78,13 +93,18 @@ int main()
 
     init(a,b,da,db);
 
-    clock_t start,end;
-
-    const int N_FRAMES_PER_DISPLAY = 10000;
+    const int N_FRAMES_PER_DISPLAY = 1000;
     int iteration = 0;
+    double fps_avg = 0.0; // decaying average of fps
     while(true)
     {
-        start = clock();
+        struct timeval tod_record;
+        double tod_before, tod_after, tod_elapsed;
+        double fps = 0.0;     // frames per second
+
+        gettimeofday(&tod_record, 0);
+        tod_before = ((double) (tod_record.tv_sec))
+                                    + ((double) (tod_record.tv_usec)) / 1.0e6;
 
         // compute:
         for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
@@ -93,11 +113,17 @@ int main()
             iteration++;
         }
 
-        end = clock();
+        gettimeofday(&tod_record, 0);
+        tod_after = ((double) (tod_record.tv_sec))
+                                    + ((double) (tod_record.tv_usec)) / 1.0e6;
+
+        tod_elapsed = tod_after - tod_before;
+        fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
+        // We display an exponential moving average of the fps measurement
+        fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
 
         char msg[1000];
-        if(end>start)
-            sprintf(msg,"GrayScott - %0.2f fps",N_FRAMES_PER_DISPLAY / ((end-start)/(float)CLOCKS_PER_SEC));
+        sprintf(msg,"GrayScott - %0.2f fps",fps_avg);
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?

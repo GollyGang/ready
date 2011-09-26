@@ -8,7 +8,7 @@ See README.txt for more details.
 */
 
 // hardware
-#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__))
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
 # include <xmmintrin.h>
 #endif
 
@@ -78,7 +78,7 @@ int main(int argc, char * * argv)
     }
   }
 
-#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__))
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
   /* On Intel we disable accurate handling of denorms and zeros. This is an
      important speed optimization. */
   int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
