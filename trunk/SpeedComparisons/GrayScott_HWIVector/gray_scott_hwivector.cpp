@@ -37,7 +37,8 @@ See README.txt for more details.
 #define GRID_HEIGHT (Y)
 
 void init(float a[GRID_HEIGHT][GRID_WIDTH],
-          float b[GRID_HEIGHT][GRID_WIDTH]);
+          float b[GRID_HEIGHT][GRID_WIDTH],
+          int density, int lowback, int BZrects);
 
 void compute(float a[GRID_HEIGHT][GRID_WIDTH],
              float b[GRID_HEIGHT][GRID_WIDTH],
@@ -57,17 +58,66 @@ void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
 static int g_color = 0;
 static int g_paramspace = 0;
 static int g_wrap = 0;
+static float g_k, g_F;
+static int g_ramprects = 0;
+static int g_lowback = 0;
+static float g_scale = 1.0;
+static int g_density = 0;
 
 int main(int argc, char * * argv)
 {
+  // Here we implement the Gray-Scott model, as described here:
+  // http://arxiv.org/abs/patt-sol/9304003
+  //    (the seminal paper by Pearson)
+  // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
+  //    (a present university course project, by Greg Turk at Georgia Tech)
+  // http://www.mrob.com/pub/comp/xmorphia/index.html
+  //    (a web exhibit with over 100 videos and 500 images)
+
+  // -- parameters --
+  float D_u = 0.082;
+  float D_v = 0.041;
+
+     g_k = 0.064;  g_F = 0.035;  // spots
+  // g_k = 0.059;  g_F = 0.022;  // spots that keep killing each other off
+  // g_k = 0.06;   g_F = 0.035;  // stripes
+  // g_k = 0.065;  g_F = 0.056;  // long stripes
+  // g_k = 0.064;  g_F = 0.04;   // dots and stripes
+  // g_k = 0.0475; g_F = 0.0118; // spiral waves
+  // g_k = 0.059;  g_F = 0.094;  // "soap bubbles"
+  float speed = 1.0;
+
+  bool custom_Fk = false;
+
   for (int i = 1; i < argc; i++) {
     if (0) {
     } else if (strcmp(argv[i],"-color")==0) {
       // do output in wonderful technicolor
       g_color = 1;
+    } else if ((i+1<argc) && (strcmp(argv[i],"-density")==0)) {
+      // set density of spots for initial pattern
+      i++; g_density = atoi(argv[i]);
+    } else if ((i+1<argc) && 
+         ((strcmp(argv[i],"-F")==0) || (strcmp(argv[i],"-f")==0)) ) {
+      // set parameter F
+      i++; g_F = atof(argv[i]);
+      custom_Fk = true;
+    } else if ((i+1<argc) && (strcmp(argv[i],"-k")==0)) {
+      // set parameter k
+      i++; g_k = atof(argv[i]);
+      custom_Fk = true;
     } else if (strcmp(argv[i],"-paramspace")==0) {
       // do a parameter space plot, like in the Pearson paper
       g_paramspace = 1;
+    } else if (strcmp(argv[i],"-ramprects")==0) {
+      // use ramped rectangles in the initial pattern
+      g_ramprects = 1;
+    } else if (strcmp(argv[i],"-lowback")==0) {
+      // use "low" background value in init
+      g_lowback = 1;
+    } else if ((i+1<argc) && (strcmp(argv[i],"-scale")==0)) {
+      // set scale
+      i++; g_scale = atof(argv[i]);
     } else if (strcmp(argv[i],"-wrap")==0) {
       // patterns wrap around ("torus", also called "continuous boundary
       // condition")
@@ -78,6 +128,14 @@ int main(int argc, char * * argv)
     }
   }
 
+  if ((g_scale == 1.0) && (custom_Fk)) {
+    g_scale = 2.0;
+  }
+
+  D_u = D_u * g_scale;
+  D_v = D_v * g_scale;
+  speed = speed / g_scale;
+
 #if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
   /* On Intel we disable accurate handling of denorms and zeros. This is an
      important speed optimization. */
@@ -86,26 +144,6 @@ int main(int argc, char * * argv)
   _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
 #endif
 
-  // Here we implement the Gray-Scott model, as described here:
-  // http://arxiv.org/abs/patt-sol/9304003
-  //    (the seminal paper by Pearson)
-  // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
-  //    (a present university course project, by Greg Turk at Georgia Tech)
-  // http://www.mrob.com/pub/comp/xmorphia/index.html
-  //    (a web exhibit with over 100 videos and 500 images)
-
-  // -- parameters --
-  float D_u = 0.082; // 0.164; // Twice the old value "0.082"
-  float D_v = 0.041; // 0.084; // Twice the old value "0.041"
-
-  float k, F;
-     k = 0.064;  F = 0.035;  // spots
-  // k = 0.059;  F = 0.022;  // spots that keep killing each other off
-  // k = 0.06;   F = 0.035;  // stripes
-  // k = 0.065;  F = 0.056;  // long stripes
-  // k = 0.064;  F = 0.04;   // dots and stripes
-  // k = 0.0475; F = 0.0118; // spiral waves
-  float speed = 2.0;
   // ----------------
   
   // these arrays store the chemical concentrations:
@@ -120,8 +158,8 @@ int main(int argc, char * * argv)
   float blue[GRID_HEIGHT][GRID_WIDTH];
 
   // put the initial conditions into each cell
-  init(u,v);
-  
+  init(u,v, g_density, g_lowback, g_ramprects);
+
 #ifdef HWIV_EMULATE
   const int N_FRAMES_PER_DISPLAY = 500;
 #else
@@ -142,7 +180,7 @@ int main(int argc, char * * argv)
     // compute:
     for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
     {
-      compute(u,v,du,dv,D_u,D_v,F,k,speed,g_paramspace);
+      compute(u,v,du,dv,D_u,D_v,g_F,g_k,speed,g_paramspace);
       iteration++;
     }
 
@@ -176,34 +214,223 @@ int main(int argc, char * * argv)
   }
 }
 
-// return a random value between lower and upper
-float frand(float lower,float upper)
-{
-  return lower + rand()*(upper-lower)/RAND_MAX;
-}
-
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-void init(float a[GRID_HEIGHT][GRID_WIDTH],float b[GRID_HEIGHT][GRID_WIDTH])
+// return a random value between lower and upper
+float frand(float lower,float upper)
 {
+  float rv;
+
+  rv = lower + rand()*(upper-lower)/RAND_MAX;
+  rv = max(0.0, min(1.0, rv));
+  return rv;
+}
+
+/* pearson_bkg fills everything with the trivial state (U=1, V=0) combined
+   with random noise of magnitude 0.01, and it does this while keeping all
+   U and V values between 0 and 1. */
+void pearson_bkg(float u[GRID_HEIGHT][GRID_WIDTH],
+                 float v[GRID_HEIGHT][GRID_WIDTH])
+{
+  int i, j;
+  for(i=0; i<GRID_HEIGHT; i++) {
+    for(j=0; j<GRID_WIDTH; j++) {
+      u[i][j] = frand(0.99, 1.0);
+      v[i][j] = frand(0.0, 0.01);
+    }
+  }
+}
+
+/* pearson_block creates a block filled with a given U and V value combined
+   with superimposed noise of amplitude 0.01 */
+void pearson_block(float u[GRID_HEIGHT][GRID_WIDTH],
+                 float v[GRID_HEIGHT][GRID_WIDTH],
+                 int vpos, int hpos, int h, int w, float U, float V)
+{
+  int i, j;
+
+  for(i=vpos; i<vpos+h; i++) {
+    if ((i >= 0) && (i < GRID_HEIGHT)) {
+      for(j=hpos; j<hpos+w; j++) {
+        if ((j >= 0) && (j < GRID_WIDTH)) {
+          u[i][j] = frand(U-0.005, U+0.005);
+          v[i][j] = frand(V-0.005, V+0.005);
+        }
+      }
+    }
+  }
+}
+
+/* ramp_block creates a starting pattern for B-Z spirals and continuous
+   propagating wave fronts (pattern type xi in my paper). */
+void ramp_block(float u[GRID_HEIGHT][GRID_WIDTH],
+                float v[GRID_HEIGHT][GRID_WIDTH],
+                int vpos, int hpos, int h, int w, int fliph)
+{
+  int i, j;
+  float U, V;
+
+  for(i=vpos; i<vpos+h; i++) {
+    if ((i >= 0) && (i < GRID_HEIGHT)) {
+      for(j=hpos; j<hpos+w; j++) {
+        if ((j >= 0) && (j < GRID_WIDTH)) {
+          U = ((float) (j-hpos)) / ((float) w);
+          if (fliph) {
+            U = 1.0 - U;
+          }
+          V = U;
+
+          if (U < 0.1) {
+            U = U / 0.1;
+          } else {
+            U = (1.0 - U) / 0.9;
+          }
+          U = 1.0 - sin((1.0 - U) * 1.5708);
+          U = 1.0 - (U * 0.95); // formerly 0.85
+          
+          if (V < 0.08) { // formerly 0.05
+            V = V / 0.08; // formerly 0.05
+          } else if (V < 0.5) {
+            V = (0.5 - V) / 0.42; // formerly 0.45
+          } else {
+            V = 0;
+          }
+          V = 1.0 - sin((1.0 - V) * 1.5708);
+          V = V * 0.4;
+
+          u[i][j] = frand(U-0.005, U+0.005);
+          v[i][j] = frand(V-0.005, V+0.005);
+        }
+      }
+    }
+  }
+}
+
+/* Given an F and k, returns the U and V values for the homogeneous state at
+ that F and k. Tries to return the secondary (blue) state, but if that
+ doesn't exist it returns the trivial (red) state.
+   The formula is derived from Muratov and Osipov 2000 formula 2.12 (with A
+ defined by 2.10, and the other variables defined as in 2.3, 2.4 and 2.5 (all
+ of this is on pages 8-9 of "Muratov 2000 Spike.pdf").
+   There is a more obvious formula (expressed in terms of F and k) in
+ "Leppanen 2004 Computational.pdf" page 40 (his equation 3.22).
+   To get the values for the center F and k settings, use (g_F_CTR, g_k_CTR) */
+void homogen_uv(float F, float k, float * hU, float * hV)
+{
+  float sqrt_F, A;
+  float U, V;
+
+  sqrt_F = sqrt(F);
+
+  if (k < (sqrt_F - 2.0 * F) / 2.0) {
+    A = sqrt_F / (F + k);
+    U = (A - sqrt(A*A - 4.0)) / (2.0 * A);
+    U = max(0.0, min(1.0, U));
+    V = sqrt_F * (A + sqrt(A*A - 4.0)) / 2.0;
+    V = max(0.0, min(1.0, V));
+  } else {
+    U = 1.0;
+    V = 0.0;
+  }
+  *hU = U;
+  *hV = V;
+}
+
+/* i5_bkg is the background for my init routines. It fills the space either
+   with the trivial stable state (V=0, U=1), or when the other stable "blue"
+   state exists it uses that state. This makes for much more interesting
+   initial patterns for the areas near the various bifurcation lines and for
+   Uskate world. */
+void i5_bkg(float u[GRID_HEIGHT][GRID_WIDTH],
+          float v[GRID_HEIGHT][GRID_WIDTH], int which)
+{
+  int i, j;
+
+  for(i=0; i<GRID_HEIGHT; i++) {
+    for(j=0; j<GRID_WIDTH; j++) {
+      float U, V;
+
+      if (which == 0) {
+        U = 1.0; V = 0.0;
+      } else {
+        homogen_uv(g_F, g_k, &U, &V);
+      }
+      // printf("F %g  k %g  A %g  U %g  V %g\n", F, k, A, U, V);
+      u[i][j] = U;
+      v[i][j] = V;
+    }
+  }
+}
+
+void init(float u[GRID_HEIGHT][GRID_WIDTH],
+          float v[GRID_HEIGHT][GRID_WIDTH],
+          int density, int lowback, int BZrects)
+{
+  long nsp, i;
+  long base, var;
+
   srand((unsigned int)time(NULL));
+
+  if (density <= 0) {
+    nsp = 0;
+  } else {
+    if (density == 3) {
+      base = (GRID_HEIGHT * GRID_WIDTH) / 512;
+      var = 2;
+    } else {
+      base = density * 20;
+      var = density * (GRID_HEIGHT * GRID_WIDTH) / 1000;
+    }
+
+    nsp = base + (rand() % var);
+    printf("Adding %ld random rectangles\n", nsp);
+  }
+
+  i5_bkg(u, v, lowback ? 0 : 1);
+
+  for(i=0; i<nsp; i++) {
+    int v1, vs, h1, hs;
+    float U, V;
+
+    vs = 10 + (rand() % 12) * (rand() % 12) / 5;
+    hs = 10 + (rand() % 12) * (rand() % 12) / 5;
+
+    v1 = (rand() % GRID_HEIGHT) - (vs / 2);
+    h1 = (rand() % GRID_WIDTH) - (hs / 2);
+
+    U = frand(0.0, 1.0);
+    if (BZrects) {
+      V = frand(0.0, 1.0 - U);
+    } else {
+      V = frand(0.0, 1.0);
+    }
+    if (BZrects) {
+      if ((rand() & 0x3) == 0) {
+        int h;
+        h = 40 + (rand() & 31); // formerly 20 + ...
+        ramp_block(u, v, v1, h1, h, 100, rand() & 1); // formerly 60
+      } else {
+        pearson_block(u, v, v1, h1, vs, hs, U, V);
+      }
+    } else {
+      pearson_block(u, v, v1, h1, vs, hs, U, V);
+    }
+  }
     
-  // figure the values
+  if (nsp <= 0) {
+  // old init pattern
   for(int i = 0; i < GRID_HEIGHT; i++) {
     for(int j = 0; j < GRID_WIDTH; j++) {
       if(hypot(i-GRID_HEIGHT/2,(j-GRID_WIDTH/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
       {
-        a[i][j] = frand(0.0,0.1);
-        b[i][j] = frand(0.9,1.0);
-      }
-      else {
-        a[i][j] = frand(0.9,1.0);
-        b[i][j] = frand(0.0,0.1);
+        u[i][j] = frand(0.0,0.1);
+        v[i][j] = frand(0.9,1.0);
       }
     }
+  }
   }
 }
 
