@@ -73,8 +73,8 @@ typedef float HWIV_4F4_ALIGNED[4];
    of floats in memory. This opcode loads 4 consecutive floats from the
    given location into the vector. The first float from memory will be loaded
    into element 0 of the vector, the 2nd into element 1, and so on. */
-#define HWIV_LOAD_4F4(dst, src) ({ (dst)[0]=(src)[0]; (dst)[1]=(src)[1]; \
-                                   (dst)[2]=(src)[2]; (dst)[3]=(src)[3]; })
+#define HWIV_LOAD_4F4(dst, src)  { (dst)[0]=(src)[0]; (dst)[1]=(src)[1]; \
+                                   (dst)[2]=(src)[2]; (dst)[3]=(src)[3]; }
 
 /* LOADO_4F4: dst is a vector of 4 floats. src is a pointer to an array
    of floats in memory. offset is a byte offset, which must be a multiple
@@ -82,10 +82,10 @@ typedef float HWIV_4F4_ALIGNED[4];
      This opcode loads 4 consecutive floats from the given location plus
    offset into the vector. The first float from memory will be loaded into
    element 0 of the vector, the 2nd into element 1, and so on. */
-#define HWIV_LOADO_4F4(dst, src, offset) ({ (dst)[0]=(src)[(offset)/4]; \
+#define HWIV_LOADO_4F4(dst, src, offset)  { (dst)[0]=(src)[(offset)/4]; \
                                             (dst)[1]=(src)[(offset)/4+1]; \
                                             (dst)[2]=(src)[(offset)/4+2]; \
-                                            (dst)[3]=(src)[(offset)/4+3]; })
+                                            (dst)[3]=(src)[(offset)/4+3]; }
 
 /* COPY_4F4: dst and src are each a vector of 4 floats. This opcode copies
    the contents of the source vector into the destination vector. */
@@ -98,8 +98,8 @@ typedef float HWIV_4F4_ALIGNED[4];
    be passed as tmp to this and other similar macros.
      This opcode loads the 4 scalar values into the vector. The sc0 will be
    loaded into element 0 of the vector, sc1 into element 1, and so on. */
-#define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3) ({ \
-            (dst)[0]=(sc0); (dst)[1]=(sc1); (dst)[2]=(sc2); (dst)[3]=(sc3); })
+#define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3) { \
+            (dst)[0]=(sc0); (dst)[1]=(sc1); (dst)[2]=(sc2); (dst)[3]=(sc3); }
 #define HWIV_INIT_FILL /* nop */
 
 #define HWIV_SPLAT_4F4(dst, s) HWIV_FILL_4F4((dst), (s), (s), (s), (s))
@@ -121,16 +121,16 @@ typedef float HWIV_4F4_ALIGNED[4];
    float) beginning at the given destination location plus offset. Element
    0 of the vector will be stored into the first 4 bytes in memory, element
    1 into the next 4 bytes of memory, and so on. */
-#define HWIV_SAVEO_4F4(dst, offset, src) ({ (dst)[(offset)/4]=(src)[0]; \
+#define HWIV_SAVEO_4F4(dst, offset, src) { (dst)[(offset)/4]=(src)[0]; \
                                          (dst)[(offset)/4+1]=(src)[1]; \
                                          (dst)[(offset)/4+2]=(src)[2]; \
-                                         (dst)[(offset)/4+3]=(src)[3]; })
+                                         (dst)[(offset)/4+3]=(src)[3]; }
 
 /* ADD_4F4: dst, a, and b are each a vector of 4 floats.
      This opcode adds each of the components of a to the corresponding
    component of b and puts the result into dst. */
-#define HWIV_ADD_4F4(dst, a, b) ({ (dst)[0]=a[0]+b[0]; (dst)[1]=a[1]+b[1]; \
-                                (dst)[2]=a[2]+b[2]; (dst)[3]=a[3]+b[3]; })
+#define HWIV_ADD_4F4(dst, a, b) { (dst)[0]=a[0]+b[0]; (dst)[1]=a[1]+b[1]; \
+                                (dst)[2]=a[2]+b[2]; (dst)[3]=a[3]+b[3]; }
 
 #define HWIV_INIT_MUL0_4F4 /* nop */
 
@@ -140,8 +140,8 @@ typedef float HWIV_4F4_ALIGNED[4];
    component of b and puts the result into dst. The varible v0 is used on
    hardware that has no 2-argument multiply operation. */
 #define HWIV_MUL_4F4(dst, a, b) \
-                             ({ (dst)[0]=a[0]*b[0]; (dst)[1]=a[1]*b[1]; \
-                                (dst)[2]=a[2]*b[2]; (dst)[3]=a[3]*b[3]; })
+                             { (dst)[0]=a[0]*b[0]; (dst)[1]=a[1]*b[1]; \
+                                (dst)[2]=a[2]*b[2]; (dst)[3]=a[3]*b[3]; }
 
 #define HWIV_INIT_MTMP_4F4 /* nop */
 
@@ -151,15 +151,15 @@ typedef float HWIV_4F4_ALIGNED[4];
    component of b, then adds the corresponding component of c, and puts the
    result into dst. The varible t is used on hardware that has no 3-argument
    multiply-add operation. */
-#define HWIV_MADD_4F4(dst, a, b, c)  ({ (dst)[0]=a[0]*b[0] + c[0]; \
+#define HWIV_MADD_4F4(dst, a, b, c)  { (dst)[0]=a[0]*b[0] + c[0]; \
                                         (dst)[1]=a[1]*b[1] + c[1]; \
                                         (dst)[2]=a[2]*b[2] + c[2]; \
-                                        (dst)[3]=a[3]*b[3] + c[3]; })
+                                        (dst)[3]=a[3]*b[3] + c[3]; }
 
-#define HWIV_MSUB_4F4(dst, a, b, c)  ({ (dst)[0]=a[0]*b[0] - c[0]; \
+#define HWIV_MSUB_4F4(dst, a, b, c)  { (dst)[0]=a[0]*b[0] - c[0]; \
                                            (dst)[1]=a[1]*b[1] - c[1]; \
                                            (dst)[2]=a[2]*b[2] - c[2]; \
-                                           (dst)[3]=a[3]*b[3] - c[3]; })
+                                           (dst)[3]=a[3]*b[3] - c[3]; }
 
 /* NMSUB_4F4: dst, a, b, and c are each a vector of 4 floats. t is a variable
    declared with the HWIV_INIT_MTMP_4F4 macro.
@@ -167,10 +167,10 @@ typedef float HWIV_4F4_ALIGNED[4];
    component of b, then subtracts that product from the corresponding
    component of c, then puts the result into dst. The varible t is used on
    hardware that has no 3-argument multiply-add operation. */
-#define HWIV_NMSUB_4F4(dst, a, b, c) ({ (dst)[0]=c[0] - a[0]*b[0]; \
+#define HWIV_NMSUB_4F4(dst, a, b, c) { (dst)[0]=c[0] - a[0]*b[0]; \
                                         (dst)[1]=c[1] - a[1]*b[1]; \
                                         (dst)[2]=c[2] - a[2]*b[2]; \
-                                        (dst)[3]=c[3] - a[3]*b[3]; })
+                                        (dst)[3]=c[3] - a[3]*b[3]; }
 
 // Declare this if you are doing any raise or lower operation
 #define HWIV_INIT_RLTMP_4F4 /* nop */
@@ -182,8 +182,8 @@ typedef float HWIV_4F4_ALIGNED[4];
    result to be computed in two pieces and then assembled via a blend
    operation. ("VSHR_4F4" in old macros) */
 #define HWIV_RAISE_4F4(dst, src, extra) \
-                                      ({ dst[3]=src[2]; dst[2]=src[1]; \
-                                         dst[1]=src[0]; dst[0]=extra[3]; })
+                                      { dst[3]=src[2]; dst[2]=src[1]; \
+                                         dst[1]=src[0]; dst[0]=extra[3]; }
 
 /* LOWER_4F4: dst, src, extra, and tmp are each a vector of 4 floats.
      This opcode "lowers" three of the values from src to the next-lower
@@ -192,8 +192,8 @@ typedef float HWIV_4F4_ALIGNED[4];
    result to be computed in two pieces and then assembled via a blend
    operation. ("VSHL_4F4" in old macros) */
 #define HWIV_LOWER_4F4(dst, src, extra) \
-                                      ({ dst[0]=src[1]; dst[1]=src[2]; \
-                                         dst[2]=src[3]; dst[3]=extra[0]; })
+                                      { dst[0]=src[1]; dst[1]=src[2]; \
+                                         dst[2]=src[3]; dst[3]=extra[0]; }
 
 # endif
 
@@ -221,9 +221,9 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
 #define HWIV_COPY_4F4(dst, src)        (dst) = (src)
 
 #define HWIV_FILL_4F4(dst, sc0, sc1, sc2, sc3) \
-            ({ HWIV_fill_4F4[0]=(sc0); HWIV_fill_4F4[1]=(sc1); \
+            { HWIV_fill_4F4[0]=(sc0); HWIV_fill_4F4[1]=(sc1); \
                HWIV_fill_4F4[2]=(sc2); HWIV_fill_4F4[3]=(sc3); \
-               HWIV_LOAD_4F4(dst, HWIV_fill_4F4); })
+               HWIV_LOAD_4F4(dst, HWIV_fill_4F4); }
 #define HWIV_INIT_FILL float __attribute__((aligned (16))) HWIV_fill_4F4[4];
 #define HWIV_SPLAT_4F4(dst, s) HWIV_FILL_4F4((dst), (s), (s), (s), (s))
 
@@ -245,25 +245,25 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
 
 #define HWIV_MUL_4F4(dst, a, b)    (dst) = _mm_mul_ps((a), (b))
 
-#define HWIV_MADD_4F4(dst, a, b, c) ({ HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
-                                    (dst) = _mm_add_ps(HWIV_mtmp_4F4, (c)); })
-#define HWIV_MSUB_4F4(dst, a, b, c) ({ HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
-                                    (dst) = _mm_sub_ps(HWIV_mtmp_4F4, (c)); })
-#define HWIV_NMSUB_4F4(dst, a, b, c) ({ HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
-                                    (dst) = _mm_sub_ps((c), HWIV_mtmp_4F4); })
+#define HWIV_MADD_4F4(dst, a, b, c) { HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
+                                    (dst) = _mm_add_ps(HWIV_mtmp_4F4, (c)); }
+#define HWIV_MSUB_4F4(dst, a, b, c) { HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
+                                    (dst) = _mm_sub_ps(HWIV_mtmp_4F4, (c)); }
+#define HWIV_NMSUB_4F4(dst, a, b, c) { HWIV_mtmp_4F4 = _mm_mul_ps((a), (b)); \
+                                    (dst) = _mm_sub_ps((c), HWIV_mtmp_4F4); }
 
 #define HWIV_INIT_RLTMP_4F4 /* nop */
 
-#define HWIV_RAISE_4F4(dest, src, new) ({ \
+#define HWIV_RAISE_4F4(dest, src, new) { \
                  (dest) = _mm_shuffle_ps((new), (src), 0x0f); \
                  (dest) = _mm_shuffle_ps((dest), (src), 0x98); \
-                 })
+                 }
 
 #define VROL_4F4(dest, src, tmp) \
                  (dest) = _mm_shuffle_ps((src), (src), 0x39)
-#define HWIV_LOWER_4F4(dest, src, new) ({ \
+#define HWIV_LOWER_4F4(dest, src, new) { \
                  (dest) = _mm_move_ss((src), (new)); \
-                 VROL_4F4(dest, dest, 0); })
+                 VROL_4F4(dest, dest, 0); }
 
 # endif
 
