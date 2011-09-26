@@ -12,8 +12,21 @@ See README.txt for more details.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/time.h>
 #include <math.h>
+
+#ifdef _WIN32
+    #include <sys/timeb.h>
+    #include <sys/types.h>
+    #include <winsock.h>
+    void gettimeofday(struct timeval* t,void* timezone)
+    {       struct _timeb timebuffer;
+          _ftime( &timebuffer );
+          t->tv_sec=timebuffer.time;
+          t->tv_usec=1000*timebuffer.millitm;
+    }
+#else
+    #include <sys/time.h>
+#endif
 
 // OpenCV:
 #include <cv.h>
