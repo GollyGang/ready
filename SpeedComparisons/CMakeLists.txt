@@ -11,6 +11,7 @@ add_subdirectory(GrayScott)
 add_subdirectory(GrayScott_HWIVector)
 add_subdirectory(GrayScott_double)
 add_subdirectory(GrayScott_SSE)
+add_subdirectory(GrayScott_SSE_OpenMP)
 add_subdirectory(GrayScott_OpenMP)
 add_subdirectory(GrayScott_OpenCL)
 
