@@ -102,8 +102,6 @@ int main(int argc, char * * argv)
     // put the initial conditions into each cell
     init(red,green);
 
-    clock_t start,end;
-
     try { 
         // Get available OpenCL platforms
         vector<Platform> platforms;
