@@ -78,7 +78,7 @@ int main()
 
     clock_t start,end;
 
-    const int N_FRAMES_PER_DISPLAY = 100;
+    const int N_FRAMES_PER_DISPLAY = 1000;
     int iteration = 0;
     while(true)
     {
@@ -116,7 +116,7 @@ float frand(float lower,float upper)
 
 void init(float *a,float *b,float *da,float *db)
 {
-#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__))
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
   /* On Intel we disable accurate handling of denorms and zeros. This is an
      important speed optimization. */
   int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
