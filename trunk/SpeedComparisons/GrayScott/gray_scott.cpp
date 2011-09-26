@@ -18,6 +18,7 @@ See README.txt for more details.
     #include <sys/timeb.h>
     #include <sys/types.h>
     #include <winsock.h>
+    // http://www.linuxjournal.com/article/5574
     void gettimeofday(struct timeval* t,void* timezone)
     {       struct _timeb timebuffer;
           _ftime( &timebuffer );

@@ -17,6 +17,7 @@ See README.txt for more details.
     #include <sys/timeb.h>
     #include <sys/types.h>
     #include <winsock.h>
+    // http://www.linuxjournal.com/article/5574
     void gettimeofday(struct timeval* t,void* timezone)
     {       struct _timeb timebuffer;
           _ftime( &timebuffer );
@@ -191,7 +192,7 @@ int main(int argc, char * * argv)
 
         int iteration = 0;
         float fps_avg = 0.0; // decaying average of fps
-        const int N_FRAMES_PER_DISPLAY = 1000;  // an even number, because of our double-buffering implementation
+        const int N_FRAMES_PER_DISPLAY = 10000;  // an even number, because of our double-buffering implementation
         while(true) 
         {
             struct timeval tod_record;

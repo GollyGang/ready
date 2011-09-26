@@ -24,6 +24,9 @@ See README.txt for more details.
 #include "defs.h"
 //#include "display.h"
 
+// OpenMP:
+#include <omp.h>
+
 inline int at(int x,int y) { return x*Y+y; }
 const int FLOATS_PER_BLOCK = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
 const int X_BLOCKS = X / FLOATS_PER_BLOCK; // 4 horizontally-neighboring cells form an SSE block
@@ -77,7 +80,7 @@ int main()
 
     clock_t start,end;
 
-    const int N_FRAMES_PER_DISPLAY = 1000;
+    const int N_FRAMES_PER_DISPLAY = 10000;
     int iteration = 0;
     while(true)
     {
@@ -151,58 +154,52 @@ void compute(float *a,float *b,float *da,float *db,
              float r_a,float r_b,float f,float k,
              float speed)
 {
-    __m128 *a_SSE = (__m128*) a;
-    __m128 *b_SSE = (__m128*) b;
-    __m128 a_left,a_right,b_left,b_right;
-    __m128 *a_above,*a_below,*b_above,*b_below;
-    __m128 *da_SSE = (__m128*) da;
-    __m128 *db_SSE = (__m128*) db;
-    __m128 t1_SSE,t2_SSE,t3_SSE,t4_SSE,t5_SSE,t6_SSE;
-    __m128 dda_SSE,ddb_SSE;
-    __m128 one_SSE = _mm_set1_ps(1.0f); // set to (1,1,1,1)
-    __m128 minus_four_SSE = _mm_set1_ps(-4.0f);
-    __m128 r_a_SSE = _mm_set1_ps(r_a);
-    __m128 r_b_SSE = _mm_set1_ps(r_b);
-    __m128 f_SSE = _mm_set1_ps(f);
-    __m128 k_SSE = _mm_set1_ps(k);
+    const __m128 r_a_SSE = _mm_set1_ps(r_a);
+    const __m128 r_b_SSE = _mm_set1_ps(r_b);
+    const __m128 f_SSE = _mm_set1_ps(f);
+    const __m128 k_SSE = _mm_set1_ps(k);
+    const __m128 speed_SSE = _mm_set1_ps(speed);
+    const __m128 one_SSE = _mm_set1_ps(1.0f);
+    const __m128 minus_four_SSE = _mm_set1_ps(-4.0f);
 
     // compute the rates of change
+    #pragma omp parallel for
     for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks for now (for simplicity)
     {
-        a_SSE = ((__m128*)a)+block_at(i,1);
-        b_SSE = ((__m128*)b)+block_at(i,1);
-        da_SSE = ((__m128*)da)+block_at(i,1);
-        db_SSE = ((__m128*)db)+block_at(i,1);
         for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks for now
         {
+            __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
+            __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
+            __m128 *da_SSE = ((__m128*)da)+block_at(i,j);
+            __m128 *db_SSE = ((__m128*)db)+block_at(i,j);
             // retrieve the neighboring cells
-            a_left = _mm_loadu_ps(((float*)a_SSE)-1);
-            a_right = _mm_loadu_ps(((float*)a_SSE)+1);
-            a_above = a_SSE-X_BLOCKS;
-            a_below = a_SSE+X_BLOCKS;
-            b_left = _mm_loadu_ps(((float*)b_SSE)-1);
-            b_right = _mm_loadu_ps(((float*)b_SSE)+1);
-            b_above = b_SSE-X_BLOCKS;
-            b_below = b_SSE+X_BLOCKS;
+            __m128 a_left = _mm_loadu_ps(((float*)a_SSE)-1);
+            __m128 a_right = _mm_loadu_ps(((float*)a_SSE)+1);
+            __m128 *a_above = a_SSE-X_BLOCKS;
+            __m128 *a_below = a_SSE+X_BLOCKS;
+            __m128 b_left = _mm_loadu_ps(((float*)b_SSE)-1);
+            __m128 b_right = _mm_loadu_ps(((float*)b_SSE)+1);
+            __m128 *b_above = b_SSE-X_BLOCKS;
+            __m128 *b_below = b_SSE+X_BLOCKS;
             // find the Laplacian of a (using the von Neumann neighborhood)
-            dda_SSE = _mm_mul_ps(*a_SSE,minus_four_SSE);
+            __m128 dda_SSE = _mm_mul_ps(*a_SSE,minus_four_SSE);
             dda_SSE = _mm_add_ps(dda_SSE,a_left);
             dda_SSE = _mm_add_ps(dda_SSE,a_right);
             dda_SSE = _mm_add_ps(dda_SSE,*a_above);
             dda_SSE = _mm_add_ps(dda_SSE,*a_below);
             // find the Laplacian of b
-            ddb_SSE = _mm_mul_ps(*b_SSE,minus_four_SSE);
+            __m128 ddb_SSE = _mm_mul_ps(*b_SSE,minus_four_SSE);
             ddb_SSE = _mm_add_ps(ddb_SSE,b_left);
             ddb_SSE = _mm_add_ps(ddb_SSE,b_right);
             ddb_SSE = _mm_add_ps(ddb_SSE,*b_above);
             ddb_SSE = _mm_add_ps(ddb_SSE,*b_below);
             // compute the new rates of changes
-            t1_SSE = _mm_mul_ps(r_a_SSE,dda_SSE); // t1 = r_a * dda
-            t2_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t2 = aval*bval
-            t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = aval*bval*bval
-            t4_SSE = _mm_sub_ps(one_SSE,*a_SSE); // t4 = 1-aval
-            t5_SSE = _mm_mul_ps(f_SSE,t4_SSE); // t5 = f * (1-aval)
-            t6_SSE = _mm_sub_ps(t1_SSE,t3_SSE); // t6 = r_a *dda - aval*bval*bval
+            __m128 t1_SSE = _mm_mul_ps(r_a_SSE,dda_SSE); // t1 = r_a * dda
+            __m128 t2_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t2 = aval*bval
+            __m128 t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = aval*bval*bval
+            __m128 t4_SSE = _mm_sub_ps(one_SSE,*a_SSE); // t4 = 1-aval
+            __m128 t5_SSE = _mm_mul_ps(f_SSE,t4_SSE); // t5 = f * (1-aval)
+            __m128 t6_SSE = _mm_sub_ps(t1_SSE,t3_SSE); // t6 = r_a *dda - aval*bval*bval
             *da_SSE = _mm_add_ps(t6_SSE,t5_SSE); // da = r_a * dda - aval*bval*bval + f*(1-aval)
             t1_SSE = _mm_mul_ps(r_b_SSE,ddb_SSE); // t1 = r_b * ddb
             t2_SSE = _mm_add_ps(f_SSE,k_SSE); // t2 = f + k
@@ -211,31 +208,23 @@ void compute(float *a,float *b,float *da,float *db,
             t5_SSE = _mm_mul_ps(t4_SSE,*b_SSE); // t5 = aval*bval*bval
             t6_SSE = _mm_add_ps(t1_SSE,t5_SSE); // t6 = r_b*ddb + aval*bval*bval
             *db_SSE = _mm_sub_ps(t6_SSE,t3_SSE); // db = r_b*ddb + aval*bval*bval - (f+k)*bval
-            a_SSE++;
-            b_SSE++;
-            da_SSE++;
-            db_SSE++;
         }
     }
 
     // apply the rate of change
-    __m128 speed_SSE = _mm_set1_ps(speed);
-    a_SSE = (__m128*) a;
-    b_SSE = (__m128*) b;
-    da_SSE = (__m128*) da;
-    db_SSE = (__m128*) db;
+    #pragma omp parallel for
     for(int i=0;i<TOTAL_BLOCKS;i++)
     {
+        __m128 *a_SSE = ((__m128*)a)+i;
+        __m128 *b_SSE = ((__m128*)b)+i;
+        __m128 *da_SSE = ((__m128*)da)+i;
+        __m128 *db_SSE = ((__m128*)db)+i;
         // a[i] += speed * da[i];
-        t1_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
+        __m128 t1_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
         *a_SSE = _mm_add_ps(*a_SSE,t1_SSE);
-        a_SSE++;
-        da_SSE++;
         // b[i] += speed * db[i];
         t1_SSE = _mm_mul_ps(*db_SSE,speed_SSE);
         *b_SSE = _mm_add_ps(*b_SSE,t1_SSE);
-        b_SSE++;
-        db_SSE++;
     }
 }
 
