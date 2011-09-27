@@ -499,10 +499,14 @@ void compute(float *u, float *v, float *du, float *dv,
   V4F4 v4_1;
   V4F4 v4_4;
   const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
-  float F_diff;
-  V4F4 v4_Fdiff;
+  float k_diff;
+  V4F4 v4_kdiff;
+  float * ubase; float * ub_prev; float * ub_next;
+  float * vbase; float * vb_prev; float * vb_next;
+  float * dubase; float * dvbase;
 
-  F_diff = (F_max-F_min)/g_width;
+  //F_diff = (F_max-F_min)/g_width;
+  k_diff = (k_max-k_min)/g_height;
 
   // Initialize our vectorized scalars
   HWIV_SPLAT_4F4(v4_speed, speed);
@@ -512,7 +516,7 @@ void compute(float *u, float *v, float *du, float *dv,
   HWIV_SPLAT_4F4(v4_Dv, D_v);
   HWIV_SPLAT_4F4(v4_1, 1.0);
   HWIV_SPLAT_4F4(v4_4, 4.0);
-  HWIV_FILL_4F4(v4_Fdiff, 0, F_diff, 2*F_diff, 3*F_diff);
+  HWIV_FILL_4F4(v4_kdiff, 0, -k_diff, -2*k_diff, -3*k_diff);
 
   // Scan per row
   for(int i = 0; i < g_height; i++) {
@@ -524,13 +528,24 @@ void compute(float *u, float *v, float *du, float *dv,
       iprev = max(i-1, 0);
       inext = min(i+1, g_height-1);
     }
+    /* Get pointers to beginning of rows for each of the grids. We access
+       3 rows each for u and v, and 1 row each for du and dv. */
+    ubase = &INDEX(u,i,0);
+    ub_prev = &INDEX(u,iprev,0);
+    ub_next = &INDEX(u,inext,0);
+    vbase = &INDEX(v,i,0);
+    vb_prev = &INDEX(v,iprev,0);
+    vb_next = &INDEX(v,inext,0);
+    dubase = &INDEX(du,i,0);
+    dvbase = &INDEX(dv,i,0);
 
     if (parameter_space) {
-      // set k for this row (ignore the provided value)
-      k = k_min + i*(k_max-k_min)/g_height;
-      HWIV_SPLAT_4F4(v4_k, k);
+      // set F for this row (ignore the provided value)
+      F = F_min + (g_height-i-1) * (F_max-F_min)/g_width;
+      HWIV_SPLAT_4F4(v4_F, F);
     }
 
+    // Scan per column in steps of vector width
     for(int j = 0; j < g_width; j+=4) {
       int jprev,jnext;
 
@@ -543,17 +558,17 @@ void compute(float *u, float *v, float *du, float *dv,
       }
 
       // float uval = u[i][j];
-      HWIV_LOAD_4F4(v4_u, &INDEX(u,i,j));
+      HWIV_LOAD_4F4(v4_u, ubase+j);
       // float vval = v[i][j];
-      HWIV_LOAD_4F4(v4_v, &INDEX(v,i,j));
+      HWIV_LOAD_4F4(v4_v, vbase+j);
 
       if (parameter_space) {
-        // fill F vector
-        F = F_min + j * F_diff;
-        // F increases by F_diff each time j increases by 1, so this vector
-        // needs to contain 4 different F values.
-        HWIV_SPLAT_4F4(v4_tmp, F);
-        HWIV_ADD_4F4(v4_F, v4_tmp, v4_Fdiff);
+        // set k for this column (ignore the provided value)
+        k = k_min + (g_width-j-1)*k_diff;
+        // k decreases by k_diff each time j increases by 1, so this vector
+        // needs to contain 4 different k values.
+        HWIV_SPLAT_4F4(v4_tmp, k);
+        HWIV_ADD_4F4(v4_k, v4_tmp, v4_kdiff);
       }
 
       // compute the Laplacians of u and v. "nabla" is the name of the
@@ -610,7 +625,7 @@ void compute(float *u, float *v, float *du, float *dv,
          So instead of "left" or "right", think of it as moving the
          data "up", because each datum moves to the next higher-numbered
          position.                                                        */
-      HWIV_LOAD_4F4(v4_du, &INDEX(u,i,jprev));
+      HWIV_LOAD_4F4(v4_du, ubase+jprev);
       HWIV_RAISE_4F4(v4_nabla_u, v4_u, v4_du);
 
       // Similar operation to get "right neighbor". This time the data
@@ -618,28 +633,28 @@ void compute(float *u, float *v, float *du, float *dv,
       // positions (x, x+1, x+2, x+3). The "x+4" element has to come from
       // the block of 4 values to the right of the current block, and jnext
       // points to that block.
-      HWIV_LOAD_4F4(v4_du, &INDEX(u,i,jnext));
+      HWIV_LOAD_4F4(v4_du, ubase+jnext);
       HWIV_LOWER_4F4(v4_tmp, v4_u, v4_du);
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
       // Now we add in the "up" and "down" neighbors
-      HWIV_LOAD_4F4(v4_tmp, &INDEX(u,iprev,j));
+      HWIV_LOAD_4F4(v4_tmp, ub_prev+j);
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
-      HWIV_LOAD_4F4(v4_tmp, &INDEX(u,inext,j));
+      HWIV_LOAD_4F4(v4_tmp, ub_next+j);
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
       // Now we compute -(4*u-neighbors)  = neighbors - 4*u
       HWIV_NMSUB_4F4(v4_nabla_u, v4_4, v4_u, v4_nabla_u);
 
       // Same thing all over again for the v's
-      HWIV_LOAD_4F4(v4_dv, &INDEX(v,i,jprev));
+      HWIV_LOAD_4F4(v4_dv, vbase+jprev);
       HWIV_RAISE_4F4(v4_nabla_v, v4_v, v4_dv);
-      HWIV_LOAD_4F4(v4_dv, &INDEX(v,i,jnext));
+      HWIV_LOAD_4F4(v4_dv, vbase+jnext);
       HWIV_LOWER_4F4(v4_tmp, v4_v, v4_dv);
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
-      HWIV_LOAD_4F4(v4_tmp, &INDEX(v,iprev,j));
+      HWIV_LOAD_4F4(v4_tmp, vb_prev+j);
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
-      HWIV_LOAD_4F4(v4_tmp, &INDEX(v,inext,j));
+      HWIV_LOAD_4F4(v4_tmp, vb_next+j);
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
       HWIV_NMSUB_4F4(v4_nabla_v, v4_4, v4_v, v4_nabla_v);
 
@@ -655,7 +670,7 @@ void compute(float *u, float *v, float *du, float *dv,
       HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - F(1-u)
       HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabla_u, v4_tmp); // D_u*nabla_u - (u*v^2 - F(1-u))
                                                        // = D_u*nabla_u - u*v^2 + F(1-u)
-      HWIV_SAVE_4F4(&INDEX(du,i,j), v4_du);
+      HWIV_SAVE_4F4(dubase+j, v4_du);
 
       /* dv formula is similar:
            dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
@@ -666,24 +681,30 @@ void compute(float *u, float *v, float *du, float *dv,
       // HWIV_MUL_4F4(v4_dv, v4_v, v4_v);                 v^2 (unchanged from above)
       HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - (F+k)v
       HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabla_v, v4_tmp); // D_v*nabla_v + u*v^2 - (F+k)v
-      HWIV_SAVE_4F4(&INDEX(dv,i,j), v4_dv);
+      HWIV_SAVE_4F4(dvbase+j, v4_dv);
     }
   }
 
   // effect change
     for(int i = 0; i < g_height; i++) {
+      ubase = &INDEX(u,i,0);
+      vbase = &INDEX(v,i,0);
+      dubase = &INDEX(du,i,0);
+      dvbase = &INDEX(dv,i,0);
       for(int j = 0; j < g_width; j+=4) {
         // u[i][j] = u[i][j] + speed * du[i][j];
-        HWIV_LOAD_4F4(v4_u, &INDEX(u,i,j));            // get u
-        HWIV_LOAD_4F4(v4_du, &INDEX(du,i,j));          // get du
+        HWIV_LOAD_4F4(v4_u, ubase);            // get u
+        HWIV_LOAD_4F4(v4_du, dubase);          // get du
         HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u); // speed*du + u
-        HWIV_SAVE_4F4(&INDEX(u,i,j), v4_u);            // write it back
+        HWIV_SAVE_4F4(ubase, v4_u);            // write it back
+        ubase += 4; dubase += 4;
 
         // v[i][j] = v[i][j] + speed * dv[i][j];
-        HWIV_LOAD_4F4(v4_v, &INDEX(v,i,j));
-        HWIV_LOAD_4F4(v4_dv, &INDEX(dv,i,j));
+        HWIV_LOAD_4F4(v4_v, vbase);
+        HWIV_LOAD_4F4(v4_dv, dvbase);
         HWIV_MADD_4F4(v4_v, v4_speed, v4_dv, v4_v);
-        HWIV_SAVE_4F4(&INDEX(v,i,j), v4_v);
+        HWIV_SAVE_4F4(vbase, v4_v);
+        vbase += 4; dvbase += 4;
       }
     }
 }
