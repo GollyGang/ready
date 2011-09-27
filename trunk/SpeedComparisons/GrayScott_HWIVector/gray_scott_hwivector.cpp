@@ -505,6 +505,11 @@ void compute(float *u, float *v, float *du, float *dv,
   float * vbase; float * vb_prev; float * vb_next;
   float * dubase; float * dvbase;
 
+  V4F4 v4_u_l;
+  V4F4 v4_u_r;
+  V4F4 v4_v_l;
+  V4F4 v4_v_r;
+
   //F_diff = (F_max-F_min)/g_width;
   k_diff = (k_max-k_min)/g_height;
 
@@ -521,6 +526,8 @@ void compute(float *u, float *v, float *du, float *dv,
   // Scan per row
   for(int i = 0; i < g_height; i++) {
     int iprev,inext;
+    int j2;
+
     if (g_wrap) {
       iprev = (i+g_height-1) % g_height;
       inext = (i+1) % g_height;
@@ -545,22 +552,29 @@ void compute(float *u, float *v, float *du, float *dv,
       HWIV_SPLAT_4F4(v4_F, F);
     }
 
+    /* Pre-load the first two blocks of data we need, which are the "center"
+       and "right" blocks from the end of the row (as if we have just wrapped
+       around from the end of the row back to the beginning) */
+    j2 = g_wrap ? (g_width-4) : 0;
+    HWIV_LOAD_4F4(v4_u, ubase+j2);
+    HWIV_LOAD_4F4(v4_u_r, ubase);
+    HWIV_LOAD_4F4(v4_v, vbase+j2);
+    HWIV_LOAD_4F4(v4_v_r, vbase);
+
     // Scan per column in steps of vector width
     for(int j = 0; j < g_width; j+=4) {
-      int jprev,jnext;
-
       if (g_wrap) {
-        jprev = (j+g_width-4) % g_width;
-        jnext = (j+4) % g_width;
+        j2 = (j+4) % g_width;
       } else {
-        jprev = max(j-4, 0);
-        jnext = min(j+4, g_height-4);
+        j2 = min(j+4, g_height-4);
       }
 
-      // float uval = u[i][j];
-      HWIV_LOAD_4F4(v4_u, ubase+j);
-      // float vval = v[i][j];
-      HWIV_LOAD_4F4(v4_v, vbase+j);
+      HWIV_COPY_4F4(v4_u_l, v4_u);
+      HWIV_COPY_4F4(v4_v_l, v4_v);
+      HWIV_COPY_4F4(v4_u, v4_u_r);
+      HWIV_COPY_4F4(v4_v, v4_v_r);
+      HWIV_LOAD_4F4(v4_u_r, ubase+j2);
+      HWIV_LOAD_4F4(v4_v_r, vbase+j2);
 
       if (parameter_space) {
         // set k for this column (ignore the provided value)
@@ -575,66 +589,10 @@ void compute(float *u, float *v, float *du, float *dv,
       // "upside down delta" symbol used for the Laplacian in equations
 
       /* Scalar code is:
-         nabla_u = u[i][jprev]+u[i][jnext]+u[iprev][j]+u[inext][j] - 4*uval;
+         nabla_u = u[i][jprev]+u[i][jnext]+u[iprev][j]+u[inext][j] - 4*uval; */
+      HWIV_RAISE_4F4(v4_nabla_u, v4_u, v4_u_l);
 
-         The first two are hard to load because they require unaligned access.
-         We instead need to load a whole vector from the neighboring location
-         and shift (RAISE or LOWER) the contents by one position. (N.B.: This
-         is the one part of vector computation that is pretty much guaranteed
-         to confuse even experienced vector programmers.)
-
-         Assuming j increases as you move to the right, consider the case of
-         getting the 4 "left neighbors" into a vector. If we're doing the
-         computation for pixels (4,5,6,7) then j=4. To get the "left neighbors"
-         we need to get (3,4,5,6). Ideally we would just do this:
-
-                           j-1
-                            v______
-                      0 1 2{3 4 5 6}7 8 9 10 11
-                             \ \ \ \
-                              v v v v
-                             +-------+
-                             |vector |
-                             +-------+
-
-         But you can't load a vector from position 3, it has to be loaded from
-         a multiple of 4. So instead, we load two vectors like this:
-
-                    jprev     j     jnext
-                      v______ v______ v
-                     {0 1 2 3|4 5 6 7}8 9 10 11
-                      | | | | | | | |
-                      v v v v v v v v
-                     +-------+-------+
-                     | vectr | vectr |
-                     +-------+-------+
-
-         And then "shift" the data within the pair of vectors.
-
-         Although this diagram, and the arrangement of pixels on the screen
-         makes this look like a "right shift", on Intel and other
-         little-endian machines, when these memory locations get loaded into
-         the vectors they actually end up in the vectors arranged like this:
-
-                     +-------+-------+
-                     |3 2 1 0|7 6 5 4| Little-endian: first element of memory
-                     +-------+-------+ ends up in "right" end of register!
-
-         We still want to shift element 3 into the vector containing 4,5,6,7
-         and have the 4,5,6 move over one spot with the 7 getting lost.
-         So instead of "left" or "right", think of it as moving the
-         data "up", because each datum moves to the next higher-numbered
-         position.                                                        */
-      HWIV_LOAD_4F4(v4_du, ubase+jprev);
-      HWIV_RAISE_4F4(v4_nabla_u, v4_u, v4_du);
-
-      // Similar operation to get "right neighbor". This time the data
-      // from locations (x+1, x+2, x+3, x+4) gets "lowered" one step to
-      // positions (x, x+1, x+2, x+3). The "x+4" element has to come from
-      // the block of 4 values to the right of the current block, and jnext
-      // points to that block.
-      HWIV_LOAD_4F4(v4_du, ubase+jnext);
-      HWIV_LOWER_4F4(v4_tmp, v4_u, v4_du);
+      HWIV_LOWER_4F4(v4_tmp, v4_u, v4_u_r);
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
       // Now we add in the "up" and "down" neighbors
@@ -647,10 +605,8 @@ void compute(float *u, float *v, float *du, float *dv,
       HWIV_NMSUB_4F4(v4_nabla_u, v4_4, v4_u, v4_nabla_u);
 
       // Same thing all over again for the v's
-      HWIV_LOAD_4F4(v4_dv, vbase+jprev);
-      HWIV_RAISE_4F4(v4_nabla_v, v4_v, v4_dv);
-      HWIV_LOAD_4F4(v4_dv, vbase+jnext);
-      HWIV_LOWER_4F4(v4_tmp, v4_v, v4_dv);
+      HWIV_RAISE_4F4(v4_nabla_v, v4_v, v4_v_l);
+      HWIV_LOWER_4F4(v4_tmp, v4_v, v4_v_r);
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
       HWIV_LOAD_4F4(v4_tmp, vb_prev+j);
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
@@ -678,7 +634,7 @@ void compute(float *u, float *v, float *du, float *dv,
                       D_v * nabla_v + uval*vval*vval - (F*vval + k*vval); */
       HWIV_MUL_4F4(v4_tmp, v4_k, v4_v);                // k*v
       HWIV_MADD_4F4(v4_tmp, v4_F, v4_v, v4_tmp);       // F*v+k*v = (F+k)v
-      // HWIV_MUL_4F4(v4_dv, v4_v, v4_v);                 v^2 (unchanged from above)
+                                                       // v^2 is still in v4_dv
       HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - (F+k)v
       HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabla_v, v4_tmp); // D_v*nabla_v + u*v^2 - (F+k)v
       HWIV_SAVE_4F4(dvbase+j, v4_dv);
@@ -693,18 +649,16 @@ void compute(float *u, float *v, float *du, float *dv,
       dvbase = &INDEX(dv,i,0);
       for(int j = 0; j < g_width; j+=4) {
         // u[i][j] = u[i][j] + speed * du[i][j];
-        HWIV_LOAD_4F4(v4_u, ubase);            // get u
-        HWIV_LOAD_4F4(v4_du, dubase);          // get du
+        HWIV_LOAD_4F4(v4_u, ubase+j);               // get u
+        HWIV_LOAD_4F4(v4_du, dubase+j);             // get du
         HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u); // speed*du + u
-        HWIV_SAVE_4F4(ubase, v4_u);            // write it back
-        ubase += 4; dubase += 4;
+        HWIV_SAVE_4F4(ubase+j, v4_u);               // write it back
 
         // v[i][j] = v[i][j] + speed * dv[i][j];
-        HWIV_LOAD_4F4(v4_v, vbase);
-        HWIV_LOAD_4F4(v4_dv, dvbase);
+        HWIV_LOAD_4F4(v4_v, vbase+j);
+        HWIV_LOAD_4F4(v4_dv, dvbase+j);
         HWIV_MADD_4F4(v4_v, v4_speed, v4_dv, v4_v);
-        HWIV_SAVE_4F4(vbase, v4_v);
-        vbase += 4; dvbase += 4;
+        HWIV_SAVE_4F4(vbase+j, v4_v);
       }
     }
 }
