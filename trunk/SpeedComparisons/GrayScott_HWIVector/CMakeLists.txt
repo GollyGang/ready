@@ -3,8 +3,6 @@ project(GrayScott_HWIVector)
 FIND_PACKAGE(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES( ${OPENCV_INCLUDE_DIR})
 
-INCLUDE_DIRECTORIES( "../Display" )
-
 if(MSVC)
   add_definitions(/arch:SSE2)
 endif()
@@ -12,9 +10,8 @@ endif()
 add_executable(GrayScott_HWIVector 
   gray_scott_hwivector.cpp 
   hwi_vector.h
-  ../Display/display.cpp
-  ../Display/display.h
-  ../Display/defs.h
+  display_hwiv.cpp
+  display_hwiv.h
 )
 
 TARGET_LINK_LIBRARIES(GrayScott_HWIVector ${OpenCV_LIBS} )
