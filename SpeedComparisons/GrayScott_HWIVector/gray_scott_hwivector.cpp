@@ -44,30 +44,37 @@ See README.txt for more details.
 #endif
 
 // local:
-#include "defs.h"
-#include "display.h"
+#include "display_hwiv.h"
 
-#define GRID_WIDTH  (X)
-#define GRID_HEIGHT (Y)
+static int g_width = 256;
+static int g_height = 256;
+#define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
 
-void init(float a[GRID_HEIGHT][GRID_WIDTH],
-          float b[GRID_HEIGHT][GRID_WIDTH],
+float *allocate(int width, int height, const char * error_text);
+float *allocate(int width, int height, const char * error_text)
+{
+  size_t sz;
+  float * rv;
+  sz = ((size_t) width) * ((size_t) height) * sizeof(*rv);
+  rv = (float *) malloc(sz);
+  if (rv == NULL) {
+    fprintf(stderr, "allocate: Could get %ld bytes for %s\n", ((long) sz),
+      error_text);
+    exit(-1);
+  }
+  return (rv);
+}
+
+void init(float *a, float *b,
           int density, int lowback, int BZrects);
 
-void compute(float a[GRID_HEIGHT][GRID_WIDTH],
-             float b[GRID_HEIGHT][GRID_WIDTH],
-             float da[GRID_HEIGHT][GRID_WIDTH],
-             float db[GRID_HEIGHT][GRID_WIDTH],
-             float D_u,float D_v,float F,float k,
+void compute(float *a, float *b, float *da, float *db,
+             float D_u, float D_v, float F, float k,
              float speed,
              int parameter_space);
 
-void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
-             float v[GRID_HEIGHT][GRID_WIDTH],
-             float du[GRID_HEIGHT][GRID_WIDTH],
-             float red[GRID_HEIGHT][GRID_WIDTH],
-             float green[GRID_HEIGHT][GRID_WIDTH],
-             float blue[GRID_HEIGHT][GRID_WIDTH]);
+void colorize(float *u, float *v, float *du,
+             float *red, float *green, float *blue);
 
 static int g_color = 0;
 static int g_paramspace = 0;
@@ -116,6 +123,9 @@ int main(int argc, char * * argv)
       // set parameter F
       i++; g_F = atof(argv[i]);
       custom_Fk = true;
+    } else if ((i+1<argc) && (strcmp(argv[i],"-height")==0)) {
+      // set height
+      i++; g_height = atoi(argv[i]);
     } else if ((i+1<argc) && (strcmp(argv[i],"-k")==0)) {
       // set parameter k
       i++; g_k = atof(argv[i]);
@@ -132,6 +142,12 @@ int main(int argc, char * * argv)
     } else if ((i+1<argc) && (strcmp(argv[i],"-scale")==0)) {
       // set scale
       i++; g_scale = atof(argv[i]);
+    } else if ((i+1<argc) && (strcmp(argv[i],"-size")==0)) {
+      // set both width and height
+      i++; g_height = g_width = atoi(argv[i]);
+    } else if ((i+1<argc) && (strcmp(argv[i],"-width")==0)) {
+      // set width
+      i++; g_width = atoi(argv[i]);
     } else if (strcmp(argv[i],"-wrap")==0) {
       // patterns wrap around ("torus", also called "continuous boundary
       // condition")
@@ -145,10 +161,13 @@ int main(int argc, char * * argv)
   if ((g_scale == 1.0) && (custom_Fk)) {
     g_scale = 2.0;
   }
-
   D_u = D_u * g_scale;
   D_v = D_v * g_scale;
   speed = speed / g_scale;
+
+  if (g_width%4) {
+    g_width = ((g_width/4)+1)*4;
+  }
 
 #if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
   /* On Intel we disable accurate handling of denorms and zeros. This is an
@@ -161,24 +180,35 @@ int main(int argc, char * * argv)
   // ----------------
   
   // these arrays store the chemical concentrations:
-  float u[GRID_HEIGHT][GRID_WIDTH];
-  float v[GRID_HEIGHT][GRID_WIDTH];
+  float *u = 0;
+  float *v = 0;
   // these arrays store the rate of change of those chemicals:
-  float du[GRID_HEIGHT][GRID_WIDTH];
-  float dv[GRID_HEIGHT][GRID_WIDTH];
+  float *du = 0;
+  float *dv = 0;
 
-  float red[GRID_HEIGHT][GRID_WIDTH];
-  float green[GRID_HEIGHT][GRID_WIDTH];
-  float blue[GRID_HEIGHT][GRID_WIDTH];
+  float *red = 0;
+  float *green = 0;
+  float *blue = 0;
+
+  u = allocate(g_width, g_height, "U array");
+  v = allocate(g_width, g_height, "V array");
+  du = allocate(g_width, g_height, "D_u array");
+  dv = allocate(g_width, g_height, "D_v array");
+  red = allocate(g_width, g_height, "red array");
+  green = allocate(g_width, g_height, "green array");
+  blue = allocate(g_width, g_height, "blue array");
 
   // put the initial conditions into each cell
   init(u,v, g_density, g_lowback, g_ramprects);
 
+  int N_FRAMES_PER_DISPLAY;
+
 #ifdef HWIV_EMULATE
-  const int N_FRAMES_PER_DISPLAY = 500;
+  N_FRAMES_PER_DISPLAY = 500;
 #else
-  const int N_FRAMES_PER_DISPLAY = 2000;
+  N_FRAMES_PER_DISPLAY = 2000;
 #endif
+
   int iteration = 0;
   double fps_avg = 0.0; // decaying average of fps
   while(true) 
@@ -218,9 +248,9 @@ int main(int argc, char * * argv)
     {
       int chose_quit;
       if (g_color) {
-        chose_quit = display(red,green,blue,iteration,false,200.0f,2,10,msg);
+        chose_quit = display(g_width,g_height,red,green,blue,iteration,false,200.0f,2,10,msg);
       } else {
-        chose_quit = display(u,u,u,iteration,false,200.0f,2,10,msg);
+        chose_quit = display(g_width,g_height,u,u,u,iteration,false,200.0f,2,10,msg);
       }
       if (chose_quit) // did user ask to quit?
         break;
@@ -246,32 +276,30 @@ float frand(float lower,float upper)
 /* pearson_bkg fills everything with the trivial state (U=1, V=0) combined
    with random noise of magnitude 0.01, and it does this while keeping all
    U and V values between 0 and 1. */
-void pearson_bkg(float u[GRID_HEIGHT][GRID_WIDTH],
-                 float v[GRID_HEIGHT][GRID_WIDTH])
+void pearson_bkg(float *u, float *v)
 {
   int i, j;
-  for(i=0; i<GRID_HEIGHT; i++) {
-    for(j=0; j<GRID_WIDTH; j++) {
-      u[i][j] = frand(0.99, 1.0);
-      v[i][j] = frand(0.0, 0.01);
+  for(i=0; i<g_height; i++) {
+    for(j=0; j<g_width; j++) {
+      INDEX(u,i,j) = frand(0.99, 1.0);
+      INDEX(v,i,j) = frand(0.0, 0.01);
     }
   }
 }
 
 /* pearson_block creates a block filled with a given U and V value combined
    with superimposed noise of amplitude 0.01 */
-void pearson_block(float u[GRID_HEIGHT][GRID_WIDTH],
-                 float v[GRID_HEIGHT][GRID_WIDTH],
+void pearson_block(float *u, float *v,
                  int vpos, int hpos, int h, int w, float U, float V)
 {
   int i, j;
 
   for(i=vpos; i<vpos+h; i++) {
-    if ((i >= 0) && (i < GRID_HEIGHT)) {
+    if ((i >= 0) && (i < g_height)) {
       for(j=hpos; j<hpos+w; j++) {
-        if ((j >= 0) && (j < GRID_WIDTH)) {
-          u[i][j] = frand(U-0.005, U+0.005);
-          v[i][j] = frand(V-0.005, V+0.005);
+        if ((j >= 0) && (j < g_width)) {
+          INDEX(u,i,j) = frand(U-0.005, U+0.005);
+          INDEX(v,i,j) = frand(V-0.005, V+0.005);
         }
       }
     }
@@ -280,17 +308,16 @@ void pearson_block(float u[GRID_HEIGHT][GRID_WIDTH],
 
 /* ramp_block creates a starting pattern for B-Z spirals and continuous
    propagating wave fronts (pattern type xi in my paper). */
-void ramp_block(float u[GRID_HEIGHT][GRID_WIDTH],
-                float v[GRID_HEIGHT][GRID_WIDTH],
+void ramp_block(float *u, float *v,
                 int vpos, int hpos, int h, int w, int fliph)
 {
   int i, j;
   float U, V;
 
   for(i=vpos; i<vpos+h; i++) {
-    if ((i >= 0) && (i < GRID_HEIGHT)) {
+    if ((i >= 0) && (i < g_height)) {
       for(j=hpos; j<hpos+w; j++) {
-        if ((j >= 0) && (j < GRID_WIDTH)) {
+        if ((j >= 0) && (j < g_width)) {
           U = ((float) (j-hpos)) / ((float) w);
           if (fliph) {
             U = 1.0 - U;
@@ -315,8 +342,8 @@ void ramp_block(float u[GRID_HEIGHT][GRID_WIDTH],
           V = 1.0 - sin((1.0 - V) * 1.5708);
           V = V * 0.4;
 
-          u[i][j] = frand(U-0.005, U+0.005);
-          v[i][j] = frand(V-0.005, V+0.005);
+          INDEX(u,i,j) = frand(U-0.005, U+0.005);
+          INDEX(v,i,j) = frand(V-0.005, V+0.005);
         }
       }
     }
@@ -358,13 +385,12 @@ void homogen_uv(float F, float k, float * hU, float * hV)
    state exists it uses that state. This makes for much more interesting
    initial patterns for the areas near the various bifurcation lines and for
    Uskate world. */
-void i5_bkg(float u[GRID_HEIGHT][GRID_WIDTH],
-          float v[GRID_HEIGHT][GRID_WIDTH], int which)
+void i5_bkg(float *u, float *v, int which)
 {
   int i, j;
 
-  for(i=0; i<GRID_HEIGHT; i++) {
-    for(j=0; j<GRID_WIDTH; j++) {
+  for(i=0; i<g_height; i++) {
+    for(j=0; j<g_width; j++) {
       float U, V;
 
       if (which == 0) {
@@ -373,14 +399,13 @@ void i5_bkg(float u[GRID_HEIGHT][GRID_WIDTH],
         homogen_uv(g_F, g_k, &U, &V);
       }
       // printf("F %g  k %g  A %g  U %g  V %g\n", F, k, A, U, V);
-      u[i][j] = U;
-      v[i][j] = V;
+      INDEX(u,i,j) = U;
+      INDEX(v,i,j) = V;
     }
   }
 }
 
-void init(float u[GRID_HEIGHT][GRID_WIDTH],
-          float v[GRID_HEIGHT][GRID_WIDTH],
+void init(float *u, float *v,
           int density, int lowback, int BZrects)
 {
   long nsp, i;
@@ -392,11 +417,11 @@ void init(float u[GRID_HEIGHT][GRID_WIDTH],
     nsp = 0;
   } else {
     if (density == 3) {
-      base = (GRID_HEIGHT * GRID_WIDTH) / 512;
+      base = (g_height * g_width) / 512;
       var = 2;
     } else {
       base = density * 20;
-      var = density * (GRID_HEIGHT * GRID_WIDTH) / 1000;
+      var = density * (g_height * g_width) / 1000;
     }
 
     nsp = base + (rand() % var);
@@ -412,8 +437,8 @@ void init(float u[GRID_HEIGHT][GRID_WIDTH],
     vs = 10 + (rand() % 12) * (rand() % 12) / 5;
     hs = 10 + (rand() % 12) * (rand() % 12) / 5;
 
-    v1 = (rand() % GRID_HEIGHT) - (vs / 2);
-    h1 = (rand() % GRID_WIDTH) - (hs / 2);
+    v1 = (rand() % g_height) - (vs / 2);
+    h1 = (rand() % g_width) - (hs / 2);
 
     U = frand(0.0, 1.0);
     if (BZrects) {
@@ -436,22 +461,19 @@ void init(float u[GRID_HEIGHT][GRID_WIDTH],
     
   if (nsp <= 0) {
   // old init pattern
-  for(int i = 0; i < GRID_HEIGHT; i++) {
-    for(int j = 0; j < GRID_WIDTH; j++) {
-      if(hypot(i-GRID_HEIGHT/2,(j-GRID_WIDTH/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+  for(int i = 0; i < g_height; i++) {
+    for(int j = 0; j < g_width; j++) {
+      if(hypot(i-g_height/2,(j-g_width/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
       {
-        u[i][j] = frand(0.0,0.1);
-        v[i][j] = frand(0.9,1.0);
+        INDEX(u,i,j) = frand(0.0,0.1);
+        INDEX(v,i,j) = frand(0.9,1.0);
       }
     }
   }
   }
 }
 
-void compute(float u[GRID_HEIGHT][GRID_WIDTH],
-             float v[GRID_HEIGHT][GRID_WIDTH],
-             float du[GRID_HEIGHT][GRID_WIDTH],
-             float dv[GRID_HEIGHT][GRID_WIDTH],
+void compute(float *u, float *v, float *du, float *dv,
              float D_u,float D_v,float F,float k,float speed,
              int parameter_space)
 {
@@ -476,9 +498,11 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
   V4F4 v4_nabla_v;
   V4F4 v4_1;
   V4F4 v4_4;
-  const float k_min=0.045f,k_max=0.07f,F_min=0.01f,F_max=0.09f;
-  const float F_diff = (F_max-F_min)/GRID_WIDTH;
+  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
+  float F_diff;
   V4F4 v4_Fdiff;
+
+  F_diff = (F_max-F_min)/g_width;
 
   // Initialize our vectorized scalars
   HWIV_SPLAT_4F4(v4_speed, speed);
@@ -491,37 +515,37 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
   HWIV_FILL_4F4(v4_Fdiff, 0, F_diff, 2*F_diff, 3*F_diff);
 
   // Scan per row
-  for(int i = 0; i < GRID_HEIGHT; i++) {
+  for(int i = 0; i < g_height; i++) {
     int iprev,inext;
     if (g_wrap) {
-      iprev = (i+GRID_HEIGHT-1) % GRID_HEIGHT;
-      inext = (i+1) % GRID_HEIGHT;
+      iprev = (i+g_height-1) % g_height;
+      inext = (i+1) % g_height;
     } else {
       iprev = max(i-1, 0);
-      inext = min(i+1, GRID_HEIGHT-1);
+      inext = min(i+1, g_height-1);
     }
 
     if (parameter_space) {
       // set k for this row (ignore the provided value)
-      k = k_min + i*(k_max-k_min)/GRID_HEIGHT;
+      k = k_min + i*(k_max-k_min)/g_height;
       HWIV_SPLAT_4F4(v4_k, k);
     }
 
-    for(int j = 0; j < GRID_WIDTH; j+=4) {
+    for(int j = 0; j < g_width; j+=4) {
       int jprev,jnext;
 
       if (g_wrap) {
-        jprev = (j+GRID_WIDTH-4) % GRID_WIDTH;
-        jnext = (j+4) % GRID_WIDTH;
+        jprev = (j+g_width-4) % g_width;
+        jnext = (j+4) % g_width;
       } else {
         jprev = max(j-4, 0);
-        jnext = min(j+4, GRID_HEIGHT-4);
+        jnext = min(j+4, g_height-4);
       }
 
       // float uval = u[i][j];
-      HWIV_LOAD_4F4(v4_u, &(u[i][j]));
+      HWIV_LOAD_4F4(v4_u, &INDEX(u,i,j));
       // float vval = v[i][j];
-      HWIV_LOAD_4F4(v4_v, &(v[i][j]));
+      HWIV_LOAD_4F4(v4_v, &INDEX(v,i,j));
 
       if (parameter_space) {
         // fill F vector
@@ -586,7 +610,7 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
          So instead of "left" or "right", think of it as moving the
          data "up", because each datum moves to the next higher-numbered
          position.                                                        */
-      HWIV_LOAD_4F4(v4_du, &(u[i][jprev]));
+      HWIV_LOAD_4F4(v4_du, &INDEX(u,i,jprev));
       HWIV_RAISE_4F4(v4_nabla_u, v4_u, v4_du);
 
       // Similar operation to get "right neighbor". This time the data
@@ -594,28 +618,28 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       // positions (x, x+1, x+2, x+3). The "x+4" element has to come from
       // the block of 4 values to the right of the current block, and jnext
       // points to that block.
-      HWIV_LOAD_4F4(v4_du, &(u[i][jnext]));
+      HWIV_LOAD_4F4(v4_du, &INDEX(u,i,jnext));
       HWIV_LOWER_4F4(v4_tmp, v4_u, v4_du);
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
       // Now we add in the "up" and "down" neighbors
-      HWIV_LOAD_4F4(v4_tmp, &(u[iprev][j]));
+      HWIV_LOAD_4F4(v4_tmp, &INDEX(u,iprev,j));
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
-      HWIV_LOAD_4F4(v4_tmp, &(u[inext][j]));
+      HWIV_LOAD_4F4(v4_tmp, &INDEX(u,inext,j));
       HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
 
       // Now we compute -(4*u-neighbors)  = neighbors - 4*u
       HWIV_NMSUB_4F4(v4_nabla_u, v4_4, v4_u, v4_nabla_u);
 
       // Same thing all over again for the v's
-      HWIV_LOAD_4F4(v4_dv, &(v[i][jprev]));
+      HWIV_LOAD_4F4(v4_dv, &INDEX(v,i,jprev));
       HWIV_RAISE_4F4(v4_nabla_v, v4_v, v4_dv);
-      HWIV_LOAD_4F4(v4_dv, &(v[i][jnext]));
+      HWIV_LOAD_4F4(v4_dv, &INDEX(v,i,jnext));
       HWIV_LOWER_4F4(v4_tmp, v4_v, v4_dv);
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
-      HWIV_LOAD_4F4(v4_tmp, &(v[iprev][j]));
+      HWIV_LOAD_4F4(v4_tmp, &INDEX(v,iprev,j));
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
-      HWIV_LOAD_4F4(v4_tmp, &(v[inext][j]));
+      HWIV_LOAD_4F4(v4_tmp, &INDEX(v,inext,j));
       HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
       HWIV_NMSUB_4F4(v4_nabla_v, v4_4, v4_v, v4_nabla_v);
 
@@ -631,7 +655,7 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - F(1-u)
       HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabla_u, v4_tmp); // D_u*nabla_u - (u*v^2 - F(1-u))
                                                        // = D_u*nabla_u - u*v^2 + F(1-u)
-      HWIV_SAVE_4F4(&(du[i][j]), v4_du);
+      HWIV_SAVE_4F4(&INDEX(du,i,j), v4_du);
 
       /* dv formula is similar:
            dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
@@ -642,50 +666,46 @@ void compute(float u[GRID_HEIGHT][GRID_WIDTH],
       // HWIV_MUL_4F4(v4_dv, v4_v, v4_v);                 v^2 (unchanged from above)
       HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - (F+k)v
       HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabla_v, v4_tmp); // D_v*nabla_v + u*v^2 - (F+k)v
-      HWIV_SAVE_4F4(&(dv[i][j]), v4_dv);
+      HWIV_SAVE_4F4(&INDEX(dv,i,j), v4_dv);
     }
   }
 
   // effect change
-    for(int i = 0; i < GRID_HEIGHT; i++) {
-      for(int j = 0; j < GRID_WIDTH; j+=4) {
+    for(int i = 0; i < g_height; i++) {
+      for(int j = 0; j < g_width; j+=4) {
         // u[i][j] = u[i][j] + speed * du[i][j];
-        HWIV_LOAD_4F4(v4_u, &(u[i][j]));            // get u
-        HWIV_LOAD_4F4(v4_du, &(du[i][j]));          // get du
+        HWIV_LOAD_4F4(v4_u, &INDEX(u,i,j));            // get u
+        HWIV_LOAD_4F4(v4_du, &INDEX(du,i,j));          // get du
         HWIV_MADD_4F4(v4_u, v4_speed, v4_du, v4_u); // speed*du + u
-        HWIV_SAVE_4F4(&(u[i][j]), v4_u);            // write it back
+        HWIV_SAVE_4F4(&INDEX(u,i,j), v4_u);            // write it back
 
         // v[i][j] = v[i][j] + speed * dv[i][j];
-        HWIV_LOAD_4F4(v4_v, &(v[i][j]));
-        HWIV_LOAD_4F4(v4_dv, &(dv[i][j]));
+        HWIV_LOAD_4F4(v4_v, &INDEX(v,i,j));
+        HWIV_LOAD_4F4(v4_dv, &INDEX(dv,i,j));
         HWIV_MADD_4F4(v4_v, v4_speed, v4_dv, v4_v);
-        HWIV_SAVE_4F4(&(v[i][j]), v4_v);
+        HWIV_SAVE_4F4(&INDEX(v,i,j), v4_v);
       }
     }
 }
 
-void colorize(float u[GRID_HEIGHT][GRID_WIDTH],
-             float v[GRID_HEIGHT][GRID_WIDTH],
-             float du[GRID_HEIGHT][GRID_WIDTH],
-             float red[GRID_HEIGHT][GRID_WIDTH],
-             float green[GRID_HEIGHT][GRID_WIDTH],
-             float blue[GRID_HEIGHT][GRID_WIDTH])
+void colorize(float *u, float *v, float *du,
+             float *red, float *green, float *blue)
 {
   // Step by row
-  for(int i = 0; i < GRID_HEIGHT; i++) {
+  for(int i = 0; i < g_height; i++) {
     // step by column
-    for(int j = 0; j < GRID_WIDTH; j++) {
-      float uval = u[i][j];
-      float vval = v[i][j];
-      float delta_u = ((du[i][j]) * 1000.0f) + 0.5f;
+    for(int j = 0; j < g_width; j++) {
+      float uval = INDEX(u,i,j);
+      float vval = INDEX(v,i,j);
+      float delta_u = (INDEX(du,i,j) * 1000.0f) + 0.5f;
       delta_u = ((delta_u < 0) ? 0.0 : (delta_u > 1.0) ? 1.0 : delta_u);
 
       // Something simple to start (-:
       // different colour schemes result if you reorder these, or replace
       // "x" with "1.0f-x" for any of the 3 variables
-      red[i][j] = delta_u; // increasing U will look pink
-      green[i][j] = 1.0-uval;
-      blue[i][j] = 1.0-vval;
+      INDEX(red,i,j) = delta_u; // increasing U will look pink
+      INDEX(green,i,j) = 1.0-uval;
+      INDEX(blue,i,j) = 1.0-vval;
     }
   }
 }
