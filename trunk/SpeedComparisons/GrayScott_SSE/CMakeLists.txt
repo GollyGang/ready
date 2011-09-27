@@ -8,13 +8,11 @@ INCLUDE_DIRECTORIES( "../Display" )
 if(MSVC)
   add_definitions(/arch:SSE2)
 else()
-  add_definitions(-msse)
+  add_definitions(-msse2)
 endif()
 
 add_executable(GrayScott_SSE
   gray_scott_SSE.cpp 
-  ../Display/display.cpp
-  ../Display/display.h
   ../Display/defs.h
 )
 

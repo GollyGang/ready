@@ -37,14 +37,19 @@ See README.txt for more details.
 
 // local:
 #include "defs.h"
-//#include "display.h"
 
-inline int at(int x,int y) { return x*Y+y; }
 const int FLOATS_PER_BLOCK = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
 const int X_BLOCKS = X / FLOATS_PER_BLOCK; // 4 horizontally-neighboring cells form an SSE block
 const int Y_BLOCKS = Y;
 const int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
-inline int block_at(int x,int y) { return x*Y_BLOCKS+y; }
+
+// intended way round: horizontal SSE blocks lie end to end, to enable easy use of _mm_loadu_ps() for left and right
+inline int at(int x,int y) { return y*X+x; } 
+inline int block_at(int x,int y) { return y*X_BLOCKS+x; }
+
+// this way round is faster but should never have worked! and only works when X==Y
+//inline int at(int x,int y) { return x*Y+y; } // cell grid is listed with the first column first
+//inline int block_at(int bx,int by) { return bx*Y_BLOCKS+by; } 
 
 void init(float *a,float *b,float *da,float *db);
 void compute(float *a,float *b,float *da,float *db,
@@ -173,95 +178,58 @@ void init(float *a,float *b,float *da,float *db)
     }
 }
 
+// some macros to make the next macros slightly more readable
+#define ADD(a,b) _mm_add_ps(a,b)
+#define MUL(a,b) _mm_mul_ps(a,b)
+#define SUB(a,b) _mm_sub_ps(a,b)
+#define SET(a) _mm_set1_ps(a)
+
+// we write the Gray-Scott computation as a macro because functions and __m128 don't mix well
+
+#define GRAYSCOTT_DA(_a,_abb,_a_left,_a_right,_a_above,_a_below,_r_a,_f) ADD(SUB(MUL(SET(_r_a),ADD(ADD(ADD(ADD(MUL(_a,SET(-4.0f)),_a_left),_a_right),_a_above),_a_below)),_abb),MUL(SET(_f),SUB(SET(1.0f),_a)));
+// da = r_a*dda - aval*bval*bval + f*(1-aval)
+
+#define GRAYSCOTT_DB(_b,_abb,_b_left,_b_right,_b_above,_b_below,_r_b,_f_plus_k) SUB(ADD(MUL(SET(_r_b),ADD(ADD(ADD(ADD(MUL(_b,SET(-4.0f)),_b_left),_b_right),_b_above),_b_below)),_abb),MUL(SET(_f_plus_k),_b));
+// db = r_b*ddb + aval*bval*bval - (f+k)*bval
+
 void compute(float *a,float *b,float *da,float *db,
              float r_a,float r_b,float f,float k,
              float speed)
 {
-    __m128 *a_SSE = (__m128*) a;
-    __m128 *b_SSE = (__m128*) b;
-    __m128 a_left,a_right,b_left,b_right;
-    __m128 *a_above,*a_below,*b_above,*b_below;
-    __m128 *da_SSE = (__m128*) da;
-    __m128 *db_SSE = (__m128*) db;
-    __m128 t1_SSE,t2_SSE,t3_SSE,t4_SSE,t5_SSE,t6_SSE;
-    __m128 dda_SSE,ddb_SSE;
-    __m128 one_SSE = _mm_set1_ps(1.0f); // set to (1,1,1,1)
-    __m128 minus_four_SSE = _mm_set1_ps(-4.0f);
-    __m128 r_a_SSE = _mm_set1_ps(r_a);
-    __m128 r_b_SSE = _mm_set1_ps(r_b);
-    __m128 f_SSE = _mm_set1_ps(f);
-    __m128 k_SSE = _mm_set1_ps(k);
-
     // compute the rates of change
-    for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks for now (for simplicity)
+    for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks
     {
-        a_SSE = ((__m128*)a)+block_at(i,1);
-        b_SSE = ((__m128*)b)+block_at(i,1);
-        da_SSE = ((__m128*)da)+block_at(i,1);
-        db_SSE = ((__m128*)db)+block_at(i,1);
-        for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks for now
+        for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks
         {
+            __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
+            __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
+            __m128 *da_SSE = ((__m128*)da)+block_at(i,j);
+            __m128 *db_SSE = ((__m128*)db)+block_at(i,j);
             // retrieve the neighboring cells
-            a_left = _mm_loadu_ps(((float*)a_SSE)-1);
-            a_right = _mm_loadu_ps(((float*)a_SSE)+1);
-            a_above = a_SSE-X_BLOCKS;
-            a_below = a_SSE+X_BLOCKS;
-            b_left = _mm_loadu_ps(((float*)b_SSE)-1);
-            b_right = _mm_loadu_ps(((float*)b_SSE)+1);
-            b_above = b_SSE-X_BLOCKS;
-            b_below = b_SSE+X_BLOCKS;
-            // find the Laplacian of a (using the von Neumann neighborhood)
-            dda_SSE = _mm_mul_ps(*a_SSE,minus_four_SSE);
-            dda_SSE = _mm_add_ps(dda_SSE,a_left);
-            dda_SSE = _mm_add_ps(dda_SSE,a_right);
-            dda_SSE = _mm_add_ps(dda_SSE,*a_above);
-            dda_SSE = _mm_add_ps(dda_SSE,*a_below);
-            // find the Laplacian of b
-            ddb_SSE = _mm_mul_ps(*b_SSE,minus_four_SSE);
-            ddb_SSE = _mm_add_ps(ddb_SSE,b_left);
-            ddb_SSE = _mm_add_ps(ddb_SSE,b_right);
-            ddb_SSE = _mm_add_ps(ddb_SSE,*b_above);
-            ddb_SSE = _mm_add_ps(ddb_SSE,*b_below);
-            // compute the new rates of changes
-            t1_SSE = _mm_mul_ps(r_a_SSE,dda_SSE); // t1 = r_a * dda
-            t2_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t2 = aval*bval
-            t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = aval*bval*bval
-            t4_SSE = _mm_sub_ps(one_SSE,*a_SSE); // t4 = 1-aval
-            t5_SSE = _mm_mul_ps(f_SSE,t4_SSE); // t5 = f * (1-aval)
-            t6_SSE = _mm_sub_ps(t1_SSE,t3_SSE); // t6 = r_a *dda - aval*bval*bval
-            *da_SSE = _mm_add_ps(t6_SSE,t5_SSE); // da = r_a * dda - aval*bval*bval + f*(1-aval)
-            t1_SSE = _mm_mul_ps(r_b_SSE,ddb_SSE); // t1 = r_b * ddb
-            t2_SSE = _mm_add_ps(f_SSE,k_SSE); // t2 = f + k
-            t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = (f+k) * bval
-            t4_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t4 = aval*bval
-            t5_SSE = _mm_mul_ps(t4_SSE,*b_SSE); // t5 = aval*bval*bval
-            t6_SSE = _mm_add_ps(t1_SSE,t5_SSE); // t6 = r_b*ddb + aval*bval*bval
-            *db_SSE = _mm_sub_ps(t6_SSE,t3_SSE); // db = r_b*ddb + aval*bval*bval - (f+k)*bval
-            a_SSE++;
-            b_SSE++;
-            da_SSE++;
-            db_SSE++;
+            __m128 a_left = _mm_loadu_ps(((float*)a_SSE)-1);
+            __m128 a_right = _mm_loadu_ps(((float*)a_SSE)+1);
+            __m128 *a_above = a_SSE-X_BLOCKS;
+            __m128 *a_below = a_SSE+X_BLOCKS;
+            __m128 b_left = _mm_loadu_ps(((float*)b_SSE)-1);
+            __m128 b_right = _mm_loadu_ps(((float*)b_SSE)+1);
+            __m128 *b_above = b_SSE-X_BLOCKS;
+            __m128 *b_below = b_SSE+X_BLOCKS;
+            __m128 abb = _mm_mul_ps(_mm_mul_ps(*a_SSE,*b_SSE),*b_SSE);
+            // compute the new rates of change of each chemical
+            *da_SSE = GRAYSCOTT_DA(*a_SSE,abb,a_left,a_right,*a_above,*a_below,r_a,f);
+            *db_SSE = GRAYSCOTT_DB(*b_SSE,abb,b_left,b_right,*b_above,*b_below,r_b,f+k);
         }
     }
 
     // apply the rate of change
-    __m128 speed_SSE = _mm_set1_ps(speed);
-    a_SSE = (__m128*) a;
-    b_SSE = (__m128*) b;
-    da_SSE = (__m128*) da;
-    db_SSE = (__m128*) db;
     for(int i=0;i<TOTAL_BLOCKS;i++)
     {
-        // a[i] += speed * da[i];
-        t1_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
-        *a_SSE = _mm_add_ps(*a_SSE,t1_SSE);
-        a_SSE++;
-        da_SSE++;
-        // b[i] += speed * db[i];
-        t1_SSE = _mm_mul_ps(*db_SSE,speed_SSE);
-        *b_SSE = _mm_add_ps(*b_SSE,t1_SSE);
-        b_SSE++;
-        db_SSE++;
+        __m128 *a_SSE = ((__m128*)a)+i;
+        __m128 *b_SSE = ((__m128*)b)+i;
+        __m128 *da_SSE = ((__m128*)da)+i;
+        __m128 *db_SSE = ((__m128*)db)+i;
+        *a_SSE = ADD(*a_SSE,MUL(*da_SSE,SET(speed))); // a[i] += speed * da[i];
+        *b_SSE = ADD(*b_SSE,MUL(*db_SSE,SET(speed))); // b[i] += speed * db[i];
     }
 }
 
@@ -287,7 +255,6 @@ bool display(float *r,float *g,float *b,
         im = cvCreateImage(cvSize(X,Y),IPL_DEPTH_8U,3);
         cvSet(im,cvScalar(0,0,0));
         im2 = cvCreateImage(cvSize(X*scale,Y*scale),IPL_DEPTH_8U,3);
-        im3 = cvCreateImage(cvSize(X*scale+border*2,Y*scale+border),IPL_DEPTH_8U,3);
 
         cvNamedWindow(title,CV_WINDOW_AUTOSIZE);
 
@@ -295,12 +262,6 @@ bool display(float *r,float *g,float *b,
         double vScale=0.4;
         int lineWidth=1;
         cvInitFont(&font,CV_FONT_HERSHEY_COMPLEX,hScale,vScale,0,lineWidth,CV_AA);
-
-        if(write_video)
-        {
-            video = cvCreateVideoWriter(title,CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
-            border = 20;
-        }
     }
 
     // convert float arrays to IplImage for OpenCV to display
@@ -326,50 +287,44 @@ bool display(float *r,float *g,float *b,
             }
         }
     }
-    for(int i=0;i<X;i++)
+    for(int col=0;col<X;col++)
     {
-        for(int j=0;j<Y;j++)
+        for(int row=0;row<Y;row++)
         {
             if(r) {
-                float val = r[at(i,Y-j-1)];
+                float val = r[at(col,row)];
                 if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
-                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
+                ((uchar *)(im->imageData + row*im->widthStep))[col*im->nChannels + 2] = (uchar)val;
             }
             if(g) {
-                float val = g[at(i,Y-j-1)];
+                float val = g[at(col,row)];
                 if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
-                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
+                ((uchar *)(im->imageData + row*im->widthStep))[col*im->nChannels + 1] = (uchar)val;
             }
             if(b) {
-                float val = b[at(i,Y-j-1)];
+                float val = b[at(col,row)];
                 if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
-                ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 0] = (uchar)val;
+                ((uchar *)(im->imageData + row*im->widthStep))[col*im->nChannels + 0] = (uchar)val;
             }
         }
     }
 
-    cvResize(im,im2);
-    cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
+    cvResize(im,im2,CV_INTER_NN);
 
-    char txt[100];
-    if(!write_video)
     {
+        char txt[100];
         sprintf(txt,"%d",iteration);
-        cvPutText(im3,txt,cvPoint(20,20),&font,white);
+        cvPutText(im2,txt,cvPoint(20,20),&font,white);
+        cvPutText(im2,message,cvPoint(20,40),&font,white);
     }
 
-    cvPutText(im3,message,cvPoint(20,40),&font,white);
-
-    if(write_video)
-        cvWriteFrame(video,im3);
-
-    cvShowImage(title,im3);
+    cvShowImage(title,im2);
 
     int key = cvWaitKey(delay_ms); // allow time for the image to be drawn
     if(key==27) // did user ask to quit?
@@ -377,8 +332,6 @@ bool display(float *r,float *g,float *b,
         cvDestroyWindow(title);
         cvReleaseImage(&im);
         cvReleaseImage(&im2);
-        if(write_video)
-            cvReleaseVideoWriter(&video);
         return true;
     }
     return false;
