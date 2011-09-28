@@ -43,14 +43,14 @@ there are usually several more steps:
 # if defined(__SSE2__)
 #   define HWIV_V4F4_SSE2
 # endif
+  // Workaround because Visual Studio doesn't seem to set its _M_IX86_FP flag, 
+  // or give us any indication what level of SSE support is available.
+  // So we just assume SSE2 is available
+# if defined(_M_X64) || defined(_M_IX86)
+#  define HWIV_V4F4_SSE2
+# endif
 #endif
 
-// Workaround because Visual Studio doesn't seem to set its _M_IX86_FP flag, 
-// or give us any indication what level of SSE support is available.
-// So we just assume SSE2 is available
-#if defined(_M_X64) || defined(_M_IX86)
-# define HWIV_V4F4_SSE2
-#endif
 
 // Finally, fall back to emulated if no hardware option is available
 #ifndef HWIV_V4F4_SSE2
