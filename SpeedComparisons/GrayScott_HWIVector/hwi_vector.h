@@ -1,35 +1,31 @@
 /*
   
-  hwi_vector.h
+  hwi_vector.h                                                                                           ^u 140 ^x f
 
-This is a hardware-independent vector library. It enables vector SIMD code
-to be written, compiled and run on non-vector machines. Once the code is
-tested and working, a compile-time macro can be changed, and a recompile
-causes the program to use actual vector instructions.
+This is a hardware-independent vector library. It enables vector SIMD code to be written, compiled and run on non-vector
+machines. Once the code is tested and working, a compile-time macro can be changed, and a recompile causes the program
+to use actual vector instructions.
 
-In the simplest case, that is all that is needed. In real applications
-there are usually several more steps:
+In the simplest case, that is all that is needed. In real applications there are usually several more steps:
 
-  * The application developer decides what base hardware platform to
-    compile for. This might be the oldest CPU the company will support,
-    such as a Pentium 4 HT.
-  * The compiler defines certain flags, such as __i386__ and __SSE2__
-    that can be tested by an #ifdef
-  * The source code can set flags of its own, such as HWIV_EMULATE
-    or HWIV_WANT_V4F4. This might be done in order to create two versions
-    of a calculation routine (one that uses vector instructions and one that
-    does not)
-  * The program is built from one or more compilations of the same source.
-    This might be done in order to create a "universal binary" capable of
-    being copied to and run on a variety of computer products. A typical
-    example is a program file that contains both a 32-bit and a 64-bit
-    version, and the operating system loads whichever one is appropriate
-    when the program is launched.
-  * At run-time, the program tests for the presence of vector instructions
-    using the CPUID instruction or its equivalent on non Intel CPUs.
-  * At run-time, based on the CPUID test, the program transfers control
-    to one or another of the calculation subroutines depending on which
-    vector instructions are actually available.
+  * The application developer decides what base hardware platform to compile for. This might be the oldest CPU the
+    company will support, such as a Pentium 4 HT.
+
+  * The compiler defines certain flags, such as __i386__ and __SSE2__ that can be tested by an #ifdef
+
+  * The source code can set flags of its own, such as HWIV_EMULATE or HWIV_WANT_V4F4. This might be done in order to
+    create two versions of a calculation routine (one that uses vector instructions and one that does not)
+
+  * The program is built from one or more compilations of the same source. This might be done in order to create a
+    "universal binary" capable of being copied to and run on a variety of computer products. A typical example is a
+    program file that contains both a 32-bit and a 64-bit version, and the operating system loads whichever one is
+    appropriate when the program is launched.
+
+  * At run-time, the program tests for the presence of vector instructions using the CPUID instruction or its
+    equivalent on non Intel CPUs.
+
+  * At run-time, based on the CPUID test, the program transfers control to one or another of the calculation
+    subroutines depending on which vector instructions are actually available.
 
 */
 
@@ -64,6 +60,22 @@ there are usually several more steps:
 #ifdef HWIV_WANT_V4F4
 
 // Okay, now see how we should create the macros for V4F4
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                                   //
+//  #include<stdio.h>                                                                                                //
+//  /*                                                     */                    /*                             */   //
+//  /*                                                     */                    /*                             */   //
+//  int                 main()  {char      a[]     ={     'T',    'h','i',     's',32,     'p','r'        ,'o','g'   //
+//  ,'r','a','m',      32,   'j',   'u',   's',    't'    ,32           ,'d',    'o',   'e'     ,'s'    ,32    ,'i'  //
+//  ,'t'              ,32    ,'t'    ,'h'  ,'e'   ,32,    'h'    ,97,'r','d'   ,32,    'w',97,121,33,   32,    40,   //
+//  68,               'o',   'n',    39,   't'    ,32     ,'y'   ,'o',   117,    32    ,'t'             ,'h'   ,'i'  //
+//  ,'n'               /*     Xy     =a     +3     +n      ++     ;a=     b-     (*     x/z              );     if   //
+//  (Xy-++n<(z+*x))z  =b;a   +b,     z+=     x*/,107 ,    63,63    ,63,41,'\n'   ,00};    puts(a);}      /*.RPM.*/   //
+//                                                                                                                   //
+//        Emulated versions of the V4F4 macros. (These also serve as documentation for what each macro does)         //
+//                                                                                                                   //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 # ifdef HWIV_V4F4_EMULATED
 
@@ -202,8 +214,48 @@ typedef float HWIV_4F4_ALIGNED[4];
                                       { dst[0]=src[1]; dst[1]=src[2]; \
                                          dst[2]=src[3]; dst[3]=extra[0]; }
 
-# endif
 
+// We also define a small set of macros for FORTRAN-style code. Using these you can build up expressions like
+//
+//    a = v4ADD(v4MUL(b,c),d);  /*  a = b*c + d;  */
+//
+// These macros do not form a complete solution, you still need things like LOAD and SAVE to do any real work.
+
+#define v4ADD(a,b) {(a)[0]+(b)[0],(a)[1]+(b)[1],(a)[2]+(b)[2],(a)[3]+(b)[3]}
+#define v4SUB(a,b) {(a)[0]-(b)[0],(a)[1]-(b)[1],(a)[2]-(b)[2],(a)[3]-(b)[3]}
+#define v4MUL(a,b) {(a)[0]*(b)[0],(a)[1]*(b)[1],(a)[2]*(b)[2],(a)[3]*(b)[3]}
+#define v4SET(v0,v1,v2,v3) {(v0),(v1),(v2),(v3)}
+#define v4SPLAT(a) {(a),(a),(a),(a)}
+#define v4ROUP(a) {(a)[3],(a)[0],(a)[1],(a)[2]}
+#define v4RODN(a) {(a)[1],(a)[2],(a)[3],(a)[0]}
+#define v4RAISE(a, new) {(new)[3],(a)[0],(a)[1],(a)[2]}
+#define v4LOWER(a, new) {(a)[1],(a)[2],(a)[3],(new)[0]}
+
+# endif
+/* - - - - - - - - - - - - - - - - - - - - - End of the EMULATED section  - - - - - - - - - - - - - - - - - - - - - - */
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                                   //
+//                             @@@@                       @@@@                     @@@@                              //
+//                             @@@@                       @@@@                     @@@@                              //
+//                             """"                       @@@@                     @@@@                              //
+//                             eeee    eeee  ,e@@e..   eee@@@@eee                  @@@@                              //
+//                             @@@@    @@@@@@@@@@@@@@. @@@@@@@@@@                  @@@@                              //
+//                             @@@@    @@@@f'    `@@@@    @@@@                     @@@@                              //
+//                             @@@@    @@@@       @@@@    @@@@        ,e@@@e.      @@@@                              //
+//                             @@@@    @@@@       @@@@    @@@@     e@@@@@@@@@@@e   @@@@                              //
+//                             @@@@    @@@@       @@@@    @@@@   .@@@@'     `@@@@i @@@@                              //
+//                             @@@@    @@@@       @@@@    @@@@kee@@@@eeeeeeeee@@@@ @@@@                              //
+//                             @@@@    @@@@       @@@@    `@@@@@@@@@@@@@@@@@@@@@@@@@@@@  (R)                         //
+//                                                               @@@@.                                               //
+//                                                               `@@@@e.    .eeee-                                   //
+//                                                                 *@@@@@@@@@@@*                                     //
+//                                                                    "*@@@@*"                                       //
+//                                                                                                                   //
+//             Versions of the V4F4 macros for the Intel SSE2 (or later) 128-bit vector instruction set              //
+//                                                                                                                   //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 # ifdef HWIV_V4F4_SSE2
 
@@ -221,9 +273,9 @@ typedef float HWIV_4F4_ALIGNED[4];
 typedef __m128 V4F4;
 
 #ifdef _WIN32
-#define ALIGNED_16 __declspec( align( 16 ) )
+# define ALIGNED_16 __declspec( align( 16 ) )
 #else
-#define ALIGNED_16 __attribute__((aligned (16)))
+# define ALIGNED_16 __attribute__((aligned (16)))
 #endif
 
 typedef float ALIGNED_16 HWIV_4F4_ALIGNED[4];
@@ -240,7 +292,8 @@ typedef float ALIGNED_16 HWIV_4F4_ALIGNED[4];
 
 #define HWIV_INIT_FILL float ALIGNED_16 HWIV_fill_4F4[4];
 
-#define HWIV_SPLAT_4F4(dst, s) HWIV_FILL_4F4((dst), (s), (s), (s), (s))
+
+#define HWIV_SPLAT_4F4(dst, s)         (dst) = _mm_set1_ps(s)
 
 #define HWIV_SAVE_4F4(dst, src)        _mm_store_ps((dst), (src))
 
@@ -269,18 +322,97 @@ typedef float ALIGNED_16 HWIV_4F4_ALIGNED[4];
 
 #define HWIV_INIT_RLTMP_4F4 /* nop */
 
-#define HWIV_RAISE_4F4(dest, src, new) { \
-                 (dest) = _mm_shuffle_ps((new), (src), 0x0f); \
-                 (dest) = _mm_shuffle_ps((dest), (src), 0x98); \
-                 }
 
-#define VROL_4F4(dest, src, tmp) \
-                 (dest) = _mm_shuffle_ps((src), (src), 0x39)
-#define HWIV_LOWER_4F4(dest, src, new) { \
-                 (dest) = _mm_move_ss((src), (new)); \
-                 VROL_4F4(dest, dest, 0); }
+/*
+HWIV_RODN_4F4 (ROtate DOwn) does a "downwards rotate" of a 4-element vector using the Intel VSHUFPS instruction
+(intrinsic _mm_shuffle_ps). If the input is {a,b,c,d} (with a being element 0) the result of the downwards rotate is
+{b,c,d,a} (with each element moving down tot he next-lower slot, except for a which rotates into the top position).
+
+  SRC1  {  x3 ,  x2 ,  x1 ,  x0  }
+  SRC2  {  y3 ,  y2 ,  y1 ,  y0  }
+  DEST  {  y0 ,  y3 ,  x2 ,  x1  }
+  imm8:    00    11    10    01      = 0x39
+
+ */
+#define HWIV_RODN_4F4(dest, src)  (dest) = _mm_shuffle_ps((src), (src), 0x39)
+
+/*
+HWIV_ROUP_4F4 is an "upwards rotate": if the input is {a,b,c,d} (with a being element 0) the result is {d,a,b,c}.
+
+  SRC1  {  x3 ,  x2 ,  x1 ,  x0  }
+  SRC2  {  y3 ,  y2 ,  y1 ,  y0  }
+  DEST  {  y2 ,  y1 ,  x0 ,  x3  }
+  imm8:    10    01    00    11      = 0x93
+
+ */
+#define HWIV_ROUP_4F4(dest, src)  (dest) = _mm_shuffle_ps((src), (src), 0x93)
+
+/*
+HWIV_RAISE_4F4 is an "upwards shift": if the input is {a,b,c,d} (with a being element 0) the result is {X,a,b,c} with
+the new element X coming from element 3 of the "new" argument.
+
+  new   {  x3 ,  x2 ,  x1 ,  x0  }
+  src   {  y3 ,  y2 ,  y1 ,  y0  }
+  dest  {  y0 ,  y0 ,  x3 ,  x3  }
+  imm8:    00    00    11    11      = 0x0F
+          src0  src0  new3  new3
+
+  dest  {  x3 ,  x2 ,  x1 ,  x0  }
+   src  {  y3 ,  y2 ,  y1 ,  y0  }
+  dest  {  y2 ,  y1 ,  x2 ,  x0  }
+  imm8:    10    01    10    00      = 0x98
+          src2  src1  src0  new3
+*/
+#define HWIV_RAISE_4F4(dest, src, new) { (dest) = _mm_shuffle_ps((new), (src), 0x0f); \
+                                         (dest) = _mm_shuffle_ps((dest), (src), 0x98);  }
+
+/*
+HWIV_LOWER_4F4 is an "downwards shift": if the input is {a,b,c,d} (with a being element 0) the result is {b,c,d,X} with
+the new element X coming from element 0 of the "new" argument.
+
+To accomplish a downwards shift we can just use _mm_move_ss to move a single scalar into the bottom position and then do
+a RODN (downwards rotate)
+ */
+#define HWIV_LOWER_4F4(dest, src, new) {  (dest) = _mm_move_ss((src), (new));  \
+                                           HWIV_RODN_4F4(dest, dest); }
+
+// Here is the subset for FORTRAN-style code
+#define v4ADD(a,b) _mm_add_ps((a), (b))
+#define v4SUB(a,b) _mm_sub_ps((a), (b))
+#define v4MUL(a,b) _mm_mul_ps((a), (b))
+// in v4SET, note the reversal of argument order
+#define v4SET(v0,v1,v2,v3) _mm_set_ps((v3),(v2),(v1),(v0))
+#define v4SPLAT(a) _mm_set1_ps(a)
+#define v4ROUP(src) _mm_shuffle_ps((src), (src), 0x93)
+#define v4RODN(src) _mm_shuffle_ps((src), (src), 0x39)
+#define v4RAISE(src, new) _mm_shuffle_ps(_mm_shuffle_ps((new), (src), 0x0f), (src), 0x98)
+#define v4LOWER(src, new) _mm_shuffle_ps(_mm_move_ss((src),(new)), _mm_move_ss((src),(new)), 0x39)
 
 # endif
+/* - - - - - - - - - - - - - - - - - - - - - - End of the INTEL section - - - - - - - - - - - - - - - - - - - - - - - */
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                                   //
+//                                                                                                                   //
+//                         /^^^^^\                                       /^^^^^\  _-^^^^^^/ TM                       //
+//                        /  ,-   )_-----_ --- ---- ----..----.  ---.---/  ,-   )/   ,---/                           //
+//                       /  /_)  //  __   )| |/   |/  _// .-   )/    _//  /_)  //   /                                //
+//                      /  //   //  / /  /|          / / (/___//   .^ /  //   /(   |                                 //
+//                     /  / ^^^'(   (/  / |   /|   _/ (  `----/   /  /  / ^^^' |   `---/                             //
+//                    /__/       \____-'  |__/ |__/    \____//___/  /__/        \_____/                              //
+//                                                                                                                   //
+//                                                                                                                   //
+//                Versions of the V4F4 macros for the PowerPC AltiVec 128-bit vector instruction set                 //
+//                                                                                                                   //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+
+The AltiVec instruction set first came with the "G4" (744x and 745x) processors from Motorola, then the "G5" (97x)
+series from IBM, the "Cell" 8-core CPU used in the Sony Playstation 3, and in IBM's POWER6 (and later) server CPUs.
+
+  Not yet implemented -- do we care about AltiVec? */
 
 #endif

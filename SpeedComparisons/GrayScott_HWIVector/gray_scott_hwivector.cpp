@@ -510,6 +510,222 @@ void compute(float *u, float *v, float *du, float *dv,
   V4F4 v4_v_l;
   V4F4 v4_v_r;
 
+  V4F4 * v_ubase;
+  V4F4 * v_vbase;
+  V4F4 * v_dubase;
+  V4F4 * v_dvbase;
+
+  //F_diff = (F_max-F_min)/g_width;
+  k_diff = (k_max-k_min)/g_height;
+
+  // Initialize our vectorized scalars
+  HWIV_SPLAT_4F4(v4_speed, speed);
+  HWIV_SPLAT_4F4(v4_F, F);
+  HWIV_SPLAT_4F4(v4_k, k);
+  HWIV_SPLAT_4F4(v4_Du, D_u);
+  HWIV_SPLAT_4F4(v4_Dv, D_v);
+  HWIV_SPLAT_4F4(v4_1, 1.0);
+  HWIV_SPLAT_4F4(v4_4, 4.0);
+  HWIV_FILL_4F4(v4_kdiff, 0, -k_diff, -2*k_diff, -3*k_diff);
+
+  // Scan per row
+  for(int i = 0; i < g_height; i++) {
+    int iprev,inext;
+    int j2;
+
+    if (g_wrap) {
+      iprev = (i+g_height-1) % g_height;
+      inext = (i+1) % g_height;
+    } else {
+      iprev = max(i-1, 0);
+      inext = min(i+1, g_height-1);
+    }
+    /* Get pointers to beginning of rows for each of the grids. We access
+       3 rows each for u and v, and 1 row each for du and dv. */
+    ubase = &INDEX(u,i,0);
+    ub_prev = &INDEX(u,iprev,0);
+    ub_next = &INDEX(u,inext,0);
+    vbase = &INDEX(v,i,0);
+    vb_prev = &INDEX(v,iprev,0);
+    vb_next = &INDEX(v,inext,0);
+    dubase = &INDEX(du,i,0);
+    dvbase = &INDEX(dv,i,0);
+
+    if (parameter_space) {
+      // set F for this row (ignore the provided value)
+      F = F_min + (g_height-i-1) * (F_max-F_min)/g_width;
+      HWIV_SPLAT_4F4(v4_F, F);
+    }
+
+    /* Pre-load the first two blocks of data we need, which are the "center"
+       and "right" blocks from the end of the row (as if we have just wrapped
+       around from the end of the row back to the beginning) */
+    j2 = g_wrap ? (g_width-4) : 0;
+    HWIV_LOAD_4F4(v4_u, ubase+j2);
+    HWIV_LOAD_4F4(v4_u_r, ubase);
+    HWIV_LOAD_4F4(v4_v, vbase+j2);
+    HWIV_LOAD_4F4(v4_v_r, vbase);
+
+    // Scan per column in steps of vector width
+    for(int j = 0; j < g_width; j+=4) {
+      if (g_wrap) {
+        j2 = (j+4) % g_width;
+      } else {
+        j2 = min(j+4, g_height-4);
+      }
+
+      HWIV_COPY_4F4(v4_u_l, v4_u);
+      HWIV_COPY_4F4(v4_v_l, v4_v);
+      HWIV_COPY_4F4(v4_u, v4_u_r);
+      HWIV_COPY_4F4(v4_v, v4_v_r);
+      HWIV_LOAD_4F4(v4_u_r, ubase+j2);
+      HWIV_LOAD_4F4(v4_v_r, vbase+j2);
+
+      if (parameter_space) {
+        // set k for this column (ignore the provided value)
+        k = k_min + (g_width-j-1)*k_diff;
+        // k decreases by k_diff each time j increases by 1, so this vector
+        // needs to contain 4 different k values.
+        HWIV_SPLAT_4F4(v4_tmp, k);
+        HWIV_ADD_4F4(v4_k, v4_tmp, v4_kdiff);
+      }
+
+      // compute the Laplacians of u and v. "nabla" is the name of the
+      // "upside down delta" symbol used for the Laplacian in equations
+
+      /* Scalar code is:
+         nabla_u = u[i][jprev]+u[i][jnext]+u[iprev][j]+u[inext][j] - 4*uval; */
+      HWIV_RAISE_4F4(v4_nabla_u, v4_u, v4_u_l);
+
+      HWIV_LOWER_4F4(v4_tmp, v4_u, v4_u_r);
+      HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
+
+      // Now we add in the "up" and "down" neighbors
+      HWIV_LOAD_4F4(v4_tmp, ub_prev+j);
+      HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
+      HWIV_LOAD_4F4(v4_tmp, ub_next+j);
+      HWIV_ADD_4F4(v4_nabla_u, v4_nabla_u, v4_tmp);
+
+      // Now we compute -(4*u-neighbors)  = neighbors - 4*u
+      HWIV_NMSUB_4F4(v4_nabla_u, v4_4, v4_u, v4_nabla_u);
+
+      // Same thing all over again for the v's
+      HWIV_RAISE_4F4(v4_nabla_v, v4_v, v4_v_l);
+      HWIV_LOWER_4F4(v4_tmp, v4_v, v4_v_r);
+      HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
+      HWIV_LOAD_4F4(v4_tmp, vb_prev+j);
+      HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
+      HWIV_LOAD_4F4(v4_tmp, vb_next+j);
+      HWIV_ADD_4F4(v4_nabla_v, v4_nabla_v, v4_tmp);
+      HWIV_NMSUB_4F4(v4_nabla_v, v4_4, v4_v, v4_nabla_v);
+
+      // compute the new rate of change of u and v
+
+      /* Scalar code is:
+           du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
+         We treat it as:
+                      D_u * nabla_u - (uval*vval*vval - (-(F*uval-F)) ) */
+
+      HWIV_NMSUB_4F4(v4_tmp, v4_F, v4_u, v4_F);        // -(F*u-F) = F-F*u = F(1-u)
+      HWIV_MUL_4F4(v4_dv, v4_v, v4_v);                 // v^2
+      HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - F(1-u)
+      HWIV_MSUB_4F4(v4_du, v4_Du, v4_nabla_u, v4_tmp); // D_u*nabla_u - (u*v^2 - F(1-u))
+                                                       // = D_u*nabla_u - u*v^2 + F(1-u)
+      HWIV_SAVE_4F4(dubase+j, v4_du);
+
+      /* dv formula is similar:
+           dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
+         We treat it as:
+                      D_v * nabla_v + uval*vval*vval - (F*vval + k*vval); */
+      HWIV_MUL_4F4(v4_tmp, v4_k, v4_v);                // k*v
+      HWIV_MADD_4F4(v4_tmp, v4_F, v4_v, v4_tmp);       // F*v+k*v = (F+k)v
+                                                       // v^2 is still in v4_dv
+      HWIV_MSUB_4F4(v4_tmp, v4_u, v4_dv, v4_tmp);      // u*v^2 - (F+k)v
+      HWIV_MADD_4F4(v4_dv, v4_Dv, v4_nabla_v, v4_tmp); // D_v*nabla_v + u*v^2 - (F+k)v
+      HWIV_SAVE_4F4(dvbase+j, v4_dv);
+    }
+  }
+
+  {
+  // effect change
+    for(int i = 0; i < g_height; i++) {
+      v_ubase = ((V4F4 *) (&INDEX(u,i,0)));
+      v_vbase = ((V4F4 *) (&INDEX(v,i,0)));
+      v_dubase = ((V4F4 *) (&INDEX(du,i,0)));
+      v_dvbase = ((V4F4 *) (&INDEX(dv,i,0)));
+      for(int j = 0; j < g_width; j+=4) {
+        // u[i][j] = u[i][j] + speed * du[i][j];
+        *v_ubase = v4ADD(v4MUL(v4_speed, *v_dubase), *v_ubase); v_ubase++; v_dubase++;
+        // v[i][j] = v[i][j] + speed * dv[i][j];
+        *v_vbase = v4ADD(v4MUL(v4_speed, *v_dvbase), *v_vbase); v_vbase++; v_dvbase++;
+      }
+    }
+  }
+}
+
+void colorize(float *u, float *v, float *du,
+             float *red, float *green, float *blue)
+{
+  // Step by row
+  for(int i = 0; i < g_height; i++) {
+    // step by column
+    for(int j = 0; j < g_width; j++) {
+      float uval = INDEX(u,i,j);
+      float vval = INDEX(v,i,j);
+      float delta_u = (INDEX(du,i,j) * 1000.0f) + 0.5f;
+      delta_u = ((delta_u < 0) ? 0.0 : (delta_u > 1.0) ? 1.0 : delta_u);
+
+      // Something simple to start (-:
+      // different colour schemes result if you reorder these, or replace
+      // "x" with "1.0f-x" for any of the 3 variables
+      INDEX(red,i,j) = delta_u; // increasing U will look pink
+      INDEX(green,i,j) = 1.0-uval;
+      INDEX(blue,i,j) = 1.0-vval;
+    }
+  }
+}
+
+#ifdef OLD_UNUSED_VERSION
+
+/* This is the old version of compute() that used all "assembly-language" syntax */
+
+void compute(float *u, float *v, float *du, float *dv,
+             float D_u,float D_v,float F,float k,float speed,
+             int parameter_space)
+{
+#ifndef HWIV_HAVE_V4F4
+  fprintf(stdout, "Did not get vector macros from HWIV\n");
+  exit(-1);
+#endif
+  V4F4 v4_speed; // vectorized version of speed scalar
+  V4F4 v4_F; // vectorized version of F scalar
+  V4F4 v4_k; // vectorized version of k scalar
+  HWIV_4F4_ALIGNED talign; // used by FILL_4F4
+  V4F4 v4_u; V4F4 v4_du;
+  V4F4 v4_v; V4F4 v4_dv;
+  HWIV_INIT_MUL0_4F4; // used by MUL (on targets that need it)
+  HWIV_INIT_MTMP_4F4; // used by MADD (on targets that need it)
+  HWIV_INIT_FILL;     // used by FILL
+  HWIV_INIT_RLTMP_4F4; // used by RAISE and LOWER
+  V4F4 v4_tmp;
+  V4F4 v4_Du;
+  V4F4 v4_Dv;
+  V4F4 v4_nabla_u;
+  V4F4 v4_nabla_v;
+  V4F4 v4_1;
+  V4F4 v4_4;
+  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
+  float k_diff;
+  V4F4 v4_kdiff;
+  float * ubase; float * ub_prev; float * ub_next;
+  float * vbase; float * vb_prev; float * vb_next;
+  float * dubase; float * dvbase;
+
+  V4F4 v4_u_l;
+  V4F4 v4_u_r;
+  V4F4 v4_v_l;
+  V4F4 v4_v_r;
+
   //F_diff = (F_max-F_min)/g_width;
   k_diff = (k_max-k_min)/g_height;
 
@@ -663,24 +879,4 @@ void compute(float *u, float *v, float *du, float *dv,
     }
 }
 
-void colorize(float *u, float *v, float *du,
-             float *red, float *green, float *blue)
-{
-  // Step by row
-  for(int i = 0; i < g_height; i++) {
-    // step by column
-    for(int j = 0; j < g_width; j++) {
-      float uval = INDEX(u,i,j);
-      float vval = INDEX(v,i,j);
-      float delta_u = (INDEX(du,i,j) * 1000.0f) + 0.5f;
-      delta_u = ((delta_u < 0) ? 0.0 : (delta_u > 1.0) ? 1.0 : delta_u);
-
-      // Something simple to start (-:
-      // different colour schemes result if you reorder these, or replace
-      // "x" with "1.0f-x" for any of the 3 variables
-      INDEX(red,i,j) = delta_u; // increasing U will look pink
-      INDEX(green,i,j) = 1.0-uval;
-      INDEX(blue,i,j) = 1.0-vval;
-    }
-  }
-}
+#endif
