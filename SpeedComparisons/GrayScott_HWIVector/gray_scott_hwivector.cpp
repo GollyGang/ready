@@ -46,17 +46,18 @@ See README.txt for more details.
 // local:
 #include "display_hwiv.h"
 
-static int g_width = 256;
-static int g_height = 256;
+static long g_width = 256;
+static long g_height = 256;
 #define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
 
-float *allocate(int width, int height, const char * error_text);
-float *allocate(int width, int height, const char * error_text)
+float *allocate(long width, long height, const char * error_text);
+float *allocate(long width, long height, const char * error_text)
 {
   size_t sz;
   float * rv;
-  sz = ((size_t) width) * ((size_t) height) * sizeof(*rv);
+  sz = ((size_t) width) * ((size_t) height) * sizeof(*rv) + 16;
   rv = (float *) malloc(sz);
+  while(((long)rv) & 0x0000000F) { rv++; }
   if (rv == NULL) {
     fprintf(stderr, "allocate: Could get %ld bytes for %s\n", ((long) sz),
       error_text);
@@ -532,14 +533,16 @@ void compute(float *u, float *v, float *du, float *dv,
   for(long i = 0; i < g_height; i++) {
     long iprev,inext;
     long j2;
-
     if (g_wrap) {
+      /* Periodic boundary condition */
       iprev = (i+g_height-1) % g_height;
       inext = (i+1) % g_height;
     } else {
+      /* The edges are their own neighbors. This amounts to a Neumann boundary condition. */
       iprev = max(i-1, 0);
       inext = min(i+1, g_height-1);
     }
+
     /* Get pointers to beginning of rows for each of the grids. We access
        3 rows each for u and v, and 1 row each for du and dv. */
     ubase = &INDEX(u,i,0);
@@ -571,7 +574,7 @@ void compute(float *u, float *v, float *du, float *dv,
       if (g_wrap) {
         j2 = (j+4) % g_width;
       } else {
-        j2 = min(j+4, g_height-4);
+        j2 = min(j+4, g_width-4);
       }
 
       HWIV_COPY_4F4(v4_u_l, v4_u);
