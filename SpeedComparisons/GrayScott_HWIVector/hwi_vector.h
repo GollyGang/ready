@@ -45,6 +45,13 @@ there are usually several more steps:
 # endif
 #endif
 
+// Workaround because Visual Studio doesn't seem to set its _M_IX86_FP flag, 
+// or give us any indication what level of SSE support is available.
+// So we just assume SSE2 is available
+#if defined(_M_X64) || defined(_M_IX86)
+# define HWIV_V4F4_SSE2
+#endif
+
 // Finally, fall back to emulated if no hardware option is available
 #ifndef HWIV_V4F4_SSE2
 # ifndef HWIV_V4F4_EMULATED
@@ -213,7 +220,13 @@ typedef float HWIV_4F4_ALIGNED[4];
 
 typedef __m128 V4F4;
 
-typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
+#ifdef _WIN32
+#define ALIGNED_16 __declspec( align( 16 ) )
+#else
+#define ALIGNED_16 __attribute__((aligned (16)))
+#endif
+
+typedef float ALIGNED_16 HWIV_4F4_ALIGNED[4];
 
 #define HWIV_LOAD_4F4(dst, src)        (dst) = _mm_load_ps(src)
 #define HWIV_LOADO_4F4(dst, src, offset) \
@@ -224,7 +237,9 @@ typedef float __attribute__((aligned (16))) HWIV_4F4_ALIGNED[4];
             { HWIV_fill_4F4[0]=(sc0); HWIV_fill_4F4[1]=(sc1); \
                HWIV_fill_4F4[2]=(sc2); HWIV_fill_4F4[3]=(sc3); \
                HWIV_LOAD_4F4(dst, HWIV_fill_4F4); }
-#define HWIV_INIT_FILL float __attribute__((aligned (16))) HWIV_fill_4F4[4];
+
+#define HWIV_INIT_FILL float ALIGNED_16 HWIV_fill_4F4[4];
+
 #define HWIV_SPLAT_4F4(dst, s) HWIV_FILL_4F4((dst), (s), (s), (s), (s))
 
 #define HWIV_SAVE_4F4(dst, src)        _mm_store_ps((dst), (src))
