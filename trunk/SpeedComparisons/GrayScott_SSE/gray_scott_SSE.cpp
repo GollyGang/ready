@@ -53,8 +53,8 @@ inline int block_at(int x,int y) { return y*X_BLOCKS+x; }
 
 void init(float *a,float *b,float *da,float *db);
 void compute(float *a,float *b,float *da,float *db,
-             float r_a,float r_b,float f,float k,
-             float speed);
+             const float r_a,const float r_b,const float f,const float k,
+             const float speed);
 bool display(float *r,float *g,float *b,
              int iteration,bool auto_brighten,float manual_brighten,
              int scale,int delay_ms,const char* message);
@@ -184,22 +184,30 @@ void init(float *a,float *b,float *da,float *db)
 #define SUB(a,b) _mm_sub_ps(a,b)
 #define SET(a) _mm_set1_ps(a)
 
-// we write the Gray-Scott computation as a macro because functions and __m128 don't mix well
+// we write the Gray-Scott computation as macros because functions and __m128 don't mix well
 
-#define GRAYSCOTT_DA(_a,_abb,_a_left,_a_right,_a_above,_a_below,_r_a,_f) ADD(SUB(MUL(SET(_r_a),ADD(ADD(ADD(ADD(MUL(_a,SET(-4.0f)),_a_left),_a_right),_a_above),_a_below)),_abb),MUL(SET(_f),SUB(SET(1.0f),_a)));
+#define LAPLACIAN(_a,_a_left,_a_right,_a_above,_a_below) ADD(ADD(ADD(ADD(MUL(_a,SET(-4.0f)),_a_left),_a_right),_a_above),_a_below)
+
+#define GRAYSCOTT_DA(_a,_abb,_a_left,_a_right,_a_above,_a_below,_r_a,_f) ADD(SUB(MUL(_r_a,LAPLACIAN(_a,_a_left,_a_right,_a_above,_a_below)),_abb),MUL(_f,SUB(SET(1.0f),_a)));
 // da = r_a*dda - aval*bval*bval + f*(1-aval)
 
-#define GRAYSCOTT_DB(_b,_abb,_b_left,_b_right,_b_above,_b_below,_r_b,_f_plus_k) SUB(ADD(MUL(SET(_r_b),ADD(ADD(ADD(ADD(MUL(_b,SET(-4.0f)),_b_left),_b_right),_b_above),_b_below)),_abb),MUL(SET(_f_plus_k),_b));
+#define GRAYSCOTT_DB(_b,_abb,_b_left,_b_right,_b_above,_b_below,_r_b,_f_plus_k) SUB(ADD(MUL(_r_b,LAPLACIAN(_b,_b_left,_b_right,_b_above,_b_below)),_abb),MUL(_f_plus_k,_b));
 // db = r_b*ddb + aval*bval*bval - (f+k)*bval
 
 void compute(float *a,float *b,float *da,float *db,
-             float r_a,float r_b,float f,float k,
-             float speed)
+             const float r_a,const float r_b,const float f,const float k,
+             const float speed)
 {
+    const __m128 r_a_SSE = SET(r_a);
+    const __m128 r_b_SSE = SET(r_b);
+    const __m128 f_SSE = SET(f);
+    const __m128 f_plus_k_SSE = SET(f+k);
+    const __m128 speed_SSE = SET(speed);
+
     // compute the rates of change
-    for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks
+    for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks
     {
-        for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks
+        for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks
         {
             __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
             __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
@@ -216,8 +224,8 @@ void compute(float *a,float *b,float *da,float *db,
             __m128 *b_below = b_SSE+X_BLOCKS;
             __m128 abb = _mm_mul_ps(_mm_mul_ps(*a_SSE,*b_SSE),*b_SSE);
             // compute the new rates of change of each chemical
-            *da_SSE = GRAYSCOTT_DA(*a_SSE,abb,a_left,a_right,*a_above,*a_below,r_a,f);
-            *db_SSE = GRAYSCOTT_DB(*b_SSE,abb,b_left,b_right,*b_above,*b_below,r_b,f+k);
+            *da_SSE = GRAYSCOTT_DA(*a_SSE,abb,a_left,a_right,*a_above,*a_below,r_a_SSE,f_SSE);
+            *db_SSE = GRAYSCOTT_DB(*b_SSE,abb,b_left,b_right,*b_above,*b_below,r_b_SSE,f_plus_k_SSE);
         }
     }
 
@@ -228,8 +236,8 @@ void compute(float *a,float *b,float *da,float *db,
         __m128 *b_SSE = ((__m128*)b)+i;
         __m128 *da_SSE = ((__m128*)da)+i;
         __m128 *db_SSE = ((__m128*)db)+i;
-        *a_SSE = ADD(*a_SSE,MUL(*da_SSE,SET(speed))); // a[i] += speed * da[i];
-        *b_SSE = ADD(*b_SSE,MUL(*db_SSE,SET(speed))); // b[i] += speed * db[i];
+        *a_SSE = ADD(*a_SSE,MUL(*da_SSE,speed_SSE)); // a[i] += speed * da[i];
+        *b_SSE = ADD(*b_SSE,MUL(*db_SSE,speed_SSE)); // b[i] += speed * db[i];
     }
 }
 
@@ -315,7 +323,7 @@ bool display(float *r,float *g,float *b,
         }
     }
 
-    cvResize(im,im2,CV_INTER_NN);
+    cvResize(im,im2);
 
     {
         char txt[100];
