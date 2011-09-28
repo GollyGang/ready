@@ -42,17 +42,17 @@ See README.txt for more details.
 // OpenMP:
 #include <omp.h>
 
-inline int at(int x,int y) { return x*Y+y; }
+inline int at(int x,int y) { return y*X+x; }
 const int FLOATS_PER_BLOCK = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
 const int X_BLOCKS = X / FLOATS_PER_BLOCK; // 4 horizontally-neighboring cells form an SSE block
 const int Y_BLOCKS = Y;
 const int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
-inline int block_at(int x,int y) { return x*Y_BLOCKS+y; }
+inline int block_at(int x,int y) { return y*X_BLOCKS+x; }
 
 void init(float *a,float *b,float *da,float *db);
 void compute(float *a,float *b,float *da,float *db,
-             float r_a,float r_b,float f,float k,
-             float speed);
+             const float r_a,const float r_b,const float f,const float k,
+             const float speed);
 bool display(float *r,float *g,float *b,
              int iteration,bool auto_brighten,float manual_brighten,
              int scale,int delay_ms,const char* message);
@@ -176,23 +176,37 @@ void init(float *a,float *b,float *da,float *db)
     }
 }
 
+// some macros to make the next macros slightly more readable
+#define ADD(a,b) _mm_add_ps(a,b)
+#define MUL(a,b) _mm_mul_ps(a,b)
+#define SUB(a,b) _mm_sub_ps(a,b)
+#define SET(a) _mm_set1_ps(a)
+
+// we write the Gray-Scott computation as macros because functions and __m128 don't mix well
+
+#define LAPLACIAN(_a,_a_left,_a_right,_a_above,_a_below) ADD(ADD(ADD(ADD(MUL(_a,SET(-4.0f)),_a_left),_a_right),_a_above),_a_below)
+
+#define GRAYSCOTT_DA(_a,_abb,_a_left,_a_right,_a_above,_a_below,_r_a,_f) ADD(SUB(MUL(_r_a,LAPLACIAN(_a,_a_left,_a_right,_a_above,_a_below)),_abb),MUL(_f,SUB(SET(1.0f),_a)));
+// da = r_a*dda - aval*bval*bval + f*(1-aval)
+
+#define GRAYSCOTT_DB(_b,_abb,_b_left,_b_right,_b_above,_b_below,_r_b,_f_plus_k) SUB(ADD(MUL(_r_b,LAPLACIAN(_b,_b_left,_b_right,_b_above,_b_below)),_abb),MUL(_f_plus_k,_b));
+// db = r_b*ddb + aval*bval*bval - (f+k)*bval
+
 void compute(float *a,float *b,float *da,float *db,
-             float r_a,float r_b,float f,float k,
-             float speed)
+             const float r_a,const float r_b,const float f,const float k,
+             const float speed)
 {
-    const __m128 r_a_SSE = _mm_set1_ps(r_a);
-    const __m128 r_b_SSE = _mm_set1_ps(r_b);
-    const __m128 f_SSE = _mm_set1_ps(f);
-    const __m128 k_SSE = _mm_set1_ps(k);
-    const __m128 speed_SSE = _mm_set1_ps(speed);
-    const __m128 one_SSE = _mm_set1_ps(1.0f);
-    const __m128 minus_four_SSE = _mm_set1_ps(-4.0f);
+    const __m128 r_a_SSE = SET(r_a);
+    const __m128 r_b_SSE = SET(r_b);
+    const __m128 f_SSE = SET(f);
+    const __m128 f_plus_k_SSE = SET(f+k);
+    const __m128 speed_SSE = SET(speed);
 
     // compute the rates of change
     #pragma omp parallel for
-    for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks for now (for simplicity)
+    for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks
     {
-        for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks for now
+        for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks
         {
             __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
             __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
@@ -207,50 +221,44 @@ void compute(float *a,float *b,float *da,float *db,
             __m128 b_right = _mm_loadu_ps(((float*)b_SSE)+1);
             __m128 *b_above = b_SSE-X_BLOCKS;
             __m128 *b_below = b_SSE+X_BLOCKS;
-            // find the Laplacian of a (using the von Neumann neighborhood)
-            __m128 dda_SSE = _mm_mul_ps(*a_SSE,minus_four_SSE);
-            dda_SSE = _mm_add_ps(dda_SSE,a_left);
-            dda_SSE = _mm_add_ps(dda_SSE,a_right);
-            dda_SSE = _mm_add_ps(dda_SSE,*a_above);
-            dda_SSE = _mm_add_ps(dda_SSE,*a_below);
-            // find the Laplacian of b
-            __m128 ddb_SSE = _mm_mul_ps(*b_SSE,minus_four_SSE);
-            ddb_SSE = _mm_add_ps(ddb_SSE,b_left);
-            ddb_SSE = _mm_add_ps(ddb_SSE,b_right);
-            ddb_SSE = _mm_add_ps(ddb_SSE,*b_above);
-            ddb_SSE = _mm_add_ps(ddb_SSE,*b_below);
-            // compute the new rates of changes
-            __m128 t1_SSE = _mm_mul_ps(r_a_SSE,dda_SSE); // t1 = r_a * dda
-            __m128 t2_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t2 = aval*bval
-            __m128 t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = aval*bval*bval
-            __m128 t4_SSE = _mm_sub_ps(one_SSE,*a_SSE); // t4 = 1-aval
-            __m128 t5_SSE = _mm_mul_ps(f_SSE,t4_SSE); // t5 = f * (1-aval)
-            __m128 t6_SSE = _mm_sub_ps(t1_SSE,t3_SSE); // t6 = r_a *dda - aval*bval*bval
-            *da_SSE = _mm_add_ps(t6_SSE,t5_SSE); // da = r_a * dda - aval*bval*bval + f*(1-aval)
-            t1_SSE = _mm_mul_ps(r_b_SSE,ddb_SSE); // t1 = r_b * ddb
-            t2_SSE = _mm_add_ps(f_SSE,k_SSE); // t2 = f + k
-            t3_SSE = _mm_mul_ps(t2_SSE,*b_SSE); // t3 = (f+k) * bval
-            t4_SSE = _mm_mul_ps(*a_SSE,*b_SSE); // t4 = aval*bval
-            t5_SSE = _mm_mul_ps(t4_SSE,*b_SSE); // t5 = aval*bval*bval
-            t6_SSE = _mm_add_ps(t1_SSE,t5_SSE); // t6 = r_b*ddb + aval*bval*bval
-            *db_SSE = _mm_sub_ps(t6_SSE,t3_SSE); // db = r_b*ddb + aval*bval*bval - (f+k)*bval
+            __m128 abb = _mm_mul_ps(_mm_mul_ps(*a_SSE,*b_SSE),*b_SSE);
+            // compute the new rates of change of each chemical
+            *da_SSE = GRAYSCOTT_DA(*a_SSE,abb,a_left,a_right,*a_above,*a_below,r_a_SSE,f_SSE);
+            *db_SSE = GRAYSCOTT_DB(*b_SSE,abb,b_left,b_right,*b_above,*b_below,r_b_SSE,f_plus_k_SSE);
         }
     }
 
     // apply the rate of change
     #pragma omp parallel for
-    for(int i=0;i<TOTAL_BLOCKS;i++)
+    for(int j=0;j<Y_BLOCKS;j++)
     {
-        __m128 *a_SSE = ((__m128*)a)+i;
-        __m128 *b_SSE = ((__m128*)b)+i;
-        __m128 *da_SSE = ((__m128*)da)+i;
-        __m128 *db_SSE = ((__m128*)db)+i;
-        // a[i] += speed * da[i];
-        __m128 t1_SSE = _mm_mul_ps(*da_SSE,speed_SSE);
-        *a_SSE = _mm_add_ps(*a_SSE,t1_SSE);
-        // b[i] += speed * db[i];
-        t1_SSE = _mm_mul_ps(*db_SSE,speed_SSE);
-        *b_SSE = _mm_add_ps(*b_SSE,t1_SSE);
+        for(int i=0;i<X_BLOCKS;i++)
+        {
+            __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
+            __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
+            __m128 *da_SSE = ((__m128*)da)+block_at(i,j);
+            __m128 *db_SSE = ((__m128*)db)+block_at(i,j);
+            *a_SSE = ADD(*a_SSE,MUL(*da_SSE,speed_SSE)); // a[i] += speed * da[i];
+            *b_SSE = ADD(*b_SSE,MUL(*db_SSE,speed_SSE)); // b[i] += speed * db[i];
+        }
+    }
+
+    // copy the top and bottom rows of the active area to the other side
+    for(int i=0;i<X_BLOCKS;i++) 
+    {
+        *(((__m128*)a)+block_at(i,Y_BLOCKS-1)) = *(((__m128*)a)+block_at(i,1));
+        *(((__m128*)a)+block_at(i,0)) = *(((__m128*)a)+block_at(i,Y_BLOCKS-2));
+        *(((__m128*)b)+block_at(i,Y_BLOCKS-1)) = *(((__m128*)b)+block_at(i,1));
+        *(((__m128*)b)+block_at(i,0)) = *(((__m128*)b)+block_at(i,Y_BLOCKS-2));
+    }
+    // likewise for the left- and right-most columns
+    #pragma omp parallel for
+    for(int j=0;j<Y_BLOCKS;j++) 
+    {
+        *(((__m128*)a)+block_at(X_BLOCKS-1,j)) = *(((__m128*)a)+block_at(1,j));
+        *(((__m128*)a)+block_at(0,j)) = *(((__m128*)a)+block_at(X_BLOCKS-2,j));
+        *(((__m128*)b)+block_at(X_BLOCKS-1,j)) = *(((__m128*)b)+block_at(1,j));
+        *(((__m128*)b)+block_at(0,j)) = *(((__m128*)b)+block_at(X_BLOCKS-2,j));
     }
 }
 
