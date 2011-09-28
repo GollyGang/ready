@@ -43,13 +43,9 @@ const int X_BLOCKS = X / FLOATS_PER_BLOCK; // 4 horizontally-neighboring cells f
 const int Y_BLOCKS = Y;
 const int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
 
-// intended way round: horizontal SSE blocks lie end to end, to enable easy use of _mm_loadu_ps() for left and right
+// consecutive horizontal SSE blocks lie end to end, to enable easy use of _mm_loadu_ps() for left and right
 inline int at(int x,int y) { return y*X+x; } 
 inline int block_at(int x,int y) { return y*X_BLOCKS+x; }
-
-// this way round is faster but should never have worked! and only works when X==Y
-//inline int at(int x,int y) { return x*Y+y; } // cell grid is listed with the first column first
-//inline int block_at(int bx,int by) { return bx*Y_BLOCKS+by; } 
 
 void init(float *a,float *b,float *da,float *db);
 void compute(float *a,float *b,float *da,float *db,
@@ -163,7 +159,7 @@ void init(float *a,float *b,float *da,float *db)
         for(int j = 0; j < Y; j++)
         {
             //if(hypot(i%50-25/*-X/2*/,j%50-25/*-Y/2*/)<=frand(2,5))
-            if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            if(hypot(i-X/3,(j-Y/4)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
             {
                 a[at(i,j)] = 0.0f;
                 b[at(i,j)] = 1.0f;
@@ -238,6 +234,23 @@ void compute(float *a,float *b,float *da,float *db,
         __m128 *db_SSE = ((__m128*)db)+i;
         *a_SSE = ADD(*a_SSE,MUL(*da_SSE,speed_SSE)); // a[i] += speed * da[i];
         *b_SSE = ADD(*b_SSE,MUL(*db_SSE,speed_SSE)); // b[i] += speed * db[i];
+    }
+
+    // copy the top and bottom rows of the active area to the other side
+    for(int i=0;i<X_BLOCKS;i++) 
+    {
+        *(((__m128*)a)+block_at(i,Y_BLOCKS-1)) = *(((__m128*)a)+block_at(i,1));
+        *(((__m128*)a)+block_at(i,0)) = *(((__m128*)a)+block_at(i,Y_BLOCKS-2));
+        *(((__m128*)b)+block_at(i,Y_BLOCKS-1)) = *(((__m128*)b)+block_at(i,1));
+        *(((__m128*)b)+block_at(i,0)) = *(((__m128*)b)+block_at(i,Y_BLOCKS-2));
+    }
+    // likewise for the left- and right-most columns
+    for(int j=0;j<Y_BLOCKS;j++) 
+    {
+        *(((__m128*)a)+block_at(X_BLOCKS-1,j)) = *(((__m128*)a)+block_at(1,j));
+        *(((__m128*)a)+block_at(0,j)) = *(((__m128*)a)+block_at(X_BLOCKS-2,j));
+        *(((__m128*)b)+block_at(X_BLOCKS-1,j)) = *(((__m128*)b)+block_at(1,j));
+        *(((__m128*)b)+block_at(0,j)) = *(((__m128*)b)+block_at(X_BLOCKS-2,j));
     }
 }
 
