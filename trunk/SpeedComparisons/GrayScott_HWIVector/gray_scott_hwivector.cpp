@@ -529,9 +529,9 @@ void compute(float *u, float *v, float *du, float *dv,
   HWIV_FILL_4F4(v4_kdiff, 0, -k_diff, -2*k_diff, -3*k_diff);
 
   // Scan per row
-  for(int i = 0; i < g_height; i++) {
-    int iprev,inext;
-    int j2;
+  for(long i = 0; i < g_height; i++) {
+    long iprev,inext;
+    long j2;
 
     if (g_wrap) {
       iprev = (i+g_height-1) % g_height;
@@ -567,7 +567,7 @@ void compute(float *u, float *v, float *du, float *dv,
     HWIV_LOAD_4F4(v4_v_r, vbase);
 
     // Scan per column in steps of vector width
-    for(int j = 0; j < g_width; j+=4) {
+    for(long j = 0; j < g_width; j+=4) {
       if (g_wrap) {
         j2 = (j+4) % g_width;
       } else {
@@ -648,12 +648,12 @@ void compute(float *u, float *v, float *du, float *dv,
 
   {
   // effect change
-    for(int i = 0; i < g_height; i++) {
+    for(long i = 0; i < g_height; i++) {
       v_ubase = ((V4F4 *) (&INDEX(u,i,0)));
       v_vbase = ((V4F4 *) (&INDEX(v,i,0)));
       v_dubase = ((V4F4 *) (&INDEX(du,i,0)));
       v_dvbase = ((V4F4 *) (&INDEX(dv,i,0)));
-      for(int j = 0; j < g_width; j+=4) {
+      for(long j = 0; j < g_width; j+=4) {
         // u[i][j] = u[i][j] + speed * du[i][j];
         *v_ubase = v4ADD(v4MUL(v4_speed, *v_dubase), *v_ubase); v_ubase++; v_dubase++;
         // v[i][j] = v[i][j] + speed * dv[i][j];
@@ -667,9 +667,9 @@ void colorize(float *u, float *v, float *du,
              float *red, float *green, float *blue)
 {
   // Step by row
-  for(int i = 0; i < g_height; i++) {
+  for(long i = 0; i < g_height; i++) {
     // step by column
-    for(int j = 0; j < g_width; j++) {
+    for(long j = 0; j < g_width; j++) {
       float uval = INDEX(u,i,j);
       float vval = INDEX(v,i,j);
       float delta_u = (INDEX(du,i,j) * 1000.0f) + 0.5f;
