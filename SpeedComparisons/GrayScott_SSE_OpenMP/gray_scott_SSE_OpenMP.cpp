@@ -42,11 +42,17 @@ See README.txt for more details.
 // OpenMP:
 #include <omp.h>
 
-inline int at(int x,int y) { return y*X+x; }
-const int FLOATS_PER_BLOCK = 16 / sizeof(float); // 4 single-precision floats fit in a 128-bit (16-byte) SSE block
-const int X_BLOCKS = X / FLOATS_PER_BLOCK; // 4 horizontally-neighboring cells form an SSE block
-const int Y_BLOCKS = Y;
+// consecutive horizontal SSE blocks lie end to end, to enable easy use of _mm_loadu_ps() for left and right
+
+const int SSE_BITS_PER_BLOCK = 128;
+const int FLOATS_PER_BLOCK = (SSE_BITS_PER_BLOCK/8) / sizeof(float);
+const int PADDED_X = X + 2*FLOATS_PER_BLOCK; // our toroidal wrap-around scheme uses a border that is copied from the other side each time
+const int PADDED_Y = Y + 2;
+const int X_BLOCKS = PADDED_X / FLOATS_PER_BLOCK;
+const int Y_BLOCKS = PADDED_Y;
 const int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
+
+inline int at(int x,int y) { return y*PADDED_X+x; } 
 inline int block_at(int x,int y) { return y*X_BLOCKS+x; }
 
 void init(float *a,float *b,float *da,float *db);
@@ -85,7 +91,7 @@ int main()
     float speed = 1.0f;
     // ----------------
 
-    const int n_cells = X*Y;
+    const int n_cells = PADDED_X*PADDED_Y;
     float *a = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *b = (float*)_mm_malloc(n_cells*sizeof(float),16);
     float *da = (float*)_mm_malloc(n_cells*sizeof(float),16);
@@ -156,12 +162,11 @@ void init(float *a,float *b,float *da,float *db)
 
     // figure the values
     float val=1.0f;
-    for(int i = 0; i < X; i++)
+    for(int i = 0; i < PADDED_X; i++)
     {
-        for(int j = 0; j < Y; j++)
+        for(int j = 0; j < PADDED_Y; j++)
         {
-            //if(hypot(i%50-25/*-X/2*/,j%50-25/*-Y/2*/)<=frand(2,5))
-            if(hypot(i-X/2,(j-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            if(hypot(i-PADDED_X/2,(j-PADDED_Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
             {
                 a[at(i,j)] = 0.0f;
                 b[at(i,j)] = 1.0f;
@@ -230,9 +235,9 @@ void compute(float *a,float *b,float *da,float *db,
 
     // apply the rate of change
     #pragma omp parallel for
-    for(int j=0;j<Y_BLOCKS;j++)
+    for(int j=1;j<Y_BLOCKS-1;j++)
     {
-        for(int i=0;i<X_BLOCKS;i++)
+        for(int i=1;i<X_BLOCKS-1;i++)
         {
             __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
             __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
@@ -244,7 +249,7 @@ void compute(float *a,float *b,float *da,float *db,
     }
 
     // copy the top and bottom rows of the active area to the other side
-    for(int i=0;i<X_BLOCKS;i++) 
+    for(int i=1;i<X_BLOCKS-1;i++) 
     {
         *(((__m128*)a)+block_at(i,Y_BLOCKS-1)) = *(((__m128*)a)+block_at(i,1));
         *(((__m128*)a)+block_at(i,0)) = *(((__m128*)a)+block_at(i,Y_BLOCKS-2));
@@ -253,7 +258,7 @@ void compute(float *a,float *b,float *da,float *db,
     }
     // likewise for the left- and right-most columns
     #pragma omp parallel for
-    for(int j=0;j<Y_BLOCKS;j++) 
+    for(int j=1;j<Y_BLOCKS-1;j++) 
     {
         *(((__m128*)a)+block_at(X_BLOCKS-1,j)) = *(((__m128*)a)+block_at(1,j));
         *(((__m128*)a)+block_at(0,j)) = *(((__m128*)a)+block_at(X_BLOCKS-2,j));
@@ -281,10 +286,10 @@ bool display(float *r,float *g,float *b,
     {
         need_init = false;
 
-        im = cvCreateImage(cvSize(X,Y),IPL_DEPTH_8U,3);
+        im = cvCreateImage(cvSize(PADDED_X,PADDED_Y),IPL_DEPTH_8U,3);
         cvSet(im,cvScalar(0,0,0));
-        im2 = cvCreateImage(cvSize(X*scale,Y*scale),IPL_DEPTH_8U,3);
-        im3 = cvCreateImage(cvSize(X*scale+border*2,Y*scale+border),IPL_DEPTH_8U,3);
+        im2 = cvCreateImage(cvSize(PADDED_X*scale,PADDED_Y*scale),IPL_DEPTH_8U,3);
+        im3 = cvCreateImage(cvSize(PADDED_X*scale+border*2,PADDED_Y*scale+border),IPL_DEPTH_8U,3);
 
         cvNamedWindow(title,CV_WINDOW_AUTOSIZE);
 
@@ -304,9 +309,9 @@ bool display(float *r,float *g,float *b,
     float val,minR=FLT_MAX,maxR=-FLT_MAX,minG=FLT_MAX,maxG=-FLT_MAX,minB=FLT_MAX,maxB=-FLT_MAX;
     if(auto_brighten)
     {
-        for(int i=0;i<X;i++)
+        for(int i=0;i<PADDED_X;i++)
         {
-            for(int j=0;j<Y;j++)
+            for(int j=0;j<PADDED_Y;j++)
             {
                 if(r) {
                     val = r[at(i,j)];
@@ -323,26 +328,26 @@ bool display(float *r,float *g,float *b,
             }
         }
     }
-    for(int i=0;i<X;i++)
+    for(int i=0;i<PADDED_X;i++)
     {
-        for(int j=0;j<Y;j++)
+        for(int j=0;j<PADDED_Y;j++)
         {
             if(r) {
-                float val = r[at(i,Y-j-1)];
+                float val = r[at(i,PADDED_Y-j-1)];
                 if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
                 ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 2] = (uchar)val;
             }
             if(g) {
-                float val = g[at(i,Y-j-1)];
+                float val = g[at(i,PADDED_Y-j-1)];
                 if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
                 ((uchar *)(im->imageData + j*im->widthStep))[i*im->nChannels + 1] = (uchar)val;
             }
             if(b) {
-                float val = b[at(i,Y-j-1)];
+                float val = b[at(i,PADDED_Y-j-1)];
                 if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
                 else val *= manual_brighten;
                 if(val<0) val=0; if(val>255) val=255;
