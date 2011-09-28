@@ -5,6 +5,8 @@ INCLUDE_DIRECTORIES( ${OPENCV_INCLUDE_DIR})
 
 if(MSVC)
   add_definitions(/arch:SSE2)
+else()
+  add_definitions(-msse2)
 endif()
 
 add_executable(GrayScott_HWIVector 
