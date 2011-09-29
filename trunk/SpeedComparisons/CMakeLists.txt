@@ -4,7 +4,9 @@ project(SpeedComparisons)
 
 # this increases GrayScott and _double fps rate by 3 and _OpenMP by 2
 if(UNIX)
-   add_definitions(-O3)
+  if(CMAKE_BUILD_TYPE MATCHES "Release")
+    add_definitions(-O3)
+  endif()
 endif()
 
 add_subdirectory(GrayScott)
