@@ -151,6 +151,12 @@ typedef float HWIV_4F4_ALIGNED[4];
 #define HWIV_ADD_4F4(dst, a, b) { (dst)[0]=a[0]+b[0]; (dst)[1]=a[1]+b[1]; \
                                 (dst)[2]=a[2]+b[2]; (dst)[3]=a[3]+b[3]; }
 
+/* SUB_4F4: dst, a, and b are each a vector of 4 floats.
+     This opcode adds each of the components of a to the corresponding
+   component of b and puts the result into dst. */
+#define HWIV_SUB_4F4(dst, a, b) { (dst)[0]=a[0]-b[0]; (dst)[1]=a[1]-b[1]; \
+                                (dst)[2]=a[2]-b[2]; (dst)[3]=a[3]-b[3]; }
+
 #define HWIV_INIT_MUL0_4F4 /* nop */
 
 /* MUL_4F4: dst, a, and b are each a vector of 4 floats. v0 is a variable
@@ -301,6 +307,8 @@ typedef float ALIGNED_16 HWIV_4F4_ALIGNED[4];
                                         _mm_store_ps((dst)+(offset)/4, (src))
 
 #define HWIV_ADD_4F4(dst, a, b) (dst) = _mm_add_ps((a), (b))
+
+#define HWIV_SUB_4F4(dst, a, b) (dst) = _mm_sub_ps((a), (b))
 
 // For INIT_MUL0, on Intel we do nothing because Intel actually has a
 // 2-operand multiply operation.
