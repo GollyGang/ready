@@ -207,9 +207,9 @@ int main(int argc, char * * argv)
   int N_FRAMES_PER_DISPLAY;
 
 #ifdef HWIV_EMULATE
-  N_FRAMES_PER_DISPLAY = 500;
+  N_FRAMES_PER_DISPLAY = 200;
 #else
-  N_FRAMES_PER_DISPLAY = 2000;
+  N_FRAMES_PER_DISPLAY = 1000;
 #endif
 
   int iteration = 0;
@@ -480,6 +480,10 @@ void init(float *u, float *v,
 
 #define VECSIZE 4
 
+/* The parameter space code, specifically the "if(parameter_space)" test itself, causes a 2.5% slowdown even when the
+   parameter_space flag is false */
+//#define SUPPORT_PARAM_SPACE
+
 void compute(float *u, float *v, float *du, float *dv,
              float D_u,float D_v,float F,float k,float speed,
              int parameter_space)
@@ -491,28 +495,15 @@ void compute(float *u, float *v, float *du, float *dv,
   V4F4 v4_speed; // vectorized version of speed scalar
   V4F4 v4_F; // vectorized version of F scalar
   V4F4 v4_k; // vectorized version of k scalar
-  HWIV_4F4_ALIGNED talign; // used by FILL_4F4
-  V4F4 v4_u; V4F4 v4_du;
-  V4F4 v4_v; V4F4 v4_uvv;
-  HWIV_INIT_MUL0_4F4; // used by MUL (on targets that need it)
-  HWIV_INIT_MTMP_4F4; // used by MADD (on targets that need it)
-  HWIV_INIT_FILL;     // used by FILL
-  HWIV_INIT_RLTMP_4F4; // used by RAISE and LOWER
-  V4F4 v4_tmp;
+  V4F4 v4_u;
+  V4F4 v4_v;
+  V4F4 v4_uvv;
   V4F4 v4_Du;
   V4F4 v4_Dv;
   V4F4 v4_nabla_u;
   V4F4 v4_nabla_v;
-  V4F4 v4_1;
-  V4F4 v4_4;
-  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
-  float k_diff;
-  V4F4 v4_kdiff;
-  float * ubase;
-    V4F4 * v_ub_prev; V4F4 * v_ub_next;
-    V4F4 * v_vb_prev; V4F4 * v_vb_next;
-  float * vbase;
-  float * dubase; float * dvbase;
+  V4F4 * v_ub_prev; V4F4 * v_ub_next;
+  V4F4 * v_vb_prev; V4F4 * v_vb_next;
 
   V4F4 v4_u_l;
   V4F4 v4_u_r;
@@ -524,23 +515,25 @@ void compute(float *u, float *v, float *du, float *dv,
   V4F4 * v_dubase;
   V4F4 * v_dvbase;
 
-  //F_diff = (F_max-F_min)/g_width;
+#ifdef SUPPORT_PARAM_SPACE
+  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
+  float k_diff;
+  V4F4 v4_kdiff;
   k_diff = (k_max-k_min)/g_height;
+  v4_kdiff = v4SET(0, -k_diff, -2*k_diff, -3*k_diff);
+#endif
 
   // Initialize our vectorized scalars
-  HWIV_SPLAT_4F4(v4_speed, speed);
-  HWIV_SPLAT_4F4(v4_F, F);
-  HWIV_SPLAT_4F4(v4_k, k);
-  HWIV_SPLAT_4F4(v4_Du, D_u);
-  HWIV_SPLAT_4F4(v4_Dv, D_v);
-  HWIV_SPLAT_4F4(v4_1, 1.0);
-  HWIV_SPLAT_4F4(v4_4, 4.0);
-  HWIV_FILL_4F4(v4_kdiff, 0, -k_diff, -2*k_diff, -3*k_diff);
+  v4_speed = v4SPLAT(speed);
+  v4_F = v4SPLAT(F);
+  v4_k = v4SPLAT(k);
+  v4_Du = v4SPLAT(D_u);
+  v4_Dv = v4SPLAT(D_v);
 
   // Scan per row
   for(long i = 0; i < g_height; i++) {
     long iprev,inext;
-    long j2, v_j2;
+    long v_j2;
     if (g_wrap) {
       /* Periodic boundary condition */
       iprev = (i+g_height-1) % g_height;
@@ -553,61 +546,49 @@ void compute(float *u, float *v, float *du, float *dv,
 
     /* Get pointers to beginning of rows for each of the grids. We access
        3 rows each for u and v, and 1 row each for du and dv. */
-    ubase = &INDEX(u,i,0);
-      v_ubase = (V4F4 *)&INDEX(u,i,0);
-      v_ub_prev = (V4F4 *)&INDEX(u,iprev,0);
-      v_ub_next = (V4F4 *)&INDEX(u,inext,0);
-    vbase = &INDEX(v,i,0);
-      v_vbase = (V4F4 *)&INDEX(v,i,0);
-      v_vb_prev = (V4F4 *)&INDEX(v,iprev,0);
-      v_vb_next = (V4F4 *)&INDEX(v,inext,0);
-    dubase = &INDEX(du,i,0);
-    dvbase = &INDEX(dv,i,0);
-      v_dubase = (V4F4 *)&INDEX(du,i,0);
-      v_dvbase = (V4F4 *)&INDEX(dv,i,0);
+    v_ubase = (V4F4 *)&INDEX(u,i,0);
+    v_ub_prev = (V4F4 *)&INDEX(u,iprev,0);
+    v_ub_next = (V4F4 *)&INDEX(u,inext,0);
+    v_vbase = (V4F4 *)&INDEX(v,i,0);
+    v_vb_prev = (V4F4 *)&INDEX(v,iprev,0);
+    v_vb_next = (V4F4 *)&INDEX(v,inext,0);
+    v_dubase = (V4F4 *)&INDEX(du,i,0);
+    v_dvbase = (V4F4 *)&INDEX(dv,i,0);
 
+#ifdef SUPPORT_PARAM_SPACE
     if (parameter_space) {
       // set F for this row (ignore the provided value)
       F = F_min + (g_height-i-1) * (F_max-F_min)/g_width;
-      HWIV_SPLAT_4F4(v4_F, F);
+      v4_F = v4SPLAT(F);
     }
+#endif
 
     /* Pre-load the first two blocks of data we need, which are the "center"
        and "right" blocks from the end of the row (as if we have just wrapped
        around from the end of the row back to the beginning) */
-    j2 = g_wrap ? (g_width-4) : 0;
     v_j2 = g_wrap ? ((g_width-4)/VECSIZE) : 0;
 
     v4_u = *(v_ubase+v_j2);
     v4_v = *(v_vbase+v_j2);
-    v4_u_r = *v_ubase;
-    v4_v_r = *v_vbase;
+    v4_u_r = *v_ubase++;
+    v4_v_r = *v_vbase++;
 
     // Scan per column in steps of vector width
-    for(long j = 0; j < g_width; j+=VECSIZE) {
-      if (g_wrap) {
-        j2 = (j+VECSIZE) % g_width;
-        v_j2 = ((j+VECSIZE) % g_width)/VECSIZE;
-      } else {
-        j2 = min(j+VECSIZE, g_width-VECSIZE);
-        v_j2 = min(j/VECSIZE+1, g_width/VECSIZE-1);
-      }
+    for(long j = 0; j < g_width-VECSIZE; j+=VECSIZE) {
+      // Get a new 4 pixels from the current row and shift the other 8 pixels over
+      v4_u_l = v4_u; v4_u = v4_u_r; v4_u_r = *v_ubase;
+      v4_v_l = v4_v; v4_v = v4_v_r; v4_v_r = *v_vbase;
 
-      v4_u_l = v4_u; v4_u = v4_u_r;
-      v4_v_l = v4_v; v4_v = v4_v_r;
-      HWIV_LOAD_4F4(v4_u_r, ubase+j2);
-      HWIV_LOAD_4F4(v4_v_r, vbase+j2);
-//      v4_u_r = *(v_ubase+v_j2);
-//      v4_v_r = *(v_vbase+v_j2);
-
+#ifdef SUPPORT_PARAM_SPACE
       if (parameter_space) {
         // set k for this column (ignore the provided value)
         k = k_min + (g_width-j-1)*k_diff;
         // k decreases by k_diff each time j increases by 1, so this vector
-        // needs to contain 4 different k values. We use v4_kdiff, computed
+        // needs to contain 4 different k values. We use v4_kdiff, pre-computed
         // above, to accomplish this.
         v4_k = v4ADD(v4SPLAT(k),v4_kdiff);
       }
+#endif
 
       // compute the Laplacians of u and v. "nabla" is the name of the
       // "upside down delta" symbol used for the Laplacian in equations.
@@ -620,10 +601,10 @@ void compute(float *u, float *v, float *du, float *dv,
          nabla_u = u[i][jprev]+u[i][jnext]+u[iprev][j]+u[inext][j] - 4*uval; */
 
       v4_nabla_u = NABLA_5PT(v4_u, v4RAISE(v4_u,v4_u_l), v4LOWER(v4_u,v4_u_r),
-         *v_ub_prev, *v_ub_next); v_ub_prev++; v_ub_next++;
+         *v_ub_prev, *v_ub_next);
 
       v4_nabla_v = NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r),
-         *v_vb_prev, *v_vb_next); v_vb_prev++; v_vb_next++;
+         *v_vb_prev, *v_vb_next);
 
       // compute the new rate of change of u and v
 
@@ -636,7 +617,6 @@ void compute(float *u, float *v, float *du, float *dv,
                      // D_u*nabla_u - (u*v^2 - F(1-u)) = D_u*nabla_u - u*v^2 + F(1-u)
       *v_dubase = v4SUB(v4MUL(v4_Du,v4_nabla_u),
                            v4SUB(v4_uvv,v4MUL(v4_F,v4SUB(v4SPLAT(1.0f),v4_u))));
-      v_dubase++;
 
       /* dv formula is similar:
            dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
@@ -645,8 +625,36 @@ void compute(float *u, float *v, float *du, float *dv,
                                                        // u*v^2 is still in v4_uvv
       *v_dvbase = v4ADD(v4MUL(v4_Dv,v4_nabla_v),
                            v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),v4_v)));
-      v_dvbase++;
+
+      v_ub_prev++; v_ub_next++;
+      v_ubase++;   v_vbase++;
+      v_vb_prev++; v_vb_next++;
+      v_dubase++;  v_dvbase++;
     }
+
+    /* Now we do the last 4 pixels. This is unrolled out of the main loop just to avoid having to do the g_wrap
+       test every time in the j loop. */
+    v4_u_l = v4_u; v4_u = v4_u_r;
+    v4_v_l = v4_v; v4_v = v4_v_r;
+    if (g_wrap) {
+      /* get the right block of cells from first 4 in this row */
+      v4_u_r = *((V4F4 *)&INDEX(u,i,0));
+      v4_v_r = *((V4F4 *)&INDEX(v,i,0));
+    } else {
+      /* just leave them alone, retaining the rightmost 4 values in this row, which were loaded on the last iteration
+         through the loop */
+    }
+    v4_nabla_u = NABLA_5PT(v4_u, v4RAISE(v4_u,v4_u_l), v4LOWER(v4_u,v4_u_r),
+         *v_ub_prev, *v_ub_next); v_ub_prev++; v_ub_next++;
+    v4_nabla_v = NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r),
+         *v_vb_prev, *v_vb_next); v_vb_prev++; v_vb_next++;
+    v4_uvv = v4MUL(v4_u,v4MUL(v4_v,v4_v));            // u*v^2
+                     // D_u*nabla_u - (u*v^2 - F(1-u)) = D_u*nabla_u - u*v^2 + F(1-u)
+    *v_dubase = v4SUB(v4MUL(v4_Du,v4_nabla_u),
+                           v4SUB(v4_uvv,v4MUL(v4_F,v4SUB(v4SPLAT(1.0f),v4_u))));
+    *v_dvbase = v4ADD(v4MUL(v4_Dv,v4_nabla_v),
+                           v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),v4_v)));
+
   }
 
   {
