@@ -193,6 +193,94 @@ void init(float *a,float *b,float *da,float *db)
 #define GRAYSCOTT_DB(_b,_abb,_b_left,_b_right,_b_above,_b_below,_r_b,_f_plus_k) SUB(ADD(MUL(_r_b,LAPLACIAN(_b,_b_left,_b_right,_b_above,_b_below)),_abb),MUL(_f_plus_k,_b));
 // db = r_b*ddb + aval*bval*bval - (f+k)*bval
 
+
+#if 0
+
+// we tried using 'raise' and 'lower' macros to reduce the amount of loading but it ended up slower
+
+// the same as _mm_loadu_ps(((float*)(&_here))-1) when _here follows _left in memory
+#define FLOAT_LEFT(_left,_here) _mm_shuffle_ps(_mm_shuffle_ps(_left,_here,_MM_SHUFFLE(0,0,3,3)),_here,_MM_SHUFFLE(2,1,2,0))
+// (Robert Munafo's RAISE function)
+
+// the same as _mm_loadu_ps(((float*)(&_here))+1) when _right follows _here in memory
+#define FLOAT_RIGHT(_here,_right) _mm_shuffle_ps(_here,_mm_move_ss(_here,_right),_MM_SHUFFLE(0,3,2,1))
+
+void compute(float *a,float *b,float *da,float *db,
+             const float r_a,const float r_b,const float f,const float k,
+             const float speed)
+{
+    /* 
+    {
+        // test our new FLOAT_LEFT and FLOAT_RIGHT macros:
+        float arr1[12] = {1,2,3,4,5,6,7,8,9,10,11,12};
+        float *arr2 = (float*)_mm_malloc(12*sizeof(float),16);
+        memcpy(arr2,arr1,12*sizeof(float));
+        __m128 *a = (__m128*)(arr2+0);
+        __m128 *b = (__m128*)(arr2+4);
+        __m128 *c = (__m128*)(arr2+8);
+        __m128 left = FLOAT_LEFT(*a,*b);
+        __m128 right = FLOAT_RIGHT(*b,*c);
+        printf("done"); // put a breakpoint here and look at left and right
+    }
+    */
+
+    const __m128 r_a_SSE = SET(r_a);
+    const __m128 r_b_SSE = SET(r_b);
+    const __m128 f_SSE = SET(f);
+    const __m128 f_plus_k_SSE = SET(f+k);
+    const __m128 speed_SSE = SET(speed);
+
+    // compute the rate of change
+    for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks
+    {
+        __m128 *a1,*b1;
+        __m128 *a2 = ((__m128*)a)+block_at(0,j);
+        __m128 *a3 = ((__m128*)a)+block_at(1,j);
+        __m128 *b2 = ((__m128*)b)+block_at(0,j);
+        __m128 *b3 = ((__m128*)b)+block_at(1,j);
+        // (TODO: wrap-around)
+        for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks
+        {
+            // load the next blocks
+            a1=a2; a2=a3; a3 = ((__m128*)a)+block_at(i+1,j);
+            b1=b2; b2=b3; b3 = ((__m128*)b)+block_at(i+1,j);
+            __m128 *da_SSE = ((__m128*)da)+block_at(i,j);
+            __m128 *db_SSE = ((__m128*)db)+block_at(i,j);
+            // retrieve the neighboring cells
+            __m128 a_left = FLOAT_LEFT(*a1,*a2);
+            __m128 a_right = FLOAT_RIGHT(*a2,*a3);
+            __m128 *a_above = a2-X_BLOCKS;
+            __m128 *a_below = a2+X_BLOCKS;
+            __m128 b_left = FLOAT_LEFT(*b1,*b2);
+            __m128 b_right = FLOAT_RIGHT(*b2,*b3);
+            __m128 *b_above = b2-X_BLOCKS;
+            __m128 *b_below = b2+X_BLOCKS;
+            __m128 abb = _mm_mul_ps(_mm_mul_ps(*a2,*b2),*b2);
+            // compute the new rates of change of each chemical
+            *da_SSE = GRAYSCOTT_DA(*a2,abb,a_left,a_right,*a_above,*a_below,r_a_SSE,f_SSE);
+            *db_SSE = GRAYSCOTT_DB(*b2,abb,b_left,b_right,*b_above,*b_below,r_b_SSE,f_plus_k_SSE);
+        }
+    }
+
+    // apply the rate of change
+    for(int j=1;j<Y_BLOCKS-1;j++) // we skip the top- and bottom-most blocks
+    {
+        for(int i=1;i<X_BLOCKS-1;i++) // we skip the left- and right-most blocks
+        {
+            __m128 *a_SSE = ((__m128*)a)+block_at(i,j);
+            __m128 *b_SSE = ((__m128*)b)+block_at(i,j);
+            __m128 *da_SSE = ((__m128*)da)+block_at(i,j);
+            __m128 *db_SSE = ((__m128*)db)+block_at(i,j);
+            *a_SSE = ADD(*a_SSE,MUL(*da_SSE,speed_SSE)); // a[i] += speed * da[i];
+            *b_SSE = ADD(*b_SSE,MUL(*db_SSE,speed_SSE)); // b[i] += speed * db[i];
+        }
+    }
+}
+
+#else
+
+// original code (faster)
+
 void compute(float *a,float *b,float *da,float *db,
              const float r_a,const float r_b,const float f,const float k,
              const float speed)
@@ -259,6 +347,8 @@ void compute(float *a,float *b,float *da,float *db,
         *(((__m128*)b)+block_at(0,j)) = *(((__m128*)b)+block_at(X_BLOCKS-2,j));
     }
 }
+
+#endif
 
 bool display(float *r,float *g,float *b,
              int iteration,bool auto_brighten,float manual_brighten,
