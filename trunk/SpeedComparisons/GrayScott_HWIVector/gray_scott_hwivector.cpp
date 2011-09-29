@@ -87,6 +87,7 @@ static int g_ramprects = 0;
 static int g_lowback = 0;
 static float g_scale = 1.0;
 static int g_density = 0;
+static bool g_video = false;
 
 int main(int argc, char * * argv)
 {
@@ -155,6 +156,9 @@ int main(int argc, char * * argv)
     } else if ((i+1<argc) && (strcmp(argv[i],"-size")==0)) {
       // set both width and height
       i++; g_height = g_width = atoi(argv[i]);
+    } else if (strcmp(argv[i],"-video")==0) {
+      // Create a video media file
+      g_video = true;
     } else if ((i+1<argc) && (strcmp(argv[i],"-width")==0)) {
       // set width
       i++; g_width = atoi(argv[i]);
@@ -213,11 +217,15 @@ int main(int argc, char * * argv)
 
   int N_FRAMES_PER_DISPLAY;
 
-#ifdef HWIV_EMULATE
-  N_FRAMES_PER_DISPLAY = 200;
-#else
-  N_FRAMES_PER_DISPLAY = 1000;
-#endif
+  if (g_video) {
+    N_FRAMES_PER_DISPLAY = 100;
+  } else {
+#   ifdef HWIV_EMULATE
+      N_FRAMES_PER_DISPLAY = 200;
+#   else
+      N_FRAMES_PER_DISPLAY = 1000;
+#   endif
+  }
 
   int iteration = 0;
   double fps_avg = 0.0; // decaying average of fps
@@ -258,9 +266,9 @@ int main(int argc, char * * argv)
     {
       int chose_quit;
       if (g_color) {
-        chose_quit = display(g_width,g_height,red,green,blue,iteration,false,200.0f,2,10,msg);
+        chose_quit = display(g_width,g_height,red,green,blue,iteration,false,200.0f,2,10,msg,g_video);
       } else {
-        chose_quit = display(g_width,g_height,u,u,u,iteration,false,200.0f,2,10,msg);
+        chose_quit = display(g_width,g_height,u,u,u,iteration,false,200.0f,2,10,msg,g_video);
       }
       if (chose_quit) // did user ask to quit?
         break;
