@@ -102,13 +102,20 @@ int main(int argc, char * * argv)
   float D_u = 0.082;
   float D_v = 0.041;
 
-     g_k = 0.064;  g_F = 0.035;  // spots
-  // g_k = 0.059;  g_F = 0.022;  // spots that keep killing each other off
-  // g_k = 0.06;   g_F = 0.035;  // stripes
-  // g_k = 0.065;  g_F = 0.056;  // long stripes
-  // g_k = 0.064;  g_F = 0.04;   // dots and stripes
-  // g_k = 0.0475; g_F = 0.0118; // spiral waves
-  // g_k = 0.059;  g_F = 0.094;  // "soap bubbles"
+  // The default is equivalent to options:   -F 0.035 -k 0.064
+  g_k = 0.064;  g_F = 0.035;
+
+  // Other pattern-types to try (pass -F and -k as argument on command line, some require "-density 1" as well):
+  //
+  // -F 0.0118 -k 0.0475              Spiral waves
+  // -F 0.022  -k 0.059               Spots that multiply and keep killing each other off
+  // -F 0.035  -k 0.06                Stripes with branching (fingerprint)
+  // -F 0.04   -k 0.064               For spots that multiply, with stripes mixed in
+  // -F 0.056  -k 0.065               Long stripes ("-density 1" option helps here)
+  // -F 0.062  -k 0.0609 -density 2   "Uskate world", where I found all the Wolfram-class-4 behaviour
+  // -F 0.094  -k 0.059  -density 1   "soap bubbles"
+  // -F 0.094  -k 0.057 -lowback -density 1   Inverse soap bubbles
+
   float speed = 1.0;
 
   bool custom_Fk = false;
@@ -492,28 +499,17 @@ void compute(float *u, float *v, float *du, float *dv,
   fprintf(stdout, "Did not get vector macros from HWIV\n");
   exit(-1);
 #endif
-  V4F4 v4_speed; // vectorized version of speed scalar
-  V4F4 v4_F; // vectorized version of F scalar
-  V4F4 v4_k; // vectorized version of k scalar
-  V4F4 v4_u;
-  V4F4 v4_v;
+  // Vector "constants": speed, F, k, D_u, D_v
+  V4F4 v4_speed, v4_F, v4_k, v4_Du, v4_Dv;
+  // Pointers used to load data from rows of the grid
+  V4F4 *v_ub_prev, *v_ubase, *v_ub_next;
+  V4F4 *v_vb_prev, *v_vbase, *v_vb_next;
+  // Actual grid data
+  V4F4 v4_u_l, v4_u, v4_u_r;
+  V4F4 v4_v_l, v4_v, v4_v_r;
   V4F4 v4_uvv;
-  V4F4 v4_Du;
-  V4F4 v4_Dv;
-  V4F4 v4_nabla_u;
-  V4F4 v4_nabla_v;
-  V4F4 * v_ub_prev; V4F4 * v_ub_next;
-  V4F4 * v_vb_prev; V4F4 * v_vb_next;
-
-  V4F4 v4_u_l;
-  V4F4 v4_u_r;
-  V4F4 v4_v_l;
-  V4F4 v4_v_r;
-
-  V4F4 * v_ubase;
-  V4F4 * v_vbase;
-  V4F4 * v_dubase;
-  V4F4 * v_dvbase;
+  // Pointers to second grid where we write the results of the main computation
+  V4F4 *v_dubase, *v_dvbase;
 
 #ifdef SUPPORT_PARAM_SPACE
   const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
@@ -590,40 +586,24 @@ void compute(float *u, float *v, float *du, float *dv,
       }
 #endif
 
-      // compute the Laplacians of u and v. "nabla" is the name of the
-      // "upside down delta" symbol used for the Laplacian in equations.
-      // 5-point neighbourhood for Euler discrete method:
+      // To compute the Laplacians of u and v, we use the 5-point neighbourhood for the Euler discrete method:
       //    nabla(x) = x[i][j-1]+x[i][j+1]+x[i-1][j]+x[i+1][j] - 4*x[i][j];
+      // ("nabla" is the name of the "upside down delta" symbol used for the Laplacian in equations)
 #     define NABLA_5PT(ctr,left,right,up,down) \
-         v4ADD(v4ADD(v4ADD(v4ADD(v4MUL(ctr,v4SPLAT(-4.0f)),left),right),up),down)
-
-      /* Scalar code is:
-         nabla_u = u[i][jprev]+u[i][jnext]+u[iprev][j]+u[inext][j] - 4*uval; */
-
-      v4_nabla_u = NABLA_5PT(v4_u, v4RAISE(v4_u,v4_u_l), v4LOWER(v4_u,v4_u_r),
-         *v_ub_prev, *v_ub_next);
-
-      v4_nabla_v = NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r),
-         *v_vb_prev, *v_vb_next);
+         v4SUB(v4ADD(v4ADD(v4ADD(left,right),up),down),v4MUL(ctr,v4SPLAT(4.0f)))
 
       // compute the new rate of change of u and v
+      v4_uvv = v4MUL(v4_u,v4MUL(v4_v,v4_v)); // u*v^2 is used twice
 
-      /* Scalar code is:
-           du[i][j] = D_u * nabla_u - uval*vval*vval + F*(1-uval);
-         We treat it as:
-                      D_u * nabla_u - (uval*vval*vval - (-(F*uval-F)) ) */
-
-      v4_uvv = v4MUL(v4_u,v4MUL(v4_v,v4_v));            // u*v^2
-                     // D_u*nabla_u - (u*v^2 - F(1-u)) = D_u*nabla_u - u*v^2 + F(1-u)
-      *v_dubase = v4SUB(v4MUL(v4_Du,v4_nabla_u),
+      /* Scalar code is:     du[i][j] = D_u * nabla_u - u*v^2 + F*(1-u);
+         We treat it as:                D_u * nabla_u - (u*v^2 - F*(1-u)) */
+      *v_dubase = v4SUB(v4MUL(v4_Du,
+         NABLA_5PT(v4_u, v4RAISE(v4_u,v4_u_l), v4LOWER(v4_u,v4_u_r), *v_ub_prev, *v_ub_next)),
                            v4SUB(v4_uvv,v4MUL(v4_F,v4SUB(v4SPLAT(1.0f),v4_u))));
 
-      /* dv formula is similar:
-           dv[i][j] = D_v * nabla_v + uval*vval*vval - (F+k)*vval;
-         We treat it as:
-                      D_v * nabla_v + uval*vval*vval - (F*vval + k*vval); */
-                                                       // u*v^2 is still in v4_uvv
-      *v_dvbase = v4ADD(v4MUL(v4_Dv,v4_nabla_v),
+      /* dv formula is similar:  dv[i][j] = D_v * nabla_v + u*v^2 - (F+k)*v; */
+      *v_dvbase = v4ADD(v4MUL(v4_Dv,
+         NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r), *v_vb_prev, *v_vb_next)),
                            v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),v4_v)));
 
       v_ub_prev++; v_ub_next++;
@@ -637,24 +617,20 @@ void compute(float *u, float *v, float *du, float *dv,
     v4_u_l = v4_u; v4_u = v4_u_r;
     v4_v_l = v4_v; v4_v = v4_v_r;
     if (g_wrap) {
-      /* get the right block of cells from first 4 in this row */
+      /* The 4 cells to the "right" are the first 4 in this row */
       v4_u_r = *((V4F4 *)&INDEX(u,i,0));
       v4_v_r = *((V4F4 *)&INDEX(v,i,0));
     } else {
       /* just leave them alone, retaining the rightmost 4 values in this row, which were loaded on the last iteration
          through the loop */
     }
-    v4_nabla_u = NABLA_5PT(v4_u, v4RAISE(v4_u,v4_u_l), v4LOWER(v4_u,v4_u_r),
-         *v_ub_prev, *v_ub_next); v_ub_prev++; v_ub_next++;
-    v4_nabla_v = NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r),
-         *v_vb_prev, *v_vb_next); v_vb_prev++; v_vb_next++;
-    v4_uvv = v4MUL(v4_u,v4MUL(v4_v,v4_v));            // u*v^2
-                     // D_u*nabla_u - (u*v^2 - F(1-u)) = D_u*nabla_u - u*v^2 + F(1-u)
-    *v_dubase = v4SUB(v4MUL(v4_Du,v4_nabla_u),
+    v4_uvv = v4MUL(v4_u,v4MUL(v4_v,v4_v));
+    *v_dubase = v4SUB(v4MUL(v4_Du,
+         NABLA_5PT(v4_u, v4RAISE(v4_u,v4_u_l), v4LOWER(v4_u,v4_u_r), *v_ub_prev, *v_ub_next)),
                            v4SUB(v4_uvv,v4MUL(v4_F,v4SUB(v4SPLAT(1.0f),v4_u))));
-    *v_dvbase = v4ADD(v4MUL(v4_Dv,v4_nabla_v),
+    *v_dvbase = v4ADD(v4MUL(v4_Dv,
+         NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r), *v_vb_prev, *v_vb_next)),
                            v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),v4_v)));
-
   }
 
   {
