@@ -218,7 +218,7 @@ int main(int argc, char * * argv)
   int N_FRAMES_PER_DISPLAY;
 
   if (g_video) {
-    N_FRAMES_PER_DISPLAY = 100;
+    N_FRAMES_PER_DISPLAY = 500;
   } else {
 #   ifdef HWIV_EMULATE
       N_FRAMES_PER_DISPLAY = 200;
