@@ -43,10 +43,10 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
 		if(write_video)
 		{
 //			video = cvCreateVideoWriter(title,CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
-			video = cvCreateVideoWriter("./vid-Gray-Scott.avi",CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im),1);
-//			video = cvCreateVideoWriter("./vid-Gray-Scott.avi",CV_FOURCC('P','I','M','1'),25.0,cvGetSize(im),1);
+			video = cvCreateVideoWriter("vid-Gray-Scott.avi",CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im),1);
+//			video = cvCreateVideoWriter("vid-Gray-Scott.avi",CV_FOURCC('P','I','M','1'),25.0,cvGetSize(im),1);
 			if(video == NULL) {
-				fprintf(stdout, "NULL from cvCreateVideoWriter\n");
+				fprintf(stdout, "NULL from cvCreateVideoWriter\n"); exit(-1);
 			}
 //			border = 20;
 		}
