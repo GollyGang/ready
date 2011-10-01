@@ -39,7 +39,10 @@ See README.txt for more details.
           t->tv_sec=timebuffer.time;
           t->tv_usec=1000*timebuffer.millitm;
     }
+
+	// TODO: Include file for file length measurement (see FILE_LENGTH macro below)
 #else
+    #include <sys/stat.h>
     #include <sys/time.h>
 #endif
 
@@ -70,8 +73,19 @@ float *allocate(long width, long height, const char * error_text)
   return (rv);
 }
 
-void init(float *a, float *b,
+void init(float *a, float *b, long width, long height,
           int density, int lowback, int BZrects);
+
+#define MAX_LOADS 100
+char * load_opts[MAX_LOADS];
+int num_loads = 0;
+
+void load_option(float * u, float * v, long width, long height, const char * option);
+void pattern_load(float * u, float * v, long width, long height,
+  const char * pattern_filename, long x, long y, int orient);
+long next_patsize(long former);
+long next_A029744(long former);
+void byteswap_2_double(double * array);
 
 typedef struct compute_params {
   DICEK_THREAD_VARS;
@@ -109,6 +123,8 @@ static int g_lowback = 0;
 static float g_scale = 1.0;
 static int g_density = 0;
 static bool g_video = false;
+
+#include <unistd.h>
 
 int main(int argc, char * * argv)
 {
@@ -171,6 +187,11 @@ int main(int argc, char * * argv)
     } else if (strcmp(argv[i],"-ramprects")==0) {
       // use ramped rectangles in the initial pattern
       g_ramprects = 1;
+    } else if ((i+1<argc) && (strcmp(argv[i],"-load")==0)) {
+      // load a pattern
+      i++; if (num_loads < MAX_LOADS) {
+        load_opts[num_loads++] = argv[i];
+      }
     } else if (strcmp(argv[i],"-lowback")==0) {
       // use "low" background value in init
       g_lowback = 1;
@@ -239,7 +260,7 @@ int main(int argc, char * * argv)
   blue = allocate(g_width, g_height, "blue array");
 
   // put the initial conditions into each cell
-  init(u,v, g_density, g_lowback, g_ramprects);
+  init(u,v, g_width, g_height, g_density, g_lowback, g_ramprects);
 
   int N_FRAMES_PER_DISPLAY;
 
@@ -255,6 +276,7 @@ int main(int argc, char * * argv)
 
   int iteration = 0;
   double fps_avg = 0.0; // decaying average of fps
+  double Mcgs;
   while(true) 
   {
     struct timeval tod_record;
@@ -281,9 +303,10 @@ int main(int argc, char * * argv)
     fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
     // We display an exponential moving average of the fps measurement
     fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
+    Mcgs = fps_avg * ((double) g_width) * ((double) g_height) / 1.0e6;
 
     char msg[1000];
-    sprintf(msg,"GrayScott - %0.2f fps", fps_avg);
+    sprintf(msg,"GrayScott - %0.2f fps, %.2f Mcgs", fps_avg, Mcgs);
 
     // display:
     {
@@ -495,7 +518,249 @@ void i5_bkg(float *u, float *v, int which)
   }
 }
 
-void init(float *u, float *v,
+/*
+ Execute one of the "-load" command-line options. This requires parsing out an X and Y coordinate, an option
+orientation, and a filename or pathname. It calls pattern_load to actually read the pattern into the grid.
+ */
+void load_option(float * u, float * v, long width, long height, const char * option)
+{
+  long x;
+  long y;
+  int orient = 0;
+  char * p1;
+
+  p1 = (char *) option;
+  x = atol(p1);
+  while((*p1 >= '0') && (*p1 <= '9')) { p1++; }
+
+  /* Now we expect to see "," */
+  if(!(*p1 == ',')) {
+    /* We got to the end of the string, or the X coordinate was followed by something other than a comma */
+    fprintf(stdout, "invalid load format: '%s'\n", option);
+    exit(-1);
+  }
+  p1++;
+  y = atol(p1);
+  while((*p1 >= '0') && (*p1 <= '9')) { p1++; }
+
+  /* Now we can see "o" or ":" */
+  if (*p1 == 'o') {
+    /* get orientation */
+    p1++;
+    orient = atoi(p1);
+    while((*p1 >= '0') && (*p1 <= '9')) { p1++; }
+  }
+  if(!(*p1 == ':')) {
+    /* We got to the end of the string, or the X and Y were not followed by ":" */
+    fprintf(stdout, "invalid load format: '%s'\n", option);
+    exit(-1);
+  }
+  p1++;
+  if (*p1) {
+    pattern_load(u, v, g_width, g_height, p1, x, y, orient);
+  }
+}
+
+
+#define MIN_CLIPSIZE 4
+#define MAX_CLIPSIZE 256
+
+#if (defined(__APPLE__) || defined(__linux__))
+# define FILE_LENGTH(name, result) \
+    struct stat _FILESTAT; int _STAT_result; \
+    _FILESTAT.st_size = 0; \
+    _STAT_result = stat(name, &_FILESTAT); \
+    *(result) = (_STAT_result < 0) ? 0 : _FILESTAT.st_size;
+#else
+# ifdef _WIN32
+// TODO: How to find out file size in Windows?
+#   define FILE_LENGTH(name, result) \
+    sprintf(stdout, "Getting length of file is not yet supported in this environment.\n"); exit(-1);
+# else
+// Neither Unix nor Windows
+#   define FILE_LENGTH(name, result) \
+    sprintf(stdout, "Getting length of file is not yet supported in this environment.\n"); exit(-1);
+# endif
+#endif
+
+/*
+   Load a PDE4 pattern file with the given filename (pathname) into the U and V arrays, at the given X and Y location.
+
+                        6   7
+  Orientations:           ^
+                          |
+                   2      |      0
+                    <-----o----->
+                   3      |      1
+                          |
+                          v
+                        4   5
+
+You'll notice an odd scaling factor of "0.633". Most of the patterns in my collection were created in my PDE4 program
+using what I call the "standard model" parameters. PDE4 converts intervals of time (frames) and space (pixels) into the
+dimensionless time and space units in the actual Pearson equations, and is adjusted to use a grid that has about sqrt(2)
+finer resolution than the grid Pearson used in his 1993 paper.
+  Here are the relevant variables and the u formula as calculated by both programs:
+
+  PDE4:                                                            HWIV:
+    g_SPATIAL_REZ = 0.007                                            g_scale = 2.0
+    dxy = (1/143)^2 = 20449                                          speed = 0.5
+    delta_t = 0.05                                                   D_u = 0.164
+    D_u = 2.0e-5                                                     D_v = 0.082
+    D_v = 1.0e-5
+    u -> u + delta_t * (D_u * nabla_u/dxy^2 - u v^2 + F(1-u))        u -> u + speed * (D_u * nabla_u - u v^2 + F(1-u))
+       = u + 0.5 * (2e-5 * dxy * nabla_u - u v^2 + F(1-u))              = u + 0.5 * (0.164 * nabla_u - u v^2 + F(1-u))
+       = u + 0.5 * (0.409 * nabla_u - u v^2 + F(1-u))
+    (v equation is similar)                                          (v equation is similar)
+
+After all the constants are combined, the result is that HWIV differs from PDE4 only in using a different effective D_u
+value, namely 0.164 as compared to 0.409. This causes a difference in scale of all simulated patterns, the scale
+difference is sqrt(0.164/0.409) = 0.633.
+
+*/
+
+void pattern_load(float * u, float * v, long width, long height,
+  const char * pattern_filename, long x, long y, int orient)
+{
+  long i, j;
+  FILE * patfile;
+  long fsize, csz;
+  double data[2];
+  char * test_endian;
+  int big_endian;
+
+  data[0] = 1.0f;
+  test_endian = (char *) data;
+printf("endian test bytes: %02X .. %02X\n", test_endian[0], test_endian[7]);
+  if (test_endian[7] == 0x3F) {
+    // little-endian
+    big_endian = 0;
+  } else {
+    big_endian = 1;
+  }
+
+  FILE_LENGTH(pattern_filename, &fsize);
+
+  if (fsize <= 0) {
+    fprintf(stderr, "Could not find pattern file '%s'\n", pattern_filename);
+    exit(-1);
+  }
+
+  /* PDE4 pattern files are a square grid of pixels, each pixel is a U followed by a V, all values are IEEE
+  /* double-precision floating-point. The size of the square is a power of 2 or a power of 2 times 1.5, ranging from 4
+  /* to 256. */
+  csz = MIN_CLIPSIZE;
+  while((csz < MAX_CLIPSIZE) && (csz * csz * 2L * sizeof(double) < fsize)) {
+    csz = next_patsize(csz);
+  }
+
+  if (csz * csz * 2L * sizeof(double) == fsize) {
+    long i2, j2, i3, j3;
+
+    // Size matched exactly
+    // printf("Clip file is %ld bytes long, size %ldx%ld.\n", fsize, csz, csz);
+    printf("Placing pattern %s at position (%ld,%ld) orientation %d\n", pattern_filename, x, y, orient);
+    patfile = fopen(pattern_filename, "r");
+
+    for(i = 0; i < csz; i++) { // i is row number, Y dimension
+      // i2 = (i - csz/2L)*63L/100L;
+      i2 = i - csz/2L;
+      i2 = (long) (0.633 * ((float) i2));
+      for(j = 0; j < csz; j++) { // j is column number, X dimension
+        float u_val, v_val;
+        // j2 = (j - csz/2L)*63L/100L;
+        j2 = j - csz/2L;
+        j2 = (long) (0.633 * ((float) j2));
+
+        // Copy to i3, j3 because we're going to change the values
+        i3 = i2; j3 = j2;
+
+        // Now apply orientation
+        if (orient & 1) { i3 = - i3; }
+        if (orient & 2) { j3 = - j3; }
+        if (orient & 4) { int t = i3; i3 = j3; j3 = t; }
+
+        i3 = y + i3;
+        j3 = (width-1) - (x + j3);
+
+        fread((void *) data, sizeof(double), 2, patfile);
+        if (big_endian) {
+          byteswap_2_double(data);
+        }
+        u_val = (float) data[0]; v_val = (float) data[1];
+        if ((i3 >= 0) && (i3 < height) && (j3 >= 0) && (j3 < width)) {
+          u[i3 * width + j3] = u_val;
+          v[i3 * width + j3] = v_val;
+        }
+      }
+    }
+    fclose(patfile);
+  } else {
+    printf("Error: %s size %ld is not canonical.\n", pattern_filename, fsize);
+  }
+}
+
+long next_patsize(long former)
+{
+  int newval;
+
+  if ((former & (former-1)) == 0) {
+    // it was a power of 2
+    newval = (former * 3) / 2;
+  } else {
+    newval = (former * 4) / 3;
+  }
+  if (newval > MAX_CLIPSIZE) {
+    newval = MAX_CLIPSIZE;
+  }
+  return(newval);
+}
+
+/* Find the next number in sequence A029744, which consists of the powers of 2 and powers of 2 times 3. */
+long next_A029744(long former)
+{
+  long newval;
+
+  if (former <= 0) {
+    return(1);
+  }
+  /* NOTE: We assume 2's complement notation, in which case (x & (x-1)) is zero iff x is a power of 2 */
+  if ((former & (former-1)) == 0) {
+    // it was a power of 2
+    newval = former + (former >> 1);
+  } else {
+    // Anything else: first it round down to a power of 2
+    newval = former;
+    newval = newval | (newval >> 1);
+    newval = newval | (newval >> 2);
+    newval = newval | (newval >> 4);
+    newval = newval | (newval >> 8);
+    newval = newval | (newval >> 16);
+    newval = newval | (newval >> 32);
+    newval++;
+    // Now double it.
+    newval = newval * 2;
+  }
+  return(newval);
+}
+
+void byteswap_2_double(double * array)
+{
+  char * bytes;
+  char t;
+  bytes = (char *) array;
+  int i;
+
+  /* We have two doubles to swap */
+  for(i=0; i<2; i++) {
+    t = bytes[8*i+0]; bytes[8*i+0] = bytes[8*i+7]; bytes[8*i+7] = t;
+    t = bytes[8*i+1]; bytes[8*i+1] = bytes[8*i+6]; bytes[8*i+6] = t;
+    t = bytes[8*i+2]; bytes[8*i+2] = bytes[8*i+5]; bytes[8*i+5] = t;
+    t = bytes[8*i+3]; bytes[8*i+3] = bytes[8*i+4]; bytes[8*i+4] = t;
+  }
+}
+
+void init(float *u, float *v, long width, long height,
           int density, int lowback, int BZrects)
 {
   long nsp, i;
@@ -507,11 +772,11 @@ void init(float *u, float *v,
     nsp = 0;
   } else {
     if (density == 3) {
-      base = (g_height * g_width) / 512;
+      base = (height * width) / 512;
       var = 2;
     } else {
       base = density * 20;
-      var = density * (g_height * g_width) / 1000;
+      var = density * (height * width) / 1000;
     }
 
     nsp = base + (rand() % var);
@@ -527,8 +792,8 @@ void init(float *u, float *v,
     vs = 10 + (rand() % 12) * (rand() % 12) / 5;
     hs = 10 + (rand() % 12) * (rand() % 12) / 5;
 
-    v1 = (rand() % g_height) - (vs / 2);
-    h1 = (rand() % g_width) - (hs / 2);
+    v1 = (rand() % height) - (vs / 2);
+    h1 = (rand() % width) - (hs / 2);
 
     U = frand(0.0, 1.0);
     if (BZrects) {
@@ -549,17 +814,29 @@ void init(float *u, float *v,
     }
   }
     
-  if (nsp <= 0) {
+  if ((num_loads <= 0) && (nsp <= 0)) {
   // old init pattern
-  for(int i = 0; i < g_height; i++) {
-    for(int j = 0; j < g_width; j++) {
-      if(hypot(i-g_height/2,(j-g_width/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+  for(int i = 0; i < height; i++) {
+    for(int j = 0; j < width; j++) {
+      if(hypot(i-height/2,(j-width/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
       {
         INDEX(u,i,j) = frand(0.0,0.1);
         INDEX(v,i,j) = frand(0.9,1.0);
       }
     }
   }
+  }
+
+  for(int i=0; i<num_loads; i++) {
+    load_option(u, v, width, height, load_opts[i]);
+  }
+
+  /* Finally, enforce the limits for Gray-Scott, which are that U and V must be in the range [0.0,1.0]. */
+  for(int i = 0; i < height; i++) {
+    for(int j = 0; j < width; j++) {
+      INDEX(u,i,j) = max(0.0, min(INDEX(u,i,j), 1.0));
+      INDEX(v,i,j) = max(0.0, min(INDEX(v,i,j), 1.0));
+    }
   }
 }
 
@@ -992,3 +1269,11 @@ void compute(float *u, float *v, float *du, float *dv,
 }
 
 #endif
+
+/*
+
+GrayScott_HWIVector/GrayScott_HWIVector -color -threads 2 -F 0.062 -k 0.0609 -wrap -load '128,128:patterns/interactions/U-curve-15-c'
+
+GrayScott_HWIVector/GrayScott_HWIVector -color -threads 2 -F 0.062 -k 0.0609 -wrap -load '30,30:patterns/uskates/std' -load '80,140o5:patterns/halftargets/ht-4-10-3'
+
+*/
