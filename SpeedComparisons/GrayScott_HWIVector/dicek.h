@@ -75,6 +75,13 @@ Windows programmer.
 #ifdef DICEK_EMULATE
 
 /*
+ We cannot do inter-thread communication because we execute each "spawned thread" to completion before starting the next
+one. Therefore, the first time any child thread tries to DICEK_INTERLOCK, the program will deadlock because there is no
+way for the parent to get to the DICEK_SYNC until the child has exited.
+ */
+#define DICEK_SUPPORTS_BLOCKING 0
+
+/*
 DICEK_THREAD_VARS defines variables which need to be included in the parameter block of any subroutine called by
 DICEK_SPLIT_MERGE
  */
@@ -132,6 +139,9 @@ which should be an array declared by a DICEK_DATA macro.
       (funcname)((void *) &(arrayname[_DICEK_i])); \
     }
 
+/* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
+#define DICEK_SPLIT(funcname, arrayname, nth) DICEK_SPLIT_MERGE(funcname, arrayname, nth)
+
 /*
  Place a DICEK_SUB at the beginning of any routine called by a DICEK_SPLIT_MERGE. dtype is the type of the struct which
 is the array elements of arrayname, and argname is the name of the subroutine's argument. For example:
@@ -149,7 +159,17 @@ is the array elements of arrayname, and argname is the name of the subroutine's 
 
 In emulated mode, we need a pointer to the struct that was passed in. This pointer is used by DICEK_RETURN
  */
-#define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
+#define DICEK_SUB(dtype, argname) \
+  dtype * _DICEK_params = (dtype *) argname; \
+  pthread_mutex_lock(&(_DICEK_params->DICEK_child_mutex));
+
+#define DICEK_SYNC \
+  fprintf(stderr, "Runtime error: DICEK does not support inter-thread communication in EMULATE mode.\n"; \
+  exit(-1);
+
+#define DICEK_INTERLOCK(arrayname, nth) DICEK_SYNC
+
+#define DICEK_RESUME(arrayname, nth) DICEK_SYNC
 
 /*
  Place a DICEK_RETURN at the very end of any routine called by a DICEK_SPLIT_MERGE. It passes returnv back
@@ -190,6 +210,8 @@ these specifics to be true in runtime.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef DICEK_USE_POSIX
 
+#define DICEK_SUPPORTS_BLOCKING 1
+
 #include <pthread.h>
 
 // Mach-based system (most notably Apple) use sysctlbyname to query the number of CPUs/cores/threads
@@ -204,6 +226,8 @@ these specifics to be true in runtime.
 #define DICEK_THREAD_VARS \
   long DICEK_tnum; \
   void * DICEK_thread; \
+  pthread_mutex_t DICEK_master_mutex; \
+  pthread_mutex_t DICEK_child_mutex; \
   void * DICEK_return;
 
 
@@ -226,6 +250,10 @@ these specifics to be true in runtime.
       arrayname[_DICEK_i].DICEK_tnum = _DICEK_i; \
       arrayname[_DICEK_i].DICEK_thread = 0; \
       arrayname[_DICEK_i].DICEK_return = 0; \
+      pthread_mutex_init(&(arrayname[_DICEK_i].DICEK_child_mutex), 0); \
+      pthread_mutex_trylock(&(arrayname[_DICEK_i].DICEK_child_mutex)); \
+      pthread_mutex_init(&(arrayname[_DICEK_i].DICEK_master_mutex), 0); \
+      pthread_mutex_trylock(&(arrayname[_DICEK_i].DICEK_master_mutex)); \
     }
 
 
@@ -240,8 +268,29 @@ these specifics to be true in runtime.
         &(arrayname[_DICEK_i].DICEK_return)); \
     }
 
+/* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
+#define DICEK_SPLIT(funcname, arrayname, nth) \
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+      arrayname[_DICEK_i].DICEK_return = 0; \
+      pthread_create((pthread_t *) (&(arrayname[_DICEK_i].DICEK_thread)), \
+        0, funcname, (void *) &(arrayname[_DICEK_i])); \
+    }
 
 #define DICEK_SUB(dtype, argname) /* nop */
+
+#define DICEK_SYNC \
+  pthread_mutex_lock(&(_DICEK_params->DICEK_master_mutex)); \
+  pthread_mutex_unlock(&(_DICEK_params->DICEK_child_mutex));
+
+#define DICEK_INTERLOCK(arrayname, nth) \
+  for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+    pthread_mutex_unlock(&(_DICEK_params->DICEK_master_mutex)); \
+  }
+
+#define DICEK_RESUME(arrayname, nth) \
+  for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+    pthread_mutex_lock(&(_DICEK_params->DICEK_child_mutex)); \
+  }
 
 #define DICEK_RETURN(returnv) pthread_exit((void*)(returnv));
 
@@ -272,6 +321,7 @@ these specifics to be true in runtime.
 //   http://msdn.microsoft.com/en-us/library/ms687032(v=VS.85).aspx
 //   http://msdn.microsoft.com/en-us/library/ms685066(v=VS.85).aspx
 
+#define DICEK_SUPPORTS_BLOCKING 1
 
 #include <process.h>
 // TODO: What other headers are needed in Windows (perhaps for the call that tells ust the number of hardware threads on the system)?
@@ -279,6 +329,8 @@ these specifics to be true in runtime.
 #define DICEK_THREAD_VARS \
   long DICEK_tnum; \
   void * DICEK_thread; \
+  HANDLE DICEK_master_mutex; \
+  HANDLE DICEK_child_mutex; \
   void * DICEK_return;
 
 // TODO include appropriate code to discover number of cores under Windows
@@ -291,6 +343,7 @@ these specifics to be true in runtime.
       arrayname[_DICEK_i].DICEK_tnum = _DICEK_i; \
       arrayname[_DICEK_i].DICEK_thread = 0; \
       arrayname[_DICEK_i].DICEK_return = 0; \
+      /* Here we need to create and lock the two mutexes */ \
     }
 
 /* We use _beginthread, there are other options including _beginthreadex and the more native CreateThread */
@@ -305,8 +358,25 @@ these specifics to be true in runtime.
       WaitForSingleObject((HANDLE) (arrayname[_DICEK_i].DICEK_thread), INFINITE); \
     }
 
+/* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
+#define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+      arrayname[_DICEK_i].DICEK_return = 0; \
+      arrayname[_DICEK_i].DICEK_thread = (void *) _beginthread(funcname, 0, \
+        (void *) &(arrayname[_DICEK_i])); \
+    }
+
 /* Save a pointer to the param block for use by DICEK_RETURN */
 # define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
+
+#define DICEK_SYNC \
+  /* TODO: Lock the master mutex, and the unlock the child mutex */
+
+#define DICEK_INTERLOCK(arrayname, nth) \
+  /* TODO: Unlock all master mutexes */
+
+#define DICEK_RESUME(arrayname, nth) \
+  /* TODO: Lock all child mutexes */
 
 // TODO this code is not yet tested
 #define DICEK_RETURN(returnv) \
