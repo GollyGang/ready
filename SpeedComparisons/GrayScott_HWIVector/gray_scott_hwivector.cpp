@@ -44,6 +44,7 @@ See README.txt for more details.
 #endif
 
 // local:
+//#define DICEK_EMULATE
 #include "dicek.h"
 #include "display_hwiv.h"
 
@@ -87,13 +88,14 @@ typedef struct compute_params {
   int num_its;
   long start_row;
   long end_row;
+  int interlock_type;
 } compute_params;
 
-void compute(compute_params * param_block);
+void * compute(void * param_block);  // Arg is really "compute_params * param_block"
 
 void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
-  int parameter_space, int num_its);
+  int parameter_space, int num_its, int num_threads);
 
 void colorize(float *u, float *v, float *du,
              float *red, float *green, float *blue);
@@ -110,6 +112,9 @@ static bool g_video = false;
 
 int main(int argc, char * * argv)
 {
+  DICEK_INIT_NTHR(g_threads)
+  printf("DiceK reports %d threads.\n", g_threads);
+
   // Here we implement the Gray-Scott model, as described here:
   // http://arxiv.org/abs/patt-sol/9304003
   //    (the seminal paper by Pearson)
@@ -175,6 +180,9 @@ int main(int argc, char * * argv)
     } else if ((i+1<argc) && (strcmp(argv[i],"-size")==0)) {
       // set both width and height
       i++; g_height = g_width = atoi(argv[i]);
+    } else if ((i+1<argc) && (strcmp(argv[i],"-threads")==0)) {
+      // specify number of threads to use
+      i++; g_threads = atoi(argv[i]);
     } else if (strcmp(argv[i],"-video")==0) {
       // Create a video media file
       g_video = true;
@@ -202,13 +210,12 @@ int main(int argc, char * * argv)
     g_width = ((g_width/4)+1)*4;
   }
 
-#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
-  /* On Intel we disable accurate handling of denorms and zeros. This is an
-     important speed optimization. */
-  int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
-  int newMXCSR = oldMXCSR | 0x8040; // set DAZ and FZ bits
-  _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
-#endif
+  /* We cannot use multiple threads unless DiceK supports thread synchronization */
+  if (!(DICEK_SUPPORTS_BLOCKING)) {
+    g_threads = 1;
+  }
+
+  printf("Will use %d threads.\n", g_threads);
 
   // ----------------
   
@@ -259,7 +266,7 @@ int main(int argc, char * * argv)
                                 + ((double) (tod_record.tv_usec)) / 1.0e6;
 
     // compute:
-    compute_dispatch(u, v, du, dv, D_u, D_v, g_F, g_k, speed, g_paramspace, N_FRAMES_PER_DISPLAY);
+    compute_dispatch(u, v, du, dv, D_u, D_v, g_F, g_k, speed, g_paramspace, N_FRAMES_PER_DISPLAY, g_threads);
     iteration+=N_FRAMES_PER_DISPLAY;
 
     if (g_color) {
@@ -295,18 +302,49 @@ int main(int argc, char * * argv)
 /* Spawn threads and dispatch to compute() routine inside threads */
 void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
-  int parameter_space, int num_its)
+  int parameter_space, int num_its, int nthreads)
 {
-  compute_params cp; /* TODO: There will be multiple arrays here */
-  int i;
+  if (nthreads <= 0) {
+    nthreads = 1;
+  }
+  DICEK_DATA(compute_params, cp, nthreads);
 
-  /* TODO: The following will be in a loop, with variant start_row and end_row by thread */
-  cp.u = u; cp.v = v; cp.du = du; cp.dv = dv; cp.D_u = D_u; cp.D_v = D_v;
-  cp.F = F; cp.k = k; cp.speed = speed; cp.parameter_space = parameter_space;
-  cp.num_its = 1; cp.start_row = 0; cp.end_row = g_height;
+  long i;
+  long a_row = 0;
 
-  for(i=0; i<num_its; i++) {
-    compute(&cp); // Will be DICEK_SPLIT
+  /* Set up all the parameter blocks */
+  for(i=0; i<nthreads; i++) {
+    cp[i].u = u; cp[i].v = v; cp[i].du = du; cp[i].dv = dv; cp[i].D_u = D_u; cp[i].D_v = D_v;
+    cp[i].F = F; cp[i].k = k; cp[i].speed = speed; cp[i].parameter_space = parameter_space;
+    cp[i].num_its = num_its; cp[i].start_row = a_row;
+    a_row = (g_height * (i+1)) / nthreads;
+    cp[i].end_row = a_row;
+    cp[i].interlock_type = (nthreads>1) ? 1 : 0;
+  }
+
+  if (nthreads > 1) {
+    /* Start N threads, each will immediately begin the first part of its computation */
+    DICEK_SPLIT(compute, cp, nthreads);
+
+    /* Now for each iteration we need to sync the threads twice. Each iteration consists of two
+       work phases: during the first phase u and v are being read and du,dv are written; during
+       the second phase u,v are overwritten with the next generation. */
+    for(i=0; i<num_its; i++) {
+      DICEK_INTERLOCK(cp, nthreads); // Wait for threads to complete derivative calculation
+
+      /* Now the threads have all finished the "compute derivative" loop */
+
+      DICEK_RESUME(cp, nthreads);  // Wait for threads to update u and v arrays with new generation
+      DICEK_INTERLOCK(cp, nthreads);
+
+      /* Now the threads have finished updating u and v arrays with the next generation */
+
+      DICEK_RESUME(cp, nthreads); // Tell threads they can now do the next iteration
+    }
+    DICEK_MERGE(compute, cp, nthreads);
+  } else {
+    /* With 1 thread it's more efficient to just call the compute routine directly */
+    compute((void *)&(cp[0]));
   }
 }
 
@@ -533,8 +571,20 @@ void init(float *u, float *v,
    parameter_space flag is false */
 //#define SUPPORT_PARAM_SPACE
 
-void compute(compute_params * param_block)
+void * compute(void * gpb)
 {
+  DICEK_SUB(compute_params, gpb);
+
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
+  /* On Intel we disable accurate handling of denorms and zeros. This is an
+     important speed optimization. */
+  int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
+  int newMXCSR = oldMXCSR | 0x8040; // set DAZ and FZ bits
+  _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
+#endif
+
+  compute_params * param_block;
+  param_block = (compute_params *) gpb;
   float *u = param_block->u;
   float *v = param_block->v;
   float *du = param_block->du;
@@ -548,6 +598,7 @@ void compute(compute_params * param_block)
   int num_its = param_block->num_its;
   long start_row = param_block->start_row;
   long end_row = param_block->end_row;
+  int interlock = param_block->interlock_type;
 
   int iter;
 #ifndef HWIV_HAVE_V4F4
@@ -583,6 +634,10 @@ void compute(compute_params * param_block)
 
   // Scan per iteration
   for(iter = 0; iter < num_its; iter++) {
+
+  if (interlock) { DICEK_CH_BEGIN }
+
+//printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
 
   // Scan per row
   for(long i = start_row; i < end_row; i++) {
@@ -692,10 +747,12 @@ void compute(compute_params * param_block)
   } // End of scan per row
 
   // First thread interlock goes here
+  if (interlock) { DICEK_CH_SYNC }
+  if (interlock) { DICEK_CH_BEGIN }
 
   {
   // effect change
-    for(long i = 0; i < g_height; i++) {
+    for(long i = start_row; i < end_row; i++) {
       v_ubase = ((V4F4 *) (&INDEX(u,i,0)));
       v_vbase = ((V4F4 *) (&INDEX(v,i,0)));
       v_dubase = ((V4F4 *) (&INDEX(du,i,0)));
@@ -710,6 +767,7 @@ void compute(compute_params * param_block)
   }
 
   // second thread interlock goes here
+  if (interlock) { DICEK_CH_SYNC }
 
   } // End of scan per iteration
 }
