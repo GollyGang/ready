@@ -44,6 +44,7 @@ See README.txt for more details.
 #endif
 
 // local:
+#include "dicek.h"
 #include "display_hwiv.h"
 
 static long g_width = 256;
@@ -71,10 +72,28 @@ float *allocate(long width, long height, const char * error_text)
 void init(float *a, float *b,
           int density, int lowback, int BZrects);
 
-void compute(float *a, float *b, float *da, float *db,
-             float D_u, float D_v, float F, float k,
-             float speed,
-             int parameter_space);
+typedef struct compute_params {
+  DICEK_THREAD_VARS;
+  float *u;
+  float *v;
+  float *du;
+  float *dv;
+  float D_u;
+  float D_v;
+  float F;
+  float k;
+  float speed;
+  int parameter_space;
+  int num_its;
+  long start_row;
+  long end_row;
+} compute_params;
+
+void compute(compute_params * param_block);
+
+void compute_dispatch(float *u, float *v, float *du, float *dv,
+  float D_u, float D_v, float F, float k, float speed,
+  int parameter_space, int num_its);
 
 void colorize(float *u, float *v, float *du,
              float *red, float *green, float *blue);
@@ -240,11 +259,8 @@ int main(int argc, char * * argv)
                                 + ((double) (tod_record.tv_usec)) / 1.0e6;
 
     // compute:
-    for(int it=0;it<N_FRAMES_PER_DISPLAY;it++)
-    {
-      compute(u,v,du,dv,D_u,D_v,g_F,g_k,speed,g_paramspace);
-      iteration++;
-    }
+    compute_dispatch(u, v, du, dv, D_u, D_v, g_F, g_k, speed, g_paramspace, N_FRAMES_PER_DISPLAY);
+    iteration+=N_FRAMES_PER_DISPLAY;
 
     if (g_color) {
       colorize(u, v, du, red, green, blue);
@@ -273,6 +289,24 @@ int main(int argc, char * * argv)
       if (chose_quit) // did user ask to quit?
         break;
     }
+  }
+}
+
+/* Spawn threads and dispatch to compute() routine inside threads */
+void compute_dispatch(float *u, float *v, float *du, float *dv,
+  float D_u, float D_v, float F, float k, float speed,
+  int parameter_space, int num_its)
+{
+  compute_params cp; /* TODO: There will be multiple arrays here */
+  int i;
+
+  /* TODO: The following will be in a loop, with variant start_row and end_row by thread */
+  cp.u = u; cp.v = v; cp.du = du; cp.dv = dv; cp.D_u = D_u; cp.D_v = D_v;
+  cp.F = F; cp.k = k; cp.speed = speed; cp.parameter_space = parameter_space;
+  cp.num_its = 1; cp.start_row = 0; cp.end_row = g_height;
+
+  for(i=0; i<num_its; i++) {
+    compute(&cp); // Will be DICEK_SPLIT
   }
 }
 
@@ -499,10 +533,23 @@ void init(float *u, float *v,
    parameter_space flag is false */
 //#define SUPPORT_PARAM_SPACE
 
-void compute(float *u, float *v, float *du, float *dv,
-             float D_u,float D_v,float F,float k,float speed,
-             int parameter_space)
+void compute(compute_params * param_block)
 {
+  float *u = param_block->u;
+  float *v = param_block->v;
+  float *du = param_block->du;
+  float *dv = param_block->dv;
+  float D_u = param_block->D_u;
+  float D_v = param_block->D_v;
+  float F = param_block->F;
+  float k = param_block->k;
+  float speed = param_block->speed;
+  int parameter_space = param_block->parameter_space;
+  int num_its = param_block->num_its;
+  long start_row = param_block->start_row;
+  long end_row = param_block->end_row;
+
+  int iter;
 #ifndef HWIV_HAVE_V4F4
   fprintf(stdout, "Did not get vector macros from HWIV\n");
   exit(-1);
@@ -534,8 +581,11 @@ void compute(float *u, float *v, float *du, float *dv,
   v4_Du = v4SPLAT(D_u);
   v4_Dv = v4SPLAT(D_v);
 
+  // Scan per iteration
+  for(iter = 0; iter < num_its; iter++) {
+
   // Scan per row
-  for(long i = 0; i < g_height; i++) {
+  for(long i = start_row; i < end_row; i++) {
     long iprev,inext;
     long v_j2;
     if (g_wrap) {
@@ -639,7 +689,9 @@ void compute(float *u, float *v, float *du, float *dv,
     *v_dvbase = v4ADD(v4MUL(v4_Dv,
          NABLA_5PT(v4_v, v4RAISE(v4_v,v4_v_l), v4LOWER(v4_v,v4_v_r), *v_vb_prev, *v_vb_next)),
                            v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),v4_v)));
-  }
+  } // End of scan per row
+
+  // First thread interlock goes here
 
   {
   // effect change
@@ -656,6 +708,10 @@ void compute(float *u, float *v, float *du, float *dv,
       }
     }
   }
+
+  // second thread interlock goes here
+
+  } // End of scan per iteration
 }
 #endif
 
