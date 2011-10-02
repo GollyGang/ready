@@ -11,12 +11,12 @@
 #define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
 
 bool display(int g_width, int g_height, float *r, float *g, float *b,
-             int iteration,bool auto_brighten,float manual_brighten,
+             int iteration, float model_scale, bool auto_brighten,float manual_brighten,
 			 int scale,int delay_ms,const char* message, bool write_video)
 {
     static bool need_init = true;
 
-    static IplImage *im,*im2; // ,*im3;
+    static IplImage *im,*im2;
 	static int border = 0;
     static CvFont font;
 	static CvVideoWriter *video;
@@ -31,7 +31,6 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
         im = cvCreateImage(cvSize(g_width,g_height),IPL_DEPTH_8U,3);
         cvSet(im,cvScalar(0,0,0));
         im2 = cvCreateImage(cvSize(g_width*scale,g_height*scale),IPL_DEPTH_8U,3);
-//        im3 = cvCreateImage(cvSize(g_width*scale+border*2,g_height*scale+border),IPL_DEPTH_8U,3);
         
         cvNamedWindow(title,CV_WINDOW_AUTOSIZE);
         
@@ -42,13 +41,10 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
 
 		if(write_video)
 		{
-//			video = cvCreateVideoWriter(title,CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im3),1);
 			video = cvCreateVideoWriter("vid-Gray-Scott.avi",CV_FOURCC('D','I','V','X'),25.0,cvGetSize(im),1);
-//			video = cvCreateVideoWriter("vid-Gray-Scott.avi",CV_FOURCC('P','I','M','1'),25.0,cvGetSize(im),1);
 			if(video == NULL) {
 				fprintf(stdout, "NULL from cvCreateVideoWriter\n"); exit(-1);
 			}
-//			border = 20;
 		}
     }
 
@@ -98,12 +94,9 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
 
     cvResize(im,im2);
 
-// Border wasn't doing anything for me
-//		cvCopyMakeBorder(im2,im3,cvPoint(border*2,0),IPL_BORDER_CONSTANT);
-
 	char txt[100];
 
-	sprintf(txt,"%d",iteration);
+	sprintf(txt,"Gen.=%d (model's t=%g)",iteration, ((double) iteration) / model_scale);
 	cvPutText(im2,txt,cvPoint(20,20),&font,white);
 	cvPutText(im2,message,cvPoint(20,40),&font,white);
 

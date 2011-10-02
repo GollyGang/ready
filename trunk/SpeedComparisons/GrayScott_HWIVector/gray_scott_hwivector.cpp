@@ -313,9 +313,9 @@ int main(int argc, char * * argv)
     {
       int chose_quit;
       if (g_color) {
-        chose_quit = display(g_width,g_height,red,green,blue,iteration,false,200.0f,2,10,msg,g_video);
+        chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,200.0f,2,10,msg,g_video);
       } else {
-        chose_quit = display(g_width,g_height,u,u,u,iteration,false,200.0f,2,10,msg,g_video);
+        chose_quit = display(g_width,g_height,u,u,u,iteration,g_scale,false,200.0f,2,10,msg,g_video);
       }
       if (chose_quit) // did user ask to quit?
         break;
@@ -604,7 +604,7 @@ void load_option(float * u, float * v, long width, long height, const char * opt
                           v
                         4   5
 
-You'll notice an odd scaling factor of "0.633". Most of the patterns in my collection were created in my PDE4 program
+You'll notice an odd scaling factor of "0.63324". Most of the patterns in my collection were created in my PDE4 program
 using what I call the "standard model" parameters. PDE4 converts intervals of time (frames) and space (pixels) into the
 dimensionless time and space units in the actual Pearson equations, and is adjusted to use a grid that has about sqrt(2)
 finer resolution than the grid Pearson used in his 1993 paper.
@@ -623,7 +623,7 @@ finer resolution than the grid Pearson used in his 1993 paper.
 
 After all the constants are combined, the result is that HWIV differs from PDE4 only in using a different effective D_u
 value, namely 0.164 as compared to 0.409. This causes a difference in scale of all simulated patterns, the scale
-difference is sqrt(0.164/0.409) = 0.633.
+difference is sqrt(0.164/0.409) = 0.63324.
 
 */
 
@@ -636,6 +636,7 @@ void pattern_load(float * u, float * v, long width, long height,
   double data[2];
   char * test_endian;
   int big_endian;
+  float scale = 0.63324 * sqrt(g_scale / 2.0);
 
   data[0] = 1.0f;
   test_endian = (char *) data;
@@ -678,12 +679,12 @@ void pattern_load(float * u, float * v, long width, long height,
     for(i = 0; i < csz; i++) { // i is row number, Y dimension
       // i2 = (i - csz/2L)*63L/100L;
       i2 = i - csz/2L;
-      i2 = (long) (0.633 * ((float) i2));
+      i2 = (long) (scale * ((float) i2));
       for(j = 0; j < csz; j++) { // j is column number, X dimension
         float u_val, v_val;
         // j2 = (j - csz/2L)*63L/100L;
         j2 = j - csz/2L;
-        j2 = (long) (0.633 * ((float) j2));
+        j2 = (long) (scale * ((float) j2));
 
         // Copy to i3, j3 because we're going to change the values
         i3 = i2; j3 = j2;
