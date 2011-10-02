@@ -40,7 +40,8 @@ See README.txt for more details.
           t->tv_usec=1000*timebuffer.millitm;
     }
 
-	// TODO: Include file for file length measurement (see FILE_LENGTH macro below)
+	// TODO: Make sure this is the correct include file for the FindFirstFile function (used in FILE_LENGTH macro below)
+    #include <windows.h>
 #else
     #include <sys/stat.h>
     #include <sys/time.h>
@@ -306,7 +307,7 @@ int main(int argc, char * * argv)
     Mcgs = fps_avg * ((double) g_width) * ((double) g_height) / 1.0e6;
 
     char msg[1000];
-    sprintf(msg,"GrayScott - %0.2f fps, %.2f Mcgs", fps_avg, Mcgs);
+    sprintf(msg,"GrayScott - %0.2f fps (%.2f Mcgs)", fps_avg, Mcgs);
 
     // display:
     {
@@ -573,9 +574,16 @@ void load_option(float * u, float * v, long width, long height, const char * opt
     *(result) = (_STAT_result < 0) ? 0 : _FILESTAT.st_size;
 #else
 # ifdef _WIN32
-// TODO: How to find out file size in Windows?
+// TODO: This needs to be tested
 #   define FILE_LENGTH(name, result) \
-    sprintf(stdout, "Getting length of file is not yet supported in this environment.\n"); exit(-1);
+    ULONGLONG _LEN_res_tmp; \
+    WIN32_FIND_DATA _LEN_fff_dat = { 0 }; \
+    HANDLE _LEN_fff_hdl = FindFirstFile(name, &_LEN_fff_dat); \
+    if (_LEN_fff_hdl != INVALID_HANDLE_VALUE) { \
+      FindClose(_LEN_fff_lhd); \
+      _LEN_res_tmp = (_LEN_fff_dat.nFileSizeHigh) << (sizeof(_LEN_fff_dat.nFileSizeHigh)*8) | (_LEN_fff_dat.nFileSizeLow); \
+      *(result) = _LEN_res_tmp; \
+    } else { *(result) = 0; }
 # else
 // Neither Unix nor Windows
 #   define FILE_LENGTH(name, result) \
@@ -586,13 +594,13 @@ void load_option(float * u, float * v, long width, long height, const char * opt
 /*
    Load a PDE4 pattern file with the given filename (pathname) into the U and V arrays, at the given X and Y location.
 
-                        6   7
-  Orientations:           ^
-                          |
-                   2      |      0
-                    <-----o----->
-                   3      |      1
-                          |
+                        6   7          Starting from orientation 0: orient. 5 is rotated 90 degrees clockwise;
+  Orientation             ^            orient. 3 is rotated 180 degrees, and orient. 6 is rotated another 90 degrees
+   diagram:               |            clockwise.
+                   2      |      0       Orientation 1 is a mirror image of orientation 0, flipped around a horizontal
+                    <-----o----->      axis. Compared to orientation 1, orient. 4 is rotated 90 degrees clockwise;
+                   3      |      1     orient. 2 is rotated 180 degrees, and orient. 7 is rotated another 90 degrees
+                          |            clockwise.
                           v
                         4   5
 
@@ -631,12 +639,12 @@ void pattern_load(float * u, float * v, long width, long height,
 
   data[0] = 1.0f;
   test_endian = (char *) data;
-printf("endian test bytes: %02X .. %02X\n", test_endian[0], test_endian[7]);
-  if (test_endian[7] == 0x3F) {
-    // little-endian
-    big_endian = 0;
-  } else {
+  // printf("endian test bytes: %02X .. %02X\n", test_endian[0], test_endian[7]);
+  if (test_endian[0] == 0x3F) {
+    // The first byte in memory is part of the exponent. This means we're on a big-endian machine.
     big_endian = 1;
+  } else {
+    big_endian = 0;
   }
 
   FILE_LENGTH(pattern_filename, &fsize);
@@ -655,13 +663,18 @@ printf("endian test bytes: %02X .. %02X\n", test_endian[0], test_endian[7]);
   }
 
   if (csz * csz * 2L * sizeof(double) == fsize) {
-    long i2, j2, i3, j3;
+    long i2, j2, i3, j3, prev_i2, prev_j2;
+    double u_avg, v_avg, perim_count;
+    long min_i = height; long max_i = 0;
+    long min_j = width; long max_j = 0;
+    prev_i2 = prev_j2 = -1;
 
     // Size matched exactly
     // printf("Clip file is %ld bytes long, size %ldx%ld.\n", fsize, csz, csz);
     printf("Placing pattern %s at position (%ld,%ld) orientation %d\n", pattern_filename, x, y, orient);
     patfile = fopen(pattern_filename, "r");
 
+    u_avg = v_avg = perim_count = 0.0;
     for(i = 0; i < csz; i++) { // i is row number, Y dimension
       // i2 = (i - csz/2L)*63L/100L;
       i2 = i - csz/2L;
@@ -687,14 +700,44 @@ printf("endian test bytes: %02X .. %02X\n", test_endian[0], test_endian[7]);
         if (big_endian) {
           byteswap_2_double(data);
         }
-        u_val = (float) data[0]; v_val = (float) data[1];
-        if ((i3 >= 0) && (i3 < height) && (j3 >= 0) && (j3 < width)) {
-          u[i3 * width + j3] = u_val;
-          v[i3 * width + j3] = v_val;
+
+        /* Add this point to the perimeter average */
+        if ((i == 0) || (i == csz-1) || (j == 0) || (j == csz-1)) {
+          u_avg += data[0]; v_avg += data[1]; perim_count += 1.0;
         }
+
+        /* Because we are ADDING the pattern to the existing grid values, rather than simply replacing grid values,
+           we need to modify each pixel at most once. */
+        if ((i2 != prev_i2) && (j2 != prev_j2)) {
+          /* Next we clip to the actual grid dimensions */
+          if ((i3 >= 0) && (i3 < height) && (j3 >= 0) && (j3 < width)) {
+            /* Keep track of the min and max values of both coordinates (used below) */
+            if (i3 < min_i) { min_i = i3; } if (i3 > max_i) { max_i = i3; }
+            if (j3 < min_j) { min_j = j3; } if (j3 > max_j) { max_j = j3; }
+            u_val = (float) data[0]; v_val = (float) data[1];
+            u[i3 * width + j3] += u_val;
+            v[i3 * width + j3] += v_val;
+          }
+        }
+        prev_j2 = j2;
       }
+      prev_i2 = i2;
     }
     fclose(patfile);
+
+    /* Now we subtract the average perimeter value from all the pixels that were adjusted. This allows the user to place
+       two patterns very close to one another, even if the "bounding rectangles" would normally cause part of the first
+       pattern to get wiped out by the second.
+         Note that the global limit to the range [0,1] is enforced in the main init() routine after all patterns are
+       loaded. */
+    u_avg = u_avg / perim_count;
+    v_avg = v_avg / perim_count;
+    for(i=min_i; i<=max_i; i++) {
+      for(j=min_j; j<=max_j; j++) {
+        u[i * width + j] -= u_avg;
+        v[i * width + j] -= v_avg;
+      }
+    }
   } else {
     printf("Error: %s size %ld is not canonical.\n", pattern_filename, fsize);
   }
