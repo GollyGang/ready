@@ -11,7 +11,7 @@
 #define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
 
 bool display(int g_width, int g_height, float *r, float *g, float *b,
-             int iteration, float model_scale, bool auto_brighten,float manual_brighten,
+             double iteration, float model_scale, bool auto_brighten,float manual_brighten,
 			 int scale,int delay_ms,const char* message, bool write_video)
 {
     static bool need_init = true;
@@ -95,10 +95,18 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
     cvResize(im,im2);
 
 	char txt[100];
+    const char * fmt;
 
-	sprintf(txt,"Gen.=%d (model's t=%g)",iteration, ((double) iteration) / model_scale);
-	cvPutText(im2,txt,cvPoint(20,20),&font,white);
-	cvPutText(im2,message,cvPoint(20,40),&font,white);
+    if (g_width > 170) {
+      fmt = "Generation=%7g (model's t=%g)";
+    } else if (g_width > 140) {
+      fmt = "Gen.=%7g (model's t=%g)";
+    } else {
+      fmt = "G=%7g t=%g";
+    }
+    sprintf(txt,fmt,iteration, ((double) iteration) / model_scale);
+	cvPutText(im2,txt,cvPoint(5,20),&font,white);
+	cvPutText(im2,message,cvPoint(5,40),&font,white);
 
 	if(write_video)
 		cvWriteFrame(video,im);

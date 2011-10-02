@@ -275,7 +275,7 @@ int main(int argc, char * * argv)
 #   endif
   }
 
-  int iteration = 0;
+  double iteration = 0;
   double fps_avg = 0.0; // decaying average of fps
   double Mcgs;
   while(true) 
@@ -290,7 +290,7 @@ int main(int argc, char * * argv)
 
     // compute:
     compute_dispatch(u, v, du, dv, D_u, D_v, g_F, g_k, speed, g_paramspace, N_FRAMES_PER_DISPLAY, g_threads);
-    iteration+=N_FRAMES_PER_DISPLAY;
+    iteration += ((double)N_FRAMES_PER_DISPLAY);
 
     if (g_color) {
       colorize(u, v, du, red, green, blue);
