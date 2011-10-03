@@ -593,13 +593,14 @@ bool digit_p(char c)
     *(result) = (_STAT_result < 0) ? 0 : _FILESTAT.st_size;
 #else
 # ifdef _WIN32
+// Based on: vcpptips.wordpress.com/tag/get-the-size-of-a-file-without-opening-it/
 // TODO: This needs to be tested
 #   define FILE_LENGTH(name, result) \
     ULONGLONG _LEN_res_tmp; \
     WIN32_FIND_DATA _LEN_fff_dat = { 0 }; \
     HANDLE _LEN_fff_hdl = FindFirstFile(name, &_LEN_fff_dat); \
     if (_LEN_fff_hdl != INVALID_HANDLE_VALUE) { \
-      FindClose(_LEN_fff_lhd); \
+      FindClose(_LEN_fff_hdl); \
       _LEN_res_tmp = (_LEN_fff_dat.nFileSizeHigh) << (sizeof(_LEN_fff_dat.nFileSizeHigh)*8) | (_LEN_fff_dat.nFileSizeLow); \
       *(result) = _LEN_res_tmp; \
     } else { *(result) = 0; }
