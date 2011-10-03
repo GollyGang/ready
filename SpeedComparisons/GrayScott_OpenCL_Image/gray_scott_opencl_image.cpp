@@ -101,6 +101,13 @@ int main()
         // Get a list of devices on this platform
         cl::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
+        bool is_ImageSupported = devices[0].getInfo<CL_DEVICE_IMAGE_SUPPORT>();
+        if(!is_ImageSupported)
+        {
+            printf("Images not supported on this device.\n");
+            throw;
+        }
+
         // Create a command queue and use the selected device
         CommandQueue queue = CommandQueue(context, devices[0]);
         Event event;
