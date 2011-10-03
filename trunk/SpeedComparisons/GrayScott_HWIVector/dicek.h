@@ -60,7 +60,7 @@ Windows programmer.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                   //
 //  #include<stdio.h>                                                                                                //
-//  /*                                                     */                    /*                             */   //
+//  /*                                                   xx*/                    /*                             */   //
 //  /*                                                     */                    /*                             */   //
 //  int                 main()  {char      a[]     ={     'T',    'h','i',     's',32,     'p','r'        ,'o','g'   //
 //  ,'r','a','m',      32,   'j',   'u',   's',    't'    ,32           ,'d',    'o',   'e'     ,'s'    ,32    ,'i'  //
@@ -133,7 +133,7 @@ contain an element at the given index. The thread will call a function called fu
   void(* funcname)(void *)
 
 The instance of funcname will be passed the index'th element of arrayname.
-  After the threads has exited, execution proceeds with the instruction following DICEK_SPLIT_1.
+  After the thread has exited, execution proceeds with the instruction following DICEK_SPLIT_1.
  */
 #define DICEK_SPLIT_1(funcname, arrayname, index) \
     arrayname[index].DICEK_return = 0; \
@@ -167,21 +167,58 @@ is the array elements of arrayname, and argname is the name of the subroutine's 
   (void *)myfunc(void * params)
   {
     DICEK_SUB(f_vars, params);
+    /* other local variable declarations */
+    ...
   }
+
+For an example of a thread that performs inter-thread synchronization, see the example below (DICEK_CH_BEGIN macro)
 
 In emulated mode, we need a pointer to the struct that was passed in. This pointer is used by DICEK_RETURN
  */
 #define DICEK_SUB(dtype, argname) \
   dtype * _DICEK_params = (dtype *) argname;
 
+/*
+ The child thread should start with DICEK_CH_BEGIN, which grabs the semaphore indicating that the child is working.
+Then it should do its work, followed DICEK_CH_SYNC to tell the other threads in its group that it has finished
+its section of work.
+ The master thread will eventually release the semaphore used by DICEK_CH_BEGIN allowing the child to continue
+with the next piece of work.
+
+  (void *)myfunc(void * params)
+  {
+    DICEK_SUB(f_vars, params);
+    /* other local variable declarations */
+    while(working) {
+      DICEK_CH_BEGIN
+      /* Do computation here */
+      DICEK_CH_SYNC
+    }
+  }
+
+*/
 #define DICEK_CH_BEGIN \
   fprintf(stderr, "Runtime error: DICEK does not support inter-thread communication in EMULATE mode.\n"); \
   exit(-1);
 
+/*
+ DICEK_CH_SYNC releases the "master working" semaphore, which tells the master that this thread is done with its
+work and the master can proceed to use the results that were produced by the child.
+ */
 #define DICEK_CH_SYNC /* nop */
 
+/*
+  DICEK_INTERLOCK is called by the master thread to wait for the children to be done with their bits of work.
+It attempts to take all of the master_working semaphores, which are initially locked and don't get unlocked
+until the child threads reach their DICEK_CH_SYNC.
+ */
 #define DICEK_INTERLOCK(arrayname, nth) DICEK_CH_BEGIN
 
+/*
+  DICEK_RESUME is called by the master thread to tell the child threads that they cal now continue with another
+piece of work. It unlocks the child_working semaphore so that the children can execute their DICEK_CH_BEGIN
+statement a second time.
+ */
 #define DICEK_RESUME(arrayname, nth) /* nop */
 
 /*
