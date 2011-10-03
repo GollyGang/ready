@@ -16,4 +16,5 @@ add_subdirectory(GrayScott_SSE)
 add_subdirectory(GrayScott_SSE_OpenMP)
 add_subdirectory(GrayScott_OpenMP)
 add_subdirectory(GrayScott_OpenCL)
+add_subdirectory(GrayScott_OpenCL_Image)
 
