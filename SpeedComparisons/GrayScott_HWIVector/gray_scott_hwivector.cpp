@@ -130,7 +130,7 @@ static float g_scale = 1.0;
 static int g_density = 0;
 static bool g_video = false;
 
-#include <unistd.h>
+
 
 int main(int argc, char * * argv)
 {
@@ -228,7 +228,7 @@ int main(int argc, char * * argv)
       // condition")
       g_wrap = 1;
     } else {
-      fprintf(stderr, "Unrecognized argument: '%s'\n", argv[i]);
+      fprintf(stderr, "Unrecognized argument, or parameter needed: '%s'\n", argv[i]);
       exit(-1);
     }
   }
