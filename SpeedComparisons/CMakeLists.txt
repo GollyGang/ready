@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 2.6)
 
 project(SpeedComparisons)
 
-# this increases GrayScott and _double fps rate by 3 and _OpenMP by 2
-if(UNIX)
-  if(NOT(CMAKE_BUILD_TYPE MATCHES "Debug"))
-    add_definitions(-O3)
-  endif()
+if (NOT CMAKE_BUILD_TYPE)
+ message(STATUS "No build type selected, default to Release")
+ set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 add_subdirectory(GrayScott)
