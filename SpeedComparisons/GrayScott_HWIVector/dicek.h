@@ -127,19 +127,28 @@ DICEK_SPLIT_MERGE.
     }
 
 /*
- DICEK_SPLIT_MERGE starts nth threads; each of the threads calls a function called funcname, which should be type
+ DICEK_SPLIT_1 starts a thread with the given index; the array "arrayname" should be allocated by DICEK_DATA and should
+contain an element at the given index. The thread will call a function called funcname, which should be type
 
   void(* funcname)(void *)
 
-each instance of funcname wil be passed one of the elements of arrayname,
-which should be an array declared by a DICEK_DATA macro.
-  After the last of the threads has exited, execution proceeds with the instruction following DICEK_SPLIT_MERGE.
+The instance of funcname will be passed the index'th element of arrayname.
+  After the threads has exited, execution proceeds with the instruction following DICEK_SPLIT_1.
+ */
+#define DICEK_SPLIT_1(funcname, arrayname, index) \
+    arrayname[index].DICEK_return = 0; \
+    arrayname[index].DICEK_thread = (void *) index; \
+    (funcname)((void *) &(arrayname[index]));
+
+#define DICEK_MERGE_1(arrayname, index)  /* nop */
+
+/*
+ DICEK_SPLIT_MERGE starts nth threads vis DICEK_SPLIT_1. After the last of the threads has exited, execution proceeds
+with the instruction following DICEK_SPLIT_MERGE.
  */
 #define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      arrayname[_DICEK_i].DICEK_return = 0; \
-      arrayname[_DICEK_i].DICEK_thread = (void *) _DICEK_i; \
-      (funcname)((void *) &(arrayname[_DICEK_i])); \
+      DICEK_SPLIT_1((funcname), (arrayname), (_DICEK_i)) \
     }
 
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
@@ -249,7 +258,6 @@ these specifics to be true in runtime.
 # define DICEK_INIT_NTHR(nth) int nth = 3;
 #endif
 
-
 #define DICEK_DATA(dtype, arrayname, nth) \
     dtype * arrayname; \
     arrayname = (dtype *)malloc(nth * sizeof(dtype)); \
@@ -259,6 +267,13 @@ these specifics to be true in runtime.
       arrayname[_DICEK_i].DICEK_return = 0; \
     }
 
+#define DICEK_MERGE_1(arrayname, index) \
+    pthread_join((pthread_t) (arrayname[index].DICEK_thread), \
+        &(arrayname[index].DICEK_return));
+
+/* In the POSIX implementation, semaphore communication is supported, so the SPLIT_MERGE function
+(which by definition has no communication between master and spawned threads) does not need to
+initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 #define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
       arrayname[_DICEK_i].DICEK_return = 0; \
@@ -266,21 +281,22 @@ these specifics to be true in runtime.
         0, funcname, (void *) &(arrayname[_DICEK_i])); \
     } \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      pthread_join((pthread_t) (arrayname[_DICEK_i].DICEK_thread), \
-        &(arrayname[_DICEK_i].DICEK_return)); \
+      DICEK_MERGE_1((arrayname), _DICEK_i) \
     }
+
+/* Just start a single thread. We also set up the semaphores in case the client is going to want to do that. */
+#define DICEK_SPLIT_1(funcname, arrayname, index) \
+    pthread_mutex_init(&(arrayname[index].DICEK_child_wkg), 0); \
+    pthread_mutex_init(&(arrayname[index].DICEK_master_wkg), 0); \
+    pthread_mutex_trylock(&(arrayname[index].DICEK_master_wkg)); \
+    arrayname[index].DICEK_return = 0; \
+    pthread_create((pthread_t *) (&(arrayname[index].DICEK_thread)), \
+        0, funcname, (void *) &(arrayname[index]));
 
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      pthread_mutex_init(&(arrayname[_DICEK_i].DICEK_child_wkg), 0); \
-      pthread_mutex_init(&(arrayname[_DICEK_i].DICEK_master_wkg), 0); \
-      pthread_mutex_trylock(&(arrayname[_DICEK_i].DICEK_master_wkg)); \
-    } \
-    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      arrayname[_DICEK_i].DICEK_return = 0; \
-      pthread_create((pthread_t *) (&(arrayname[_DICEK_i].DICEK_thread)), \
-        0, funcname, (void *) &(arrayname[_DICEK_i])); \
+      DICEK_SPLIT_1((funcname), (arrayname), (_DICEK_i)) \
     }
 
 #define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
@@ -305,8 +321,7 @@ these specifics to be true in runtime.
 
 #define DICEK_MERGE(funcname, arrayname, nth) \
   for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-    pthread_join((pthread_t) (arrayname[_DICEK_i].DICEK_thread), \
-      &(arrayname[_DICEK_i].DICEK_return)); \
+    DICEK_MERGE_1((arrayname), _DICEK_i) \
   }
 
 #endif
@@ -373,15 +388,19 @@ these specifics to be true in runtime.
       WaitForSingleObject((HANDLE) (arrayname[_DICEK_i].DICEK_thread), INFINITE); \
     }
 
+#define DICEK_SPLIT_1(funcname, arrayname, index) \
+    /* Init both mutexes and lock the DICEK_master_wkg one */ \
+    arrayname[_DICEK_i].DICEK_return = 0; \
+    arrayname[_DICEK_i].DICEK_thread = (void *) _beginthread(funcname, 0, \
+        (void *) &(arrayname[_DICEK_i]));
+
+#define DICEK_MERGE_1(arrayname, index) \
+    WaitForSingleObject((HANDLE) ((arrayname)[index].DICEK_thread), INFINITE);
+
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      /* Init both mutexes and lock the DICEK_master_wkg one */ \
-    } \
-    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      arrayname[_DICEK_i].DICEK_return = 0; \
-      arrayname[_DICEK_i].DICEK_thread = (void *) _beginthread(funcname, 0, \
-        (void *) &(arrayname[_DICEK_i])); \
+      DICEK_SPLIT_1(funcname), (arrayname), (_DICEK_i)) \
     }
 
 /* Save a pointer to the param block for use by DICEK_RETURN */
@@ -406,7 +425,7 @@ these specifics to be true in runtime.
 
 #define DICEK_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      WaitForSingleObject((HANDLE) (arrayname[_DICEK_i].DICEK_thread), INFINITE); \
+      DICEK_MERGE_1((arrayname), _DICEK_i) \
     }
 
 #endif
