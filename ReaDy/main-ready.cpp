@@ -84,6 +84,7 @@ long next_patsize(long former);
 void byteswap_2_double(double * array);
 
 
+static const char * g_rd_name = "";
 static int g_color = 0;
 static int g_oldcolor = 0;
 static int g_pastel_mode = 0;
@@ -96,6 +97,7 @@ static float g_scale = 1.0;
 static int g_density = 0;
 static bool g_video = false;
 static int g_threads;
+static bool g_autobright = false;
 
 #define READY_MODULE_GS_SCALAR 1
 #define READY_MODULE_GS_HWIV 2
@@ -103,10 +105,9 @@ static int g_threads;
 
 static int g_module = READY_MODULE_GS_HWIV;
 
-
 int main(int argc, char * * argv)
 {
-  long frames_per_display = 10;
+  long frames_per_display = 200;
   long i;
   DICEK_INIT_NTHR(g_hw_threads)
   g_threads = g_hw_threads;
@@ -151,6 +152,9 @@ int main(int argc, char * * argv)
 
   for (i = 1; i < argc; i++) {
     if (0) {
+    } else if (strcmp(argv[i],"-autobright")==0) {
+      // force display()'s auto-brightness feature
+      g_autobright = true;
     } else if ((i+1<argc) && (strcmp(argv[i],"-calc-module")==0)) {
       // select a calculation module
       /* TODO: This will be replaced with two options, one to select the equations (Gray-Scott vs. Brusselator)
@@ -220,6 +224,23 @@ int main(int argc, char * * argv)
     }
   }
 
+  /* Set per-system parameters (there will eventually be a routine in each module that returns these
+     model-specific values) */
+  switch(g_module) {
+    default:
+    case READY_MODULE_GS_SCALAR:
+    case READY_MODULE_GS_HWIV:
+      uv_range = 1.0;
+      g_rd_name = "Gray-Scott";
+      break;
+
+    case READY_MODULE_BRUSSELATOR:
+      uv_range = 10.0;
+      g_rd_name = "Brusselator";
+      break;
+  }
+
+
   if ((g_scale == 1.0) && (custom_Fk)) {
     g_scale = 2.0;
   }
@@ -263,18 +284,6 @@ int main(int argc, char * * argv)
   green = allocate(g_width, g_height, "green array");
   blue = allocate(g_width, g_height, "blue array");
 
-  switch(g_module) {
-    default:
-    case READY_MODULE_GS_SCALAR:
-    case READY_MODULE_GS_HWIV:
-      uv_range = 1.0;
-      break;
-
-    case READY_MODULE_BRUSSELATOR:
-      uv_range = 10.0;
-      break;
-  }
-
   // put the initial conditions into each cell
   switch(g_module) {
     default:
@@ -284,7 +293,6 @@ int main(int argc, char * * argv)
       break;
 
     case READY_MODULE_BRUSSELATOR:
-printf("bruss_init(%f,%f)\n", bruss_A, bruss_B);
       bruss_init(u, v, g_width, g_height, bruss_A, bruss_B);
       break;
   }
@@ -349,21 +357,25 @@ printf("bruss_init(%f,%f)\n", bruss_A, bruss_B);
     Mcgs = fps_avg * ((double) g_width) * ((double) g_height) / 1.0e6;
 
     char msg[1000];
-    sprintf(msg,"GrayScott - %0.2f fps (%.2f Mcgs)", fps_avg, Mcgs);
+    sprintf(msg, "%s - %0.2f fps (%.2f Mcgs)", g_rd_name, fps_avg, Mcgs);
 
     // display:
     {
       int chose_quit;
       if (g_color) {
-        chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,1.0f,2,10,msg,g_video);
+        chose_quit = display(g_width, g_height, red, green, blue,
+          iteration, g_scale, g_autobright, 1.0f, 2, 10, msg, g_video);
       } else {
-        chose_quit = display(g_width,g_height,u,u,u,iteration,g_scale,false,uv_range,2,10,msg,g_video);
+        chose_quit = display(g_width, g_height, u, u, u, 
+          iteration, g_scale, g_autobright, uv_range, 2, 10, msg, g_video);
       }
 
       if (chose_quit) // did user ask to quit?
         break;
     }
 
+    /* Dynamically adjust frame rate for a balance between responsiveness and
+       efficiency */
     if(!(g_video)) {
       if (tod_elapsed < 0.2) {
         frames_per_display *= 2;
@@ -872,7 +884,8 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
 
 ./ReaDy -color -threads 2 -F 0.062 -k 0.0609 -wrap -load '128,128:patterns/interactions/U-curve-15-c'
 
-./ReaDy -color -threads 2 -F 0.062 -k 0.0609 -wrap -load '80,140o5:patterns/halftargets/ht-4-10-3' \
+./ReaDy -color -threads 2 -F 0.062 -k 0.0609 -wrap \
+  -load '80,140o5:patterns/halftargets/ht-4-10-3' \
   -load '30,30:patterns/uskates/std'
 
 */
