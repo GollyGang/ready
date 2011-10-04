@@ -20,6 +20,6 @@ To standardise the results we have chosen the Gray-Scott system on a 256x256 gri
 
 Issues: 
   * not all systems currently implement the toroidal topology
-  * 256x256 isn't big enough for some implementations - e.g. at 1024x1024 with _OpenCL_Image_2x2 I get 4200 fps, the equivelent of 67000 fps on a 256x256 grid.
+  * 256x256 isn't big enough for some implementations - e.g. at 1024x1024 with `_OpenCL_Image_2x2` I get 4200 fps, the equivalent of 67000 fps on a 256x256 grid.
 
 = History =
