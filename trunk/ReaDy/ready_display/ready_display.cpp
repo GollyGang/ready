@@ -27,7 +27,7 @@ See ../../README.txt for more details.
 
 bool display(int g_width, int g_height, float *r, float *g, float *b,
              double iteration, float model_scale, bool auto_brighten,float manual_brighten,
-             int scale,int delay_ms,const char* message, bool write_video)
+             int image_scale,int delay_ms,const char* message, bool write_video)
 {
   static bool need_init = true;
 
@@ -45,7 +45,7 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
 
     im = cvCreateImage(cvSize(g_width,g_height),IPL_DEPTH_8U,3);
     cvSet(im,cvScalar(0,0,0));
-    im2 = cvCreateImage(cvSize(g_width*scale,g_height*scale),IPL_DEPTH_8U,3);
+    im2 = cvCreateImage(cvSize(g_width*image_scale,g_height*image_scale),IPL_DEPTH_8U,3);
         
     cvNamedWindow(title,CV_WINDOW_AUTOSIZE);
         
