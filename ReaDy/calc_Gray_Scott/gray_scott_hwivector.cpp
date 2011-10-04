@@ -88,7 +88,7 @@ void compute_dispatch(float *u, float *v, float *du, float *dv, long width, long
 
 /* The parameter space code, specifically the "if(parameter_space)" test itself, causes a 2.5% slowdown even when the
    parameter_space flag is false */
-//#define SUPPORT_PARAM_SPACE
+#define SUPPORT_PARAM_SPACE
 
 void * compute_gs_hwiv(void * gpb)
 {
