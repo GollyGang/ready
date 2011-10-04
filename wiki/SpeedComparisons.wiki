@@ -5,7 +5,9 @@ _This page will contain the results from the different implementations on differ
 
 = Results =
 
-|| || Intel i7-2600 @ 3.4GHz, nVidia GeForce GTX 460 ||
+To standardise the results we have chosen the Gray-Scott system on a 256x256 grid, with toroidal topology. The figures are the framerate of the computation (higher is better).
+
+|| || Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia GeForce GTX 460 ||
 || GrayScott || ||
 || GrayScott_double || ||
 || GrayScott_OpenMP || ||
@@ -16,5 +18,6 @@ _This page will contain the results from the different implementations on differ
 || GrayScott_OpenCL_Image || ||
 || GrayScott_OpenCL_Image_2x2 || ||
 
+Issues: not all systems currently implement the toroidal topology.
 
 = History =
