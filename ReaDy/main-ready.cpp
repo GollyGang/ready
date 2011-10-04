@@ -35,6 +35,8 @@ See ../README.txt for more details.
 
 #include "ready_display.h"
 
+#include "brusselator.h"
+
 #include "gray_scott_scalar.h"
 #include "gray_scott_hwivector.h"
 
@@ -97,15 +99,23 @@ static int g_threads;
 
 #define READY_MODULE_GS_SCALAR 1
 #define READY_MODULE_GS_HWIV 2
+#define READY_MODULE_BRUSSELATOR 3
 
 static int g_module = READY_MODULE_GS_HWIV;
 
 
 int main(int argc, char * * argv)
 {
+  long frames_per_display = 10;
   long i;
   DICEK_INIT_NTHR(g_hw_threads)
   g_threads = g_hw_threads;
+
+  float bruss_A = 3.0f;
+  float bruss_B = 10.0f;
+  float bruss_D1 = 5.0f;
+  float bruss_D2 = 12.0f;
+  float bruss_speed = 0.001f;
 
   // Here we implement the Gray-Scott model, as described here:
   // http://arxiv.org/abs/patt-sol/9304003
@@ -252,18 +262,21 @@ int main(int argc, char * * argv)
   blue = allocate(g_width, g_height, "blue array");
 
   // put the initial conditions into each cell
-  init(u,v, g_width, g_height, g_density, g_lowback, g_ramprects);
+  switch(g_module) {
+    default:
+    case READY_MODULE_GS_SCALAR:
+    case READY_MODULE_GS_HWIV:
+      init(u,v, g_width, g_height, g_density, g_lowback, g_ramprects);
+      break;
 
-  int N_FRAMES_PER_DISPLAY;
+    case READY_MODULE_BRUSSELATOR:
+printf("bruss_init(%f,%f)\n", bruss_A, bruss_B);
+      bruss_init(u, v, g_width, g_height, bruss_A, bruss_B);
+      break;
+  }
 
   if (g_video) {
-    N_FRAMES_PER_DISPLAY = 500;
-  } else {
-#   ifdef HWIV_EMULATE
-      N_FRAMES_PER_DISPLAY = 200;
-#   else
-      N_FRAMES_PER_DISPLAY = 1000;
-#   endif
+    frames_per_display = 500;
   }
 
   double iteration = 0;
@@ -285,7 +298,7 @@ int main(int argc, char * * argv)
     switch(g_module) {
       default:
       case READY_MODULE_GS_SCALAR:
-        for(i=0; i<N_FRAMES_PER_DISPLAY/5; i++) {
+        for(i=0; i<frames_per_display; i++) {
           compute_gs_scalar(u, v, du, dv, g_width, g_height, g_wrap, D_u, D_v, g_F, g_k, speed);
           its_done++;
         }
@@ -293,8 +306,16 @@ int main(int argc, char * * argv)
 
       case READY_MODULE_GS_HWIV:
         compute_dispatch(u, v, du, dv, g_width, g_height, g_wrap, D_u, D_v, g_F, g_k, speed, g_paramspace,
-          N_FRAMES_PER_DISPLAY, g_threads);
-        its_done = N_FRAMES_PER_DISPLAY;
+          frames_per_display, g_threads);
+        its_done = frames_per_display;
+        break;
+
+      case READY_MODULE_BRUSSELATOR:
+        for(i=0; i<frames_per_display; i++) {
+          compute_bruss(u, v, du, dv, g_width, g_height,
+             bruss_A, bruss_B, bruss_D1, bruss_D2, bruss_speed, g_paramspace);
+          its_done++;
+        }
         break;
     }
     iteration += ((double)its_done);
@@ -319,13 +340,37 @@ int main(int argc, char * * argv)
     // display:
     {
       int chose_quit;
-      if (g_color) {
-        chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,200.0f,2,10,msg,g_video);
-      } else {
-        chose_quit = display(g_width,g_height,u,u,u,iteration,g_scale,false,200.0f,2,10,msg,g_video);
+      switch(g_module) {
+        default:
+        case READY_MODULE_GS_SCALAR:
+        case READY_MODULE_GS_HWIV:
+          if (g_color) {
+            chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,255.0f,2,10,msg,g_video);
+          } else {
+            chose_quit = display(g_width,g_height,u,u,u,iteration,g_scale,false,200.0f,2,10,msg,g_video);
+          }
+          break;
+        case READY_MODULE_BRUSSELATOR:
+          if (g_color) {
+            chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,200.0f,2,10,msg,g_video);
+          } else {
+            chose_quit = display(g_width,g_height,u,v,u,iteration,g_scale,false,50.0f,2,10,msg,g_video);
+          }
+          break;
       }
       if (chose_quit) // did user ask to quit?
         break;
+    }
+
+    if(!(g_video)) {
+      if (tod_elapsed < 0.1) {
+        frames_per_display *= 2;
+      } else if (tod_elapsed > 0.5) {
+        frames_per_display /= 2;
+        if (frames_per_display < 10) {
+          frames_per_display = 10;
+        }
+      }
     }
   }
 }
