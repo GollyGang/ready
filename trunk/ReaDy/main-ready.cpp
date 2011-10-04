@@ -346,6 +346,20 @@ float frand(float lower,float upper)
   return rv;
 }
 
+/* pearson_bkg fills everything with the trivial state (U=1, V=0) combined
+   with random noise of magnitude 0.01, and it does this while keeping all
+   U and V values between 0 and 1. */
+void pearson_bkg(float *u, float *v, long width, long height)
+{
+  int i, j;
+  for(i=0; i<height; i++) {
+    for(j=0; j<width; j++) {
+      u[i*width+j] = frand(0.99, 1.0);
+      v[i*width+j] = frand(0.0, 0.01);
+    }
+  }
+}
+
 /* pearson_block creates a block filled with a given U and V value combined
    with superimposed noise of amplitude 0.01 */
 void pearson_block(float *u, float *v, long width, long height,
@@ -354,9 +368,9 @@ void pearson_block(float *u, float *v, long width, long height,
   int i, j;
 
   for(i=vpos; i<vpos+h; i++) {
-    if ((i >= 0) && (i < g_height)) {
+    if ((i >= 0) && (i < height)) {
       for(j=hpos; j<hpos+w; j++) {
-        if ((j >= 0) && (j < g_width)) {
+        if ((j >= 0) && (j < width)) {
           u[i*width+j] = frand(U-0.005, U+0.005);
           v[i*width+j] = frand(V-0.005, V+0.005);
         }
@@ -374,9 +388,9 @@ void ramp_block(float *u, float *v, long width, long height,
   float U, V;
 
   for(i=vpos; i<vpos+h; i++) {
-    if ((i >= 0) && (i < g_height)) {
+    if ((i >= 0) && (i < height)) {
       for(j=hpos; j<hpos+w; j++) {
-        if ((j >= 0) && (j < g_width)) {
+        if ((j >= 0) && (j < width)) {
           U = ((float) (j-hpos)) / ((float) w);
           if (fliph) {
             U = 1.0 - U;
@@ -448,8 +462,8 @@ void i5_bkg(float *u, float *v, long width, long height, int which)
 {
   int i, j;
 
-  for(i=0; i<g_height; i++) {
-    for(j=0; j<g_width; j++) {
+  for(i=0; i<height; i++) {
+    for(j=0; j<width; j++) {
       float U, V;
 
       if (which == 0) {
@@ -503,7 +517,7 @@ void load_option(float * u, float * v, long width, long height, const char * opt
   }
   p1++; // skip the ':'
   if (*p1) {
-    pattern_load(u, v, g_width, g_height, p1, x, y, orient);
+    pattern_load(u, v, width, height, p1, x, y, orient);
   }
 }
 
