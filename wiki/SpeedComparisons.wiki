@@ -8,15 +8,15 @@ _This page will contain the results from the different implementations on differ
 To standardise the results we have chosen the Gray-Scott system on a 256x256 grid, with toroidal topology. The figures are the framerate of the computation (higher is better).
 
 || || Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia !GeForce GTX 460 ||
-|| !GrayScott || ||
-|| !GrayScott_double || ||
-|| !GrayScott_OpenMP || ||
-|| !GrayScott_SSE || ||
-|| !GrayScott_SSE_OpenMP || ||
-|| !GrayScott_HWIVector || ||
-|| !GrayScott_OpenCL || ||
-|| !GrayScott_OpenCL_Image || ||
-|| !GrayScott_OpenCL_Image_2x2 || ||
+|| !GrayScott || 1200 ||
+|| !GrayScott_double || 700 ||
+|| !GrayScott_OpenMP || 4000 ||
+|| !GrayScott_SSE || 8100 ||
+|| !GrayScott_SSE_OpenMP || 16000 ||
+|| !GrayScott_HWIVector || 6600 ||
+|| !GrayScott_OpenCL || 15000 ||
+|| !GrayScott_OpenCL_Image || 27000 ||
+|| !GrayScott_OpenCL_Image_2x2 || 36000 ||
 
 Issues: not all systems currently implement the toroidal topology.
 
