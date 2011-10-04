@@ -3,4 +3,18 @@
 
 _This page will contain the results from the different implementations on different systems, allowing everyone to see how they compare._
 
-TODO
+= Results =
+
+|| || Intel i7-2600 @ 3.4GHz, nVidia GeForce GTX 460 ||
+|| GrayScott || ||
+|| GrayScott_double || ||
+|| GrayScott_OpenMP || ||
+|| GrayScott_SSE || ||
+|| GrayScott_SSE_OpenMP || ||
+|| GrayScott_HWIVector || ||
+|| GrayScott_OpenCL || ||
+|| GrayScott_OpenCL_Image || ||
+|| GrayScott_OpenCL_Image_2x2 || ||
+
+
+= History =
