@@ -16,13 +16,18 @@ endif()
 FIND_PACKAGE(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES( ${OPENCV_INCLUDE_DIR})
 
+INCLUDE_DIRECTORIES( "calc_Brusselator" )
 INCLUDE_DIRECTORIES( "calc_Gray_Scott" )
 INCLUDE_DIRECTORIES( "ready_display" )
 
 add_executable(ReaDy 
-  main-ready.cpp 
+  main-ready.cpp
+  calc_Brusselator/brusselator.cpp
+  calc_Brusselator/brusselator.h
   calc_Gray_Scott/gray_scott_scalar.cpp
+  calc_Gray_Scott/gray_scott_scalar.h
   calc_Gray_Scott/gray_scott_hwivector.cpp
+  calc_Gray_Scott/gray_scott_hwivector.h
   calc_Gray_Scott/hwi_vector.h
   calc_Gray_Scott/dicek.h
   ready_display/ready_display.cpp
