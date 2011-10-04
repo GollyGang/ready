@@ -65,23 +65,20 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
 
   // convert float arrays to IplImage for OpenCV to display
   float val,minR=FLT_MAX,maxR=-FLT_MAX,minG=FLT_MAX,maxG=-FLT_MAX,minB=FLT_MAX,maxB=-FLT_MAX;
-  if(auto_brighten)
-  {
-    for(int i=0;i<g_height;i++)
-    {
-      for(int j=0;j<g_width;j++)
-      {
-        val = INDEX(r,i,j);
-        if(val<minR) minR=val; if(val>maxR) maxR=val;
+  for(int i=0;i<g_height;i++) {
+    for(int j=0;j<g_width;j++) {
+      val = INDEX(r,i,j);
+      if(val<minR) minR=val; if(val>maxR) maxR=val;
 
-        val = INDEX(g,i,j);
-        if(val<minG) minG=val; if(val>maxG) maxG=val;
+      val = INDEX(g,i,j);
+      if(val<minG) minG=val; if(val>maxG) maxG=val;
 
-        val = INDEX(b,i,j);
-        if(val<minB) minB=val; if(val>maxB) maxB=val;
-      }
+      val = INDEX(b,i,j);
+      if(val<minB) minB=val; if(val>maxB) maxB=val;
     }
   }
+  // I use this to find out the range of the chemicals when adding a new R-D system to ReaDy
+  // printf("R:[%f..%f] G:[%f..%f] B:[%f..%f]\n", minR,maxR, minG,maxG, minB,maxB);
 
   for(int i=0;i<g_height;i++)
   {
@@ -90,19 +87,19 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
       float val;
       val = INDEX(r,i,g_width-j-1);
       if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
-      else val *= manual_brighten;
+      else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 2] = (uchar)val;
 
       val = INDEX(g,i,g_width-j-1);
       if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
-      else val *= manual_brighten;
+      else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 1] = (uchar)val;
 
       val = INDEX(b,i,g_width-j-1);
       if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
-      else val *= manual_brighten;
+      else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 0] = (uchar)val;
     }
@@ -142,15 +139,16 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
   return false;
 }
 
-void colorize(float *u, float *v, float *du, float *red, float *green, float *blue, long width, long height,
+void colorize(float *u, float *v, float *du, float uv_range,
+  float *red, float *green, float *blue, long width, long height,
   int color_style, int pastel_mode)
 {
   float r, g, b;
   // Step by row
   for(long i = 0; i < height*width; i++) {
-    float uval = u[i];
-    float vval = v[i];
-    float delta_u = du[i];
+    float uval = u[i] / uv_range;
+    float vval = v[i] / uv_range;
+    float delta_u = du[i] / uv_range;
 
     color_mapping(uval, vval, delta_u, color_style, &r, &g, &b, pastel_mode);
     red[i] = r;

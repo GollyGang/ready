@@ -111,11 +111,13 @@ int main(int argc, char * * argv)
   DICEK_INIT_NTHR(g_hw_threads)
   g_threads = g_hw_threads;
 
-  float bruss_A = 3.0f;
-  float bruss_B = 10.0f;
-  float bruss_D1 = 5.0f;
-  float bruss_D2 = 12.0f;
-  float bruss_speed = 0.001f;
+  float uv_range = 1.0;
+
+  float bruss_A = 3.0;
+  float bruss_B = 10.0;
+  float bruss_D1 = 5.0;
+  float bruss_D2 = 12.0;
+  float bruss_speed = 0.001;
 
   // Here we implement the Gray-Scott model, as described here:
   // http://arxiv.org/abs/patt-sol/9304003
@@ -261,6 +263,18 @@ int main(int argc, char * * argv)
   green = allocate(g_width, g_height, "green array");
   blue = allocate(g_width, g_height, "blue array");
 
+  switch(g_module) {
+    default:
+    case READY_MODULE_GS_SCALAR:
+    case READY_MODULE_GS_HWIV:
+      uv_range = 1.0;
+      break;
+
+    case READY_MODULE_BRUSSELATOR:
+      uv_range = 10.0;
+      break;
+  }
+
   // put the initial conditions into each cell
   switch(g_module) {
     default:
@@ -321,7 +335,7 @@ printf("bruss_init(%f,%f)\n", bruss_A, bruss_B);
     iteration += ((double)its_done);
 
     if (g_color) {
-      colorize(u, v, du, red, green, blue, g_width, g_height, g_oldcolor, g_pastel_mode);
+      colorize(u, v, du, uv_range, red, green, blue, g_width, g_height, g_oldcolor, g_pastel_mode);
     }
 
     gettimeofday(&tod_record, 0);
@@ -340,32 +354,20 @@ printf("bruss_init(%f,%f)\n", bruss_A, bruss_B);
     // display:
     {
       int chose_quit;
-      switch(g_module) {
-        default:
-        case READY_MODULE_GS_SCALAR:
-        case READY_MODULE_GS_HWIV:
-          if (g_color) {
-            chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,255.0f,2,10,msg,g_video);
-          } else {
-            chose_quit = display(g_width,g_height,u,u,u,iteration,g_scale,false,200.0f,2,10,msg,g_video);
-          }
-          break;
-        case READY_MODULE_BRUSSELATOR:
-          if (g_color) {
-            chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,200.0f,2,10,msg,g_video);
-          } else {
-            chose_quit = display(g_width,g_height,u,v,u,iteration,g_scale,false,50.0f,2,10,msg,g_video);
-          }
-          break;
+      if (g_color) {
+        chose_quit = display(g_width,g_height,red,green,blue,iteration,g_scale,false,1.0f,2,10,msg,g_video);
+      } else {
+        chose_quit = display(g_width,g_height,u,u,u,iteration,g_scale,false,uv_range,2,10,msg,g_video);
       }
+
       if (chose_quit) // did user ask to quit?
         break;
     }
 
     if(!(g_video)) {
-      if (tod_elapsed < 0.1) {
+      if (tod_elapsed < 0.2) {
         frames_per_display *= 2;
-      } else if (tod_elapsed > 0.5) {
+      } else if (tod_elapsed > 0.4) {
         frames_per_display /= 2;
         if (frames_per_display < 10) {
           frames_per_display = 10;
