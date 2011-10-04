@@ -12,6 +12,7 @@ endif()
 add_executable(GrayScott_HWIVector 
   gray_scott_hwivector.cpp 
   hwi_vector.h
+  dicek.h
   display_hwiv.cpp
   display_hwiv.h
 )
