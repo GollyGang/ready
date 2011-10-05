@@ -30,4 +30,10 @@ We tried using doubles instead of floats (!GrayScott_double) and this helped eno
 
 Eventually we worked out that we had the problem of *denormals* - float values that through repeated division were becoming smaller and smaller (in the empty spaces where no Gray-Scott spots were found. Adding a tiny constant got rid of this problem, giving us a speed of 84 Mcgs on Tim's machine. Now the float and the double versions run at about the same speed.
 
-Using !OpenMP is an easy way to speed up code by spreading the work over multiple threads. This resulted in a 3x speedup on a 4-core, 8-thread machine. Not brilliant but it's very simple to add a single #pragma line before a `for` loop, see !GrayScott_OpenMP.
+The most obvious way to speed up reaction-diffusion (RD) code is to parallelise it. Using OpenMP resulted in a 3x speedup on a 4-core, 8-thread machine. Not brilliant but it's very simple to add a single #pragma line before a `for` loop, see !GrayScott_OpenMP.
+
+OpenCL is perhaps the most promising way to get RD to run fast, using the many cores on a graphics card. Our initial implementation, !GrayScott_OpenCL gave a 10x speedup over the single-core version. (Initially we thought it was more, because of the denormals issue.)
+
+But a couple of people (Tom and Robert) suggested exploring SSE first, rather than jumping straight to OpenCL. This turned out to be good advice, our GrayScott_SSE version is 6x faster than the base version, still running on a single core. Putting OpenMP on top took us to 12x faster than the base version - faster than our OpenCL implementation!
+
+Robert is working on the !GrayScott_HWIVector implementation, making a version that should run whether or not the users machine has SSE available. More about this version soon.
