@@ -14,7 +14,7 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 || !GrayScott_SSE || 540 Mcgs ||
 || !GrayScott_SSE_OpenMP || 1000 Mcgs ||
 || !GrayScott_HWIVector || 432 Mcgs ||
-|| !GrayScott_OpenCL || 820 ||
+|| !GrayScott_OpenCL || 820 Mcgs ||
 || !GrayScott_OpenCL_Image || 2300 Mcgs ||
 || !GrayScott_OpenCL_Image_2x2 || 4400 Mcgs ||
 
@@ -24,4 +24,10 @@ Issues:
 
 = History =
 
-Our first implementation suffered from a variable speed. Different patterns would run at different speeds, despite the fact that nothing in the code depended on the values on the floats being manipulated. Turned out that we had the problem of *denormals* - float values that through repeated division were becoming smaller and smaller (in the empty spaces where no Gray-Scott spots were found. Adding a tiny constant got rid of this problem, giving us a speed of 84 Mcgs on Tim's machine.
+Our first implementation (!GrayScott) suffered from a variable speed. Different patterns would run at different speeds, despite the fact that nothing in the code depended on the values on the floats being manipulated. 
+
+We tried using doubles instead of floats (!GrayScott_double) and this helped enormously. There was still a speed change but it was much less.
+
+Eventually we worked out that we had the problem of *denormals* - float values that through repeated division were becoming smaller and smaller (in the empty spaces where no Gray-Scott spots were found. Adding a tiny constant got rid of this problem, giving us a speed of 84 Mcgs on Tim's machine. Now the float and the double versions run at about the same speed.
+
+Using !OpenMP is an easy way to speed up code by spreading the work over multiple threads. This resulted in a 3x speedup on a 4-core, 8-thread machine. Not brilliant but it's very simple to add a single #pragma line before a `for` loop, see !GrayScott_OpenMP.
