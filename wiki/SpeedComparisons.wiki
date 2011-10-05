@@ -8,18 +8,20 @@ _This page will contain the results from the different implementations on differ
 To standardise the results we have chosen the Gray-Scott system, with toroidal topology. The figures are in Million cell-generations per second.
 
 || || Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia !GeForce GTX 460 ||
-|| !GrayScott || 84 ||
-|| !GrayScott_double || 87 ||
-|| !GrayScott_OpenMP || 250 ||
-|| !GrayScott_SSE || 540 ||
-|| !GrayScott_SSE_OpenMP || 1000 ||
-|| !GrayScott_HWIVector || 432 ||
+|| !GrayScott || 84 Mcgs ||
+|| !GrayScott_double || 87 Mcgs ||
+|| !GrayScott_OpenMP || 250 Mcgs ||
+|| !GrayScott_SSE || 540 Mcgs ||
+|| !GrayScott_SSE_OpenMP || 1000 Mcgs ||
+|| !GrayScott_HWIVector || 432 Mcgs ||
 || !GrayScott_OpenCL || 820 ||
-|| !GrayScott_OpenCL_Image || 2300 ||
-|| !GrayScott_OpenCL_Image_2x2 || 4400 ||
+|| !GrayScott_OpenCL_Image || 2300 Mcgs ||
+|| !GrayScott_OpenCL_Image_2x2 || 4400 Mcgs ||
 
 Issues: 
   * Not all systems currently implement the toroidal topology.
   * The grid size affects the speed. 256x256 isn't big enough for some implementations - e.g. at 1024x1024 with `_OpenCL_Image_2x2` I get 4200 fps, the equivalent of 67000 fps on a 256x256 grid, but only 36000 fps on an actual 256x256 grid
 
 = History =
+
+Our first implementation suffered from a variable speed. Different patterns would run at different speeds, despite the fact that nothing in the code depended on the values on the floats being manipulated. Turned out that we had the problem of *denormals* - float values that through repeated division were becoming smaller and smaller (in the empty spaces where no Gray-Scott spots were found. Adding a tiny constant got rid of this problem, giving us a speed of 84 Mcgs on Tim's machine.
