@@ -302,7 +302,7 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
       arrayname[_DICEK_i].DICEK_return = 0; \
       pthread_create((pthread_t *) (&(arrayname[_DICEK_i].DICEK_thread)), \
-        0, funcname, (void *) &(arrayname[_DICEK_i])); \
+        0, (void* (*)(void*))funcname, (void *) &(arrayname[_DICEK_i])); \
     } \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
       DICEK_MERGE_1((arrayname), _DICEK_i) \
@@ -315,12 +315,12 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
     pthread_mutex_trylock(&(arrayname[index].DICEK_master_wkg)); \
     arrayname[index].DICEK_return = 0; \
     pthread_create((pthread_t *) (&(arrayname[index].DICEK_thread)), \
-        0, funcname, (void *) &(arrayname[index]));
+        0, (void* (*)(void*))funcname, (void *) &(arrayname[index]));
 
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      DICEK_SPLIT_1((funcname), (arrayname), (_DICEK_i)) \
+      DICEK_SPLIT_1((void* (*)(void*))funcname, (arrayname), _DICEK_i) \
     }
 
 #define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
