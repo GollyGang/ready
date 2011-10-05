@@ -30,10 +30,16 @@ We tried using doubles instead of floats (!GrayScott_double) and this helped eno
 
 Eventually we worked out that we had the problem of *denormals* - float values that through repeated division were becoming smaller and smaller (in the empty spaces where no Gray-Scott spots were found. Adding a tiny constant got rid of this problem, giving us a speed of 84 Mcgs on Tim's machine. Now the float and the double versions run at about the same speed.
 
-The most obvious way to speed up reaction-diffusion (RD) code is to parallelise it. Using OpenMP resulted in a 3x speedup on a 4-core, 8-thread machine. Not brilliant but it's very simple to add a single #pragma line before a `for` loop, see !GrayScott_OpenMP.
+The most obvious way to speed up reaction-diffusion (RD) code is to parallelise it. Using *OpenMP* resulted in a 3x speedup on a 4-core, 8-thread machine. Not brilliant but it's very simple to add a single #pragma line before a `for` loop, see !GrayScott_OpenMP.
 
-OpenCL is perhaps the most promising way to get RD to run fast, using the many cores on a graphics card. Our initial implementation, !GrayScott_OpenCL gave a 10x speedup over the single-core version. (Initially we thought it was more, because of the denormals issue.)
+*OpenCL* is perhaps the most promising way to get RD to run fast, using the many cores on a graphics card. Our initial implementation, !GrayScott_OpenCL gave a 10x speedup over the single-core version. (Initially we thought it was more, because of the denormals issue.)
 
-But a couple of people (Tom and Robert) suggested exploring SSE first, rather than jumping straight to OpenCL. This turned out to be good advice, our GrayScott_SSE version is 6x faster than the base version, still running on a single core. Putting OpenMP on top took us to 12x faster than the base version - faster than our OpenCL implementation!
+But a couple of people (Tom and Robert) suggested exploring *SSE* first, rather than jumping straight to OpenCL. This turned out to be good advice, our GrayScott_SSE version is 6x faster than the base version, still running on a single core. Putting OpenMP on top took us to 12x faster than the base version - faster than our OpenCL implementation!
 
 Robert is working on the !GrayScott_HWIVector implementation, making a version that should run whether or not the users machine has SSE available. More about this version soon.
+
+Returning to OpenCL, the main advice for optimisation is to look at cache hits - how to ensure that the data you want is available in the fastest memory. Our GrayScott_OpenCL version uses NDRange local(8,8) which gives a big speed improvement over local(1,1), presumably because it then makes a local cache. We're still learning about these issues so all help is welcome! We tried manually caching data but this didn't help.
+
+The advantage of using the image structure in OpenCL is that it is already optimized for 2D caching. We found it was 3x faster than our `float*` based version.
+
+Our final optimization to date uses OpenCL's own version of SSE-like processing, using float4's to operate on 4 values at once. This gave another 2x speedup on top of the image version.
