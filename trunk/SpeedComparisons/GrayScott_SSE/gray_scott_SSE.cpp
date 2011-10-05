@@ -36,7 +36,7 @@ See README.txt for more details.
 #include <highgui.h>
 
 // If SIZE_OPTIONS is declared, the user can specify an image size with -width N and -height N options
-#define SIZE_OPTIONS
+//#define SIZE_OPTIONS
 
 #ifndef SIZE_OPTIONS
 // local:
