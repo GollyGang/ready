@@ -96,7 +96,7 @@ typedef struct compute_params {
   int interlock_type;
 } compute_params;
 
-void * compute(void * param_block);  // Arg is really "compute_params * param_block"
+void compute(void * param_block);  // Arg is really "compute_params * param_block"
 
 void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
@@ -341,7 +341,7 @@ void init(float *u, float *v, long width, long height)
    parameter_space flag is false */
 //#define SUPPORT_PARAM_SPACE
 
-void * compute(void * gpb)
+void compute(void * gpb)
 {
   DICEK_SUB(compute_params, gpb);
   const int full_width = g_width + 2*VECSIZE;
