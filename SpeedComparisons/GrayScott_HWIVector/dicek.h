@@ -167,7 +167,7 @@ is the array elements of arrayname, and argname is the name of the subroutine's 
   (void *)myfunc(void * params)
   {
     DICEK_SUB(f_vars, params);
-    /* other local variable declarations */
+    // other local variable declarations
     ...
   }
 
@@ -188,10 +188,10 @@ with the next piece of work.
   (void *)myfunc(void * params)
   {
     DICEK_SUB(f_vars, params);
-    /* other local variable declarations */
+    // other local variable declarations
     while(working) {
       DICEK_CH_BEGIN
-      /* Do computation here */
+      // Do computation here
       DICEK_CH_SYNC
     }
   }
