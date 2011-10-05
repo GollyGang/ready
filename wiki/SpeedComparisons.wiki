@@ -7,18 +7,27 @@ _This page will contain the results from the different implementations on differ
 
 To standardise the results we have chosen the Gray-Scott system, with toroidal topology. The figures are in Million cell-generations per second.
 
-|| || System 1 || others (please add) ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott GrayScott] || 84 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_double GrayScott_double] || 87 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] || 540 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 820 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 Mcgs || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 Mcgs || ||
+|| || System 1 || System 2 || others (please add) ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott GrayScott] || 84 Mcgs || 117 Mcgs || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_double GrayScott_double] || 87 Mcgs || 115 Mcgs || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 Mcgs || 163 Mcgs || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 Mcgs || 450 Mcgs || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 Mcgs || 160 - 230 Mcgs[1] || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 Mcgs || 455 Mcgs || ||
+|| GrayScott_HWIVector (2 threads) ||  || 670 Mcgs || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 820 Mcgs || 104 Mcgs || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 Mcgs || [2] || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 Mcgs || [2] || ||
 
 *System 1:* Visual Studio 2008 (32-bit), Windows 7 (64-bit), Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia !GeForce GTX 460
+
+*System 2:* CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Intel Core i7-2720QM (4 cores, 8 threads) @ 2.2 GHz, AMD Radeon HD 6750 QM with 1024 MB VRAM
+
+Notes:
+
+[1] Speeds up as the dots fill the screen (a known issue on Intel processors with denormal values)
+
+[2] Does not run, OS does not support a needed OpenCL feature.
 
 Issues: 
   * Not all systems currently implement the toroidal topology.
