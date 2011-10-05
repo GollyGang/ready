@@ -40,6 +40,6 @@ Robert is working on the !GrayScott_HWIVector implementation, making a version t
 
 Returning to OpenCL, the main advice for optimisation is to look at cache hits - how to ensure that the data you want is available in the fastest memory. Our !GrayScott_OpenCL version uses NDRange local(8,8) which gives a big speed improvement over local(1,1), presumably because it then makes a local cache. We're still learning about these issues so all help is welcome! We tried manually caching data but this didn't help.
 
-The advantage of using the image structure in OpenCL is that it is already optimized for 2D caching. We found it was 3x faster than our `float*` based version.
+The advantage of using the *image2d_t* structure in OpenCL is that it is already optimized for 2D caching. We found it was 3x faster than our `float*`-based OpenCL version.
 
 Our final optimization to date uses OpenCL's own version of SSE-like processing, using float4's to operate on 4 values at once, both for the maths and the reading and writing. This gave another 2x speedup on top of the image version.
