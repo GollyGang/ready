@@ -297,6 +297,9 @@ void compute_dispatch(float *u, float *v, float *du, float *dv,
 #ifndef max
 # define max(a,b) (((a) > (b)) ? (a) : (b))
 # define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef minmax
 # define minmax(v, lo, hi) max(lo, min(v, hi))
 #endif
 
