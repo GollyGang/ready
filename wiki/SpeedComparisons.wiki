@@ -13,7 +13,7 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 Mcgs ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 Mcgs ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 Mcgs ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] || 432 Mcgs ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] || 540 Mcgs ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 820 Mcgs ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 Mcgs ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 Mcgs ||
