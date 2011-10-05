@@ -35,18 +35,34 @@ See README.txt for more details.
 #include <cv.h>
 #include <highgui.h>
 
+// If SIZE_OPTIONS is declared, the user can specify an image size with -width N and -height N options
+#define SIZE_OPTIONS
+
+#ifndef SIZE_OPTIONS
 // local:
 #include "defs.h"
+#endif
 
 // consecutive horizontal SSE blocks lie end to end, to enable easy use of _mm_loadu_ps() for left and right
 
 const int SSE_BITS_PER_BLOCK = 128;
 const int FLOATS_PER_BLOCK = (SSE_BITS_PER_BLOCK/8) / sizeof(float);
+
+#ifndef SIZE_OPTIONS
 const int PADDED_X = X + 2*FLOATS_PER_BLOCK; // our toroidal wrap-around scheme uses a border that is copied from the other side each time
 const int PADDED_Y = Y + 2;
 const int X_BLOCKS = PADDED_X / FLOATS_PER_BLOCK;
 const int Y_BLOCKS = PADDED_Y;
 const int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
+#else
+static int X = 256;
+static int Y = 256;
+static int PADDED_X = X + 2*FLOATS_PER_BLOCK; // our toroidal wrap-around scheme uses a border that is copied from the other side each time
+static int PADDED_Y = Y + 2;
+static int X_BLOCKS = PADDED_X / FLOATS_PER_BLOCK;
+static int Y_BLOCKS = PADDED_Y;
+static int TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
+#endif
 
 inline int at(int x,int y) { return y*PADDED_X+x; } 
 inline int block_at(int x,int y) { return y*X_BLOCKS+x; }
@@ -59,8 +75,32 @@ bool display(float *r,float *g,float *b,
              int iteration,bool auto_brighten,float manual_brighten,
              int scale,int delay_ms,const char* message);
 
-int main()
+int main(int argc, char * * argv)
 {
+#ifdef SIZE_OPTIONS
+  for (int i = 1; i < argc; i++) {
+    if (0) {
+    } else if ((i+1<argc) && (strcmp(argv[i],"-height")==0)) {
+      // set height
+      i++; Y = atoi(argv[i]);
+    } else if ((i+1<argc) && (strcmp(argv[i],"-size")==0)) {
+      // set both width and height
+      i++; Y = X = atoi(argv[i]);
+    } else if ((i+1<argc) && (strcmp(argv[i],"-width")==0)) {
+      // set width
+      i++; X = atoi(argv[i]);
+    } else {
+      fprintf(stderr, "Unrecognized argument, or parameter needed: '%s'\n", argv[i]);
+      exit(-1);
+    }
+  }
+  PADDED_X = X + 2*FLOATS_PER_BLOCK; // our toroidal wrap-around scheme uses a border that is copied from the other side each time
+  PADDED_Y = Y + 2;
+  X_BLOCKS = PADDED_X / FLOATS_PER_BLOCK;
+  Y_BLOCKS = PADDED_Y;
+  TOTAL_BLOCKS = X_BLOCKS * Y_BLOCKS;
+#endif
+
     // Here we implement the Gray-Scott model, as described here:
     // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
     // http://arxiv.org/abs/patt-sol/9304003
@@ -123,9 +163,10 @@ int main()
         fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
         // We display an exponential moving average of the fps measurement
         fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
+        float Mcgs = (fps_avg * ((float)X) * ((float)Y)) / 1.0e6;
 
         char msg[1000];
-        sprintf(msg,"GrayScott - %0.2f fps",fps_avg);
+        sprintf(msg,"GrayScott - %0.2f fps %0.3f Mcgs",fps_avg, Mcgs);
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?
