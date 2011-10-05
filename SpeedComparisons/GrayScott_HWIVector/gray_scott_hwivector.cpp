@@ -55,18 +55,21 @@ See README.txt for more details.
 static long g_width = 256;
 static long g_height = 256;
 
-float *allocate(long width, long height, const char * error_text);
-float *allocate(long width, long height, const char * error_text)
+float *allocate(long width, long height, const char * error_text, bool for_mm);
+float *allocate(long width, long height, const char * error_text, bool for_mm)
 {
-  size_t sz;
+  long sz;
   float * rv;
-  // we add 32 bytes: 16 so we can align it here, and another 16 so the v_j2
-  // index can go one past the end of the last row
-  sz = ((size_t) width) * ((size_t) height) * sizeof(*rv) + 32;
-  rv = (float *) malloc(sz);
-  while(((long)rv) & 0x0000000F) { rv++; }
-  if (rv == NULL) {
-    fprintf(stderr, "allocate: Could get %ld bytes for %s\n", ((long) sz),
+
+  sz = width *  height * sizeof(*rv);
+  if (for_mm) {
+    rv = (float *) _mm_malloc(sz, 16);
+  } else {
+    rv = (float *) malloc(((size_t)sz));
+  }
+
+   if (rv == NULL) {
+    fprintf(stderr, "allocate: Could not get %ld bytes for %s\n", ((long) sz),
       error_text);
     exit(-1);
   }
@@ -104,6 +107,8 @@ static int g_wrap = 0;
 static float g_k = 0.064;
 static float g_F = 0.035;
 static bool g_video = false;
+
+#define VECSIZE 4
 
 int main(int argc, char * * argv)
 {
@@ -162,9 +167,10 @@ int main(int argc, char * * argv)
     }
   }
 
-  if (g_width%4) {
-    g_width = ((g_width/4)+1)*4;
+  if (g_width % VECSIZE) {
+    g_width = ((g_width/VECSIZE)+1)*VECSIZE;
   }
+  long full_width = g_width + 2*VECSIZE;
 
   /* We cannot use multiple threads unless DiceK supports thread synchronization */
   if (!(DICEK_SUPPORTS_BLOCKING)) {
@@ -186,24 +192,18 @@ int main(int argc, char * * argv)
   float *green = 0;
   float *blue = 0;
 
-  u = allocate(g_width, g_height, "U array");
-  v = allocate(g_width, g_height, "V array");
-  du = allocate(g_width, g_height, "D_u array");
-  dv = allocate(g_width, g_height, "D_v array");
-  red = allocate(g_width, g_height, "red array");
-  green = allocate(g_width, g_height, "green array");
-  blue = allocate(g_width, g_height, "blue array");
+  u = allocate(full_width, g_height, "U array", true);
+  v = allocate(full_width, g_height, "V array", true);
+  du = allocate(full_width, g_height, "D_u array", true);
+  dv = allocate(full_width, g_height, "D_v array", true);
+  red = allocate(full_width, g_height, "red array", false);
+  green = allocate(full_width, g_height, "green array", false);
+  blue = allocate(full_width, g_height, "blue array", false);
 
   // put the initial conditions into each cell
-  init(u,v, g_width, g_height);
+  init(u,v, full_width, g_height);
 
-  int N_FRAMES_PER_DISPLAY;
-
-# ifdef HWIV_EMULATE
-    N_FRAMES_PER_DISPLAY = 200;
-# else
-    N_FRAMES_PER_DISPLAY = 1000;
-# endif
+#define N_FRAMES_PER_DISPLAY 1000
 
   double iteration = 0;
   double fps_avg = 0.0; // decaying average of fps
@@ -230,7 +230,7 @@ int main(int argc, char * * argv)
     fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
     // We display an exponential moving average of the fps measurement
     fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
-    Mcgs = fps_avg * ((double) g_width) * ((double) g_height) / 1.0e6;
+    Mcgs = fps_avg * ((double) full_width) * ((double) g_height) / 1.0e6;
 
     char msg[1000];
     sprintf(msg,"GrayScott - %0.2f fps (%.2f Mcgs)", fps_avg, Mcgs);
@@ -320,7 +320,7 @@ void init(float *u, float *v, long width, long height)
   for(int i = 0; i < height; i++) {
     for(int j = 0; j < width; j++) {
       // start with a uniform field with an approximate circle in the middle
-      if (hypot(i-height/2,(j-width/2)/1.5)<=frand(2,5))
+      if (hypot(i-height/2,j-width/3)<=frand(2,5))
       {
         u[i*width+j] = frand(0.0,0.1);
         v[i*width+j] = frand(0.9,1.0);
@@ -332,11 +332,186 @@ void init(float *u, float *v, long width, long height)
   }
 }
 
-#define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
+#define INDEX(a,x,y) ((a)[(x)*full_width+(y)])
 
-#ifdef HWIV_V4F4_SSE2
+/* The parameter space code, specifically the "if(parameter_space)" test itself, causes a 2.5% slowdown even when the
+   parameter_space flag is false */
+//#define SUPPORT_PARAM_SPACE
 
-#define VECSIZE 4
+void * compute(void * gpb)
+{
+  DICEK_SUB(compute_params, gpb);
+  const int full_width = g_width + 2*VECSIZE;
+  const int wid_v = full_width / VECSIZE;
+
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
+  /* On Intel we disable accurate handling of denorms and zeros. This is an
+     important speed optimization. */
+  int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
+  int newMXCSR = oldMXCSR | 0x8040; // set DAZ and FZ bits
+  _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
+#endif
+
+  compute_params * param_block;
+  param_block = (compute_params *) gpb;
+  float *u = param_block->u;
+  float *v = param_block->v;
+  float *du = param_block->du;
+  float *dv = param_block->dv;
+  float D_u = param_block->D_u;
+  float D_v = param_block->D_v;
+  float F = param_block->F;
+  float k = param_block->k;
+  float speed = param_block->speed;
+  int parameter_space = param_block->parameter_space;
+  int num_its = param_block->num_its;
+  int start_row = param_block->start_row;
+  int end_row = param_block->end_row;
+  int interlock = param_block->interlock_type;
+
+
+
+  int iter;
+
+#ifdef SUPPORT_PARAM_SPACE
+  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
+  float k_diff;
+  V4F4 v4_kdiff;
+  k_diff = (k_max-k_min)/g_height;
+  v4_kdiff = v4SET(0, -k_diff, -2*k_diff, -3*k_diff);
+#endif
+
+  // Initialize our vectorized scalars
+
+  // Scan per iteration
+  for(iter = 0; iter < num_its; iter++) {
+
+  if (interlock) { DICEK_CH_BEGIN }
+
+//printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
+
+  // Scan per row
+  for(int i = start_row; i < end_row; i++) {
+#ifdef SUPPORT_PARAM_SPACE
+    V4F4 v4_F = v4SPLAT(F);
+    V4F4 v4_k = v4SPLAT(k);
+#else
+    const V4F4 v4_F = v4SPLAT(F);
+    const V4F4 v4_k = v4SPLAT(k);
+#endif
+    const V4F4 v4_Du = v4SPLAT(D_u);
+    const V4F4 v4_Dv = v4SPLAT(D_v);
+    int iprev,inext;
+    if (g_wrap) {
+      /* Periodic boundary condition */
+      iprev = (i+g_height-1) % g_height;
+      inext = (i+1) % g_height;
+    } else {
+      /* The edges are their own neighbors. This amounts to a von Neumann boundary condition. */
+      iprev = max(i-1, 0);
+      inext = min(i+1, g_height-1);
+    }
+
+#ifdef SUPPORT_PARAM_SPACE
+    if (parameter_space) {
+      // set F for this row (ignore the provided value)
+      F = F_min + (g_height-i-1) * (F_max-F_min)/g_width;
+      v4_F = v4SPLAT(F);
+    }
+#endif
+
+    // Scan per column in steps of vector width
+    for(int j = 1; j < wid_v-1; j++) {
+      V4F4 * v_ubase = ((V4F4 *)u)+i*wid_v+j;
+      V4F4 * v_vbase = ((V4F4 *)v)+i*wid_v+j;
+      V4F4 * v_dubase = ((V4F4 *)du)+i*wid_v+j;
+      V4F4 * v_dvbase = ((V4F4 *)dv)+i*wid_v+j;
+      V4F4 u_left = _mm_loadu_ps(((float*)v_ubase)-1);
+      V4F4 u_right = _mm_loadu_ps(((float*)v_ubase)+1);
+      V4F4 v_left = _mm_loadu_ps(((float*)v_vbase)-1);
+      V4F4 v_right = _mm_loadu_ps(((float*)v_vbase)+1);
+      V4F4 * v_ub_prev = ((V4F4 *)u)+iprev*wid_v+j;
+      V4F4 * v_ub_next = ((V4F4 *)u)+inext*wid_v+j;
+      V4F4 * v_vb_prev = ((V4F4 *)v)+iprev*wid_v+j;
+      V4F4 * v_vb_next = ((V4F4 *)v)+inext*wid_v+j;
+
+#ifdef SUPPORT_PARAM_SPACE
+      if (parameter_space) {
+        // set k for this column (ignore the provided value)
+        k = k_min + (g_width-(j*4)-5)*k_diff;
+        // k decreases by k_diff each time j increases by 1, so this vector
+        // needs to contain 4 different k values. We use v4_kdiff, pre-computed
+        // above, to accomplish this.
+        v4_k = v4ADD(v4SPLAT(k),v4_kdiff);
+      }
+#endif
+
+      // To compute the Laplacians of u and v, we use the 5-point neighbourhood for the Euler discrete method:
+      //    nabla(x) = x[i][j-1]+x[i][j+1]+x[i-1][j]+x[i+1][j] - 4*x[i][j];
+      // ("nabla" is the name of the "upside down delta" symbol used for the Laplacian in equations)
+#     define NABLA_5PT(ctr,left,right,up,down) \
+         v4SUB(v4ADD(v4ADD(v4ADD(left,right),up),down),v4MUL(ctr,v4SPLAT(4.0f)))
+
+      // compute the new rate of change of u and v
+      V4F4 v4_uvv = v4MUL(*v_ubase,v4MUL(*v_vbase,*v_vbase)); // u*v^2 is used twice
+
+      /* Scalar code is:     du[i][j] = D_u * nabla_u - u*v^2 + F*(1-u);
+         We treat it as:                D_u * nabla_u - (u*v^2 - F*(1-u)) */
+      *v_dubase = v4SUB(v4MUL(v4_Du,
+         NABLA_5PT(*v_ubase, u_left, u_right, *v_ub_prev, *v_ub_next)),
+                           v4SUB(v4_uvv,v4MUL(v4_F,v4SUB(v4SPLAT(1.0f),*v_ubase))));
+
+      /* dv formula is similar:  dv[i][j] = D_v * nabla_v + u*v^2 - (F+k)*v; */
+      *v_dvbase = v4ADD(v4MUL(v4_Dv,
+         NABLA_5PT(*v_vbase, v_left, v_right, *v_vb_prev, *v_vb_next)),
+                           v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),*v_vbase)));
+    }
+
+  } // End of scan per row
+
+  // First thread interlock goes here
+  if (interlock) { DICEK_CH_SYNC }
+  if (interlock) { DICEK_CH_BEGIN }
+
+  {
+    int right_b, left_b;
+    if (g_wrap) {
+      right_b = wid_v-2;
+      left_b = 1;
+    } else {
+      right_b = 1;
+      left_b = wid_v-2;
+    }
+  // effect change
+    for(int i = start_row; i < end_row; i++) {
+      for(int j = 1; j < wid_v-1; j++) {
+        const V4F4 v4_speed = v4SPLAT(speed);
+        V4F4 * v_ubase = ((V4F4 *)u)+i*wid_v+j;
+        V4F4 * v_vbase = ((V4F4 *)v)+i*wid_v+j;
+        V4F4 * v_dubase = ((V4F4 *)du)+i*wid_v+j;
+        V4F4 * v_dvbase = ((V4F4 *)dv)+i*wid_v+j;
+        // u[i][j] = u[i][j] + speed * du[i][j];
+        *v_ubase = v4ADD(v4MUL(v4_speed, *v_dubase), *v_ubase);
+        // v[i][j] = v[i][j] + speed * dv[i][j];
+        *v_vbase = v4ADD(v4MUL(v4_speed, *v_dvbase), *v_vbase);
+      }
+      // Update cells on boundary from one row inland
+      *(((V4F4 *)u)+i*wid_v) = *(((V4F4 *)u)+i*wid_v+right_b);
+      *(((V4F4 *)v)+i*wid_v) = *(((V4F4 *)v)+i*wid_v+right_b);
+      *(((V4F4 *)u)+i*wid_v+wid_v-1) = *(((V4F4 *)u)+i*wid_v+left_b);
+      *(((V4F4 *)v)+i*wid_v+wid_v-1) = *(((V4F4 *)v)+i*wid_v+left_b);
+    }
+  }
+
+  // second thread interlock goes here
+  if (interlock) { DICEK_CH_SYNC }
+
+  } // End of scan per iteration
+}
+
+
+
+#ifdef COMPUTE_A
 
 /* The parameter space code, specifically the "if(parameter_space)" test itself, causes a 2.5% slowdown even when the
    parameter_space flag is false */
@@ -544,7 +719,7 @@ void * compute(void * gpb)
 }
 #endif
 
-#ifdef HWIV_EMULATE
+#ifdef COMPUTE_PRE_THREADS
 
 /* This is the old version of compute() that used all "assembly-language" syntax */
 

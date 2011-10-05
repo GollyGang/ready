@@ -367,7 +367,7 @@ int main(int argc, char * * argv)
           iteration, g_scale, g_autobright, 1.0f, 2, 10, msg, g_video);
       } else {
         chose_quit = display(g_width, g_height, u, u, u, 
-          iteration, g_scale, g_autobright, uv_range, 2, 10, msg, g_video);
+          iteration, g_scale, g_autobright, uv_range*1.25, 2, 10, msg, g_video);
       }
 
       if (chose_quit) // did user ask to quit?
