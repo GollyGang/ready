@@ -128,7 +128,8 @@ int main(int argc, char * * argv)
         fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elap;
         // We display an exponential moving average of the fps measurement
         fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0); 
-        sprintf(msg,"GrayScott %d threads %0.2f fps", g_nthreads, fps_avg);
+		double Mcgs = fps_avg * ((double) X) * ((double) Y) / 1.0e6;
+        sprintf(msg,"GrayScott %d threads %0.2f fps %0.2f Mcgs", g_nthreads, fps_avg, Mcgs);
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?

@@ -123,9 +123,10 @@ int main(int argc, char * * argv)
         fps = ((double)N_FRAMES_PER_DISPLAY) / tod_elapsed;
         // We display an exponential moving average of the fps measurement
         fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
+		double Mcgs = fps_avg * ((double) X) * ((double) Y) / 1.0e6;
 
         char msg[1000];
-        sprintf(msg, "GrayScott - %0.2f fps", fps_avg);
+        sprintf(msg, "GrayScott - %0.2f fps %0.2f Mcgs", fps_avg, Mcgs);
 
         // display:
         if(display(a,a,a,iteration,false,200.0f,2,10,msg)) // did user ask to quit?

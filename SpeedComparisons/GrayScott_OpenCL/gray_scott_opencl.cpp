@@ -190,7 +190,7 @@ int main(int argc, char * * argv)
 
         int iteration = 0;
         float fps_avg = 0.0; // decaying average of fps
-        const int N_FRAMES_PER_DISPLAY = 10000;  // an even number, because of our double-buffering implementation
+        const int N_FRAMES_PER_DISPLAY = 2000;  // an even number, because of our double-buffering implementation
         while(true) 
         {
             struct timeval tod_record;
@@ -256,7 +256,8 @@ int main(int argc, char * * argv)
                 fps = ((float)N_FRAMES_PER_DISPLAY) / tod_elap;
             // We display an exponential moving average of the fps measurement
             fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
-            sprintf(msg,"GrayScott - %0.2f fps", fps_avg);
+	        double Mcgs = (fps_avg * ((double)X) * ((double)Y)) / 1.0e6;
+            sprintf(msg,"GrayScott - %0.2f fps %0.2f Mcgs", fps_avg, Mcgs);
 
             // display:
             {
