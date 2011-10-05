@@ -19,7 +19,7 @@ See README.txt for more details.
 // slower.
 //#define HWIV_EMULATE
 #define HWIV_WANT_V4F4
-#include "hwi_vector.h";
+#include "hwi_vector.h"
 
 // stdlib:
 #include <time.h>
