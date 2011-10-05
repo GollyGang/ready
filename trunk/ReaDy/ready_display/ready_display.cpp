@@ -37,7 +37,7 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
   static CvVideoWriter *video;
   static const CvScalar white = cvScalar(255,255,255);
 
-  const char *title = "Press ESC to quit";
+  const char *title = "ReaDy (ESC to quit)";
 
   if(need_init)
   {

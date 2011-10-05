@@ -95,6 +95,9 @@ typedef float HWIV_4F4_ALIGNED[4];
 #define HWIV_LOAD_4F4(dst, src)  { (dst)[0]=(src)[0]; (dst)[1]=(src)[1]; \
                                    (dst)[2]=(src)[2]; (dst)[3]=(src)[3]; }
 
+#define HWIV_LOADU_4F4(dst, src) { (dst)[0]=(src)[0]; (dst)[1]=(src)[1]; \
+                                   (dst)[2]=(src)[2]; (dst)[3]=(src)[3]; }
+
 /* LOADO_4F4: dst is a vector of 4 floats. src is a pointer to an array
    of floats in memory. offset is a byte offset, which must be a multiple
    of sizeof(float).
@@ -227,6 +230,7 @@ typedef float HWIV_4F4_ALIGNED[4];
 //
 // These macros do not form a complete solution, you still need things like LOAD and SAVE to do any real work.
 
+#define v4LOADU(a) {(a)[0],(a)[1],(a)[2],(a)[3]}
 #define v4ADD(a,b) {(a)[0]+(b)[0],(a)[1]+(b)[1],(a)[2]+(b)[2],(a)[3]+(b)[3]}
 #define v4SUB(a,b) {(a)[0]-(b)[0],(a)[1]-(b)[1],(a)[2]-(b)[2],(a)[3]-(b)[3]}
 #define v4MUL(a,b) {(a)[0]*(b)[0],(a)[1]*(b)[1],(a)[2]*(b)[2],(a)[3]*(b)[3]}
@@ -287,6 +291,7 @@ typedef __m128 V4F4;
 typedef float ALIGNED_16 HWIV_4F4_ALIGNED[4];
 
 #define HWIV_LOAD_4F4(dst, src)        (dst) = _mm_load_ps(src)
+#define HWIV_LOADU_4F4(dst, src)       (dst) = _mm_loadu_ps(src)
 #define HWIV_LOADO_4F4(dst, src, offset) \
                                        (dst) = _mm_load_ps((src)+(offset)/4)
 #define HWIV_COPY_4F4(dst, src)        (dst) = (src)
@@ -385,6 +390,7 @@ a RODN (downwards rotate)
                                            HWIV_RODN_4F4(dest, dest); }
 
 // Here is the subset for FORTRAN-style code
+#define v4LOADU(a) _mm_loadu_ps(a)
 #define v4ADD(a,b) _mm_add_ps((a), (b))
 #define v4SUB(a,b) _mm_sub_ps((a), (b))
 #define v4MUL(a,b) _mm_mul_ps((a), (b))
