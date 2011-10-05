@@ -26,22 +26,10 @@ Windows programmer.
 # endif
 #endif
 
-// TODO for _WIN32: Search the rest of this file for TODO lines applying to
-// Windows, and insert suitable code. (The plan is to try to use process.h
-// to provide the same functionality as pthreads). When the code looks good enough to
-// test, remove the following #ifdef _WIN32 block and replace it with the
-// following:
-// #ifdef _WIN32
-// # ifndef DICEK_EMULATE
-// #   define DICEK_USE_PROCESS_H
-// # endif
-// #endif
+
 #ifdef _WIN32
-# ifdef DICEK_USE_PROCESS_H
-#   undef DICEK_USE_PROCESS_H
-# endif
 # ifndef DICEK_EMULATE
-#   define DICEK_EMULATE
+#   define DICEK_USE_PROCESS_H
 # endif
 #endif
 
@@ -53,7 +41,6 @@ Windows programmer.
 #   endif
 # endif
 #endif
-
 
 
 
@@ -437,7 +424,7 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      DICEK_SPLIT_1(funcname), (arrayname), (_DICEK_i)) \
+      DICEK_SPLIT_1((funcname), (arrayname), (_DICEK_i)) \
     }
 
 /* Save a pointer to the param block for use by DICEK_RETURN */
