@@ -433,7 +433,7 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
     WaitForSingleObject(_DICEK_params->DICEK_child_wkg,INFINITE);
 
 #define DICEK_CH_SYNC \
-    ReleaseMutex(_DICEK_params->DICEK_child_wkg);
+    ReleaseMutex(_DICEK_params->DICEK_master_wkg);
 
 #define DICEK_INTERLOCK(arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
