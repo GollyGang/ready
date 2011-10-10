@@ -7,17 +7,17 @@ _This page will contain the results from the different implementations on differ
 
 To standardise the results we have chosen the Gray-Scott system, with toroidal topology. The figures are in Million cell-generations per second.
 
-|| || System 1 || System 2 || System 3 || System 4 || System 5 || others (please add) ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott GrayScott] || 84 || 117 || 67 || 129 || 14 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_double GrayScott_double] || 87 || 115 || 69 || 128 || 10 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 || 163 || 98 || 253 || 10 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 || 450 || 315 || 492 || 18 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 || 160-230^1^ || 64-79^1^ || 250-730^1^ || 23 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 || 455 || 285 || 498 || 26 || ||
-|| HWIVector (2 threads) ||  || 670 || 435 || 805 || 23 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 820 || 104 || 161 || 356 || - || || 
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || note^2^ || - || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || note^2^ || - || ||
+|| || System 1 || System 2 || System 3 || System 4 || System 5 || System 6 || others (please add) ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott GrayScott] || 84 || 117 || 67 || 129 || 14 || 9 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_double GrayScott_double] || 87 || 115 || 69 || 128 || 10 || 9 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 || 163 || 98 || 253 || 10 || 8 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 || 450 || 315 || 492 || 18 || 27 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 || 160-230^1^ || 64-79^1^ || 250-730^1^ || 23 || 24 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 || 455 || 285 || 498 || 26 || 27 || ||
+|| HWIVector (2 threads) ||  || 670 || 435 || 805 || 23 || 27 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 820 || 104 || 161 || 356 || - || - || || 
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || note^2^ || - || - || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || note^2^ || - || - || ||
 
 *System 1:* Visual Studio 2008 (32-bit), Windows 7 (64-bit), Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia !GeForce GTX 460 (Tim's desktop)
 
@@ -28,6 +28,8 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 *System 4*: CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Intel Core i5 (4 cores, 4 threads) @ 3.1 GHz, AMD Radeon HD 6970M with 1024 MB VRAM
 
 *System 5*: GCC 4.6.1, Debian Linux (32-bit), Intel Pentium 4 HT@ 3.2GHz, AMD Radeon Mobility 9100 IGP (Tim's old laptop)
+
+*System 6*: Visual Studio 2008, Windows XP (32-bit), Intel Pentium 4 HT@ 3.2GHz, AMD Radeon Mobility 9100 IGP (Tim's old laptop)
 
 Notes:
 
