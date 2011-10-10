@@ -378,7 +378,7 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 #define DICEK_SUPPORTS_BLOCKING 1
 
 #include <process.h>
-// TODO: What other headers are needed in Windows (perhaps for the call that tells ust the number of hardware threads on the system)?
+#include <windows.h>
 
 #define DICEK_THREAD_VARS \
   long DICEK_tnum; \
@@ -387,8 +387,9 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
   HANDLE DICEK_child_wkg; \
   void * DICEK_return;
 
-// TODO include appropriate code to discover number of cores under Windows
-#define DICEK_INIT_NTHR(nth) int nth = 3;
+#define DICEK_INIT_NTHR(nth) \
+    int nth; \
+    { SYSTEM_INFO si; GetSystemInfo(&si); nth = si.dwNumberOfProcessors; }
 
 #define DICEK_DATA(dtype, arrayname, nth) \
     dtype * arrayname; \
@@ -397,11 +398,9 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
       arrayname[_DICEK_i].DICEK_tnum = _DICEK_i; \
       arrayname[_DICEK_i].DICEK_thread = 0; \
       arrayname[_DICEK_i].DICEK_return = 0; \
-      /* Here we need to create and lock the two mutexes */ \
     }
 
 /* We use _beginthread, there are other options including _beginthreadex and the more native CreateThread */
-// TODO this code is not yet tested
 #define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
       arrayname[_DICEK_i].DICEK_return = 0; \
@@ -431,18 +430,21 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 #define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
 
 #define DICEK_CH_BEGIN \
-    /* TODO: Lock the DICEK_child_wkg mutex */
+    WaitForSingleObject(_DICEK_params->DICEK_child_wkg,INFINITE);
 
 #define DICEK_CH_SYNC \
-    /* TODO: Unlock the DICEK_master_wkg mutex */
+    ReleaseMutex(_DICEK_params->DICEK_child_wkg);
 
 #define DICEK_INTERLOCK(arrayname, nth) \
-    /* TODO: Lock all DICEK_master_wkg mutexes */
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+        WaitForSingleObject(arrayname[_DICEK_i].DICEK_master_wkg,INFINITE); \
+    }
 
 #define DICEK_RESUME(arrayname, nth) \
-    /* TODO: Unlock all DICEK_child_wkg mutexes */
+  for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+    ReleaseMutex(arrayname[_DICEK_i].DICEK_child_wkg); \
+  }
 
-// TODO this code is not yet tested
 #define DICEK_RETURN(returnv) \
     _DICEK_params->DICEK_return = (void*)(returnv); \
     _endthread();
