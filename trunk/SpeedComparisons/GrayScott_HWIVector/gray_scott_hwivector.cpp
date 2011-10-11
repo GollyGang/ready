@@ -272,21 +272,20 @@ void compute_dispatch(float *u, float *v, float *du, float *dv,
     /* Start N threads, each will immediately begin the first part of its computation */
     DICEK_SPLIT(compute, cp, nthreads);
 
-    /* Now for each iteration we need to sync the threads twice. Each iteration consists of two
-       work phases: during the first phase u and v are being read and du,dv are written; during
-       the second phase u,v are overwritten with the next generation. */
+    /* Now for each iteration we need to sync the threads once. Each iteration consists of two
+       work phases.
+         During the first phase u and v are being read and du,dv are written; each thread
+       reads neighboring thread's data (in a single row along its top and bottom borders)
+         During the second phase u,v are overwritten with the next generation; each thread keeps
+       to its own area.
+         Because inter-thread communication only happens during phase 1, there need be only
+       one barrier per loop. */
     for(i=0; i<num_its; i++) {
-      DICEK_INTERLOCK(cp, nthreads); // Wait for threads to complete derivative calculation
-
-      /* Now the threads have all finished the "compute derivative" loop */
-
-      DICEK_RESUME(cp, nthreads);  // Wait for threads to update u and v arrays with new generation
-      DICEK_INTERLOCK(cp, nthreads);
-
-      /* Now the threads have finished updating u and v arrays with the next generation */
-
-      DICEK_RESUME(cp, nthreads); // Tell threads they can now do the next iteration
+      DICEK_INTERLOCK(cp, nthreads); // Wait for all threads to get to the end of the i'th derivative phase
+      DICEK_RESUME(cp, nthreads);  // Let them continue
     }
+
+    // Now wait for the threads to finish updating u and v arrays the final time, and exit
     DICEK_MERGE(compute, cp, nthreads);
   } else {
     /* With 1 thread it's more efficient to just call the compute routine directly */
@@ -386,10 +385,10 @@ void compute(void * gpb)
 
   // Initialize our vectorized scalars
 
+  if (interlock) { DICEK_CH_BEGIN }
+
   // Scan per iteration
   for(iter = 0; iter < num_its; iter++) {
-
-  if (interlock) { DICEK_CH_BEGIN }
 
 //printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
 
@@ -472,7 +471,6 @@ void compute(void * gpb)
 
   } // End of scan per row
 
-  // First thread interlock goes here
   if (interlock) { DICEK_CH_SYNC }
   if (interlock) { DICEK_CH_BEGIN }
 
@@ -506,10 +504,10 @@ void compute(void * gpb)
     }
   }
 
-  // second thread interlock goes here
-  if (interlock) { DICEK_CH_SYNC }
-
   } // End of scan per iteration
+
+  // finish last phase 2
+  if (interlock) { DICEK_CH_SYNC }
 
   DICEK_CH_END
 }
