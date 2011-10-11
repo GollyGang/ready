@@ -416,9 +416,9 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
     arrayname[index].DICEK_child_wkg = CreateMutex(NULL, FALSE, NULL); \
     arrayname[index].DICEK_master_wkg = CreateMutex(NULL, FALSE, NULL); \
     WaitForSingleObject(arrayname[index].DICEK_master_wkg,INFINITE); \
-    arrayname[_DICEK_i].DICEK_return = 0; \
-    arrayname[_DICEK_i].DICEK_thread = (void *) _beginthread(funcname, 0, \
-        (void *) &(arrayname[_DICEK_i]));
+    arrayname[index].DICEK_return = 0; \
+    arrayname[index].DICEK_thread = (void *) _beginthread(funcname, 0, \
+        (void *) &(arrayname[index]));
 
 #define DICEK_MERGE_1(arrayname, index) \
     WaitForSingleObject((HANDLE) ((arrayname)[index].DICEK_thread), INFINITE);
