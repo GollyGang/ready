@@ -13,6 +13,8 @@ DICEK_EMULATE modes (tested with math3000.cxx A094358() routine).
 fall-back #ifdef block at the beginning that checks for Windows and reverts to EMULATE mode, pending testing by a real
 Windows programmer.
  20111001 Add the thread interlock macros and get them working in EMULATE and POSIX modes.
+ 20111009 Initialize mutexes in Win32 version of DICEK_SPLIT_1
+ 20111011 Use semaphores instead of mutexes in Win32 version.
 
 */
 
@@ -26,22 +28,10 @@ Windows programmer.
 # endif
 #endif
 
-// TODO for _WIN32: Search the rest of this file for TODO lines applying to
-// Windows, and insert suitable code. (The plan is to try to use process.h
-// to provide the same functionality as pthreads). When the code looks good enough to
-// test, remove the following #ifdef _WIN32 block and replace it with the
-// following:
-// #ifdef _WIN32
-// # ifndef DICEK_EMULATE
-// #   define DICEK_USE_PROCESS_H
-// # endif
-// #endif
+
 #ifdef _WIN32
-# ifdef DICEK_USE_PROCESS_H
-#   undef DICEK_USE_PROCESS_H
-# endif
 # ifndef DICEK_EMULATE
-#   define DICEK_EMULATE
+#   define DICEK_USE_PROCESS_H
 # endif
 #endif
 
@@ -53,7 +43,6 @@ Windows programmer.
 #   endif
 # endif
 #endif
-
 
 
 
@@ -85,12 +74,11 @@ way for the parent to get to the DICEK_CH_BEGIN until the child has exited.
 /*
 DICEK_THREAD_VARS defines variables which need to be included in the parameter block of any subroutine called by
 DICEK_SPLIT_MERGE
+  Since this is the emulated version, there are no master_wkg and child_wkg semaphores.
  */
 #define DICEK_THREAD_VARS \
   long DICEK_tnum; \
   void * DICEK_thread; \
-  void * DICEK_master_wkg; \
-  void * DICEK_child_wkg; \
   void * DICEK_return;
 
 /*
@@ -151,6 +139,8 @@ with the instruction following DICEK_SPLIT_MERGE.
       DICEK_SPLIT_1((funcname), (arrayname), (_DICEK_i)) \
     }
 
+#define DICEK_SPLIT_M(funcname, arrayname, index) DICEK_SPLIT_1(funcname, arrayname, index)
+
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) DICEK_SPLIT_MERGE(funcname, arrayname, nth)
 
@@ -167,7 +157,7 @@ is the array elements of arrayname, and argname is the name of the subroutine's 
   (void *)myfunc(void * params)
   {
     DICEK_SUB(f_vars, params);
-    /* other local variable declarations */
+    // other local variable declarations
     ...
   }
 
@@ -188,12 +178,16 @@ with the next piece of work.
   (void *)myfunc(void * params)
   {
     DICEK_SUB(f_vars, params);
-    /* other local variable declarations */
+    // other local variable declarations
     while(working) {
       DICEK_CH_BEGIN
-      /* Do computation here */
+      // Do computation here
       DICEK_CH_SYNC
     }
+    // We're done performing useful work
+    DICEK_CH_END
+    // Here we deallocate any temporary private storage
+    DICEK_RETURN(result)
   }
 
 */
@@ -222,6 +216,15 @@ statement a second time.
 #define DICEK_RESUME(arrayname, nth) /* nop */
 
 /*
+ Put DICEK_CH_END at the point where a child thread has finished performing any actions that require
+cooperation or synchronization, and before the process ends. This macro releases the child_working semaphore
+so that the semaphore can be deallocated by the master process.
+ The typical sequence is: DICEK_CH_END; deallocate private storage; DICEK_RETURN; exit. See the DICEK_CH_BEGIN
+block comment for a pseudo-code example.
+ */
+#define DICEK_CH_END /* nop */
+
+/*
  Place a DICEK_RETURN at the very end of any routine called by a DICEK_SPLIT_MERGE. It passes returnv back
 to the calling (master) thread via a field routine's parameter block.
  WARNING: On some operating systems, this return value is passed through the kernel, while on others it is actually
@@ -230,6 +233,8 @@ others it is possible to execute statements after the DICEK_RETURN. Users of thi
 these specifics to be true in runtime.
  */
 #define DICEK_RETURN(returnv) _DICEK_params->DICEK_return = (void*)(returnv);
+
+#define DICEK_MERGE_M(arrayname, index)  /* nop */
 
 #define DICEK_MERGE(funcname, arrayname, nth) /* nop */
 
@@ -304,6 +309,13 @@ these specifics to be true in runtime.
       arrayname[_DICEK_i].DICEK_return = 0; \
     }
 
+/* Just start a single thread. */
+#define DICEK_SPLIT_1(funcname, arrayname, index) \
+    arrayname[index].DICEK_return = 0; \
+    pthread_create((pthread_t *) (&(arrayname[index].DICEK_thread)), \
+        0, (void* (*)(void*))funcname, (void *) &(arrayname[index]));
+
+/* End a single thread. */
 #define DICEK_MERGE_1(arrayname, index) \
     pthread_join((pthread_t) (arrayname[index].DICEK_thread), \
         &(arrayname[index].DICEK_return));
@@ -313,27 +325,23 @@ these specifics to be true in runtime.
 initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 #define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      arrayname[_DICEK_i].DICEK_return = 0; \
-      pthread_create((pthread_t *) (&(arrayname[_DICEK_i].DICEK_thread)), \
-        0, funcname, (void *) &(arrayname[_DICEK_i])); \
+      DICEK_SPLIT_1(funcname, arrayname, _DICEK_i) \
     } \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      DICEK_MERGE_1((arrayname), _DICEK_i) \
+      DICEK_MERGE_1(arrayname, _DICEK_i) \
     }
 
-/* Just start a single thread. We also set up the semaphores in case the client is going to want to do that. */
-#define DICEK_SPLIT_1(funcname, arrayname, index) \
+/* DICEK_SPLIT_M also sets up the semaphores in case the client is going to want to do that. */
+#define DICEK_SPLIT_M(funcname, arrayname, index) \
     pthread_mutex_init(&(arrayname[index].DICEK_child_wkg), 0); \
     pthread_mutex_init(&(arrayname[index].DICEK_master_wkg), 0); \
     pthread_mutex_trylock(&(arrayname[index].DICEK_master_wkg)); \
-    arrayname[index].DICEK_return = 0; \
-    pthread_create((pthread_t *) (&(arrayname[index].DICEK_thread)), \
-        0, funcname, (void *) &(arrayname[index]));
+    DICEK_SPLIT_1(funcname, arrayname, index)
 
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      DICEK_SPLIT_1((funcname), (arrayname), (_DICEK_i)) \
+      DICEK_SPLIT_M((void* (*)(void*))funcname, (arrayname), _DICEK_i) \
     }
 
 #define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
@@ -354,11 +362,20 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
     pthread_mutex_unlock(&(arrayname[_DICEK_i].DICEK_child_wkg)); \
   }
 
+#define DICEK_CH_END \
+  pthread_mutex_unlock(&(_DICEK_params->DICEK_child_wkg));
+
 #define DICEK_RETURN(returnv) pthread_exit((void*)(returnv));
+
+#define DICEK_MERGE_M(arrayname, index) \
+    DICEK_MERGE_1(arrayname, index) \
+    pthread_mutex_destroy(&(arrayname[index].DICEK_child_wkg)); \
+    pthread_mutex_unlock(&(arrayname[index].DICEK_master_wkg)); \
+    pthread_mutex_destroy(&(arrayname[index].DICEK_master_wkg));
 
 #define DICEK_MERGE(funcname, arrayname, nth) \
   for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-    DICEK_MERGE_1((arrayname), _DICEK_i) \
+    DICEK_MERGE_M((arrayname), _DICEK_i) \
   }
 
 #endif
@@ -383,86 +400,105 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 #ifdef DICEK_USE_PROCESS_H
 
 // This is based on:
-//   http://msdn.microsoft.com/en-US/library/kdzttdcb(v=VS.80).aspx
-//   http://msdn.microsoft.com/en-us/library/ms682411(v=VS.85).aspx
-//   http://msdn.microsoft.com/en-us/library/ms687032(v=VS.85).aspx
-//   http://msdn.microsoft.com/en-us/library/ms685066(v=VS.85).aspx
+//   http://msdn.microsoft.com/en-US/library/kdzttdcb(v=VS.80).aspx  (_beginthread)
+//   http://msdn.microsoft.com/en-us/library/ms687032(v=VS.85).aspx  (WaitForSingleObject)
+//   http://msdn.microsoft.com/en-us/library/ms685071(v=VS.85).aspx  (ReleaseSemaphore)
+//   http://msdn.microsoft.com/en-us/library/ms682438(v=VS.85).aspx  (CreateSemaphore)
+//
+//   http://msdn.microsoft.com/en-us/library/ms682411(v=VS.85).aspx  (CreateMutex, no longer used)
+//   http://msdn.microsoft.com/en-us/library/ms685066(v=VS.85).aspx  (ReleaseMutex, no longer used)   
 
 #define DICEK_SUPPORTS_BLOCKING 1
 
 #include <process.h>
-// TODO: What other headers are needed in Windows (perhaps for the call that tells ust the number of hardware threads on the system)?
+#include <windows.h>
 
 #define DICEK_THREAD_VARS \
   long DICEK_tnum; \
-  void * DICEK_thread; \
+  HANDLE DICEK_thread; \
   HANDLE DICEK_master_wkg; \
   HANDLE DICEK_child_wkg; \
   void * DICEK_return;
 
-// TODO include appropriate code to discover number of cores under Windows
-#define DICEK_INIT_NTHR(nth) int nth = 3;
+#define DICEK_INIT_NTHR(nth) \
+    int nth; \
+    { SYSTEM_INFO si; GetSystemInfo(&si); nth = si.dwNumberOfProcessors; }
 
 #define DICEK_DATA(dtype, arrayname, nth) \
     dtype * arrayname; \
     arrayname = (dtype *)malloc(nth * sizeof(dtype)); \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
       arrayname[_DICEK_i].DICEK_tnum = _DICEK_i; \
-      arrayname[_DICEK_i].DICEK_thread = 0; \
+      arrayname[_DICEK_i].DICEK_thread = (HANDLE) NULL; \
       arrayname[_DICEK_i].DICEK_return = 0; \
-      /* Here we need to create and lock the two mutexes */ \
-    }
-
-/* We use _beginthread, there are other options including _beginthreadex and the more native CreateThread */
-// TODO this code is not yet tested
-#define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
-    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      arrayname[_DICEK_i].DICEK_return = 0; \
-      arrayname[_DICEK_i].DICEK_thread = (void *) _beginthread(funcname, 0, \
-        (void *) &(arrayname[_DICEK_i])); \
-    } \
-    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      WaitForSingleObject((HANDLE) (arrayname[_DICEK_i].DICEK_thread), INFINITE); \
     }
 
 #define DICEK_SPLIT_1(funcname, arrayname, index) \
-    /* Init both mutexes and lock the DICEK_master_wkg one */ \
-    arrayname[_DICEK_i].DICEK_return = 0; \
-    arrayname[_DICEK_i].DICEK_thread = (void *) _beginthread(funcname, 0, \
-        (void *) &(arrayname[_DICEK_i]));
+    arrayname[index].DICEK_return = 0; \
+    arrayname[index].DICEK_thread = (HANDLE) _beginthread(funcname, 0, \
+        (void *) &(arrayname[index]));
 
 #define DICEK_MERGE_1(arrayname, index) \
-    WaitForSingleObject((HANDLE) ((arrayname)[index].DICEK_thread), INFINITE);
+    WaitForSingleObject(arrayname[index].DICEK_thread, INFINITE);
+
+/* We use _beginthread, there are other options including _beginthreadex and the more native CreateThread */
+#define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+      DICEK_SPLIT_1(funcname, arrayname, _DICEK_i) \
+    } \
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+      DICEK_MERGE_1(arrayname, _DICEK_i) \
+    }
+
+// DICEK_SPLIT_M also sets up the semaphores in case the client is going to want to do that.
+// child semaphore is initially free (value 1); master semaphore is initially taken
+#define DICEK_SPLIT_M(funcname, arrayname, index) \
+    arrayname[index].DICEK_child_wkg = CreateSemaphore(NULL, 1, 1, NULL); \
+    arrayname[index].DICEK_master_wkg = CreateSemaphore(NULL, 0, 1, NULL); \
+    DICEK_SPLIT_1(funcname, arrayname, index)
 
 /* Just start the threads, without a merge. This is used for applications that do inter-thread synchronization */
 #define DICEK_SPLIT(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      DICEK_SPLIT_1(funcname), (arrayname), (_DICEK_i)) \
+      DICEK_SPLIT_M((funcname), (arrayname), (_DICEK_i)) \
     }
 
 /* Save a pointer to the param block for use by DICEK_RETURN */
 #define DICEK_SUB(dtype, argname) dtype * _DICEK_params = (dtype *) argname;
 
 #define DICEK_CH_BEGIN \
-    /* TODO: Lock the DICEK_child_wkg mutex */
+    WaitForSingleObject(_DICEK_params->DICEK_child_wkg,INFINITE);
 
 #define DICEK_CH_SYNC \
-    /* TODO: Unlock the DICEK_master_wkg mutex */
+    ReleaseSemaphore(_DICEK_params->DICEK_master_wkg, 1, NULL);
 
 #define DICEK_INTERLOCK(arrayname, nth) \
-    /* TODO: Lock all DICEK_master_wkg mutexes */
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+        WaitForSingleObject(arrayname[_DICEK_i].DICEK_master_wkg,INFINITE); \
+    }
 
 #define DICEK_RESUME(arrayname, nth) \
-    /* TODO: Unlock all DICEK_child_wkg mutexes */
+    for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
+      ReleaseSemaphore(arrayname[_DICEK_i].DICEK_child_wkg, 1, NULL); \
+    }
 
-// TODO this code is not yet tested
+#define DICEK_CH_END \
+    ReleaseSemaphore(_DICEK_params->DICEK_child_wkg, 1, NULL);
+
 #define DICEK_RETURN(returnv) \
     _DICEK_params->DICEK_return = (void*)(returnv); \
     _endthread();
 
+#define DICEK_MERGE_M(arrayname, index) \
+    DICEK_MERGE_1(arrayname, index) \
+    CloseHandle(arrayname[index].DICEK_thread); \
+    CloseHandle(arrayname[index].DICEK_child_wkg); \
+    ReleaseSemaphore(arrayname[index].DICEK_master_wkg, 1, NULL); \
+    CloseHandle(arrayname[index].DICEK_master_wkg);
+
 #define DICEK_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
-      DICEK_MERGE_1((arrayname), _DICEK_i) \
+      DICEK_MERGE_M((arrayname), _DICEK_i) \
     }
 
 #endif

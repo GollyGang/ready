@@ -383,8 +383,6 @@ void compute(void * gpb)
   v4_kdiff = v4SET(0, -k_diff, -2*k_diff, -3*k_diff);
 #endif
 
-  // Initialize our vectorized scalars
-
   if (interlock) { DICEK_CH_BEGIN }
 
   // Scan per iteration
