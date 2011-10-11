@@ -510,6 +510,8 @@ void compute(void * gpb)
   if (interlock) { DICEK_CH_SYNC }
 
   } // End of scan per iteration
+
+  DICEK_CH_END
 }
 
 
