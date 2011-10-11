@@ -60,21 +60,12 @@ void compute_dispatch(float *u, float *v, float *du, float *dv, long width, long
     /* Start N threads, each will immediately begin the first part of its computation */
     DICEK_SPLIT(compute_gs_hwiv, cp, nthreads);
 
-    /* Now for each iteration we need to sync the threads twice. Each iteration consists of two
-       work phases: during the first phase u and v are being read and du,dv are written; during
-       the second phase u,v are overwritten with the next generation. */
+    /* For each iteration we sync the threads once. */
     for(i=0; i<num_its; i++) {
-      DICEK_INTERLOCK(cp, nthreads); // Wait for threads to complete derivative calculation
-
-      /* Now the threads have all finished the "compute derivative" loop */
-
-      DICEK_RESUME(cp, nthreads);  // Wait for threads to update u and v arrays with new generation
       DICEK_INTERLOCK(cp, nthreads);
-
-      /* Now the threads have finished updating u and v arrays with the next generation */
-
-      DICEK_RESUME(cp, nthreads); // Tell threads they can now do the next iteration
+      DICEK_RESUME(cp, nthreads);
     }
+
     DICEK_MERGE(compute_gs_hwiv, cp, nthreads);
   } else {
     /* With 1 thread it's more efficient to just call the compute routine directly */
@@ -154,10 +145,10 @@ void * compute_gs_hwiv(void * gpb)
   v4_Du = v4SPLAT(D_u);
   v4_Dv = v4SPLAT(D_v);
 
+  if (interlock) { DICEK_CH_BEGIN }
+
   // Scan per iteration
   for(iter = 0; iter < num_its; iter++) {
-
-  if (interlock) { DICEK_CH_BEGIN }
 
 //printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
 
@@ -288,10 +279,12 @@ void * compute_gs_hwiv(void * gpb)
     }
   }
 
+  } // End of scan per iteration
+
   // second thread interlock goes here
   if (interlock) { DICEK_CH_SYNC }
 
-  } // End of scan per iteration
+  DICEK_CH_END
 }
 #endif
 
