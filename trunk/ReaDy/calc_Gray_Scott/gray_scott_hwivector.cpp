@@ -25,6 +25,10 @@ See ../../README.txt for more details.
 #include <stdio.h>
 
 #include "gray_scott_hwivector.h"
+extern long g_width;
+extern long g_height;
+extern bool g_wrap;
+extern bool g_paramspace;
 
 #ifndef max
 # define max(a,b) (((a) > (b)) ? (a) : (b))
@@ -33,9 +37,9 @@ See ../../README.txt for more details.
 #endif
 
 /* Spawn threads and dispatch to compute() routine inside threads */
-void compute_dispatch(float *u, float *v, float *du, float *dv, long width, long height, bool wrap,
+void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
-  int parameter_space, int num_its, int nthreads)
+  int num_its, int nthreads)
 {
   if (nthreads <= 0) {
     nthreads = 1;
@@ -47,11 +51,11 @@ void compute_dispatch(float *u, float *v, float *du, float *dv, long width, long
 
   /* Set up all the parameter blocks */
   for(i=0; i<nthreads; i++) {
-    cp[i].u = u; cp[i].v = v; cp[i].du = du; cp[i].dv = dv; cp[i].width = width; cp[i].height = height;
-    cp[i].wrap = wrap; cp[i].D_u = D_u; cp[i].D_v = D_v;
-    cp[i].F = F; cp[i].k = k; cp[i].speed = speed; cp[i].parameter_space = parameter_space;
+    cp[i].u = u; cp[i].v = v; cp[i].du = du; cp[i].dv = dv;
+    cp[i].D_u = D_u; cp[i].D_v = D_v;
+    cp[i].F = F; cp[i].k = k; cp[i].speed = speed;
     cp[i].num_its = num_its; cp[i].start_row = a_row;
-    a_row = (height * (i+1)) / nthreads;
+    a_row = (g_height * (i+1)) / nthreads;
     cp[i].end_row = a_row;
     cp[i].interlock_type = (nthreads>1) ? 1 : 0;
   }
@@ -74,6 +78,192 @@ void compute_dispatch(float *u, float *v, float *du, float *dv, long width, long
 }
 
 #ifdef HWIV_V4F4_SSE2
+
+#define VECSIZE 4
+
+/* The parameter space code, specifically the "if(parameter_space)" test itself, causes a significant slowdown
+   even when the parameter_space flag is false. This #define is here in case we want to get the speed boost
+   by eliminating the -paramspace user option. */
+#define SUPPORT_PARAM_SPACE
+
+void * compute_gs_hwiv(void * gpb)
+{
+  DICEK_SUB(compute_params, gpb);
+  const int full_width = g_width + 2*VECSIZE;
+  const int wid_v = full_width / VECSIZE;
+
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
+  /* On Intel we disable accurate handling of denorms and zeros. This is an
+     important speed optimization. */
+  int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
+  int newMXCSR = oldMXCSR | 0x8040; // set DAZ and FZ bits
+  _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
+#endif
+
+  compute_params * param_block;
+  param_block = (compute_params *) gpb;
+  float *u = param_block->u;
+  float *v = param_block->v;
+  float *du = param_block->du;
+  float *dv = param_block->dv;
+  float D_u = param_block->D_u;
+  float D_v = param_block->D_v;
+  float F = param_block->F;
+  float k = param_block->k;
+  float speed = param_block->speed;
+  int num_its = param_block->num_its;
+  int start_row = param_block->start_row;
+  int end_row = param_block->end_row;
+  int interlock = param_block->interlock_type;
+
+
+  int iter;
+
+#ifdef SUPPORT_PARAM_SPACE
+  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
+  float k_diff;
+  V4F4 v4_kdiff;
+  k_diff = (k_max-k_min)/g_height;
+  v4_kdiff = v4SET(0, -k_diff, -2*k_diff, -3*k_diff);
+#endif
+
+  if (interlock) { DICEK_CH_BEGIN }
+
+  // Scan per iteration
+  for(iter = 0; iter < num_its; iter++) {
+
+//printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
+
+  // Scan per row
+  for(int i = start_row; i < end_row; i++) {
+#ifdef SUPPORT_PARAM_SPACE
+    V4F4 v4_F = v4SPLAT(F);
+    V4F4 v4_k = v4SPLAT(k);
+#else
+    const V4F4 v4_F = v4SPLAT(F);
+    const V4F4 v4_k = v4SPLAT(k);
+#endif
+    const V4F4 v4_Du = v4SPLAT(D_u);
+    const V4F4 v4_Dv = v4SPLAT(D_v);
+    int iprev,inext;
+    if (g_wrap) {
+      /* Periodic boundary condition */
+      iprev = (i+g_height-1) % g_height;
+      inext = (i+1) % g_height;
+    } else {
+      /* The edges are their own neighbors. This amounts to a Neumann boundary condition. */
+      iprev = max(i-1, 0);
+      inext = min(i+1, g_height-1);
+    }
+
+#ifdef SUPPORT_PARAM_SPACE
+    if (g_paramspace) {
+      // set F for this row (ignore the provided value)
+      F = F_min + (g_height-i-1) * (F_max-F_min)/g_height;
+      v4_F = v4SPLAT(F);
+    }
+#endif
+
+    // Scan per column in steps of vector width
+    for(int j = 1; j < wid_v-1; j++) {
+      V4F4 * v_ubase = ((V4F4 *)u)+i*wid_v+j;
+      V4F4 * v_vbase = ((V4F4 *)v)+i*wid_v+j;
+      V4F4 * v_dubase = ((V4F4 *)du)+i*wid_v+j;
+      V4F4 * v_dvbase = ((V4F4 *)dv)+i*wid_v+j;
+      V4F4 u_left = _mm_loadu_ps(((float*)v_ubase)-1);
+      V4F4 u_right = _mm_loadu_ps(((float*)v_ubase)+1);
+      V4F4 v_left = _mm_loadu_ps(((float*)v_vbase)-1);
+      V4F4 v_right = _mm_loadu_ps(((float*)v_vbase)+1);
+      V4F4 * v_ub_prev = ((V4F4 *)u)+iprev*wid_v+j;
+      V4F4 * v_ub_next = ((V4F4 *)u)+inext*wid_v+j;
+      V4F4 * v_vb_prev = ((V4F4 *)v)+iprev*wid_v+j;
+      V4F4 * v_vb_next = ((V4F4 *)v)+inext*wid_v+j;
+
+#ifdef SUPPORT_PARAM_SPACE
+      if (g_paramspace) {
+        // set k for this column (ignore the provided value)
+        k = k_min + (g_width-(j*4)-5)*k_diff;
+        // k decreases by k_diff each time j increases by 1, so this vector
+        // needs to contain 4 different k values. We use v4_kdiff, pre-computed
+        // above, to accomplish this.
+        v4_k = v4ADD(v4SPLAT(k),v4_kdiff);
+      }
+#endif
+
+      // To compute the Laplacians of u and v, we use the 5-point neighbourhood for the Euler discrete method:
+      //    nabla(x) = x[i][j-1]+x[i][j+1]+x[i-1][j]+x[i+1][j] - 4*x[i][j];
+      // ("nabla" is the name of the "upside down delta" symbol used for the Laplacian in equations)
+#     define NABLA_5PT(ctr,left,right,up,down) \
+         v4SUB(v4ADD(v4ADD(v4ADD(left,right),up),down),v4MUL(ctr,v4SPLAT(4.0f)))
+
+      // compute the new rate of change of u and v
+      V4F4 v4_uvv = v4MUL(*v_ubase,v4MUL(*v_vbase,*v_vbase)); // u*v^2 is used twice
+
+      /* Scalar code is:     du[i][j] = D_u * nabla_u - u*v^2 + F*(1-u);
+         We treat it as:                D_u * nabla_u - (u*v^2 - F*(1-u)) */
+      *v_dubase = v4SUB(v4MUL(v4_Du,
+         NABLA_5PT(*v_ubase, u_left, u_right, *v_ub_prev, *v_ub_next)),
+                           v4SUB(v4_uvv,v4MUL(v4_F,v4SUB(v4SPLAT(1.0f),*v_ubase))));
+
+      /* dv formula is similar:  dv[i][j] = D_v * nabla_v + u*v^2 - (F+k)*v; */
+      *v_dvbase = v4ADD(v4MUL(v4_Dv,
+         NABLA_5PT(*v_vbase, v_left, v_right, *v_vb_prev, *v_vb_next)),
+                           v4SUB(v4_uvv,v4MUL(v4ADD(v4_F,v4_k),*v_vbase)));
+    }
+
+  } // End of scan per row
+
+  // First thread interlock goes here
+  if (interlock) { DICEK_CH_SYNC }
+  if (interlock) { DICEK_CH_BEGIN }
+
+  {
+    int right_b, left_b;
+    if (g_wrap) {
+      right_b = wid_v-2;
+      left_b = 1;
+    } else {
+      right_b = 1;
+      left_b = wid_v-2;
+    }
+  // effect change
+    for(int i = start_row; i < end_row; i++) {
+      for(int j = 1; j < wid_v-1; j++) {
+        const V4F4 v4_speed = v4SPLAT(speed);
+        V4F4 * v_ubase = ((V4F4 *)u)+i*wid_v+j;
+        V4F4 * v_vbase = ((V4F4 *)v)+i*wid_v+j;
+        V4F4 * v_dubase = ((V4F4 *)du)+i*wid_v+j;
+        V4F4 * v_dvbase = ((V4F4 *)dv)+i*wid_v+j;
+        // u[i][j] = u[i][j] + speed * du[i][j];
+        *v_ubase = v4ADD(v4MUL(v4_speed, *v_dubase), *v_ubase);
+        // v[i][j] = v[i][j] + speed * dv[i][j];
+        *v_vbase = v4ADD(v4MUL(v4_speed, *v_dvbase), *v_vbase);
+      }
+      // Update cells on boundary from one row inland
+      *(((V4F4 *)u)+i*wid_v) = *(((V4F4 *)u)+i*wid_v+right_b);
+      *(((V4F4 *)v)+i*wid_v) = *(((V4F4 *)v)+i*wid_v+right_b);
+      *(((V4F4 *)u)+i*wid_v+wid_v-1) = *(((V4F4 *)u)+i*wid_v+left_b);
+      *(((V4F4 *)v)+i*wid_v+wid_v-1) = *(((V4F4 *)v)+i*wid_v+left_b);
+    }
+  }
+
+  } // End of scan per iteration
+
+  // second thread interlock goes here
+  if (interlock) { DICEK_CH_SYNC }
+
+  DICEK_CH_END
+}
+#endif
+
+
+#ifdef HWIV_V4F4_PDE4
+
+/*
+ This SSE code is based on the method in Munafo's PDE4 program, which tries to reduce memory accesses
+by using aligned loads and shifting data internally to vector registers. The more obvious approach above
+turned out to be faster.
+ */
 
 #define VECSIZE 4
 

@@ -21,18 +21,14 @@ typedef struct compute_params {
   float F;
   float k;
   float speed;
-  int parameter_space;
   int num_its;
-  long width;
-  long height;
-  bool wrap;
   long start_row;
   long end_row;
   int interlock_type;
 } compute_params;
 
-void compute_dispatch(float *u, float *v, float *du, float *dv, long width, long height, bool wrap,
+void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
-  int parameter_space, int num_its, int num_threads);
+  int num_its, int num_threads);
 
 void * compute_gs_hwiv(void * param_block);  // Arg is really "compute_params * param_block"

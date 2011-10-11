@@ -23,12 +23,13 @@ See ../../README.txt for more details.
 # define minmax(v, lo, hi) max(lo, min(v, hi))
 #endif
 
-#define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
+#define INDEX(a,x,y) ((a)[(x)*full_width+(y)])
 
-bool display(int g_width, int g_height, float *r, float *g, float *b,
+bool display(int g_width, int wid_x, int g_height, float *r, float *g, float *b,
              double iteration, float model_scale, bool auto_brighten,float manual_brighten,
              int image_scale,int delay_ms,const char* message, bool write_video)
 {
+  int full_width = g_width + 2*wid_x;
   static bool need_init = true;
 
   static IplImage *im,*im2;
@@ -66,7 +67,7 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
   // convert float arrays to IplImage for OpenCV to display
   float val,minR=FLT_MAX,maxR=-FLT_MAX,minG=FLT_MAX,maxG=-FLT_MAX,minB=FLT_MAX,maxB=-FLT_MAX;
   for(int i=0;i<g_height;i++) {
-    for(int j=0;j<g_width;j++) {
+    for(int j=wid_x;j<g_width+wid_x;j++) {
       val = INDEX(r,i,j);
       if(val<minR) minR=val; if(val>maxR) maxR=val;
 
@@ -85,19 +86,19 @@ bool display(int g_width, int g_height, float *r, float *g, float *b,
     for(int j=0;j<g_width;j++)
     {
       float val;
-      val = INDEX(r,i,g_width-j-1);
+      val = INDEX(r,i,full_width-j-(wid_x+1));
       if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
       else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 2] = (uchar)val;
 
-      val = INDEX(g,i,g_width-j-1);
+      val = INDEX(g,i,full_width-j-(wid_x+1));
       if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
       else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 1] = (uchar)val;
 
-      val = INDEX(b,i,g_width-j-1);
+      val = INDEX(b,i,full_width-j-(wid_x+1));
       if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
       else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;

@@ -188,17 +188,10 @@ int main(int argc, char * * argv)
   float *du = 0;
   float *dv = 0;
 
-  float *red = 0;
-  float *green = 0;
-  float *blue = 0;
-
   u = allocate(full_width, g_height, "U array", true);
   v = allocate(full_width, g_height, "V array", true);
   du = allocate(full_width, g_height, "D_u array", true);
   dv = allocate(full_width, g_height, "D_v array", true);
-  red = allocate(full_width, g_height, "red array", false);
-  green = allocate(full_width, g_height, "green array", false);
-  blue = allocate(full_width, g_height, "blue array", false);
 
   // put the initial conditions into each cell
   init(u,v, full_width, g_height);
@@ -334,12 +327,6 @@ void init(float *u, float *v, long width, long height)
   }
 }
 
-#define INDEX(a,x,y) ((a)[(x)*full_width+(y)])
-
-/* The parameter space code, specifically the "if(parameter_space)" test itself, causes a 2.5% slowdown even when the
-   parameter_space flag is false */
-//#define SUPPORT_PARAM_SPACE
-
 void compute(void * gpb)
 {
   DICEK_SUB(compute_params, gpb);
@@ -375,14 +362,6 @@ void compute(void * gpb)
 
   int iter;
 
-#ifdef SUPPORT_PARAM_SPACE
-  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
-  float k_diff;
-  V4F4 v4_kdiff;
-  k_diff = (k_max-k_min)/g_height;
-  v4_kdiff = v4SET(0, -k_diff, -2*k_diff, -3*k_diff);
-#endif
-
   if (interlock) { DICEK_CH_BEGIN }
 
   // Scan per iteration
@@ -392,13 +371,8 @@ void compute(void * gpb)
 
   // Scan per row
   for(int i = start_row; i < end_row; i++) {
-#ifdef SUPPORT_PARAM_SPACE
-    V4F4 v4_F = v4SPLAT(F);
-    V4F4 v4_k = v4SPLAT(k);
-#else
     const V4F4 v4_F = v4SPLAT(F);
     const V4F4 v4_k = v4SPLAT(k);
-#endif
     const V4F4 v4_Du = v4SPLAT(D_u);
     const V4F4 v4_Dv = v4SPLAT(D_v);
     int iprev,inext;
@@ -411,14 +385,6 @@ void compute(void * gpb)
       iprev = max(i-1, 0);
       inext = min(i+1, g_height-1);
     }
-
-#ifdef SUPPORT_PARAM_SPACE
-    if (parameter_space) {
-      // set F for this row (ignore the provided value)
-      F = F_min + (g_height-i-1) * (F_max-F_min)/g_width;
-      v4_F = v4SPLAT(F);
-    }
-#endif
 
     // Scan per column in steps of vector width
     for(int j = 1; j < wid_v-1; j++) {
@@ -434,17 +400,6 @@ void compute(void * gpb)
       V4F4 * v_ub_next = ((V4F4 *)u)+inext*wid_v+j;
       V4F4 * v_vb_prev = ((V4F4 *)v)+iprev*wid_v+j;
       V4F4 * v_vb_next = ((V4F4 *)v)+inext*wid_v+j;
-
-#ifdef SUPPORT_PARAM_SPACE
-      if (parameter_space) {
-        // set k for this column (ignore the provided value)
-        k = k_min + (g_width-(j*4)-5)*k_diff;
-        // k decreases by k_diff each time j increases by 1, so this vector
-        // needs to contain 4 different k values. We use v4_kdiff, pre-computed
-        // above, to accomplish this.
-        v4_k = v4ADD(v4SPLAT(k),v4_kdiff);
-      }
-#endif
 
       // To compute the Laplacians of u and v, we use the 5-point neighbourhood for the Euler discrete method:
       //    nabla(x) = x[i][j-1]+x[i][j+1]+x[i-1][j]+x[i+1][j] - 4*x[i][j];

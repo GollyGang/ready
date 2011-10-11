@@ -7,6 +7,11 @@ See ../README.txt for more details.
 
 */
 
+// hardware
+#if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
+# include <xmmintrin.h>
+#endif
+
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
@@ -40,20 +45,23 @@ See ../README.txt for more details.
 #include "gray_scott_scalar.h"
 #include "gray_scott_hwivector.h"
 
-static long g_width = 256;
-static long g_height = 256;
-#define INDEX(a,x,y) ((a)[(x)*g_width+(y)])
+long g_width = 256;
+long g_height = 256;
 
-float *allocate(long width, long height, const char * error_text);
-float *allocate(long width, long height, const char * error_text)
+float *allocate(long width, long height, const char * error_text, bool for_mm);
+float *allocate(long width, long height, const char * error_text, bool for_mm)
 {
-  size_t sz;
+  long sz;
   float * rv;
   // we add 32 bytes: 16 so we can align it here, and another 16 so the v_j2
   // index can go one past the end of the last row
-  sz = ((size_t) width) * ((size_t) height) * sizeof(*rv) + 32;
-  rv = (float *) malloc(sz);
-  while(((long)rv) & 0x0000000F) { rv++; }
+  sz = width * height * sizeof(*rv);
+  if (for_mm) {
+    rv = (float *) _mm_malloc(sz, 16);
+  } else {
+    rv = (float *) malloc(((size_t)sz));
+  }
+
   if (rv == NULL) {
     fprintf(stderr, "allocate: Could get %ld bytes for %s\n", ((long) sz),
       error_text);
@@ -88,8 +96,8 @@ static const char * g_rd_name = "";
 static int g_color = 0;
 static int g_oldcolor = 0;
 static int g_pastel_mode = 0;
-static int g_paramspace = 0;
-static bool g_wrap = false;
+bool g_paramspace = false;
+bool g_wrap = false;
 static float g_k, g_F;
 static int g_ramprects = 0;
 static int g_lowback = 0;
@@ -184,7 +192,7 @@ int main(int argc, char * * argv)
       g_color = 1; i++; g_oldcolor = atoi(argv[i]);
     } else if (strcmp(argv[i],"-paramspace")==0) {
       // do a parameter space plot, like in the Pearson paper
-      g_paramspace = 1;
+      g_paramspace = true;
     } else if ((i+1<argc) && (strcmp(argv[i],"-pastel")==0)) {
       // select a pastel mode
       i++; g_pastel_mode = atoi(argv[i]);
@@ -240,6 +248,7 @@ int main(int argc, char * * argv)
       break;
   }
 
+#define VECSIZE 4
 
   if ((g_scale == 1.0) && (custom_Fk)) {
     g_scale = 2.0;
@@ -248,8 +257,21 @@ int main(int argc, char * * argv)
   D_v = D_v * g_scale;
   speed = speed / g_scale;
 
-  if (g_width%4) {
-    g_width = ((g_width/4)+1)*4;
+  if (g_width % VECSIZE) {
+    g_width = ((g_width/VECSIZE)+1)*VECSIZE;
+  }
+  long full_width, wid_x;
+
+  switch(g_module) {
+    case READY_MODULE_GS_HWIV:
+      wid_x = VECSIZE;
+      full_width = g_width + 2*wid_x;
+      break;
+
+    default:
+      wid_x = 0;
+      full_width = g_width;
+      break;
   }
 
   /* If user has selected a multi-threaded module, we need to check the threading library to
@@ -276,20 +298,23 @@ int main(int argc, char * * argv)
   float *green = 0;
   float *blue = 0;
 
-  u = allocate(g_width, g_height, "U array");
-  v = allocate(g_width, g_height, "V array");
-  du = allocate(g_width, g_height, "D_u array");
-  dv = allocate(g_width, g_height, "D_v array");
-  red = allocate(g_width, g_height, "red array");
-  green = allocate(g_width, g_height, "green array");
-  blue = allocate(g_width, g_height, "blue array");
+  u = allocate(full_width, g_height, "U array", true);
+  v = allocate(full_width, g_height, "V array", true);
+  du = allocate(full_width, g_height, "D_u array", true);
+  dv = allocate(full_width, g_height, "D_v array", true);
+  red = allocate(full_width, g_height, "red array", false);
+  green = allocate(full_width, g_height, "green array", false);
+  blue = allocate(full_width, g_height, "blue array", false);
 
   // put the initial conditions into each cell
   switch(g_module) {
     default:
     case READY_MODULE_GS_SCALAR:
-    case READY_MODULE_GS_HWIV:
       init(u,v, g_width, g_height, g_density, g_lowback, g_ramprects);
+      break;
+
+    case READY_MODULE_GS_HWIV:
+      init(u,v, full_width, g_height, g_density, g_lowback, g_ramprects);
       break;
 
     case READY_MODULE_BRUSSELATOR:
@@ -327,7 +352,7 @@ int main(int argc, char * * argv)
         break;
 
       case READY_MODULE_GS_HWIV:
-        compute_dispatch(u, v, du, dv, g_width, g_height, g_wrap, D_u, D_v, g_F, g_k, speed, g_paramspace,
+        compute_dispatch(u, v, du, dv, D_u, D_v, g_F, g_k, speed,
           frames_per_display, g_threads);
         its_done = frames_per_display;
         break;
@@ -343,7 +368,7 @@ int main(int argc, char * * argv)
     iteration += ((double)its_done);
 
     if (g_color) {
-      colorize(u, v, du, uv_range, red, green, blue, g_width, g_height, g_oldcolor, g_pastel_mode);
+      colorize(u, v, du, uv_range, red, green, blue, full_width, g_height, g_oldcolor, g_pastel_mode);
     }
 
     gettimeofday(&tod_record, 0);
@@ -363,10 +388,10 @@ int main(int argc, char * * argv)
     {
       int chose_quit;
       if (g_color) {
-        chose_quit = display(g_width, g_height, red, green, blue,
+        chose_quit = display(g_width, wid_x, g_height, red, green, blue,
           iteration, g_scale, g_autobright, 1.0f, 2, 10, msg, g_video);
       } else {
-        chose_quit = display(g_width, g_height, u, u, u, 
+        chose_quit = display(g_width, wid_x, g_height, u, u, u, 
           iteration, g_scale, g_autobright, uv_range*1.25, 2, 10, msg, g_video);
       }
 
@@ -860,8 +885,8 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
     for(int j = 0; j < width; j++) {
       if(hypot(i-height/2,(j-width/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
       {
-        INDEX(u,i,j) = frand(0.0,0.1);
-        INDEX(v,i,j) = frand(0.9,1.0);
+        u[i*width+j] = frand(0.0,0.1);
+        v[i*width+j] = frand(0.9,1.0);
       }
     }
   }
@@ -874,8 +899,8 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
   /* Finally, enforce the limits for Gray-Scott, which are that U and V must be in the range [0.0,1.0]. */
   for(int i = 0; i < height; i++) {
     for(int j = 0; j < width; j++) {
-      INDEX(u,i,j) = max(0.0, min(INDEX(u,i,j), 1.0));
-      INDEX(v,i,j) = max(0.0, min(INDEX(v,i,j), 1.0));
+      u[i*width+j] = max(0.0, min(u[i*width+j], 1.0));
+      v[i*width+j] = max(0.0, min(v[i*width+j], 1.0));
     }
   }
 }
