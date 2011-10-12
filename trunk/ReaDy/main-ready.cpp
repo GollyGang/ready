@@ -10,6 +10,7 @@ See ../README.txt for more details.
 // hardware
 #if (defined(__i386__) || defined(__amd64__) || defined(__x86_64__) || 	defined(_M_X64) || defined(_M_IX86))
 # include <xmmintrin.h>
+# define ALLOC_USE_MM
 #endif
 
 // stdlib:
@@ -38,6 +39,8 @@ See ../README.txt for more details.
     #include <sys/time.h>
 #endif
 
+#include "util.h"
+
 #include "ready_display.h"
 
 #include "brusselator.h"
@@ -45,22 +48,25 @@ See ../README.txt for more details.
 #include "gray_scott_scalar.h"
 #include "gray_scott_hwivector.h"
 
-long g_width = 256;
-long g_height = 256;
+static int g_width = 256;
+static int g_height = 256;
 
-float *allocate(long width, long height, const char * error_text, bool for_mm);
-float *allocate(long width, long height, const char * error_text, bool for_mm)
+float *allocate(int width, int height, const char * error_text, bool for_mm);
+float *allocate(int width, int height, const char * error_text, bool for_mm)
 {
   long sz;
   float * rv;
-  // we add 32 bytes: 16 so we can align it here, and another 16 so the v_j2
-  // index can go one past the end of the last row
-  sz = width * height * sizeof(*rv);
+
+  sz = ((long) width) * ((long) height) * sizeof(*rv);
+#ifdef ALLOC_USE_MM
   if (for_mm) {
     rv = (float *) _mm_malloc(sz, 16);
   } else {
+#endif
     rv = (float *) malloc(((size_t)sz));
+#ifdef ALLOC_USE_MM
   }
+#endif
 
   if (rv == NULL) {
     fprintf(stderr, "allocate: Could get %ld bytes for %s\n", ((long) sz),
@@ -70,25 +76,24 @@ float *allocate(long width, long height, const char * error_text, bool for_mm)
   return (rv);
 }
 
-void init(float *a, float *b, long width, long height,
+void init(float *a, float *b, int width, int height,
           int density, int lowback, int BZrects);
 
 #define MAX_LOADS 100
 char * load_opts[MAX_LOADS];
 int num_loads = 0;
 
-float frand(float lower,float upper);
-void pearson_block(float *u, float *v, long width, long height,
+void pearson_block(float *u, float *v, int width, int height,
                  int vpos, int hpos, int h, int w, float U, float V);
-void ramp_block(float *u, float *v, long width, long height,
+void ramp_block(float *u, float *v, int width, int height,
                 int vpos, int hpos, int h, int w, int fliph);
 void homogen_uv(float F, float k, float * hU, float * hV);
-void i5_bkg(float *u, float *v, long width, long height, int which);
-void load_option(float * u, float * v, long width, long height, const char * option);
+void i5_bkg(float *u, float *v, int width, int height, int which);
+void load_option(float * u, float * v, int width, int height, const char * option);
 bool digit_p(char c);
-void pattern_load(float * u, float * v, long width, long height,
-  const char * pattern_filename, long x, long y, int orient);
-long next_patsize(long former);
+void pattern_load(float * u, float * v, int width, int height,
+  const char * pattern_filename, int x, int y, int orient);
+int next_patsize(int former);
 void byteswap_2_double(double * array);
 
 
@@ -96,8 +101,8 @@ static const char * g_rd_name = "";
 static int g_color = 0;
 static int g_oldcolor = 0;
 static int g_pastel_mode = 0;
-bool g_paramspace = false;
-bool g_wrap = false;
+static bool g_paramspace = false;
+static bool g_wrap = false;
 static float g_k, g_F;
 static int g_ramprects = 0;
 static int g_lowback = 0;
@@ -260,7 +265,7 @@ int main(int argc, char * * argv)
   if (g_width % VECSIZE) {
     g_width = ((g_width/VECSIZE)+1)*VECSIZE;
   }
-  long full_width, wid_x;
+  int full_width, wid_x;
 
   switch(g_module) {
     case READY_MODULE_GS_HWIV:
@@ -326,6 +331,22 @@ int main(int argc, char * * argv)
     frames_per_display = 500;
   }
 
+  /* Pass any non-changing variables to the compute module */
+  switch(g_module) {
+    default:
+    case READY_MODULE_GS_SCALAR:
+      gs_scl_compute_setup(g_width, g_height, g_wrap, g_paramspace);
+      break;
+
+    case READY_MODULE_BRUSSELATOR:
+      bruss_compute_setup(g_width, g_height, g_wrap, g_paramspace);
+      break;
+
+    case READY_MODULE_GS_HWIV:
+      gs_hwi_compute_setup(g_width, g_height, g_wrap, g_paramspace);
+      break;
+    }
+
   double iteration = 0;
   double fps_avg = 0.0; // decaying average of fps
   double Mcgs;
@@ -346,7 +367,7 @@ int main(int argc, char * * argv)
       default:
       case READY_MODULE_GS_SCALAR:
         for(i=0; i<frames_per_display; i++) {
-          compute_gs_scalar(u, v, du, dv, g_width, g_height, g_wrap, D_u, D_v, g_F, g_k, speed);
+          compute_gs_scalar(u, v, du, dv, D_u, D_v, g_F, g_k, speed);
           its_done++;
         }
         break;
@@ -359,8 +380,7 @@ int main(int argc, char * * argv)
 
       case READY_MODULE_BRUSSELATOR:
         for(i=0; i<frames_per_display; i++) {
-          compute_bruss(u, v, du, dv, g_width, g_height,
-             bruss_A, bruss_B, bruss_D1, bruss_D2, bruss_speed, g_paramspace);
+          compute_bruss(u, v, du, dv, bruss_A, bruss_B, bruss_D1, bruss_D2, bruss_speed);
           its_done++;
         }
         break;
@@ -414,39 +434,23 @@ int main(int argc, char * * argv)
   }
 }
 
-#ifndef max
-# define max(a,b) (((a) > (b)) ? (a) : (b))
-# define min(a,b) (((a) < (b)) ? (a) : (b))
-# define minmax(v, lo, hi) max(lo, min(v, hi))
-#endif
-
-// return a random value between lower and upper
-float frand(float lower,float upper)
-{
-  float rv;
-
-  rv = lower + rand()*(upper-lower)/RAND_MAX;
-  rv = max(0.0, min(1.0, rv));
-  return rv;
-}
-
 /* pearson_bkg fills everything with the trivial state (U=1, V=0) combined
    with random noise of magnitude 0.01, and it does this while keeping all
    U and V values between 0 and 1. */
-void pearson_bkg(float *u, float *v, long width, long height)
+void pearson_bkg(float *u, float *v, int width, int height)
 {
   int i, j;
   for(i=0; i<height; i++) {
     for(j=0; j<width; j++) {
-      u[i*width+j] = frand(0.99, 1.0);
-      v[i*width+j] = frand(0.0, 0.01);
+      u[i*width+j] = ut_frand(0.99, 1.0);
+      v[i*width+j] = ut_frand(0.0, 0.01);
     }
   }
 }
 
 /* pearson_block creates a block filled with a given U and V value combined
    with superimposed noise of amplitude 0.01 */
-void pearson_block(float *u, float *v, long width, long height,
+void pearson_block(float *u, float *v, int width, int height,
                  int vpos, int hpos, int h, int w, float U, float V)
 {
   int i, j;
@@ -455,8 +459,8 @@ void pearson_block(float *u, float *v, long width, long height,
     if ((i >= 0) && (i < height)) {
       for(j=hpos; j<hpos+w; j++) {
         if ((j >= 0) && (j < width)) {
-          u[i*width+j] = frand(U-0.005, U+0.005);
-          v[i*width+j] = frand(V-0.005, V+0.005);
+          u[i*width+j] = ut_frand(U-0.005, U+0.005);
+          v[i*width+j] = ut_frand(V-0.005, V+0.005);
         }
       }
     }
@@ -465,7 +469,7 @@ void pearson_block(float *u, float *v, long width, long height,
 
 /* ramp_block creates a starting pattern for B-Z spirals and continuous
    propagating wave fronts (pattern type xi in my paper). */
-void ramp_block(float *u, float *v, long width, long height,
+void ramp_block(float *u, float *v, int width, int height,
                 int vpos, int hpos, int h, int w, int fliph)
 {
   int i, j;
@@ -499,8 +503,8 @@ void ramp_block(float *u, float *v, long width, long height,
           V = 1.0 - sin((1.0 - V) * 1.5708);
           V = V * 0.4;
 
-          u[i*width+j] = frand(U-0.005, U+0.005);
-          v[i*width+j] = frand(V-0.005, V+0.005);
+          u[i*width+j] = ut_frand(U-0.005, U+0.005);
+          v[i*width+j] = ut_frand(V-0.005, V+0.005);
         }
       }
     }
@@ -542,7 +546,7 @@ void homogen_uv(float F, float k, float * hU, float * hV)
    state exists it uses that state. This makes for much more interesting
    initial patterns for the areas near the various bifurcation lines and for
    Uskate world. */
-void i5_bkg(float *u, float *v, long width, long height, int which)
+void i5_bkg(float *u, float *v, int width, int height, int which)
 {
   int i, j;
 
@@ -566,10 +570,10 @@ void i5_bkg(float *u, float *v, long width, long height, int which)
  Execute one of the "-load" command-line options. This requires parsing out an X and Y coordinate, an option
 orientation, and a filename or pathname. It calls pattern_load to actually read the pattern into the grid.
  */
-void load_option(float * u, float * v, long width, long height, const char * option)
+void load_option(float * u, float * v, int width, int height, const char * option)
 {
-  long x;
-  long y;
+  int x;
+  int y;
   int orient = 0;
   char * p1;
 
@@ -676,10 +680,10 @@ difference is sqrt(0.164/0.409) = 0.63324.
 
 */
 
-void pattern_load(float * u, float * v, long width, long height,
-  const char * pattern_filename, long x, long y, int orient)
+void pattern_load(float * u, float * v, int width, int height,
+  const char * pattern_filename, int x, int y, int orient)
 {
-  long i, j;
+  int i, j;
   FILE * patfile;
   long fsize, csz;
   double data[2];
@@ -713,27 +717,27 @@ void pattern_load(float * u, float * v, long width, long height,
   }
 
   if (csz * csz * 2L * sizeof(double) == fsize) {
-    long i2, j2, i3, j3, prev_i2, prev_j2;
+    int i2, j2, i3, j3, prev_i2, prev_j2;
     double u_avg, v_avg, perim_count;
-    long min_i = height; long max_i = 0;
-    long min_j = width; long max_j = 0;
+    int min_i = height; int max_i = 0;
+    int min_j = width; int max_j = 0;
     prev_i2 = prev_j2 = -1;
 
     // Size matched exactly
     // printf("Clip file is %ld bytes long, size %ldx%ld.\n", fsize, csz, csz);
-    printf("Placing pattern %s at position (%ld,%ld) orientation %d\n", pattern_filename, x, y, orient);
+    printf("Placing pattern %s at position (%d,%d) orientation %d\n", pattern_filename, x, y, orient);
     patfile = fopen(pattern_filename, "r");
 
     u_avg = v_avg = perim_count = 0.0;
     for(i = 0; i < csz; i++) { // i is row number, Y dimension
       // i2 = (i - csz/2L)*63L/100L;
       i2 = i - csz/2L;
-      i2 = (long) (scale * ((float) i2));
+      i2 = (int) (scale * ((float) i2));
       for(j = 0; j < csz; j++) { // j is column number, X dimension
         float u_val, v_val;
         // j2 = (j - csz/2L)*63L/100L;
         j2 = j - csz/2L;
-        j2 = (long) (scale * ((float) j2));
+        j2 = (int) (scale * ((float) j2));
 
         // Copy to i3, j3 because we're going to change the values
         i3 = i2; j3 = j2;
@@ -793,7 +797,7 @@ void pattern_load(float * u, float * v, long width, long height,
   }
 }
 
-long next_patsize(long former)
+int next_patsize(int former)
 {
   int newval;
 
@@ -826,10 +830,10 @@ void byteswap_2_double(double * array)
   }
 }
 
-void init(float *u, float *v, long width, long height, int density, int lowback, int BZrects)
+void init(float *u, float *v, int width, int height, int density, int lowback, int BZrects)
 {
-  long nsp, i;
-  long base, var;
+  int nsp, i;
+  int base, var;
 
   srand((unsigned int)time(NULL));
 
@@ -845,7 +849,7 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
     }
 
     nsp = base + (rand() % var);
-    printf("Adding %ld random rectangles\n", nsp);
+    printf("Adding %d random rectangles\n", nsp);
   }
 
   i5_bkg(u, v, width, height, lowback ? 0 : 1);
@@ -860,11 +864,11 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
     v1 = (rand() % height) - (vs / 2);
     h1 = (rand() % width) - (hs / 2);
 
-    U = frand(0.0, 1.0);
+    U = ut_frand(0.0, 1.0);
     if (BZrects) {
-      V = frand(0.0, 1.0 - U);
+      V = ut_frand(0.0, 1.0 - U);
     } else {
-      V = frand(0.0, 1.0);
+      V = ut_frand(0.0, 1.0);
     }
     if (BZrects) {
       if ((rand() & 0x3) == 0) {
@@ -880,18 +884,20 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
   }
     
   if ((num_loads <= 0) && (nsp <= 0)) {
-  // old init pattern
-  for(int i = 0; i < height; i++) {
-    for(int j = 0; j < width; j++) {
-      if(hypot(i-height/2,(j-width/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
-      {
-        u[i*width+j] = frand(0.0,0.1);
-        v[i*width+j] = frand(0.9,1.0);
+    // old init pattern
+    for(int i = 0; i < height; i++) {
+      for(int j = 0; j < width; j++) {
+        // Make an approximate circle in the middle
+        if(hypot(i-height/2,(j-width/2)/1.5)<=ut_frand(2,5))
+        {
+          u[i*width+j] = ut_frand(0.0,0.1);
+          v[i*width+j] = ut_frand(0.9,1.0);
+        }
       }
     }
   }
-  }
 
+  /* Execute any -load arguments */
   for(int i=0; i<num_loads; i++) {
     load_option(u, v, width, height, load_opts[i]);
   }
@@ -907,10 +913,18 @@ void init(float *u, float *v, long width, long height, int density, int lowback,
 
 /*
 
+The following command-line examples are for Linux or Mac OS shell.
+Change file pathnames to use these examples in Windows.
+
+# Show the Brusselator parameter space:
+./ReaDy -calc-module 3 -paramspace -color
+
+# An example of running from a saved pattern:
 ./ReaDy -color -threads 2 -F 0.062 -k 0.0609 -wrap -load '128,128:patterns/interactions/U-curve-15-c'
 
+# Two patterns combined:
 ./ReaDy -color -threads 2 -F 0.062 -k 0.0609 -wrap \
   -load '80,140o5:patterns/halftargets/ht-4-10-3' \
-  -load '30,30:patterns/uskates/std'
+  -load '35,30:patterns/uskates/std'
 
 */

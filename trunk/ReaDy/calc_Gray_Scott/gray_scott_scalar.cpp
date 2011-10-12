@@ -8,57 +8,67 @@ See ../../README.txt for more details.
 */
 
 #include "gray_scott_scalar.h"
+#include "../util.h"
 
-#ifndef max
-# define max(a,b) (((a) > (b)) ? (a) : (b))
-# define min(a,b) (((a) < (b)) ? (a) : (b))
-# define minmax(v, lo, hi) max(lo, min(v, hi))
-#endif
+static int g_width;
+static int g_height;
+static bool g_wrap;
+static bool g_paramspace;
 
-void compute_gs_scalar(float *a, float *b, float *da, float *db, long width, long height, bool toroidal,
-             float r_a,float r_b,float f,float k,
-             float speed)
+void gs_scl_compute_setup(int width, int height, bool wrap, bool paramspace)
 {
-    //const bool toroidal = false;
+  g_width = width;
+  g_height = height;
+  g_wrap = wrap;
+  g_paramspace = paramspace;
+}
 
-    //int iprev,inext,jprev,jnext;
-
+void compute_gs_scalar(float *a, float *b, float *da, float *db,
+             float r_a, float r_b, float f, float k, float speed)
+{
     // compute change in each cell
-    for(long i = 0; i < height; i++) {
-        long iprev,inext;
-        if (toroidal) {
-            iprev = (i + height - 1) % height;
-            inext = (i + 1) % height;
+    for(int i = 0; i < g_height; i++) {
+        int iprev,inext;
+        if (g_wrap) {
+            iprev = (i + g_height - 1) % g_height;
+            inext = (i + 1) % g_height;
         } else {
             iprev = max(0,i-1);
-            inext = min(height-1,i+1);
+            inext = min(g_height-1,i+1);
         }
 
-        for(long j = 0; j < width; j++) {
-            long jprev,jnext;
-            if (toroidal) {
-                jprev = (j + width - 1) % width;
-                jnext = (j + 1) % width;
+        for(int j = 0; j < g_width; j++) {
+            int jprev,jnext;
+            if (g_wrap) {
+                jprev = (j + g_width - 1) % g_width;
+                jnext = (j + 1) % g_width;
             } else {
                 jprev = max(0,j-1);
-                jnext = min(width-1,j+1);
+                jnext = min(g_width-1,j+1);
             }
 
-            float aval = a[i*width+j];
-            float bval = b[i*width+j];
+            float aval = a[i*g_width+j];
+            float bval = b[i*g_width+j];
+
+            if(g_paramspace)	{
+                const float kmin=0.045, kmax=0.07, fmin=0.01, fmax=0.09;
+                // set f and k for this location (ignore the provided values of f and k)
+                k = kmin + (g_width-j-1)*(kmax-kmin)/g_width;
+                f = fmin + (g_height-i-1)*(fmax-fmin)/g_height;
+            }
 
             // compute the Laplacians of a and b
-            float dda = a[i*width+jprev] + a[i*width+jnext] + a[iprev*width+j] + a[inext*width+j] - 4*aval;
-            float ddb = b[i*width+jprev] + b[i*width+jnext] + b[iprev*width+j] + b[inext*width+j] - 4*bval;
+            float dda = a[i*g_width+jprev] + a[i*g_width+jnext] + a[iprev*g_width+j] + a[inext*g_width+j] - 4*aval;
+            float ddb = b[i*g_width+jprev] + b[i*g_width+jnext] + b[iprev*g_width+j] + b[inext*g_width+j] - 4*bval;
 
             // compute the new rate of change of a and b
-            da[i*width+j] = r_a * dda - aval*bval*bval + f*(1-aval);
-            db[i*width+j] = r_b * ddb + aval*bval*bval - (f+k)*bval;
+            da[i*g_width+j] = r_a * dda - aval*bval*bval + f*(1-aval);
+            db[i*g_width+j] = r_b * ddb + aval*bval*bval - (f+k)*bval;
         }
     }
 
     // effect change
-    for(long i = 0; i < width*height; i++) {
+    for(int i = 0; i < g_width*g_height; i++) {
       a[i] += speed * da[i];
       b[i] += speed * db[i];
     }

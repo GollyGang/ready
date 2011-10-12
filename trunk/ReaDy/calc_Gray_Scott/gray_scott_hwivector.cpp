@@ -25,16 +25,20 @@ See ../../README.txt for more details.
 #include <stdio.h>
 
 #include "gray_scott_hwivector.h"
-extern long g_width;
-extern long g_height;
-extern bool g_wrap;
-extern bool g_paramspace;
+#include "../util.h"
 
-#ifndef max
-# define max(a,b) (((a) > (b)) ? (a) : (b))
-# define min(a,b) (((a) < (b)) ? (a) : (b))
-# define minmax(v, lo, hi) max(lo, min(v, hi))
-#endif
+static int g_width;
+static int g_height;
+static bool g_wrap;
+static bool g_paramspace;
+
+void gs_hwi_compute_setup(int width, int height, bool wrap, bool paramspace)
+{
+  g_width = width;
+  g_height = height;
+  g_wrap = wrap;
+  g_paramspace = paramspace;
+}
 
 /* Spawn threads and dispatch to compute() routine inside threads */
 void compute_dispatch(float *u, float *v, float *du, float *dv,
@@ -46,8 +50,8 @@ void compute_dispatch(float *u, float *v, float *du, float *dv,
   }
   DICEK_DATA(compute_params, cp, nthreads);
 
-  long i;
-  long a_row = 0;
+  int i;
+  int a_row = 0;
 
   /* Set up all the parameter blocks */
   for(i=0; i<nthreads; i++) {
@@ -120,7 +124,7 @@ void * compute_gs_hwiv(void * gpb)
   int iter;
 
 #ifdef SUPPORT_PARAM_SPACE
-  const float k_min=0.045f, k_max=0.07f, F_min=0.01f, F_max=0.09f;
+  const float k_min=0.045, k_max=0.07, F_min=0.01, F_max=0.09;
   float k_diff;
   V4F4 v4_kdiff;
   k_diff = (k_max-k_min)/g_height;
@@ -131,8 +135,6 @@ void * compute_gs_hwiv(void * gpb)
 
   // Scan per iteration
   for(iter = 0; iter < num_its; iter++) {
-
-//printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
 
   // Scan per row
   for(int i = start_row; i < end_row; i++) {
@@ -213,7 +215,6 @@ void * compute_gs_hwiv(void * gpb)
 
   } // End of scan per row
 
-  // First thread interlock goes here
   if (interlock) { DICEK_CH_SYNC }
   if (interlock) { DICEK_CH_BEGIN }
 
@@ -249,7 +250,6 @@ void * compute_gs_hwiv(void * gpb)
 
   } // End of scan per iteration
 
-  // second thread interlock goes here
   if (interlock) { DICEK_CH_SYNC }
 
   DICEK_CH_END
@@ -296,11 +296,11 @@ void * compute_gs_hwiv(void * gpb)
   float speed = param_block->speed;
   int parameter_space = param_block->parameter_space;
   int num_its = param_block->num_its;
-  long width = param_block->width;
-  long height = param_block->height;
+  int width = param_block->width;
+  int height = param_block->height;
   bool wrap = param_block->wrap;
-  long start_row = param_block->start_row;
-  long end_row = param_block->end_row;
+  int start_row = param_block->start_row;
+  int end_row = param_block->end_row;
   int interlock = param_block->interlock_type;
 
   int iter;
@@ -343,9 +343,9 @@ void * compute_gs_hwiv(void * gpb)
 //printf("iter %d rows [%ld,%ld)\n",iter,start_row,end_row);
 
   // Scan per row
-  for(long i = start_row; i < end_row; i++) {
-    long iprev,inext;
-    long v_j2;
+  for(int i = start_row; i < end_row; i++) {
+    int iprev,inext;
+    int v_j2;
     if (wrap) {
       /* Periodic boundary condition */
       iprev = (i+height-1) % height;
@@ -386,7 +386,7 @@ void * compute_gs_hwiv(void * gpb)
     v4_v_r = *v_vbase++;
 
     // Scan per column in steps of vector width
-    for(long j = 0; j < width-VECSIZE; j+=VECSIZE) {
+    for(int j = 0; j < width-VECSIZE; j+=VECSIZE) {
       // Get a new 4 pixels from the current row and shift the other 8 pixels over
       v4_u_l = v4_u; v4_u = v4_u_r; v4_u_r = *v_ubase;
       v4_v_l = v4_v; v4_v = v4_v_r; v4_v_r = *v_vbase;
@@ -455,12 +455,12 @@ void * compute_gs_hwiv(void * gpb)
 
   {
   // effect change
-    for(long i = start_row; i < end_row; i++) {
+    for(int i = start_row; i < end_row; i++) {
       v_ubase = ((V4F4 *) (&(u[i*width])));
       v_vbase = ((V4F4 *) (&(v[i*width])));
       v_dubase = ((V4F4 *) (&(du[i*width])));
       v_dvbase = ((V4F4 *) (&(dv[i*width])));
-      for(long j = 0; j < width; j+=VECSIZE) {
+      for(int j = 0; j < width; j+=VECSIZE) {
         // u[i][j] = u[i][j] + speed * du[i][j];
         *v_ubase = v4ADD(v4MUL(v4_speed, *v_dubase), *v_ubase); v_ubase++; v_dubase++;
         // v[i][j] = v[i][j] + speed * dv[i][j];

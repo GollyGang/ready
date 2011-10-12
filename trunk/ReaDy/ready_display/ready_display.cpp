@@ -16,14 +16,7 @@ See ../../README.txt for more details.
 
 // local:
 #include "ready_display.h"
-
-#ifndef max
-# define max(a,b) (((a) > (b)) ? (a) : (b))
-# define min(a,b) (((a) < (b)) ? (a) : (b))
-# define minmax(v, lo, hi) max(lo, min(v, hi))
-#endif
-
-#define INDEX(a,x,y) ((a)[(x)*full_width+(y)])
+#include "../util.h"
 
 bool display(int g_width, int wid_x, int g_height, float *r, float *g, float *b,
              double iteration, float model_scale, bool auto_brighten,float manual_brighten,
@@ -68,13 +61,13 @@ bool display(int g_width, int wid_x, int g_height, float *r, float *g, float *b,
   float val,minR=FLT_MAX,maxR=-FLT_MAX,minG=FLT_MAX,maxG=-FLT_MAX,minB=FLT_MAX,maxB=-FLT_MAX;
   for(int i=0;i<g_height;i++) {
     for(int j=wid_x;j<g_width+wid_x;j++) {
-      val = INDEX(r,i,j);
+      val = r[i*full_width+j];
       if(val<minR) minR=val; if(val>maxR) maxR=val;
 
-      val = INDEX(g,i,j);
+      val = g[i*full_width+j];
       if(val<minG) minG=val; if(val>maxG) maxG=val;
 
-      val = INDEX(b,i,j);
+      val = b[i*full_width+j];
       if(val<minB) minB=val; if(val>maxB) maxB=val;
     }
   }
@@ -83,22 +76,22 @@ bool display(int g_width, int wid_x, int g_height, float *r, float *g, float *b,
 
   for(int i=0;i<g_height;i++)
   {
-    for(int j=0;j<g_width;j++)
-    {
+    for(int j=0;j<g_width;j++) {
+      int j2 = full_width-j-(wid_x+1);
       float val;
-      val = INDEX(r,i,full_width-j-(wid_x+1));
+      val = r[i*full_width+j2];
       if(auto_brighten) val = 255.0f * (val-minR) / (maxR-minR);
       else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 2] = (uchar)val;
 
-      val = INDEX(g,i,full_width-j-(wid_x+1));
+      val = g[i*full_width+j2];
       if(auto_brighten) val = 255.0f * (val-minG) / (maxG-minG);
       else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
       ((uchar *)(im->imageData + i*im->widthStep))[j*im->nChannels + 1] = (uchar)val;
 
-      val = INDEX(b,i,full_width-j-(wid_x+1));
+      val = b[i*full_width+j2];
       if(auto_brighten) val = 255.0f * (val-minB) / (maxB-minB);
       else val = (val * 255.0 / manual_brighten);
       if(val<0) val=0; if(val>255) val=255;
@@ -141,12 +134,12 @@ bool display(int g_width, int wid_x, int g_height, float *r, float *g, float *b,
 }
 
 void colorize(float *u, float *v, float *du, float uv_range,
-  float *red, float *green, float *blue, long width, long height,
+  float *red, float *green, float *blue, int width, int height,
   int color_style, int pastel_mode)
 {
   float r, g, b;
   // Step by row
-  for(long i = 0; i < height*width; i++) {
+  for(int i = 0; i < height*width; i++) {
     float uval = u[i] / uv_range;
     float vval = v[i] / uv_range;
     float delta_u = du[i] / uv_range;

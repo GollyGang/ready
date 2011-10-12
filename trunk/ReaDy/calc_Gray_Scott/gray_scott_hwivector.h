@@ -22,10 +22,12 @@ typedef struct compute_params {
   float k;
   float speed;
   int num_its;
-  long start_row;
-  long end_row;
+  int start_row;
+  int end_row;
   int interlock_type;
 } compute_params;
+
+void gs_hwi_compute_setup(int width, int height, bool wrap, bool paramspace);
 
 void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
