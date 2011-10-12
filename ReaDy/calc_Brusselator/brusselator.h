@@ -7,7 +7,7 @@ See README.txt for more details.
 
 */
 
-void bruss_init(float *a, float *b, long width, long height, float A, float B);
-
-void compute_bruss(float *a, float *b, float *da, float *db, long width, long height,
-             float A, float B, float D1, float D2, float speed, bool parameter_space);
+void bruss_init(float *a, float *b, int width, int height, float A, float B);
+void bruss_compute_setup(int width, int height, bool wrap, bool paramspace);
+void compute_bruss(float *a, float *b, float *da, float *db,
+             float A, float B, float D1, float D2, float speed);

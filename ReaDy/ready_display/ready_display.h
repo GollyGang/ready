@@ -4,7 +4,7 @@ bool display(int width, int wid_x, int height, float *r, float *g, float *b,
 
 void colorize(float *u, float *v, float *du, float uv_range,
              float *red, float *green, float *blue,
-             long width, long height, int color_style, int pastel_mode);
+             int width, int height, int color_style, int pastel_mode);
 void color_mapping(float u0, float v0, float dU, int pm, float *red, float *green, float *blue, int pastel);
 void go_hsv2rgb(float h, float s, float v, float *red, float *green, float *blue);
 

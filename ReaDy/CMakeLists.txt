@@ -22,6 +22,8 @@ INCLUDE_DIRECTORIES( "ready_display" )
 
 add_executable(ReaDy 
   main-ready.cpp
+  util.h
+  util.cpp
   calc_Brusselator/brusselator.cpp
   calc_Brusselator/brusselator.h
   calc_Gray_Scott/gray_scott_scalar.cpp
