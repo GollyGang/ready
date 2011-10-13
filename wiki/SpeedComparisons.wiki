@@ -56,10 +56,10 @@ The most obvious way to speed up reaction-diffusion (RD) code is to parallelise 
 
 But a couple of people (Tom and Robert) suggested exploring *SSE* first, rather than jumping straight to OpenCL. This turned out to be good advice, our !GrayScott_SSE version is 6x faster than the base version on System 1, still running on a single core. Putting OpenMP on top took us to 12x faster than the base version - faster than our OpenCL implementation!
 
-In !GrayScott_HWIVector we have wrapped all the SSE calls in a set of macros. Firstly this allows it to run on CPUs that don't support SSE, through emulation. Secondly it also wraps the threading, to allow it to be used on different platforms. Together these give great performance.
+In !GrayScott_HWIVector we have wrapped all the SSE calls in a set of macros, to allow it to run on CPUs that don't support SSE, through emulation. We also wrap the threading, to allow it to be used on different platforms. Together these give great performance, 1.7x that of !GrayScott_SSE_OpenMP on System 1.
 
 Returning to OpenCL, the main advice for optimisation is to look at cache hits - how to ensure that the data you want is available in the fastest memory. Our !GrayScott_OpenCL version uses NDRange local(8,8) which gives a big speed improvement over local(1,1), presumably because it then makes a local cache. We're still learning about these issues so all help is welcome! We tried manually caching data but this didn't help.
 
-There's an *image2d_t* structure in OpenCL that is already optimized for 2D caching. We found it was 3x faster than our `float*`-based OpenCL version on System 1.
+There's an *image2d_t* structure in OpenCL that is already optimized for 2D caching. We found that !GrayScott_OpenCL_Image was 3x faster than our `float*`-based !GrayScott_OpenCL on System 1.
 
-Our final optimization to date uses OpenCL's own version of SSE-like processing, using float4's to operate on 4 values at once, both for the maths and the reading and writing. This gave another 2x speedup on top of the image version.
+Our final optimization to date uses OpenCL's own version of SSE-like processing, using float4's to operate on 4 values at once, both for the maths and the reading and writing. !GrayScott_OpenCL_Image_2x2 gave another 2x speedup on top of the image version.
