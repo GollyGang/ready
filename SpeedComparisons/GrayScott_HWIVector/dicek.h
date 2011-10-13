@@ -33,6 +33,8 @@ Windows programmer.
 # ifndef DICEK_EMULATE
 #   define DICEK_USE_PROCESS_H
 # endif
+#else
+# define __stdcall
 #endif
 
 
@@ -435,13 +437,12 @@ initialize the semaphores, whereas DICEK_SPLIT_1 does. */
 
 #define DICEK_SPLIT_1(funcname, arrayname, index) \
     arrayname[index].DICEK_return = 0; \
-    arrayname[index].DICEK_thread = (HANDLE) _beginthread(funcname, 0, \
-        (void *) &(arrayname[index]));
+    arrayname[index].DICEK_thread = (HANDLE) _beginthreadex(NULL,0,funcname, \
+        (void *) &(arrayname[index]), 0, NULL);
 
 #define DICEK_MERGE_1(arrayname, index) \
     WaitForSingleObject(arrayname[index].DICEK_thread, INFINITE);
 
-/* We use _beginthread, there are other options including _beginthreadex and the more native CreateThread */
 #define DICEK_SPLIT_MERGE(funcname, arrayname, nth) \
     for(int _DICEK_i=0; _DICEK_i<nth; _DICEK_i++) { \
       DICEK_SPLIT_1(funcname, arrayname, _DICEK_i) \
