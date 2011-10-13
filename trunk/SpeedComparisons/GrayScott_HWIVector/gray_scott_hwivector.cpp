@@ -96,7 +96,7 @@ typedef struct compute_params {
   int interlock_type;
 } compute_params;
 
-void compute(void * param_block);  // Arg is really "compute_params * param_block"
+unsigned __stdcall  compute(void * param_block);  // Arg is really "compute_params * param_block"
 
 void compute_dispatch(float *u, float *v, float *du, float *dv,
   float D_u, float D_v, float F, float k, float speed,
@@ -327,7 +327,7 @@ void init(float *u, float *v, long width, long height)
   }
 }
 
-void compute(void * gpb)
+unsigned __stdcall compute(void * gpb)
 {
   DICEK_SUB(compute_params, gpb);
   const int full_width = g_width + 2*VECSIZE;
@@ -463,6 +463,8 @@ void compute(void * gpb)
   if (interlock) { DICEK_CH_SYNC }
 
   DICEK_CH_END
+
+  return 0;
 }
 
 
