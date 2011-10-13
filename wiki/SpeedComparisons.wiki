@@ -14,7 +14,7 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 || 450 || 315 || 492 || 18 || 27 || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 || 160-230^1^ || 64-79^1^ || 250-730^1^ || 23 || 24 || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 || 455 || 285 || 498 || 26 || 27 || ||
-|| HWIVector (2 threads) ||  || 670 || 435 || 805 || 23 || 27 || ||
+|| HWIVector (2 threads) ||  || 750 || 478 || 805 || 23 || 27 || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 820 || 104 || 161 || 356 || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || note^2^ || - || - || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || note^2^ || - || - || ||
