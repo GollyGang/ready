@@ -125,12 +125,17 @@ int main(int argc, char * * argv)
         std::cout << (maxdev+1) << " device(s) available; using device "
                                                     << g_opt_device << ".\n";
 
+        Device &device = devices[g_opt_device];
+        std::cout << "Global memory: " << device.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>() << " bytes\n";
+        std::cout << "Local memory: " << device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>() << " bytes\n";
+        std::cout << "Local memory type: " << std::string((device.getInfo<CL_DEVICE_LOCAL_MEM_TYPE>()==CL_LOCAL)?"local":"global") << " \n";
+
         // Create a command queue and use the selected device
         if (maxdev < 0) {
           std::cerr << "error -- need at least one OpenCL capable device.\n";
           exit(-1);
         }
-        CommandQueue queue = CommandQueue(context, devices[g_opt_device]);
+        CommandQueue queue = CommandQueue(context, device);
         Event event;
  
         // Read source file
