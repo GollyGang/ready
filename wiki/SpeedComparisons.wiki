@@ -38,7 +38,7 @@ Notes:
 
 _1_. Speeds up as the dots fill the screen (a known issue on Intel processors with denormal values)
 
-_2_. Does not run, OS does not support a needed OpenCL feature.
+_2_. Does not run, OS and/or GPU driver does not support a needed OpenCL feature.
 
 Issues: 
   * Not all systems currently implement the toroidal topology.
