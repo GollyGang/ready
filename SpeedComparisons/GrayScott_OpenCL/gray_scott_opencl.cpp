@@ -151,7 +151,9 @@ int main(int argc, char * * argv)
         Program program = Program(context, source);
  
         // Build program for these specific devices
-        program.build(devices);
+        // If wrap (toroidal) option is selected, we define a preprocessor flag
+        // that controls how the xm1, xp1, etc. are computed.
+        program.build(devices, g_wrap ? "-D WRAP" : NULL, NULL, NULL);
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
@@ -191,7 +193,6 @@ int main(int argc, char * * argv)
         kernel.setArg(6, r_a);
         kernel.setArg(7, r_b);
         kernel.setArg(8, speed);
-        kernel.setArg(9, g_wrap);
 
         int iteration = 0;
         float fps_avg = 0.0; // decaying average of fps

@@ -65,8 +65,26 @@ float& float_at(float* arr,int x,int y)
     return arr[ ( (x/2)*(Y/2) + y/2 ) * 4 + (y%2)*2 + x%2 ]; 
 }
 
-int main()
+static int g_opt_device = 0;
+static int g_wrap = 0;
+
+int main(int argc, char * * argv)
 {
+    for (int i = 1; i < argc; i++) {
+        if (0) {
+        } else if ((i+1<argc) && (strcmp(argv[i],"-device")==0)) {
+            // select an output device
+            i++; g_opt_device = atoi(argv[i]);
+        } else if (strcmp(argv[i],"-wrap")==0) {
+            // patterns wrap around ("torus", also called "continuous boundary
+            // condition")
+            g_wrap = 1;
+        } else {
+            std::cout << "Unrecognized argument: '" << argv[i] << "'\n";
+            exit(-1);
+        }
+    }
+
     // Here we implement the Gray-Scott model, as described here:
     // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
     // http://arxiv.org/abs/patt-sol/9304003
@@ -105,11 +123,22 @@ int main()
  
         // Get a list of devices on this platform
         cl::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
-        CommandQueue queue = CommandQueue(context, devices[0]);
+
+        int maxdev = devices.size() - 1;
+        g_opt_device = (g_opt_device > maxdev) ? maxdev :
+                                     ((g_opt_device < 0) ? 0 : g_opt_device);
+        std::cout << (maxdev+1) << " device(s) available; using device "
+                                                    << g_opt_device << ".\n";
+        Device &device = devices[g_opt_device];
+
+        CommandQueue queue = CommandQueue(context, device);
         Event event;
  
         // Read source file
-        std::string kfn = CL_SOURCE_DIR; // (defined in CMakeLists.txt to be the source folder)
+        // (CL_SOURCE_DIR is defined in CMakeLists.txt to be the folder
+        // containing the source files, including this file 'gray_scott_opencl_2x2.cpp'
+        // and the kernel source 'gs_wrap_kernel_2x2.cl'.)
+        std::string kfn = CL_SOURCE_DIR;
         kfn += "/grayscott_kernel_2x2.cl";
         std::ifstream sourceFile(kfn.c_str());
         std::string sourceCode(
@@ -131,7 +160,7 @@ int main()
            cl_program myprog = clCreateProgramWithSource(context(), (cl_uint)n, strings, lengths, &err);
            err = clBuildProgram(myprog, (cl_uint)devices.size(), (cl_device_id*)&devices.front(), NULL, NULL, NULL);
            char proglog[1024];
-           clGetProgramBuildInfo(myprog, devices[0](), CL_PROGRAM_BUILD_LOG, 1024, proglog, 0);
+           clGetProgramBuildInfo(myprog, device(), CL_PROGRAM_BUILD_LOG, 1024, proglog, 0);
            printf("err=%d log=%s\n", err, proglog);
            return 0;
         #endif
@@ -141,7 +170,9 @@ int main()
         Program program = Program(context, source);
  
         // Build program for these specific devices
-        program.build(devices);
+        // If wrap (toroidal) option is selected, we define a preprocessor flag
+        // that controls how the xm1, xp1, etc. are computed.
+        program.build(devices, g_wrap ? "-D WRAP" : NULL, NULL, NULL);
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
@@ -215,7 +246,7 @@ int main()
             sprintf(msg,"GrayScott - %0.2f fps %0.2f Mcgs", fps_avg, Mcgs);
 
             // display:
-            if(display(a,a,a,iteration,false,200.0f,1,10,msg))
+            if(display(a,a,a,iteration,false,200.0f,2,10,msg))
                 break;
         }
     } 
