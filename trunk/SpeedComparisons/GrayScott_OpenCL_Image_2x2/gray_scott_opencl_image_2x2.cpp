@@ -101,14 +101,21 @@ int main()
         float *b = new float[X*Y];
         init(a,b);
 
+        // Get a list of devices on this platform
+        cl::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+
+        bool is_ImageSupported = devices[0].getInfo<CL_DEVICE_IMAGE_SUPPORT>();
+        if(!is_ImageSupported)
+        {
+            printf("Images not supported on this device.\n");
+            throw;
+        }
+
         // we make two images and swap between them
         cl::Image2D a1(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X/2,Y/2);
         cl::Image2D b1(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X/2,Y/2);
         cl::Image2D a2(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X/2,Y/2);
         cl::Image2D b2(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X/2,Y/2);
-
-        // Get a list of devices on this platform
-        cl::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
         // Create a command queue and use the selected device
         CommandQueue queue = CommandQueue(context, devices[0]);
