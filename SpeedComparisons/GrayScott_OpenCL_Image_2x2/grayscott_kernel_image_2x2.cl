@@ -30,13 +30,13 @@ __kernel void grayscott_compute_2x2(
         a_left.y + a_up.z + a_pixel.y + a_pixel.z,
         a_pixel.x + a_up.w + a_right.x + a_pixel.w,
         a_left.w + a_pixel.x + a_pixel.w + a_down.x,
-        a_pixel.z + a_pixel.y + a_right.z + a_down.y) - 4*a_pixel) 
-        - a_pixel * b_pixel * b_pixel + f*(1-a_pixel)) );
+        a_pixel.z + a_pixel.y + a_right.z + a_down.y) - 4.0f*a_pixel) 
+        - a_pixel * b_pixel * b_pixel + f*(1.0f-a_pixel)) );
     write_imagef( b2, (int2)(x, y), b_pixel + speed * (r_b * ((float4)(
         b_left.y + b_up.z + b_pixel.y + b_pixel.z,
         b_pixel.x + b_up.w + b_right.x + b_pixel.w,
         b_left.w + b_pixel.x + b_pixel.w + b_down.x,
-        b_pixel.z + b_pixel.y + b_right.z + b_down.y) - 4*b_pixel) 
+        b_pixel.z + b_pixel.y + b_right.z + b_down.y) - 4.0f*b_pixel) 
         + a_pixel * b_pixel * b_pixel - f_plus_k*b_pixel) );
     // (it's faster than using local const floats to split up the computation, annoyingly)
 }

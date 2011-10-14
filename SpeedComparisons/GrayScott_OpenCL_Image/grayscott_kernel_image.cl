@@ -16,7 +16,7 @@ __kernel void grayscott_compute (
     const float4 up = read_imagef(input, smp, (int2)(x, y-1));
     const float4 down = read_imagef(input, smp, (int2)(x, y+1));
  
-    const float4 laplacian = left + right + up + down - 4*pixel;
+    const float4 laplacian = left + right + up + down - 4.0f*pixel;
 
     {    
         // for Gray-Scott we only use the first two components:

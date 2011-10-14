@@ -58,8 +58,21 @@ bool display(float *chemicals,
              int iteration,bool auto_brighten,float manual_brighten,
              int scale,int delay_ms,const char* message);
 
-int main()
+static int g_opt_device = 0;
+
+int main(int argc, char * * argv)
 {
+    for (int i = 1; i < argc; i++) {
+        if (0) {
+        } else if ((i+1<argc) && (strcmp(argv[i],"-device")==0)) {
+            // select an output device
+            i++; g_opt_device = atoi(argv[i]);
+        } else {
+            std::cout << "Unrecognized argument: '" << argv[i] << "'\n";
+            exit(-1);
+        }
+    }
+
     // Here we implement the Gray-Scott model, as described here:
     // http://www.cc.gatech.edu/~turk/bio_sim/hw3.html
     // http://arxiv.org/abs/patt-sol/9304003
@@ -97,11 +110,22 @@ int main()
         // Get a list of devices on this platform
         cl::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
-        bool is_ImageSupported = devices[0].getInfo<CL_DEVICE_IMAGE_SUPPORT>();
+        // range-check the user's selection
+        int maxdev = devices.size() - 1;
+        g_opt_device = (g_opt_device > maxdev) ? maxdev :
+                                     ((g_opt_device < 0) ? 0 : g_opt_device);
+        std::cout << (maxdev+1) << " device(s) available; using device "
+                                                    << g_opt_device << ".\n";
+
+        Device &device = devices[g_opt_device];
+        cl::vector<Device> ourdevices = cl::vector<Device>(1, device);
+
+
+        bool is_ImageSupported = device.getInfo<CL_DEVICE_IMAGE_SUPPORT>();
         if(!is_ImageSupported)
         {
             printf("Images not supported on this device.\n");
-            throw;
+            exit(-1);
         }
 
         // we make two images and swap between them
@@ -109,7 +133,7 @@ int main()
         cl::Image2D chemicals2(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X,Y);
 
         // Create a command queue and use the selected device
-        CommandQueue queue = CommandQueue(context, devices[0]);
+        CommandQueue queue = CommandQueue(context, device);
         Event event;
  
         // Copy to the memory buffers
@@ -133,11 +157,33 @@ int main()
             (std::istreambuf_iterator<char>()));
         Program::Sources source(1, std::make_pair(sourceCode.c_str(), sourceCode.length()+1));
  
+        // enable this code to display kernel compilation error if you get clBuildProgram(-11)
+        #if 0
+           const ::size_t n = (::size_t)source.size();
+           ::size_t* lengths = (::size_t*) alloca(n * sizeof(::size_t));
+           const char** strings = (const char**) alloca(n * sizeof(const char*));
+           for (::size_t i = 0; i < n; ++i) {
+               strings[i] = source[(int)i].first;
+               lengths[i] = source[(int)i].second;
+           }
+           cl_int err;
+           cl_program myprog = clCreateProgramWithSource(context(), (cl_uint)n, strings, lengths, &err);
+           err = clBuildProgram(myprog, (cl_uint)ourdevices.size(), (cl_device_id*)&ourdevices.front(), NULL, NULL, NULL);
+           char proglog[1024];
+           clGetProgramBuildInfo(myprog, device(), CL_PROGRAM_BUILD_LOG, 1024, proglog, 0);
+           printf("err=%d log=%s\n", err, proglog);
+           return 0;
+        #endif
+
         // Make program of the source code in the context
         Program program = Program(context, source);
  
-        // Build program for these specific devices
-        program.build(devices);
+        // Build program for the specific device we are using
+        // IMPORTANT: If this program is running on a system that has multiple
+        // graphics cards, and if ANY of those cards does not support Images,
+        // then "program.build(devices);" will fail. Thus, we must build only
+        // on the device that is actually being used for the command queue.
+        program.build(ourdevices);
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
