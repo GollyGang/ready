@@ -23,11 +23,11 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 
 *System 1:* Visual Studio 2008 (32-bit), Windows 7 (64-bit), Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia !GeForce GTX 460 (Tim's desktop)
 
-*System 2:* CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Intel Core i7-2720QM (4 cores, 8 threads) @ 2.2 GHz, AMD Radeon HD 6750 QM with 1024 MB VRAM
+*System 2:* CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Intel Core i7-2720QM (4 cores, 8 threads) @ 2.2 GHz, AMD Radeon HD 6750 QM with 1024 MB VRAM (mrob)
 
-*System 3*: CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Dual Intel Xeon E5520 (8 cores, 16 threads) @ 2.27 GHz, ATI Radeon HD 5770 with 1024 MB VRAM
+*System 3*: CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Dual Intel Xeon E5520 (8 cores, 16 threads) @ 2.27 GHz, ATI Radeon HD 5770 with 1024 MB VRAM (mrob)
 
-*System 4*: CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Intel Core i5 (4 cores, 4 threads) @ 3.1 GHz, AMD Radeon HD 6970M with 1024 MB VRAM
+*System 4*: CMake version 2.8.5, GCC 4.2.1, Mac OS 10.6.8 (64-bit), Intel Core i5 (4 cores, 4 threads) @ 3.1 GHz, AMD Radeon HD 6970M with 1024 MB VRAM (Andrew)
 
 *System 5*: GCC 4.6.1, Debian Linux (32-bit), Intel Pentium 4 HT@ 3.2GHz, AMD Radeon Mobility 9100 IGP (Tim's old laptop)
 
