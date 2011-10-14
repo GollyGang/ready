@@ -19,8 +19,8 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 970 || 137 || 201 || 27 || 356 || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Local GrayScott_OpenCL_Local] || 660 || 54 || 76 || 37 || || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_2x2 GrayScott_OpenCL_2x2] || 1220 || 339 || 423 || 112 || 630 || - || - || || 
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || || note^2^ || - || - || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || || note^2^ || - || - || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || 324 || note^2^ || - || - || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || 437 || note^2^ || - || - || ||
 
 *System 1:* Visual Studio 2008 (32-bit), Windows 7 (64-bit), Intel i7-2600 (4 cores, 8 threads) @ 3.4GHz, nVidia !GeForce GTX 460 (962MB global memory, 48 KB local memory, local memory type: local) (Tim's desktop)
 
