@@ -7,7 +7,7 @@
 __kernel void grayscott_compute(
     __global float *U,__global float *V,
     __global float *U2, __global float *V2,
-    float k,float F,float D_u,float D_v,float delta_t, int wrap)
+    float k,float F,float D_u,float D_v,float delta_t)
 {
     // Get the index of the current element. X and Y are oriented like
     // in high school math class, with the origin (0,0) in the bottom-left
@@ -53,10 +53,17 @@ __kernel void grayscott_compute(
         // slower version, must use global data
 
         // compute the Laplacians of a and b
-        const int xm1 = wrap ? ((x-1+X)%X) : max(x-1,0);
-        const int xp1 = wrap ? ((x+1)%X)   : min(x+1,X-1);
-        const int ym1 = wrap ? ((y-1+Y)%Y) : max(y-1,0);
-        const int yp1 = wrap ? ((y+1)%Y)   : min(y+1,Y-1);
+#ifdef WRAP
+        const int xm1 = ((x-1+X)%X);
+        const int xp1 = ((x+1)%X);
+        const int ym1 = ((y-1+Y)%Y);
+        const int yp1 = ((y+1)%Y);
+#else
+        const int xm1 = max(x-1,0);
+        const int xp1 = min(x+1,X-1);
+        const int ym1 = max(y-1,0);
+        const int yp1 = min(y+1,Y-1);
+#endif
         const int iLeft = xm1*Y + y;
         const int iRight = xp1*Y + y;
         const int iUp = x*Y + ym1;   // Actually down: y=0 is the bottom edge

@@ -151,7 +151,7 @@ int main(int argc, char * * argv)
         Program program = Program(context, source);
  
         // Build program for these specific devices
-        program.build(devices);
+        program.build(devices, g_wrap ? "-D WRAP" : NULL, NULL, NULL);
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
@@ -191,11 +191,10 @@ int main(int argc, char * * argv)
         kernel.setArg(6, r_a);
         kernel.setArg(7, r_b);
         kernel.setArg(8, speed);
-        kernel.setArg(9, g_wrap);
 
         int iteration = 0;
         float fps_avg = 0.0; // decaying average of fps
-        const int N_FRAMES_PER_DISPLAY = 2000;  // an even number, because of our double-buffering implementation
+        const int N_FRAMES_PER_DISPLAY = 500;  // an even number, because of our double-buffering implementation
         while(true) 
         {
             struct timeval tod_record;
