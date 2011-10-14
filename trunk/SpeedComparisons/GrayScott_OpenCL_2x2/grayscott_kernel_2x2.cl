@@ -13,10 +13,17 @@ __kernel void grayscott_compute(
     const float4 v = V[i];
     
     // compute the Laplacians of a and b
+#ifdef WRAP
+    const int xm1 = ((x-1+X)%X);
+    const int xp1 = ((x+1)%X);
+    const int ym1 = ((y-1+Y)%Y);
+    const int yp1 = ((y+1)%Y);
+#else
     const int xm1 = max(x-1,0);
     const int xp1 = min(x+1,X-1);
     const int ym1 = max(y-1,0);
     const int yp1 = min(y+1,Y-1);
+#endif
     const int iLeft = xm1*Y + y;
     const int iRight = xp1*Y + y;
     const int iUp = x*Y + ym1;
