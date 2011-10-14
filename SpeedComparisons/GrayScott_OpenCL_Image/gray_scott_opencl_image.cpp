@@ -94,10 +94,6 @@ int main()
         float *chem2 = new float[X*Y*4];
         init(chem1);
 
-        // we make two images and swap between them
-        cl::Image2D chemicals1(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X,Y);
-        cl::Image2D chemicals2(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X,Y);
-
         // Get a list of devices on this platform
         cl::vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
@@ -107,6 +103,10 @@ int main()
             printf("Images not supported on this device.\n");
             throw;
         }
+
+        // we make two images and swap between them
+        cl::Image2D chemicals1(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X,Y);
+        cl::Image2D chemicals2(context,CL_MEM_READ_WRITE,cl::ImageFormat(CL_RGBA,CL_FLOAT),X,Y);
 
         // Create a command queue and use the selected device
         CommandQueue queue = CommandQueue(context, devices[0]);
