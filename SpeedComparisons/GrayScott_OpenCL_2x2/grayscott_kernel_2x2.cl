@@ -35,12 +35,12 @@ __kernel void grayscott_compute(
         u_left.y + u_up.z + u.y + u.z,
         u.x + u_up.w + u_right.x + u.w,
         u_left.w + u.x + u.w + u_down.x,
-        u.z + u.y + u_right.z + u_down.y) - 4*u;
+        u.z + u.y + u_right.z + u_down.y) - 4.0f*u;
     const float4 nabla_v = (float4)(
         v_left.y + v_up.z + v.y + v.z,
         v.x + v_up.w + v_right.x + v.w,
         v_left.w + v.x + v.w + v_down.x,
-        v.z + v.y + v_right.z + v_down.y) - 4*v;
+        v.z + v.y + v_right.z + v_down.y) - 4.0f*v;
 
     // compute the new rate of change
     const float4 delta_u = D_u * nabla_u - u*v*v + F*(1.0f-u);
