@@ -116,6 +116,26 @@ int main()
             std::istreambuf_iterator<char>(sourceFile),
             (std::istreambuf_iterator<char>()));
         Program::Sources source(1, std::make_pair(sourceCode.c_str(), sourceCode.length()+1));
+
+
+        // enable this code to display kernel compilation error if you get clBuildProgram(-11)
+        #if 0
+           const ::size_t n = (::size_t)source.size();
+           ::size_t* lengths = (::size_t*) alloca(n * sizeof(::size_t));
+           const char** strings = (const char**) alloca(n * sizeof(const char*));
+           for (::size_t i = 0; i < n; ++i) {
+               strings[i] = source[(int)i].first;
+               lengths[i] = source[(int)i].second;
+           }
+           cl_int err;
+           cl_program myprog = clCreateProgramWithSource(context(), (cl_uint)n, strings, lengths, &err);
+           err = clBuildProgram(myprog, (cl_uint)devices.size(), (cl_device_id*)&devices.front(), NULL, NULL, NULL);
+           char proglog[1024];
+           clGetProgramBuildInfo(myprog, devices[0](), CL_PROGRAM_BUILD_LOG, 1024, proglog, 0);
+           printf("err=%d log=%s\n", err, proglog);
+           return 0;
+        #endif
+         
  
         // Make program of the source code in the context
         Program program = Program(context, source);
@@ -191,7 +211,7 @@ int main()
                 fps = ((float)N_FRAMES_PER_DISPLAY) / tod_elap;
             // We display an exponential moving average of the fps measurement
             fps_avg = (fps_avg == 0) ? fps : (((fps_avg * 10.0) + fps) / 11.0);
-	        double Mcgs = (fps_avg * ((double)X) * ((double)Y)) / 1.0e6;
+                double Mcgs = (fps_avg * ((double)X) * ((double)Y)) / 1.0e6;
             sprintf(msg,"GrayScott - %0.2f fps %0.2f Mcgs", fps_avg, Mcgs);
 
             // display:
@@ -349,4 +369,3 @@ bool display(float r[X][Y],float g[X][Y],float b[X][Y],
     }
     return false;
 }
-
