@@ -188,7 +188,7 @@ int main(int argc, char * * argv)
         queue.enqueueWriteBuffer(bufferV, CL_TRUE, 0, MEM_SIZE, b);
  
         NDRange global(X/2,Y/2);
-        NDRange local(8,8);
+        NDRange local(1,256);
 
         kernel.setArg(4, k);
         kernel.setArg(5, f);
@@ -246,7 +246,7 @@ int main(int argc, char * * argv)
             sprintf(msg,"GrayScott - %0.2f fps %0.2f Mcgs", fps_avg, Mcgs);
 
             // display:
-            if(display(a,a,a,iteration,false,200.0f,2,10,msg))
+            if(display(a,a,a,iteration,false,200.0f,1,10,msg))
                 break;
         }
     } 
