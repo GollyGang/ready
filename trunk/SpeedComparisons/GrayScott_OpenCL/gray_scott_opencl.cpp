@@ -53,16 +53,12 @@ using namespace cl;
 void init(float a[X][Y],float b[X][Y]);
 
 static int g_opt_device = 0;
-static int g_color = 0;
 static int g_wrap = 0;
 
 int main(int argc, char * * argv)
 {
     for (int i = 1; i < argc; i++) {
         if (0) {
-        } else if (strcmp(argv[i],"-color")==0) {
-            // do output in wonderful technicolor
-            g_color = 1;
         } else if ((i+1<argc) && (strcmp(argv[i],"-device")==0)) {
             // select an output device
             i++; g_opt_device = atoi(argv[i]);
@@ -93,14 +89,11 @@ int main(int argc, char * * argv)
     float speed = 2.0f;
     // ----------------
     
-    // the first two will be used to send the initial pattern of
-    // chemical concentrations into the GPU, and then all three arrays
-    // are used to read the colour rendering back out.
-    float red[X][Y], green[X][Y], blue[X][Y];
+    float u[X][Y], v[X][Y];
     const int MEM_SIZE = sizeof(float)*X*Y;
 
     // put the initial conditions into each cell
-    init(red,green);
+    init(u,v);
 
     try { 
         // Get available OpenCL platforms
@@ -158,32 +151,15 @@ int main(int argc, char * * argv)
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
 
-        // Same thing, cor colour kernel
-        std::string kfn_2 = CL_SOURCE_DIR;
-        kfn_2 += "/gs_colorkernel.cl";
-        std::ifstream sourceFile_2(kfn_2.c_str());
-        std::string sourceCode_2(
-            std::istreambuf_iterator<char>(sourceFile_2),
-            (std::istreambuf_iterator<char>()));
-        Program::Sources source_2(1,
-              std::make_pair(sourceCode_2.c_str(), sourceCode_2.length()+1));
-        Program program_2 = Program(context, source_2);
-        program_2.build(devices);
-        Kernel k_col(program_2, "grayscott_colour");
- 
         // Create memory buffers
         Buffer bufferU = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
         Buffer bufferV = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
         Buffer bufferU2 = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
         Buffer bufferV2 = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
 
-        Buffer bufferR = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
-        Buffer bufferG = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
-        Buffer bufferB = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
-
         // Copy lists A and B to the memory buffers
-        queue.enqueueWriteBuffer(bufferU, CL_TRUE, 0, MEM_SIZE, red);
-        queue.enqueueWriteBuffer(bufferV, CL_TRUE, 0, MEM_SIZE, green);
+        queue.enqueueWriteBuffer(bufferU, CL_TRUE, 0, MEM_SIZE, u);
+        queue.enqueueWriteBuffer(bufferV, CL_TRUE, 0, MEM_SIZE, v);
  
         NDRange global(X,Y);
         NDRange local(8,8);
@@ -226,29 +202,8 @@ int main(int argc, char * * argv)
                 iteration++;
             }
 
-            if (g_color) {
-                // Colorize
-                k_col.setArg(0, bufferU);
-                k_col.setArg(1, bufferV);
-                k_col.setArg(2, bufferU2);
-                k_col.setArg(3, bufferR);
-                k_col.setArg(4, bufferG);
-                k_col.setArg(5, bufferB);
-                queue.enqueueNDRangeKernel(k_col, NullRange, global, local,
-                                           NULL, &event);
-
-                // Wait for this last command to finish before reading buffers
-                // back into CPU memory.
-                event.wait();
-
-                // retrieve the buffers
-                queue.enqueueReadBuffer(bufferR, CL_TRUE, 0, MEM_SIZE, red);
-                queue.enqueueReadBuffer(bufferG, CL_TRUE, 0, MEM_SIZE, green);
-                queue.enqueueReadBuffer(bufferB, CL_TRUE, 0, MEM_SIZE, blue);
-            } else {
-                // no colour -- just read the A pattern back into a buffer
-                queue.enqueueReadBuffer(bufferU, CL_TRUE, 0, MEM_SIZE, red);
-            }
+            // no colour -- just read the A pattern back into a buffer
+            queue.enqueueReadBuffer(bufferU, CL_TRUE, 0, MEM_SIZE, u);
 
             gettimeofday(&tod_record, 0);
             tod_after = ((double) (tod_record.tv_sec))
@@ -267,13 +222,7 @@ int main(int argc, char * * argv)
 
             // display:
             {
-                int quitnow;
-                if (g_color) {
-                    quitnow = display(red,green,blue,iteration,false,200.0f,2,10,msg);
-                } else {
-                    /* Simply show one dimension on all three channels. */
-                    quitnow = display(red,red,red,iteration,false,200.0f,2,10,msg);
-                }
+                int quitnow = display(u,u,u,iteration,false,200.0f,1,10,msg);
                 if (quitnow)
                     break;
             }
