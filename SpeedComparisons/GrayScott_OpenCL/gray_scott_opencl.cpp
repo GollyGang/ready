@@ -165,7 +165,7 @@ int main(int argc, char * * argv)
         queue.enqueueWriteBuffer(bufferV, CL_TRUE, 0, MEM_SIZE, v);
  
         NDRange global(X,Y);
-        NDRange local(8,8);
+        NDRange local(1,512);
 
         kernel.setArg(4, k);
         kernel.setArg(5, f);
