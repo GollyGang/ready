@@ -122,6 +122,7 @@ int main(int argc, char * * argv)
         std::cout << "Global memory: " << device.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>() << " bytes\n";
         std::cout << "Local memory: " << device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>() << " bytes\n";
         std::cout << "Local memory type: " << std::string((device.getInfo<CL_DEVICE_LOCAL_MEM_TYPE>()==CL_LOCAL)?"local":"global") << " \n";
+        std::cout << "CL_DEVICE_MAX_WORK_GROUP_SIZE: " << device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>() << "\n";
 
         // Create a command queue and use the selected device
         if (maxdev < 0) {
@@ -150,6 +151,8 @@ int main(int argc, char * * argv)
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
+
+        std::cout << "CL_KERNEL_WORK_GROUP_SIZE: " << kernel.getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(device) << "\n";
 
         // Create memory buffers
         Buffer bufferU = Buffer(context, CL_MEM_READ_ONLY, MEM_SIZE);
