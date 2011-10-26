@@ -8,17 +8,17 @@ _This page will contain the results from the different implementations on differ
 To standardise the results we have chosen the Gray-Scott system, with toroidal topology. The figures are in Million cell-generations per second.
 
 || || System 1 || System 2 || System 3 || 3b || System 4 || System 5 || System 6 || others (please add) ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott GrayScott] || 84 || 117 || 67 || || 129 || 14 || 9 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_double GrayScott_double] || 87 || 115 || 69 || || 128 || 10 || 9 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCV GrayScott_OpenCV] || 97 || || || || || || || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 || 163 || 98 || || 253 || 10 || 8 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 || 450 || 315 || || 492 || 18 || 27 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 || 160-230^1^ || 64-79^1^ || || 250-730^1^ || 23 || 24 || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 || 455 || 285 || || 496 || 26 || 27 || ||
-|| HWIVector (2 threads) || 950 || 750 || 478 || || 870 || 23 || 27 || ||
-|| HWIVector (all threads) || 1710 || 825 || 675 || || 1300 || || || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott GrayScott] || 84 || 117 || 67 || || 126 || 14 || 9 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_double GrayScott_double] || 87 || 115 || 69 || || 127 || 10 || 9 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCV GrayScott_OpenCV] || 97 || || || || 117 || || || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenMP GrayScott_OpenMP] || 250 || 163 || 98 || || 250 || 10 || 8 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE GrayScott_SSE] || 540 || 450 || 315 || || 490 || 18 || 27 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_SSE_OpenMP GrayScott_SSE_OpenMP] || 1000 || 160-230^1^ || 64-79^1^ || || 230-728^1^ || 23 || 24 || ||
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 || 455 || 285 || || 478 || 26 || 27 || ||
+|| HWIVector (2 threads) || 950 || 750 || 478 || || 838 || 23 || 27 || ||
+|| HWIVector (all threads) || 1710 || 825 || 675 || || 1268 || || || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 3400 || 137 || 201 || 27 || 435 || - || - || || 
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Local GrayScott_OpenCL_Local] || 3380 || 54 || 76 || 37 || 185 || - || - || || 
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Local GrayScott_OpenCL_Local] || 3380 || 54 || 76 || 37 || 1400 || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_2x2 GrayScott_OpenCL_2x2] || 2880 || 339 || 423 || 112 || 630 || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || 324 || note^2^ || - || - || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || 437 || note^2^ || - || - || ||
