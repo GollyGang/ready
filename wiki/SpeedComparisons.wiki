@@ -17,9 +17,9 @@ To standardise the results we have chosen the Gray-Scott system, with toroidal t
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_HWIVector GrayScott_HWIVector] (1 thread) || 540 || 455 || 285 || || 478 || 26 || 27 || ||
 || HWIVector (2 threads) || 950 || 750 || 478 || || 838 || 23 || 27 || ||
 || HWIVector (all threads) || 1710 || 825 || 675 || || 1268 || || || ||
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 3400 || 137 || 201 || 27 || 435 || - || - || || 
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL GrayScott_OpenCL] || 3400 || 137 || 201 || 27 || 1760 || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Local GrayScott_OpenCL_Local] || 3380 || 54 || 76 || 37 || 1400 || - || - || || 
-|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_2x2 GrayScott_OpenCL_2x2] || 2880 || 339 || 423 || 112 || 630 || - || - || || 
+|| [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_2x2 GrayScott_OpenCL_2x2] || 2880 || 339 || 423 || 112 || 1860 || - || - || || 
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image GrayScott_OpenCL_Image] || 2300 || note^2^ || note^2^ || 324 || note^2^ || - || - || ||
 || [https://code.google.com/p/reaction-diffusion/source/browse/trunk#trunk%2FSpeedComparisons%2FGrayScott_OpenCL_Image_2x2 GrayScott_OpenCL_Image_2x2] || 4400 || note^2^ || note^2^ || 437 || note^2^ || - || - || ||
 
