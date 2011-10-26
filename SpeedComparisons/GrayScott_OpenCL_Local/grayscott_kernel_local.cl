@@ -1,7 +1,7 @@
 //  This version loads data into a local cache, see http://www.khronos.org/message_boards/viewtopic.php?p=11081#p11081
 
-#define LOCAL_X 8
-#define LOCAL_Y 8
+#define LOCAL_X 1
+#define LOCAL_Y 256
 // annoyingly, we have to keep these manually synced with the size of the local group in the host
 
 __kernel void grayscott_compute(
