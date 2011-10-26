@@ -68,3 +68,7 @@ Returning to OpenCL, the main advice for optimisation is to look at cache hits -
 There's an *image2d_t* structure in OpenCL that is already optimized for 2D caching. We found that !GrayScott_OpenCL_Image was 3x faster than our `float*`-based !GrayScott_OpenCL on System 1.
 
 Our final optimization to date uses OpenCL's own version of SSE-like processing, using float4's to operate on 4 values at once, both for the maths and the reading and writing. !GrayScott_OpenCL_Image_2x2 gave another 2x speedup on top of the image version.
+
+= Outside help =
+
+Tim started a thread at Khronos.org about this: http://www.khronos.org/message_boards/viewtopic.php?f=28&t=4455
