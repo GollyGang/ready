@@ -66,7 +66,7 @@ float& float_at(float* arr,int x,int y)
 }
 
 static int g_opt_device = 0;
-static int g_wrap = 0;
+static int g_wrap = 1;
 
 int main(int argc, char * * argv)
 {
