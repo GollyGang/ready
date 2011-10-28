@@ -39,7 +39,7 @@ See README.txt for more details.
 // local:
 #include "defs.h"
 
-static int g_wrap = 0;
+static int g_wrap = 1;
 static bool g_paramspace = 0;
 
 bool display_gsd(double r[X][Y],double g[X][Y],double b[X][Y],

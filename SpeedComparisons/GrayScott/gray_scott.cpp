@@ -41,7 +41,7 @@ void compute(float a[X][Y],float b[X][Y],
              float speed,
              bool parameter_space);
 
-static int g_wrap = 0;
+static int g_wrap = 1;
 static bool g_paramspace = 0;
 
 int main(int argc, char * * argv)

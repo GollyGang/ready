@@ -103,7 +103,7 @@ void compute_dispatch(float *u, float *v, float *du, float *dv,
   int parameter_space, int num_its, int num_threads);
 
 static int g_paramspace = 0;
-static int g_wrap = 0;
+static int g_wrap = 1;
 static float g_k = 0.064;
 static float g_F = 0.035;
 static bool g_video = false;
