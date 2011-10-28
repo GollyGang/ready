@@ -45,6 +45,7 @@ using namespace cl;
 // STL:
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 // local:
 #include "defs.h"
@@ -142,9 +143,15 @@ int main(int argc, char * * argv)
  
         // Make program of the source code in the context
         Program program = Program(context, source);
+
+        const int LOCAL_X=1;
+        const int LOCAL_Y=256;
  
         // Build program for these specific devices
-        program.build(devices, g_wrap ? "-D WRAP" : NULL, NULL, NULL);
+        std::ostringstream oss;
+        oss << "-D LOCAL_X=" << LOCAL_X << " -D LOCAL_Y=" << LOCAL_Y;
+        if(g_wrap) oss << " -D WRAP";
+        program.build(devices, oss.str().c_str(), NULL, NULL);
  
         // Make kernel
         Kernel kernel(program, "grayscott_compute");
@@ -160,7 +167,7 @@ int main(int argc, char * * argv)
         queue.enqueueWriteBuffer(bufferV, CL_TRUE, 0, MEM_SIZE, b);
  
         NDRange global(X,Y);
-        NDRange local(1,256); // keep in sync with kernel defines
+        NDRange local(LOCAL_X,LOCAL_Y);
 
         kernel.setArg(4, k);
         kernel.setArg(5, f);
