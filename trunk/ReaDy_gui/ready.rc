@@ -1,0 +1,53 @@
+// first icon file is used by Windows Explorer:
+aaaaaaaa ICON "appicon.ico"
+
+// these icons are for the frame:
+appicon16 ICON "appicon16.ico"
+appicon32 ICON "appicon32.ico"
+
+#include "wx/msw/wx.rc"
+
+// tool bar buttons
+play           BITMAP "bitmaps/play.bmp"
+stop           BITMAP "bitmaps/stop.bmp"
+reset          BITMAP "bitmaps/reset.bmp"
+algo           BITMAP "bitmaps/algo.bmp"
+autofit        BITMAP "bitmaps/autofit.bmp"
+new            BITMAP "bitmaps/new.bmp"
+open           BITMAP "bitmaps/open.bmp"
+save           BITMAP "bitmaps/save.bmp"
+patterns       BITMAP "bitmaps/patterns.bmp"
+info           BITMAP "bitmaps/info.bmp"
+help           BITMAP "bitmaps/help.bmp"
+autofit_down   BITMAP "bitmaps/autofit_down.bmp"
+patterns_down  BITMAP "bitmaps/patterns_down.bmp"
+
+// edit bar buttons
+undo           BITMAP "bitmaps/undo.bmp"
+redo           BITMAP "bitmaps/redo.bmp"
+draw           BITMAP "bitmaps/draw.bmp"
+pick           BITMAP "bitmaps/pick.bmp"
+select         BITMAP "bitmaps/select.bmp"
+move           BITMAP "bitmaps/move.bmp"
+zoomin         BITMAP "bitmaps/zoomin.bmp"
+zoomout        BITMAP "bitmaps/zoomout.bmp"
+draw_down      BITMAP "bitmaps/draw_down.bmp"
+pick_down      BITMAP "bitmaps/pick_down.bmp"
+select_down    BITMAP "bitmaps/select_down.bmp"
+move_down      BITMAP "bitmaps/move_down.bmp"
+zoomin_down    BITMAP "bitmaps/zoomin_down.bmp"
+zoomout_down   BITMAP "bitmaps/zoomout_down.bmp"
+
+// timeline bar buttons
+record         BITMAP "bitmaps/record.bmp"
+backwards      BITMAP "bitmaps/backwards.bmp"
+forwards       BITMAP "bitmaps/forwards.bmp"
+stopplay       BITMAP "bitmaps/stopplay.bmp"
+deltime        BITMAP "bitmaps/deltime.bmp"
+
+// cursors
+pick_curs      BITMAP "bitmaps/pick_curs.bmp"
+hand_curs      BITMAP "bitmaps/hand_curs.bmp"
+cross_curs     BITMAP "bitmaps/cross_curs.bmp"
+zoomin_curs    BITMAP "bitmaps/zoomin_curs.bmp"
+zoomout_curs   BITMAP "bitmaps/zoomout_curs.bmp"
