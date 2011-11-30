@@ -75,7 +75,8 @@ ELSE(WIN32)
     SET(GUI_EXECUTABLE MACOSX_BUNDLE)
     IF(VTK_USE_COCOA)
       SET_SOURCE_FILES_PROPERTIES(
-        src/wxVTKRenderWindowInteractor.cxx
+        # AKT: removed src/
+        wxVTKRenderWindowInteractor.cxx
         PROPERTIES COMPILE_FLAGS "-ObjC++")
     ENDIF(VTK_USE_COCOA)
   ELSE(APPLE)
@@ -129,21 +130,6 @@ if(APPLE OR UNIX)
    add_definitions(-D_LARGE_FILES)
 endif()
 
-if(APPLE)
-   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
-   add_custom_target( app_bundle
-      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >${CMAKE_SOURCE_DIR}/ReaDy.app/Contents/Info.plist
-      COMMAND echo -n "APPLReDy" >${CMAKE_SOURCE_DIR}/ReaDy.app/Contents/PkgInfo
-   )
-   add_dependencies( ${APP_NAME} app_bundle )
-   
-   # copy *.icns files into Resources directory inside .app bundle
-   set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-   
-   # strip out debug info (reduces app size by 1.6MB)
-   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
-endif()
-
 # put the executables in the src folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
@@ -172,6 +158,22 @@ else()
    add_library( static_zlib STATIC IMPORTED )
    set_property( TARGET static_zlib PROPERTY IMPORTED_LOCATION /usr/lib/libz.a )
    target_link_libraries( ${APP_NAME} static_zlib )
+endif()
+
+# AKT: this code must be after add_executable
+if(APPLE)
+   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
+   add_custom_target( app_bundle
+      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >${CMAKE_SOURCE_DIR}/ReaDy.app/Contents/Info.plist
+      COMMAND echo -n "APPLReDy" >${CMAKE_SOURCE_DIR}/ReaDy.app/Contents/PkgInfo
+   )
+   add_dependencies( ${APP_NAME} app_bundle )
+   
+   # copy *.icns files into Resources directory inside .app bundle
+   set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+   
+   # strip out debug info (reduces app size by 1.6MB)
+   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
 endif()
 
 # hack to get around the "Debug" and "Release" folders Visual Studio adds on Windows

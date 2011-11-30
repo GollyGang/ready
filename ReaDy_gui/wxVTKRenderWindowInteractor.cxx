@@ -33,7 +33,8 @@
 #include "vtkDebugLeaks.h"
 
 #ifdef __WXMAC__
-#include "vtkCarbonRenderWindow.h"
+//AKT #include "vtkCarbonRenderWindow.h"
+#include "vtkCocoaRenderWindow.h"
 #endif
 
 //Keep this for compatibilty reason, this was introduced in wxGTK 2.4.0
@@ -371,10 +372,11 @@ void wxVTKRenderWindowInteractor::OnPaint(wxPaintEvent& WXUNUSED(event))
 #ifdef __WXMAC__
   // This solves a problem with repainting after a window resize
   // See also: http://sourceforge.net/mailarchive/forum.php?thread_id=31690967&forum_id=41789
-  vtkCarbonRenderWindow* rwin = vtkCarbonRenderWindow::SafeDownCast(RenderWindow);
+  //AKT vtkCarbonRenderWindow* rwin = vtkCarbonRenderWindow::SafeDownCast(RenderWindow);
+  vtkCocoaRenderWindow* rwin = vtkCocoaRenderWindow::SafeDownCast(RenderWindow);
   if( rwin )
   {
-    rwin->UpdateGLRegion();
+    //AKT rwin->UpdateGLRegion();
   }
 #endif
 }
