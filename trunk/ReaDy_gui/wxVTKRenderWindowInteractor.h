@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: wxVTKRenderWindowInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2008/04/13 22:06:52 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2009/03/03 16:20:43 $
+  Version:   $Revision: 1.24 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -55,14 +55,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
 
-// Apparently since wxGTK 2.8.0 one can finally use wxWindow (just as in any
-// other port):
-// MM: tested on 2008/04/08: experienced some heavy flickering with wx-widget 2.6.0
-// using a wxWindow instead of wxGLCanvas fixed the symptoms
-//#if (!wxCHECK_VERSION(2, 6, 0))
-#if (!wxCHECK_VERSION(2, 8, 0))
 #define USE_WXGLCANVAS
-#endif
 
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
 #  if wxUSE_GLCANVAS
@@ -130,13 +123,16 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
 #if !(VTK_MAJOR_VERSION == 3 && VTK_MINOR_VERSION == 1)
     void OnEnter(wxMouseEvent &event);
     void OnLeave(wxMouseEvent &event);
+    void OnMouseWheel(wxMouseEvent& event);
+#if wxCHECK_VERSION(2, 8, 0)
+    void OnMouseCaptureLost(wxMouseCaptureLostEvent& event);
+#endif
     void OnKeyDown(wxKeyEvent &event);
     void OnKeyUp(wxKeyEvent &event);
     void OnChar(wxKeyEvent &event);
 #endif
     void OnTimer(wxTimerEvent &event);
     void OnSize(wxSizeEvent &event);
-    void OnMouseWheel(wxMouseEvent& event);
 
     void Render();
     void SetRenderWhenDisabled(int newValue);
@@ -155,10 +151,15 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
     vtkSetMacro(UseCaptureMouse,int);
     vtkBooleanMacro(UseCaptureMouse,int);
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
+  protected:
+    virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration);
+    virtual int InternalDestroyTimer(int platformTimerId);
+#endif
+
   protected:
     wxTimer timer;
     int ActiveButton;
-    int RenderAllowed;
     long GetHandleHack();
     int Stereo;
     
