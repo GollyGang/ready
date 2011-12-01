@@ -32,6 +32,11 @@
 #endif
 #include "vtkDebugLeaks.h"
 
+// AKT: wxOSX 2.9.x defines __WXOSX_COCOA__ rather than __WXCOCOA__
+#ifdef __WXOSX_COCOA__
+#define __WXCOCOA__
+#endif
+
 #ifdef __WXMAC__
 #ifdef __WXCOCOA__
 #include "vtkCocoaRenderWindow.h"
@@ -362,11 +367,15 @@ long wxVTKRenderWindowInteractor::GetHandleHack()
 //__WXCOCOA__ stands for using the objective-c Cocoa API
 #ifdef __WXCOCOA__
    // Here is how to find the NSWindow
-   wxTopLevelWindow* toplevel = dynamic_cast<wxTopLevelWindow*>(
-     wxGetTopLevelParent( this ) );
+   wxTopLevelWindow* toplevel = dynamic_cast<wxTopLevelWindow*>(wxGetTopLevelParent( this ) );
    if (toplevel != NULL )    
    {
-     handle_tmp = (long)toplevel->GetNSWindow();
+     // AKT: use new Cocoa code if wxOSX 2.9.x
+     #if wxCHECK_VERSION(2, 9, 0)
+        handle_tmp = (long)toplevel->GetWXWindow();
+     #else
+        handle_tmp = (long)toplevel->GetNSWindow();
+     #endif
    }
    // The NSView will be deducted from 
    // [(NSWindow*)Handle contentView]
