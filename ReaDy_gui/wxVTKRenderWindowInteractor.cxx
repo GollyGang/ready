@@ -358,29 +358,25 @@ long wxVTKRenderWindowInteractor::GetHandleHack()
   long handle_tmp = 0;
 
 // __WXMSW__ is for Win32
-//__WXMAC__ stands for using Carbon C-headers, using either the CarbonLib/CFM or the native Mach-O builds (which then also use the latest features available)
+// __WXMAC__ is for Carbon or Cocoa builds
 // __WXGTK__ is for both gtk 1.2.x and gtk 2.x
 #if defined(__WXMSW__) || defined(__WXMAC__)
     handle_tmp = (long)this->GetHandle();
 #endif //__WXMSW__
 
-//__WXCOCOA__ stands for using the objective-c Cocoa API
+/* AKT: not needed -- using above GetHandle() works fine with wxOSX 2.9.x
 #ifdef __WXCOCOA__
    // Here is how to find the NSWindow
    wxTopLevelWindow* toplevel = dynamic_cast<wxTopLevelWindow*>(wxGetTopLevelParent( this ) );
    if (toplevel != NULL )    
    {
-     // AKT: use new Cocoa code if wxOSX 2.9.x
-     #if wxCHECK_VERSION(2, 9, 0)
-        handle_tmp = (long)toplevel->GetWXWindow();
-     #else
-        handle_tmp = (long)toplevel->GetNSWindow();
-     #endif
+      handle_tmp = (long)toplevel->GetNSWindow();
    }
    // The NSView will be deducted from 
    // [(NSWindow*)Handle contentView]
    // if only I knew how to write that in c++
 #endif //__WXCOCOA__
+*/
 
     // Find and return the actual X-Window.
 #if defined(__WXGTK__) || defined(__WXX11__)
@@ -404,9 +400,7 @@ void wxVTKRenderWindowInteractor::OnPaint(wxPaintEvent& WXUNUSED(event))
   {
     Handle = GetHandleHack();
     RenderWindow->SetWindowId(reinterpret_cast<void *>(Handle));
-// Cocoa
-// this->GetNSView() <-> DisplayId
-// this->GetTopLevel()->GetNSWindow() <-> WindowId
+
 #ifdef __WXMSW__
     RenderWindow->SetParentId(reinterpret_cast<void *>(this->GetParent()->GetHWND()));
 #endif //__WXMSW__
@@ -415,7 +409,11 @@ void wxVTKRenderWindowInteractor::OnPaint(wxPaintEvent& WXUNUSED(event))
     // If VTK closes the display, ~wxContext chashes while trying to destroy its
     // glContext (because the display is closed). The Get -> Set makes this VTK
     // object think someone else is responsible for the display. 
-    this->RenderWindow->SetDisplayId(this->RenderWindow->GetGenericDisplayId());
+    #ifdef __WXCOCOA__
+      // AKT: avoid "Method not implemented" messages in Console
+    #else
+      this->RenderWindow->SetDisplayId(this->RenderWindow->GetGenericDisplayId());
+    #endif
   }
   // get vtk to render to the wxWindows
   Render();
@@ -423,11 +421,13 @@ void wxVTKRenderWindowInteractor::OnPaint(wxPaintEvent& WXUNUSED(event))
   // This solves a problem with repainting after a window resize
   // See also: http://sourceforge.net/mailarchive/forum.php?thread_id=31690967&forum_id=41789
 #ifdef __WXCOCOA__
+  /* AKT: this doesn't seem necessary with wxOSX 2.9.x
   vtkCocoaRenderWindow * rwin = vtkCocoaRenderWindow::SafeDownCast(RenderWindow);
   if( rwin )
   {
     rwin->UpdateContext();
   }
+  */
 #else
   vtkCarbonRenderWindow* rwin = vtkCarbonRenderWindow::SafeDownCast(RenderWindow);
   if( rwin )
