@@ -1,19 +1,19 @@
-#  Copyright 2011, The ReaDy Bunch
+#  Copyright 2011, The Ready Bunch
 #
-#  This file is part of ReaDy.
+#  This file is part of Ready.
 #
-#  ReaDy is free software: you can redistribute it and/or modify
+#  Ready is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  ReaDy is distributed in the hope that it will be useful,
+#  Ready is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with ReaDy. If not, see <http://www.gnu.org/licenses/>.
+#  along with Ready. If not, see <http://www.gnu.org/licenses/>.
     
 cmake_minimum_required(VERSION 2.6)
 
@@ -21,11 +21,11 @@ if(COMMAND cmake_policy)
 cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-project( ReaDy )
+project( Ready )
 
 if(APPLE OR WIN32)
    # app names are usually capitalized on Mac OS X and Windows
-   set( APP_NAME ReaDy )
+   set( APP_NAME Ready )
 else()
    # Linux binaries are usually all lowercase
    set( APP_NAME ready )
@@ -34,11 +34,13 @@ endif()
 # low-level code used in all executables
 set(BASE_SOURCES
    core.cpp
+   cl.hpp
 )
 
-# high-level GUI code used only in ReaDy
+# high-level GUI code used only in Ready
 set(GUI_SOURCES
    app.hpp app.cpp frame.hpp frame.cpp 
+   vtk_pipeline.hpp vtk_pipeline.cpp
    wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx   # a local copy, since it gets released so infrequently
 )
 
@@ -59,12 +61,11 @@ elseif(UNIX)
    set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
 endif()
 
-
 find_package( VTK )
 IF(VTK_FOUND)
   INCLUDE(${VTK_USE_FILE})
 ELSE(VTK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK_DIR")
+  MESSAGE(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK variables.")
 ENDIF(VTK_FOUND)
 
 # The following allows you to access wxGLCanvas for GTK
@@ -97,13 +98,13 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # wxWidgets is required to build the project
-FIND_PACKAGE(wxWidgets COMPONENTS aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE(wxWidgets COMPONENTS propgrid aui ${WXGLCANVASLIBS} core adv base )
 
 IF(wxWidgets_FOUND)
   INCLUDE( ${wxWidgets_USE_FILE} )
 ELSE(wxWidgets_FOUND)
   MESSAGE(FATAL_ERROR
-   "Cannot build the executable without wxWidgets. Please set the wxWidgets_DIR")
+   "Cannot build the executable without wxWidgets. Please set the wxWidgets variables.")
 ENDIF(wxWidgets_FOUND)
 
 if(WIN32)
@@ -118,8 +119,14 @@ include_directories(
 )
 add_definitions( -DZLIB )
 
+set(CMAKE_MODULE_PATH ${Ready_SOURCE_DIR})
+# (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
+find_package ( OpenCL REQUIRED )
+include_directories ( ${OPENCL_INCLUDE_DIRS} )
+link_libraries ( ${OPENCL_LIBRARIES} )
+  
 # tell the code where the .cl files live
-add_definitions(-DCL_SOURCE_DIR="${ReaDy_SOURCE_DIR}")
+add_definitions(-DCL_SOURCE_DIR="${Ready_SOURCE_DIR}")
 
 if(APPLE)
    # support Mac OS 10.5 or later
@@ -129,9 +136,6 @@ if(APPLE OR UNIX)
    # use same settings as in makefiles
    add_definitions(-D_LARGE_FILES)
 endif()
-
-# put the executables in the src folder
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
@@ -160,12 +164,11 @@ else()
    target_link_libraries( ${APP_NAME} static_zlib )
 endif()
 
-# AKT: this code must be after add_executable
 if(APPLE)
    # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
    add_custom_target( app_bundle
-      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >${CMAKE_SOURCE_DIR}/ReaDy.app/Contents/Info.plist
-      COMMAND echo -n "APPLReDy" >${CMAKE_SOURCE_DIR}/ReaDy.app/Contents/PkgInfo
+      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >${CMAKE_SOURCE_DIR}/Ready.app/Contents/Info.plist
+      COMMAND echo -n "APPLReDy" >${CMAKE_SOURCE_DIR}/Ready.app/Contents/PkgInfo
    )
    add_dependencies( ${APP_NAME} app_bundle )
    

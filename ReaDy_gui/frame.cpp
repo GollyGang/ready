@@ -1,22 +1,23 @@
-/*  Copyright 2011, The ReaDy Bunch
+/*  Copyright 2011, The Ready Bunch
 
-    This file is part of ReaDy.
+    This file is part of Ready.
 
-    ReaDy is free software: you can redistribute it and/or modify
+    Ready is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    ReaDy is distributed in the hope that it will be useful,
+    Ready is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with ReaDy. If not, see <http://www.gnu.org/licenses/>.         */
+    along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
 #include "frame.hpp"
+#include "vtk_pipeline.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -26,28 +27,25 @@
 #include <wx/imaglist.h>
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
+#include <wx/propgrid/propgrid.h>
 
-// wxVTK:
+// wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
-
-// VTK:
-#include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkConeSource.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkSmartPointer.h>
-#include <vtkPerlinNoise.h>
-#include <vtkSampleFunction.h>
-#include <vtkContourFilter.h>
-#include <vtkProperty.h>
 
 // STL:
 #include <fstream>
 #include <string>
+#include <sstream>
 using namespace std;
+
+// OpenCL: (local copy)
+#include "cl.hpp"
+
+// VTK:
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+#include <vtkJPEGWriter.h>
+#include <vtkSmartPointer.h>
 
 // IDs for the controls and the menu commands
 namespace ID { enum {
@@ -58,6 +56,13 @@ namespace ID { enum {
    PatternsPane = wxID_HIGHEST+1,
    KernelPane,
    CanvasPane,
+   SystemSettingsPane,
+
+   OpenCLDiagnostics,
+   Screenshot,
+
+   Show2DDemo,
+   Show3DDemo,
 
 }; };
 
@@ -67,17 +72,26 @@ wxString PaneName(int id)
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
+    EVT_SIZE(MyFrame::OnSize)
+    // menu commands
     EVT_MENU(ID::Quit,  MyFrame::OnQuit)
+    EVT_MENU(ID::About, MyFrame::OnAbout)
+    EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
+    EVT_MENU(ID::Show2DDemo,MyFrame::OnShow2DDemo)
+    EVT_MENU(ID::Show3DDemo,MyFrame::OnShow3DDemo)
+    EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
+    // allow panes to be turned on and off from the menu:
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::KernelPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::KernelPane, MyFrame::OnUpdateViewPane)
-    EVT_MENU(ID::About, MyFrame::OnAbout)
+    EVT_MENU(ID::CanvasPane, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::CanvasPane, MyFrame::OnUpdateViewPane)
 END_EVENT_TABLE()
 
 // frame constructor
 MyFrame::MyFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title)
+       : wxFrame(NULL, wxID_ANY, title),pVTKWindow(NULL)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -95,11 +109,20 @@ MyFrame::MyFrame(const wxString& title)
     }
     {
         wxMenu *viewMenu = new wxMenu;
+        viewMenu->Append(ID::Show2DDemo,_("Show &2D demo"),_("Show a 2D image in the main pane"));
+        viewMenu->Append(ID::Show3DDemo,_("Show &3D demo"),_("Show a 3D scene in the main pane"));
+        viewMenu->AppendSeparator();
         viewMenu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
         viewMenu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
+        viewMenu->AppendCheckItem(ID::CanvasPane, _("&Canvas"), _("View the canvas pane"));
         viewMenu->AppendSeparator();
-        viewMenu->Append(wxID_ANY, _("Save &screenshot"), _("Save a screenshot of the current view"));
+        viewMenu->Append(ID::Screenshot, _("Save &screenshot"), _("Save a screenshot of the current view"));
         menuBar->Append(viewMenu, _("&View"));
+    }
+    {
+        wxMenu *settingsMenu = new wxMenu;
+        settingsMenu->Append(ID::OpenCLDiagnostics,_("&OpenCL diagnostics"),_("Show the available OpenCL devices and their attributes"));
+        menuBar->Append(settingsMenu,_("&Settings"));
     }
     {
         wxMenu *helpMenu = new wxMenu;
@@ -112,8 +135,9 @@ MyFrame::MyFrame(const wxString& title)
     CreateStatusBar(2);
     SetStatusText(_("Ready"));
 
-    // initialise a VTK pipeline and connect it to the rendering window
-    this->InitializeVTKPipeline();
+    // create a VTK window and give it a pipeline to render
+    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
+    Show3DVTKDemo(this->pVTKWindow);
     
     // load a kernel text (just as a demo, doesn't do anything)
     string dummy_kernel_text;
@@ -148,88 +172,32 @@ MyFrame::MyFrame(const wxString& title)
                   .BestSize(400,400)
                   .Layer(1) // layer 1 is further towards the edge
                   );
-
-    // center pane (always visible)
     this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
                   .Name(PaneName(ID::CanvasPane))
+                  .Caption(_("Canvas"))
+                  .Top()
+                  .BestSize(400,400)
+                  );
+    // center pane (always visible)
+    wxPropertyGrid *pg = new wxPropertyGrid(this,wxID_ANY);
+    pg->Append( new wxStringProperty("String Property", wxPG_LABEL) );
+    pg->Append( new wxIntProperty("Int Property", wxPG_LABEL) );
+    pg->Append( new wxBoolProperty("Bool Property", wxPG_LABEL) );
+    this->aui_mgr.AddPane(pg, 
+                  wxAuiPaneInfo().Name(PaneName(ID::SystemSettingsPane))
                   .CenterPane()
-                  .PaneBorder(false)
                   );
 
-    this->LoadSettings();
-}
-
-void MyFrame::InitializeVTKPipeline()
-{
-    // wxVTKRenderWindowInteractor inherits from wxWindow *and* vtkRenderWindowInteractor
-    this->pVTKWindow = new wxVTKRenderWindowInteractor(this, wxID_ANY);
-
-    // the VTK renderer is responsible for drawing the scene onto the screen
-    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
-    this->pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
-
-    // make a 3D perlin noise scene, just as a placeholder
-    // (VTK can do 2D rendering too, for image display)
-    {
-        // a function that returns a value at every point in space
-        vtkSmartPointer<vtkPerlinNoise> perlinNoise = vtkSmartPointer<vtkPerlinNoise>::New();
-        perlinNoise->SetFrequency(2, 1.25, 1.5);
-        perlinNoise->SetPhase(0, 0, 0);
-
-        // samples the function at a 3D grid of points
-        vtkSmartPointer<vtkSampleFunction> sample = vtkSmartPointer<vtkSampleFunction>::New();
-        sample->SetImplicitFunction(perlinNoise);
-        sample->SetSampleDimensions(65, 65, 20);
-        sample->ComputeNormalsOff();
-    
-        // turns the 3d grid of sampled values into a polygon mesh for rendering,
-        // by making a surface that contours the volume at a specified level
-        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInputConnection(sample->GetOutputPort());
-        surface->SetValue(0, 0.0);
-
-        // a mapper converts scene objects to graphics primitives
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(surface->GetOutputPort());
-        mapper->ScalarVisibilityOff();
-
-        // an actor determines how a scene object is displayed
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(1,1,0.9);  
-        actor->GetProperty()->SetAmbient(0.1);
-        actor->GetProperty()->SetDiffuse(0.6);
-        actor->GetProperty()->SetSpecular(0.3);
-        actor->GetProperty()->SetSpecularPower(30);
-
-        // add the actor to the renderer's scene
-        pRenderer->AddActor(actor);
-    }
-
-    // set the background color
-    pRenderer->GradientBackgroundOn();
-    pRenderer->SetBackground(0,0.4,0.6);
-    pRenderer->SetBackground2(0,0.2,0.3);
-    
-    // change the interactor style to a trackball
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    this->pVTKWindow->SetInteractorStyle(is);
-
-    // left mouse: rotates the camera around the focal point, as if the scene is a trackball
-    // right mouse: move up and down to zoom in and out
-    // scroll wheel: zoom in and out
-    // shift+left mouse: pan
-    // ctrl+left mouse: roll
-    // shift+ctrl+left mouse: move up and down to zoom in and out
-    // 'r' : reset the view to make everything visible
-    // 'w' : switch to wireframe view
-    // 's' : switch to surface view
+    if(true) // DEBUG: sometimes useful to return to default settings
+        this->LoadSettings();
+    else
+        this->aui_mgr.Update();
 }
 
 void MyFrame::LoadSettings()
 {
     // (uses registry or files, depending on platform)
-    wxConfig config(_T("ReaDy"));
+    wxConfig config(_T("Ready"));
     wxString str;
     if(config.Read(_T("WindowLayout"),&str))
         this->aui_mgr.LoadPerspective(str);
@@ -246,7 +214,7 @@ void MyFrame::LoadSettings()
 void MyFrame::SaveSettings()
 {
     // (uses registry or files, depending on platform)
-    wxConfig config(_T("ReaDy"));
+    wxConfig config(_T("Ready"));
     config.Write(_T("WindowLayout"),this->aui_mgr.SavePerspective());
     config.Write(_T("AppWidth"),this->GetSize().x);
     config.Write(_T("AppHeight"),this->GetSize().y);
@@ -269,9 +237,9 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     wxAboutDialogInfo info;
-    info.SetName(_("ReaDy"));
-    info.SetDescription(_("A program for exploring reaction-diffusion systems.\n\nReaDy is free software, distributed under the GPLv3 license."));
-    info.SetCopyright(_T("(C) 2011 The ReaDy Bunch"));
+    info.SetName(_("Ready"));
+    info.SetDescription(_("A program for exploring reaction-diffusion systems.\n\nReady is free software, distributed under the GPLv3 license."));
+    info.SetCopyright(_T("(C) 2011 The Ready Bunch"));
     info.AddDeveloper(_T("Tim Hutton"));
     info.AddDeveloper(_T("Robert Munafo"));
     info.AddDeveloper(_T("Andrew Trevorrow"));
@@ -327,4 +295,96 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
     if(!pane.IsOk()) return;
     event.Check(pane.IsShown());
     this->aui_mgr.Update();
+}
+
+void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
+{
+    ostringstream report;
+    {
+        // Get available OpenCL platforms
+        vector<cl::Platform> platforms;
+        cl::Platform::get(&platforms);
+
+        report << "Found " << platforms.size() << " platform(s):\n";
+
+        for(unsigned int iPlatform=0;iPlatform<platforms.size();iPlatform++)
+        {
+            report << "Platform " << iPlatform+1 << ":\n";
+            string info;
+            for(int i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
+            {
+                platforms[iPlatform].getInfo(i,&info);
+                report << info << endl;
+            }
+
+            // create a context using this platform and the GPU
+            cl_context_properties cps[3] = { 
+                CL_CONTEXT_PLATFORM, 
+                (cl_context_properties)(platforms[iPlatform])(), 
+                0 
+            };
+            cl::Context context( CL_DEVICE_TYPE_ALL, cps);
+
+            // Get a list of devices on this platform
+            vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+            report << "\nFound " << devices.size() << " device(s) on this platform.\n";
+            for(unsigned int iDevice=0;iDevice<devices.size();iDevice++)
+            {
+                report << "Device " << iDevice+1 << ":\n";
+                for(unsigned int i=CL_DEVICE_NAME;i<=CL_DEVICE_EXTENSIONS;i++)
+                {
+                    if(devices[iDevice].getInfo(i,&info) == CL_SUCCESS)
+                        report << info << endl;
+                }
+            }
+            report << endl;
+        }
+    }
+    wxMessageBox(wxString(report.str().c_str(),wxConvUTF8));
+}
+
+void MyFrame::OnShow2DDemo(wxCommandEvent& event)
+{
+    Show2DVTKDemo(this->pVTKWindow);
+    Refresh(false);
+}
+
+void MyFrame::OnShow3DDemo(wxCommandEvent& event)
+{
+    Show3DVTKDemo(this->pVTKWindow);
+    Refresh(false);
+}
+
+void MyFrame::OnSize(wxSizeEvent& event)
+{
+    if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
+}
+
+void MyFrame::OnScreenshot(wxCommandEvent& event)
+{
+    wxString filename,extension;
+    bool accepted = true;
+    do {
+        filename = wxFileSelector(_("Specify the screenshot filename:"),_T("."),_("Ready_screenshot_00"),_T("png"),
+            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
+            wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+        wxFileName::SplitPath(filename,NULL,NULL,&extension);
+        if(filename.empty()) return; // user cancelled
+        // validate
+        if(extension!=_T("png") && extension!=_T("jpg"))
+        {
+            wxMessageBox(_("Unsupported format"));
+            accepted = false;
+        }
+    } while(!accepted);
+
+    vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
+    screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
+
+    vtkSmartPointer<vtkImageWriter> writer;
+    if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+    else if(extension==_T("jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+    writer->SetFileName(filename);
+    writer->SetInputConnection(screenshot->GetOutputPort());
+    writer->Write();
 }
