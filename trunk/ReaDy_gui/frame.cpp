@@ -28,6 +28,7 @@
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
 #include <wx/propgrid/propgrid.h>
+#include <wx/filename.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -384,7 +385,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     vtkSmartPointer<vtkImageWriter> writer;
     if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
     else if(extension==_T("jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-    writer->SetFileName(filename);
+    writer->SetFileName(filename.mb_str());
     writer->SetInputConnection(screenshot->GetOutputPort());
     writer->Write();
 }
