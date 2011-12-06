@@ -9,9 +9,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>ReaDy</string>
+	<string>Ready</string>
 	<key>CFBundleName</key>
-	<string>ReaDy</string>
+	<string>Ready</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
@@ -23,7 +23,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>VERSION</string>
 	<key>CFBundleGetInfoString</key>
-	<string>ReaDy version VERSION, Copyright 2011 The ReaDy Bunch</string>
+	<string>Ready version VERSION, Copyright 2011 The Ready Bunch</string>
 	<key>LSRequiresCarbon</key>
 	<true/>
 	<key>CFBundleDocumentTypes</key>
