@@ -27,6 +27,7 @@
 #include <wx/treectrl.h>
 
 class wxVTKRenderWindowInteractor;
+class BaseRD;
 
 class MyFrame : public wxFrame
 {
@@ -43,6 +44,9 @@ private:
     // VTK does the rendering
     wxVTKRenderWindowInteractor *pVTKWindow;
 
+    // current system being simulated (in future we might want more than one)
+    BaseRD *system;
+
 private:
 
     void OnQuit(wxCommandEvent& event);
@@ -50,8 +54,6 @@ private:
     void OnSize(wxSizeEvent& event);
 
     void OnOpenCLDiagnostics(wxCommandEvent& event);
-    void OnShow2DDemo(wxCommandEvent& event);
-    void OnShow3DDemo(wxCommandEvent& event);
 
     void OnToggleViewPane(wxCommandEvent& event);
     void OnUpdateViewPane(wxUpdateUIEvent& event);

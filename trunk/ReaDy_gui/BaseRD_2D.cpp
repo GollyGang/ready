@@ -16,24 +16,16 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "app.hpp"
-#include "frame.hpp"
+#include "BaseRD_2D.hpp"
 
-// STL:
-#include <stdexcept>
-using namespace std;
-
-DECLARE_APP(MyApp)
-IMPLEMENT_APP(MyApp)
-
-bool MyApp::OnInit()
+BaseRD_2D::BaseRD_2D()
 {
-    if ( !wxApp::OnInit() )
-        return false;
-
-    wxFrame* frame = new MyFrame(_("Ready"));
-    SetTopWindow(frame);
-    frame->Show();
-
-    return true;
+    this->dimensionality = 2;
 }
+
+void BaseRD_2D::GetSize(int &x,int &y) 
+{ 
+    x = this->X; 
+    y = this->Y; 
+}
+
