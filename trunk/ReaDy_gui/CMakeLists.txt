@@ -79,7 +79,6 @@ ELSE(WIN32)
     SET(GUI_EXECUTABLE MACOSX_BUNDLE)
     IF(VTK_USE_COCOA)
       SET_SOURCE_FILES_PROPERTIES(
-        # AKT: removed src/
         wxVTKRenderWindowInteractor.cxx
         PROPERTIES COMPILE_FLAGS "-ObjC++")
     ENDIF(VTK_USE_COCOA)
@@ -123,9 +122,13 @@ include_directories(
 add_definitions( -DZLIB )
 
 set(CMAKE_MODULE_PATH ${Ready_SOURCE_DIR})
+
 # (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
+
 find_package ( OpenCL REQUIRED )
+
 include_directories ( ${OPENCL_INCLUDE_DIRS} )
+
 link_libraries ( ${OPENCL_LIBRARIES} )
   
 # tell the code where the .cl files live
@@ -170,8 +173,8 @@ endif()
 if(APPLE)
    # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
    add_custom_target( app_bundle
-      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >${CMAKE_SOURCE_DIR}/Ready.app/Contents/Info.plist
-      COMMAND echo -n "APPLReDy" >${CMAKE_SOURCE_DIR}/Ready.app/Contents/PkgInfo
+      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >Ready.app/Contents/Info.plist
+      COMMAND echo -n "APPLReDy" >Ready.app/Contents/PkgInfo
    )
    add_dependencies( ${APP_NAME} app_bundle )
    
