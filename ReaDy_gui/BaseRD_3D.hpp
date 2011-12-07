@@ -16,24 +16,21 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "app.hpp"
-#include "frame.hpp"
+#include "BaseRD.hpp"
 
-// STL:
-#include <stdexcept>
-using namespace std;
-
-DECLARE_APP(MyApp)
-IMPLEMENT_APP(MyApp)
-
-bool MyApp::OnInit()
+class BaseRD_3D : public BaseRD
 {
-    if ( !wxApp::OnInit() )
-        return false;
+    public:
 
-    wxFrame* frame = new MyFrame(_("Ready"));
-    SetTopWindow(frame);
-    frame->Show();
+        BaseRD_3D();
 
-    return true;
-}
+        // retrieve the x, y and z size of the system
+        void GetSize(int &x,int &y,int &z);
+
+        // retrieve the chemical value at an x,y,z location
+        virtual float GetAt(int x,int y,int z,int iChemical)=0;
+
+    protected:
+
+        int X,Y,Z;
+};

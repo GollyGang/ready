@@ -16,24 +16,29 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "app.hpp"
-#include "frame.hpp"
+#include "BaseRD_2D.hpp"
 
-// STL:
-#include <stdexcept>
-using namespace std;
+// a basic RD system, provided as an example implementation
 
-DECLARE_APP(MyApp)
-IMPLEMENT_APP(MyApp)
-
-bool MyApp::OnInit()
+class GrayScott_slow : public BaseRD_2D
 {
-    if ( !wxApp::OnInit() )
-        return false;
+    public:
 
-    wxFrame* frame = new MyFrame(_("Ready"));
-    SetTopWindow(frame);
-    frame->Show();
+        GrayScott_slow();
+        ~GrayScott_slow();
 
-    return true;
-}
+        void Allocate(int x,int y);
+        float GetF() { return this->f; }
+        float GetK() { return this->k; }
+        void SetF(float new_f) { this->f = new_f; }
+        void SetK(float new_k) { this->k = new_k; }
+        void InitWithBlobInCenter();
+
+        void Update(int n_steps);
+        float GetAt(int x,int y,int iChemical);
+
+    protected:
+
+        float* data;
+        float f,k;
+};

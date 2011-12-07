@@ -15,25 +15,19 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
-#include "app.hpp"
-#include "frame.hpp"
+#include "BaseRD.hpp"
 
-// STL:
-#include <stdexcept>
-using namespace std;
+int BaseRD::GetDimensionality() 
+{ 
+    return this->dimensionality; 
+}
 
-DECLARE_APP(MyApp)
-IMPLEMENT_APP(MyApp)
+int BaseRD::GetNumberOfChemicals() 
+{ 
+    return this->n_chemicals; 
+}
 
-bool MyApp::OnInit()
-{
-    if ( !wxApp::OnInit() )
-        return false;
-
-    wxFrame* frame = new MyFrame(_("Ready"));
-    SetTopWindow(frame);
-    frame->Show();
-
-    return true;
+float BaseRD::GetTimestep()
+{ 
+    return this->timestep; 
 }

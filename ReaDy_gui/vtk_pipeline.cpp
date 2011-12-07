@@ -1,5 +1,26 @@
+/*  Copyright 2011, The Ready Bunch
+
+    This file is part of Ready.
+
+    Ready is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Ready is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
+
 // local:
 #include "vtk_pipeline.hpp"
+
+// readybase:
+#include "BaseRD_2D.hpp"
+#include "BaseRD_3D.hpp"
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -25,6 +46,42 @@
 #include <vtkLookupTable.h>
 #include <vtkImageMapToColors.h>
 
+// STL:
+#include <stdexcept>
+using namespace std;
+
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
+{
+    switch(system->GetDimensionality())
+    {
+        case 2: 
+            {
+                BaseRD_2D* system_2d = dynamic_cast<BaseRD_2D*>(system);
+                Initialize2DVTKPipeline(pVTKWindow,system_2d);
+            }
+            break;
+        case 3: 
+            {
+                BaseRD_3D* system_3d = dynamic_cast<BaseRD_3D*>(system);
+                Initialize3DVTKPipeline(pVTKWindow,system_3d);
+            }
+            break;
+        default:
+            throw runtime_error("Unsupported RD system");
+    }
+}
+
+void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD_2D* system)
+{
+    // TODO
+}
+
+void Initialize3DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD_3D* system)
+{
+    // TODO
+}
+
+/*
 void Show3DVTKDemo(wxVTKRenderWindowInteractor* pVTKWindow)
 {
     // the VTK renderer is responsible for drawing the scene onto the screen
@@ -137,3 +194,4 @@ void Show2DVTKDemo(wxVTKRenderWindowInteractor* pVTKWindow)
     vtkSmartPointer<vtkInteractorStyleImage> is = vtkSmartPointer<vtkInteractorStyleImage>::New();
     pVTKWindow->SetInteractorStyle(is);
 }
+*/

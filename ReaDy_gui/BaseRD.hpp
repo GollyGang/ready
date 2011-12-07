@@ -15,25 +15,34 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
-#include "app.hpp"
-#include "frame.hpp"
+#ifndef __BASERD__
+#define __BASERD__
 
-// STL:
-#include <stdexcept>
-using namespace std;
+// abstract base classes for all reaction-diffusion systems, 2D and 3D
 
-DECLARE_APP(MyApp)
-IMPLEMENT_APP(MyApp)
-
-bool MyApp::OnInit()
+class BaseRD 
 {
-    if ( !wxApp::OnInit() )
-        return false;
+    public:
 
-    wxFrame* frame = new MyFrame(_("Ready"));
-    SetTopWindow(frame);
-    frame->Show();
+        virtual ~BaseRD() {}
 
-    return true;
-}
+        // returns 2 for 2D systems, 3 for 3D, etc.
+        int GetDimensionality();
+
+        // e.g. 2 for Gray-Scott, 1 for Schlogl
+        int GetNumberOfChemicals();
+
+        // advance the RD system by n timesteps
+        virtual void Update(int n_steps)=0;
+
+        // returns the timestep for the system
+        float GetTimestep();
+
+    protected:
+
+        int dimensionality;
+        int n_chemicals;
+        float timestep;
+};
+
+#endif

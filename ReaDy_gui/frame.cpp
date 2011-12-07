@@ -19,6 +19,9 @@
 #include "frame.hpp"
 #include "vtk_pipeline.hpp"
 
+// readybase:
+#include "GrayScott_slow.hpp"
+
 // local resources:
 #include "appicon16.xpm"
 
@@ -62,9 +65,6 @@ namespace ID { enum {
    OpenCLDiagnostics,
    Screenshot,
 
-   Show2DDemo,
-   Show3DDemo,
-
 }; };
 
 wxString PaneName(int id)
@@ -78,8 +78,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::Quit,  MyFrame::OnQuit)
     EVT_MENU(ID::About, MyFrame::OnAbout)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
-    EVT_MENU(ID::Show2DDemo,MyFrame::OnShow2DDemo)
-    EVT_MENU(ID::Show3DDemo,MyFrame::OnShow3DDemo)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
     // allow panes to be turned on and off from the menu:
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
@@ -92,7 +90,7 @@ END_EVENT_TABLE()
 
 // frame constructor
 MyFrame::MyFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title),pVTKWindow(NULL)
+       : wxFrame(NULL, wxID_ANY, title),pVTKWindow(NULL),system(NULL)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -110,9 +108,6 @@ MyFrame::MyFrame(const wxString& title)
     }
     {
         wxMenu *viewMenu = new wxMenu;
-        viewMenu->Append(ID::Show2DDemo,_("Show &2D demo"),_("Show a 2D image in the main pane"));
-        viewMenu->Append(ID::Show3DDemo,_("Show &3D demo"),_("Show a 3D scene in the main pane"));
-        viewMenu->AppendSeparator();
         viewMenu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
         viewMenu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
         viewMenu->AppendCheckItem(ID::CanvasPane, _("&Canvas"), _("View the canvas pane"));
@@ -136,9 +131,23 @@ MyFrame::MyFrame(const wxString& title)
     CreateStatusBar(2);
     SetStatusText(_("Ready"));
 
+    // initialize an RD system to get us started
+    try
+    {
+        GrayScott_slow *gs = new GrayScott_slow();
+        gs->Allocate(200,200);
+        gs->InitWithBlobInCenter();
+        this->system = gs;
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format("An error occurred: %s",e.what()));
+        throw;
+    }
+
     // create a VTK window and give it a pipeline to render
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
-    Show3DVTKDemo(this->pVTKWindow);
+    InitializeVTKPipeline(this->pVTKWindow,this->system);
     
     // load a kernel text (just as a demo, doesn't do anything)
     string dummy_kernel_text;
@@ -228,6 +237,7 @@ MyFrame::~MyFrame()
     this->SaveSettings(); // save the current settings so it starts up the same next time
     this->aui_mgr.UnInit();
     this->pVTKWindow->Delete();
+    delete this->system;
 }
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -342,18 +352,6 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
         }
     }
     wxMessageBox(wxString(report.str().c_str(),wxConvUTF8));
-}
-
-void MyFrame::OnShow2DDemo(wxCommandEvent& event)
-{
-    Show2DVTKDemo(this->pVTKWindow);
-    Refresh(false);
-}
-
-void MyFrame::OnShow3DDemo(wxCommandEvent& event)
-{
-    Show3DVTKDemo(this->pVTKWindow);
-    Refresh(false);
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)
