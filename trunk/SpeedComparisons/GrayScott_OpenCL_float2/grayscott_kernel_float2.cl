@@ -31,7 +31,7 @@ __kernel void grayscott_compute(
     const int iUp = x*Y + ym1;
     const int iDown = x*Y + yp1;
     // Standard 5-point stencil
-    const float2 nabla_uv = UV[iLeft] + UV[iRight] + UV[iUp] + UV[iDown] - 4*uv;
+    const float2 nabla_uv = UV[iLeft] + UV[iRight] + UV[iUp] + UV[iDown] - 4.0f*uv;
 
     // compute the new value
     UV2[i] = uv + delta_t * (float2)(D_u * nabla_uv.x - uv.x*uv.y*uv.y + F*(1.0f-uv.x), D_v * nabla_uv.y + uv.x*uv.y*uv.y - (F+k)*uv.y);
