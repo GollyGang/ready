@@ -40,12 +40,16 @@ class BaseRD
         // returns the timestep for the system
         float GetTimestep();
 
+        // how many timesteps have we advanced since being initialized?
+        int GetTimestepsTaken();
+
         vtkImageData* GetVTKImage();
 
     protected:
 
         vtkImageData *image_data; // supports 1D, 2D and 3D images
         float timestep;
+        int timesteps_taken;
 };
 
 // TODO: find a better home for utility functions
@@ -53,6 +57,7 @@ class BaseRD
 // return a random value between lower and upper
 float frand(float lower,float upper);
 
-double _hypot(double x,double y,double z);
+double hypot2(double x,double y);
+double hypot3(double x,double y,double z);
 
 #endif

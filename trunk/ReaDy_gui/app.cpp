@@ -23,6 +23,10 @@
 #include <stdexcept>
 using namespace std;
 
+// stdlib:
+#include <stdlib.h>
+#include <time.h>
+
 DECLARE_APP(MyApp)
 IMPLEMENT_APP(MyApp)
 
@@ -30,6 +34,8 @@ bool MyApp::OnInit()
 {
     if ( !wxApp::OnInit() )
         return false;
+
+    srand((unsigned int)time(NULL));
 
     wxFrame* frame = new MyFrame(_("Ready"));
     SetTopWindow(frame);

@@ -47,6 +47,8 @@ private:
     // current system being simulated (in future we might want more than one)
     BaseRD *system;
 
+    bool is_running;
+
 private:
 
     // menu event handlers
@@ -55,16 +57,25 @@ private:
 
     void OnGrayScott2DDemo(wxCommandEvent& event);
     void OnGrayScott3DDemo(wxCommandEvent& event);
+
     void OnToggleViewPane(wxCommandEvent& event);
     void OnUpdateViewPane(wxUpdateUIEvent& event);
     void OnScreenshot(wxCommandEvent& event);
 
     void OnOpenCLDiagnostics(wxCommandEvent& event);
 
+    void OnStep(wxCommandEvent& event);
+    void OnUpdateStep(wxUpdateUIEvent& event);
+    void OnRun(wxCommandEvent& event);
+    void OnUpdateRun(wxUpdateUIEvent& event);
+    void OnStop(wxCommandEvent& event);
+    void OnUpdateStop(wxUpdateUIEvent& event);
+
     void OnAbout(wxCommandEvent& event);
 
     // other event handlers
 
+    void OnIdle(wxIdleEvent& event);
     void OnSize(wxSizeEvent& event);
 
     // internal functions
