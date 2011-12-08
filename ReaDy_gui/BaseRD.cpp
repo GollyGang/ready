@@ -15,19 +15,57 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// local:
 #include "BaseRD.hpp"
 
+// stdlib:
+#include <stdlib.h>
+
+// STL:
+#include <cassert>
+using namespace std;
+
+// VTK:
+#include <vtkImageData.h>
+
+BaseRD::BaseRD() : image_data(NULL)
+{
+}
+
+BaseRD::~BaseRD()
+{
+    if(this->image_data)
+        this->image_data->Delete();
+}
+
 int BaseRD::GetDimensionality() 
-{ 
-    return this->dimensionality; 
+{
+    assert(this->image_data);
+    int dimensionality=0;
+    for(int iDim=0;iDim<3;iDim++)
+        if(this->image_data->GetDimensions()[iDim]>1)
+            dimensionality++;
+    return dimensionality;
 }
 
-int BaseRD::GetNumberOfChemicals() 
-{ 
-    return this->n_chemicals; 
+int BaseRD::GetNumberOfChemicals()
+{
+    assert(this->image_data);
+    return this->image_data->GetNumberOfScalarComponents();
 }
 
-float BaseRD::GetTimestep()
+float BaseRD::GetTimestep() 
 { 
     return this->timestep; 
+}
+
+vtkImageData* BaseRD::GetVTKImage() 
+{ 
+    assert(this->image_data);
+    return this->image_data; 
+}
+
+float frand(float lower,float upper)
+{
+    return lower + rand()*(upper-lower)/RAND_MAX;
 }

@@ -34,8 +34,6 @@ endif()
 # low-level code used in all executables
 set(BASE_SOURCES
    BaseRD.hpp BaseRD.cpp
-   BaseRD_2D.hpp BaseRD_2D.cpp
-   BaseRD_3D.hpp BaseRD_3D.cpp
    GrayScott_slow.hpp GrayScott_slow.cpp
    cl.hpp
 )
