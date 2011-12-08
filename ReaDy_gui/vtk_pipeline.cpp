@@ -44,6 +44,7 @@
 #include <vtkImageData.h>
 #include <vtkScalarBarActor.h>
 #include <vtkCubeSource.h>
+#include <vtkExtractEdges.h>
 
 // STL:
 #include <stdexcept>
@@ -153,13 +154,14 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
         box->SetBounds(system->GetVTKImage()->GetBounds());
+        vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+        edges->SetInputConnection(box->GetOutputPort());
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(box->GetOutputPort());
+        mapper->SetInputConnection(edges->GetOutputPort());
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->SetColor(0,0,0);  
         actor->GetProperty()->SetAmbient(1);
-        actor->GetProperty()->SetRepresentationToWireframe();
         pRenderer->AddActor(actor);
     }
 

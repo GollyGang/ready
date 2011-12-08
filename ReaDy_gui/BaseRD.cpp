@@ -29,7 +29,7 @@ using namespace std;
 // VTK:
 #include <vtkImageData.h>
 
-BaseRD::BaseRD() : image_data(NULL)
+BaseRD::BaseRD() : image_data(NULL), timesteps_taken(0)
 {
 }
 
@@ -66,12 +66,24 @@ vtkImageData* BaseRD::GetVTKImage()
     return this->image_data; 
 }
 
+int BaseRD::GetTimestepsTaken()
+{
+    return this->timesteps_taken;
+}
+
+// ------------- utility functions feel a bit lost here ----------------------
+
 float frand(float lower,float upper)
 {
     return lower + rand()*(upper-lower)/RAND_MAX;
 }
 
-double _hypot(double x,double y,double z) 
+double hypot2(double x,double y) 
+{ 
+    return sqrt(x*x+y*y); 
+}
+
+double hypot3(double x,double y,double z) 
 { 
     return sqrt(x*x+y*y+z*z); 
 }

@@ -66,6 +66,10 @@ namespace ID { enum {
    GrayScott2DDemo,
    GrayScott3DDemo,
 
+   Step,
+   Run,
+   Stop,
+
    OpenCLDiagnostics,
    Screenshot,
 
@@ -77,6 +81,7 @@ wxString PaneName(int id)
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
+    EVT_IDLE(MyFrame::OnIdle)
     EVT_SIZE(MyFrame::OnSize)
     // menu commands
     EVT_MENU(ID::Quit,  MyFrame::OnQuit)
@@ -85,6 +90,12 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
     EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnGrayScott2DDemo)
     EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnGrayScott3DDemo)
+    EVT_MENU(ID::Step,MyFrame::OnStep)
+    EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
+    EVT_MENU(ID::Run,MyFrame::OnRun)
+    EVT_UPDATE_UI(ID::Run,MyFrame::OnUpdateRun)
+    EVT_MENU(ID::Stop,MyFrame::OnStop)
+    EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
     // allow panes to be turned on and off from the menu:
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
@@ -96,7 +107,9 @@ END_EVENT_TABLE()
 
 // frame constructor
 MyFrame::MyFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title),pVTKWindow(NULL),system(NULL)
+       : wxFrame(NULL, wxID_ANY, title),
+       pVTKWindow(NULL),system(NULL),
+       is_running(false)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -126,7 +139,11 @@ MyFrame::MyFrame(const wxString& title)
     }
     {
         wxMenu *settingsMenu = new wxMenu;
-        settingsMenu->Append(ID::OpenCLDiagnostics,_("&OpenCL diagnostics"),_("Show the available OpenCL devices and their attributes"));
+        settingsMenu->Append(ID::Step,_("&Step\tSPACE"),_("Advance the simulation by a single timestep"));
+        settingsMenu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
+        settingsMenu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
+        settingsMenu->AppendSeparator();
+        settingsMenu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
         menuBar->Append(settingsMenu,_("&Settings"));
     }
     {
@@ -414,3 +431,54 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     this->system = sys;
     InitializeVTKPipeline(this->pVTKWindow,this->system);
 }
+
+void MyFrame::OnStep(wxCommandEvent &event)
+{
+    this->system->Update(1);
+    SetStatusText(wxString::Format(_("Timesteps: %d"),this->system->GetTimestepsTaken()));
+    Refresh(false);
+}
+
+void MyFrame::OnRun(wxCommandEvent &event)
+{
+    this->is_running = true;
+    Refresh(false);
+}
+
+void MyFrame::OnStop(wxCommandEvent &event)
+{
+    this->is_running = false;
+    Refresh(false);
+}
+
+void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
+{
+    event.Enable(!this->is_running);
+}
+
+void MyFrame::OnUpdateRun(wxUpdateUIEvent& event)
+{
+    event.Enable(!this->is_running);
+}
+
+void MyFrame::OnUpdateStop(wxUpdateUIEvent& event)
+{
+    event.Enable(this->is_running);
+}
+
+void MyFrame::OnIdle(wxIdleEvent& event)
+{
+    // we drive our game loop by onIdle events
+    if(!this->is_running) return;
+
+    this->system->Update(1); // TODO: user controls speed
+    SetStatusText(wxString::Format(_("Timesteps: %d"),this->system->GetTimestepsTaken()));
+    this->Refresh(false);
+
+    // TODO: report wallclock speed
+
+    wxMilliSleep(30);
+
+    event.RequestMore(); // trigger another onIdle event
+}
+

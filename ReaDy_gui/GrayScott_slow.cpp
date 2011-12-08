@@ -53,7 +53,12 @@ void GrayScott_slow::Allocate(int x,int y)
 void GrayScott_slow::Update(int n_steps)
 {
     assert(this->image_data);
+
     // TODO
+    this->InitWithBlobInCenter(); // just a placeholder
+
+    this->timesteps_taken++;
+    this->image_data->Modified();
 }
 
 void GrayScott_slow::InitWithBlobInCenter()
@@ -65,7 +70,7 @@ void GrayScott_slow::InitWithBlobInCenter()
     {
         for(int y=0;y<Y;y++)
         {
-            if(_hypot(x-X/2,(y-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
             {
                 this->image_data->SetScalarComponentFromFloat(x,y,0,0,0.0f);
                 this->image_data->SetScalarComponentFromFloat(x,y,0,1,1.0f);

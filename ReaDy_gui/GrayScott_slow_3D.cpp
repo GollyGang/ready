@@ -53,7 +53,19 @@ void GrayScott_slow_3D::Allocate(int x,int y,int z)
 void GrayScott_slow_3D::Update(int n_steps)
 {
     assert(this->image_data);
+    
     // TODO
+
+    // placeholder
+    {
+        const int X = this->image_data->GetDimensions()[0];
+        const int Y = this->image_data->GetDimensions()[1];
+        const int Z = this->image_data->GetDimensions()[2];
+        this->image_data->SetScalarComponentFromFloat(rand()%X,rand()%Y,rand()%Z,1,rand()/float(RAND_MAX));
+    }
+
+    this->timesteps_taken++;
+    this->image_data->Modified();
 }
 
 void GrayScott_slow_3D::InitWithBlobInCenter()
@@ -68,7 +80,7 @@ void GrayScott_slow_3D::InitWithBlobInCenter()
         {
             for(int z=0;z<Z;z++)
             {
-                if(_hypot(x-X/2,(y-Y/2)/1.5,z-Z/2)<=5.0f) // start with a uniform field with an approximate circle in the middle
+                if(hypot3(x-X/2,(y-Y/2)/1.5,z-Z/2)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate sphere in the middle
                 {
                     this->image_data->SetScalarComponentFromFloat(x,y,z,0,0.0f);
                     this->image_data->SetScalarComponentFromFloat(x,y,z,1,1.0f);
