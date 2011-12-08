@@ -78,6 +78,9 @@ float *allocate(long width, long height, const char * error_text, bool for_mm)
 
 void init(float *a, float *b, long width, long height);
 
+void compute_allocate(void);
+void compute_import(float *u, float *v, long width, long height);
+
 typedef struct compute_params {
   DICEK_THREAD_VARS;
   float *u;
@@ -323,6 +326,31 @@ void init(float *u, float *v, long width, long height)
         u[i*width+j] = frand(0.9,1.0);
         v[i*width+j] = frand(0.0,0.1);
       }
+    }
+  }
+}
+
+static float * c_u;
+static float * c_v;
+static float * c_du;
+static float * c_dv;
+static long c_full_width;
+
+void compute_allocate(long width, long height)
+{
+  c_full_width = width + 2*VECSIZE;
+  c_u = allocate(c_full_width, height, "U array", true);
+  c_v = allocate(c_full_width, height, "V array", true);
+  c_du = allocate(c_full_width, height, "D_u array", true);
+  c_dv = allocate(c_full_width, height, "D_v array", true);
+}
+
+void compute_import(float *u, float *v, long width, long height)
+{
+  for(long i = 0; i < height; i++) {
+    for(long j = 0; j < width; j++) {
+      c_u[(i+VECSIZE)*width+j] = u[i*width+j];
+      c_v[(i+VECSIZE)*width+j] = v[i*width+j];
     }
   }
 }

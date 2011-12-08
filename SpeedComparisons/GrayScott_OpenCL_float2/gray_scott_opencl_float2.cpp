@@ -223,7 +223,7 @@ int main(int argc, char * * argv)
 
             // display:
             {
-                int quitnow = display(ab,ab,ab,iteration,false,200.0f,1,10,msg);
+                int quitnow = display(ab,ab,ab,iteration,false,200.0f,2,10,msg);
                 if (quitnow)
                     break;
             }
