@@ -29,12 +29,9 @@
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkConeSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkSmartPointer.h>
-#include <vtkPerlinNoise.h>
-#include <vtkSampleFunction.h>
 #include <vtkContourFilter.h>
 #include <vtkProperty.h>
 #include <vtkImageShiftScale.h>
@@ -45,27 +42,32 @@
 #include <vtkLookupTable.h>
 #include <vtkImageMapToColors.h>
 #include <vtkImageData.h>
+#include <vtkScalarBarActor.h>
+#include <vtkCubeSource.h>
 
 // STL:
 #include <stdexcept>
 using namespace std;
 
+void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
+void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
+
 void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
 {
+    assert(pVTKWindow);
+    assert(system);
+
     switch(system->GetDimensionality())
     {
-        case 2: 
-            Initialize2DVTKPipeline(pVTKWindow,system);
-            break;
-        case 3: 
-            Initialize3DVTKPipeline(pVTKWindow,system);
-            break;
+        case 2: InitializeVTKPipeline_2D(pVTKWindow,system); break;
+        case 3: InitializeVTKPipeline_3D(pVTKWindow,system); break;
         default:
-            throw runtime_error("Unsupported RD system");
+            throw runtime_error("InitializeVTKPipeline : Unsupported dimensionality");
     }
+    pVTKWindow->Refresh(false);
 }
 
-void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
+void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
 {
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -78,13 +80,15 @@ void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sys
         vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
         lut->SetRampToLinear();
         lut->SetScaleToLinear();
-        lut->SetTableRange(-1.0, 1.0);
+        lut->SetTableRange(0.0, 1.0);
         lut->SetHueRange(0.6, 0.0);
 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
         image_mapper->SetInput(system->GetVTKImage());
+        image_mapper->SetActiveComponent(1);
+        // TODO: will need to support many more ways of rendering
       
         // an actor determines how a scene object is displayed
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
@@ -93,6 +97,13 @@ void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sys
 
         // add the actor to the renderer's scene
         pRenderer->AddActor(actor);
+
+        // also add a scalar bar to show how the colors correspond to values
+        {
+            vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalar_bar->SetLookupTable(lut);
+            pRenderer->AddActor2D(scalar_bar);
+        }
     }
 
     // set the background color
@@ -103,7 +114,61 @@ void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sys
     pVTKWindow->SetInteractorStyle(is);
 }
 
-void Initialize3DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
+void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
 {
-    // TODO
+    // the VTK renderer is responsible for drawing the scene onto the screen
+    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
+    pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
+    pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
+
+    // contour the 3D volume and render as a polygonal surface
+    {
+        // turns the 3d grid of sampled values into a polygon mesh for rendering,
+        // by making a surface that contours the volume at a specified level
+        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+        surface->SetInput(system->GetVTKImage());
+        surface->SetValue(0, 0.5);
+        surface->SetArrayComponent(1);
+        // TODO: will need to provide more ways of rendering (e.g. volume rendering)
+        // TODO: allow user to control the contour level
+
+        // a mapper converts scene objects to graphics primitives
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(surface->GetOutputPort());
+        mapper->ScalarVisibilityOff();
+
+        // an actor determines how a scene object is displayed
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(1,1,0.9);  
+        actor->GetProperty()->SetAmbient(0.1);
+        actor->GetProperty()->SetDiffuse(0.6);
+        actor->GetProperty()->SetSpecular(0.3);
+        actor->GetProperty()->SetSpecularPower(30);
+
+        // add the actor to the renderer's scene
+        pRenderer->AddActor(actor);
+    }
+    // also add the bounding box
+    {
+        vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
+        box->SetBounds(system->GetVTKImage()->GetBounds());
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(box->GetOutputPort());
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(0,0,0);  
+        actor->GetProperty()->SetAmbient(1);
+        actor->GetProperty()->SetRepresentationToWireframe();
+        pRenderer->AddActor(actor);
+    }
+
+    // set the background color
+    pRenderer->GradientBackgroundOn();
+    pRenderer->SetBackground(0,0.4,0.6);
+    pRenderer->SetBackground2(0,0.2,0.3);
+    
+    // change the interactor style to a trackball
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    pVTKWindow->SetInteractorStyle(is);
 }

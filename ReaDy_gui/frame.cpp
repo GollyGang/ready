@@ -21,6 +21,7 @@
 
 // readybase:
 #include "GrayScott_slow.hpp"
+#include "GrayScott_slow_3D.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -62,6 +63,9 @@ namespace ID { enum {
    CanvasPane,
    SystemSettingsPane,
 
+   GrayScott2DDemo,
+   GrayScott3DDemo,
+
    OpenCLDiagnostics,
    Screenshot,
 
@@ -79,6 +83,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::About, MyFrame::OnAbout)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
+    EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnGrayScott2DDemo)
+    EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnGrayScott3DDemo)
     // allow panes to be turned on and off from the menu:
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
@@ -108,6 +114,9 @@ MyFrame::MyFrame(const wxString& title)
     }
     {
         wxMenu *viewMenu = new wxMenu;
+        viewMenu->Append(ID::GrayScott2DDemo,_("GrayScott &2D demo"),_("Show a 2D demo"));
+        viewMenu->Append(ID::GrayScott3DDemo,_("GrayScott &3D demo"),_("Show a 3D demo"));
+        viewMenu->AppendSeparator();
         viewMenu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
         viewMenu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
         viewMenu->AppendCheckItem(ID::CanvasPane, _("&Canvas"), _("View the canvas pane"));
@@ -131,18 +140,16 @@ MyFrame::MyFrame(const wxString& title)
     CreateStatusBar(2);
     SetStatusText(_("Ready"));
 
+    // create a VTK window
+    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
+
     // initialize an RD system to get us started
     {
         GrayScott_slow *gs = new GrayScott_slow();
-        gs->Allocate(200,200);
+        gs->Allocate(50,50);
         gs->InitWithBlobInCenter();
-        this->system = gs;
+        this->SetCurrentRDSystem(gs); // connects it to the VTK window
     }
-
-    // create a VTK window
-    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
-    // create a pipeline from the RD system to the VTK render window
-    InitializeVTKPipeline(this->pVTKWindow,this->system);
     
     // load a kernel text (just as a demo, doesn't do anything)
     string dummy_kernel_text;
@@ -305,6 +312,7 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
 
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 {
+    wxBusyCursor busy;
     ostringstream report;
     {
         // Get available OpenCL platforms
@@ -382,4 +390,27 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     writer->SetFileName(filename.mb_str());
     writer->SetInputConnection(screenshot->GetOutputPort());
     writer->Write();
+}
+
+void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
+{
+    GrayScott_slow *gs = new GrayScott_slow();
+    gs->Allocate(50,50);
+    gs->InitWithBlobInCenter();
+    this->SetCurrentRDSystem(gs);
+}
+
+void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
+{
+    GrayScott_slow_3D *gs = new GrayScott_slow_3D();
+    gs->Allocate(50,50,50);
+    gs->InitWithBlobInCenter();
+    this->SetCurrentRDSystem(gs);
+}
+
+void MyFrame::SetCurrentRDSystem(BaseRD* sys)
+{
+    delete this->system;
+    this->system = sys;
+    InitializeVTKPipeline(this->pVTKWindow,this->system);
 }

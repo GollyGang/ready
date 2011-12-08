@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "GrayScott_slow.hpp"
+#include "GrayScott_slow_3D.hpp"
 
 // stdlib:
 #include <stdlib.h>
@@ -30,7 +30,7 @@ using namespace std;
 // VTK:
 #include <vtkImageData.h>
 
-GrayScott_slow::GrayScott_slow()
+GrayScott_slow_3D::GrayScott_slow_3D()
 {
     this->timestep = 1.0f;
     this->r_a = 0.082f;
@@ -40,40 +40,44 @@ GrayScott_slow::GrayScott_slow()
     this->f = 0.035f;
 }
 
-void GrayScott_slow::Allocate(int x,int y)
+void GrayScott_slow_3D::Allocate(int x,int y,int z)
 {
     assert(!this->image_data);
     this->image_data = vtkImageData::New();
     this->image_data->SetNumberOfScalarComponents(2);
     this->image_data->SetScalarTypeToFloat();
-    this->image_data->SetDimensions(x,y,1);
+    this->image_data->SetDimensions(x,y,z);
     this->image_data->AllocateScalars();
 }
 
-void GrayScott_slow::Update(int n_steps)
+void GrayScott_slow_3D::Update(int n_steps)
 {
     assert(this->image_data);
     // TODO
 }
 
-void GrayScott_slow::InitWithBlobInCenter()
+void GrayScott_slow_3D::InitWithBlobInCenter()
 {
     assert(this->image_data);
-    int X = this->image_data->GetDimensions()[0];
-    int Y = this->image_data->GetDimensions()[1];
+    const int X = this->image_data->GetDimensions()[0];
+    const int Y = this->image_data->GetDimensions()[1];
+    const int Z = this->image_data->GetDimensions()[2];
     for(int x=0;x<X;x++)
     {
         for(int y=0;y<Y;y++)
         {
-            if(_hypot(x-X/2,(y-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            for(int z=0;z<Z;z++)
             {
-                this->image_data->SetScalarComponentFromFloat(x,y,0,0,0.0f);
-                this->image_data->SetScalarComponentFromFloat(x,y,0,1,1.0f);
-            }
-            else 
-            {
-                this->image_data->SetScalarComponentFromFloat(x,y,0,0,1.0f);
-                this->image_data->SetScalarComponentFromFloat(x,y,0,1,0.0f);
+                if(_hypot(x-X/2,(y-Y/2)/1.5,z-Z/2)<=5.0f) // start with a uniform field with an approximate circle in the middle
+                {
+                    this->image_data->SetScalarComponentFromFloat(x,y,z,0,0.0f);
+                    this->image_data->SetScalarComponentFromFloat(x,y,z,1,1.0f);
+                }
+                else 
+                {
+                    this->image_data->SetScalarComponentFromFloat(x,y,z,0,1.0f);
+                    this->image_data->SetScalarComponentFromFloat(x,y,z,1,0.0f);
+                }
             }
         }
     }
