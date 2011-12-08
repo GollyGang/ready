@@ -132,21 +132,16 @@ MyFrame::MyFrame(const wxString& title)
     SetStatusText(_("Ready"));
 
     // initialize an RD system to get us started
-    try
     {
         GrayScott_slow *gs = new GrayScott_slow();
         gs->Allocate(200,200);
         gs->InitWithBlobInCenter();
         this->system = gs;
     }
-    catch(const exception& e)
-    {
-        wxMessageBox(wxString::Format("An error occurred: %s",e.what()));
-        throw;
-    }
 
-    // create a VTK window and give it a pipeline to render
+    // create a VTK window
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
+    // create a pipeline from the RD system to the VTK render window
     InitializeVTKPipeline(this->pVTKWindow,this->system);
     
     // load a kernel text (just as a demo, doesn't do anything)
@@ -356,6 +351,7 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 
 void MyFrame::OnSize(wxSizeEvent& event)
 {
+    // trigger a redraw
     if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
 }
 
@@ -364,7 +360,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     wxString filename,extension;
     bool accepted = true;
     do {
-        filename = wxFileSelector(_("Specify the screenshot filename:"),_T("."),_("Ready_screenshot_00"),_T("png"),
+        filename = wxFileSelector(_("Specify the screenshot filename:"),_T("."),_("Ready_screenshot_00.png"),_T("png"),
             _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
             wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
         wxFileName::SplitPath(filename,NULL,NULL,&extension);

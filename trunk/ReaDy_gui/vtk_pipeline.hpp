@@ -17,12 +17,7 @@
 
 class wxVTKRenderWindowInteractor;
 class BaseRD;
-class BaseRD_2D;
-class BaseRD_3D;
 
 void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
-void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD_2D* system);
-void Initialize3DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD_3D* system);
-
-//void Show2DVTKDemo(wxVTKRenderWindowInteractor* pVTKWindow);
-//void Show3DVTKDemo(wxVTKRenderWindowInteractor* pVTKWindow);
+void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
+void Initialize3DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);

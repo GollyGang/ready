@@ -18,18 +18,20 @@
 #ifndef __BASERD__
 #define __BASERD__
 
+class vtkImageData;
+
 // abstract base classes for all reaction-diffusion systems, 2D and 3D
 
 class BaseRD 
 {
     public:
 
-        virtual ~BaseRD() {}
+        BaseRD();
+        virtual ~BaseRD();
 
-        // returns 2 for 2D systems, 3 for 3D, etc.
+        // e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality();
 
-        // e.g. 2 for Gray-Scott, 1 for Schlogl
         int GetNumberOfChemicals();
 
         // advance the RD system by n timesteps
@@ -38,11 +40,17 @@ class BaseRD
         // returns the timestep for the system
         float GetTimestep();
 
+        vtkImageData* GetVTKImage();
+
     protected:
 
-        int dimensionality;
-        int n_chemicals;
+        vtkImageData *image_data; // supports 1D, 2D and 3D images
         float timestep;
 };
+
+// TODO: find a better home for utility functions
+
+// return a random value between lower and upper
+float frand(float lower,float upper);
 
 #endif

@@ -16,11 +16,11 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "BaseRD_2D.hpp"
+#include "BaseRD.hpp"
 
 // a basic RD system, provided as an example implementation
 
-class GrayScott_slow : public BaseRD_2D
+class GrayScott_slow : public BaseRD
 {
     public:
 
@@ -35,10 +35,9 @@ class GrayScott_slow : public BaseRD_2D
         void InitWithBlobInCenter();
 
         void Update(int n_steps);
-        float GetAt(int x,int y,int iChemical);
 
     protected:
 
         float* data;
-        float f,k;
+        float f,k,r_a,r_b;
 };
