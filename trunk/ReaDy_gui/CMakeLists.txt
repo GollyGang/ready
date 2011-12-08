@@ -35,6 +35,7 @@ endif()
 set(BASE_SOURCES
    BaseRD.hpp BaseRD.cpp
    GrayScott_slow.hpp GrayScott_slow.cpp
+   GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
    cl.hpp
 )
 
@@ -157,6 +158,7 @@ target_link_libraries( ${APP_NAME}
   vtkGraphics 
   vtkIO 
   vtkRendering
+  vtkHybrid
 )
 
 if(APPLE OR WIN32)

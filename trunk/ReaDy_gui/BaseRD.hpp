@@ -53,4 +53,6 @@ class BaseRD
 // return a random value between lower and upper
 float frand(float lower,float upper);
 
+double _hypot(double x,double y,double z);
+
 #endif

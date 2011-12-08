@@ -49,19 +49,30 @@ private:
 
 private:
 
+    // menu event handlers
+
     void OnQuit(wxCommandEvent& event);
-    void OnAbout(wxCommandEvent& event);
-    void OnSize(wxSizeEvent& event);
+
+    void OnGrayScott2DDemo(wxCommandEvent& event);
+    void OnGrayScott3DDemo(wxCommandEvent& event);
+    void OnToggleViewPane(wxCommandEvent& event);
+    void OnUpdateViewPane(wxUpdateUIEvent& event);
+    void OnScreenshot(wxCommandEvent& event);
 
     void OnOpenCLDiagnostics(wxCommandEvent& event);
 
-    void OnToggleViewPane(wxCommandEvent& event);
-    void OnUpdateViewPane(wxUpdateUIEvent& event);
+    void OnAbout(wxCommandEvent& event);
 
-    void OnScreenshot(wxCommandEvent& event);
+    // other event handlers
+
+    void OnSize(wxSizeEvent& event);
+
+    // internal functions
 
     void LoadSettings();
     void SaveSettings();
+   
+    void SetCurrentRDSystem(BaseRD* system);
 
     wxTreeCtrl* CreatePatternsCtrl();
 

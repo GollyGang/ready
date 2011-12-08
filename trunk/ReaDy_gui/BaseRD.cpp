@@ -20,6 +20,7 @@
 
 // stdlib:
 #include <stdlib.h>
+#include <math.h>
 
 // STL:
 #include <cassert>
@@ -69,3 +70,9 @@ float frand(float lower,float upper)
 {
     return lower + rand()*(upper-lower)/RAND_MAX;
 }
+
+double _hypot(double x,double y,double z) 
+{ 
+    return sqrt(x*x+y*y+z*z); 
+}
+

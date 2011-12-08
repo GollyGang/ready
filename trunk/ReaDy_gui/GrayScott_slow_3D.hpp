@@ -20,13 +20,13 @@
 
 // a basic RD system, provided as a placeholder
 // N.B. Work in progress. Most implementations will use a generic 'algorithm' instead (e.g. 'RD_OpenCL_2D')
-class GrayScott_slow : public BaseRD
+class GrayScott_slow_3D : public BaseRD
 {
     public:
 
-        GrayScott_slow();
+        GrayScott_slow_3D();
 
-        void Allocate(int x,int y);
+        void Allocate(int x,int y,int z);
         float GetF() { return this->f; }
         float GetK() { return this->k; }
         void SetF(float new_f) { this->f = new_f; }

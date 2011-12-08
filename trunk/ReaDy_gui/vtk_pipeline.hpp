@@ -19,5 +19,3 @@ class wxVTKRenderWindowInteractor;
 class BaseRD;
 
 void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
-void Initialize2DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
-void Initialize3DVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
