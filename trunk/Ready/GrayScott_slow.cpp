@@ -42,44 +42,91 @@ GrayScott_slow::GrayScott_slow()
 
 void GrayScott_slow::Allocate(int x,int y)
 {
-    assert(!this->image_data);
-    this->image_data = vtkImageData::New();
-    this->image_data->SetNumberOfScalarComponents(2);
-    this->image_data->SetScalarTypeToFloat();
-    this->image_data->SetDimensions(x,y,1);
-    this->image_data->AllocateScalars();
+    for(int iB=0;iB<2;iB++)
+    {
+        assert(!this->buffer[iB]);
+        this->buffer[iB] = vtkImageData::New();
+        this->buffer[iB]->SetNumberOfScalarComponents(2);
+        this->buffer[iB]->SetScalarTypeToFloat();
+        this->buffer[iB]->SetDimensions(x,y,1);
+        this->buffer[iB]->AllocateScalars();
+    }
 }
 
 void GrayScott_slow::Update(int n_steps)
 {
-    assert(this->image_data);
+    for(int iStep=0;iStep<n_steps;iStep++)
+    {
+        vtkImageData *old_image = this->GetOldImage();
+        vtkImageData *new_image = this->GetNewImage();
+        assert(old_image);
+        assert(new_image);
 
-    // TODO
-    this->InitWithBlobInCenter(); // just a placeholder
+        const int X = old_image->GetDimensions()[0];
+        const int Y = old_image->GetDimensions()[1];
+        for(int x=0;x<X;x++)
+        {
+            int x_prev = (x-1+X)%X;
+            int x_next = (x+1)%X;
+            for(int y=0;y<Y;y++)
+            {
+                int y_prev = (y-1+Y)%Y;
+                int y_next = (y+1)%Y;
 
-    this->timesteps_taken++;
-    this->image_data->Modified();
+                float aval = old_image->GetScalarComponentAsFloat(x,y,0,0);
+                float bval = old_image->GetScalarComponentAsFloat(x,y,0,1);
+
+                // compute the Laplacians of a and b
+                float dda = old_image->GetScalarComponentAsFloat(x,y_prev,0,0) +
+                            old_image->GetScalarComponentAsFloat(x,y_next,0,0) +
+                            old_image->GetScalarComponentAsFloat(x_prev,y,0,0) + 
+                            old_image->GetScalarComponentAsFloat(x_next,y,0,0) - 4*aval;
+                float ddb = old_image->GetScalarComponentAsFloat(x,y_prev,0,1) +
+                            old_image->GetScalarComponentAsFloat(x,y_next,0,1) +
+                            old_image->GetScalarComponentAsFloat(x_prev,y,0,1) + 
+                            old_image->GetScalarComponentAsFloat(x_next,y,0,1) - 4*bval;
+
+                // compute the new rate of change of a and b
+                float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
+                float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
+
+                // apply the change
+                aval += this->timestep * da;
+                bval += this->timestep * db;
+                new_image->SetScalarComponentFromFloat(x,y,0,0,aval);
+                new_image->SetScalarComponentFromFloat(x,y,0,1,bval);
+            }
+        }
+
+        this->SwitchBuffers();
+        this->timesteps_taken++;
+    }
 }
 
 void GrayScott_slow::InitWithBlobInCenter()
 {
-    assert(this->image_data);
-    int X = this->image_data->GetDimensions()[0];
-    int Y = this->image_data->GetDimensions()[1];
+    vtkImageData *old_image = this->GetOldImage();
+    vtkImageData *new_image = this->GetNewImage();
+    assert(old_image);
+    assert(new_image);
+
+    const int X = old_image->GetDimensions()[0];
+    const int Y = old_image->GetDimensions()[1];
     for(int x=0;x<X;x++)
     {
         for(int y=0;y<Y;y++)
         {
-            if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2,5)) // start with a uniform field with an approximate circle in the middle
+            if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
             {
-                this->image_data->SetScalarComponentFromFloat(x,y,0,0,0.0f);
-                this->image_data->SetScalarComponentFromFloat(x,y,0,1,1.0f);
+                new_image->SetScalarComponentFromFloat(x,y,0,0,0.0f);
+                new_image->SetScalarComponentFromFloat(x,y,0,1,1.0f);
             }
             else 
             {
-                this->image_data->SetScalarComponentFromFloat(x,y,0,0,1.0f);
-                this->image_data->SetScalarComponentFromFloat(x,y,0,1,0.0f);
+                new_image->SetScalarComponentFromFloat(x,y,0,0,1.0f);
+                new_image->SetScalarComponentFromFloat(x,y,0,1,0.0f);
             }
         }
     }
+    this->SwitchBuffers();
 }

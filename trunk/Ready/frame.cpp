@@ -109,7 +109,7 @@ END_EVENT_TABLE()
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
-       is_running(false)
+       is_running(true)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -162,8 +162,8 @@ MyFrame::MyFrame(const wxString& title)
 
     // initialize an RD system to get us started
     {
-        GrayScott_slow *gs = new GrayScott_slow();
-        gs->Allocate(50,50);
+        GrayScott_slow_3D *gs = new GrayScott_slow_3D();
+        gs->Allocate(15,15,15);
         gs->InitWithBlobInCenter();
         this->SetCurrentRDSystem(gs); // connects it to the VTK window
     }
@@ -414,14 +414,16 @@ void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
     GrayScott_slow *gs = new GrayScott_slow();
     gs->Allocate(50,50);
     gs->InitWithBlobInCenter();
+    this->is_running = false;
     this->SetCurrentRDSystem(gs);
 }
 
 void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
 {
     GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-    gs->Allocate(50,50,50);
+    gs->Allocate(15,15,15);
     gs->InitWithBlobInCenter();
+    this->is_running = false;
     this->SetCurrentRDSystem(gs);
 }
 
@@ -471,7 +473,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
-    this->system->Update(1); // TODO: user controls speed
+    this->system->Update(10); // TODO: user controls speed
     SetStatusText(wxString::Format(_("Timesteps: %d"),this->system->GetTimestepsTaken()));
     this->Refresh(false);
 

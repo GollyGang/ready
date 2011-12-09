@@ -159,6 +159,7 @@ target_link_libraries( ${APP_NAME}
   vtkIO 
   vtkRendering
   vtkHybrid
+  vtkVolumeRendering
 )
 
 if(APPLE OR WIN32)

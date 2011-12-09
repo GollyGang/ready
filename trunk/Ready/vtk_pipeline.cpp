@@ -45,6 +45,14 @@
 #include <vtkScalarBarActor.h>
 #include <vtkCubeSource.h>
 #include <vtkExtractEdges.h>
+// volume rendering
+#include <vtkVolumeRayCastCompositeFunction.h>
+#include <vtkVolumeRayCastMapper.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
+#include <vtkVolumeProperty.h>
+#include <vtkVolume.h>
+#include <vtkImageExtractComponents.h>
 
 // STL:
 #include <stdexcept>
@@ -87,7 +95,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(system->GetVTKImage());
+        image_mapper->SetInput(system->GetImageToRender());
         image_mapper->SetActiveComponent(1);
         // TODO: will need to support many more ways of rendering
       
@@ -111,7 +119,9 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     pRenderer->SetBackground(0,0,0);
     
     // change the interactor style to something suitable for 2D images
-    vtkSmartPointer<vtkInteractorStyleImage> is = vtkSmartPointer<vtkInteractorStyleImage>::New();
+    //vtkSmartPointer<vtkInteractorStyleImage> is = vtkSmartPointer<vtkInteractorStyleImage>::New();
+    // actually I quite like the flying plane style too
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     pVTKWindow->SetInteractorStyle(is);
 }
 
@@ -122,13 +132,90 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
     pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
 
-    // contour the 3D volume and render as a polygonal surface
+    if(0)
     {
+        // use volume rendering
+
+        // extract desired component
+        vtkSmartPointer<vtkImageExtractComponents> get_component = vtkSmartPointer<vtkImageExtractComponents>::New();
+        get_component->SetInput(system->GetImageToRender());
+        get_component->SetComponents(1);
+
+        // convert image to unsigned char
+        vtkSmartPointer<vtkImageShiftScale> char_image = vtkSmartPointer<vtkImageShiftScale>::New();
+        char_image->SetInputConnection(get_component->GetOutputPort());
+        char_image->SetScale(255.0);
+        char_image->SetOutputScalarTypeToUnsignedChar();
+
+        // The volume will be displayed by ray-cast alpha compositing.
+        // A ray-cast mapper is needed to do the ray-casting, and a
+        // compositing function is needed to do the compositing along the ray. 
+        vtkSmartPointer<vtkVolumeRayCastCompositeFunction> rayCastFunction =
+        vtkSmartPointer<vtkVolumeRayCastCompositeFunction>::New();
+
+        vtkSmartPointer<vtkVolumeRayCastMapper> volumeMapper =
+        vtkSmartPointer<vtkVolumeRayCastMapper>::New();
+        volumeMapper->SetInput(char_image->GetOutput());
+        volumeMapper->SetVolumeRayCastFunction(rayCastFunction);
+
+        // The color transfer function maps voxel intensities to colors.
+        vtkSmartPointer<vtkColorTransferFunction>volumeColor =
+        vtkSmartPointer<vtkColorTransferFunction>::New();
+        volumeColor->AddRGBPoint(0,   1,1,1);
+        volumeColor->AddRGBPoint(255,   1.0, 1.0, 1.0);
+
+        // The opacity transfer function is used to control the opacity
+        // of different tissue types.
+        vtkSmartPointer<vtkPiecewiseFunction> volumeScalarOpacity =
+        vtkSmartPointer<vtkPiecewiseFunction>::New();
+        volumeScalarOpacity->AddPoint(0,   0.0);
+        volumeScalarOpacity->AddPoint(60, 0.0);
+        volumeScalarOpacity->AddPoint(80, 0.8);
+        volumeScalarOpacity->AddPoint(255, 1.0);
+
+        // The gradient opacity function is used to decrease the opacity
+        // in the "flat" regions of the volume while maintaining the opacity
+        // at the boundaries between tissue types.  The gradient is measured
+        // as the amount by which the intensity changes over unit distance.
+        // For most medical data, the unit distance is 1mm.
+        vtkSmartPointer<vtkPiecewiseFunction> volumeGradientOpacity =
+        vtkSmartPointer<vtkPiecewiseFunction>::New();
+        volumeGradientOpacity->AddPoint(0,   0.0);
+        volumeGradientOpacity->AddPoint(10,  0.5);
+        volumeGradientOpacity->AddPoint(100, 1.0);
+ 
+        // The VolumeProperty attaches the color and opacity functions to the
+        // volume, and sets other volume properties.
+        vtkSmartPointer<vtkVolumeProperty> volumeProperty =
+        vtkSmartPointer<vtkVolumeProperty>::New();
+        volumeProperty->SetColor(volumeColor);
+        volumeProperty->SetScalarOpacity(volumeScalarOpacity);
+        volumeProperty->SetGradientOpacity(volumeGradientOpacity);
+        volumeProperty->SetInterpolationTypeToLinear();
+        volumeProperty->ShadeOff();
+        volumeProperty->SetAmbient(0.4);
+        volumeProperty->SetDiffuse(0.6);
+        volumeProperty->SetSpecular(0.2);
+
+        // The vtkVolume is a vtkProp3D (like a vtkActor) and controls the position
+        // and orientation of the volume in world coordinates.
+        vtkSmartPointer<vtkVolume> volume =
+        vtkSmartPointer<vtkVolume>::New();
+        volume->SetMapper(volumeMapper);
+        volume->SetProperty(volumeProperty);
+
+        // Finally, add the volume to the renderer
+        pRenderer->AddViewProp(volume);
+    }
+    else
+    {
+        // contour the 3D volume and render as a polygonal surface
+
         // turns the 3d grid of sampled values into a polygon mesh for rendering,
         // by making a surface that contours the volume at a specified level
         vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInput(system->GetVTKImage());
-        surface->SetValue(0, 0.5);
+        surface->SetInput(system->GetImageToRender());
+        surface->SetValue(0, 0.25);
         surface->SetArrayComponent(1);
         // TODO: will need to provide more ways of rendering (e.g. volume rendering)
         // TODO: allow user to control the contour level
@@ -141,19 +228,25 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // an actor determines how a scene object is displayed
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(1,1,0.9);  
+        actor->GetProperty()->SetColor(1,1,1);  
         actor->GetProperty()->SetAmbient(0.1);
-        actor->GetProperty()->SetDiffuse(0.6);
-        actor->GetProperty()->SetSpecular(0.3);
-        actor->GetProperty()->SetSpecularPower(30);
+        actor->GetProperty()->SetDiffuse(0.7);
+        actor->GetProperty()->SetSpecular(0.2);
+        actor->GetProperty()->SetSpecularPower(3);
+        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+        actor->SetBackfaceProperty(bfprop);
+        bfprop->SetColor(0.3,0.3,0.3);
+        bfprop->SetAmbient(0.3);
+        bfprop->SetDiffuse(0.6);
+        bfprop->SetSpecular(0.1);
 
         // add the actor to the renderer's scene
         pRenderer->AddActor(actor);
     }
-    // also add the bounding box
+    // add the bounding box
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(system->GetVTKImage()->GetBounds());
+        box->SetBounds(system->GetImageToRender()->GetBounds());
         vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
         edges->SetInputConnection(box->GetOutputPort());
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();

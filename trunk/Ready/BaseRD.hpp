@@ -19,6 +19,7 @@
 #define __BASERD__
 
 class vtkImageData;
+class vtkImageAlgorithm;
 
 // abstract base classes for all reaction-diffusion systems, 2D and 3D
 
@@ -43,13 +44,24 @@ class BaseRD
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken();
 
-        vtkImageData* GetVTKImage();
+        vtkImageData* GetImageToRender();
 
     protected:
 
-        vtkImageData *image_data; // supports 1D, 2D and 3D images
+        vtkImageData *buffer[2];
+        vtkImageData* GetOldImage(); // copy from this one
+        vtkImageData* GetNewImage(); // edit this one
+
         float timestep;
         int timesteps_taken;
+
+        void SwitchBuffers();
+
+    private:
+    
+        int iCurrentBuffer; // the buffer being edited (the other is being rendered)
+        vtkImageAlgorithm *buffer_switcher;
+
 };
 
 // TODO: find a better home for utility functions
