@@ -28,31 +28,47 @@ using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
+#include <vtkImageShiftScale.h>
+#include <vtkImageAlgorithm.h>
 
-BaseRD::BaseRD() : image_data(NULL), timesteps_taken(0)
+BaseRD::BaseRD() : 
+    timesteps_taken(0),
+    iCurrentBuffer(0)
 {
+    this->buffer[0] = NULL;
+    this->buffer[1] = NULL;
+    vtkImageShiftScale *iss = vtkImageShiftScale::New();
+    iss->SetScale(1.0);
+    iss->SetShift(0.0);
+    iss->SetOutputScalarTypeToFloat();
+    iss->ClampOverflowOn();
+    this->buffer_switcher = iss;
 }
 
 BaseRD::~BaseRD()
 {
-    if(this->image_data)
-        this->image_data->Delete();
+    if(this->buffer[0])
+        this->buffer[0]->Delete();
+    if(this->buffer[1])
+        this->buffer[1]->Delete();
+    if(this->buffer_switcher)
+        this->buffer_switcher->Delete();
 }
 
 int BaseRD::GetDimensionality() 
 {
-    assert(this->image_data);
+    assert(this->buffer[0]);
     int dimensionality=0;
     for(int iDim=0;iDim<3;iDim++)
-        if(this->image_data->GetDimensions()[iDim]>1)
+        if(this->buffer[0]->GetDimensions()[iDim]>1)
             dimensionality++;
     return dimensionality;
 }
 
 int BaseRD::GetNumberOfChemicals()
 {
-    assert(this->image_data);
-    return this->image_data->GetNumberOfScalarComponents();
+    assert(this->buffer[0]);
+    return this->buffer[0]->GetNumberOfScalarComponents();
 }
 
 float BaseRD::GetTimestep() 
@@ -60,15 +76,34 @@ float BaseRD::GetTimestep()
     return this->timestep; 
 }
 
-vtkImageData* BaseRD::GetVTKImage() 
+vtkImageData* BaseRD::GetImageToRender() 
 { 
-    assert(this->image_data);
-    return this->image_data; 
+    assert(this->buffer_switcher);
+    this->buffer_switcher->Update();
+    return this->buffer_switcher->GetOutput(); 
+}
+
+vtkImageData* BaseRD::GetNewImage() 
+{ 
+    assert(this->buffer[this->iCurrentBuffer]);
+    return this->buffer[this->iCurrentBuffer]; 
+}
+
+vtkImageData* BaseRD::GetOldImage() 
+{ 
+    assert(this->buffer[1-this->iCurrentBuffer]);
+    return this->buffer[1-this->iCurrentBuffer]; 
 }
 
 int BaseRD::GetTimestepsTaken()
 {
     return this->timesteps_taken;
+}
+
+void BaseRD::SwitchBuffers()
+{
+    this->buffer_switcher->SetInput(this->buffer[this->iCurrentBuffer]);
+    this->iCurrentBuffer = 1-this->iCurrentBuffer;
 }
 
 // ------------- utility functions feel a bit lost here ----------------------
