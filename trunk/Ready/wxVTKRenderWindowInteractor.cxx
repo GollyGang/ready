@@ -583,7 +583,7 @@ void wxVTKRenderWindowInteractor::OnKeyUp(wxKeyEvent &event)
   event.Skip();
 }
 #endif //!(VTK_MAJOR_VERSION == 3 && VTK_MINOR_VERSION == 1)
- //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 void wxVTKRenderWindowInteractor::OnChar(wxKeyEvent &event)
 {
   if (!Enabled) 
@@ -608,7 +608,12 @@ void wxVTKRenderWindowInteractor::OnChar(wxKeyEvent &event)
                            event.ControlDown(), event.ShiftDown(), key, 0, NULL);
   InvokeEvent(vtkCommand::CharEvent, NULL);
 #endif
+
+#ifdef __WXCOCOA__
+  // AKT: avoid unwanted beep (probably due to bug in wxOSX 2.9.x)
+#else
   event.Skip();
+#endif
 }
 //---------------------------------------------------------------------------
 void wxVTKRenderWindowInteractor::OnButtonDown(wxMouseEvent &event)
