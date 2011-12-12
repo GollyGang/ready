@@ -31,7 +31,6 @@
 #include <wx/imaglist.h>
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
-#include <wx/propgrid/propgrid.h>
 #include <wx/filename.h>
 
 // wxVTK: (local copy)
@@ -201,26 +200,21 @@ MyFrame::MyFrame(const wxString& title)
                   .BestSize(400,400)
                   .Layer(1) // layer 1 is further towards the edge
                   );
-    this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
-                  .Name(PaneName(ID::CanvasPane))
-                  .Caption(_("Canvas"))
+    this->aui_mgr.AddPane(new wxTextCtrl(this,wxID_ANY), 
+                  wxAuiPaneInfo()
+                  .Name(PaneName(ID::SystemSettingsPane))
+                  .Caption(_("System"))
                   .Top()
-                  .BestSize(400,400)
                   );
     // center pane (always visible)
-    wxPropertyGrid *pg = new wxPropertyGrid(this,wxID_ANY);
-    pg->Append( new wxStringProperty("String Property", wxPG_LABEL) );
-    pg->Append( new wxIntProperty("Int Property", wxPG_LABEL) );
-    pg->Append( new wxBoolProperty("Bool Property", wxPG_LABEL) );
-    this->aui_mgr.AddPane(pg, 
-                  wxAuiPaneInfo().Name(PaneName(ID::SystemSettingsPane))
+    this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
+                  .Name(PaneName(ID::CanvasPane))
                   .CenterPane()
+                  .BestSize(400,400)
                   );
 
-    if(true) // DEBUG: sometimes useful to return to default settings
-        this->LoadSettings();
-    else
-        this->aui_mgr.Update();
+    this->LoadSettings();
+    this->aui_mgr.Update();
 }
 
 void MyFrame::LoadSettings()
@@ -437,7 +431,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 void MyFrame::OnStep(wxCommandEvent &event)
 {
     this->system->Update(1);
-    SetStatusText(wxString::Format(_("Timesteps: %d"),this->system->GetTimestepsTaken()));
+    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
     Refresh(false);
 }
 
@@ -450,6 +444,7 @@ void MyFrame::OnRun(wxCommandEvent &event)
 void MyFrame::OnStop(wxCommandEvent &event)
 {
     this->is_running = false;
+    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
     Refresh(false);
 }
 
@@ -474,7 +469,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     if(!this->is_running) return;
 
     this->system->Update(10); // TODO: user controls speed
-    SetStatusText(wxString::Format(_("Timesteps: %d"),this->system->GetTimestepsTaken()));
+    SetStatusText(wxString::Format(_("Running. Timesteps: %d"),this->system->GetTimestepsTaken()));
     this->Refresh(false);
 
     // TODO: report wallclock speed

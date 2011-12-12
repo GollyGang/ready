@@ -99,7 +99,7 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # wxWidgets is required to build the project
-FIND_PACKAGE(wxWidgets COMPONENTS propgrid aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE(wxWidgets COMPONENTS aui ${WXGLCANVASLIBS} core adv base )
 
 IF(wxWidgets_FOUND)
   INCLUDE( ${wxWidgets_USE_FILE} )
