@@ -16,26 +16,21 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "BaseRD.hpp"
+#include "OpenCL_RD.hpp"
 
-// a basic RD system, provided as a placeholder
-// N.B. Work in progress. Most implementations will use a generic 'algorithm' instead (e.g. 'RD_OpenCL_2D')
-class GrayScott_slow_3D : public BaseRD
+// STL:
+#include <vector>
+#include <string>
+
+// base class for 2D OpenCL RD implementations with 2 chemicals, where the user can specify the kernel program
+class OpenCL2D_2Chemicals : public OpenCL_RD
 {
     public:
 
-        GrayScott_slow_3D();
+        OpenCL2D_2Chemicals();
 
-        void Allocate(int x,int y,int z);
-        float GetF() { return this->f; }
-        float GetK() { return this->k; }
-        void SetF(float new_f) { this->f = new_f; }
-        void SetK(float new_k) { this->k = new_k; }
+        void Allocate(int x,int y);
         void InitWithBlobInCenter();
 
         void Update(int n_steps);
-
-    protected:
-
-        float f,k,r_a,r_b;
 };

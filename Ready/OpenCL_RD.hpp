@@ -16,26 +16,27 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "BaseRD.hpp"
+#include "UserAlgorithm.hpp"
 
-// a basic RD system, provided as a placeholder
-// N.B. Work in progress. Most implementations will use a generic 'algorithm' instead (e.g. 'RD_OpenCL_2D')
-class GrayScott_slow_3D : public BaseRD
+// base class for those RD implementations that use OpenCL
+class OpenCL_RD : public UserAlgorithm
 {
     public:
-
-        GrayScott_slow_3D();
-
-        void Allocate(int x,int y,int z);
-        float GetF() { return this->f; }
-        float GetK() { return this->k; }
-        void SetF(float new_f) { this->f = new_f; }
-        void SetK(float new_k) { this->k = new_k; }
-        void InitWithBlobInCenter();
-
-        void Update(int n_steps);
-
+    
+        void SetPlatform(int i);
+        void SetDevice(int i);
+        int GetPlatform();
+        int GetDevice();
+    
     protected:
 
-        float f,k,r_a,r_b;
+        void ReloadOpenCLIfNeeded();
+
+    private:
+    
+        // OpenCL things for re-use
+        // TODO
+        
+        int iPlatform,iDevice;
+        bool need_reload_opencl;
 };
