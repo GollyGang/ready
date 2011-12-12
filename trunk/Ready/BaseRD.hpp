@@ -66,6 +66,8 @@ class BaseRD
 
 // TODO: find a better home for utility functions
 
+float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
+
 // return a random value between lower and upper
 float frand(float lower,float upper);
 

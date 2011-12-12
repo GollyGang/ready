@@ -410,6 +410,7 @@ void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
     gs->InitWithBlobInCenter();
     this->is_running = false;
     this->SetCurrentRDSystem(gs);
+    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
 }
 
 void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
@@ -419,6 +420,7 @@ void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
     gs->InitWithBlobInCenter();
     this->is_running = false;
     this->SetCurrentRDSystem(gs);
+    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
 }
 
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
@@ -468,7 +470,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
-    this->system->Update(10); // TODO: user controls speed
+    this->system->Update(100); // TODO: user controls speed
     SetStatusText(wxString::Format(_("Running. Timesteps: %d"),this->system->GetTimestepsTaken()));
     this->Refresh(false);
 

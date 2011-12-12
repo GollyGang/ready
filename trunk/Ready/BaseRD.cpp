@@ -108,6 +108,11 @@ void BaseRD::SwitchBuffers()
 
 // ------------- utility functions feel a bit lost here ----------------------
 
+float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
+{
+    return origin + NC*(X*(Y*z + y) + x) + iC;
+}
+
 float frand(float lower,float upper)
 {
     return lower + rand()*(upper-lower)/RAND_MAX;
