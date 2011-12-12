@@ -106,12 +106,25 @@ void BaseRD::SwitchBuffers()
     this->iCurrentBuffer = 1-this->iCurrentBuffer;
 }
 
-// ------------- utility functions feel a bit lost here ----------------------
+void BaseRD::AllocateBuffers(int x,int y,int z,int nc)
+{
+    for(int iB=0;iB<2;iB++)
+    {
+        assert(!this->buffer[iB]);
+        this->buffer[iB] = vtkImageData::New();
+        this->buffer[iB]->SetNumberOfScalarComponents(nc);
+        this->buffer[iB]->SetScalarTypeToFloat();
+        this->buffer[iB]->SetDimensions(x,y,z);
+        this->buffer[iB]->AllocateScalars();
+    }
+}
 
-float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
+float* BaseRD::vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
 {
     return origin + NC*(X*(Y*z + y) + x) + iC;
 }
+
+// ------------- utility functions feel a bit lost here ----------------------
 
 float frand(float lower,float upper)
 {
@@ -127,4 +140,3 @@ double hypot3(double x,double y,double z)
 { 
     return sqrt(x*x+y*y+z*z); 
 }
-

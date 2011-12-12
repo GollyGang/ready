@@ -22,7 +22,6 @@ class vtkImageData;
 class vtkImageAlgorithm;
 
 // abstract base classes for all reaction-diffusion systems, 2D and 3D
-
 class BaseRD 
 {
     public:
@@ -38,7 +37,6 @@ class BaseRD
         // advance the RD system by n timesteps
         virtual void Update(int n_steps)=0;
 
-        // returns the timestep for the system
         float GetTimestep();
 
         // how many timesteps have we advanced since being initialized?
@@ -55,18 +53,19 @@ class BaseRD
         float timestep;
         int timesteps_taken;
 
+    protected:
+
         void SwitchBuffers();
+        void AllocateBuffers(int x,int y,int z,int nc);
+        static float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
 
     private:
     
         int iCurrentBuffer; // the buffer being edited (the other is being rendered)
         vtkImageAlgorithm *buffer_switcher;
-
 };
 
 // TODO: find a better home for utility functions
-
-float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
 
 // return a random value between lower and upper
 float frand(float lower,float upper);

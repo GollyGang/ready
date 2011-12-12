@@ -89,7 +89,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
         lut->SetRampToLinear();
         lut->SetScaleToLinear();
-        lut->SetTableRange(0.0, 1.0);
+        lut->SetTableRange(0.0, 0.5);
         lut->SetHueRange(0.6, 0.0);
 
         // pass the image through the lookup table

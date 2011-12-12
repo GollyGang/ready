@@ -16,26 +16,37 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "BaseRD.hpp"
+#include "OpenCL_RD.hpp"
 
-// a basic RD system, provided as a placeholder
-// N.B. Work in progress. Most implementations will use a generic 'algorithm' instead (e.g. 'RD_OpenCL_2D')
-class GrayScott_slow_3D : public BaseRD
+void OpenCL_RD::SetPlatform(int i)
 {
-    public:
+    if(i != this->iPlatform)
+        this->need_reload_opencl = true;
+    this->iPlatform = i;
+}
 
-        GrayScott_slow_3D();
+void OpenCL_RD::SetDevice(int i)
+{
+    if(i != this->iDevice)
+        this->need_reload_opencl = true;
+    this->iDevice = i;
+}
 
-        void Allocate(int x,int y,int z);
-        float GetF() { return this->f; }
-        float GetK() { return this->k; }
-        void SetF(float new_f) { this->f = new_f; }
-        void SetK(float new_k) { this->k = new_k; }
-        void InitWithBlobInCenter();
+int OpenCL_RD::GetPlatform()
+{
+    return this->iPlatform;
+}
 
-        void Update(int n_steps);
+int OpenCL_RD::GetDevice()
+{
+    return this->iDevice;
+}
 
-    protected:
+void OpenCL_RD::ReloadOpenCLIfNeeded()
+{
+    if(!this->need_reload_opencl) return;
 
-        float f,k,r_a,r_b;
-};
+    // TODO
+
+    this->need_reload_opencl = false;
+}

@@ -36,12 +36,16 @@ set(BASE_SOURCES
    BaseRD.hpp BaseRD.cpp
    GrayScott_slow.hpp GrayScott_slow.cpp
    GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
+   UserAlgorithm.hpp UserAlgorithm.cpp
+   OpenCL_RD.hpp OpenCL_RD.cpp
+   OpenCL2D_2Chemicals.hpp OpenCL2D_2Chemicals.cpp
    cl.hpp
 )
 
 # high-level GUI code used only in Ready
 set(GUI_SOURCES
-   app.hpp app.cpp frame.hpp frame.cpp 
+   app.hpp app.cpp 
+   frame.hpp frame.cpp 
    vtk_pipeline.hpp vtk_pipeline.cpp
    wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx   # a local copy, since it gets released so infrequently
 )

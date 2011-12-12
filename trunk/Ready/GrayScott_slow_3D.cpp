@@ -42,15 +42,7 @@ GrayScott_slow_3D::GrayScott_slow_3D()
 
 void GrayScott_slow_3D::Allocate(int x,int y,int z)
 {
-    for(int iB=0;iB<2;iB++)
-    {
-        assert(!this->buffer[iB]);
-        this->buffer[iB]= vtkImageData::New();
-        this->buffer[iB]->SetNumberOfScalarComponents(2);
-        this->buffer[iB]->SetScalarTypeToFloat();
-        this->buffer[iB]->SetDimensions(x,y,z);
-        this->buffer[iB]->AllocateScalars();
-    }
+    this->AllocateBuffers(x,y,z,2);
 }
 
 void GrayScott_slow_3D::Update(int n_steps)

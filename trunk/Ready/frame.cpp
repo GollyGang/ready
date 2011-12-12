@@ -162,7 +162,7 @@ MyFrame::MyFrame(const wxString& title)
     // initialize an RD system to get us started
     {
         GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-        gs->Allocate(20,20,20);
+        gs->Allocate(30,25,20);
         gs->InitWithBlobInCenter();
         this->SetCurrentRDSystem(gs); // connects it to the VTK window
     }
@@ -406,10 +406,9 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
 void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
 {
     GrayScott_slow *gs = new GrayScott_slow();
-    gs->Allocate(50,50);
+    gs->Allocate(80,50);
     gs->InitWithBlobInCenter();
     this->SetCurrentRDSystem(gs);
-    this->SetStatusBarText();
 }
 
 void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
@@ -418,7 +417,6 @@ void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
     gs->Allocate(15,15,15);
     gs->InitWithBlobInCenter();
     this->SetCurrentRDSystem(gs);
-    this->SetStatusBarText();
 }
 
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
@@ -426,6 +424,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     delete this->system;
     this->system = sys;
     InitializeVTKPipeline(this->pVTKWindow,this->system);
+    this->SetStatusBarText();
 }
 
 void MyFrame::OnStep(wxCommandEvent &event)
@@ -469,10 +468,11 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     if(!this->is_running) return;
 
     this->system->Update(10); // TODO: user controls speed
-    this->SetStatusBarText();
-    this->Refresh(false);
 
     // TODO: compute wallclock speed
+
+    this->SetStatusBarText();
+    this->Refresh(false);
 
     wxMilliSleep(30);
 
