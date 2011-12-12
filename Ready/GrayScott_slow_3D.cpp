@@ -87,6 +87,7 @@ void GrayScott_slow_3D::Update(int n_steps)
                     float bval = *vtk_at(old_data,x,y,z,1,X,Y,NC);
 
                     // compute the Laplacians of a and b
+                    // 7-point stencil:
                     float dda = *vtk_at(old_data,x,y_prev,z,0,X,Y,NC) +
                                 *vtk_at(old_data,x,y_next,z,0,X,Y,NC) +
                                 *vtk_at(old_data,x_prev,y,z,0,X,Y,NC) + 
@@ -100,17 +101,68 @@ void GrayScott_slow_3D::Update(int n_steps)
                                 *vtk_at(old_data,x_next,y,z,1,X,Y,NC) +
                                 *vtk_at(old_data,x,y,z_prev,1,X,Y,NC) + 
                                 *vtk_at(old_data,x,y,z_next,1,X,Y,NC) +
-                                - 6*bval;
+                                - 6*bval; 
+                    /* // 19-point stencil
+                    // Spotz,W.F. and G.F. Carey, 1996, A high-order compact formulation for the 3D Poisson equation
+                    // Numerical Methods for Partial Differential Equations, 12, 235–243.
+                    // www.cfdlab.ae.utexas.edu/labstaff/carey/GFC_Papers/Carey146.pdf
+                    // (also contains a 27-point stencil if we need it)
+                    // N.B. code doesn't behave anything like the 7-point stencil above. Have I done something wrong?
+                    float dda = 2 * (*vtk_at(old_data,x,y_prev,z,0,X,Y,NC) +
+                                     *vtk_at(old_data,x,y_next,z,0,X,Y,NC) +
+                                     *vtk_at(old_data,x_prev,y,z,0,X,Y,NC) + 
+                                     *vtk_at(old_data,x_next,y,z,0,X,Y,NC) +
+                                     *vtk_at(old_data,x,y,z_prev,0,X,Y,NC) + 
+                                     *vtk_at(old_data,x,y,z_next,0,X,Y,NC) ) +
+ 
+                                *vtk_at(old_data,x,y_prev,z_prev,0,X,Y,NC) +
+                                *vtk_at(old_data,x,y_next,z_prev,0,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y,z_prev,0,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y,z_prev,0,X,Y,NC) +
+
+                                *vtk_at(old_data,x,y_prev,z_next,0,X,Y,NC) +
+                                *vtk_at(old_data,x,y_next,z_next,0,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y,z_next,0,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y,z_next,0,X,Y,NC) +
+
+                                *vtk_at(old_data,x_prev,y_prev,z,0,X,Y,NC) +
+                                *vtk_at(old_data,x_next,y_prev,z,0,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y_next,z,0,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y_next,z,0,X,Y,NC)
+
+                                - 24*aval;
+
+                    float ddb = 2 * (*vtk_at(old_data,x,y_prev,z,1,X,Y,NC) +
+                                     *vtk_at(old_data,x,y_next,z,1,X,Y,NC) +
+                                     *vtk_at(old_data,x_prev,y,z,1,X,Y,NC) + 
+                                     *vtk_at(old_data,x_next,y,z,1,X,Y,NC) +
+                                     *vtk_at(old_data,x,y,z_prev,1,X,Y,NC) + 
+                                     *vtk_at(old_data,x,y,z_next,1,X,Y,NC) ) +
+ 
+                                *vtk_at(old_data,x,y_prev,z_prev,1,X,Y,NC) +
+                                *vtk_at(old_data,x,y_next,z_prev,1,X,Y,NC) +
+                                *vtk_at(old_data,x,y_prev,z_next,1,X,Y,NC) +
+                                *vtk_at(old_data,x,y_next,z_next,1,X,Y,NC) +
+
+                                *vtk_at(old_data,x_prev,y,z_prev,1,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y,z_prev,1,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y,z_next,1,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y,z_next,1,X,Y,NC) +
+
+                                *vtk_at(old_data,x_prev,y_prev,z,1,X,Y,NC) +
+                                *vtk_at(old_data,x_next,y_prev,z,1,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y_next,z,1,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y_next,z,1,X,Y,NC)
+
+                                - 24*bval;*/
 
                     // compute the new rate of change of a and b
                     float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
                     float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
 
                     // apply the change
-                    aval += this->timestep * da;
-                    bval += this->timestep * db;
-                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = aval;
-                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = bval;
+                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = aval + this->timestep * da;
+                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = bval + this->timestep * db;
                 }
             }
         }

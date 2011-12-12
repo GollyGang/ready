@@ -84,6 +84,7 @@ private:
     void SaveSettings();
    
     void SetCurrentRDSystem(BaseRD* system);
+    void SetStatusBarText();
 
     wxTreeCtrl* CreatePatternsCtrl();
 

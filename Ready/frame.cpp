@@ -162,7 +162,7 @@ MyFrame::MyFrame(const wxString& title)
     // initialize an RD system to get us started
     {
         GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-        gs->Allocate(15,15,15);
+        gs->Allocate(20,20,20);
         gs->InitWithBlobInCenter();
         this->SetCurrentRDSystem(gs); // connects it to the VTK window
     }
@@ -408,9 +408,8 @@ void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
     GrayScott_slow *gs = new GrayScott_slow();
     gs->Allocate(50,50);
     gs->InitWithBlobInCenter();
-    this->is_running = false;
     this->SetCurrentRDSystem(gs);
-    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
+    this->SetStatusBarText();
 }
 
 void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
@@ -418,9 +417,8 @@ void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
     GrayScott_slow_3D *gs = new GrayScott_slow_3D();
     gs->Allocate(15,15,15);
     gs->InitWithBlobInCenter();
-    this->is_running = false;
     this->SetCurrentRDSystem(gs);
-    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
+    this->SetStatusBarText();
 }
 
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
@@ -433,7 +431,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 void MyFrame::OnStep(wxCommandEvent &event)
 {
     this->system->Update(1);
-    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
+    this->SetStatusBarText();
     Refresh(false);
 }
 
@@ -446,7 +444,7 @@ void MyFrame::OnRun(wxCommandEvent &event)
 void MyFrame::OnStop(wxCommandEvent &event)
 {
     this->is_running = false;
-    SetStatusText(wxString::Format(_("Stopped. Timesteps: %d"),this->system->GetTimestepsTaken()));
+    this->SetStatusBarText();
     Refresh(false);
 }
 
@@ -470,14 +468,23 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
-    this->system->Update(100); // TODO: user controls speed
-    SetStatusText(wxString::Format(_("Running. Timesteps: %d"),this->system->GetTimestepsTaken()));
+    this->system->Update(10); // TODO: user controls speed
+    this->SetStatusBarText();
     this->Refresh(false);
 
-    // TODO: report wallclock speed
+    // TODO: compute wallclock speed
 
     wxMilliSleep(30);
 
     event.RequestMore(); // trigger another onIdle event
 }
 
+void MyFrame::SetStatusBarText()
+{
+    // TODO: display wallclock speed
+    wxString txt;
+    if(this->is_running) txt << _("Running. ");
+    else txt << _("Stopped. ");
+    txt << _("Timesteps: ") << this->system->GetTimestepsTaken();
+    SetStatusText(txt);
+}
