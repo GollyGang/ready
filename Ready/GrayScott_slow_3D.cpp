@@ -61,10 +61,15 @@ void GrayScott_slow_3D::Update(int n_steps)
         vtkImageData *new_image = this->GetNewImage();
         assert(old_image);
         assert(new_image);
-        
+
         const int X = old_image->GetDimensions()[0];
         const int Y = old_image->GetDimensions()[1];
         const int Z = old_image->GetDimensions()[2];
+        const int NC = old_image->GetNumberOfScalarComponents();
+
+        float* old_data = static_cast<float*>(old_image->GetScalarPointer());
+        float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+
         for(int x=0;x<X;x++)
         {
             int x_prev = (x-1+X)%X;
@@ -78,23 +83,23 @@ void GrayScott_slow_3D::Update(int n_steps)
                     int z_prev = (z-1+Z)%Z;
                     int z_next = (z+1)%Z;
 
-                    float aval = old_image->GetScalarComponentAsFloat(x,y,z,0);
-                    float bval = old_image->GetScalarComponentAsFloat(x,y,z,1);
+                    float aval = *vtk_at(old_data,x,y,z,0,X,Y,NC);
+                    float bval = *vtk_at(old_data,x,y,z,1,X,Y,NC);
 
                     // compute the Laplacians of a and b
-                    float dda = old_image->GetScalarComponentAsFloat(x,y_prev,z,0) +
-                                old_image->GetScalarComponentAsFloat(x,y_next,z,0) +
-                                old_image->GetScalarComponentAsFloat(x_prev,y,z,0) + 
-                                old_image->GetScalarComponentAsFloat(x_next,y,z,0) +
-                                old_image->GetScalarComponentAsFloat(x,y,z_prev,0) + 
-                                old_image->GetScalarComponentAsFloat(x,y,z_next,0) +
+                    float dda = *vtk_at(old_data,x,y_prev,z,0,X,Y,NC) +
+                                *vtk_at(old_data,x,y_next,z,0,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y,z,0,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y,z,0,X,Y,NC) +
+                                *vtk_at(old_data,x,y,z_prev,0,X,Y,NC) + 
+                                *vtk_at(old_data,x,y,z_next,0,X,Y,NC) +
                                 - 6*aval;
-                    float ddb = old_image->GetScalarComponentAsFloat(x,y_prev,z,1) +
-                                old_image->GetScalarComponentAsFloat(x,y_next,z,1) +
-                                old_image->GetScalarComponentAsFloat(x_prev,y,z,1) + 
-                                old_image->GetScalarComponentAsFloat(x_next,y,z,1) +
-                                old_image->GetScalarComponentAsFloat(x,y,z_prev,1) + 
-                                old_image->GetScalarComponentAsFloat(x,y,z_next,1) +
+                    float ddb = *vtk_at(old_data,x,y_prev,z,1,X,Y,NC) +
+                                *vtk_at(old_data,x,y_next,z,1,X,Y,NC) +
+                                *vtk_at(old_data,x_prev,y,z,1,X,Y,NC) + 
+                                *vtk_at(old_data,x_next,y,z,1,X,Y,NC) +
+                                *vtk_at(old_data,x,y,z_prev,1,X,Y,NC) + 
+                                *vtk_at(old_data,x,y,z_next,1,X,Y,NC) +
                                 - 6*bval;
 
                     // compute the new rate of change of a and b
@@ -104,8 +109,8 @@ void GrayScott_slow_3D::Update(int n_steps)
                     // apply the change
                     aval += this->timestep * da;
                     bval += this->timestep * db;
-                    new_image->SetScalarComponentFromFloat(x,y,z,0,aval);
-                    new_image->SetScalarComponentFromFloat(x,y,z,1,bval);
+                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = aval;
+                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = bval;
                 }
             }
         }
@@ -125,6 +130,11 @@ void GrayScott_slow_3D::InitWithBlobInCenter()
     const int X = old_image->GetDimensions()[0];
     const int Y = old_image->GetDimensions()[1];
     const int Z = old_image->GetDimensions()[2];
+    const int NC = old_image->GetNumberOfScalarComponents();
+
+    float* old_data = static_cast<float*>(old_image->GetScalarPointer());
+    float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+
     for(int x=0;x<X;x++)
     {
         for(int y=0;y<Y;y++)
@@ -133,13 +143,13 @@ void GrayScott_slow_3D::InitWithBlobInCenter()
             {
                 if(hypot3(x-X/2,(y-Y/2)/1.5,z-Z/2)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate sphere in the middle
                 {
-                    new_image->SetScalarComponentFromFloat(x,y,z,0,0.0f);
-                    new_image->SetScalarComponentFromFloat(x,y,z,1,1.0f);
+                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = 0.0f;
+                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = 1.0f;
                 }
                 else 
                 {
-                    new_image->SetScalarComponentFromFloat(x,y,z,0,1.0f);
-                    new_image->SetScalarComponentFromFloat(x,y,z,1,0.0f);
+                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = 1.0f;
+                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = 0.0f;
                 }
             }
         }
