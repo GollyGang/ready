@@ -22,6 +22,7 @@
 // readybase:
 #include "GrayScott_slow.hpp"
 #include "GrayScott_slow_3D.hpp"
+#include "OpenCL2D_2Chemicals.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -39,7 +40,6 @@
 // STL:
 #include <fstream>
 #include <string>
-#include <sstream>
 using namespace std;
 
 // OpenCL: (local copy)
@@ -157,14 +157,35 @@ MyFrame::MyFrame(const wxString& title)
     SetStatusText(_("Ready"));
 
     // create a VTK window
+    vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
 
     // initialize an RD system to get us started
+    try {
+        if(0)
+        {
+            OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
+            s->Allocate(60,40);
+            s->InitWithBlobInCenter();
+            this->SetCurrentRDSystem(s);
+        }
+        else
+        {
+            GrayScott_slow_3D *gs = new GrayScott_slow_3D();
+            gs->Allocate(30,25,20);
+            gs->InitWithBlobInCenter();
+            this->SetCurrentRDSystem(gs); // connects it to the VTK window
+        }
+    }
+    catch(const exception& e)
     {
-        GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-        gs->Allocate(30,25,20);
-        gs->InitWithBlobInCenter();
-        this->SetCurrentRDSystem(gs); // connects it to the VTK window
+        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        this->Destroy();
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown error during RD system initialization"));
+        this->Destroy();
     }
     
     // load a kernel text (just as a demo, doesn't do anything)
@@ -324,22 +345,22 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 {
     wxBusyCursor busy;
-    ostringstream report;
+    wxString report;
     {
         // Get available OpenCL platforms
         vector<cl::Platform> platforms;
         cl::Platform::get(&platforms);
 
-        report << "Found " << platforms.size() << " platform(s):\n";
+        report << _("Found ") << platforms.size() << _(" platform(s):\n");
 
         for(unsigned int iPlatform=0;iPlatform<platforms.size();iPlatform++)
         {
-            report << "Platform " << iPlatform+1 << ":\n";
+            report << _("Platform ") << iPlatform+1 << _T(":\n");
             string info;
             for(int i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
             {
                 platforms[iPlatform].getInfo(i,&info);
-                report << info << endl;
+                report << info << _T("\n");
             }
 
             // create a context using this platform and the GPU
@@ -352,20 +373,20 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 
             // Get a list of devices on this platform
             vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
-            report << "\nFound " << devices.size() << " device(s) on this platform.\n";
+            report << _("\nFound ") << devices.size() << _(" device(s) on this platform.\n");
             for(unsigned int iDevice=0;iDevice<devices.size();iDevice++)
             {
-                report << "Device " << iDevice+1 << ":\n";
+                report << _("Device ") << iDevice+1 << _T(":\n");
                 for(unsigned int i=CL_DEVICE_NAME;i<=CL_DEVICE_EXTENSIONS;i++)
                 {
                     if(devices[iDevice].getInfo(i,&info) == CL_SUCCESS)
-                        report << info << endl;
+                        report << info << _T("\n");
                 }
             }
-            report << endl;
+            report << _T("\n");
         }
     }
-    wxMessageBox(wxString(report.str().c_str(),wxConvUTF8));
+    wxMessageBox(report);
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)
@@ -432,7 +453,19 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 
 void MyFrame::OnStep(wxCommandEvent &event)
 {
-    this->system->Update(1);
+    try {
+        this->system->Update(1);
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format(_("Fatal error: %s"),e.what()));
+        this->Destroy();
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown fatal error"));
+        this->Destroy();
+    }
     this->SetStatusBarText();
     Refresh(false);
 }
@@ -470,7 +503,19 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
-    this->system->Update(10); // TODO: user controls speed
+    try {
+        this->system->Update(10); // TODO: user controls speed
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format(_("Fatal error: %s"),e.what()));
+        this->Destroy();
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown fatal error"));
+        this->Destroy();
+    }
 
     // TODO: compute wallclock speed
 

@@ -21,6 +21,11 @@
 // STL:
 using namespace std;
 
+UserAlgorithm::UserAlgorithm()
+{
+    this->need_reload_program = true;
+}
+
 void UserAlgorithm::SetProgram(string s)
 {
     if(s != this->program_string)

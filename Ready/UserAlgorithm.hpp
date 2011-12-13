@@ -26,6 +26,8 @@ class UserAlgorithm : public BaseRD
 {
     public:
 
+        UserAlgorithm();
+
         void SetProgram(std::string s);
 
     protected:

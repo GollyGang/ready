@@ -24,6 +24,7 @@
 
 // STL:
 #include <cassert>
+#include <stdexcept>
 using namespace std;
 
 // VTK:
@@ -38,10 +39,7 @@ BaseRD::BaseRD() :
     this->buffer[0] = NULL;
     this->buffer[1] = NULL;
     vtkImageShiftScale *iss = vtkImageShiftScale::New();
-    iss->SetScale(1.0);
-    iss->SetShift(0.0);
     iss->SetOutputScalarTypeToFloat();
-    iss->ClampOverflowOn();
     this->buffer_switcher = iss;
 }
 
@@ -55,7 +53,7 @@ BaseRD::~BaseRD()
         this->buffer_switcher->Delete();
 }
 
-int BaseRD::GetDimensionality() 
+int BaseRD::GetDimensionality() const
 {
     assert(this->buffer[0]);
     int dimensionality=0;
@@ -65,37 +63,37 @@ int BaseRD::GetDimensionality()
     return dimensionality;
 }
 
-int BaseRD::GetNumberOfChemicals()
+int BaseRD::GetNumberOfChemicals() const
 {
     assert(this->buffer[0]);
     return this->buffer[0]->GetNumberOfScalarComponents();
 }
 
-float BaseRD::GetTimestep() 
+float BaseRD::GetTimestep() const
 { 
     return this->timestep; 
 }
 
-vtkImageData* BaseRD::GetImageToRender() 
+vtkImageData* BaseRD::GetImageToRender() const
 { 
     assert(this->buffer_switcher);
     this->buffer_switcher->Update();
     return this->buffer_switcher->GetOutput(); 
 }
 
-vtkImageData* BaseRD::GetNewImage() 
+vtkImageData* BaseRD::GetNewImage() const
 { 
     assert(this->buffer[this->iCurrentBuffer]);
     return this->buffer[this->iCurrentBuffer]; 
 }
 
-vtkImageData* BaseRD::GetOldImage() 
+vtkImageData* BaseRD::GetOldImage() const
 { 
     assert(this->buffer[1-this->iCurrentBuffer]);
     return this->buffer[1-this->iCurrentBuffer]; 
 }
 
-int BaseRD::GetTimestepsTaken()
+int BaseRD::GetTimestepsTaken() const
 {
     return this->timesteps_taken;
 }
@@ -116,11 +114,19 @@ void BaseRD::AllocateBuffers(int x,int y,int z,int nc)
         this->buffer[iB]->SetScalarTypeToFloat();
         this->buffer[iB]->SetDimensions(x,y,z);
         this->buffer[iB]->AllocateScalars();
+        if(this->buffer[iB]->GetDimensions()[0]!=x || this->buffer[iB]->GetDimensions()[1]!=y || this->buffer[iB]->GetDimensions()[2]!=z)
+            throw runtime_error("BaseRD::AllocateBuffers : Failed to allocate image data - dimensions too big?");
     }
+}
+
+int BaseRD::vtk_offset(int x,int y,int z,int iC,int X,int Y,int NC)
+{
+    return NC*(X*(Y*z + y) + x) + iC;
 }
 
 float* BaseRD::vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
 {
+    // vtkImageData scalars stored as: component1,component2,...componentN,component1,.... for consecutive x, then y, then z
     return origin + NC*(X*(Y*z + y) + x) + iC;
 }
 

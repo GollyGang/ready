@@ -18,10 +18,16 @@
 // local:
 #include "UserAlgorithm.hpp"
 
+// OpenCL: (local copy)
+#include "cl.hpp"
+
 // base class for those RD implementations that use OpenCL
 class OpenCL_RD : public UserAlgorithm
 {
     public:
+
+        OpenCL_RD();
+        ~OpenCL_RD();
     
         void SetPlatform(int i);
         void SetDevice(int i);
@@ -30,13 +36,30 @@ class OpenCL_RD : public UserAlgorithm
     
     protected:
 
-        void ReloadOpenCLIfNeeded();
+        void ReloadContextIfNeeded();
+        void ReloadKernelIfNeeded();
+
+        void CreateOpenCLBuffers();
+        void WriteToOpenCLBuffers();
+        void ReadFromOpenCLBuffers();
+        void DeleteOpenCLBuffers();
+
+        void Update2Steps();
 
     private:
     
         // OpenCL things for re-use
-        // TODO
+        cl::Context *context;
+        cl::CommandQueue *command_queue;
+        cl::Device *device;
+        cl::Kernel *kernel;
+        cl::Buffer *buffer1,*buffer2;
+        cl::NDRange global_range,local_range;
+
+        std::string kernel_function_name;
+
+    private:
         
         int iPlatform,iDevice;
-        bool need_reload_opencl;
+        bool need_reload_context;
 };
