@@ -372,6 +372,9 @@ void MyFrame::OnSize(wxSizeEvent& event)
 {
     // trigger a redraw
     if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
+    
+    // need this to move and resize status bar in Mac app
+    event.Skip();
 }
 
 void MyFrame::OnScreenshot(wxCommandEvent& event)
