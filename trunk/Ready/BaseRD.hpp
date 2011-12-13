@@ -30,25 +30,25 @@ class BaseRD
         virtual ~BaseRD();
 
         // e.g. 2 for 2D systems, 3 for 3D
-        int GetDimensionality();
+        int GetDimensionality() const;
 
-        int GetNumberOfChemicals();
+        int GetNumberOfChemicals() const;
 
         // advance the RD system by n timesteps
         virtual void Update(int n_steps)=0;
 
-        float GetTimestep();
+        float GetTimestep() const;
 
         // how many timesteps have we advanced since being initialized?
-        int GetTimestepsTaken();
+        int GetTimestepsTaken() const;
 
-        vtkImageData* GetImageToRender();
+        vtkImageData* GetImageToRender() const;
 
     protected:
 
         vtkImageData *buffer[2];
-        vtkImageData* GetOldImage(); // copy from this one
-        vtkImageData* GetNewImage(); // edit this one
+        vtkImageData* GetOldImage() const; // copy from this one
+        vtkImageData* GetNewImage() const; // edit this one
 
         float timestep;
         int timesteps_taken;
@@ -57,6 +57,7 @@ class BaseRD
 
         void SwitchBuffers();
         void AllocateBuffers(int x,int y,int z,int nc);
+        static int vtk_offset(int x,int y,int z,int iC,int X,int Y,int NC);
         static float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
 
     private:

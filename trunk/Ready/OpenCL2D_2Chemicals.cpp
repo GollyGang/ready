@@ -28,11 +28,28 @@ using namespace std;
 OpenCL2D_2Chemicals::OpenCL2D_2Chemicals()
 {
     this->timestep = 1.0f;
+    this->program_string = "__kernel void rd_compute(\n\
+    __global float *input,__global float *output)\n\
+{\n\
+    const int x = get_global_id(0);\n\
+    const int y = get_global_id(1);\n\
+    const int z = get_global_id(2);\n\
+    const int X = get_global_size(0);\n\
+    const int Y = get_global_size(1);\n\
+    const int NC = 2; // TODO: make a param\n\
+    const int i = NC*(X*(Y*z + y) + x);\n\
+\n\
+    output[i] = input[i]/2.0f+0.1;\n\
+    output[i+1] = input[i+1]/2.0f+0.1;\n\
+}";
 }
 
 void OpenCL2D_2Chemicals::Allocate(int x,int y)
 {
     this->AllocateBuffers(x,y,1,2);
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
+    this->CreateOpenCLBuffers();
 }
 
 void OpenCL2D_2Chemicals::InitWithBlobInCenter()
@@ -65,12 +82,22 @@ void OpenCL2D_2Chemicals::InitWithBlobInCenter()
             }
         }
     }
-    this->SwitchBuffers();
+    this->SwitchBuffers(); // new_data -> old_data
+    this->WriteToOpenCLBuffers(); // old_data -> buffer1 
 }
 
 void OpenCL2D_2Chemicals::Update(int n_steps)
 {
-    this->ReloadOpenCLIfNeeded();
+    if(n_steps%2)
+        throw runtime_error("OpenCL2D_2Chemicals::Update : n_steps must be divisible by 2");
 
-    // TODO
+    for(int it=0;it<n_steps/2;it++)
+    {
+        this->Update2Steps(); // take data from buffer1, leaves output in buffer1
+    }
+
+    this->timesteps_taken += n_steps;
+
+    this->ReadFromOpenCLBuffers(); // buffer1 -> new_data = buffers[iCurrentBuffer]
+    this->SwitchBuffers(); // buffers[iCurrentBuffer] gets connected to output for rendering
 }
