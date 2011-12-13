@@ -360,7 +360,7 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
             for(int i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
             {
                 platforms[iPlatform].getInfo(i,&info);
-                report << info << _T("\n");
+                report << wxString(info.c_str(),wxConvUTF8) << _T("\n");
             }
 
             // create a context using this platform and the GPU
@@ -380,7 +380,7 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
                 for(unsigned int i=CL_DEVICE_NAME;i<=CL_DEVICE_EXTENSIONS;i++)
                 {
                     if(devices[iDevice].getInfo(i,&info) == CL_SUCCESS)
-                        report << info << _T("\n");
+                        report << wxString(info.c_str(),wxConvUTF8) << _T("\n");
                 }
             }
             report << _T("\n");
