@@ -186,7 +186,7 @@ if(APPLE)
    # copy *.icns files into Resources directory inside .app bundle
    set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
    
-   # strip out debug info (reduces app size by 1.6MB)
+   # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
    target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
 endif()
 
