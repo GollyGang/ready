@@ -52,6 +52,8 @@ class OpenCL_RD : public UserAlgorithm
         cl::Context *context;
         cl::CommandQueue *command_queue;
         cl::Device *device;
+        cl::Program *program;
+        cl::Program::Sources *source;
         cl::Kernel *kernel;
         cl::Buffer *buffer1,*buffer2;
         cl::NDRange global_range,local_range;
@@ -63,3 +65,5 @@ class OpenCL_RD : public UserAlgorithm
         int iPlatform,iDevice;
         bool need_reload_context;
 };
+
+const char* descriptionOfError(cl_int err);

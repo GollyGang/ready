@@ -57,7 +57,7 @@ class BaseRD
 
         void SwitchBuffers();
         void AllocateBuffers(int x,int y,int z,int nc);
-        static int vtk_offset(int x,int y,int z,int iC,int X,int Y,int NC);
+
         static float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
 
     private:

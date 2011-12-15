@@ -32,6 +32,14 @@ OpenCL2D_2Chemicals::OpenCL2D_2Chemicals()
     this->program_string = "__kernel void rd_compute(\n\
     __global float *input,__global float *output)\n\
 {\n\
+    const float D_u = 0.082f;\n\
+    const float D_v = 0.041f;\n\
+\n\
+    const float k = 0.064f;\n\
+    const float F = 0.035f;\n\
+\n\
+    const float delta_t = 1.0f;\n\
+\n\
     const int x = get_global_id(0);\n\
     const int y = get_global_id(1);\n\
     const int z = get_global_id(2);\n\
@@ -40,13 +48,38 @@ OpenCL2D_2Chemicals::OpenCL2D_2Chemicals()
     const int NC = 2; // TODO: make a param\n\
     const int i = NC*(X*(Y*z + y) + x);\n\
 \n\
-    output[i] = input[i]/2.0f+0.1;\n\
-    output[i+1] = input[i+1]/2.0f+0.1;\n\
+    const float u = input[i];\n\
+    const float v = input[i+1];\n\
+\n\
+    // compute the Laplacians of u and v (assuming X and Y are powers of 2)\n\
+    const int xm1 = ((x-1+X) & (X-1));\n\
+    const int xp1 = ((x+1) & (X-1));\n\
+    const int ym1 = ((y-1+Y) & (Y-1));\n\
+    const int yp1 = ((y+1) & (Y-1));\n\
+    const int iLeft = NC*(X*(Y*z + y) + xm1);\n\
+    const int iRight = NC*(X*(Y*z + y) + xp1);\n\
+    const int iUp = NC*(X*(Y*z + ym1) + x);\n\
+    const int iDown = NC*(X*(Y*z + yp1) + x);\n\
+\n\
+    // Standard 5-point stencil\n\
+    const float nabla_u = input[iLeft] + input[iRight] + input[iUp] + input[iDown] - 4*u;\n\
+    const float nabla_v = input[iLeft+1] + input[iRight+1] + input[iUp+1] + input[iDown+1] - 4*v;\n\
+\n\
+    // compute the new rate of change\n\
+    const float delta_u = D_u * nabla_u - u*v*v + F*(1.0f-u);\n\
+    const float delta_v = D_v * nabla_v + u*v*v - (F+k)*v;\n\
+\n\
+    // apply the change (to the new buffer)\n\
+    output[i] = u + delta_t * delta_u;\n\
+    output[i+1] = v + delta_t * delta_v;\n\
 }";
+    // TODO: parameterize the kernel code
 }
 
 void OpenCL2D_2Chemicals::Allocate(int x,int y)
 {
+    if(x&(x-1) || y&(y-1))
+        throw runtime_error("OpenCL2D_2Chemicals::Allocate : for OpenCL we require both dimensions to be powers of 2");
     this->AllocateBuffers(x,y,1,2);
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
@@ -73,32 +106,34 @@ void OpenCL2D_2Chemicals::InitWithBlobInCenter()
         {
             if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
             {
+                *vtk_at(old_data,x,y,0,0,X,Y,NC) = 0.0f;
                 *vtk_at(new_data,x,y,0,0,X,Y,NC) = 0.0f;
+                *vtk_at(old_data,x,y,0,1,X,Y,NC) = 1.0f;
                 *vtk_at(new_data,x,y,0,1,X,Y,NC) = 1.0f;
             }
             else 
             {
+                *vtk_at(old_data,x,y,0,0,X,Y,NC) = 1.0f;
                 *vtk_at(new_data,x,y,0,0,X,Y,NC) = 1.0f;
+                *vtk_at(old_data,x,y,0,1,X,Y,NC) = 0.0f;
                 *vtk_at(new_data,x,y,0,1,X,Y,NC) = 0.0f;
             }
         }
     }
-    this->SwitchBuffers(); // new_data -> old_data
+    this->GetNewImage()->Modified();
     this->WriteToOpenCLBuffers(); // old_data -> buffer1 
 }
 
 void OpenCL2D_2Chemicals::Update(int n_steps)
 {
-    if(n_steps%2)
-        throw runtime_error("OpenCL2D_2Chemicals::Update : n_steps must be divisible by 2");
-
-    for(int it=0;it<n_steps/2;it++)
+    // take approximately n_steps steps
+    for(int it=0;it<(n_steps+1)/2;it++)
     {
         this->Update2Steps(); // take data from buffer1, leaves output in buffer1
+        this->timesteps_taken += 2;
     }
 
-    this->timesteps_taken += n_steps;
-
     this->ReadFromOpenCLBuffers(); // buffer1 -> new_data = buffers[iCurrentBuffer]
-    this->SwitchBuffers(); // buffers[iCurrentBuffer] gets connected to output for rendering
+    this->GetNewImage()->Modified();
+    // N.B. we're not using BaseRD's render-buffer switching since we already have two OpenCL buffers
 }
