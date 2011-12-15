@@ -145,8 +145,8 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     const int X = this->GetOldImage()->GetDimensions()[0];
     const int Y = this->GetOldImage()->GetDimensions()[1];
     const int Z = this->GetOldImage()->GetDimensions()[2];
-    this->global_range = cl::NDRange(X,Y);
-    this->local_range = cl::NDRange(512,1); // TODO: some way of sensibly choosing this
+    this->global_range = cl::NDRange(X,Y,Z);
+    this->local_range = cl::NDRange(512,1,1); // TODO: some way of sensibly choosing this
 
     this->need_reload_program = false;
 }
