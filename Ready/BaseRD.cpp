@@ -117,11 +117,7 @@ void BaseRD::AllocateBuffers(int x,int y,int z,int nc)
         if(this->buffer[iB]->GetDimensions()[0]!=x || this->buffer[iB]->GetDimensions()[1]!=y || this->buffer[iB]->GetDimensions()[2]!=z)
             throw runtime_error("BaseRD::AllocateBuffers : Failed to allocate image data - dimensions too big?");
     }
-}
-
-int BaseRD::vtk_offset(int x,int y,int z,int iC,int X,int Y,int NC)
-{
-    return NC*(X*(Y*z + y) + x) + iC;
+    this->buffer_switcher->SetInput(this->buffer[this->iCurrentBuffer]);
 }
 
 float* BaseRD::vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)

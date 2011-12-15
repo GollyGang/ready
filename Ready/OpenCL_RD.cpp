@@ -42,6 +42,8 @@ OpenCL_RD::OpenCL_RD()
     this->kernel = NULL;
     this->buffer1 = NULL;
     this->buffer2 = NULL;
+    this->program = NULL;
+    this->source = NULL;
 }
 
 OpenCL_RD::~OpenCL_RD()
@@ -51,6 +53,8 @@ OpenCL_RD::~OpenCL_RD()
     delete this->device;
     delete this->command_queue;
     delete this->kernel;
+    delete this->program;
+    delete this->source;
 }
 
 void OpenCL_RD::SetPlatform(int i)
@@ -114,27 +118,26 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
     cl_int ret;
 
-    cl::Program::Sources source(1, std::make_pair(this->program_string.c_str(), this->program_string.length()+1));
+    this->source = new cl::Program::Sources(1, std::make_pair(this->program_string.c_str(), this->program_string.length()+1));
 
     // Make program of the source code in the context
-    cl::Program program(*this->context, source);
+    this->program = new cl::Program(*this->context, *this->source);
 
     // Build program for our selected device
     vector<cl::Device> devices;
     devices.push_back(*this->device);
-    ret = program.build(devices, NULL, NULL, NULL);
+    ret = this->program->build(devices, NULL, NULL, NULL);
     if(ret != CL_SUCCESS)
     {
-        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : program.build() failed:\n\n" + program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(*this->device));
+        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : program.build() failed:\n\n" + this->program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(*this->device));
     }
 
     // Make kernel
-    this->kernel = new cl::Kernel(program, this->kernel_function_name.c_str(),&ret);
+    this->kernel = new cl::Kernel(*this->program, this->kernel_function_name.c_str(),&ret);
     if(ret != CL_SUCCESS)
     {
-        // e.g. -46 = CL_INVALID_KERNEL_NAME : function name not found in kernel
         ostringstream oss;
-        oss << "OpenCL_RD::ReloadKernelIfNeeded : Kernel() failed: " << ret;
+        oss << "OpenCL_RD::ReloadKernelIfNeeded : Kernel() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
     }
 
@@ -142,8 +145,8 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     const int X = this->GetOldImage()->GetDimensions()[0];
     const int Y = this->GetOldImage()->GetDimensions()[1];
     const int Z = this->GetOldImage()->GetDimensions()[2];
-    this->global_range = cl::NDRange(X,Y,Z);
-    this->local_range = cl::NDRange(1,1,1); // TODO: some way of sensibly choosing this
+    this->global_range = cl::NDRange(X,Y);
+    this->local_range = cl::NDRange(512,1); // TODO: some way of sensibly choosing this
 
     this->need_reload_program = false;
 }
@@ -166,19 +169,19 @@ void OpenCL_RD::CreateOpenCLBuffers()
 
     cl_int ret;
 
-    this->buffer1 = new cl::Buffer(*this->context, CL_MEM_READ_ONLY, MEM_SIZE, NULL, &ret);
+    this->buffer1 = new cl::Buffer(*this->context, 0, MEM_SIZE, NULL, &ret);
     if(ret != CL_SUCCESS)
     {
         ostringstream oss;
-        oss << "OpenCL_RD::CreateBuffers : Buffer() failed: " << ret;
+        oss << "OpenCL_RD::CreateBuffers : Buffer() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
     }
 
-    this->buffer2 = new cl::Buffer(*this->context, CL_MEM_READ_ONLY, MEM_SIZE, NULL, &ret);
+    this->buffer2 = new cl::Buffer(*this->context, 0, MEM_SIZE, NULL, &ret);
     if(ret != CL_SUCCESS)
     {
         ostringstream oss;
-        oss << "OpenCL_RD::CreateBuffers : Buffer() failed: " << ret;
+        oss << "OpenCL_RD::CreateBuffers : Buffer() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
     }
 }
@@ -200,7 +203,7 @@ void OpenCL_RD::WriteToOpenCLBuffers()
 
     float* old_data = static_cast<float*>(old_image->GetScalarPointer());
     float* new_data = static_cast<float*>(new_image->GetScalarPointer());
-    const unsigned long MEM_SIZE = sizeof(float) * X * Y * Z * NC;
+    const size_t MEM_SIZE = sizeof(float) * X * Y * Z * NC;
 
     cl_int ret;
 
@@ -208,7 +211,7 @@ void OpenCL_RD::WriteToOpenCLBuffers()
     if(ret != CL_SUCCESS)
     {
         ostringstream oss;
-        oss << "OpenCL_RD::WriteToBuffers : enqueueWriteBuffer() failed: " << ret;
+        oss << "OpenCL_RD::WriteToBuffers : enqueueWriteBuffer() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
     }
 }
@@ -230,7 +233,7 @@ void OpenCL_RD::ReadFromOpenCLBuffers()
 
     float* old_data = static_cast<float*>(old_image->GetScalarPointer());
     float* new_data = static_cast<float*>(new_image->GetScalarPointer());
-    const unsigned long MEM_SIZE = sizeof(float) * X * Y * Z * NC;
+    const size_t MEM_SIZE = sizeof(float) * X * Y * Z * NC;
 
     cl_int ret;
 
@@ -238,7 +241,7 @@ void OpenCL_RD::ReadFromOpenCLBuffers()
     if(ret != CL_SUCCESS)
     {
         ostringstream oss;
-        oss << "OpenCL_RD::ReadFromBuffers : enqueueReadBuffer() failed: " << ret;
+        oss << "OpenCL_RD::ReadFromBuffers : enqueueReadBuffer() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
     }
 }
@@ -255,23 +258,101 @@ void OpenCL_RD::Update2Steps()
 
     cl_int ret;
 
-    this->kernel->setArg(0, this->buffer1); // input
-    this->kernel->setArg(1, this->buffer2); // output
+    ret = this->kernel->setArg(0, *this->buffer1); // input
+    if(ret != CL_SUCCESS)
+    {
+        ostringstream oss;
+        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
+        throw runtime_error(oss.str().c_str());
+    }
+    ret = this->kernel->setArg(1, *this->buffer2); // output
+    if(ret != CL_SUCCESS)
+    {
+        ostringstream oss;
+        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
+        throw runtime_error(oss.str().c_str());
+    }
     ret = this->command_queue->enqueueNDRangeKernel(*this->kernel, cl::NullRange, this->global_range, this->local_range);
     if(ret != CL_SUCCESS)
     {
         ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: " << ret;
+        oss << "OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
     }
 
-    this->kernel->setArg(0, this->buffer2); // input
-    this->kernel->setArg(1, this->buffer1); // output
+    ret = this->kernel->setArg(0, *this->buffer2); // input
+    if(ret != CL_SUCCESS)
+    {
+        ostringstream oss;
+        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
+        throw runtime_error(oss.str().c_str());
+    }
+    ret = this->kernel->setArg(1, *this->buffer1); // output
+    if(ret != CL_SUCCESS)
+    {
+        ostringstream oss;
+        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
+        throw runtime_error(oss.str().c_str());
+    }
     ret = this->command_queue->enqueueNDRangeKernel(*this->kernel, cl::NullRange, this->global_range, this->local_range);
     if(ret != CL_SUCCESS)
     {
         ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: " << ret;
+        oss << "OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: " << descriptionOfError(ret);
         throw runtime_error(oss.str().c_str());
+    }
+}
+
+// http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
+const char* descriptionOfError(cl_int err) 
+{
+    switch (err) {
+        case CL_SUCCESS:                            return "Success!";
+        case CL_DEVICE_NOT_FOUND:                   return "Device not found.";
+        case CL_DEVICE_NOT_AVAILABLE:               return "Device not available";
+        case CL_COMPILER_NOT_AVAILABLE:             return "Compiler not available";
+        case CL_MEM_OBJECT_ALLOCATION_FAILURE:      return "Memory object allocation failure";
+        case CL_OUT_OF_RESOURCES:                   return "Out of resources";
+        case CL_OUT_OF_HOST_MEMORY:                 return "Out of host memory";
+        case CL_PROFILING_INFO_NOT_AVAILABLE:       return "Profiling information not available";
+        case CL_MEM_COPY_OVERLAP:                   return "Memory copy overlap";
+        case CL_IMAGE_FORMAT_MISMATCH:              return "Image format mismatch";
+        case CL_IMAGE_FORMAT_NOT_SUPPORTED:         return "Image format not supported";
+        case CL_BUILD_PROGRAM_FAILURE:              return "Program build failure";
+        case CL_MAP_FAILURE:                        return "Map failure";
+        case CL_INVALID_VALUE:                      return "Invalid value";
+        case CL_INVALID_DEVICE_TYPE:                return "Invalid device type";
+        case CL_INVALID_PLATFORM:                   return "Invalid platform";
+        case CL_INVALID_DEVICE:                     return "Invalid device";
+        case CL_INVALID_CONTEXT:                    return "Invalid context";
+        case CL_INVALID_QUEUE_PROPERTIES:           return "Invalid queue properties";
+        case CL_INVALID_COMMAND_QUEUE:              return "Invalid command queue";
+        case CL_INVALID_HOST_PTR:                   return "Invalid host pointer";
+        case CL_INVALID_MEM_OBJECT:                 return "Invalid memory object";
+        case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:    return "Invalid image format descriptor";
+        case CL_INVALID_IMAGE_SIZE:                 return "Invalid image size";
+        case CL_INVALID_SAMPLER:                    return "Invalid sampler";
+        case CL_INVALID_BINARY:                     return "Invalid binary";
+        case CL_INVALID_BUILD_OPTIONS:              return "Invalid build options";
+        case CL_INVALID_PROGRAM:                    return "Invalid program";
+        case CL_INVALID_PROGRAM_EXECUTABLE:         return "Invalid program executable";
+        case CL_INVALID_KERNEL_NAME:                return "Invalid kernel name";
+        case CL_INVALID_KERNEL_DEFINITION:          return "Invalid kernel definition";
+        case CL_INVALID_KERNEL:                     return "Invalid kernel";
+        case CL_INVALID_ARG_INDEX:                  return "Invalid argument index";
+        case CL_INVALID_ARG_VALUE:                  return "Invalid argument value";
+        case CL_INVALID_ARG_SIZE:                   return "Invalid argument size";
+        case CL_INVALID_KERNEL_ARGS:                return "Invalid kernel arguments";
+        case CL_INVALID_WORK_DIMENSION:             return "Invalid work dimension";
+        case CL_INVALID_WORK_GROUP_SIZE:            return "Invalid work group size";
+        case CL_INVALID_WORK_ITEM_SIZE:             return "Invalid work item size";
+        case CL_INVALID_GLOBAL_OFFSET:              return "Invalid global offset";
+        case CL_INVALID_EVENT_WAIT_LIST:            return "Invalid event wait list";
+        case CL_INVALID_EVENT:                      return "Invalid event";
+        case CL_INVALID_OPERATION:                  return "Invalid operation";
+        case CL_INVALID_GL_OBJECT:                  return "Invalid OpenGL object";
+        case CL_INVALID_BUFFER_SIZE:                return "Invalid buffer size";
+        case CL_INVALID_MIP_LEVEL:                  return "Invalid mip-map level";
+        default: return "Unknown";
     }
 }

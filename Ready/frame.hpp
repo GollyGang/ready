@@ -56,6 +56,7 @@ private:
     void OnQuit(wxCommandEvent& event);
 
     void OnGrayScott2DDemo(wxCommandEvent& event);
+    void OnGrayScott2DOpenCLDemo(wxCommandEvent& event);
     void OnGrayScott3DDemo(wxCommandEvent& event);
 
     void OnToggleViewPane(wxCommandEvent& event);

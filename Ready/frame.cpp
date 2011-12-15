@@ -63,6 +63,7 @@ namespace ID { enum {
    SystemSettingsPane,
 
    GrayScott2DDemo,
+   GrayScott2DOpenCLDemo,
    GrayScott3DDemo,
 
    Step,
@@ -88,6 +89,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
     EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnGrayScott2DDemo)
+    EVT_MENU(ID::GrayScott2DOpenCLDemo,MyFrame::OnGrayScott2DOpenCLDemo)
     EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnGrayScott3DDemo)
     EVT_MENU(ID::Step,MyFrame::OnStep)
     EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
@@ -127,6 +129,7 @@ MyFrame::MyFrame(const wxString& title)
     {
         wxMenu *viewMenu = new wxMenu;
         viewMenu->Append(ID::GrayScott2DDemo,_("GrayScott &2D demo"),_("Show a 2D demo"));
+        viewMenu->Append(ID::GrayScott2DOpenCLDemo,_("GrayScott &2D OpenCL demo"),_("Show a 2D OpenCL demo"));
         viewMenu->Append(ID::GrayScott3DDemo,_("GrayScott &3D demo"),_("Show a 3D demo"));
         viewMenu->AppendSeparator();
         viewMenu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
@@ -162,20 +165,10 @@ MyFrame::MyFrame(const wxString& title)
 
     // initialize an RD system to get us started
     try {
-        if(0)
-        {
-            OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
-            s->Allocate(60,40);
-            s->InitWithBlobInCenter();
-            this->SetCurrentRDSystem(s);
-        }
-        else
-        {
-            GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-            gs->Allocate(30,25,20);
-            gs->InitWithBlobInCenter();
-            this->SetCurrentRDSystem(gs); // connects it to the VTK window
-        }
+        GrayScott_slow_3D *gs = new GrayScott_slow_3D();
+        gs->Allocate(30,25,20);
+        gs->InitWithBlobInCenter();
+        this->SetCurrentRDSystem(gs); // connects it to the VTK window
     }
     catch(const exception& e)
     {
@@ -429,18 +422,62 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
 
 void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
 {
-    GrayScott_slow *gs = new GrayScott_slow();
-    gs->Allocate(80,50);
-    gs->InitWithBlobInCenter();
-    this->SetCurrentRDSystem(gs);
+    try {
+        GrayScott_slow *gs = new GrayScott_slow();
+        gs->Allocate(80,50);
+        gs->InitWithBlobInCenter();
+        this->SetCurrentRDSystem(gs);
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        this->Destroy();
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown error during RD system initialization"));
+        this->Destroy();
+    }
+}
+
+void MyFrame::OnGrayScott2DOpenCLDemo(wxCommandEvent& event)
+{
+    try { 
+        OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
+        s->Allocate(512,512);
+        s->InitWithBlobInCenter();
+        this->SetCurrentRDSystem(s);
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        this->Destroy();
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown error during RD system initialization"));
+        this->Destroy();
+    }
 }
 
 void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
 {
-    GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-    gs->Allocate(15,15,15);
-    gs->InitWithBlobInCenter();
-    this->SetCurrentRDSystem(gs);
+    try {
+        GrayScott_slow_3D *gs = new GrayScott_slow_3D();
+        gs->Allocate(15,15,15);
+        gs->InitWithBlobInCenter();
+        this->SetCurrentRDSystem(gs);
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        this->Destroy();
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown error during RD system initialization"));
+        this->Destroy();
+    }
 }
 
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
@@ -504,7 +541,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     if(!this->is_running) return;
 
     try {
-        this->system->Update(10); // TODO: user controls speed
+        this->system->Update(100); // TODO: user controls speed
     }
     catch(const exception& e)
     {
