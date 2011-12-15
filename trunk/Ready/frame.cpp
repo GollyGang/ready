@@ -473,7 +473,7 @@ void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(_("Error during RD system initialization: %s")+
+        wxMessageBox(_("Error during RD system initialization: ")+
             wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
@@ -499,7 +499,7 @@ void MyFrame::OnStep(wxCommandEvent &event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(_("Fatal error: %s")+wxString(e.what(),wxConvUTF8));
+        wxMessageBox(_("Fatal error: ")+wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
@@ -549,7 +549,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(_("Fatal error: %s")+wxString(e.what(),wxConvUTF8));
+        wxMessageBox(_("Fatal error: ")+wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
