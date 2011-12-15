@@ -172,7 +172,8 @@ MyFrame::MyFrame(const wxString& title)
     }
     catch(const exception& e)
     {
-        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        wxMessageBox(_("Error during RD system initialization: ")+
+            wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
@@ -430,7 +431,8 @@ void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        wxMessageBox(_("Error during RD system initialization: ")+
+            wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
@@ -450,7 +452,8 @@ void MyFrame::OnGrayScott2DOpenCLDemo(wxCommandEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        wxMessageBox(_("Error during RD system initialization: ")+
+            wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
@@ -470,7 +473,8 @@ void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(wxString::Format(_("Error during RD system initialization: %s"),e.what()));
+        wxMessageBox(_("Error during RD system initialization: %s")+
+            wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
@@ -495,7 +499,7 @@ void MyFrame::OnStep(wxCommandEvent &event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(wxString::Format(_("Fatal error: %s"),e.what()));
+        wxMessageBox(_("Fatal error: %s")+wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
@@ -545,7 +549,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(wxString::Format(_("Fatal error: %s"),e.what()));
+        wxMessageBox(_("Fatal error: %s")+wxString(e.what(),wxConvUTF8));
         this->Destroy();
     }
     catch(...)
