@@ -132,7 +132,8 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     ret = this->program->build(devices, NULL, NULL, NULL);
     if(ret != CL_SUCCESS)
     {
-        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : program.build() failed:\n\n" + this->program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(*this->device));
+        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : program.build() failed:\n\n" 
+            + this->program->getBuildInfo<CL_PROGRAM_BUILD_LOG>(*this->device));
     }
 
     // Make kernel
@@ -144,12 +145,13 @@ void OpenCL_RD::ReloadKernelIfNeeded()
         throw runtime_error(oss.str().c_str());
     }
 
-    // make work-items queue
+    // decide the size of the work-groups
     const int X = this->GetOldImage()->GetDimensions()[0];
     const int Y = this->GetOldImage()->GetDimensions()[1];
     const int Z = this->GetOldImage()->GetDimensions()[2];
     this->global_range = cl::NDRange(X,Y,Z);
     int wgs = this->kernel->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(*this->device);
+    // TODO: allow user override (this value isn't always optimal)
     if(wgs&(wgs-1)) 
         throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2");
     // spread the work group over the dimensions, preferring x over y and y over z because of memory alignment
@@ -157,9 +159,10 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     wgx = min(X,wgs);
     wgy = min(Y,wgs/wgx);
     wgz = min(Z,wgs/(wgx*wgy));
+    // TODO: give user control over the work group shape?
     if(X%wgx || Y%wgy || Z%wgz)
         throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : work group size doesn't divide into grid dimensions");
-    this->local_range = cl::NDRange(wgx,wgy,wgz); // TODO: give user control over the work group size
+    this->local_range = cl::NDRange(wgx,wgy,wgz);
 
     this->need_reload_program = false;
 }

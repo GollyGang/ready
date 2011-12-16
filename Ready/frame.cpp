@@ -512,7 +512,7 @@ void MyFrame::SetStatusBarText()
     else txt << _("Stopped.");
     txt << _(" Timesteps: ") << this->system->GetTimestepsTaken();
     txt << _T("   (") << wxString::Format(_T("%.0f"),this->frames_per_second) 
-        << _(" frames per second, ")
+        << _(" computed frames per second, ")
         << wxString::Format(_T("%.0f"),this->million_cell_generations_per_second) 
         << _T(" mcgs)");
     SetStatusText(txt);
@@ -531,7 +531,7 @@ void MyFrame::LoadDemo(int iDemo)
             case ID::GrayScott2DDemo:
                 {
                     GrayScott_slow *gs = new GrayScott_slow();
-                    gs->Allocate(16,16);
+                    gs->Allocate(80,50);
                     gs->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(gs);
                 }
