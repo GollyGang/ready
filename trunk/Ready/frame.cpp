@@ -88,9 +88,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::About, MyFrame::OnAbout)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
-    EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnGrayScott2DDemo)
-    EVT_MENU(ID::GrayScott2DOpenCLDemo,MyFrame::OnGrayScott2DOpenCLDemo)
-    EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnGrayScott3DDemo)
+    EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnDemo)
+    EVT_MENU(ID::GrayScott2DOpenCLDemo,MyFrame::OnDemo)
+    EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnDemo)
     EVT_MENU(ID::Step,MyFrame::OnStep)
     EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
     EVT_MENU(ID::Run,MyFrame::OnRun)
@@ -164,24 +164,8 @@ MyFrame::MyFrame(const wxString& title)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
 
     // initialize an RD system to get us started
-    try {
-        GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-        gs->Allocate(30,25,20);
-        gs->InitWithBlobInCenter();
-        this->SetCurrentRDSystem(gs); // connects it to the VTK window
-    }
-    catch(const exception& e)
-    {
-        wxMessageBox(_("Error during RD system initialization: ")+
-            wxString(e.what(),wxConvUTF8));
-        this->Destroy();
-    }
-    catch(...)
-    {
-        wxMessageBox(_("Unknown error during RD system initialization"));
-        this->Destroy();
-    }
-    
+    this->LoadDemo(ID::GrayScott3DDemo);
+
     // load a kernel text (just as a demo, doesn't do anything)
     string dummy_kernel_text;
     {
@@ -421,69 +405,6 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     writer->Write();
 }
 
-void MyFrame::OnGrayScott2DDemo(wxCommandEvent& event)
-{
-    try {
-        GrayScott_slow *gs = new GrayScott_slow();
-        gs->Allocate(80,50);
-        gs->InitWithBlobInCenter();
-        this->SetCurrentRDSystem(gs);
-    }
-    catch(const exception& e)
-    {
-        wxMessageBox(_("Error during RD system initialization: ")+
-            wxString(e.what(),wxConvUTF8));
-        this->Destroy();
-    }
-    catch(...)
-    {
-        wxMessageBox(_("Unknown error during RD system initialization"));
-        this->Destroy();
-    }
-}
-
-void MyFrame::OnGrayScott2DOpenCLDemo(wxCommandEvent& event)
-{
-    try { 
-        OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
-        s->Allocate(512,512);
-        s->InitWithBlobInCenter();
-        this->SetCurrentRDSystem(s);
-    }
-    catch(const exception& e)
-    {
-        wxMessageBox(_("Error during RD system initialization: ")+
-            wxString(e.what(),wxConvUTF8));
-        this->Destroy();
-    }
-    catch(...)
-    {
-        wxMessageBox(_("Unknown error during RD system initialization"));
-        this->Destroy();
-    }
-}
-
-void MyFrame::OnGrayScott3DDemo(wxCommandEvent& event)
-{
-    try {
-        GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-        gs->Allocate(15,15,15);
-        gs->InitWithBlobInCenter();
-        this->SetCurrentRDSystem(gs);
-    }
-    catch(const exception& e)
-    {
-        wxMessageBox(_("Error during RD system initialization: ")+
-            wxString(e.what(),wxConvUTF8));
-        this->Destroy();
-    }
-    catch(...)
-    {
-        wxMessageBox(_("Unknown error during RD system initialization"));
-        this->Destroy();
-    }
-}
-
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
@@ -576,4 +497,52 @@ void MyFrame::SetStatusBarText()
     else txt << _("Stopped. ");
     txt << _("Timesteps: ") << this->system->GetTimestepsTaken();
     SetStatusText(txt);
+}
+
+void MyFrame::OnDemo(wxCommandEvent& event)
+{
+    this->LoadDemo(event.GetId());
+}
+
+void MyFrame::LoadDemo(int iDemo)
+{
+    try {
+        switch(iDemo) 
+        {
+            case ID::GrayScott2DDemo:
+                {
+                    GrayScott_slow *gs = new GrayScott_slow();
+                    gs->Allocate(16,16);
+                    gs->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(gs);
+                }
+                break;
+            case ID::GrayScott3DDemo: 
+                {
+                    GrayScott_slow_3D *gs = new GrayScott_slow_3D();
+                    gs->Allocate(30,25,20);
+                    gs->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(gs);
+                }
+                break;
+            case ID::GrayScott2DOpenCLDemo:
+                {
+                    OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
+                    s->Allocate(256,128);
+                    s->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(s);
+                }
+                break;
+            default: throw runtime_error("MyFrame::LoadDemo : internal error: unknown demo ID");
+        }
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(_("Error during RD system initialization: ")+
+            wxString(e.what(),wxConvUTF8));
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown error during RD system initialization"));
+    }
 }

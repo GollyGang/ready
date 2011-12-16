@@ -146,7 +146,17 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     const int Y = this->GetOldImage()->GetDimensions()[1];
     const int Z = this->GetOldImage()->GetDimensions()[2];
     this->global_range = cl::NDRange(X,Y,Z);
-    this->local_range = cl::NDRange(512,1,1); // TODO: some way of sensibly choosing this
+    int wgs = this->kernel->getWorkGroupInfo<CL_KERNEL_WORK_GROUP_SIZE>(*this->device);
+    if(wgs&(wgs-1)) 
+        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2");
+    // spread the work group over the dimensions, preferring x over y and y over z because of memory alignment
+    int wgx,wgy,wgz;
+    wgx = min(X,wgs);
+    wgy = min(Y,wgs/wgx);
+    wgz = min(Z,wgs/(wgx*wgy));
+    if(X%wgx || Y%wgy || Z%wgz)
+        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : work group size doesn't divide into grid dimensions");
+    this->local_range = cl::NDRange(wgx,wgy,wgz); // TODO: give user control over the work group size
 
     this->need_reload_program = false;
 }
@@ -304,7 +314,7 @@ void OpenCL_RD::Update2Steps()
 }
 
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
-const char* descriptionOfError(cl_int err) 
+const char* OpenCL_RD::descriptionOfError(cl_int err) 
 {
     switch (err) {
         case CL_SUCCESS:                            return "Success!";

@@ -79,7 +79,7 @@ OpenCL2D_2Chemicals::OpenCL2D_2Chemicals()
 void OpenCL2D_2Chemicals::Allocate(int x,int y)
 {
     if(x&(x-1) || y&(y-1))
-        throw runtime_error("OpenCL2D_2Chemicals::Allocate : for OpenCL we require both dimensions to be powers of 2");
+        throw runtime_error("OpenCL2D_2Chemicals::Allocate : for wrap-around in OpenCL we require both dimensions to be powers of 2");
     this->AllocateBuffers(x,y,1,2);
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();

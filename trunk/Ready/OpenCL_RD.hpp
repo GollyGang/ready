@@ -46,7 +46,9 @@ class OpenCL_RD : public UserAlgorithm
 
         void Update2Steps();
 
-    private:
+        static const char* descriptionOfError(cl_int err);
+
+private:
     
         // OpenCL things for re-use
         cl::Context *context;
@@ -65,5 +67,3 @@ class OpenCL_RD : public UserAlgorithm
         int iPlatform,iDevice;
         bool need_reload_context;
 };
-
-const char* descriptionOfError(cl_int err);
