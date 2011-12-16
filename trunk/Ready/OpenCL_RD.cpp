@@ -81,6 +81,15 @@ int OpenCL_RD::GetDevice()
     return this->iDevice;
 }
 
+void OpenCL_RD::throwOnError(cl_int ret,const char* message)
+{
+    if(ret == CL_SUCCESS) return;
+
+    ostringstream oss;
+    oss << message << descriptionOfError(ret);
+    throw runtime_error(oss.str().c_str());
+}
+
 void OpenCL_RD::ReloadContextIfNeeded()
 {
     if(!this->need_reload_context) return;
@@ -138,12 +147,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
     // Make kernel
     this->kernel = new cl::Kernel(*this->program, this->kernel_function_name.c_str(),&ret);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::ReloadKernelIfNeeded : Kernel() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : Kernel() failed: ");
 
     // decide the size of the work-groups
     const int X = this->GetOldImage()->GetDimensions()[0];
@@ -186,20 +190,10 @@ void OpenCL_RD::CreateOpenCLBuffers()
     cl_int ret;
 
     this->buffer1 = new cl::Buffer(*this->context, 0, MEM_SIZE, NULL, &ret);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::CreateBuffers : Buffer() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::CreateBuffers : Buffer() failed: ");
 
     this->buffer2 = new cl::Buffer(*this->context, 0, MEM_SIZE, NULL, &ret);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::CreateBuffers : Buffer() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::CreateBuffers : Buffer() failed: ");
 }
 
 void OpenCL_RD::WriteToOpenCLBuffers()
@@ -224,12 +218,7 @@ void OpenCL_RD::WriteToOpenCLBuffers()
     cl_int ret;
 
     ret = this->command_queue->enqueueWriteBuffer(*this->buffer1, CL_TRUE, 0, MEM_SIZE, old_data);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::WriteToBuffers : enqueueWriteBuffer() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::WriteToBuffers : enqueueWriteBuffer() failed: ");
 }
 
 void OpenCL_RD::ReadFromOpenCLBuffers()
@@ -254,12 +243,7 @@ void OpenCL_RD::ReadFromOpenCLBuffers()
     cl_int ret;
 
     ret = this->command_queue->enqueueReadBuffer(*this->buffer1, CL_TRUE, 0, MEM_SIZE, new_data);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::ReadFromBuffers : enqueueReadBuffer() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::ReadFromBuffers : enqueueReadBuffer() failed: ");
 }
 
 void OpenCL_RD::DeleteOpenCLBuffers()
@@ -275,48 +259,18 @@ void OpenCL_RD::Update2Steps()
     cl_int ret;
 
     ret = this->kernel->setArg(0, *this->buffer1); // input
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::Update2Steps : setArg() failed: ");
     ret = this->kernel->setArg(1, *this->buffer2); // output
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::Update2Steps : setArg() failed: ");
     ret = this->command_queue->enqueueNDRangeKernel(*this->kernel, cl::NullRange, this->global_range, this->local_range);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: ");
 
     ret = this->kernel->setArg(0, *this->buffer2); // input
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::Update2Steps : setArg() failed: ");
     ret = this->kernel->setArg(1, *this->buffer1); // output
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : setArg() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::Update2Steps : setArg() failed: ");
     ret = this->command_queue->enqueueNDRangeKernel(*this->kernel, cl::NullRange, this->global_range, this->local_range);
-    if(ret != CL_SUCCESS)
-    {
-        ostringstream oss;
-        oss << "OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: " << descriptionOfError(ret);
-        throw runtime_error(oss.str().c_str());
-    }
+    throwOnError(ret,"OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: ");
 }
 
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
