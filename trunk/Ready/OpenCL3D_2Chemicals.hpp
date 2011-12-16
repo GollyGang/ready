@@ -15,29 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#ifndef __USERALGORITHM__
-#define __USERALGORITHM__
-
 // local:
-#include "BaseRD.hpp"
+#include "OpenCL_RD.hpp"
 
 // STL:
+#include <vector>
 #include <string>
 
-// base class for those RD implementations where the user can specify a program as a string
-class UserAlgorithm : public BaseRD
+// base class for 3D OpenCL RD implementations with 2 chemicals, where the user can specify the kernel program
+class OpenCL3D_2Chemicals : public OpenCL_RD
 {
     public:
 
-        UserAlgorithm();
+        OpenCL3D_2Chemicals();
 
-        void SetProgram(std::string s);
-        std::string GetProgram();
+        void Allocate(int x,int y,int z);
+        void InitWithBlobInCenter();
 
-    protected:
+        void Update(int n_steps);
 
-        std::string program_string;
-        bool need_reload_program;
 };
-
-#endif
