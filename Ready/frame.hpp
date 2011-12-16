@@ -48,6 +48,8 @@ private:
     BaseRD *system;
 
     bool is_running;
+    int timesteps_per_render;
+    double frames_per_second;
 
 private:
 

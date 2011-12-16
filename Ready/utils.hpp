@@ -15,11 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#ifdef _WIN32
-    void gettimeofday(struct timeval* t,void* timezone);
-#else
-    #include <sys/time.h>
-#endif
+double get_time_in_seconds();
 
 float frand(float lower,float upper);
 
