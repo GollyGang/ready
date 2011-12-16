@@ -40,6 +40,7 @@
 // STL:
 #include <fstream>
 #include <string>
+#include <stdexcept>
 using namespace std;
 
 // OpenCL: (local copy)
