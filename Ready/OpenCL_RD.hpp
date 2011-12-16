@@ -49,6 +49,7 @@ class OpenCL_RD : public UserAlgorithm
 
         void Update2Steps();
 
+        static void throwOnError(cl_int ret,const char* message);
         static const char* descriptionOfError(cl_int err);
 
     private:
