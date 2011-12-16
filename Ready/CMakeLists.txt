@@ -40,6 +40,7 @@ set(BASE_SOURCES
    OpenCL_RD.hpp OpenCL_RD.cpp
    OpenCL2D_2Chemicals.hpp OpenCL2D_2Chemicals.cpp
    cl.hpp
+   utils.hpp utils.cpp
 )
 
 # high-level GUI code used only in Ready

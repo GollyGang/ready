@@ -66,12 +66,4 @@ class BaseRD
         vtkImageAlgorithm *buffer_switcher;
 };
 
-// TODO: find a better home for utility functions
-
-// return a random value between lower and upper
-float frand(float lower,float upper);
-
-double hypot2(double x,double y);
-double hypot3(double x,double y,double z);
-
 #endif
