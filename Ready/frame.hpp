@@ -55,9 +55,7 @@ private:
 
     void OnQuit(wxCommandEvent& event);
 
-    void OnGrayScott2DDemo(wxCommandEvent& event);
-    void OnGrayScott2DOpenCLDemo(wxCommandEvent& event);
-    void OnGrayScott3DDemo(wxCommandEvent& event);
+    void OnDemo(wxCommandEvent& event);
 
     void OnToggleViewPane(wxCommandEvent& event);
     void OnUpdateViewPane(wxUpdateUIEvent& event);
@@ -83,6 +81,7 @@ private:
 
     void LoadSettings();
     void SaveSettings();
+    void LoadDemo(int iDemo);
    
     void SetCurrentRDSystem(BaseRD* system);
     void SetStatusBarText();
