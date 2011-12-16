@@ -17,6 +17,7 @@
 
 // local:
 #include "OpenCL2D_2Chemicals.hpp"
+#include "utils.hpp"
 
 // STL:
 #include <cassert>

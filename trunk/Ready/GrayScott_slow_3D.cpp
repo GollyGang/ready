@@ -17,6 +17,7 @@
 
 // local:
 #include "GrayScott_slow_3D.hpp"
+#include "utils.hpp"
 
 // stdlib:
 #include <stdlib.h>

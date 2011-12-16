@@ -89,8 +89,11 @@ void OpenCL_RD::ReloadContextIfNeeded()
 
     vector<cl::Platform> platforms_available;
     ret = cl::Platform::get(&platforms_available);
-    if(ret != CL_SUCCESS)
-        throw runtime_error("OpenCL_RD::ReloadContextIfNeeded : cl::Platform::get() failed");
+    if(ret != CL_SUCCESS || platforms_available.empty())
+    {
+        throw runtime_error("No OpenCL platforms available");
+        // currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn't work
+    }
     if(this->iPlatform>=(int)platforms_available.size())
         throw runtime_error("OpenCL_RD::ReloadContextIfNeeded : too few platforms available");
     cl::Platform &platform = platforms_available[this->iPlatform];

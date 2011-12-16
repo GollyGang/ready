@@ -125,20 +125,3 @@ float* BaseRD::vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
     // vtkImageData scalars stored as: component1,component2,...componentN,component1,.... for consecutive x, then y, then z
     return origin + NC*(X*(Y*z + y) + x) + iC;
 }
-
-// ------------- utility functions feel a bit lost here ----------------------
-
-float frand(float lower,float upper)
-{
-    return lower + rand()*(upper-lower)/RAND_MAX;
-}
-
-double hypot2(double x,double y) 
-{ 
-    return sqrt(x*x+y*y); 
-}
-
-double hypot3(double x,double y,double z) 
-{ 
-    return sqrt(x*x+y*y+z*z); 
-}
