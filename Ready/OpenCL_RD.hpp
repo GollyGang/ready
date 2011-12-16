@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef __OPENCL_RD__
+#define __OPENCL_RD__
+
 // local:
 #include "UserAlgorithm.hpp"
 
@@ -48,7 +51,7 @@ class OpenCL_RD : public UserAlgorithm
 
         static const char* descriptionOfError(cl_int err);
 
-private:
+    private:
     
         // OpenCL things for re-use
         cl::Context *context;
@@ -67,3 +70,5 @@ private:
         int iPlatform,iDevice;
         bool need_reload_context;
 };
+
+#endif

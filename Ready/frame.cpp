@@ -24,6 +24,7 @@
 #include "GrayScott_slow.hpp"
 #include "GrayScott_slow_3D.hpp"
 #include "OpenCL2D_2Chemicals.hpp"
+#include "OpenCL3D_2Chemicals.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -67,6 +68,7 @@ namespace ID { enum {
    GrayScott2DDemo,
    GrayScott2DOpenCLDemo,
    GrayScott3DDemo,
+   GrayScott3DOpenCLDemo,
 
    Step,
    Run,
@@ -93,6 +95,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnDemo)
     EVT_MENU(ID::GrayScott2DOpenCLDemo,MyFrame::OnDemo)
     EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnDemo)
+    EVT_MENU(ID::GrayScott3DOpenCLDemo,MyFrame::OnDemo)
     EVT_MENU(ID::Step,MyFrame::OnStep)
     EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
     EVT_MENU(ID::Run,MyFrame::OnRun)
@@ -114,7 +117,8 @@ MyFrame::MyFrame(const wxString& title)
        pVTKWindow(NULL),system(NULL),
        is_running(true),
        timesteps_per_render(100),
-       frames_per_second(0.0)
+       frames_per_second(0.0),
+       million_cell_generations_per_second(0.0)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -135,6 +139,7 @@ MyFrame::MyFrame(const wxString& title)
         viewMenu->Append(ID::GrayScott2DDemo,_("GrayScott &2D demo"),_("Show a 2D demo"));
         viewMenu->Append(ID::GrayScott2DOpenCLDemo,_("GrayScott &2D OpenCL demo"),_("Show a 2D OpenCL demo"));
         viewMenu->Append(ID::GrayScott3DDemo,_("GrayScott &3D demo"),_("Show a 3D demo"));
+        viewMenu->Append(ID::GrayScott3DOpenCLDemo,_("GrayScott &3D OpenCL demo"),_("Show a 3D OpenCL demo"));
         viewMenu->AppendSeparator();
         viewMenu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
         viewMenu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
@@ -486,8 +491,11 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     }
 
     double time_after = get_time_in_seconds();
-
-    this->frames_per_second = this->timesteps_per_render / (time_after-time_before);
+    this->frames_per_second = this->timesteps_per_render / (time_after - time_before);
+    int n_cells = this->system->GetImageToRender()->GetDimensions()[0]
+                * this->system->GetImageToRender()->GetDimensions()[1]
+                * this->system->GetImageToRender()->GetDimensions()[2];
+    this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
 
     this->SetStatusBarText();
     this->Refresh(false);
@@ -503,7 +511,10 @@ void MyFrame::SetStatusBarText()
     if(this->is_running) txt << _("Running.");
     else txt << _("Stopped.");
     txt << _(" Timesteps: ") << this->system->GetTimestepsTaken();
-    txt << _T("   (") << wxString::Format(_T("%.1f"),this->frames_per_second) << _(" frames per second)");
+    txt << _T("   (") << wxString::Format(_T("%.0f"),this->frames_per_second) 
+        << _(" frames per second, ")
+        << wxString::Format(_T("%.0f"),this->million_cell_generations_per_second) 
+        << _T(" mcgs)");
     SetStatusText(txt);
 }
 
@@ -537,6 +548,14 @@ void MyFrame::LoadDemo(int iDemo)
                 {
                     OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
                     s->Allocate(256,128);
+                    s->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(s);
+                }
+                break;
+            case ID::GrayScott3DOpenCLDemo:
+                {
+                    OpenCL3D_2Chemicals *s = new OpenCL3D_2Chemicals();
+                    s->Allocate(64,64,64);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }

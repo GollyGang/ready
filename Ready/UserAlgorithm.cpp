@@ -32,3 +32,8 @@ void UserAlgorithm::SetProgram(string s)
         this->need_reload_program = true;
     this->program_string = s;
 }
+
+string UserAlgorithm::GetProgram()
+{
+    return this->program_string;
+}
