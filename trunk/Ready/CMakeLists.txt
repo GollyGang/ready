@@ -126,13 +126,11 @@ include_directories(
 add_definitions( -DZLIB )
 
 set(CMAKE_MODULE_PATH ${Ready_SOURCE_DIR})
-
 # (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
 
+# we need to build against OpenCL
 find_package ( OpenCL REQUIRED )
-
 include_directories ( ${OPENCL_INCLUDE_DIRS} )
-
 link_libraries ( ${OPENCL_LIBRARIES} )
   
 # tell the code where the .cl files live

@@ -18,6 +18,7 @@
 // local:
 #include "frame.hpp"
 #include "vtk_pipeline.hpp"
+#include "utils.hpp"
 
 // readybase:
 #include "GrayScott_slow.hpp"
@@ -111,7 +112,9 @@ END_EVENT_TABLE()
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
-       is_running(true)
+       is_running(true),
+       timesteps_per_render(100),
+       frames_per_second(0.0)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -466,8 +469,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
+    double time_before = get_time_in_seconds();
+
     try {
-        this->system->Update(100); // TODO: user controls speed
+        this->system->Update(this->timesteps_per_render); // TODO: user controls speed
     }
     catch(const exception& e)
     {
@@ -480,7 +485,9 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         this->Destroy();
     }
 
-    // TODO: compute wallclock speed
+    double time_after = get_time_in_seconds();
+
+    this->frames_per_second = this->timesteps_per_render / (time_after-time_before);
 
     this->SetStatusBarText();
     this->Refresh(false);
@@ -492,11 +499,11 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
 void MyFrame::SetStatusBarText()
 {
-    // TODO: display wallclock speed
     wxString txt;
-    if(this->is_running) txt << _("Running. ");
-    else txt << _("Stopped. ");
-    txt << _("Timesteps: ") << this->system->GetTimestepsTaken();
+    if(this->is_running) txt << _("Running.");
+    else txt << _("Stopped.");
+    txt << _(" Timesteps: ") << this->system->GetTimestepsTaken();
+    txt << _T("   (") << wxString::Format(_T("%.1f"),this->frames_per_second) << _(" frames per second)");
     SetStatusText(txt);
 }
 

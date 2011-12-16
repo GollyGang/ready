@@ -21,22 +21,30 @@
 // stdlib:
 #include <time.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 
 #ifdef _WIN32
-        #include <sys/timeb.h>
-        #include <sys/types.h>
-        #include <winsock.h>
-        // http://www.linuxjournal.com/article/5574
-        void gettimeofday(struct timeval* t,void* timezone)
-        {
-            struct _timeb timebuffer;
-            _ftime_s( &timebuffer );
-            t->tv_sec = timebuffer.time;
-            t->tv_usec = 1000 * timebuffer.millitm;
-        }
+    #include <sys/timeb.h>
+    #include <sys/types.h>
+    #include <winsock.h>
+    // http://www.linuxjournal.com/article/5574
+    void gettimeofday(struct timeval* t,void* timezone)
+    {
+        struct _timeb timebuffer;
+        _ftime_s( &timebuffer );
+        t->tv_sec = timebuffer.time;
+        t->tv_usec = 1000 * timebuffer.millitm;
+    }
+#else
+    #include <sys/time.h>
 #endif
+
+double get_time_in_seconds()
+{
+    struct timeval tod_record;
+    gettimeofday(&tod_record, 0);
+    return double(tod_record.tv_sec) + double(tod_record.tv_usec) / 1.0e6;
+}
 
 float frand(float lower,float upper)
 {
