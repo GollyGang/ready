@@ -50,6 +50,7 @@ class BaseRD
         virtual bool HasEditableProgram() const =0;
         void SetProgram(std::string s);
         std::string GetProgram() const;
+        virtual void TestProgram(std::string program_string) const {}
 
         virtual void InitWithBlobInCenter() =0;
 

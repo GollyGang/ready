@@ -612,6 +612,20 @@ void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
 
 void MyFrame::OnReplaceProgram(wxCommandEvent& event)
 {
+    try {
+        this->system->TestProgram(string(this->kernel_pane->GetValue().mb_str()));
+    }
+    catch(const runtime_error& e)
+    {
+        wxMessageBox(_("Kernel program did not compile:\n\n")+wxString(e.what(),wxConvUTF8));
+        return;
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown error during test compile"));
+        return;
+    }
+    // program compiled successfully
     this->system->SetProgram(string(this->kernel_pane->GetValue().mb_str()));
 }
 

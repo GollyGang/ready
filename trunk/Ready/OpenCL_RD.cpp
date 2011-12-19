@@ -267,6 +267,18 @@ void OpenCL_RD::Update2Steps()
     throwOnError(ret,"OpenCL_RD::Update2Steps : enqueueNDRangeKernel() failed: ");
 }
 
+void OpenCL_RD::TestProgram(std::string program_string) const
+{
+    cl::Program::Sources source(1, std::make_pair(program_string.c_str(), program_string.length()+1));
+    cl::Program program(*this->context, source);
+
+    vector<cl::Device> devices;
+    devices.push_back(*this->device);
+    cl_int ret = program.build(devices, NULL, NULL, NULL);
+    if(ret != CL_SUCCESS)
+        throw runtime_error(program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(*this->device));
+}
+
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
 const char* OpenCL_RD::descriptionOfError(cl_int err) 
 {
