@@ -71,12 +71,12 @@ void OpenCL_RD::SetDevice(int i)
     this->iDevice = i;
 }
 
-int OpenCL_RD::GetPlatform()
+int OpenCL_RD::GetPlatform() const
 {
     return this->iPlatform;
 }
 
-int OpenCL_RD::GetDevice()
+int OpenCL_RD::GetDevice() const
 {
     return this->iDevice;
 }

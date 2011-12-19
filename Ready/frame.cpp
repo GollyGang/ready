@@ -57,25 +57,30 @@ using namespace std;
 // IDs for the controls and the menu commands
 namespace ID { enum {
 
+   // some IDs have special values
    Quit = wxID_EXIT,
    About = wxID_ABOUT,
 
-   PatternsPane = wxID_HIGHEST+1,
-   KernelPane,
-   CanvasPane,
-   SystemSettingsPane,
+   // we can use IDs higher than this for our own purposes
+   Dummy = wxID_HIGHEST+1,
 
+   // view menu
    GrayScott2DDemo,
    GrayScott2DOpenCLDemo,
    GrayScott3DDemo,
    GrayScott3DOpenCLDemo,
+   PatternsPane,
+   KernelPane,
+   CanvasPane,
+   SystemSettingsPane,
+   RestoreDefaultPerspective,
+   Screenshot,
 
+   // actions menu
    Step,
    Run,
    Stop,
-
    OpenCLDiagnostics,
-   Screenshot,
 
 }; };
 
@@ -87,28 +92,31 @@ wxString PaneName(int id)
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_IDLE(MyFrame::OnIdle)
     EVT_SIZE(MyFrame::OnSize)
-    // menu commands
+    // file menu
     EVT_MENU(ID::Quit,  MyFrame::OnQuit)
-    EVT_MENU(ID::About, MyFrame::OnAbout)
-    EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
-    EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
+    // view menu
     EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnDemo)
     EVT_MENU(ID::GrayScott2DOpenCLDemo,MyFrame::OnDemo)
     EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnDemo)
     EVT_MENU(ID::GrayScott3DOpenCLDemo,MyFrame::OnDemo)
-    EVT_MENU(ID::Step,MyFrame::OnStep)
-    EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
-    EVT_MENU(ID::Run,MyFrame::OnRun)
-    EVT_UPDATE_UI(ID::Run,MyFrame::OnUpdateRun)
-    EVT_MENU(ID::Stop,MyFrame::OnStop)
-    EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
-    // allow panes to be turned on and off from the menu:
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::KernelPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::KernelPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::CanvasPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::CanvasPane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::RestoreDefaultPerspective,MyFrame::OnRestoreDefaultPerspective)
+    EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
+    // actions menu
+    EVT_MENU(ID::Step,MyFrame::OnStep)
+    EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
+    EVT_MENU(ID::Run,MyFrame::OnRun)
+    EVT_UPDATE_UI(ID::Run,MyFrame::OnUpdateRun)
+    EVT_MENU(ID::Stop,MyFrame::OnStop)
+    EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
+    EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
+    // help menu
+    EVT_MENU(ID::About, MyFrame::OnAbout)
 END_EVENT_TABLE()
 
 // frame constructor
@@ -125,42 +133,44 @@ MyFrame::MyFrame(const wxString& title)
 
     // add menus
     wxMenuBar *menuBar = new wxMenuBar();
-    {
-        wxMenu *fileMenu = new wxMenu;
-        fileMenu->Append(wxID_ANY, _("&Open\tCtrl-O"), _("Open a pattern"));
-        fileMenu->AppendSeparator();
-        fileMenu->Append(wxID_ANY, _("&Save\tCtrl-S"), _("Save the current pattern"));
-        fileMenu->AppendSeparator();
-        fileMenu->Append(ID::Quit, _("E&xit\tAlt-X"), _("Quit this program"));
-        menuBar->Append(fileMenu, _("&File"));
+    {   // file menu:
+        wxMenu *menu = new wxMenu;
+        menu->Append(wxID_ANY, _("&Open\tCtrl-O"), _("Open a pattern"));
+        menu->AppendSeparator();
+        menu->Append(wxID_ANY, _("&Save\tCtrl-S"), _("Save the current pattern"));
+        menu->AppendSeparator();
+        menu->Append(ID::Quit, _("E&xit\tAlt-X"), _("Quit this program"));
+        menuBar->Append(menu, _("&File"));
     }
-    {
-        wxMenu *viewMenu = new wxMenu;
-        viewMenu->Append(ID::GrayScott2DDemo,_("GrayScott &2D demo"),_("Show a 2D demo"));
-        viewMenu->Append(ID::GrayScott2DOpenCLDemo,_("GrayScott &2D OpenCL demo"),_("Show a 2D OpenCL demo"));
-        viewMenu->Append(ID::GrayScott3DDemo,_("GrayScott &3D demo"),_("Show a 3D demo"));
-        viewMenu->Append(ID::GrayScott3DOpenCLDemo,_("GrayScott &3D OpenCL demo"),_("Show a 3D OpenCL demo"));
-        viewMenu->AppendSeparator();
-        viewMenu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
-        viewMenu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
-        viewMenu->AppendCheckItem(ID::CanvasPane, _("&Canvas"), _("View the canvas pane"));
-        viewMenu->AppendSeparator();
-        viewMenu->Append(ID::Screenshot, _("Save &screenshot"), _("Save a screenshot of the current view"));
-        menuBar->Append(viewMenu, _("&View"));
+    {   // view menu:
+        wxMenu *menu = new wxMenu;
+        menu->Append(ID::GrayScott2DDemo,_("GrayScott 2D demo"),_("Show a 2D demo"));
+        menu->Append(ID::GrayScott2DOpenCLDemo,_("GrayScott 2D OpenCL demo"),_("Show a 2D OpenCL demo"));
+        menu->Append(ID::GrayScott3DDemo,_("GrayScott 3D demo"),_("Show a 3D demo"));
+        menu->Append(ID::GrayScott3DOpenCLDemo,_("GrayScott 3D OpenCL demo"),_("Show a 3D OpenCL demo"));
+        menu->AppendSeparator();
+        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
+        menu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
+        menu->AppendCheckItem(ID::CanvasPane, _("&Canvas"), _("View the canvas pane"));
+        menu->AppendSeparator();
+        menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
+        menu->AppendSeparator();
+        menu->Append(ID::Screenshot, _("Save &screenshot"), _("Save a screenshot of the current view"));
+        menuBar->Append(menu, _("&View"));
     }
-    {
-        wxMenu *settingsMenu = new wxMenu;
-        settingsMenu->Append(ID::Step,_("&Step\tSPACE"),_("Advance the simulation by a single timestep"));
-        settingsMenu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
-        settingsMenu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
-        settingsMenu->AppendSeparator();
-        settingsMenu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
-        menuBar->Append(settingsMenu,_("&Settings"));
+    {   // actions menu:
+        wxMenu *menu = new wxMenu;
+        menu->Append(ID::Step,_("&Step\tSPACE"),_("Advance the simulation by a single timestep"));
+        menu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
+        menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
+        menu->AppendSeparator();
+        menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
+        menuBar->Append(menu,_("&Actions"));
     }
-    {
-        wxMenu *helpMenu = new wxMenu;
-        helpMenu->Append(ID::About, _("&About...\tF1"), _("Show about dialog"));
-        menuBar->Append(helpMenu, _("&Help"));
+    {   // help menu:
+        wxMenu *menu = new wxMenu;
+        menu->Append(ID::About, _("&About...\tF1"), _("Show about dialog"));
+        menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
 
@@ -172,23 +182,6 @@ MyFrame::MyFrame(const wxString& title)
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
 
-    // initialize an RD system to get us started
-    this->LoadDemo(ID::GrayScott3DDemo);
-
-    // load a kernel text (just as a demo, doesn't do anything)
-    string dummy_kernel_text;
-    {
-        std::string kfn = CL_SOURCE_DIR; // (defined in CMakeLists.txt to be the source folder)
-        kfn += "/gray_scott_kernel.cl";
-        ifstream in(kfn.c_str());
-        while(in.good())
-        {
-            string s;
-            getline(in,s);
-            dummy_kernel_text += s + "\n";
-        }
-    }
-
     // side panes (can be turned on and off, and rearranged)
     this->aui_mgr.AddPane(this->CreatePatternsCtrl(), wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
@@ -197,10 +190,11 @@ MyFrame::MyFrame(const wxString& title)
                   .BestSize(300,300)
                   .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
-    this->aui_mgr.AddPane(new wxTextCtrl(this,wxID_ANY,
-                        wxString(dummy_kernel_text.c_str(),wxConvUTF8),
+    this->kernel_pane = new wxTextCtrl(this,wxID_ANY,
+                        _T(""),
                         wxDefaultPosition,wxDefaultSize,
-                        wxTE_MULTILINE), 
+                        wxTE_MULTILINE);
+    this->aui_mgr.AddPane(this->kernel_pane, 
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::KernelPane))
                   .Caption(_("Kernel Pane"))
@@ -221,6 +215,10 @@ MyFrame::MyFrame(const wxString& title)
                   .BestSize(400,400)
                   );
 
+    // initialize an RD system to get us started
+    this->LoadDemo(ID::GrayScott3DDemo);
+
+    this->default_perspective = this->aui_mgr.SavePerspective();
     this->LoadSettings();
     this->aui_mgr.Update();
 }
@@ -379,7 +377,7 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 void MyFrame::OnSize(wxSizeEvent& event)
 {
     // trigger a redraw
-    if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
+    this->pVTKWindow->Refresh(false);
     
     // need this to move and resize status bar in Mac app
     event.Skip();
@@ -393,9 +391,9 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
         filename = wxFileSelector(_("Specify the screenshot filename:"),_T("."),_("Ready_screenshot_00.png"),_T("png"),
             _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
             wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-        wxFileName::SplitPath(filename,NULL,NULL,&extension);
         if(filename.empty()) return; // user cancelled
         // validate
+        wxFileName::SplitPath(filename,NULL,NULL,&extension);
         if(extension!=_T("png") && extension!=_T("jpg"))
         {
             wxMessageBox(_("Unsupported format"));
@@ -420,6 +418,11 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     this->system = sys;
     InitializeVTKPipeline(this->pVTKWindow,this->system);
     this->SetStatusBarText();
+    // fill the kernel pane
+    if(this->system->HasEditableProgram())
+        this->kernel_pane->SetValue(wxString(this->system->GetProgram().c_str(),wxConvUTF8));
+    else
+        this->kernel_pane->SetValue(_T(""));
 }
 
 void MyFrame::OnStep(wxCommandEvent &event)
@@ -572,4 +575,9 @@ void MyFrame::LoadDemo(int iDemo)
     {
         wxMessageBox(_("Unknown error during RD system initialization"));
     }
+}
+
+void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
+{
+    this->aui_mgr.LoadPerspective(this->default_perspective);
 }
