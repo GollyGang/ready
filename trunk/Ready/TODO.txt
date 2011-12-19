@@ -6,11 +6,14 @@ before 0.1 release:
 before 0.x release
 - file format for saving/loading rules and patterns
 - populate a pattern library (primary UI for beginners is a list of examples to click)
+- control over size of world
 
 before 1.0 release:
 - allow user to paint, erase, even while running (2D only)
 - control over render pipeline: contouring level, color map, etc.
+- control over boundary conditions: wrap-around or constant value
 - save out videos
+- save out scene (e.g. OBJ) for external render
 
 future:
 - parameter map in a separate window, to allow user to explore parameters 

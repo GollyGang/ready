@@ -126,10 +126,11 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
         warp->SetScaleFactor(5.0);
-        vtkSmartPointer<vtkPolyDataNormals> smooth = vtkSmartPointer<vtkPolyDataNormals>::New();
-        smooth->SetInputConnection(warp->GetOutputPort());
+        vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+        normals->SetInputConnection(warp->GetOutputPort());
+        normals->SplittingOff();
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(smooth->GetOutputPort());
+        mapper->SetInputConnection(normals->GetOutputPort());
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
@@ -237,7 +238,6 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         surface->SetInput(system->GetImageToRender());
         surface->SetValue(0, 0.25);
         surface->SetArrayComponent(1);
-        // TODO: will need to provide more ways of rendering (e.g. volume rendering)
         // TODO: allow user to control the contour level
 
         // a mapper converts scene objects to graphics primitives
