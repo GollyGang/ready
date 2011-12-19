@@ -41,6 +41,7 @@ BaseRD::BaseRD() :
     vtkImageShiftScale *iss = vtkImageShiftScale::New();
     iss->SetOutputScalarTypeToFloat();
     this->buffer_switcher = iss;
+    this->need_reload_program = true;
 }
 
 BaseRD::~BaseRD()

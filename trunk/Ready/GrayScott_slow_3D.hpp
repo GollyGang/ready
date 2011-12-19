@@ -27,8 +27,8 @@ class GrayScott_slow_3D : public BaseRD
         GrayScott_slow_3D();
 
         void Allocate(int x,int y,int z);
-        float GetF() { return this->f; }
-        float GetK() { return this->k; }
+        float GetF() const { return this->f; }
+        float GetK() const { return this->k; }
         void SetF(float new_f) { this->f = new_f; }
         void SetK(float new_k) { this->k = new_k; }
         void InitWithBlobInCenter();

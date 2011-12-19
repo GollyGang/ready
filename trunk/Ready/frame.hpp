@@ -44,6 +44,9 @@ private:
     // VTK does the rendering
     wxVTKRenderWindowInteractor *pVTKWindow;
 
+    // the kernel pane allows the user to edit the code of the current RD system
+    wxTextCtrl *kernel_pane;
+
     // current system being simulated (in future we might want more than one)
     BaseRD *system;
 
@@ -51,19 +54,23 @@ private:
     int timesteps_per_render;
     double frames_per_second,million_cell_generations_per_second;
 
+    wxString default_perspective;
+
 private:
 
-    // menu event handlers
+    // file menu
 
     void OnQuit(wxCommandEvent& event);
 
-    void OnDemo(wxCommandEvent& event);
+    // view menu
 
+    void OnDemo(wxCommandEvent& event);
     void OnToggleViewPane(wxCommandEvent& event);
     void OnUpdateViewPane(wxUpdateUIEvent& event);
+    void OnRestoreDefaultPerspective(wxCommandEvent& event);
     void OnScreenshot(wxCommandEvent& event);
 
-    void OnOpenCLDiagnostics(wxCommandEvent& event);
+    // actions menu
 
     void OnStep(wxCommandEvent& event);
     void OnUpdateStep(wxUpdateUIEvent& event);
@@ -71,6 +78,9 @@ private:
     void OnUpdateRun(wxUpdateUIEvent& event);
     void OnStop(wxCommandEvent& event);
     void OnUpdateStop(wxUpdateUIEvent& event);
+    void OnOpenCLDiagnostics(wxCommandEvent& event);
+
+    // help menu
 
     void OnAbout(wxCommandEvent& event);
 

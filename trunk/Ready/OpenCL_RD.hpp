@@ -34,8 +34,8 @@ class OpenCL_RD : public BaseRD
     
         void SetPlatform(int i);
         void SetDevice(int i);
-        int GetPlatform();
-        int GetDevice();
+        int GetPlatform() const;
+        int GetDevice() const;
 
         bool HasEditableProgram() const { return true; }
     
