@@ -78,6 +78,8 @@ private:
     void OnUpdateRun(wxUpdateUIEvent& event);
     void OnStop(wxCommandEvent& event);
     void OnUpdateStop(wxUpdateUIEvent& event);
+    void OnReplaceProgram(wxCommandEvent& event);
+    void OnUpdateReplaceProgram(wxUpdateUIEvent& event);
     void OnOpenCLDiagnostics(wxCommandEvent& event);
 
     // help menu
@@ -91,6 +93,8 @@ private:
 
     // internal functions
 
+    void InitializeMenus();
+    void InitializePanes();
     void LoadSettings();
     void SaveSettings();
     void LoadDemo(int iDemo);
