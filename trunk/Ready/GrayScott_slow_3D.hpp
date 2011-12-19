@@ -35,6 +35,8 @@ class GrayScott_slow_3D : public BaseRD
 
         void Update(int n_steps);
 
+        bool HasEditableProgram() const { return false; }
+
     protected:
 
         float f,k,r_a,r_b;

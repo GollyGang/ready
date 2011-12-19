@@ -33,5 +33,4 @@ class OpenCL3D_2Chemicals : public OpenCL_RD
         void InitWithBlobInCenter();
 
         void Update(int n_steps);
-
 };

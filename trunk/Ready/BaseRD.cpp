@@ -125,3 +125,15 @@ float* BaseRD::vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
     // vtkImageData scalars stored as: component1,component2,...componentN,component1,.... for consecutive x, then y, then z
     return origin + NC*(X*(Y*z + y) + x) + iC;
 }
+
+void BaseRD::SetProgram(string s)
+{
+    if(s != this->program_string)
+        this->need_reload_program = true;
+    this->program_string = s;
+}
+
+string BaseRD::GetProgram() const
+{
+    return this->program_string;
+}
