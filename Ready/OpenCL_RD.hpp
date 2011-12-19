@@ -38,7 +38,9 @@ class OpenCL_RD : public BaseRD
         int GetDevice() const;
 
         bool HasEditableProgram() const { return true; }
-    
+
+        void TestProgram(std::string program_string) const;
+
     protected:
 
         void ReloadContextIfNeeded();
