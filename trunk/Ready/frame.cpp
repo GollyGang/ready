@@ -35,6 +35,7 @@
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
 #include <wx/filename.h>
+#include <wx/font.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -116,7 +117,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Run,MyFrame::OnUpdateRun)
     EVT_MENU(ID::Stop,MyFrame::OnStop)
     EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
-    EVT_MENU(ID::ReplaceProgram,MyFrame::OnReplaceProgram)
+    EVT_BUTTON(ID::ReplaceProgram,MyFrame::OnReplaceProgram)
     EVT_UPDATE_UI(ID::ReplaceProgram,MyFrame::OnUpdateReplaceProgram)
     EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
@@ -186,8 +187,6 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
         menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
         menu->AppendSeparator();
-        menu->Append(ID::ReplaceProgram,_("Replace &program"),_("Update the current RD system with the edited program code"));
-        menu->AppendSeparator();
         menu->Append(ID::InitWithBlobInCenter,_("Init with random blob"),_("Re-start with a random blob in the middle"));
         menu->AppendSeparator();
         menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
@@ -203,7 +202,7 @@ void MyFrame::InitializeMenus()
 
 void MyFrame::InitializePanes()
 {
-    // side panes (can be turned on and off, and rearranged)
+    // a patterns file structure pane (currently just a placeholder)
     this->aui_mgr.AddPane(this->CreatePatternsCtrl(), wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
                   .Caption(_("Patterns Pane"))
@@ -211,25 +210,35 @@ void MyFrame::InitializePanes()
                   .BestSize(300,300)
                   .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
-    this->kernel_pane = new wxTextCtrl(this,wxID_ANY,
-                        _T(""),
-                        wxDefaultPosition,wxDefaultSize,
-                        wxTE_MULTILINE);
-    this->aui_mgr.AddPane(this->kernel_pane, 
-                  wxAuiPaneInfo()
-                  .Name(PaneName(ID::KernelPane))
-                  .Caption(_("Kernel Pane"))
-                  .Right()
-                  .BestSize(400,400)
-                  .Layer(1) // layer 1 is further towards the edge
-                  );
+    // a kernel-editing pane
+    {
+        wxWindow *frame = new wxWindow(this,wxID_ANY);
+        this->kernel_pane = new wxTextCtrl(frame,wxID_ANY,
+                            _T(""),
+                            wxDefaultPosition,wxDefaultSize,
+                            wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
+        this->kernel_pane->SetFont(wxFont(9,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+        wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+        sizer->Add(new wxButton(frame,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
+        sizer->Add(this->kernel_pane,wxSizerFlags(1).Expand());
+        frame->SetSizer(sizer);
+        this->aui_mgr.AddPane(frame, 
+                      wxAuiPaneInfo()
+                      .Name(PaneName(ID::KernelPane))
+                      .Caption(_("Kernel Pane"))
+                      .Right()
+                      .BestSize(400,400)
+                      .Layer(1) // layer 1 is further towards the edge
+                      );
+    }
+    // a 'settings' pane (just a placeholder)
     this->aui_mgr.AddPane(new wxTextCtrl(this,wxID_ANY), 
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::SystemSettingsPane))
                   .Caption(_("System"))
                   .Top()
                   );
-    // center pane (always visible)
+    // the VTK window goes in the center pane (always visible) - got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
     this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
@@ -631,7 +640,7 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
 
 void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
 {
-    event.Enable(this->system->HasEditableProgram());
+    event.Enable(this->system->HasEditableProgram() && this->kernel_pane->IsModified());
 }
 
 void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)

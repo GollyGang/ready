@@ -30,8 +30,8 @@ using namespace std;
 OpenCL2D_2Chemicals::OpenCL2D_2Chemicals()
 {
     this->timestep = 1.0f;
-    this->program_string = "__kernel void rd_compute(\n\
-    __global float2 *input,__global float2 *output)\n\
+    this->program_string = 
+"__kernel void rd_compute(__global float2 *input,__global float2 *output)\n\
 {\n\
     const float D_u = 0.082f;\n\
     const float D_v = 0.041f;\n\
