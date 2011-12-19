@@ -32,10 +32,10 @@ using namespace std;
 #include <vtkImageShiftScale.h>
 #include <vtkImageAlgorithm.h>
 
-BaseRD::BaseRD() : 
-    timesteps_taken(0),
-    iCurrentBuffer(0)
+BaseRD::BaseRD()
 {
+    this->timesteps_taken = 0;
+    this->iCurrentBuffer = 0;
     this->buffer[0] = NULL;
     this->buffer[1] = NULL;
     vtkImageShiftScale *iss = vtkImageShiftScale::New();

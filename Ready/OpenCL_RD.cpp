@@ -40,21 +40,22 @@ OpenCL_RD::OpenCL_RD()
     this->device = NULL;
     this->command_queue = NULL;
     this->kernel = NULL;
-    this->buffer1 = NULL;
-    this->buffer2 = NULL;
     this->program = NULL;
     this->source = NULL;
+    this->buffer1 = NULL;
+    this->buffer2 = NULL;
 }
 
 OpenCL_RD::~OpenCL_RD()
 {
-    this->DeleteOpenCLBuffers();
     delete this->context;
     delete this->device;
     delete this->command_queue;
     delete this->kernel;
     delete this->program;
     delete this->source;
+    delete this->buffer1;
+    delete this->buffer2;
 }
 
 void OpenCL_RD::SetPlatform(int i)
@@ -112,13 +113,16 @@ void OpenCL_RD::ReloadContextIfNeeded()
         (cl_context_properties)(platform)(), 
         0 
     };
+    delete this->context;
     this->context = new cl::Context( CL_DEVICE_TYPE_ALL, cps);
 
     vector<cl::Device> devices_available = this->context->getInfo<CL_CONTEXT_DEVICES>();
     if(this->iDevice>=(int)devices_available.size())
         throw runtime_error("OpenCL_RD::ReloadContextIfNeeded : too few devices available");
+    delete this->device;
     this->device = new cl::Device(devices_available[this->iDevice]);
 
+    delete this->command_queue;
     this->command_queue = new cl::CommandQueue(*this->context,*this->device);
 
     this->need_reload_context = false;
@@ -130,9 +134,11 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
     cl_int ret;
 
+    delete this->source;
     this->source = new cl::Program::Sources(1, std::make_pair(this->program_string.c_str(), this->program_string.length()+1));
 
     // Make program of the source code in the context
+    delete this->program;
     this->program = new cl::Program(*this->context, *this->source);
 
     // Build program for our selected device
@@ -146,6 +152,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     }
 
     // Make kernel
+    delete this->kernel;
     this->kernel = new cl::Kernel(*this->program, this->kernel_function_name.c_str(),&ret);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : Kernel() failed: ");
 
@@ -189,9 +196,11 @@ void OpenCL_RD::CreateOpenCLBuffers()
 
     cl_int ret;
 
+    delete this->buffer1;
     this->buffer1 = new cl::Buffer(*this->context, 0, MEM_SIZE, NULL, &ret);
     throwOnError(ret,"OpenCL_RD::CreateBuffers : Buffer() failed: ");
 
+    delete this->buffer2;
     this->buffer2 = new cl::Buffer(*this->context, 0, MEM_SIZE, NULL, &ret);
     throwOnError(ret,"OpenCL_RD::CreateBuffers : Buffer() failed: ");
 }
@@ -244,12 +253,6 @@ void OpenCL_RD::ReadFromOpenCLBuffers()
 
     ret = this->command_queue->enqueueReadBuffer(*this->buffer1, CL_TRUE, 0, MEM_SIZE, new_data);
     throwOnError(ret,"OpenCL_RD::ReadFromBuffers : enqueueReadBuffer() failed: ");
-}
-
-void OpenCL_RD::DeleteOpenCLBuffers()
-{
-    delete this->buffer1;
-    delete this->buffer2;
 }
 
 void OpenCL_RD::Update2Steps()
