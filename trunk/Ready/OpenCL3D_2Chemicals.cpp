@@ -136,6 +136,9 @@ void OpenCL3D_2Chemicals::InitWithBlobInCenter()
 
 void OpenCL3D_2Chemicals::Update(int n_steps)
 {
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
+
     // take approximately n_steps steps
     for(int it=0;it<(n_steps+1)/2;it++)
     {

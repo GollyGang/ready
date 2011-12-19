@@ -80,6 +80,7 @@ namespace ID { enum {
    Step,
    Run,
    Stop,
+   ReplaceProgram,
    OpenCLDiagnostics,
 
 }; };
@@ -114,6 +115,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Run,MyFrame::OnUpdateRun)
     EVT_MENU(ID::Stop,MyFrame::OnStop)
     EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
+    EVT_MENU(ID::ReplaceProgram,MyFrame::OnReplaceProgram)
+    EVT_UPDATE_UI(ID::ReplaceProgram,MyFrame::OnUpdateReplaceProgram)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     // help menu
     EVT_MENU(ID::About, MyFrame::OnAbout)
@@ -131,6 +134,23 @@ MyFrame::MyFrame(const wxString& title)
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
 
+    this->InitializeMenus();
+
+    CreateStatusBar(2);
+    SetStatusText(_("Ready"));
+
+    this->InitializePanes();
+
+    this->default_perspective = this->aui_mgr.SavePerspective();
+    this->LoadSettings();
+    this->aui_mgr.Update();
+
+    // initialize an RD system to get us started
+    this->LoadDemo(ID::GrayScott3DDemo);
+}
+
+void MyFrame::InitializeMenus()
+{
     // add menus
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
@@ -164,6 +184,8 @@ MyFrame::MyFrame(const wxString& title)
         menu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
         menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
         menu->AppendSeparator();
+        menu->Append(ID::ReplaceProgram,_("Replace &program"),_("Update the current RD system with the edited program code"));
+        menu->AppendSeparator();
         menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu,_("&Actions"));
     }
@@ -173,15 +195,10 @@ MyFrame::MyFrame(const wxString& title)
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
+}
 
-    // add status bar
-    CreateStatusBar(2);
-    SetStatusText(_("Ready"));
-
-    // create a VTK window
-    vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
-    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
-
+void MyFrame::InitializePanes()
+{
     // side panes (can be turned on and off, and rearranged)
     this->aui_mgr.AddPane(this->CreatePatternsCtrl(), wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
@@ -209,18 +226,13 @@ MyFrame::MyFrame(const wxString& title)
                   .Top()
                   );
     // center pane (always visible)
+    vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
+    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
     this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
                   .Name(PaneName(ID::CanvasPane))
                   .CenterPane()
                   .BestSize(400,400)
                   );
-
-    // initialize an RD system to get us started
-    this->LoadDemo(ID::GrayScott3DDemo);
-
-    this->default_perspective = this->aui_mgr.SavePerspective();
-    this->LoadSettings();
-    this->aui_mgr.Update();
 }
 
 void MyFrame::LoadSettings()
@@ -420,9 +432,15 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     this->SetStatusBarText();
     // fill the kernel pane
     if(this->system->HasEditableProgram())
+    {
         this->kernel_pane->SetValue(wxString(this->system->GetProgram().c_str(),wxConvUTF8));
+        this->kernel_pane->Enable(true);
+    }
     else
+    {
         this->kernel_pane->SetValue(_T(""));
+        this->kernel_pane->Enable(false);
+    }
 }
 
 void MyFrame::OnStep(wxCommandEvent &event)
@@ -580,4 +598,14 @@ void MyFrame::LoadDemo(int iDemo)
 void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
 {
     this->aui_mgr.LoadPerspective(this->default_perspective);
+}
+
+void MyFrame::OnReplaceProgram(wxCommandEvent& event)
+{
+    this->system->SetProgram(string(this->kernel_pane->GetValue().mb_str()));
+}
+
+void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->HasEditableProgram());
 }
