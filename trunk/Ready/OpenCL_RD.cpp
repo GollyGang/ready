@@ -180,9 +180,6 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
 void OpenCL_RD::CreateOpenCLBuffers()
 {
-    assert(!this->buffer1);
-    assert(!this->buffer2);
-
     vtkImageData *old_image = this->GetOldImage();
     vtkImageData *new_image = this->GetNewImage();
     assert(old_image);
@@ -207,9 +204,6 @@ void OpenCL_RD::CreateOpenCLBuffers()
 
 void OpenCL_RD::WriteToOpenCLBuffers()
 {
-    assert(this->buffer1);
-    assert(this->buffer2);
-
     vtkImageData *old_image = this->GetOldImage();
     vtkImageData *new_image = this->GetNewImage();
     assert(old_image);
@@ -232,9 +226,6 @@ void OpenCL_RD::WriteToOpenCLBuffers()
 
 void OpenCL_RD::ReadFromOpenCLBuffers()
 {
-    assert(this->buffer1);
-    assert(this->buffer2);
-
     vtkImageData *old_image = this->GetOldImage();
     vtkImageData *new_image = this->GetNewImage();
     assert(old_image);
