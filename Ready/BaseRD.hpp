@@ -18,6 +18,9 @@
 #ifndef __BASERD__
 #define __BASERD__
 
+// STL:
+#include <string>
+
 class vtkImageData;
 class vtkImageAlgorithm;
 
@@ -44,6 +47,10 @@ class BaseRD
 
         vtkImageData* GetImageToRender() const;
 
+        virtual bool HasEditableProgram() const =0;
+        void SetProgram(std::string s);
+        std::string GetProgram() const;
+
     protected:
 
         vtkImageData *buffer[2];
@@ -52,6 +59,9 @@ class BaseRD
 
         float timestep;
         int timesteps_taken;
+
+        std::string program_string;
+        bool need_reload_program;
 
     protected:
 

@@ -19,13 +19,13 @@
 #define __OPENCL_RD__
 
 // local:
-#include "UserAlgorithm.hpp"
+#include "BaseRD.hpp"
 
 // OpenCL: (local copy)
 #include "cl.hpp"
 
 // base class for those RD implementations that use OpenCL
-class OpenCL_RD : public UserAlgorithm
+class OpenCL_RD : public BaseRD
 {
     public:
 
@@ -36,6 +36,8 @@ class OpenCL_RD : public UserAlgorithm
         void SetDevice(int i);
         int GetPlatform();
         int GetDevice();
+
+        bool HasEditableProgram() const { return true; }
     
     protected:
 
