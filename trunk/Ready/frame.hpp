@@ -59,11 +59,9 @@ private:
 private:
 
     // file menu
-
     void OnQuit(wxCommandEvent& event);
 
     // view menu
-
     void OnDemo(wxCommandEvent& event);
     void OnToggleViewPane(wxCommandEvent& event);
     void OnUpdateViewPane(wxUpdateUIEvent& event);
@@ -71,7 +69,6 @@ private:
     void OnScreenshot(wxCommandEvent& event);
 
     // actions menu
-
     void OnStep(wxCommandEvent& event);
     void OnUpdateStep(wxUpdateUIEvent& event);
     void OnRun(wxCommandEvent& event);
@@ -80,10 +77,10 @@ private:
     void OnUpdateStop(wxUpdateUIEvent& event);
     void OnReplaceProgram(wxCommandEvent& event);
     void OnUpdateReplaceProgram(wxUpdateUIEvent& event);
+    void OnInitWithBlobInCenter(wxCommandEvent& event);
     void OnOpenCLDiagnostics(wxCommandEvent& event);
 
     // help menu
-
     void OnAbout(wxCommandEvent& event);
 
     // other event handlers
@@ -100,6 +97,7 @@ private:
     void LoadDemo(int iDemo);
    
     void SetCurrentRDSystem(BaseRD* system);
+    void UpdateWindows();
     void SetStatusBarText();
 
     wxTreeCtrl* CreatePatternsCtrl();

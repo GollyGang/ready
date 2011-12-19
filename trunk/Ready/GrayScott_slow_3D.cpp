@@ -200,4 +200,5 @@ void GrayScott_slow_3D::InitWithBlobInCenter()
         }
     }
     this->SwitchBuffers();
+    this->timesteps_taken = 0;
 }

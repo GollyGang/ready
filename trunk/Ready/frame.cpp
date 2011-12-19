@@ -81,6 +81,7 @@ namespace ID { enum {
    Run,
    Stop,
    ReplaceProgram,
+   InitWithBlobInCenter,
    OpenCLDiagnostics,
 
 }; };
@@ -117,6 +118,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
     EVT_MENU(ID::ReplaceProgram,MyFrame::OnReplaceProgram)
     EVT_UPDATE_UI(ID::ReplaceProgram,MyFrame::OnUpdateReplaceProgram)
+    EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     // help menu
     EVT_MENU(ID::About, MyFrame::OnAbout)
@@ -185,6 +187,8 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::ReplaceProgram,_("Replace &program"),_("Update the current RD system with the edited program code"));
+        menu->AppendSeparator();
+        menu->Append(ID::InitWithBlobInCenter,_("Init with random blob"),_("Re-start with a random blob in the middle"));
         menu->AppendSeparator();
         menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu,_("&Actions"));
@@ -429,6 +433,11 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     delete this->system;
     this->system = sys;
     InitializeVTKPipeline(this->pVTKWindow,this->system);
+    this->UpdateWindows();
+}
+
+void MyFrame::UpdateWindows()
+{
     this->SetStatusBarText();
     // fill the kernel pane
     if(this->system->HasEditableProgram())
@@ -441,6 +450,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
         this->kernel_pane->SetValue(_T(""));
         this->kernel_pane->Enable(false);
     }
+    this->Refresh(false);
 }
 
 void MyFrame::OnStep(wxCommandEvent &event)
@@ -519,7 +529,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
 
     this->SetStatusBarText();
-    this->Refresh(false);
+    this->pVTKWindow->Refresh(false);
 
     wxMilliSleep(30);
 
@@ -608,4 +618,10 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
 void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
 {
     event.Enable(this->system->HasEditableProgram());
+}
+
+void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)
+{
+    this->system->InitWithBlobInCenter();
+    this->UpdateWindows();
 }

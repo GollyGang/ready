@@ -123,6 +123,7 @@ void OpenCL2D_2Chemicals::InitWithBlobInCenter()
     }
     this->GetNewImage()->Modified();
     this->WriteToOpenCLBuffers(); // old_data -> buffer1 
+    this->timesteps_taken = 0;
 }
 
 void OpenCL2D_2Chemicals::Update(int n_steps)

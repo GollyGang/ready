@@ -51,6 +51,8 @@ class BaseRD
         void SetProgram(std::string s);
         std::string GetProgram() const;
 
+        virtual void InitWithBlobInCenter() =0;
+
     protected:
 
         vtkImageData *buffer[2];

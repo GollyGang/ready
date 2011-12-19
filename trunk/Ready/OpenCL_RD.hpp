@@ -47,7 +47,6 @@ class OpenCL_RD : public BaseRD
         void CreateOpenCLBuffers();
         void WriteToOpenCLBuffers();
         void ReadFromOpenCLBuffers();
-        void DeleteOpenCLBuffers();
 
         void Update2Steps();
 
