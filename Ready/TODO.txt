@@ -1,0 +1,22 @@
+before 0.1 release:
+- start versioning
+- dynamic-link opencl at runtime
+- decide whether using single- or multi-component vtkImageData's (consider: SSE, float4 in opencl, rendering)
+
+before 0.x release
+- file format for saving/loading rules and patterns
+- populate a pattern library (primary UI for beginners is a list of examples to click)
+
+before 1.0 release:
+- allow user to paint, erase, even while running (2D only)
+- control over render pipeline: contouring level, color map, etc.
+- save out videos
+
+future:
+- parameter map in a separate window, to allow user to explore parameters 
+- full control over scene graph; nodes+connections interface
+- different topologies: e.g. arbitrary 2d mesh embedded in 3d: zebra, etc.
+- parameters driven by an input scene (for writhing logos, etc.)
+- multi-stage, multi-scale RD
+- radiosity rendering for better visualization of tangled structures
+- STL output, email file to shapeways for printing

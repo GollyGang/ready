@@ -45,6 +45,9 @@
 #include <vtkScalarBarActor.h>
 #include <vtkCubeSource.h>
 #include <vtkExtractEdges.h>
+#include <vtkWarpScalar.h>
+#include <vtkImageDataGeometryFilter.h>
+#include <vtkPolyDataNormals.h>
 // volume rendering
 #include <vtkVolumeRayCastCompositeFunction.h>
 #include <vtkVolumeRayCastMapper.h>
@@ -53,6 +56,7 @@
 #include <vtkVolumeProperty.h>
 #include <vtkVolume.h>
 #include <vtkImageExtractComponents.h>
+#include <vtkExtractVOI.h>
 
 // STL:
 #include <stdexcept>
@@ -115,12 +119,28 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         }
     }
 
+    // also add a displacement-mapped surface
+    {
+        vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+        plane->SetInput(system->GetImageToRender());
+        vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+        warp->SetInputConnection(plane->GetOutputPort());
+        warp->SetScaleFactor(5.0);
+        vtkSmartPointer<vtkPolyDataNormals> smooth = vtkSmartPointer<vtkPolyDataNormals>::New();
+        smooth->SetInputConnection(warp->GetOutputPort());
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(smooth->GetOutputPort());
+        mapper->ScalarVisibilityOff();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->SetPosition(0,0,-5.1);
+        pRenderer->AddActor(actor);
+    }
+
     // set the background color
     pRenderer->SetBackground(0,0,0);
     
-    // change the interactor style to something suitable for 2D images
-    //vtkSmartPointer<vtkInteractorStyleImage> is = vtkSmartPointer<vtkInteractorStyleImage>::New();
-    // actually I quite like the flying plane style too
+    // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     pVTKWindow->SetInteractorStyle(is);
 }
@@ -256,6 +276,44 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         actor->GetProperty()->SetColor(0,0,0);  
         actor->GetProperty()->SetAmbient(1);
         pRenderer->AddActor(actor);
+    }
+
+    // add a 2D slice too
+    {
+        // create a lookup table for mapping values to colors
+        vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+        lut->SetRampToLinear();
+        lut->SetScaleToLinear();
+        lut->SetTableRange(0.0, 0.5);
+        lut->SetHueRange(0.6, 0.0);
+
+        // extract a slice
+        vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
+        voi->SetInput(system->GetImageToRender());
+        voi->SetVOI(0,system->GetImageToRender()->GetDimensions()[0],
+            0,system->GetImageToRender()->GetDimensions()[1],
+            system->GetImageToRender()->GetDimensions()[2]/2.0,system->GetImageToRender()->GetDimensions()[2]/2.0);
+
+        // pass the image through the lookup table
+        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+        image_mapper->SetLookupTable(lut);
+        image_mapper->SetInputConnection(voi->GetOutputPort());
+        image_mapper->SetActiveComponent(1);
+      
+        // an actor determines how a scene object is displayed
+        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+        actor->SetInput(image_mapper->GetOutput());
+        //actor->InterpolateOff();
+
+        // add the actor to the renderer's scene
+        pRenderer->AddActor(actor);
+
+        // also add a scalar bar to show how the colors correspond to values
+        {
+            vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalar_bar->SetLookupTable(lut);
+            pRenderer->AddActor2D(scalar_bar);
+        }
     }
 
     // set the background color

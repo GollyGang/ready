@@ -18,10 +18,6 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-// STL:
-#include <vector>
-#include <string>
-
 // base class for 2D OpenCL RD implementations with 2 chemicals, where the user can specify the kernel program
 class OpenCL2D_2Chemicals : public OpenCL_RD
 {
