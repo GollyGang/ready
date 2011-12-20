@@ -14,6 +14,8 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with Ready. If not, see <http://www.gnu.org/licenses/>.
+#
+#--------------------------------------------------------------------------
     
 cmake_minimum_required(VERSION 2.6)
 
@@ -34,6 +36,8 @@ else()
    set( APP_NAME ready )
 endif()
 
+#-------------------------------------------source files----------------------------------------------
+
 # low-level code used in all executables
 set(BASE_SOURCES
    BaseRD.hpp BaseRD.cpp
@@ -42,7 +46,6 @@ set(BASE_SOURCES
    OpenCL_RD.hpp OpenCL_RD.cpp
    OpenCL2D_2Chemicals.hpp OpenCL2D_2Chemicals.cpp
    OpenCL3D_2Chemicals.hpp OpenCL3D_2Chemicals.cpp
-   cl.hpp
    utils.hpp utils.cpp
 )
 
@@ -61,15 +64,7 @@ set(RESOURCES
    app.icns
 )
 
-if(APPLE)
-   # on Mac OS X it's better to use locally installed wxWidgets headers and libs
-   # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
-   set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
-   set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
-elseif(UNIX)
-   # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
-   set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
-endif()
+#-------------------------------------------VTK----------------------------------------------
 
 find_package( VTK )
 IF(VTK_FOUND)
@@ -77,6 +72,8 @@ IF(VTK_FOUND)
 ELSE(VTK_FOUND)
   MESSAGE(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK variables.")
 ENDIF(VTK_FOUND)
+
+#-------------------------------------------wxVTK----------------------------------------------
 
 # The following allows you to access wxGLCanvas for GTK
 IF(WIN32)
@@ -106,6 +103,18 @@ ELSE(WIN32)
   ENDIF(APPLE)
 ENDIF(WIN32)
 
+#-------------------------------------------wxWidgets----------------------------------------------
+
+if(APPLE)
+   # on Mac OS X it's better to use locally installed wxWidgets headers and libs
+   # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
+   set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
+   set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
+elseif(UNIX)
+   # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
+   set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
+endif()
+
 # wxWidgets is required to build the project
 FIND_PACKAGE(wxWidgets COMPONENTS aui ${WXGLCANVASLIBS} core adv base )
 
@@ -115,6 +124,8 @@ ELSE(wxWidgets_FOUND)
   MESSAGE(FATAL_ERROR
    "Cannot build the executable without wxWidgets. Please set the wxWidgets variables.")
 ENDIF(wxWidgets_FOUND)
+
+#-------------------------------------------zLib----------------------------------------------
 
 if(WIN32)
    # use zlib library included in wxWidgets
@@ -128,6 +139,8 @@ include_directories(
 )
 add_definitions( -DZLIB )
 
+#-------------------------------------------OpenCL----------------------------------------------
+
 set(CMAKE_MODULE_PATH ${Ready_SOURCE_DIR})
 # (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
 
@@ -136,8 +149,7 @@ find_package ( OpenCL REQUIRED )
 include_directories ( ${OPENCL_INCLUDE_DIRS} )
 link_libraries ( ${OPENCL_LIBRARIES} )
   
-# tell the code where the .cl files live
-add_definitions(-DCL_SOURCE_DIR="${Ready_SOURCE_DIR}")
+#-----------------------------------------------------------------------------------------------
 
 if(APPLE)
    # support Mac OS 10.5 or later

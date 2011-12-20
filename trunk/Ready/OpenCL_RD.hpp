@@ -21,8 +21,12 @@
 // local:
 #include "BaseRD.hpp"
 
-// OpenCL: (local copy)
-#include "cl.hpp"
+// OpenCL:
+#if defined(__APPLE__) || defined(__MACOSX)
+ #include <OpenCL/opencl.h>
+#else
+ #include <CL/opencl.h>
+#endif
 
 // base class for those RD implementations that use OpenCL
 class OpenCL_RD : public BaseRD
@@ -40,6 +44,7 @@ class OpenCL_RD : public BaseRD
         bool HasEditableProgram() const { return true; }
 
         void TestProgram(std::string program_string) const;
+        static std::string GetOpenCLDiagnostics();
 
     protected:
 
@@ -58,14 +63,12 @@ class OpenCL_RD : public BaseRD
     private:
     
         // OpenCL things for re-use
-        cl::Context *context;
-        cl::CommandQueue *command_queue;
-        cl::Device *device;
-        cl::Program *program;
-        cl::Program::Sources *source;
-        cl::Kernel *kernel;
-        cl::Buffer *buffer1,*buffer2;
-        cl::NDRange global_range,local_range;
+        cl_device_id device_id;
+        cl_context context;
+        cl_command_queue command_queue;
+        cl_kernel kernel;
+        cl_mem buffer1,buffer2;
+        size_t global_range[3],local_range[3];
 
         std::string kernel_function_name;
 
