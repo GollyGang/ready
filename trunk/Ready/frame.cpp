@@ -74,13 +74,16 @@ namespace ID { enum {
    RestoreDefaultPerspective,
    Screenshot,
 
+   // settings menu
+   SelectOpenCLDevice,
+   OpenCLDiagnostics,
+
    // actions menu
    Step,
    Run,
    Stop,
    ReplaceProgram,
    InitWithBlobInCenter,
-   OpenCLDiagnostics,
 
 }; };
 
@@ -107,6 +110,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::CanvasPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective,MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
+    // settings menu
+    EVT_MENU(ID::SelectOpenCLDevice,MyFrame::OnSelectOpenCLDevice)
+    EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     // actions menu
     EVT_MENU(ID::Step,MyFrame::OnStep)
     EVT_UPDATE_UI(ID::Step,MyFrame::OnUpdateStep)
@@ -117,7 +123,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(ID::ReplaceProgram,MyFrame::OnReplaceProgram)
     EVT_UPDATE_UI(ID::ReplaceProgram,MyFrame::OnUpdateReplaceProgram)
     EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
-    EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
     // help menu
     EVT_MENU(ID::About, MyFrame::OnAbout)
 END_EVENT_TABLE()
@@ -129,7 +134,8 @@ MyFrame::MyFrame(const wxString& title)
        is_running(true),
        timesteps_per_render(100),
        frames_per_second(0.0),
-       million_cell_generations_per_second(0.0)
+       million_cell_generations_per_second(0.0),
+       iOpenCLPlatform(0),iOpenCLDevice(0)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -178,6 +184,13 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Screenshot, _("Save &screenshot"), _("Save a screenshot of the current view"));
         menuBar->Append(menu, _("&View"));
     }
+    {   // settings menu:
+        wxMenu *menu = new wxMenu;
+        menu->Append(ID::SelectOpenCLDevice,_("&Select OpenCL device to use"),_("Choose which OpenCL device to run on"));
+        menu->AppendSeparator();
+        menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
+        menuBar->Append(menu,_("&Settings"));
+    }
     {   // actions menu:
         wxMenu *menu = new wxMenu;
         menu->Append(ID::Step,_("&Step\tSPACE"),_("Advance the simulation by a single timestep"));
@@ -185,8 +198,6 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::InitWithBlobInCenter,_("Init with random blob"),_("Re-start with a random blob in the middle"));
-        menu->AppendSeparator();
-        menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu,_("&Actions"));
     }
     {   // help menu:
@@ -260,6 +271,8 @@ void MyFrame::LoadSettings()
     config.Read(_T("AppX"),&x);
     config.Read(_T("AppY"),&y);
     this->SetPosition(wxPoint(x,y));
+    config.Read(_T("iOpenCLPlatform"),&this->iOpenCLPlatform);
+    config.Read(_T("iOpenCLDevice"),&this->iOpenCLDevice);
 }
 
 void MyFrame::SaveSettings()
@@ -271,6 +284,8 @@ void MyFrame::SaveSettings()
     config.Write(_T("AppHeight"),this->GetSize().y);
     config.Write(_T("AppX"),this->GetPosition().x);
     config.Write(_T("AppY"),this->GetPosition().y);
+    config.Write(_T("iOpenCLPlatform"),this->iOpenCLPlatform);
+    config.Write(_T("iOpenCLDevice"),this->iOpenCLDevice);
 }
 
 MyFrame::~MyFrame()
@@ -353,6 +368,7 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
 
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 {
+    // TODO: merge this with SelectOpenCLDevice?
     wxBusyCursor busy;
     wxMessageBox(wxString(OpenCL_RD::GetOpenCLDiagnostics().c_str(),wxConvUTF8));
 }
@@ -548,6 +564,8 @@ void MyFrame::LoadDemo(int iDemo)
                     OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
                     s->Allocate(128,64);
                     s->InitWithBlobInCenter();
+                    s->SetPlatform(this->iOpenCLPlatform);
+                    s->SetDevice(this->iOpenCLDevice);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -556,6 +574,8 @@ void MyFrame::LoadDemo(int iDemo)
                     OpenCL3D_2Chemicals *s = new OpenCL3D_2Chemicals();
                     s->Allocate(64,64,64);
                     s->InitWithBlobInCenter();
+                    s->SetPlatform(this->iOpenCLPlatform);
+                    s->SetDevice(this->iOpenCLDevice);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -607,4 +627,43 @@ void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)
 {
     this->system->InitWithBlobInCenter();
     this->UpdateWindows();
+}
+
+void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
+{
+    // TODO: merge this with GetOpenCL diagnostics?
+    wxArrayString choices;
+    int iSelection;
+    int np = OpenCL_RD::GetNumberOfPlatforms();
+    for(int ip=0;ip<np;ip++)
+    {
+        int nd = OpenCL_RD::GetNumberOfDevices(ip);
+        for(int id=0;id<nd;id++)
+        {
+            if(ip==this->iOpenCLPlatform && id==this->iOpenCLDevice)
+                iSelection = choices.size();
+            wxString s = OpenCL_RD::GetPlatformDescription(ip);
+            s << " : " << OpenCL_RD::GetDeviceDescription(ip,id);
+            choices.Add(s);
+        }
+    }
+    wxSingleChoiceDialog dlg(this,_("Select the OpenCL device to use:"),_("Select OpenCL device"),
+        choices);
+    dlg.SetSelection(iSelection);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    iSelection = dlg.GetSelection();
+    int dc = 0;
+    for(int ip=0;ip<np;ip++)
+    {
+        int nd = OpenCL_RD::GetNumberOfDevices(ip);
+        if(iSelection < nd)
+        {
+            this->iOpenCLPlatform = ip;
+            this->iOpenCLDevice = iSelection;
+            break;
+        }
+        iSelection -= nd;
+    }
+    // TODO: how to tell the current system that the desired platform/device may have changed?
+    // (will currently only take effect the next time the user loads a new system)
 }

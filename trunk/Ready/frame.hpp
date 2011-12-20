@@ -56,6 +56,8 @@ private:
 
     wxString default_perspective;
 
+    int iOpenCLPlatform,iOpenCLDevice;
+
 private:
 
     // file menu
@@ -68,6 +70,10 @@ private:
     void OnRestoreDefaultPerspective(wxCommandEvent& event);
     void OnScreenshot(wxCommandEvent& event);
 
+    // settings menu
+    void OnSelectOpenCLDevice(wxCommandEvent& event);
+    void OnOpenCLDiagnostics(wxCommandEvent& event);
+
     // actions menu
     void OnStep(wxCommandEvent& event);
     void OnUpdateStep(wxUpdateUIEvent& event);
@@ -78,7 +84,6 @@ private:
     void OnReplaceProgram(wxCommandEvent& event);
     void OnUpdateReplaceProgram(wxUpdateUIEvent& event);
     void OnInitWithBlobInCenter(wxCommandEvent& event);
-    void OnOpenCLDiagnostics(wxCommandEvent& event);
 
     // help menu
     void OnAbout(wxCommandEvent& event);
