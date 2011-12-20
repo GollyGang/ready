@@ -143,10 +143,12 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     {
         const int MAX_BUILD_LOG = 10000;
         char* build_log[MAX_BUILD_LOG];
-        cl_uint build_log_length;
+        size_t build_log_length;
         ret = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
         throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : retrieving program build log failed: ");
-        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : build failed:\n\n"+string(build_log,build_log+build_log_length));
+        ostringstream oss;
+        oss << "OpenCL_RD::ReloadKernelIfNeeded : build failed:\n\n" << build_log;
+        throw runtime_error(oss.str().c_str());
     }
 
     // create the kernel
@@ -280,10 +282,12 @@ void OpenCL_RD::TestProgram(std::string test_program_string) const
     {
         const int MAX_BUILD_LOG = 10000;
         char* build_log[MAX_BUILD_LOG];
-        cl_uint build_log_length;
+        size_t build_log_length;
         ret = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
         throwOnError(ret,"OpenCL_RD::TestProgram : retrieving program build log failed: ");
-        throw runtime_error("OpenCL_RD::TestProgram : build failed:\n\n"+string(build_log,build_log+build_log_length));
+        ostringstream oss;
+        oss << "OpenCL_RD::TestProgram : build failed:\n\n" << build_log;
+        throw runtime_error(oss.str().c_str());
     }
 }
 
