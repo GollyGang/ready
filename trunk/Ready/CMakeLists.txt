@@ -23,6 +23,10 @@ endif(COMMAND cmake_policy)
 
 project( Ready )
 
+set( READY_MAJOR_VERSION 0 )
+set( READY_MINOR_VERSION 0 )
+add_definitions( -DREADY_MAJOR_VERSION=${READY_MAJOR_VERSION} -DREADY_MINOR_VERSION=${READY_MINOR_VERSION} )
+
 if(APPLE OR WIN32)
    # app names are usually capitalized on Mac OS X and Windows
    set( APP_NAME Ready )

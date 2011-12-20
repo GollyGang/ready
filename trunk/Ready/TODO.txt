@@ -1,5 +1,4 @@
 before 0.1 release:
-- start versioning
 - dynamic-link opencl at runtime
 - decide whether using single- or multi-component vtkImageData's (consider: SSE, float4 in opencl, rendering)
 
@@ -11,7 +10,7 @@ before 0.x release
 
 before 1.0 release:
 - allow user to paint, erase, even while running (2D only)
-- control over render pipeline: contouring level, color map, etc.
+- control over render pipeline: contouring level, color map, active components etc.
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - save out scene (e.g. OBJ) for external render
