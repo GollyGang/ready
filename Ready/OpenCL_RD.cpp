@@ -35,6 +35,12 @@ OpenCL_RD::OpenCL_RD()
     this->iDevice = 0;
     this->need_reload_context = true;
     this->kernel_function_name = "rd_compute";
+
+#if !defined(__APPLE__) && !defined(__MACOSX)
+    if( clLibLoad() != CL_SUCCESS)
+        throw runtime_error("Failed to load dynamic library for OpenCL");
+#endif
+
 }
 
 OpenCL_RD::~OpenCL_RD()
@@ -293,6 +299,11 @@ void OpenCL_RD::TestProgram(std::string test_program_string) const
 
 std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
 {
+#if !defined(__APPLE__) && !defined(__MACOSX)
+    if( clLibLoad() != CL_SUCCESS)
+        throw runtime_error("Failed to load dynamic library for OpenCL");
+#endif
+
     // TODO: make this report more readable, retrieve numeric data too
     ostringstream report;
 

@@ -47,6 +47,7 @@ set(BASE_SOURCES
    OpenCL2D_2Chemicals.hpp OpenCL2D_2Chemicals.cpp
    OpenCL3D_2Chemicals.hpp OpenCL3D_2Chemicals.cpp
    utils.hpp utils.cpp
+   OpenCL_Dyn_Load.h OpenCL_Dyn_Load.c
 )
 
 # high-level GUI code used only in Ready
@@ -147,7 +148,9 @@ set(CMAKE_MODULE_PATH ${Ready_SOURCE_DIR})
 # we need to build against OpenCL
 find_package ( OpenCL REQUIRED )
 include_directories ( ${OPENCL_INCLUDE_DIRS} )
-link_libraries ( ${OPENCL_LIBRARIES} )
+if(APPLE)
+  link_libraries ( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
+endif()
   
 #-----------------------------------------------------------------------------------------------
 
