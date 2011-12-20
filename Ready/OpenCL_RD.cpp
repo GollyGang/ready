@@ -299,13 +299,16 @@ void OpenCL_RD::TestProgram(std::string test_program_string) const
 
 std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
 {
-#if !defined(__APPLE__) && !defined(__MACOSX)
-    if( clLibLoad() != CL_SUCCESS)
-        throw runtime_error("Failed to load dynamic library for OpenCL");
-#endif
-
     // TODO: make this report more readable, retrieve numeric data too
     ostringstream report;
+
+#if !defined(__APPLE__) && !defined(__MACOSX)
+    if( clLibLoad() != CL_SUCCESS)
+    {
+        report << "Failed to load dynamic library for OpenCL";
+        return report.str();
+    }
+#endif
 
     // get available OpenCL platforms
     const size_t MAX_PLATFORMS = 10;
