@@ -142,7 +142,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     if(ret != CL_SUCCESS)
     {
         const int MAX_BUILD_LOG = 10000;
-        char* build_log[MAX_BUILD_LOG];
+        char build_log[MAX_BUILD_LOG];
         size_t build_log_length;
         ret = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
         throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : retrieving program build log failed: ");
@@ -281,7 +281,7 @@ void OpenCL_RD::TestProgram(std::string test_program_string) const
     if(ret != CL_SUCCESS)
     {
         const int MAX_BUILD_LOG = 10000;
-        char* build_log[MAX_BUILD_LOG];
+        char build_log[MAX_BUILD_LOG];
         size_t build_log_length;
         ret = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
         throwOnError(ret,"OpenCL_RD::TestProgram : retrieving program build log failed: ");
