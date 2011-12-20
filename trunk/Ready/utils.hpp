@@ -22,3 +22,8 @@ float frand(float lower,float upper);
 double hypot2(double x,double y);
 
 double hypot3(double x,double y,double z);
+
+// http://www.doc.ic.ac.uk/~akf/handel-c/cgi-bin/forum.cgi?msg=551 
+#define STRING_FROM_LITERAL(a) #a
+#define STR(a) STRING_FROM_LITERAL(a)
+
