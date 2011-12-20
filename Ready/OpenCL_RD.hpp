@@ -36,16 +36,20 @@ class OpenCL_RD : public BaseRD
 
         OpenCL_RD();
         ~OpenCL_RD();
-    
+
+        bool HasEditableProgram() const { return true; }
+
         void SetPlatform(int i);
         void SetDevice(int i);
         int GetPlatform() const;
         int GetDevice() const;
-
-        bool HasEditableProgram() const { return true; }
+        static std::string GetOpenCLDiagnostics();
+        static int GetNumberOfPlatforms();
+        static int GetNumberOfDevices(int iPlatform);
+        static std::string GetPlatformDescription(int iPlatform);
+        static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
         void TestProgram(std::string program_string) const;
-        static std::string GetOpenCLDiagnostics();
 
     protected:
 
@@ -58,11 +62,12 @@ class OpenCL_RD : public BaseRD
 
         void Update2Steps();
 
+        static cl_int LinkOpenCL();
         static void throwOnError(cl_int ret,const char* message);
         static const char* descriptionOfError(cl_int err);
 
     private:
-    
+
         // OpenCL things for re-use
         cl_device_id device_id;
         cl_context context;
@@ -73,8 +78,6 @@ class OpenCL_RD : public BaseRD
 
         std::string kernel_function_name;
 
-    private:
-        
         int iPlatform,iDevice;
         bool need_reload_context;
 };

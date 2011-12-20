@@ -36,11 +36,8 @@ OpenCL_RD::OpenCL_RD()
     this->need_reload_context = true;
     this->kernel_function_name = "rd_compute";
 
-#if !defined(__APPLE__) && !defined(__MACOSX)
-    if( clLibLoad() != CL_SUCCESS)
+    if(LinkOpenCL()!= CL_SUCCESS)
         throw runtime_error("Failed to load dynamic library for OpenCL");
-#endif
-
 }
 
 OpenCL_RD::~OpenCL_RD()
@@ -302,13 +299,11 @@ std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwi
     // TODO: make this report more readable, retrieve numeric data too
     ostringstream report;
 
-#if !defined(__APPLE__) && !defined(__MACOSX)
-    if( clLibLoad() != CL_SUCCESS)
+    if(LinkOpenCL()!= CL_SUCCESS)
     {
         report << "Failed to load dynamic library for OpenCL";
         return report.str();
     }
-#endif
 
     // get available OpenCL platforms
     const size_t MAX_PLATFORMS = 10;
@@ -354,6 +349,99 @@ std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwi
     }
 
     return report.str();
+}
+
+int OpenCL_RD::GetNumberOfPlatforms()
+{
+    if(LinkOpenCL() != CL_SUCCESS)
+        return 0;
+
+    const size_t MAX_PLATFORMS = 10;
+    cl_platform_id platforms_available[MAX_PLATFORMS];
+    cl_uint num_platforms;
+    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    throwOnError(ret,"OpenCL_RD::GetNumberOfPlatforms : clGetPlatformIDs failed: ");
+    return num_platforms;
+}
+
+int OpenCL_RD::GetNumberOfDevices(int iPlatform)
+{
+    if(LinkOpenCL() != CL_SUCCESS)
+        return 0;
+
+    // get available OpenCL platforms
+    const size_t MAX_PLATFORMS = 10;
+    cl_platform_id platforms_available[MAX_PLATFORMS];
+    cl_uint num_platforms;
+    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    throwOnError(ret,"OpenCL_RD::GetNumberOfDevices : clGetPlatformIDs failed: ");
+
+    const size_t MAX_DEVICES = 10;
+    cl_device_id devices_available[MAX_DEVICES];
+    cl_uint num_devices;
+    ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
+    throwOnError(ret,"OpenCL_RD::GetNumberOfDevices : clGetDeviceIDs failed: ");
+
+    return num_devices;
+}
+
+string OpenCL_RD::GetPlatformDescription(int iPlatform)
+{
+    LinkOpenCL();
+
+    // get available OpenCL platforms
+    const size_t MAX_PLATFORMS = 10;
+    cl_platform_id platforms_available[MAX_PLATFORMS];
+    cl_uint num_platforms;
+    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    throwOnError(ret,"OpenCL_RD::GetPlatformDescription : clGetPlatformIDs failed: ");
+
+    ostringstream oss;
+    const size_t MAX_INFO_LENGTH = 1000;
+    char info[MAX_INFO_LENGTH];
+    size_t info_length;
+    ret = clGetPlatformInfo(platforms_available[iPlatform],CL_PLATFORM_NAME,
+        MAX_INFO_LENGTH,info,&info_length);
+    throwOnError(ret,"OpenCL_RD::GetPlatformDescription : clGetPlatformInfo failed: ");
+    oss << info;
+    return oss.str();
+}
+
+string OpenCL_RD::GetDeviceDescription(int iPlatform,int iDevice)
+{
+    LinkOpenCL();
+
+    // get available OpenCL platforms
+    const size_t MAX_PLATFORMS = 10;
+    cl_platform_id platforms_available[MAX_PLATFORMS];
+    cl_uint num_platforms;
+    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetPlatformIDs failed: ");
+
+    const size_t MAX_INFO_LENGTH = 1000;
+    char info[MAX_INFO_LENGTH];
+    size_t info_length;
+
+    ostringstream oss;
+    const size_t MAX_DEVICES = 10;
+    cl_device_id devices_available[MAX_DEVICES];
+    cl_uint num_devices;
+    ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,
+        MAX_DEVICES,devices_available,&num_devices);
+    throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetDeviceIDs failed: ");
+    ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_NAME,
+        MAX_INFO_LENGTH,info,&info_length);
+    throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetDeviceInfo failed: ");
+    oss << info;
+    return oss.str();
+}
+
+cl_int OpenCL_RD::LinkOpenCL()
+{
+#if !defined(__APPLE__) && !defined(__MACOSX)
+    return clLibLoad();
+#endif
+    return CL_SUCCESS;
 }
 
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
