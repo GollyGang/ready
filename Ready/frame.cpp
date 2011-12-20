@@ -127,7 +127,7 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(true),
-       timesteps_per_render(1000),
+       timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0)
 {
