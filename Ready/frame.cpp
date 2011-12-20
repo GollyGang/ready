@@ -212,17 +212,17 @@ void MyFrame::InitializePanes()
                   );
     // a kernel-editing pane
     {
-        wxWindow *frame = new wxWindow(this,wxID_ANY);
-        this->kernel_pane = new wxTextCtrl(frame,wxID_ANY,
+        wxPanel *panel = new wxPanel(this,wxID_ANY);
+        this->kernel_pane = new wxTextCtrl(panel,wxID_ANY,
                             _T(""),
                             wxDefaultPosition,wxDefaultSize,
                             wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
         this->kernel_pane->SetFont(wxFont(9,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
         wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        sizer->Add(new wxButton(frame,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
+        sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
         sizer->Add(this->kernel_pane,wxSizerFlags(1).Expand());
-        frame->SetSizer(sizer);
-        this->aui_mgr.AddPane(frame, 
+        panel->SetSizer(sizer);
+        this->aui_mgr.AddPane(panel,
                       wxAuiPaneInfo()
                       .Name(PaneName(ID::KernelPane))
                       .Caption(_("Kernel Pane"))
@@ -587,7 +587,7 @@ void MyFrame::LoadDemo(int iDemo)
             case ID::GrayScott2DOpenCLDemo:
                 {
                     OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
-                    s->Allocate(256,128);
+                    s->Allocate(128,64);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }
@@ -636,6 +636,7 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
     }
     // program compiled successfully
     this->system->SetProgram(string(this->kernel_pane->GetValue().mb_str()));
+    this->kernel_pane->SetModified(false);
 }
 
 void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
