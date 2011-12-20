@@ -87,15 +87,16 @@ __clEnqueueBarrier                   *clEnqueueBarrier;
 __clGetExtensionFunctionAddress      *clGetExtensionFunctionAddress;
 
 /* OpenCL 1.1 stuff */
+/* TJH commented this out, to avoid requiring 1.1
 __clCreateSubBuffer                  *clCreateSubBuffer;
-//__clSetMemObjectDestructorCallback   *clSetMemObjectDestructorCallback; TJH commented this out
+__clSetMemObjectDestructorCallback   *clSetMemObjectDestructorCallback;
 __clCreateUserEvent                  *clCreateUserEvent;
 __clSetUserEventStatus               *clSetUserEventStatus;
-//__clSetEventCallback                 *clSetEventCallback; // TJH commented this out
+__clSetEventCallback                 *clSetEventCallback;
 __clEnqueueReadBufferRect            *clEnqueueReadBufferRect;
 __clEnqueueWriteBufferRect           *clEnqueueWriteBufferRect;
 __clEnqueueCopyBufferRect            *clEnqueueCopyBufferRect;
-
+*/
 
 #if defined(_WIN32) || defined(_WIN64)
 
@@ -228,14 +229,15 @@ cl_int CL_API_CALL clLibLoad()
     GET_PROC(clGetExtensionFunctionAddress      );
 
     /* Load OpenCL 1.1  stuff*/
-    GET_PROC(clCreateSubBuffer                  );
-    //GET_PROC(clSetMemObjectDestructorCallback   ); TJH commented this out
-    GET_PROC(clCreateUserEvent                  );
-    GET_PROC(clSetUserEventStatus               );
-    //GET_PROC(clSetEventCallback                 ); TJH commented this out
-    GET_PROC(clEnqueueReadBufferRect            );
-    GET_PROC(clEnqueueWriteBufferRect           );
-    GET_PROC(clEnqueueCopyBufferRect            );
+    // TJH commented this all out, to avoid requiring 1.1
+    //GET_PROC(clCreateSubBuffer                  );
+    //GET_PROC(clSetMemObjectDestructorCallback   );
+    //GET_PROC(clCreateUserEvent                  );
+    //GET_PROC(clSetUserEventStatus               );
+    //GET_PROC(clSetEventCallback                 );
+    //GET_PROC(clEnqueueReadBufferRect            );
+    //GET_PROC(clEnqueueWriteBufferRect           );
+    //GET_PROC(clEnqueueCopyBufferRect            );
 
     return CL_SUCCESS;
 }

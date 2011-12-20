@@ -1,5 +1,4 @@
 before 0.1 release:
-- dynamic-link opencl at runtime
 - decide whether using single- or multi-component vtkImageData's (consider: SSE, float4 in opencl, rendering)
 
 before 0.x release
