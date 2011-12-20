@@ -25,7 +25,8 @@
 #if defined(__APPLE__) || defined(__MACOSX)
  #include <OpenCL/opencl.h>
 #else
- #include <CL/opencl.h>
+ // load OpenCL dynamically
+ #include "OpenCL_Dyn_Load.h"
 #endif
 
 // base class for those RD implementations that use OpenCL
