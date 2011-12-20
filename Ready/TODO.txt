@@ -1,5 +1,6 @@
 before 0.1 release:
 - decide whether using single- or multi-component vtkImageData's (consider: SSE, float4 in opencl, rendering)
+- allow user to select OpenCL platform and device
 
 before 0.x release
 - file format for saving/loading rules and patterns
