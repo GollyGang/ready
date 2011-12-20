@@ -46,9 +46,6 @@
 #include <stdexcept>
 using namespace std;
 
-// OpenCL: (local copy)
-#include "cl.hpp"
-
 // VTK:
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
@@ -130,7 +127,7 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(true),
-       timesteps_per_render(100),
+       timesteps_per_render(1000),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0)
 {
@@ -357,48 +354,7 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 {
     wxBusyCursor busy;
-    wxString report;
-    {
-        // Get available OpenCL platforms
-        vector<cl::Platform> platforms;
-        cl::Platform::get(&platforms);
-
-        report << _("Found ") << platforms.size() << _(" platform(s):\n");
-
-        for(unsigned int iPlatform=0;iPlatform<platforms.size();iPlatform++)
-        {
-            report << _("Platform ") << iPlatform+1 << _T(":\n");
-            string info;
-            for(int i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
-            {
-                platforms[iPlatform].getInfo(i,&info);
-                report << wxString(info.c_str(),wxConvUTF8) << _T("\n");
-            }
-
-            // create a context using this platform and the GPU
-            cl_context_properties cps[3] = { 
-                CL_CONTEXT_PLATFORM, 
-                (cl_context_properties)(platforms[iPlatform])(), 
-                0 
-            };
-            cl::Context context( CL_DEVICE_TYPE_ALL, cps);
-
-            // Get a list of devices on this platform
-            vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
-            report << _("\nFound ") << devices.size() << _(" device(s) on this platform.\n");
-            for(unsigned int iDevice=0;iDevice<devices.size();iDevice++)
-            {
-                report << _("Device ") << iDevice+1 << _T(":\n");
-                for(unsigned int i=CL_DEVICE_NAME;i<=CL_DEVICE_EXTENSIONS;i++)
-                {
-                    if(devices[iDevice].getInfo(i,&info) == CL_SUCCESS)
-                        report << wxString(info.c_str(),wxConvUTF8) << _T("\n");
-                }
-            }
-            report << _T("\n");
-        }
-    }
-    wxMessageBox(report);
+    wxMessageBox(wxString(OpenCL_RD::GetOpenCLDiagnostics().c_str(),wxConvUTF8));
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)
@@ -516,6 +472,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
+    int n_cells = this->system->GetImageToRender()->GetDimensions()[0]
+                * this->system->GetImageToRender()->GetDimensions()[1]
+                * this->system->GetImageToRender()->GetDimensions()[2];
+
     double time_before = get_time_in_seconds();
 
     try {
@@ -534,13 +494,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
     double time_after = get_time_in_seconds();
     this->frames_per_second = this->timesteps_per_render / (time_after - time_before);
-    int n_cells = this->system->GetImageToRender()->GetDimensions()[0]
-                * this->system->GetImageToRender()->GetDimensions()[1]
-                * this->system->GetImageToRender()->GetDimensions()[2];
     this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
 
-    this->SetStatusBarText();
     this->pVTKWindow->Refresh(false);
+    this->SetStatusBarText();
 
     wxMilliSleep(30);
 
