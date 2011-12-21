@@ -438,10 +438,11 @@ string OpenCL_RD::GetDeviceDescription(int iPlatform,int iDevice)
 
 cl_int OpenCL_RD::LinkOpenCL()
 {
-#if !defined(__APPLE__) && !defined(__MACOSX)
+#ifdef __APPLE__
+    return CL_SUCCESS;
+#else
     return clLibLoad();
 #endif
-    return CL_SUCCESS;
 }
 
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107

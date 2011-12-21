@@ -19,7 +19,6 @@
 
 #include "OpenCL_Dyn_Load.h"
 
-
 __clGetPlatformIDs                   *clGetPlatformIDs;
 __clGetPlatformInfo                  *clGetPlatformInfo;
 __clGetDeviceIDs                     *clGetDeviceIDs;
