@@ -22,11 +22,12 @@
 #include "BaseRD.hpp"
 
 // OpenCL:
-#if defined(__APPLE__) || defined(__MACOSX)
- #include <OpenCL/opencl.h>
+#ifdef __APPLE__
+    // OpenCL is linked at start up time on Mac OS 10.6+
+    #include <OpenCL/opencl.h>
 #else
- // load OpenCL dynamically
- #include "OpenCL_Dyn_Load.h"
+    // OpenCL is loaded dynamically on Windows and Linux
+    #include "OpenCL_Dyn_Load.h"
 #endif
 
 // base class for those RD implementations that use OpenCL

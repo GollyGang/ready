@@ -47,8 +47,11 @@ set(BASE_SOURCES
    OpenCL2D_2Chemicals.hpp OpenCL2D_2Chemicals.cpp
    OpenCL3D_2Chemicals.hpp OpenCL3D_2Chemicals.cpp
    utils.hpp utils.cpp
-   OpenCL_Dyn_Load.h OpenCL_Dyn_Load.c
 )
+if (NOT APPLE)
+   # dynamic loading of OpenCL is only done on Windows and Linux
+   set( BASE_SOURCES ${BASE_SOURCES} OpenCL_Dyn_Load.h OpenCL_Dyn_Load.c )
+endif()
 
 # high-level GUI code used only in Ready
 set(GUI_SOURCES
