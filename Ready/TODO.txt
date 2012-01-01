@@ -9,6 +9,7 @@ before 0.x release
 - make a toolbar of icons for commonly-used functions
 
 before 1.0 release:
+- copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
 - control over render pipeline: contouring level, color map, active components etc.
 - control over boundary conditions: wrap-around or constant value
