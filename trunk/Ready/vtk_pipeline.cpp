@@ -99,7 +99,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(system->GetImageToRender());
+        image_mapper->SetInput(system->GetImage());
         image_mapper->SetActiveComponent(1);
         // TODO: will need to support many more ways of rendering
       
@@ -122,7 +122,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // also add a displacement-mapped surface
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInput(system->GetImageToRender());
+        plane->SetInput(system->GetImage());
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
         warp->SetScaleFactor(5.0);
@@ -159,7 +159,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
         // extract desired component
         vtkSmartPointer<vtkImageExtractComponents> get_component = vtkSmartPointer<vtkImageExtractComponents>::New();
-        get_component->SetInput(system->GetImageToRender());
+        get_component->SetInput(system->GetImage());
         get_component->SetComponents(1);
 
         // convert image to unsigned char
@@ -235,7 +235,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // turns the 3d grid of sampled values into a polygon mesh for rendering,
         // by making a surface that contours the volume at a specified level
         vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInput(system->GetImageToRender());
+        surface->SetInput(system->GetImage());
         surface->SetValue(0, 0.25);
         surface->SetArrayComponent(1);
         // TODO: allow user to control the contour level
@@ -266,7 +266,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // add the bounding box
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(system->GetImageToRender()->GetBounds());
+        box->SetBounds(system->GetImage()->GetBounds());
         vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
         edges->SetInputConnection(box->GetOutputPort());
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -289,10 +289,10 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
         // extract a slice
         vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-        voi->SetInput(system->GetImageToRender());
-        voi->SetVOI(0,system->GetImageToRender()->GetDimensions()[0],
-            0,system->GetImageToRender()->GetDimensions()[1],
-            system->GetImageToRender()->GetDimensions()[2]/2.0,system->GetImageToRender()->GetDimensions()[2]/2.0);
+        voi->SetInput(system->GetImage());
+        voi->SetVOI(0,system->GetImage()->GetDimensions()[0],
+            0,system->GetImage()->GetDimensions()[1],
+            system->GetImage()->GetDimensions()[2]/2.0,system->GetImage()->GetDimensions()[2]/2.0);
 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();

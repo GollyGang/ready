@@ -1,6 +1,7 @@
 before 0.1 release:
 - decide whether using single- or multi-component vtkImageData's (consider: SSE, float4 in opencl, rendering)
 - allow user to select OpenCL platform and device
+- move demos to patterns pane
 
 before 0.x release
 - file format for saving/loading rules and patterns
@@ -16,11 +17,13 @@ before 1.0 release:
 - save out videos
 - save out scene (e.g. OBJ) for external render
 
-future:
-- parameter map in a separate window, to allow user to explore parameters 
+future ideas:
+- parameter map(s) in a separate window, to allow user to explore parameters 
 - full control over scene graph; nodes+connections interface
 - different topologies: e.g. arbitrary 2d mesh embedded in 3d: zebra, etc.
 - parameters driven by an input scene (for writhing logos, etc.)
 - multi-stage, multi-scale RD
 - radiosity rendering for better visualization of tangled structures
 - STL output, email file to shapeways for printing
+- 1D RD
+- discrete RD (simulation of individual chemicals, to compare with differential equations)

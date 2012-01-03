@@ -22,7 +22,6 @@
 #include <string>
 
 class vtkImageData;
-class vtkImageAlgorithm;
 
 // abstract base classes for all reaction-diffusion systems, 2D and 3D
 class BaseRD 
@@ -45,7 +44,7 @@ class BaseRD
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
 
-        vtkImageData* GetImageToRender() const;
+        vtkImageData* GetImage() const;
 
         virtual bool HasEditableProgram() const =0;
         void SetProgram(std::string s);
@@ -56,9 +55,7 @@ class BaseRD
 
     protected:
 
-        vtkImageData *buffer[2];
-        vtkImageData* GetOldImage() const; // copy from this one
-        vtkImageData* GetNewImage() const; // edit this one
+        vtkImageData *image;
 
         float timestep;
         int timesteps_taken;
@@ -68,15 +65,10 @@ class BaseRD
 
     protected:
 
-        void SwitchBuffers();
-        void AllocateBuffers(int x,int y,int z,int nc);
+        void AllocateImage(int x,int y,int z,int nc);
 
+        static vtkImageData* AllocateVTKImage(int x,int y,int z,int nc);
         static float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
-
-    private:
-    
-        int iCurrentBuffer; // the buffer being edited (the other is being rendered)
-        vtkImageAlgorithm *buffer_switcher;
 };
 
 #endif

@@ -69,8 +69,8 @@ OpenCL3D_2Chemicals::OpenCL3D_2Chemicals()
 \n\
     // Standard 7-point stencil\n\
     const float2 nabla_uv = input[iLeft] + input[iRight] + input[iUp] + input[iDown] + input[iFore] + input[iBack] - 6.0f*uv;\n\
-    const float nabla_u = nabla_uv.x;\n\
-    const float nabla_v = nabla_uv.y;\n\
+    const float nabla_u = nabla_uv.x + 1e-6f; // (kill denormals)\n\
+    const float nabla_v = nabla_uv.y + 1e-6f; // (kill denormals)\n\
 \n\
     // compute the new rate of change\n\
     const float delta_u = D_u * nabla_u - u*v*v + F*(1.0f-u);\n\
@@ -86,7 +86,7 @@ void OpenCL3D_2Chemicals::Allocate(int x,int y,int z)
 {
     if(x&(x-1) || y&(y-1) || z&(z-1))
         throw runtime_error("OpenCL3D_2Chemicals::Allocate : for wrap-around in OpenCL we require both dimensions to be powers of 2");
-    this->AllocateBuffers(x,y,z,2);
+    this->AllocateImage(x,y,z,2);
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
     this->CreateOpenCLBuffers();
@@ -94,18 +94,15 @@ void OpenCL3D_2Chemicals::Allocate(int x,int y,int z)
 
 void OpenCL3D_2Chemicals::InitWithBlobInCenter()
 {
-    vtkImageData *old_image = this->GetOldImage();
-    vtkImageData *new_image = this->GetNewImage();
-    assert(old_image);
-    assert(new_image);
+    vtkImageData *image = this->GetImage();
+    assert(image);
 
-    const int X = old_image->GetDimensions()[0];
-    const int Y = old_image->GetDimensions()[1];
-    const int Z = old_image->GetDimensions()[2];
-    const int NC = old_image->GetNumberOfScalarComponents();
+    const int X = image->GetDimensions()[0];
+    const int Y = image->GetDimensions()[1];
+    const int Z = image->GetDimensions()[2];
+    const int NC = image->GetNumberOfScalarComponents();
 
-    float* old_data = static_cast<float*>(old_image->GetScalarPointer());
-    float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+    float* data = static_cast<float*>(image->GetScalarPointer());
 
     for(int x=0;x<X;x++)
     {
@@ -115,23 +112,19 @@ void OpenCL3D_2Chemicals::InitWithBlobInCenter()
             {
                 if(hypot3(x-X/2,(y-Y/2)/1.5,z-Z/2)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate sphere in the middle
                 {
-                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = 0.0f;
-                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = 1.0f;
-                    *vtk_at(old_data,x,y,z,0,X,Y,NC) = 0.0f;
-                    *vtk_at(old_data,x,y,z,1,X,Y,NC) = 1.0f;
+                    *vtk_at(data,x,y,z,0,X,Y,NC) = 0.0f;
+                    *vtk_at(data,x,y,z,1,X,Y,NC) = 1.0f;
                 }
                 else 
                 {
-                    *vtk_at(new_data,x,y,z,0,X,Y,NC) = 1.0f;
-                    *vtk_at(new_data,x,y,z,1,X,Y,NC) = 0.0f;
-                    *vtk_at(old_data,x,y,z,0,X,Y,NC) = 1.0f;
-                    *vtk_at(old_data,x,y,z,1,X,Y,NC) = 0.0f;
+                    *vtk_at(data,x,y,z,0,X,Y,NC) = 1.0f;
+                    *vtk_at(data,x,y,z,1,X,Y,NC) = 0.0f;
                 }
             }
         }
     }
-    this->GetNewImage()->Modified();
-    this->WriteToOpenCLBuffers(); // old_data -> buffer1 
+    this->GetImage()->Modified();
+    this->WriteToOpenCLBuffers();
     this->timesteps_taken = 0;
 }
 
@@ -147,7 +140,6 @@ void OpenCL3D_2Chemicals::Update(int n_steps)
         this->timesteps_taken += 2;
     }
 
-    this->ReadFromOpenCLBuffers(); // buffer1 -> new_data = buffers[iCurrentBuffer]
-    this->GetNewImage()->Modified();
-    // N.B. we're not using BaseRD's render-buffer switching since we already have two OpenCL buffers
+    this->ReadFromOpenCLBuffers(); // buffer1 -> image
+    this->GetImage()->Modified();
 }

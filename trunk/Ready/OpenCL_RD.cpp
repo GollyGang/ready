@@ -24,7 +24,6 @@
 #include <utility>
 #include <sstream>
 #include <cassert>
-#include <algorithm>
 using namespace std;
 
 // VTK:
@@ -141,8 +140,12 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
+    // make a set of options to pass to the compiler
+    ostringstream options;
+    //options << "-cl-denorms-are-zero -cl-fast-relaxed-math";
+
     // build the program
-    ret = clBuildProgram(program,1,&this->device_id,NULL,NULL,NULL);
+    ret = clBuildProgram(program,1,&this->device_id,options.str().c_str(),NULL,NULL);
     if(ret != CL_SUCCESS)
     {
         const int MAX_BUILD_LOG = 10000;
@@ -160,9 +163,9 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : kernel creation failed: ");
 
     // decide the size of the work-groups
-    const size_t X = this->GetOldImage()->GetDimensions()[0];
-    const size_t Y = this->GetOldImage()->GetDimensions()[1];
-    const size_t Z = this->GetOldImage()->GetDimensions()[2];
+    const size_t X = this->GetImage()->GetDimensions()[0];
+    const size_t Y = this->GetImage()->GetDimensions()[1];
+    const size_t Z = this->GetImage()->GetDimensions()[2];
     this->global_range[0] = X;
     this->global_range[1] = Y;
     this->global_range[2] = Z;
@@ -189,15 +192,13 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
 void OpenCL_RD::CreateOpenCLBuffers()
 {
-    vtkImageData *old_image = this->GetOldImage();
-    vtkImageData *new_image = this->GetNewImage();
-    assert(old_image);
-    assert(new_image);
+    vtkImageData *image = this->GetImage();
+    assert(image);
 
-    const int X = old_image->GetDimensions()[0];
-    const int Y = old_image->GetDimensions()[1];
-    const int Z = old_image->GetDimensions()[2];
-    const int NC = old_image->GetNumberOfScalarComponents();
+    const int X = image->GetDimensions()[0];
+    const int Y = image->GetDimensions()[1];
+    const int Z = image->GetDimensions()[2];
+    const int NC = image->GetNumberOfScalarComponents();
     const unsigned long MEM_SIZE = sizeof(float) * X * Y * Z * NC;
 
     cl_int ret;
@@ -211,41 +212,35 @@ void OpenCL_RD::CreateOpenCLBuffers()
 
 void OpenCL_RD::WriteToOpenCLBuffers()
 {
-    vtkImageData *old_image = this->GetOldImage();
-    vtkImageData *new_image = this->GetNewImage();
-    assert(old_image);
-    assert(new_image);
+    vtkImageData *image = this->GetImage();
+    assert(image);
 
-    const int X = old_image->GetDimensions()[0];
-    const int Y = old_image->GetDimensions()[1];
-    const int Z = old_image->GetDimensions()[2];
-    const int NC = old_image->GetNumberOfScalarComponents();
+    const int X = image->GetDimensions()[0];
+    const int Y = image->GetDimensions()[1];
+    const int Z = image->GetDimensions()[2];
+    const int NC = image->GetNumberOfScalarComponents();
 
-    float* old_data = static_cast<float*>(old_image->GetScalarPointer());
-    float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+    float* data = static_cast<float*>(image->GetScalarPointer());
     const size_t MEM_SIZE = sizeof(float) * X * Y * Z * NC;
 
-    cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffer1, CL_TRUE, 0, MEM_SIZE, old_data, 0, NULL, NULL);
+    cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffer1, CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
     throwOnError(ret,"OpenCL_RD::WriteToBuffers : buffer writing failed: ");
 }
 
 void OpenCL_RD::ReadFromOpenCLBuffers()
 {
-    vtkImageData *old_image = this->GetOldImage();
-    vtkImageData *new_image = this->GetNewImage();
-    assert(old_image);
-    assert(new_image);
+    vtkImageData *image = this->GetImage();
+    assert(image);
 
-    const int X = old_image->GetDimensions()[0];
-    const int Y = old_image->GetDimensions()[1];
-    const int Z = old_image->GetDimensions()[2];
-    const int NC = old_image->GetNumberOfScalarComponents();
+    const int X = image->GetDimensions()[0];
+    const int Y = image->GetDimensions()[1];
+    const int Z = image->GetDimensions()[2];
+    const int NC = image->GetNumberOfScalarComponents();
 
-    float* old_data = static_cast<float*>(old_image->GetScalarPointer());
-    float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+    float* data = static_cast<float*>(image->GetScalarPointer());
     const size_t MEM_SIZE = sizeof(float) * X * Y * Z * NC;
 
-    cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffer1, CL_TRUE, 0, MEM_SIZE, new_data, 0, NULL, NULL);
+    cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffer1, CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
     throwOnError(ret,"OpenCL_RD::ReadFromBuffers : buffer reading failed: ");
 }
 
