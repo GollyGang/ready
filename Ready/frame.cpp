@@ -562,20 +562,20 @@ void MyFrame::LoadDemo(int iDemo)
             case ID::GrayScott2DOpenCLDemo:
                 {
                     OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
-                    s->Allocate(128,64);
-                    s->InitWithBlobInCenter();
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
+                    s->Allocate(128,64);
+                    s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }
                 break;
             case ID::GrayScott3DOpenCLDemo:
                 {
                     OpenCL3D_2Chemicals *s = new OpenCL3D_2Chemicals();
-                    s->Allocate(64,64,64);
-                    s->InitWithBlobInCenter();
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
+                    s->Allocate(64,64,64);
+                    s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }
                 break;
