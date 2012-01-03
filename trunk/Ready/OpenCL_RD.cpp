@@ -24,6 +24,7 @@
 #include <utility>
 #include <sstream>
 #include <cassert>
+#include <algorithm>
 using namespace std;
 
 // VTK:
@@ -403,7 +404,9 @@ string OpenCL_RD::GetPlatformDescription(int iPlatform)
     ret = clGetPlatformInfo(platforms_available[iPlatform],CL_PLATFORM_NAME,
         MAX_INFO_LENGTH,info,&info_length);
     throwOnError(ret,"OpenCL_RD::GetPlatformDescription : clGetPlatformInfo failed: ");
-    oss << info;
+    string platform_name = info;
+    platform_name = platform_name.substr(platform_name.find_first_not_of(" \n\r\t"));
+    oss << platform_name;
     return oss.str();
 }
 
@@ -432,7 +435,9 @@ string OpenCL_RD::GetDeviceDescription(int iPlatform,int iDevice)
     ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_NAME,
         MAX_INFO_LENGTH,info,&info_length);
     throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetDeviceInfo failed: ");
-    oss << info;
+    string device_name = info;
+    device_name = device_name.substr(device_name.find_first_not_of(" \n\r\t"));
+    oss << device_name;
     return oss.str();
 }
 
