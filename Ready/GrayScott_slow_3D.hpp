@@ -25,6 +25,7 @@ class GrayScott_slow_3D : public BaseRD
     public:
 
         GrayScott_slow_3D();
+        ~GrayScott_slow_3D();
 
         void Allocate(int x,int y,int z);
         float GetF() const { return this->f; }
@@ -40,4 +41,5 @@ class GrayScott_slow_3D : public BaseRD
     protected:
 
         float f,k,r_a,r_b;
+        vtkImageData *buffer_image;
 };

@@ -39,98 +39,90 @@ GrayScott_slow::GrayScott_slow()
     // for spots:
     this->k = 0.064f;
     this->f = 0.035f;
+    this->buffer_image = NULL;
 }
 
 void GrayScott_slow::Allocate(int x,int y)
 {
-    this->AllocateBuffers(x,y,1,2);
+    this->AllocateImage(x,y,1,2);
+    // also allocate our buffer image
+    this->buffer_image = AllocateVTKImage(x,y,1,2);
+}
+
+GrayScott_slow::~GrayScott_slow()
+{
+    if(this->buffer_image)
+        this->buffer_image->Delete();
 }
 
 void GrayScott_slow::Update(int n_steps)
 {
-    for(int iStep=0;iStep<n_steps;iStep++)
+    // take approximately n_steps
+    for(int iStepPair=0;iStepPair<(n_steps+1)/2;iStepPair++)
     {
-        vtkImageData *old_image = this->GetOldImage();
-        vtkImageData *new_image = this->GetNewImage();
-        assert(old_image);
-        assert(new_image);
-
-        const int X = old_image->GetDimensions()[0];
-        const int Y = old_image->GetDimensions()[1];
-        const int NC = old_image->GetNumberOfScalarComponents();
-
-        float* old_data = static_cast<float*>(old_image->GetScalarPointer());
-        float* new_data = static_cast<float*>(new_image->GetScalarPointer());
-
-        for(int x=0;x<X;x++)
+        for(int iStep=0;iStep<2;iStep++)
         {
-            int x_prev = (x-1+X)%X;
-            int x_next = (x+1)%X;
-            for(int y=0;y<Y;y++)
+            vtkImageData *from_im,*to_im;
+            switch(iStep) {
+                case 0: from_im = this->GetImage(); to_im = this->buffer_image; break;
+                case 1: from_im = this->buffer_image; to_im = this->GetImage(); break;
+            }
+
+            const int X = from_im->GetDimensions()[0];
+            const int Y = from_im->GetDimensions()[1];
+            const int NC = from_im->GetNumberOfScalarComponents();
+
+            float* from_data = static_cast<float*>(from_im->GetScalarPointer());
+            float* to_data = static_cast<float*>(to_im->GetScalarPointer());
+
+            for(int x=0;x<X;x++)
             {
-                int y_prev = (y-1+Y)%Y;
-                int y_next = (y+1)%Y;
+                int x_prev = (x-1+X)%X;
+                int x_next = (x+1)%X;
+                for(int y=0;y<Y;y++)
+                {
+                    int y_prev = (y-1+Y)%Y;
+                    int y_next = (y+1)%Y;
 
-                float aval = *vtk_at(old_data,x,y,0,0,X,Y,NC);
-                float bval = *vtk_at(old_data,x,y,0,1,X,Y,NC);
+                    float aval = *vtk_at(from_data,x,y,0,0,X,Y,NC);
+                    float bval = *vtk_at(from_data,x,y,0,1,X,Y,NC);
 
-                // compute the Laplacians of a and b
-                // 5-point stencil:
-                float dda = *vtk_at(old_data,x,y_prev,0,0,X,Y,NC) +
-                            *vtk_at(old_data,x,y_next,0,0,X,Y,NC) +
-                            *vtk_at(old_data,x_prev,y,0,0,X,Y,NC) + 
-                            *vtk_at(old_data,x_next,y,0,0,X,Y,NC) - 4*aval;
-                float ddb = *vtk_at(old_data,x,y_prev,0,1,X,Y,NC) +
-                            *vtk_at(old_data,x,y_next,0,1,X,Y,NC) +
-                            *vtk_at(old_data,x_prev,y,0,1,X,Y,NC) + 
-                            *vtk_at(old_data,x_next,y,0,1,X,Y,NC) - 4*bval;
-                /* // 9-point stencil of Arad et al. 1997
-                //    Arad, A Yakhot, G Ben-Dor. A Highly Accurate Numerical Solution
-                //    of a Biharmonic Equation. Numer. Meth. PDE, 13, pp. 375-397, 1997.
-                //    PDF at www.bgu.ac.il/~yakhot/homepage/publications/nmpde_4_97.pdf
-                //    (see page 379)
-                // gives more correct results (no vertical/horizontal bias) but slows down
-                // the kernal a lot mainly because of the extra accesses to get neighboring
-                // values.
-                float dda = (*vtk_at(old_data,x_prev,y,0,0,X,Y,NC)+*vtk_at(old_data,x_next,y,0,0,X,Y,NC)
-                             + *vtk_at(old_data,x,y_prev,0,0,X,Y,NC)+*vtk_at(old_data,x,y_next,0,0,X,Y,NC))*2.0f/3.0f
-                             + (*vtk_at(old_data,x_prev,y_prev,0,0,X,Y,NC)+*vtk_at(old_data,x_next,y_prev,0,0,X,Y,NC)
-                             + *vtk_at(old_data,x_prev,y_next,0,0,X,Y,NC)+*vtk_at(old_data,x_next,y_next,0,0,X,Y,NC))/6.0f
-                             - 10.0f*aval/3.0f;
-                float ddb = (*vtk_at(old_data,x_prev,y,0,1,X,Y,NC)+*vtk_at(old_data,x_next,y,0,1,X,Y,NC)
-                             + *vtk_at(old_data,x,y_prev,0,1,X,Y,NC)+*vtk_at(old_data,x,y_next,0,1,X,Y,NC))*2.0f/3.0f
-                             + (*vtk_at(old_data,x_prev,y_prev,0,1,X,Y,NC)+*vtk_at(old_data,x_next,y_prev,0,1,X,Y,NC)
-                             + *vtk_at(old_data,x_prev,y_next,0,1,X,Y,NC)+*vtk_at(old_data,x_next,y_next,0,1,X,Y,NC))/6.0f
-                             - 10.0f*bval/3.0f; */
+                    // compute the Laplacians of a and b
+                    // 5-point stencil:
+                    float dda = *vtk_at(from_data,x,y_prev,0,0,X,Y,NC) +
+                                *vtk_at(from_data,x,y_next,0,0,X,Y,NC) +
+                                *vtk_at(from_data,x_prev,y,0,0,X,Y,NC) + 
+                                *vtk_at(from_data,x_next,y,0,0,X,Y,NC) - 4*aval;
+                    float ddb = *vtk_at(from_data,x,y_prev,0,1,X,Y,NC) +
+                                *vtk_at(from_data,x,y_next,0,1,X,Y,NC) +
+                                *vtk_at(from_data,x_prev,y,0,1,X,Y,NC) + 
+                                *vtk_at(from_data,x_next,y,0,1,X,Y,NC) - 4*bval;
+     
+                    // compute the new rate of change of a and b
+                    float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
+                    float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
 
-                // compute the new rate of change of a and b
-                float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
-                float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
-
-                // apply the change
-                *vtk_at(new_data,x,y,0,0,X,Y,NC) = aval + this->timestep * da;
-                *vtk_at(new_data,x,y,0,1,X,Y,NC) = bval + this->timestep * db;
+                    // apply the change
+                    *vtk_at(to_data,x,y,0,0,X,Y,NC) = aval + this->timestep * da;
+                    *vtk_at(to_data,x,y,0,1,X,Y,NC) = bval + this->timestep * db;
+                }
             }
         }
-
-        this->SwitchBuffers();
-        this->timesteps_taken++;
+        this->timesteps_taken+=2;
     }
+    this->GetImage()->Modified();
 }
 
 void GrayScott_slow::InitWithBlobInCenter()
 {
-    vtkImageData *old_image = this->GetOldImage();
-    vtkImageData *new_image = this->GetNewImage();
-    assert(old_image);
-    assert(new_image);
+    vtkImageData *image = this->GetImage();
+    assert(image);
 
-    const int X = old_image->GetDimensions()[0];
-    const int Y = old_image->GetDimensions()[1];
-    const int NC = old_image->GetNumberOfScalarComponents();
+    const int X = image->GetDimensions()[0];
+    const int Y = image->GetDimensions()[1];
+    const int NC = image->GetNumberOfScalarComponents();
 
-    float* old_data = static_cast<float*>(old_image->GetScalarPointer());
-    float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+    float* data = static_cast<float*>(image->GetScalarPointer());
 
     for(int x=0;x<X;x++)
     {
@@ -138,16 +130,16 @@ void GrayScott_slow::InitWithBlobInCenter()
         {
             if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
             {
-                *vtk_at(new_data,x,y,0,0,X,Y,NC) = 0.0f;
-                *vtk_at(new_data,x,y,0,1,X,Y,NC) = 1.0f;
+                *vtk_at(data,x,y,0,0,X,Y,NC) = 0.0f;
+                *vtk_at(data,x,y,0,1,X,Y,NC) = 1.0f;
             }
             else 
             {
-                *vtk_at(new_data,x,y,0,0,X,Y,NC) = 1.0f;
-                *vtk_at(new_data,x,y,0,1,X,Y,NC) = 0.0f;
+                *vtk_at(data,x,y,0,0,X,Y,NC) = 1.0f;
+                *vtk_at(data,x,y,0,1,X,Y,NC) = 0.0f;
             }
         }
     }
-    this->SwitchBuffers();
+    this->GetImage()->Modified();
     this->timesteps_taken = 0;
 }

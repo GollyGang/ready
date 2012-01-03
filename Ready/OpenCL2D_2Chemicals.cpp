@@ -64,8 +64,8 @@ OpenCL2D_2Chemicals::OpenCL2D_2Chemicals()
 \n\
     // standard 5-point stencil\n\
     const float2 nabla_uv = input[iLeft] + input[iRight] + input[iUp] + input[iDown] - 4.0f*uv;\n\
-    const float nabla_u = nabla_uv.x;\n\
-    const float nabla_v = nabla_uv.y;\n\
+    const float nabla_u = nabla_uv.x + 1e-6f; // (kill denormals)\n\
+    const float nabla_v = nabla_uv.y + 1e-6f; // (kill denormals)\n\
 \n\
     // compute the new rate of change\n\
     const float delta_u = D_u * nabla_u - u*v*v + F*(1.0f-u);\n\
@@ -81,7 +81,7 @@ void OpenCL2D_2Chemicals::Allocate(int x,int y)
 {
     if(x&(x-1) || y&(y-1))
         throw runtime_error("OpenCL2D_2Chemicals::Allocate : for wrap-around in OpenCL we require both dimensions to be powers of 2");
-    this->AllocateBuffers(x,y,1,2);
+    this->AllocateImage(x,y,1,2);
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
     this->CreateOpenCLBuffers();
@@ -89,17 +89,14 @@ void OpenCL2D_2Chemicals::Allocate(int x,int y)
 
 void OpenCL2D_2Chemicals::InitWithBlobInCenter()
 {
-    vtkImageData *old_image = this->GetOldImage();
-    vtkImageData *new_image = this->GetNewImage();
-    assert(old_image);
-    assert(new_image);
+    vtkImageData *image = this->GetImage();
+    assert(image);
 
-    const int X = old_image->GetDimensions()[0];
-    const int Y = old_image->GetDimensions()[1];
-    const int NC = old_image->GetNumberOfScalarComponents();
+    const int X = image->GetDimensions()[0];
+    const int Y = image->GetDimensions()[1];
+    const int NC = image->GetNumberOfScalarComponents();
 
-    float* old_data = static_cast<float*>(old_image->GetScalarPointer());
-    float* new_data = static_cast<float*>(new_image->GetScalarPointer());
+    float* data = static_cast<float*>(image->GetScalarPointer());
 
     for(int x=0;x<X;x++)
     {
@@ -107,22 +104,18 @@ void OpenCL2D_2Chemicals::InitWithBlobInCenter()
         {
             if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
             {
-                *vtk_at(old_data,x,y,0,0,X,Y,NC) = 0.0f;
-                *vtk_at(new_data,x,y,0,0,X,Y,NC) = 0.0f;
-                *vtk_at(old_data,x,y,0,1,X,Y,NC) = 1.0f;
-                *vtk_at(new_data,x,y,0,1,X,Y,NC) = 1.0f;
+                *vtk_at(data,x,y,0,0,X,Y,NC) = 0.0f;
+                *vtk_at(data,x,y,0,1,X,Y,NC) = 1.0f;
             }
             else 
             {
-                *vtk_at(old_data,x,y,0,0,X,Y,NC) = 1.0f;
-                *vtk_at(new_data,x,y,0,0,X,Y,NC) = 1.0f;
-                *vtk_at(old_data,x,y,0,1,X,Y,NC) = 0.0f;
-                *vtk_at(new_data,x,y,0,1,X,Y,NC) = 0.0f;
+                *vtk_at(data,x,y,0,0,X,Y,NC) = 1.0f;
+                *vtk_at(data,x,y,0,0,X,Y,NC) = 1.0f;
             }
         }
     }
-    this->GetNewImage()->Modified();
-    this->WriteToOpenCLBuffers(); // old_data -> buffer1 
+    this->GetImage()->Modified();
+    this->WriteToOpenCLBuffers(); // data -> buffer1 
     this->timesteps_taken = 0;
 }
 
@@ -138,7 +131,6 @@ void OpenCL2D_2Chemicals::Update(int n_steps)
         this->timesteps_taken += 2;
     }
 
-    this->ReadFromOpenCLBuffers(); // buffer1 -> new_data = buffers[iCurrentBuffer]
-    this->GetNewImage()->Modified();
-    // N.B. we're not using BaseRD's render-buffer switching since we already have two OpenCL buffers
+    this->ReadFromOpenCLBuffers(); // buffer1 -> image
+    this->GetImage()->Modified();
 }
