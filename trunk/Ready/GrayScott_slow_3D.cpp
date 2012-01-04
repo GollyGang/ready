@@ -39,41 +39,49 @@ GrayScott_slow_3D::GrayScott_slow_3D()
     // for spots:
     this->k = 0.064f;
     this->f = 0.035f;
-    this->buffer_image = NULL;
 }
 
 GrayScott_slow_3D::~GrayScott_slow_3D()
 {
-    if(this->buffer_image)
-        this->buffer_image->Delete();
+    for(int i=0;i<(int)this->buffer_images.size();i++)
+    {
+        if(this->buffer_images[i])
+            this->buffer_images[i]->Delete();
+    }
 }
 
 void GrayScott_slow_3D::Allocate(int x,int y,int z)
 {
-    this->AllocateImage(x,y,z,2);
-    this->buffer_image = AllocateVTKImage(x,y,z,2);
+    this->AllocateImages(x,y,z,2);
+    this->buffer_images.resize(2);
+    for(int i=0;i<2;i++)
+        this->buffer_images[i] = AllocateVTKImage(x,y,z);
 }
 
 void GrayScott_slow_3D::Update(int n_steps)
 {
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
+
     // take approximately n_steps
     for(int iStepPair=0;iStepPair<(n_steps+1)/2;iStepPair++)
     {
         for(int iStep=0;iStep<2;iStep++)
         {
-            vtkImageData *from_image,*to_image;
+            float *old_a,*new_a,*old_b,*new_b;
             switch(iStep) {
-                case 0: from_image = this->GetImage(); to_image = this->buffer_image; break;
-                case 1: from_image = this->buffer_image; to_image = this->GetImage(); break;
+                case 0: old_a = static_cast<float*>(this->images[0]->GetScalarPointer()); 
+                        old_b = static_cast<float*>(this->images[1]->GetScalarPointer()); 
+                        new_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer()); 
+                        new_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer()); 
+                        break;
+                case 1: old_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer()); 
+                        old_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer()); 
+                        new_a = static_cast<float*>(this->images[0]->GetScalarPointer()); 
+                        new_b = static_cast<float*>(this->images[1]->GetScalarPointer()); 
+                        break;
             }
-
-            const int X = from_image->GetDimensions()[0];
-            const int Y = from_image->GetDimensions()[1];
-            const int Z = from_image->GetDimensions()[2];
-            const int NC = from_image->GetNumberOfScalarComponents();
-
-            float* from_data = static_cast<float*>(from_image->GetScalarPointer());
-            float* to_data = static_cast<float*>(to_image->GetScalarPointer());
 
             for(int x=0;x<X;x++)
             {
@@ -88,86 +96,33 @@ void GrayScott_slow_3D::Update(int n_steps)
                         int z_prev = (z-1+Z)%Z;
                         int z_next = (z+1)%Z;
 
-                        float aval = *vtk_at(from_data,x,y,z,0,X,Y,NC);
-                        float bval = *vtk_at(from_data,x,y,z,1,X,Y,NC);
+                        float aval = *vtk_at(old_a,x,y,z,X,Y);
+                        float bval = *vtk_at(old_b,x,y,z,X,Y);
 
                         // compute the Laplacians of a and b
                         // 7-point stencil:
-                        float dda = *vtk_at(from_data,x,y_prev,z,0,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_next,z,0,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y,z,0,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y,z,0,X,Y,NC) +
-                                    *vtk_at(from_data,x,y,z_prev,0,X,Y,NC) + 
-                                    *vtk_at(from_data,x,y,z_next,0,X,Y,NC) +
+                        float dda = *vtk_at(old_a,x,y_prev,z,X,Y) +
+                                    *vtk_at(old_a,x,y_next,z,X,Y) +
+                                    *vtk_at(old_a,x_prev,y,z,X,Y) + 
+                                    *vtk_at(old_a,x_next,y,z,X,Y) +
+                                    *vtk_at(old_a,x,y,z_prev,X,Y) + 
+                                    *vtk_at(old_a,x,y,z_next,X,Y) +
                                     - 6*aval;
-                        float ddb = *vtk_at(from_data,x,y_prev,z,1,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_next,z,1,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y,z,1,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y,z,1,X,Y,NC) +
-                                    *vtk_at(from_data,x,y,z_prev,1,X,Y,NC) + 
-                                    *vtk_at(from_data,x,y,z_next,1,X,Y,NC) +
+                        float ddb = *vtk_at(old_b,x,y_prev,z,X,Y) +
+                                    *vtk_at(old_b,x,y_next,z,X,Y) +
+                                    *vtk_at(old_b,x_prev,y,z,X,Y) + 
+                                    *vtk_at(old_b,x_next,y,z,X,Y) +
+                                    *vtk_at(old_b,x,y,z_prev,X,Y) + 
+                                    *vtk_at(old_b,x,y,z_next,X,Y) +
                                     - 6*bval; 
-                        /* // 19-point stencil
-                        // Spotz,W.F. and G.F. Carey, 1996, A high-order compact formulation for the 3D Poisson equation
-                        // Numerical Methods for Partial Differential Equations, 12, 235–243.
-                        // www.cfdlab.ae.utexas.edu/labstaff/carey/GFC_Papers/Carey146.pdf
-                        // (also contains a 27-point stencil if we need it)
-                        // N.B. code doesn't behave anything like the 7-point stencil above. Have I done something wrong?
-                        float dda = 2 * (*vtk_at(from_data,x,y_prev,z,0,X,Y,NC) +
-                                         *vtk_at(from_data,x,y_next,z,0,X,Y,NC) +
-                                         *vtk_at(from_data,x_prev,y,z,0,X,Y,NC) + 
-                                         *vtk_at(from_data,x_next,y,z,0,X,Y,NC) +
-                                         *vtk_at(from_data,x,y,z_prev,0,X,Y,NC) + 
-                                         *vtk_at(from_data,x,y,z_next,0,X,Y,NC) ) +
-     
-                                    *vtk_at(from_data,x,y_prev,z_prev,0,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_next,z_prev,0,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y,z_prev,0,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y,z_prev,0,X,Y,NC) +
-
-                                    *vtk_at(from_data,x,y_prev,z_next,0,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_next,z_next,0,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y,z_next,0,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y,z_next,0,X,Y,NC) +
-
-                                    *vtk_at(from_data,x_prev,y_prev,z,0,X,Y,NC) +
-                                    *vtk_at(from_data,x_next,y_prev,z,0,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y_next,z,0,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y_next,z,0,X,Y,NC)
-
-                                    - 24*aval;
-
-                        float ddb = 2 * (*vtk_at(from_data,x,y_prev,z,1,X,Y,NC) +
-                                         *vtk_at(from_data,x,y_next,z,1,X,Y,NC) +
-                                         *vtk_at(from_data,x_prev,y,z,1,X,Y,NC) + 
-                                         *vtk_at(from_data,x_next,y,z,1,X,Y,NC) +
-                                         *vtk_at(from_data,x,y,z_prev,1,X,Y,NC) + 
-                                         *vtk_at(from_data,x,y,z_next,1,X,Y,NC) ) +
-     
-                                    *vtk_at(from_data,x,y_prev,z_prev,1,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_next,z_prev,1,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_prev,z_next,1,X,Y,NC) +
-                                    *vtk_at(from_data,x,y_next,z_next,1,X,Y,NC) +
-
-                                    *vtk_at(from_data,x_prev,y,z_prev,1,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y,z_prev,1,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y,z_next,1,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y,z_next,1,X,Y,NC) +
-
-                                    *vtk_at(from_data,x_prev,y_prev,z,1,X,Y,NC) +
-                                    *vtk_at(from_data,x_next,y_prev,z,1,X,Y,NC) +
-                                    *vtk_at(from_data,x_prev,y_next,z,1,X,Y,NC) + 
-                                    *vtk_at(from_data,x_next,y_next,z,1,X,Y,NC)
-
-                                    - 24*bval;*/
 
                         // compute the new rate of change of a and b
                         float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
                         float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
 
                         // apply the change
-                        *vtk_at(to_data,x,y,z,0,X,Y,NC) = aval + this->timestep * da;
-                        *vtk_at(to_data,x,y,z,1,X,Y,NC) = bval + this->timestep * db;
+                        *vtk_at(new_a,x,y,z,X,Y) = aval + this->timestep * da;
+                        *vtk_at(new_b,x,y,z,X,Y) = bval + this->timestep * db;
                     }
                 }
             }
@@ -175,20 +130,20 @@ void GrayScott_slow_3D::Update(int n_steps)
         }
         this->timesteps_taken+=2;
     }
-    this->image->Modified();
+    this->images[0]->Modified();
+    this->images[1]->Modified();
 }
 
 void GrayScott_slow_3D::InitWithBlobInCenter()
 {
-    vtkImageData *image = this->GetImage();
-    assert(image);
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
 
-    const int X = image->GetDimensions()[0];
-    const int Y = image->GetDimensions()[1];
-    const int Z = image->GetDimensions()[2];
-    const int NC = image->GetNumberOfScalarComponents();
-
-    float* data = static_cast<float*>(image->GetScalarPointer());
+    vtkImageData *a_image = this->images[0];
+    vtkImageData *b_image = this->images[1];
+    float* a_data = static_cast<float*>(a_image->GetScalarPointer());
+    float* b_data = static_cast<float*>(b_image->GetScalarPointer());
 
     for(int x=0;x<X;x++)
     {
@@ -196,19 +151,20 @@ void GrayScott_slow_3D::InitWithBlobInCenter()
         {
             for(int z=0;z<Z;z++)
             {
-                if(hypot3(x-X/2,(y-Y/2)/1.5,z-Z/2)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate sphere in the middle
+                if(hypot3(x-X/2,(y-Y/2)/1.5,z-Z/2)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
                 {
-                    *vtk_at(data,x,y,z,0,X,Y,NC) = 0.0f;
-                    *vtk_at(data,x,y,z,1,X,Y,NC) = 1.0f;
+                    *vtk_at(a_data,x,y,z,X,Y) = 0.0f;
+                    *vtk_at(b_data,x,y,z,X,Y) = 1.0f;
                 }
                 else 
                 {
-                    *vtk_at(data,x,y,z,0,X,Y,NC) = 1.0f;
-                    *vtk_at(data,x,y,z,1,X,Y,NC) = 0.0f;
+                    *vtk_at(a_data,x,y,z,X,Y) = 1.0f;
+                    *vtk_at(b_data,x,y,z,X,Y) = 0.0f;
                 }
             }
         }
     }
-    image->Modified();
+    a_image->Modified();
+    b_image->Modified();
     this->timesteps_taken = 0;
 }

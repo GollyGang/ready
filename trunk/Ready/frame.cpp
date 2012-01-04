@@ -415,7 +415,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
     this->system = sys;
-    InitializeVTKPipeline(this->pVTKWindow,this->system);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,1); // TODO: allow user to change which chemical is being visualized
     this->UpdateWindows();
 }
 
@@ -488,9 +488,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(!this->is_running) return;
 
-    int n_cells = this->system->GetImage()->GetDimensions()[0]
-                * this->system->GetImage()->GetDimensions()[1]
-                * this->system->GetImage()->GetDimensions()[2];
+    int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
 
     double time_before = get_time_in_seconds();
 

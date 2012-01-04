@@ -20,6 +20,7 @@
 
 // STL:
 #include <string>
+#include <vector>
 
 class vtkImageData;
 
@@ -34,6 +35,9 @@ class BaseRD
         // e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality() const;
 
+        int GetX() const;
+        int GetY() const;
+        int GetZ() const;
         int GetNumberOfChemicals() const;
 
         // advance the RD system by n timesteps
@@ -44,7 +48,7 @@ class BaseRD
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
 
-        vtkImageData* GetImage() const;
+        vtkImageData* GetImage(int iChemical) const;
 
         virtual bool HasEditableProgram() const =0;
         void SetProgram(std::string s);
@@ -55,7 +59,7 @@ class BaseRD
 
     protected:
 
-        vtkImageData *image;
+        std::vector<vtkImageData*> images; // one for each chemical
 
         float timestep;
         int timesteps_taken;
@@ -65,10 +69,10 @@ class BaseRD
 
     protected:
 
-        void AllocateImage(int x,int y,int z,int nc);
+        void AllocateImages(int x,int y,int z,int nc);
 
-        static vtkImageData* AllocateVTKImage(int x,int y,int z,int nc);
-        static float* vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC);
+        static vtkImageData* AllocateVTKImage(int x,int y,int z);
+        static float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
 };
 
 #endif

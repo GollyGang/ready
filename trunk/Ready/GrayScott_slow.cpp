@@ -39,41 +39,49 @@ GrayScott_slow::GrayScott_slow()
     // for spots:
     this->k = 0.064f;
     this->f = 0.035f;
-    this->buffer_image = NULL;
 }
 
 void GrayScott_slow::Allocate(int x,int y)
 {
-    this->AllocateImage(x,y,1,2);
-    // also allocate our buffer image
-    this->buffer_image = AllocateVTKImage(x,y,1,2);
+    this->AllocateImages(x,y,1,2);
+    // also allocate our buffer images
+    this->buffer_images.resize(2);
+    for(int i=0;i<2;i++)
+        this->buffer_images[i] = AllocateVTKImage(x,y,1);
 }
 
 GrayScott_slow::~GrayScott_slow()
 {
-    if(this->buffer_image)
-        this->buffer_image->Delete();
+    for(int i=0;i<(int)this->buffer_images.size();i++)
+    {
+        if(this->buffer_images[i])
+            this->buffer_images[i]->Delete();
+    }
 }
 
 void GrayScott_slow::Update(int n_steps)
 {
+    const int X = this->GetX();
+    const int Y = this->GetY();
+
     // take approximately n_steps
     for(int iStepPair=0;iStepPair<(n_steps+1)/2;iStepPair++)
     {
         for(int iStep=0;iStep<2;iStep++)
         {
-            vtkImageData *from_im,*to_im;
+            float *old_a,*new_a,*old_b,*new_b;
             switch(iStep) {
-                case 0: from_im = this->GetImage(); to_im = this->buffer_image; break;
-                case 1: from_im = this->buffer_image; to_im = this->GetImage(); break;
+                case 0: old_a = static_cast<float*>(this->images[0]->GetScalarPointer()); 
+                        old_b = static_cast<float*>(this->images[1]->GetScalarPointer()); 
+                        new_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer()); 
+                        new_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer()); 
+                        break;
+                case 1: old_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer()); 
+                        old_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer()); 
+                        new_a = static_cast<float*>(this->images[0]->GetScalarPointer()); 
+                        new_b = static_cast<float*>(this->images[1]->GetScalarPointer()); 
+                        break;
             }
-
-            const int X = from_im->GetDimensions()[0];
-            const int Y = from_im->GetDimensions()[1];
-            const int NC = from_im->GetNumberOfScalarComponents();
-
-            float* from_data = static_cast<float*>(from_im->GetScalarPointer());
-            float* to_data = static_cast<float*>(to_im->GetScalarPointer());
 
             for(int x=0;x<X;x++)
             {
@@ -84,45 +92,45 @@ void GrayScott_slow::Update(int n_steps)
                     int y_prev = (y-1+Y)%Y;
                     int y_next = (y+1)%Y;
 
-                    float aval = *vtk_at(from_data,x,y,0,0,X,Y,NC);
-                    float bval = *vtk_at(from_data,x,y,0,1,X,Y,NC);
+                    float aval = *vtk_at(old_a,x,y,0,X,Y);
+                    float bval = *vtk_at(old_b,x,y,0,X,Y);
 
                     // compute the Laplacians of a and b
                     // 5-point stencil:
-                    float dda = *vtk_at(from_data,x,y_prev,0,0,X,Y,NC) +
-                                *vtk_at(from_data,x,y_next,0,0,X,Y,NC) +
-                                *vtk_at(from_data,x_prev,y,0,0,X,Y,NC) + 
-                                *vtk_at(from_data,x_next,y,0,0,X,Y,NC) - 4*aval;
-                    float ddb = *vtk_at(from_data,x,y_prev,0,1,X,Y,NC) +
-                                *vtk_at(from_data,x,y_next,0,1,X,Y,NC) +
-                                *vtk_at(from_data,x_prev,y,0,1,X,Y,NC) + 
-                                *vtk_at(from_data,x_next,y,0,1,X,Y,NC) - 4*bval;
+                    float dda = *vtk_at(old_a,x,y_prev,0,X,Y) +
+                                *vtk_at(old_a,x,y_next,0,X,Y) +
+                                *vtk_at(old_a,x_prev,y,0,X,Y) + 
+                                *vtk_at(old_a,x_next,y,0,X,Y) - 4*aval;
+                    float ddb = *vtk_at(old_b,x,y_prev,0,X,Y) +
+                                *vtk_at(old_b,x,y_next,0,X,Y) +
+                                *vtk_at(old_b,x_prev,y,0,X,Y) + 
+                                *vtk_at(old_b,x_next,y,0,X,Y) - 4*bval;
      
                     // compute the new rate of change of a and b
                     float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
                     float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
 
                     // apply the change
-                    *vtk_at(to_data,x,y,0,0,X,Y,NC) = aval + this->timestep * da;
-                    *vtk_at(to_data,x,y,0,1,X,Y,NC) = bval + this->timestep * db;
+                    *vtk_at(new_a,x,y,0,X,Y) = aval + this->timestep * da;
+                    *vtk_at(new_b,x,y,0,X,Y) = bval + this->timestep * db;
                 }
             }
         }
         this->timesteps_taken+=2;
     }
-    this->GetImage()->Modified();
+    this->images[0]->Modified();
+    this->images[1]->Modified();
 }
 
 void GrayScott_slow::InitWithBlobInCenter()
 {
-    vtkImageData *image = this->GetImage();
-    assert(image);
+    const int X = this->GetX();
+    const int Y = this->GetY();
 
-    const int X = image->GetDimensions()[0];
-    const int Y = image->GetDimensions()[1];
-    const int NC = image->GetNumberOfScalarComponents();
-
-    float* data = static_cast<float*>(image->GetScalarPointer());
+    vtkImageData *a_image = this->images[0];
+    vtkImageData *b_image = this->images[1];
+    float* a_data = static_cast<float*>(a_image->GetScalarPointer());
+    float* b_data = static_cast<float*>(b_image->GetScalarPointer());
 
     for(int x=0;x<X;x++)
     {
@@ -130,16 +138,17 @@ void GrayScott_slow::InitWithBlobInCenter()
         {
             if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
             {
-                *vtk_at(data,x,y,0,0,X,Y,NC) = 0.0f;
-                *vtk_at(data,x,y,0,1,X,Y,NC) = 1.0f;
+                *vtk_at(a_data,x,y,0,X,Y) = 0.0f;
+                *vtk_at(b_data,x,y,0,X,Y) = 1.0f;
             }
             else 
             {
-                *vtk_at(data,x,y,0,0,X,Y,NC) = 1.0f;
-                *vtk_at(data,x,y,0,1,X,Y,NC) = 0.0f;
+                *vtk_at(a_data,x,y,0,X,Y) = 1.0f;
+                *vtk_at(b_data,x,y,0,X,Y) = 0.0f;
             }
         }
     }
-    this->GetImage()->Modified();
+    a_image->Modified();
+    b_image->Modified();
     this->timesteps_taken = 0;
 }

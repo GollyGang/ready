@@ -55,32 +55,33 @@
 #include <vtkPiecewiseFunction.h>
 #include <vtkVolumeProperty.h>
 #include <vtkVolume.h>
-#include <vtkImageExtractComponents.h>
 #include <vtkExtractVOI.h>
 
 // STL:
 #include <stdexcept>
 using namespace std;
 
-void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
-void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
+// TODO: allow visualizations that use more than one chemical
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
+void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
+void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
+
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
 {
     assert(pVTKWindow);
     assert(system);
 
     switch(system->GetDimensionality())
     {
-        case 2: InitializeVTKPipeline_2D(pVTKWindow,system); break;
-        case 3: InitializeVTKPipeline_3D(pVTKWindow,system); break;
+        case 2: InitializeVTKPipeline_2D(pVTKWindow,system,iActiveChemical); break;
+        case 3: InitializeVTKPipeline_3D(pVTKWindow,system,iActiveChemical); break;
         default:
             throw runtime_error("InitializeVTKPipeline : Unsupported dimensionality");
     }
     pVTKWindow->Refresh(false);
 }
 
-void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
+void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
 {
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -99,9 +100,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(system->GetImage());
-        image_mapper->SetActiveComponent(1);
-        // TODO: will need to support many more ways of rendering
+        image_mapper->SetInput(system->GetImage(iActiveChemical));
       
         // an actor determines how a scene object is displayed
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
@@ -122,7 +121,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // also add a displacement-mapped surface
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInput(system->GetImage());
+        plane->SetInput(system->GetImage(iActiveChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
         warp->SetScaleFactor(5.0);
@@ -146,7 +145,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     pVTKWindow->SetInteractorStyle(is);
 }
 
-void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system)
+void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
 {
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -157,58 +156,47 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     {
         // use volume rendering
 
-        // extract desired component
-        vtkSmartPointer<vtkImageExtractComponents> get_component = vtkSmartPointer<vtkImageExtractComponents>::New();
-        get_component->SetInput(system->GetImage());
-        get_component->SetComponents(1);
-
         // convert image to unsigned char
         vtkSmartPointer<vtkImageShiftScale> char_image = vtkSmartPointer<vtkImageShiftScale>::New();
-        char_image->SetInputConnection(get_component->GetOutputPort());
+        char_image->SetInput(system->GetImage(iActiveChemical));
         char_image->SetScale(255.0);
         char_image->SetOutputScalarTypeToUnsignedChar();
 
         // The volume will be displayed by ray-cast alpha compositing.
         // A ray-cast mapper is needed to do the ray-casting, and a
         // compositing function is needed to do the compositing along the ray. 
-        vtkSmartPointer<vtkVolumeRayCastCompositeFunction> rayCastFunction =
-        vtkSmartPointer<vtkVolumeRayCastCompositeFunction>::New();
+        vtkSmartPointer<vtkVolumeRayCastCompositeFunction> rayCastFunction = vtkSmartPointer<vtkVolumeRayCastCompositeFunction>::New();
 
-        vtkSmartPointer<vtkVolumeRayCastMapper> volumeMapper =
-        vtkSmartPointer<vtkVolumeRayCastMapper>::New();
+        vtkSmartPointer<vtkVolumeRayCastMapper> volumeMapper = vtkSmartPointer<vtkVolumeRayCastMapper>::New();
         volumeMapper->SetInput(char_image->GetOutput());
         volumeMapper->SetVolumeRayCastFunction(rayCastFunction);
 
         // The color transfer function maps voxel intensities to colors.
-        vtkSmartPointer<vtkColorTransferFunction>volumeColor =
-        vtkSmartPointer<vtkColorTransferFunction>::New();
-        volumeColor->AddRGBPoint(0,   1,1,1);
-        volumeColor->AddRGBPoint(255,   1.0, 1.0, 1.0);
+        vtkSmartPointer<vtkColorTransferFunction>volumeColor = vtkSmartPointer<vtkColorTransferFunction>::New();
+        volumeColor->AddRGBPoint(0,1,1,1);
+        volumeColor->AddRGBPoint(255,1,1,1);
 
         // The opacity transfer function is used to control the opacity
         // of different tissue types.
-        vtkSmartPointer<vtkPiecewiseFunction> volumeScalarOpacity =
-        vtkSmartPointer<vtkPiecewiseFunction>::New();
-        volumeScalarOpacity->AddPoint(0,   0.0);
-        volumeScalarOpacity->AddPoint(60, 0.0);
-        volumeScalarOpacity->AddPoint(80, 0.8);
-        volumeScalarOpacity->AddPoint(255, 1.0);
+        vtkSmartPointer<vtkPiecewiseFunction> volumeScalarOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+        volumeScalarOpacity->AddPoint(0,0.0);
+        volumeScalarOpacity->AddPoint(60,0.0);
+        volumeScalarOpacity->AddPoint(80,0.8);
+        volumeScalarOpacity->AddPoint(255,1.0);
 
         // The gradient opacity function is used to decrease the opacity
         // in the "flat" regions of the volume while maintaining the opacity
         // at the boundaries between tissue types.  The gradient is measured
         // as the amount by which the intensity changes over unit distance.
         // For most medical data, the unit distance is 1mm.
-        vtkSmartPointer<vtkPiecewiseFunction> volumeGradientOpacity =
-        vtkSmartPointer<vtkPiecewiseFunction>::New();
-        volumeGradientOpacity->AddPoint(0,   0.0);
-        volumeGradientOpacity->AddPoint(10,  0.5);
-        volumeGradientOpacity->AddPoint(100, 1.0);
+        vtkSmartPointer<vtkPiecewiseFunction> volumeGradientOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
+        volumeGradientOpacity->AddPoint(0,0.0);
+        volumeGradientOpacity->AddPoint(10,0.5);
+        volumeGradientOpacity->AddPoint(100,1.0);
  
         // The VolumeProperty attaches the color and opacity functions to the
         // volume, and sets other volume properties.
-        vtkSmartPointer<vtkVolumeProperty> volumeProperty =
-        vtkSmartPointer<vtkVolumeProperty>::New();
+        vtkSmartPointer<vtkVolumeProperty> volumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
         volumeProperty->SetColor(volumeColor);
         volumeProperty->SetScalarOpacity(volumeScalarOpacity);
         volumeProperty->SetGradientOpacity(volumeGradientOpacity);
@@ -220,8 +208,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
         // The vtkVolume is a vtkProp3D (like a vtkActor) and controls the position
         // and orientation of the volume in world coordinates.
-        vtkSmartPointer<vtkVolume> volume =
-        vtkSmartPointer<vtkVolume>::New();
+        vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
         volume->SetMapper(volumeMapper);
         volume->SetProperty(volumeProperty);
 
@@ -235,9 +222,8 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // turns the 3d grid of sampled values into a polygon mesh for rendering,
         // by making a surface that contours the volume at a specified level
         vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInput(system->GetImage());
+        surface->SetInput(system->GetImage(iActiveChemical));
         surface->SetValue(0, 0.25);
-        surface->SetArrayComponent(1);
         // TODO: allow user to control the contour level
 
         // a mapper converts scene objects to graphics primitives
@@ -266,15 +252,19 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // add the bounding box
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(system->GetImage()->GetBounds());
+        box->SetBounds(system->GetImage(iActiveChemical)->GetBounds());
+
         vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
         edges->SetInputConnection(box->GetOutputPort());
+
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(edges->GetOutputPort());
+
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->SetColor(0,0,0);  
         actor->GetProperty()->SetAmbient(1);
+
         pRenderer->AddActor(actor);
     }
 
@@ -289,16 +279,13 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
         // extract a slice
         vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-        voi->SetInput(system->GetImage());
-        voi->SetVOI(0,system->GetImage()->GetDimensions()[0],
-            0,system->GetImage()->GetDimensions()[1],
-            system->GetImage()->GetDimensions()[2]/2.0,system->GetImage()->GetDimensions()[2]/2.0);
+        voi->SetInput(system->GetImage(iActiveChemical));
+        voi->SetVOI(0,system->GetX(),0,system->GetY(),system->GetZ()/2.0,system->GetZ()/2.0);
 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
         image_mapper->SetInputConnection(voi->GetOutputPort());
-        image_mapper->SetActiveComponent(1);
       
         // an actor determines how a scene object is displayed
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
@@ -312,6 +299,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         {
             vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
             scalar_bar->SetLookupTable(lut);
+
             pRenderer->AddActor2D(scalar_bar);
         }
     }
