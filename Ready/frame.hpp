@@ -26,6 +26,9 @@
 #include <wx/aui/aui.h>
 #include <wx/treectrl.h>
 
+// STL:
+#include <vector>
+
 class wxVTKRenderWindowInteractor;
 class BaseRD;
 
@@ -64,7 +67,6 @@ private:
     void OnQuit(wxCommandEvent& event);
 
     // view menu
-    void OnDemo(wxCommandEvent& event);
     void OnToggleViewPane(wxCommandEvent& event);
     void OnUpdateViewPane(wxUpdateUIEvent& event);
     void OnRestoreDefaultPerspective(wxCommandEvent& event);
@@ -88,12 +90,14 @@ private:
     // help menu
     void OnAbout(wxCommandEvent& event);
 
-    // other event handlers
+    // controls
+    void OnPatternsTreeSelChanged(wxTreeEvent& event);
 
+    // other event handlers
     void OnIdle(wxIdleEvent& event);
     void OnSize(wxSizeEvent& event);
 
-    // internal functions
+private:
 
     void InitializeMenus();
     void InitializePanes();
@@ -106,6 +110,7 @@ private:
     void SetStatusBarText();
 
     wxTreeCtrl* CreatePatternsCtrl();
+    std::vector<wxTreeItemId> demo_ids;
 
     DECLARE_EVENT_TABLE()
 };

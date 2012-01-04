@@ -1,7 +1,4 @@
 before 0.1 release:
-- decide whether using single- or multi-component vtkImageData's (consider: SSE, float4 in opencl, rendering)
-- allow user to select OpenCL platform and device
-- move demos to patterns pane
 
 before 0.x release
 - file format for saving/loading rules and patterns
@@ -16,8 +13,10 @@ before 1.0 release:
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - save out scene (e.g. OBJ) for external render
+- SSE for non-OpenCL implementations (will assume all target cpus support SSE)
 
 future ideas:
+- allow user to change OpenCL platform and device while a pattern is running
 - parameter map(s) in a separate window, to allow user to explore parameters 
 - full control over scene graph; nodes+connections interface
 - different topologies: e.g. arbitrary 2d mesh embedded in 3d: zebra, etc.

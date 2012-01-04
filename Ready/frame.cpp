@@ -62,11 +62,10 @@ namespace ID { enum {
    // we can use IDs higher than this for our own purposes
    Dummy = wxID_HIGHEST+1,
 
+   // controls
+   PatternsTree,
+
    // view menu
-   GrayScott2DDemo,
-   GrayScott2DOpenCLDemo,
-   GrayScott3DDemo,
-   GrayScott3DOpenCLDemo,
    PatternsPane,
    KernelPane,
    CanvasPane,
@@ -98,16 +97,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     // file menu
     EVT_MENU(ID::Quit,  MyFrame::OnQuit)
     // view menu
-    EVT_MENU(ID::GrayScott2DDemo,MyFrame::OnDemo)
-    EVT_MENU(ID::GrayScott2DOpenCLDemo,MyFrame::OnDemo)
-    EVT_MENU(ID::GrayScott3DDemo,MyFrame::OnDemo)
-    EVT_MENU(ID::GrayScott3DOpenCLDemo,MyFrame::OnDemo)
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::KernelPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::KernelPane, MyFrame::OnUpdateViewPane)
-    EVT_MENU(ID::CanvasPane, MyFrame::OnToggleViewPane)
-    EVT_UPDATE_UI(ID::CanvasPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective,MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
     // settings menu
@@ -125,6 +118,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
     // help menu
     EVT_MENU(ID::About, MyFrame::OnAbout)
+    // controls
+    EVT_TREE_SEL_CHANGED(ID::PatternsTree,MyFrame::OnPatternsTreeSelChanged)
 END_EVENT_TABLE()
 
 // frame constructor
@@ -152,7 +147,7 @@ MyFrame::MyFrame(const wxString& title)
     this->aui_mgr.Update();
 
     // initialize an RD system to get us started
-    this->LoadDemo(ID::GrayScott3DDemo);
+    this->LoadDemo(2);
 }
 
 void MyFrame::InitializeMenus()
@@ -161,23 +156,17 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_ANY, _("&Open\tCtrl-O"), _("Open a pattern"));
-        menu->AppendSeparator();
-        menu->Append(wxID_ANY, _("&Save\tCtrl-S"), _("Save the current pattern"));
-        menu->AppendSeparator();
-        menu->Append(ID::Quit, _("E&xit\tAlt-X"), _("Quit this program"));
+        //menu->Append(wxID_ANY, _("&Open\tCtrl-O"), _("Open a pattern"));
+        //menu->AppendSeparator();
+        //menu->Append(wxID_ANY, _("&Save\tCtrl-S"), _("Save the current pattern"));
+        //menu->AppendSeparator();
+        menu->Append(ID::Quit, _("E&xit\tAlt-F4"), _("Quit this program"));
         menuBar->Append(menu, _("&File"));
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::GrayScott2DDemo,_("GrayScott 2D demo"),_("Show a 2D demo"));
-        menu->Append(ID::GrayScott2DOpenCLDemo,_("GrayScott 2D OpenCL demo"),_("Show a 2D OpenCL demo"));
-        menu->Append(ID::GrayScott3DDemo,_("GrayScott 3D demo"),_("Show a 3D demo"));
-        menu->Append(ID::GrayScott3DOpenCLDemo,_("GrayScott 3D OpenCL demo"),_("Show a 3D OpenCL demo"));
-        menu->AppendSeparator();
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
         menu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
-        menu->AppendCheckItem(ID::CanvasPane, _("&Canvas"), _("View the canvas pane"));
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
         menu->AppendSeparator();
@@ -210,11 +199,11 @@ void MyFrame::InitializeMenus()
 
 void MyFrame::InitializePanes()
 {
-    // a patterns file structure pane (currently just a placeholder)
+    // a patterns file structure pane (currently just has some hard-wired demos)
     this->aui_mgr.AddPane(this->CreatePatternsCtrl(), wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
                   .Caption(_("Patterns Pane"))
-                  .Bottom()
+                  .Left()
                   .BestSize(300,300)
                   .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
@@ -237,6 +226,7 @@ void MyFrame::InitializePanes()
                       .Right()
                       .BestSize(400,400)
                       .Layer(1) // layer 1 is further towards the edge
+                      .Hide()
                       );
     }
     // a 'settings' pane (just a placeholder)
@@ -244,7 +234,8 @@ void MyFrame::InitializePanes()
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::SystemSettingsPane))
                   .Caption(_("System"))
-                  .Top()
+                  .Bottom()
+                  .Hide()
                   );
     // the VTK window goes in the center pane (always visible) - got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
@@ -318,7 +309,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 wxTreeCtrl* MyFrame::CreatePatternsCtrl()
 {
-    wxTreeCtrl* tree = new wxTreeCtrl(this, wxID_ANY,
+    wxTreeCtrl* tree = new wxTreeCtrl(this, ID::PatternsTree,
                                       wxPoint(0,0), wxSize(240,250),
                                       wxTR_DEFAULT_STYLE | wxNO_BORDER);
 
@@ -327,25 +318,21 @@ wxTreeCtrl* MyFrame::CreatePatternsCtrl()
     imglist->Add(wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16,16)));
     tree->AssignImageList(imglist);
 
-    // TODO: parse the Patterns folder; code below is just a placeholder!
-
-    wxTreeItemId root = tree->AddRoot(_("Patterns folder"), 0);
-    wxArrayTreeItemIds items;
-
-    items.Add(tree->AppendItem(root, wxT("Gray-Scott"), 0));
-    items.Add(tree->AppendItem(root, wxT("FitzHugh-Nagumo"), 0));
-
-    int i, count;
-    for (i = 0, count = items.Count(); i < count; ++i)
+    wxTreeItemId root = tree->AddRoot(_("Patterns"), 0);
     {
-        wxTreeItemId id = items.Item(i);
-        tree->AppendItem(id, wxT("Dots_demo.txt"), 1);
-        tree->AppendItem(id, wxT("Stripes_demo.txt"), 1);
-        tree->AppendItem(id, wxT("Waves_demo.txt"), 1);
+        wxTreeItemId demos = tree->AppendItem(root, wxT("CPU demos"), 0);
+        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"),1));
+        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
+        tree->Expand(demos);
     }
-
+    {
+        wxTreeItemId demos = tree->AppendItem(root, wxT("OpenCL demos"), 0);
+        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
+        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
+        tree->Expand(demos);
+    }
     tree->Expand(root);
-    tree->Expand(items.front());
+    // TODO: parse the Patterns folder and add those instead of these hard-wired demos
 
     return tree;
 }
@@ -492,7 +479,8 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
     double time_before = get_time_in_seconds();
 
-    try {
+    try 
+    {
         this->system->Update(this->timesteps_per_render); // TODO: user controls speed
     }
     catch(const exception& e)
@@ -531,33 +519,29 @@ void MyFrame::SetStatusBarText()
     SetStatusText(txt);
 }
 
-void MyFrame::OnDemo(wxCommandEvent& event)
-{
-    this->LoadDemo(event.GetId());
-}
-
 void MyFrame::LoadDemo(int iDemo)
 {
-    try {
+    try 
+    {
         switch(iDemo) 
         {
-            case ID::GrayScott2DDemo:
+            case 0:
                 {
-                    GrayScott_slow *gs = new GrayScott_slow();
-                    gs->Allocate(80,50);
-                    gs->InitWithBlobInCenter();
-                    this->SetCurrentRDSystem(gs);
+                    GrayScott_slow *s = new GrayScott_slow();
+                    s->Allocate(80,50);
+                    s->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(s);
                 }
                 break;
-            case ID::GrayScott3DDemo: 
+            case 1: 
                 {
-                    GrayScott_slow_3D *gs = new GrayScott_slow_3D();
-                    gs->Allocate(30,25,20);
-                    gs->InitWithBlobInCenter();
-                    this->SetCurrentRDSystem(gs);
+                    GrayScott_slow_3D *s = new GrayScott_slow_3D();
+                    s->Allocate(30,25,20);
+                    s->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(s);
                 }
                 break;
-            case ID::GrayScott2DOpenCLDemo:
+            case 2:
                 {
                     OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
                     s->SetPlatform(this->iOpenCLPlatform);
@@ -567,7 +551,7 @@ void MyFrame::LoadDemo(int iDemo)
                     this->SetCurrentRDSystem(s);
                 }
                 break;
-            case ID::GrayScott3DOpenCLDemo:
+            case 3:
                 {
                     OpenCL3D_2Chemicals *s = new OpenCL3D_2Chemicals();
                     s->SetPlatform(this->iOpenCLPlatform);
@@ -598,7 +582,8 @@ void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
 
 void MyFrame::OnReplaceProgram(wxCommandEvent& event)
 {
-    try {
+    try 
+    {
         this->system->TestProgram(string(this->kernel_pane->GetValue().mb_str()));
     }
     catch(const runtime_error& e)
@@ -631,7 +616,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
 {
     // TODO: merge this with GetOpenCL diagnostics?
     wxArrayString choices;
-    int iSelection;
+    int iOldSelection;
     int np = OpenCL_RD::GetNumberOfPlatforms();
     for(int ip=0;ip<np;ip++)
     {
@@ -639,7 +624,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
         for(int id=0;id<nd;id++)
         {
             if(ip==this->iOpenCLPlatform && id==this->iOpenCLDevice)
-                iSelection = choices.size();
+                iOldSelection = choices.size();
             wxString s = OpenCL_RD::GetPlatformDescription(ip);
             s << " : " << OpenCL_RD::GetDeviceDescription(ip,id);
             choices.Add(s);
@@ -647,21 +632,29 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     }
     wxSingleChoiceDialog dlg(this,_("Select the OpenCL device to use:"),_("Select OpenCL device"),
         choices);
-    dlg.SetSelection(iSelection);
+    dlg.SetSelection(iOldSelection);
     if(dlg.ShowModal()!=wxID_OK) return;
-    iSelection = dlg.GetSelection();
+    int iNewSelection = dlg.GetSelection();
+    if(iNewSelection != iOldSelection)
+        wxMessageBox(_("The selected device will be used the next time an OpenCL pattern is loaded."));
     int dc = 0;
     for(int ip=0;ip<np;ip++)
     {
         int nd = OpenCL_RD::GetNumberOfDevices(ip);
-        if(iSelection < nd)
+        if(iNewSelection < nd)
         {
             this->iOpenCLPlatform = ip;
-            this->iOpenCLDevice = iSelection;
+            this->iOpenCLDevice = iNewSelection;
             break;
         }
-        iSelection -= nd;
+        iNewSelection -= nd;
     }
-    // TODO: how to tell the current system that the desired platform/device may have changed?
-    // (will currently only take effect the next time the user loads a new system)
+    // TODO: hot-change the current RD system
+}
+
+void MyFrame::OnPatternsTreeSelChanged(wxTreeEvent& event)
+{
+    for(int i=0;i<(int)this->demo_ids.size();i++)
+        if(event.GetItem()==this->demo_ids[i])
+            this->LoadDemo(i);
 }
