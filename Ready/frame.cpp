@@ -618,7 +618,22 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     // TODO: merge this with GetOpenCL diagnostics?
     wxArrayString choices;
     int iOldSelection;
-    int np = OpenCL_RD::GetNumberOfPlatforms();
+    int np;
+    try 
+    {
+        np = OpenCL_RD::GetNumberOfPlatforms();
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(_("OpenCL not available: ")+
+            wxString(e.what(),wxConvUTF8));
+        return;
+    }
+    catch(...)
+    {
+        wxMessageBox(_("OpenCL not available"));
+        return;
+    }
     for(int ip=0;ip<np;ip++)
     {
         int nd = OpenCL_RD::GetNumberOfDevices(ip);
