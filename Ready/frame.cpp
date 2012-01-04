@@ -300,7 +300,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     title << _("Ready ") << _T(STR(READY_VERSION));
     info.SetName(title);
     info.SetDescription(_("A program for exploring reaction-diffusion systems.\n\nReady is free software, distributed under the GPLv3 license."));
-    info.SetCopyright(_T("(C) 2011 The Ready Bunch"));
+    info.SetCopyright(_T("(C) 2011, 2012 The Ready Bunch"));
     info.AddDeveloper(_T("Tim Hutton"));
     info.AddDeveloper(_T("Robert Munafo"));
     info.AddDeveloper(_T("Andrew Trevorrow"));
