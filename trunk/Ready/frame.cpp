@@ -141,13 +141,14 @@ MyFrame::MyFrame(const wxString& title)
     SetStatusText(_("Ready"));
 
     this->InitializePanes();
-
+    
     this->default_perspective = this->aui_mgr.SavePerspective();
     this->LoadSettings();
     this->aui_mgr.Update();
 
     // initialize an RD system to get us started
-    this->LoadDemo(2);
+    
+    this->LoadDemo(1);
 }
 
 void MyFrame::InitializeMenus()
@@ -625,8 +626,8 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
         {
             if(ip==this->iOpenCLPlatform && id==this->iOpenCLDevice)
                 iOldSelection = choices.size();
-            wxString s = OpenCL_RD::GetPlatformDescription(ip);
-            s << " : " << OpenCL_RD::GetDeviceDescription(ip,id);
+            wxString s(OpenCL_RD::GetPlatformDescription(ip).c_str(),wxConvUTF8);
+            s << _T(" : ") << wxString(OpenCL_RD::GetDeviceDescription(ip,id).c_str(),wxConvUTF8);
             choices.Add(s);
         }
     }
