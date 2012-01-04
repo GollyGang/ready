@@ -1,4 +1,4 @@
-#  Copyright 2011, The Ready Bunch
+#  Copyright 2011, 2012 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -25,7 +25,7 @@ endif(COMMAND cmake_policy)
 
 project( Ready )
 
-set( READY_VERSION 0.0.1 )
+set( READY_VERSION 0.1 )
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if(APPLE OR WIN32)

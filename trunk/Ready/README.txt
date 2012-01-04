@@ -4,9 +4,11 @@
 
 Build with CMake.
 Dependencies: VTK, wxWidgets, any OpenCL SDK
+Tested on: Windows, Linux, MacOS
+For help: http://code.google.com/p/reaction-diffusion/
 
 ---------------------------------------------------------------------------------
-                                   About
+                              Acknowledgements
 ---------------------------------------------------------------------------------
 
 Based on Greg Turk's reaction-diffusion code, from:
@@ -42,11 +44,14 @@ Copyright (c) Greg Turk, 1991
 
 ==end==
 
+The code for dynamically-linking OpenCL (OpenCL_Dyn_Load.c and .h) is from the 
+ElectroMag project: http://code.google.com/p/electromag-with-cuda   Thanks!
+
 ---------------------------------------------------------------------------------
                                    License
 ---------------------------------------------------------------------------------
 
-Copyright 2011, The Ready Bunch
+Copyright 2011, 2012 The Ready Bunch
 
 The Ready Bunch is: Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki
 
