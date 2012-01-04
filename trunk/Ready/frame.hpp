@@ -58,6 +58,7 @@ private:
     double frames_per_second,million_cell_generations_per_second;
 
     wxString default_perspective;
+    wxString last_used_screenshot_folder;
 
     int iOpenCLPlatform,iOpenCLDevice;
 

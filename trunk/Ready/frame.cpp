@@ -147,7 +147,6 @@ MyFrame::MyFrame(const wxString& title)
     this->aui_mgr.Update();
 
     // initialize an RD system to get us started
-    
     this->LoadDemo(1);
 }
 
@@ -171,7 +170,7 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
         menu->AppendSeparator();
-        menu->Append(ID::Screenshot, _("Save &screenshot"), _("Save a screenshot of the current view"));
+        menu->Append(ID::Screenshot, _("Save &screenshot\tF3"), _("Save a screenshot of the current view"));
         menuBar->Append(menu, _("&View"));
     }
     {   // settings menu:
@@ -265,6 +264,7 @@ void MyFrame::LoadSettings()
     this->SetPosition(wxPoint(x,y));
     config.Read(_T("iOpenCLPlatform"),&this->iOpenCLPlatform);
     config.Read(_T("iOpenCLDevice"),&this->iOpenCLDevice);
+    config.Read(_T("LastUsedScreenshotFolder"),&this->last_used_screenshot_folder);
 }
 
 void MyFrame::SaveSettings()
@@ -278,6 +278,7 @@ void MyFrame::SaveSettings()
     config.Write(_T("AppY"),this->GetPosition().y);
     config.Write(_T("iOpenCLPlatform"),this->iOpenCLPlatform);
     config.Write(_T("iOpenCLDevice"),this->iOpenCLDevice);
+    config.Write(_T("LastUsedScreenshotFolder"),this->last_used_screenshot_folder);
 }
 
 MyFrame::~MyFrame()
@@ -372,21 +373,35 @@ void MyFrame::OnSize(wxSizeEvent& event)
 
 void MyFrame::OnScreenshot(wxCommandEvent& event)
 {
-    wxString filename,extension;
+    // find an unused filename
+    const wxString default_filename_root = ("Ready_screenshot_");
+    const wxString default_filename_ext = ("png");
+    int unused_value = 0;
+    wxString filename;
+    wxString extension,folder;
+    folder = this->last_used_screenshot_folder;
+    do {
+        filename = wxString::Format(_("%s%04d.%s"),default_filename_root,unused_value,default_filename_ext);
+        unused_value++;
+    } while(::wxFileExists(folder+_T("\\")+filename));
+
+    // ask the user for confirmation
     bool accepted = true;
     do {
-        filename = wxFileSelector(_("Specify the screenshot filename:"),_T("."),_("Ready_screenshot_00.png"),_T("png"),
+        filename = wxFileSelector(_("Specify the screenshot filename:"),folder,filename,default_filename_ext,
             _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
             wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
         if(filename.empty()) return; // user cancelled
         // validate
-        wxFileName::SplitPath(filename,NULL,NULL,&extension);
+        wxFileName::SplitPath(filename,&folder,NULL,&extension);
         if(extension!=_T("png") && extension!=_T("jpg"))
         {
             wxMessageBox(_("Unsupported format"));
             accepted = false;
         }
     } while(!accepted);
+
+    this->last_used_screenshot_folder = folder;
 
     vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
     screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
