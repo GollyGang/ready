@@ -1,5 +1,4 @@
 before 0.1 release:
-- FIX: select opencl device shouldn't crash
 
 before 0.x release
 - file format for saving/loading rules and patterns
