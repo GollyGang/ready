@@ -41,5 +41,5 @@ class GrayScott_slow_3D : public BaseRD
     protected:
 
         float f,k,r_a,r_b;
-        vtkImageData *buffer_image;
+        std::vector<vtkImageData*> buffer_images;
 };

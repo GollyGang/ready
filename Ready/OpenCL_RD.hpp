@@ -74,7 +74,7 @@ class OpenCL_RD : public BaseRD
         cl_context context;
         cl_command_queue command_queue;
         cl_kernel kernel;
-        cl_mem buffer1,buffer2;
+        std::vector<cl_mem> buffers[2];
         size_t global_range[3],local_range[3];
 
         std::string kernel_function_name;

@@ -33,30 +33,46 @@ using namespace std;
 BaseRD::BaseRD()
 {
     this->timesteps_taken = 0;
-    this->image = NULL;
     this->need_reload_program = true;
 }
 
 BaseRD::~BaseRD()
 {
-    if(this->image)
-        this->image->Delete();
+    for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
+    {
+        if(this->images[iChem])
+            this->images[iChem]->Delete();
+    }
 }
 
 int BaseRD::GetDimensionality() const
 {
-    assert(this->image);
+    assert(this->images.front());
     int dimensionality=0;
     for(int iDim=0;iDim<3;iDim++)
-        if(this->image->GetDimensions()[iDim]>1)
+        if(this->images.front()->GetDimensions()[iDim]>1)
             dimensionality++;
     return dimensionality;
 }
 
+int BaseRD::GetX() const
+{
+    return this->images.front()->GetDimensions()[0];
+}
+
+int BaseRD::GetY() const
+{
+    return this->images.front()->GetDimensions()[1];
+}
+
+int BaseRD::GetZ() const
+{
+    return this->images.front()->GetDimensions()[2];
+}
+
 int BaseRD::GetNumberOfChemicals() const
 {
-    assert(this->image);
-    return this->image->GetNumberOfScalarComponents();
+    return this->images.size();
 }
 
 float BaseRD::GetTimestep() const
@@ -64,9 +80,9 @@ float BaseRD::GetTimestep() const
     return this->timestep; 
 }
 
-vtkImageData* BaseRD::GetImage() const
+vtkImageData* BaseRD::GetImage(int iChemical) const
 { 
-    return this->image; 
+    return this->images[iChemical];
 }
 
 int BaseRD::GetTimestepsTaken() const
@@ -74,16 +90,18 @@ int BaseRD::GetTimestepsTaken() const
     return this->timesteps_taken;
 }
 
-void BaseRD::AllocateImage(int x,int y,int z,int nc)
+void BaseRD::AllocateImages(int x,int y,int z,int nc)
 {
-    assert(!this->image);
-    this->image = AllocateVTKImage(x,y,z,nc);
+    this->images.resize(nc);
+    for(int i=0;i<nc;i++)
+        this->images[i] = AllocateVTKImage(x,y,z);
 }
 
-vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z,int nc)
+vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z)
 {
     vtkImageData *im = vtkImageData::New();
-    im->SetNumberOfScalarComponents(nc);
+    assert(im);
+    im->SetNumberOfScalarComponents(1);
     im->SetScalarTypeToFloat();
     im->SetDimensions(x,y,z);
     im->AllocateScalars();
@@ -92,10 +110,10 @@ vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z,int nc)
     return im;
 }
 
-float* BaseRD::vtk_at(float* origin,int x,int y,int z,int iC,int X,int Y,int NC)
+float* BaseRD::vtk_at(float* origin,int x,int y,int z,int X,int Y)
 {
-    // vtkImageData scalars stored as: component1,component2,...componentN,component1,.... for consecutive x, then y, then z
-    return origin + iC + (x + (y + z*Y)*X)*NC;
+    // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
+    return origin + x + X*(y + Y*z);
 }
 
 void BaseRD::SetProgram(string s)

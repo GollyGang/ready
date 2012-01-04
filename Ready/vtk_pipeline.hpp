@@ -18,4 +18,4 @@
 class wxVTKRenderWindowInteractor;
 class BaseRD;
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system);
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);

@@ -45,8 +45,9 @@ OpenCL_RD::~OpenCL_RD()
     clReleaseContext(this->context);
     clReleaseCommandQueue(this->command_queue);
     clReleaseKernel(this->kernel);
-    clReleaseMemObject(this->buffer1);
-    clReleaseMemObject(this->buffer2);
+    for(int io=0;io<2;io++)
+        for(int i=0;i<(int)this->buffers[io].size();i++)
+            clReleaseMemObject(this->buffers[io][i]);
 }
 
 void OpenCL_RD::SetPlatform(int i)
@@ -125,7 +126,7 @@ void OpenCL_RD::ReloadContextIfNeeded()
     this->command_queue = clCreateCommandQueue(this->context,this->device_id,NULL,&ret);
     throwOnError(ret,"OpenCL_RD::ReloadContextIfNeeded : Failed to create command queue: ");
 
-    this->need_reload_context = false;
+    this->need_reload_context = false; 
 }
 
 void OpenCL_RD::ReloadKernelIfNeeded()
@@ -163,9 +164,9 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : kernel creation failed: ");
 
     // decide the size of the work-groups
-    const size_t X = this->GetImage()->GetDimensions()[0];
-    const size_t Y = this->GetImage()->GetDimensions()[1];
-    const size_t Z = this->GetImage()->GetDimensions()[2];
+    const size_t X = this->GetX() / 4; // using float4 in kernels
+    const size_t Y = this->GetY();
+    const size_t Z = this->GetZ();
     this->global_range[0] = X;
     this->global_range[1] = Y;
     this->global_range[2] = Z;
@@ -192,56 +193,47 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
 void OpenCL_RD::CreateOpenCLBuffers()
 {
-    vtkImageData *image = this->GetImage();
-    assert(image);
-
-    const int X = image->GetDimensions()[0];
-    const int Y = image->GetDimensions()[1];
-    const int Z = image->GetDimensions()[2];
-    const int NC = image->GetNumberOfScalarComponents();
-    const unsigned long MEM_SIZE = sizeof(float) * X * Y * Z * NC;
+    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+    const int NC = this->GetNumberOfChemicals();
 
     cl_int ret;
 
-    this->buffer1 = clCreateBuffer(this->context, CL_MEM_READ_WRITE, MEM_SIZE, NULL, &ret);
-    throwOnError(ret,"OpenCL_RD::CreateBuffers : buffer creation failed: ");
-
-    this->buffer2 = clCreateBuffer(this->context, CL_MEM_READ_WRITE, MEM_SIZE, NULL, &ret);
-    throwOnError(ret,"OpenCL_RD::CreateBuffers : buffer creation failed: ");
+    for(int io=0;io<2;io++) // we create two buffers for each chemical, and switch between them
+    {
+        this->buffers[io].resize(NC);
+        for(int ic=0;ic<NC;ic++)
+        {
+            this->buffers[io][ic] = clCreateBuffer(this->context, CL_MEM_READ_WRITE, MEM_SIZE, NULL, &ret);
+            throwOnError(ret,"OpenCL_RD::CreateBuffers : buffer creation failed: ");
+        }
+    }
 }
 
 void OpenCL_RD::WriteToOpenCLBuffers()
 {
-    vtkImageData *image = this->GetImage();
-    assert(image);
+    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
 
-    const int X = image->GetDimensions()[0];
-    const int Y = image->GetDimensions()[1];
-    const int Z = image->GetDimensions()[2];
-    const int NC = image->GetNumberOfScalarComponents();
-
-    float* data = static_cast<float*>(image->GetScalarPointer());
-    const size_t MEM_SIZE = sizeof(float) * X * Y * Z * NC;
-
-    cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffer1, CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-    throwOnError(ret,"OpenCL_RD::WriteToBuffers : buffer writing failed: ");
+    const int io = 0;
+    for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
+    {
+        float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
+        cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[io][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
+        throwOnError(ret,"OpenCL_RD::WriteToBuffers : buffer writing failed: ");
+    }
 }
 
 void OpenCL_RD::ReadFromOpenCLBuffers()
 {
-    vtkImageData *image = this->GetImage();
-    assert(image);
+    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
 
-    const int X = image->GetDimensions()[0];
-    const int Y = image->GetDimensions()[1];
-    const int Z = image->GetDimensions()[2];
-    const int NC = image->GetNumberOfScalarComponents();
-
-    float* data = static_cast<float*>(image->GetScalarPointer());
-    const size_t MEM_SIZE = sizeof(float) * X * Y * Z * NC;
-
-    cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffer1, CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-    throwOnError(ret,"OpenCL_RD::ReadFromBuffers : buffer reading failed: ");
+    const int io = 0;
+    for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
+    {
+        float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
+        cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[io][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
+        throwOnError(ret,"OpenCL_RD::ReadFromBuffers : buffer reading failed: ");
+        this->images[ic]->Modified();
+    }
 }
 
 void OpenCL_RD::Update2Steps()
@@ -250,17 +242,27 @@ void OpenCL_RD::Update2Steps()
 
     cl_int ret;
 
-    ret = clSetKernelArg(this->kernel, 0, sizeof(cl_mem), (void *)&this->buffer1); // input
-    throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
-    ret = clSetKernelArg(this->kernel, 1, sizeof(cl_mem), (void *)&this->buffer2); // output
-    throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
+    const int NC = this->GetNumberOfChemicals();
+
+    for(int io=0;io<2;io++)
+    {
+        for(int ic=0;ic<NC;ic++)
+        {
+            ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[io][ic]); // 0=input, 1=output
+            throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
+        }
+    }
     ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
     throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
 
-    ret = clSetKernelArg(this->kernel, 0, sizeof(cl_mem), (void *)&this->buffer2); // input
-    throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
-    ret = clSetKernelArg(this->kernel, 1, sizeof(cl_mem), (void *)&this->buffer1); // output
-    throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
+    for(int io=0;io<2;io++)
+    {
+        for(int ic=0;ic<NC;ic++)
+        {
+            ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[1-io][ic]); // 1=input, 0=output
+            throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
+        }
+    }
     ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
     throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
 }
