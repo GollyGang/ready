@@ -384,7 +384,6 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
         filename = default_filename_root;
         filename << wxString::Format(_("%04d."),unused_value) << default_filename_ext;
         unused_value++;
-        cout << "Trying: " << filename.mb_str() << endl;
     } while(::wxFileExists(folder+_T("/")+filename));
 
     // ask the user for confirmation
