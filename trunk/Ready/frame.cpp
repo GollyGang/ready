@@ -374,16 +374,18 @@ void MyFrame::OnSize(wxSizeEvent& event)
 void MyFrame::OnScreenshot(wxCommandEvent& event)
 {
     // find an unused filename
-    const wxString default_filename_root = ("Ready_screenshot_");
-    const wxString default_filename_ext = ("png");
+    const wxString default_filename_root = _("Ready_screenshot_");
+    const wxString default_filename_ext = _T("png");
     int unused_value = 0;
     wxString filename;
     wxString extension,folder;
     folder = this->last_used_screenshot_folder;
     do {
-        filename = wxString::Format(_("%s%04d.%s"),default_filename_root,unused_value,default_filename_ext);
+        filename = default_filename_root;
+        filename << wxString::Format(_("%04d."),unused_value) << default_filename_ext;
         unused_value++;
-    } while(::wxFileExists(folder+_T("\\")+filename));
+        cout << "Trying: " << filename.mb_str() << endl;
+    } while(::wxFileExists(folder+_T("/")+filename));
 
     // ask the user for confirmation
     bool accepted = true;
