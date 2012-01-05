@@ -182,7 +182,7 @@ void MyFrame::InitializeMenus()
     }
     {   // actions menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::Step,_("&Step\tSPACE"),_("Advance the simulation by a single timestep"));
+        menu->Append(ID::Step,_("&Step\tF4"),_("Advance the simulation by a single timestep"));
         menu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
         menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
         menu->AppendSeparator();
