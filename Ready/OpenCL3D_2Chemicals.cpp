@@ -31,16 +31,8 @@ OpenCL3D_2Chemicals::OpenCL3D_2Chemicals()
 {
     this->timestep = 1.0f;
     this->program_string = 
-"__kernel void rd_compute(__global float4 *a,__global float4 *b,__global float4 *a2,__global float4 *b2)\n\
+"__kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global float4 *a_out,__global float4 *b_out)\n\
 {\n\
-    const float D_u = 0.082f;\n\
-    const float D_v = 0.041f;\n\
-\n\
-    const float k = 0.064f;\n\
-    const float F = 0.035f;\n\
-\n\
-    const float delta_t = 1.0f;\n\
-\n\
     const int x = get_global_id(0);\n\
     const int y = get_global_id(1);\n\
     const int z = get_global_id(2);\n\
@@ -49,8 +41,8 @@ OpenCL3D_2Chemicals::OpenCL3D_2Chemicals()
     const int Z = get_global_size(2);\n\
     const int i = X*(Y*z + y) + x;\n\
 \n\
-    const float4 u = a[i];\n\
-    const float4 v = b[i];\n\
+    const float4 a = a_in[i];\n\
+    const float4 b = b_in[i];\n\
 \n\
     // compute the Laplacians of u and v (assuming X and Y are powers of 2)\n\
     const int xm1 = ((x-1+X) & (X-1));\n\
@@ -65,37 +57,44 @@ OpenCL3D_2Chemicals::OpenCL3D_2Chemicals()
     const int iDown =  X*(Y*z + yp1) + x;\n\
     const int iFore =  X*(Y*zm1 + y) + x;\n\
     const int iBack =  X*(Y*zp1 + y) + x;\n\
-    const float4 a_left = a[iLeft];\n\
-    const float4 a_right = a[iRight];\n\
-    const float4 a_up = a[iUp];\n\
-    const float4 a_down = a[iDown];\n\
-    const float4 a_fore = a[iFore];\n\
-    const float4 a_back = a[iBack];\n\
-    const float4 b_left = b[iLeft];\n\
-    const float4 b_right = b[iRight];\n\
-    const float4 b_up = b[iUp];\n\
-    const float4 b_down = b[iDown];\n\
-    const float4 b_fore = b[iFore];\n\
-    const float4 b_back = b[iBack];\n\
+    const float4 a_left = a_in[iLeft];\n\
+    const float4 a_right = a_in[iRight];\n\
+    const float4 a_up = a_in[iUp];\n\
+    const float4 a_down = a_in[iDown];\n\
+    const float4 a_fore = a_in[iFore];\n\
+    const float4 a_back = a_in[iBack];\n\
+    const float4 b_left = b_in[iLeft];\n\
+    const float4 b_right = b_in[iRight];\n\
+    const float4 b_up = b_in[iUp];\n\
+    const float4 b_down = b_in[iDown];\n\
+    const float4 b_fore = b_in[iFore];\n\
+    const float4 b_back = b_in[iBack];\n\
     // standard 7-point stencil:\n\
-    const float4 nabla_u = (float4)(a_up.x + u.y + a_down.x + a_left.w + a_fore.x + a_back.x,\n\
-                                    a_up.y + u.z + a_down.y + u.x + a_fore.y + a_back.y,\n\
-                                    a_up.z + u.w + a_down.z + u.y + a_fore.z + a_back.z,\n\
-                                    a_up.w + a_right.x + a_down.w + u.z + a_fore.w + a_back.w) - 6.0f*u\n\
+    const float4 laplacian_a = (float4)(a_up.x + a.y + a_down.x + a_left.w + a_fore.x + a_back.x,\n\
+                                    a_up.y + a.z + a_down.y + a.x + a_fore.y + a_back.y,\n\
+                                    a_up.z + a.w + a_down.z + a.y + a_fore.z + a_back.z,\n\
+                                    a_up.w + a_right.x + a_down.w + a.z + a_fore.w + a_back.w) - 6.0f*a\n\
                                     + (float4)(1e-6f,1e-6f,1e-6f,1e-6f); // (kill denormals)\n\
-    const float4 nabla_v = (float4)(b_up.x + v.y + b_down.x + b_left.w + b_fore.x + b_back.x,\n\
-                                    b_up.y + v.z + b_down.y + v.x + b_fore.y + b_back.y,\n\
-                                    b_up.z + v.w + b_down.z + v.y + b_fore.z + b_back.z,\n\
-                                    b_up.w + b_right.x + b_down.w + v.z + b_fore.w + b_back.w) - 6.0f*v\n\
+    const float4 laplacian_b = (float4)(b_up.x + b.y + b_down.x + b_left.w + b_fore.x + b_back.x,\n\
+                                    b_up.y + b.z + b_down.y + b.x + b_fore.y + b_back.y,\n\
+                                    b_up.z + b.w + b_down.z + b.y + b_fore.z + b_back.z,\n\
+                                    b_up.w + b_right.x + b_down.w + b.z + b_fore.w + b_back.w) - 6.0f*b\n\
                                     + (float4)(1e-6f,1e-6f,1e-6f,1e-6f); // (kill denormals)\n\
 \n\
+    // --------- change the code inside this block --------------\n\
     // compute the new rate of change\n\
-    const float4 delta_u = D_u * nabla_u - u*v*v + F*(1.0f-u);\n\
-    const float4 delta_v = D_v * nabla_v + u*v*v - (F+k)*v;\n\
+    const float D_a = 0.082f;\n\
+    const float D_b = 0.041f;\n\
+    const float k = 0.064f;\n\
+    const float F = 0.035f;\n\
+    const float4 delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
+    const float4 delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;\n\
+    const float delta_t = 1.0f;\n\
+    // ----------------------------------------------------------\n\
 \n\
-    // apply the change (to the new buffer)\n\
-    a2[i] = u + delta_t * delta_u;\n\
-    b2[i] = v + delta_t * delta_v;\n\
+    // apply the change\n\
+    a_out[i] = a + delta_t * delta_a;\n\
+    b_out[i] = b + delta_t * delta_b;\n\
 }";
     // TODO: parameterize the kernel code
 }
