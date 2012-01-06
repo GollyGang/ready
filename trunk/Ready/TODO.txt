@@ -1,5 +1,3 @@
-before 0.1 release:
-
 before 0.x release
 - file format for saving/loading rules and patterns
 - populate a pattern library (primary UI for beginners is a list of examples to click)
