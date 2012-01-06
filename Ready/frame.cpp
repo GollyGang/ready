@@ -36,6 +36,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/filename.h>
 #include <wx/font.h>
+#include <wx/html/htmlwin.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -58,18 +59,16 @@ namespace ID { enum {
    // some IDs have special values
    Quit = wxID_EXIT,
    About = wxID_ABOUT,
+   Help = wxID_HELP,
 
    // we can use IDs higher than this for our own purposes
    Dummy = wxID_HIGHEST+1,
-
-   // controls
-   PatternsTree,
 
    // view menu
    PatternsPane,
    KernelPane,
    CanvasPane,
-   SystemSettingsPane,
+   HelpPane,
    RestoreDefaultPerspective,
    Screenshot,
 
@@ -83,6 +82,9 @@ namespace ID { enum {
    Stop,
    ReplaceProgram,
    InitWithBlobInCenter,
+
+   // controls
+   PatternsTree,
 
 }; };
 
@@ -101,6 +103,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::KernelPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::KernelPane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective,MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
     // settings menu
@@ -118,6 +122,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
     // help menu
     EVT_MENU(ID::About, MyFrame::OnAbout)
+    EVT_MENU(ID::Help, MyFrame::OnHelp)
     // controls
     EVT_TREE_SEL_CHANGED(ID::PatternsTree,MyFrame::OnPatternsTreeSelChanged)
 END_EVENT_TABLE()
@@ -165,19 +170,20 @@ void MyFrame::InitializeMenus()
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
-        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns"), _("View the patterns pane"));
-        menu->AppendCheckItem(ID::KernelPane, _("&Kernel"), _("View the kernel pane"));
+        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns pane"), _("View the patterns pane"));
+        menu->AppendCheckItem(ID::KernelPane, _("&Kernel pane"), _("View the kernel pane"));
+        menu->AppendCheckItem(ID::HelpPane, _("&Help pane"), _("View the help pane"));
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
         menu->AppendSeparator();
-        menu->Append(ID::Screenshot, _("Save &screenshot\tF3"), _("Save a screenshot of the current view"));
+        menu->Append(ID::Screenshot, _("Save &screenshot...\tF3"), _("Save a screenshot of the current view"));
         menuBar->Append(menu, _("&View"));
     }
     {   // settings menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::SelectOpenCLDevice,_("&Select OpenCL device to use"),_("Choose which OpenCL device to run on"));
+        menu->Append(ID::SelectOpenCLDevice,_("&Select OpenCL device to use..."),_("Choose which OpenCL device to run on"));
         menu->AppendSeparator();
-        menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics"),_("Show the available OpenCL devices and their attributes"));
+        menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics..."),_("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu,_("&Settings"));
     }
     {   // actions menu:
@@ -191,7 +197,9 @@ void MyFrame::InitializeMenus()
     }
     {   // help menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::About, _("&About...\tF1"), _("Show about dialog"));
+        menu->Append(ID::Help, _("&Help...\tF1"), _("Show information about how to use Ready"));
+        menu->AppendSeparator();
+        menu->Append(ID::About, _("&About..."), _("Show about dialog"));
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
@@ -229,15 +237,61 @@ void MyFrame::InitializePanes()
                       .Hide()
                       );
     }
-    // a 'settings' pane (just a placeholder)
-    this->aui_mgr.AddPane(new wxTextCtrl(this,wxID_ANY), 
-                  wxAuiPaneInfo()
-                  .Name(PaneName(ID::SystemSettingsPane))
-                  .Caption(_("System"))
-                  .Bottom()
-                  .Hide()
-                  );
-    // the VTK window goes in the center pane (always visible) - got problems when had in a floating pane
+    {
+        // http://wiki.wxwidgets.org/Calling_The_Default_Browser_In_WxHtmlWindow
+        class HtmlWindow: public wxHtmlWindow
+        {
+        public:
+	        HtmlWindow(wxWindow *parent, wxWindowID id = -1,
+		        const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
+		        long style = wxHW_SCROLLBAR_AUTO, const wxString& name = _T("htmlWindow"))
+                : wxHtmlWindow(parent, id, pos, size, style, name) {}
+
+	        void OnLinkClicked(const wxHtmlLinkInfo& link)
+            {
+	            if( link.GetHref().StartsWith(_T("http://")) || link.GetHref().StartsWith(_T("mailto://")) )
+		            wxLaunchDefaultBrowser(link.GetHref());
+	            else
+		            wxHtmlWindow::OnLinkClicked(link);
+            }
+        };
+        // a help pane
+        HtmlWindow *html = new HtmlWindow(this,wxID_ANY);
+        html->SetPage(_("<html><body>"
+            "<h3>Quick start guide</h3>"
+            "<h5>1. Overview</h5>"
+            "<p>Ready " STR(READY_VERSION) " is an early release of a program to explore <a href=\"http://en.wikipedia.org/wiki/Reaction–diffusion_system\">reaction-diffusion</a> systems.</p>"
+            "<p>Click on the demos in the Patterns Pane to see some different systems."
+            "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
+            "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
+            "that will work with your CPU. Use the Settings menu commands to examine the OpenCL devices available."
+            "<h5>2. Interacting with the rendered scene</h5>"
+            "<p>From the Actions menu: Stop (F6) the system running, or start it running (F5), or take small Steps (F4)."
+            "<p><b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball"
+            "<p><b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out"
+            "<p><b>scroll wheel:</b> zoom in and out"
+            "<p><b>shift+left mouse:</b> pan"
+            "<p><b>ctrl+left mouse:</b> roll"
+            "<p><b>'r':</b> reset the view to make everything visible"
+            "<p><b>'w':</b> switch to wireframe view"
+            "<p><b>'s':</b> switch to surface view</ul>"
+            "<h5>3. Working with the windows</h5>"
+            "<p>The Patterns Pane, Help Pane and Kernel Pane can be shown or hidden by using the commands on the View menu. By dragging the panes by their title bar you can dock them into the "
+            "Ready frame in different positions or float them as separate windows."
+            "<h5>4. More help</h5>"
+            "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
+            "<p>See the text files in the installation folder for more information."
+            "</body></html>")); // TODO: split out into html files
+        this->aui_mgr.AddPane(html, 
+                      wxAuiPaneInfo()
+                      .Name(PaneName(ID::HelpPane))
+                      .Caption(_("Help Pane"))
+                      .Right()
+                      .BestSize(400,400)
+                      .Hide()
+                      );
+    }
+    // for now the VTK window goes in the center pane (always visible) - we got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
     this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
@@ -298,7 +352,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     wxAboutDialogInfo info;
     wxString title;
-    title << _("Ready ") << _T(STR(READY_VERSION));
+    title << _T("Ready ") << _T(STR(READY_VERSION));
     info.SetName(title);
     info.SetDescription(_("A program for exploring reaction-diffusion systems.\n\nReady is free software, distributed under the GPLv3 license."));
     info.SetCopyright(_T("(C) 2011, 2012 The Ready Bunch"));
@@ -656,7 +710,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
         for(int id=0;id<nd;id++)
         {
             if(ip==this->iOpenCLPlatform && id==this->iOpenCLDevice)
-                iOldSelection = choices.size();
+                iOldSelection = (int)choices.size();
             wxString s(OpenCL_RD::GetPlatformDescription(ip).c_str(),wxConvUTF8);
             s << _T(" : ") << wxString(OpenCL_RD::GetDeviceDescription(ip,id).c_str(),wxConvUTF8);
             choices.Add(s);
@@ -689,4 +743,12 @@ void MyFrame::OnPatternsTreeSelChanged(wxTreeEvent& event)
     for(int i=0;i<(int)this->demo_ids.size();i++)
         if(event.GetItem()==this->demo_ids[i])
             this->LoadDemo(i);
+}
+
+void MyFrame::OnHelp(wxCommandEvent &event)
+{
+    wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
+    if(!pane.IsOk()) return;
+    pane.Show();
+    this->aui_mgr.Update();
 }

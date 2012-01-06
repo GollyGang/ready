@@ -120,7 +120,7 @@ elseif(UNIX)
 endif()
 
 # wxWidgets is required to build the project
-FIND_PACKAGE(wxWidgets COMPONENTS aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE(wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
 
 IF(wxWidgets_FOUND)
   INCLUDE( ${wxWidgets_USE_FILE} )
@@ -215,3 +215,18 @@ endif()
 if(MSVC_IDE)
    set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
 endif()
+
+#----------------------------------------Packaging----------------------------------------------
+
+set( PACKAGED_FILES
+  "README.txt" "CHANGES.txt" "COPYING.txt" "TODO.txt" 
+)
+
+install( TARGETS ${APP_NAME} DESTINATION "." )
+install( FILES ${PACKAGED_FILES} DESTINATION "." )
+
+include( InstallRequiredSystemLibraries )
+set( CPACK_GENERATOR "ZIP" )
+set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
+set( CPACK_SOURCE_GENERATOR "ZIP" )
+include( CPack )

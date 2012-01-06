@@ -72,7 +72,7 @@ int BaseRD::GetZ() const
 
 int BaseRD::GetNumberOfChemicals() const
 {
-    return this->images.size();
+    return (int)this->images.size();
 }
 
 float BaseRD::GetTimestep() const
