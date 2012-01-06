@@ -242,17 +242,17 @@ void MyFrame::InitializePanes()
         class HtmlWindow: public wxHtmlWindow
         {
         public:
-	        HtmlWindow(wxWindow *parent, wxWindowID id = -1,
-		        const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
-		        long style = wxHW_SCROLLBAR_AUTO, const wxString& name = _T("htmlWindow"))
+            HtmlWindow(wxWindow *parent, wxWindowID id = -1,
+                const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
+                long style = wxHW_SCROLLBAR_AUTO, const wxString& name = _T("htmlWindow"))
                 : wxHtmlWindow(parent, id, pos, size, style, name) {}
 
-	        void OnLinkClicked(const wxHtmlLinkInfo& link)
+            void OnLinkClicked(const wxHtmlLinkInfo& link)
             {
-	            if( link.GetHref().StartsWith(_T("http://")) || link.GetHref().StartsWith(_T("mailto://")) )
-		            wxLaunchDefaultBrowser(link.GetHref());
-	            else
-		            wxHtmlWindow::OnLinkClicked(link);
+                if( link.GetHref().StartsWith(_T("http://")) || link.GetHref().StartsWith(_T("mailto://")) )
+                    wxLaunchDefaultBrowser(link.GetHref());
+                else
+                    wxHtmlWindow::OnLinkClicked(link);
             }
         };
         // a help pane
@@ -260,7 +260,7 @@ void MyFrame::InitializePanes()
         html->SetPage(_("<html><body>"
             "<h3>Quick start guide</h3>"
             "<h5>1. Overview</h5>"
-            "<p>Ready " STR(READY_VERSION) " is an early release of a program to explore <a href=\"http://en.wikipedia.org/wiki/Reaction–diffusion_system\">reaction-diffusion</a> systems.</p>"
+            "<p>Ready " STR(READY_VERSION) " is an early release of a program to explore <a href=\"http://en.wikipedia.org/wiki/Reaction-diffusion_system\">reaction-diffusion</a> systems.</p>"
             "<p>Click on the demos in the Patterns Pane to see some different systems."
             "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
             "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
