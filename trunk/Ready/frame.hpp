@@ -90,6 +90,7 @@ private:
 
     // help menu
     void OnAbout(wxCommandEvent& event);
+    void OnHelp(wxCommandEvent& event);
 
     // controls
     void OnPatternsTreeSelChanged(wxTreeEvent& event);
