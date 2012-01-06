@@ -1,0 +1,28 @@
+before 0.1 release:
+
+before 0.x release
+- file format for saving/loading rules and patterns
+- populate a pattern library (primary UI for beginners is a list of examples to click)
+- control over size of world, running speed
+- make a toolbar of icons for commonly-used functions
+
+before 1.0 release:
+- copy/paste (2d only) (paste modes: add, overwrite)
+- allow user to paint, erase, even while running (2D only)
+- control over render pipeline: contouring level, color map, active components etc.
+- control over boundary conditions: wrap-around or constant value
+- save out videos
+- save out scene (e.g. OBJ) for external render
+- SSE for non-OpenCL implementations (will assume all target cpus support SSE)
+
+future ideas:
+- allow user to change OpenCL platform and device while a pattern is running
+- parameter map(s) in a separate window, to allow user to explore parameters 
+- full control over scene graph; nodes+connections interface
+- different topologies: e.g. arbitrary 2d mesh embedded in 3d: zebra, etc.
+- parameters driven by an input scene (for writhing logos, etc.)
+- multi-stage, multi-scale RD
+- radiosity rendering for better visualization of tangled structures
+- STL output, email file to shapeways for printing
+- 1D RD
+- discrete RD (simulation of individual chemicals, to compare with differential equations)

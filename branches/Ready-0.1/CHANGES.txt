@@ -1,0 +1,11 @@
+0.1 - Jan 2012
+--------------
+- 2d and 3d Gray-Scott demos
+- CPU and OpenCL implementations
+- user can edit OpenCL kernel and apply it to the running system
+- works on Windows XP, Windows 7, Linux and MacOS
+- 3d visualisation shows a volume contoured at a fixed value, and a slice from the middle
+  rendered as an image
+- 2d visualisation shows a false-color image and a height-mapped mesh on the back
+- user can select from available OpenCL devices (GPUs or CPUs)
+- OpenCL is loaded at runtime, so we can still do something even if it is not available
