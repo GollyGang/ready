@@ -41,16 +41,24 @@ GrayScott_slow::GrayScott_slow()
     this->f = 0.035f;
 }
 
-void GrayScott_slow::Allocate(int x,int y)
+void GrayScott_slow::Allocate(int x,int y,int z,int nc)
 {
-    this->AllocateImages(x,y,1,2);
+    if(z!=1) throw runtime_error("GrayScott_slow::Allocate : this implementation is 2D only"); 
+    if(nc!=2) throw runtime_error("GrayScott_slow::Allocate : this implementation is for 2 chemicals only"); 
+    BaseRD::Allocate(x,y,1,2);
     // also allocate our buffer images
+    this->DeleteBuffers();
     this->buffer_images.resize(2);
     for(int i=0;i<2;i++)
         this->buffer_images[i] = AllocateVTKImage(x,y,1);
 }
 
 GrayScott_slow::~GrayScott_slow()
+{
+    this->DeleteBuffers();
+}
+
+void GrayScott_slow::DeleteBuffers()
 {
     for(int i=0;i<(int)this->buffer_images.size();i++)
     {

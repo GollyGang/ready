@@ -38,6 +38,11 @@ BaseRD::BaseRD()
 
 BaseRD::~BaseRD()
 {
+    this->Deallocate();
+}
+
+void BaseRD::Deallocate()
+{
     for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
     {
         if(this->images[iChem])
@@ -85,13 +90,19 @@ vtkImageData* BaseRD::GetImage(int iChemical) const
     return this->images[iChemical];
 }
 
+void BaseRD::CopyFromImage(int iChemical,vtkImageData* im)
+{
+    this->images[iChemical]->DeepCopy(im);
+}
+
 int BaseRD::GetTimestepsTaken() const
 {
     return this->timesteps_taken;
 }
 
-void BaseRD::AllocateImages(int x,int y,int z,int nc)
+void BaseRD::Allocate(int x,int y,int z,int nc)
 {
+    this->Deallocate();
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);

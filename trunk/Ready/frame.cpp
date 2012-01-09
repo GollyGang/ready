@@ -51,6 +51,10 @@ using namespace std;
 #include <vtkPNGWriter.h>
 #include <vtkJPEGWriter.h>
 #include <vtkSmartPointer.h>
+#include <vtkXMLImageDataWriter.h>
+#include <vtkXMLImageDataReader.h>
+#include <vtkImageAppendComponents.h>
+#include <vtkImageExtractComponents.h>
 
 // IDs for the controls and the menu commands
 namespace ID { enum {
@@ -65,6 +69,7 @@ namespace ID { enum {
    HelpPane,
    RestoreDefaultPerspective,
    Screenshot,
+   ChangeActiveChemical,
 
    // settings menu
    SelectOpenCLDevice,
@@ -91,8 +96,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_IDLE(MyFrame::OnIdle)
     EVT_SIZE(MyFrame::OnSize)
     // file menu
-    EVT_MENU(wxID_EXIT,  MyFrame::OnQuit)
+    EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
+    EVT_MENU(wxID_EXIT,  MyFrame::OnQuit)
     // view menu
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
@@ -102,6 +108,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective,MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::Screenshot,MyFrame::OnScreenshot)
+    EVT_MENU(ID::ChangeActiveChemical,MyFrame::OnChangeActiveChemical)
     // settings menu
     EVT_MENU(ID::SelectOpenCLDevice,MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics,MyFrame::OnOpenCLDiagnostics)
@@ -130,7 +137,8 @@ MyFrame::MyFrame(const wxString& title)
        timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
-       iOpenCLPlatform(0),iOpenCLDevice(0)
+       iOpenCLPlatform(0),iOpenCLDevice(0),
+       iActiveChemical(1)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
@@ -156,9 +164,9 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_OPEN);//, _("&Open\tCtrl-O"), _("Open a pattern"));
+        menu->Append(wxID_OPEN);
         menu->AppendSeparator();
-        menu->Append(wxID_SAVE);//, _("&Save\tCtrl-S"), _("Save the current pattern"));
+        menu->Append(wxID_SAVE);
         menu->AppendSeparator();
         menu->Append(wxID_EXIT);
         menuBar->Append(menu, _("&File"));
@@ -172,6 +180,8 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
         menu->AppendSeparator();
         menu->Append(ID::Screenshot, _("Save &screenshot...\tF3"), _("Save a screenshot of the current view"));
+        menu->AppendSeparator();
+        menu->Append(ID::ChangeActiveChemical,_("&Change active chemical"),_("Change which chemical is being visualized"));
         menuBar->Append(menu, _("&View"));
     }
     {   // settings menu:
@@ -471,7 +481,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
     this->system = sys;
-    InitializeVTKPipeline(this->pVTKWindow,this->system,1); // TODO: allow user to change which chemical is being visualized
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
     this->UpdateWindows();
 }
 
@@ -597,7 +607,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 0:
                 {
                     GrayScott_slow *s = new GrayScott_slow();
-                    s->Allocate(80,50);
+                    s->Allocate(80,50,1,2);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }
@@ -605,7 +615,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 1: 
                 {
                     GrayScott_slow_3D *s = new GrayScott_slow_3D();
-                    s->Allocate(30,25,20);
+                    s->Allocate(30,25,20,2);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }
@@ -763,10 +773,60 @@ void MyFrame::OnHelp(wxCommandEvent &event)
 
 void MyFrame::OnSavePattern(wxCommandEvent &event)
 {
-    /*
     wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vtk"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
         wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if(filename.empty()) return; // user cancelled
 
-    */
+    vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
+    for(int i=0;i<this->system->GetNumberOfChemicals();i++)
+        iac->AddInput(this->system->GetImage(i));
+
+    vtkSmartPointer<vtkXMLImageDataWriter> iw = vtkSmartPointer<vtkXMLImageDataWriter>::New();
+    iw->SetInputConnection(iac->GetOutputPort());
+    iw->SetFileName(filename.mb_str());
+    iw->Write();
+}
+
+void MyFrame::OnOpenPattern(wxCommandEvent &event)
+{
+    wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vtk"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
+        wxFD_OPEN);
+    if(filename.empty()) return; // user cancelled
+
+    vtkSmartPointer<vtkXMLImageDataReader> iw = vtkSmartPointer<vtkXMLImageDataReader>::New();
+    iw->SetFileName(filename.mb_str());
+    iw->Update();
+
+    vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
+    iec->SetInputConnection(iw->GetOutputPort());
+
+    int dim[3];
+    iw->GetOutput()->GetDimensions(dim);
+    int nc = iw->GetOutput()->GetNumberOfScalarComponents();
+    this->system->Allocate(dim[0],dim[1],dim[2],nc);
+    for(int i=0;i<nc;i++)
+    {
+        iec->SetComponents(i);
+        iec->Update();
+        this->system->CopyFromImage(i,iec->GetOutput());
+    }
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
+    this->UpdateWindows();
+
+    // TODO: this isn't our pattern format, just a placeholder
+}
+
+void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
+{
+    wxArrayString choices;
+    for(int i=0;i<this->system->GetNumberOfChemicals();i++)
+        choices.Add(wxString::Format(_T("%d"),i+1));
+    wxSingleChoiceDialog dlg(this,_("Select the OpenCL device to use:"),_("Select OpenCL device"),
+        choices);
+    dlg.SetSelection(this->iActiveChemical);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    this->iActiveChemical = dlg.GetSelection();
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
+    this->UpdateWindows();
+    // TODO: might have some visualization based on more than one chemical
 }

@@ -27,7 +27,7 @@ class GrayScott_slow : public BaseRD
         GrayScott_slow();
         ~GrayScott_slow();
 
-        void Allocate(int x,int y);
+        void Allocate(int x,int y,int z,int nc);
         float GetF() const { return this->f; }
         float GetK() const { return this->k; }
         void SetF(float new_f) { this->f = new_f; }
@@ -42,4 +42,8 @@ class GrayScott_slow : public BaseRD
 
         float f,k,r_a,r_b;
         std::vector<vtkImageData*> buffer_images;
+
+    protected:
+
+        void DeleteBuffers();
 };

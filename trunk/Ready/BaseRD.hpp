@@ -24,7 +24,7 @@
 
 class vtkImageData;
 
-// abstract base classes for all reaction-diffusion systems, 2D and 3D
+// abstract base classes for all reaction-diffusion systems
 class BaseRD 
 {
     public:
@@ -49,6 +49,7 @@ class BaseRD
         int GetTimestepsTaken() const;
 
         vtkImageData* GetImage(int iChemical) const;
+        virtual void CopyFromImage(int iChemical,vtkImageData* im);
 
         virtual bool HasEditableProgram() const =0;
         void SetProgram(std::string s);
@@ -56,6 +57,8 @@ class BaseRD
         virtual void TestProgram(std::string program_string) const {}
 
         virtual void InitWithBlobInCenter() =0;
+
+        virtual void Allocate(int x,int y,int z,int nc);
 
     protected:
 
@@ -69,7 +72,7 @@ class BaseRD
 
     protected:
 
-        void AllocateImages(int x,int y,int z,int nc);
+        void Deallocate();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
         static float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
