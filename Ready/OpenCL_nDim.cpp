@@ -106,7 +106,7 @@ OpenCL_nDim::OpenCL_nDim()
 void OpenCL_nDim::Allocate(int x,int y,int z,int nc)
 {
     if(x&(x-1) || y&(y-1) || z&(z-1))
-        throw runtime_error("OpenCL_nDim::Allocate : for wrap-around in OpenCL we require both dimensions to be powers of 2");
+        throw runtime_error("OpenCL_nDim::Allocate : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
     this->AllocateImages(x,y,z,nc);
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();

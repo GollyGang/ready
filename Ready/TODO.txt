@@ -22,5 +22,4 @@ future ideas:
 - multi-stage, multi-scale RD
 - radiosity rendering for better visualization of tangled structures
 - STL output, email file to shapeways for printing
-- 1D RD
 - discrete RD (simulation of individual chemicals, to compare with differential equations)
