@@ -59,12 +59,14 @@ private:
 
     wxString default_perspective;
     wxString last_used_screenshot_folder;
+    int iActiveChemical;
 
     int iOpenCLPlatform,iOpenCLDevice;
 
 private:
 
     // file menu
+    void OnOpenPattern(wxCommandEvent& event);
     void OnSavePattern(wxCommandEvent& event);
     void OnQuit(wxCommandEvent& event);
 
@@ -73,6 +75,7 @@ private:
     void OnUpdateViewPane(wxUpdateUIEvent& event);
     void OnRestoreDefaultPerspective(wxCommandEvent& event);
     void OnScreenshot(wxCommandEvent& event);
+    void OnChangeActiveChemical(wxCommandEvent& event);
 
     // settings menu
     void OnSelectOpenCLDevice(wxCommandEvent& event);

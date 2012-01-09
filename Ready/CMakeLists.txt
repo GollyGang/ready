@@ -140,7 +140,7 @@ find_package( ZLIB REQUIRED )
 include_directories( 
    ${ZLIB_INCLUDE_DIR}
 )
-add_definitions( -DZLIB )
+#add_definitions( -DZLIB )
 
 #-------------------------------------------OpenCL----------------------------------------------
 
