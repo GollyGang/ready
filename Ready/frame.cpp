@@ -278,6 +278,8 @@ void MyFrame::InitializePanes()
             "<h5>3. Working with the windows</h5>"
             "<p>The Patterns Pane, Help Pane and Kernel Pane can be shown or hidden by using the commands on the View menu. By dragging the panes by their title bar you can dock them into the "
             "Ready frame in different positions or float them as separate windows."
+            "<p>The Kernel Pane is only used when the current system is an OpenCL demo. It shows the current OpenCL kernel and "
+            "allows for editing - you can change the parameters or the RD formula. Use the compile button to use the new kernel."
             "<h5>4. More help</h5>"
             "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
             "<p>See the text files in the installation folder for more information."
