@@ -1,0 +1,79 @@
+Ready uses CMake as a pre-build setup. You might need to read some
+CMake documentation to get the hang of it. We've put some hints
+below.
+
+Dependencies: VTK, wxWidgets, any OpenCL SDK.
+
+=========================== Windows =================================
+
+1. Open CMake (cmake-gui.exe)
+2. Create a build folder, locate the source folder
+3. Hit configure.
+4. Select a compiler (e.g. Visual Studio 2008)
+5. Check the variables that go red.
+6. Help CMake find things. Hit configure again.
+7. Eventually hit generate to generate the build files.
+8. Build in your chosen package. (e.g. open the .sln and build)
+
+=========================== Linux =================================
+
+mkdir Ready_build
+cd Ready_build
+cmake ../Ready_source_folder
+make
+
+Alternatively, use ccmake or cmake-gui.
+
+=========================== MacOS =================================
+
+1. To avoid the error "-- Could NOT find wxWidgets (missing:  wxWidgets_FOUND)", 
+   manually build and install wxWidgets 2.9 even if you already have an 
+   wxWidgets that works for other projects:
+
+ cd
+ cd devt    # A directory for things I download and build but do not checkout/modify/checkin
+ svn checkout http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wx-trunk
+ cd wx-trunk
+ mkdir build-osx
+ cd build-osx
+ ../configure --enable-unicode --disable-shared --with-osx_cocoa
+ make    # Take a nap, it'll be a while
+ sudo make install
+
+2. If you have not already done do, build VTK 5.8 (no install is needed in this 
+   case because we supply the option "-DVTK_DIR:PATH=$HOME/devt/VTK/build" when 
+   cmake'ing Ready)
+
+ cd
+ cd devt    # A directory for things I download and build but do not checkout/modify/checkin
+ curl 'http://www.vtk.org/files/release/5.8/vtk-5.8.0.tar.gz' > vtk-5.8.0.tar.gz
+ gunzip vtk-5.8.0.tar.gz
+ tar -xvf vtk-5.8.0.tar        # (creates directory ./VTK)
+ cd VTK
+ mkdir build
+ cd build
+ cmake ..
+ make     # This also takes some time
+
+3. Then do this to get, configure and build Ready (assuming VTK was built in 
+   ~/devt/VTK as shown above):
+
+ cd
+ cd proj    # A directory for projects I am "working on"
+ svn checkout https://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion --username $MYEMAIL
+ #
+ # Or if not a project member do:
+ # svn checkout http://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion-read-only
+ # And substitute "reaction-diffusion-read-only" for "reaction-diffusion" in the following
+ #
+ cd reaction-diffusion
+ mkdir Ready_gui_build
+ cd !$
+ cmake ../reaction-diffusion/Ready -DVTK_DIR:PATH=$HOME/devt/VTK/build
+ make
+
+4. Finally, "open ." which will show the current directory in the Finder, and 
+   you should see the Ready icon. However my Finder will not let me run it, so I just type:
+
+ ./Ready.app/Contents/MacOS/Ready
+
