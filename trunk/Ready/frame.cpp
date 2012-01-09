@@ -23,8 +23,7 @@
 // readybase:
 #include "GrayScott_slow.hpp"
 #include "GrayScott_slow_3D.hpp"
-#include "OpenCL2D_2Chemicals.hpp"
-#include "OpenCL3D_2Chemicals.hpp"
+#include "OpenCL_nDim.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -385,6 +384,7 @@ wxTreeCtrl* MyFrame::CreatePatternsCtrl()
     }
     {
         wxTreeItemId demos = tree->AppendItem(root, wxT("OpenCL demos"), 0);
+        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 1D"), 1));
         this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
         this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
         tree->Expand(demos);
@@ -616,20 +616,30 @@ void MyFrame::LoadDemo(int iDemo)
                 break;
             case 2:
                 {
-                    OpenCL2D_2Chemicals *s = new OpenCL2D_2Chemicals();
+                    OpenCL_nDim *s = new OpenCL_nDim();
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
-                    s->Allocate(128,64);
+                    s->Allocate(128,1,1,2);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }
                 break;
             case 3:
                 {
-                    OpenCL3D_2Chemicals *s = new OpenCL3D_2Chemicals();
+                    OpenCL_nDim *s = new OpenCL_nDim();
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
-                    s->Allocate(64,64,64);
+                    s->Allocate(128,64,1,2);
+                    s->InitWithBlobInCenter();
+                    this->SetCurrentRDSystem(s);
+                }
+                break;
+            case 4:
+                {
+                    OpenCL_nDim *s = new OpenCL_nDim();
+                    s->SetPlatform(this->iOpenCLPlatform);
+                    s->SetDevice(this->iOpenCLDevice);
+                    s->Allocate(64,64,64,2);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
                 }

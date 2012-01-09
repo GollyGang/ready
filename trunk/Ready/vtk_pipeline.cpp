@@ -63,6 +63,7 @@ using namespace std;
 
 // TODO: allow visualizations that use more than one chemical
 
+void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
 void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
 void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
 
@@ -73,12 +74,77 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
 
     switch(system->GetDimensionality())
     {
+        case 1: InitializeVTKPipeline_1D(pVTKWindow,system,iActiveChemical); break;
         case 2: InitializeVTKPipeline_2D(pVTKWindow,system,iActiveChemical); break;
         case 3: InitializeVTKPipeline_3D(pVTKWindow,system,iActiveChemical); break;
         default:
             throw runtime_error("InitializeVTKPipeline : Unsupported dimensionality");
     }
     pVTKWindow->Refresh(false);
+}
+
+void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
+{
+    // the VTK renderer is responsible for drawing the scene onto the screen
+    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
+    pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
+    pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
+
+    // assemble the scene
+    {
+        // create a lookup table for mapping values to colors
+        vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+        lut->SetRampToLinear();
+        lut->SetScaleToLinear();
+        lut->SetTableRange(0.0, 0.5);
+        lut->SetHueRange(0.6, 0.0);
+
+        // pass the image through the lookup table
+        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+        image_mapper->SetLookupTable(lut);
+        image_mapper->SetInput(system->GetImage(iActiveChemical));
+      
+        // an actor determines how a scene object is displayed
+        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+        actor->SetInput(image_mapper->GetOutput());
+        //actor->InterpolateOff();
+
+        // add the actor to the renderer's scene
+        pRenderer->AddActor(actor);
+
+        // also add a scalar bar to show how the colors correspond to values
+        {
+            vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalar_bar->SetLookupTable(lut);
+            pRenderer->AddActor2D(scalar_bar);
+        }
+    }
+
+    // also add a displacement-mapped surface
+    {
+        vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+        plane->SetInput(system->GetImage(iActiveChemical));
+        vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+        warp->SetInputConnection(plane->GetOutputPort());
+        warp->SetScaleFactor(-5.0);
+        vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+        normals->SetInputConnection(warp->GetOutputPort());
+        normals->SplittingOff();
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(normals->GetOutputPort());
+        mapper->ScalarVisibilityOff();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->SetPosition(0,0,-5.1);
+        pRenderer->AddActor(actor);
+    }
+
+    // set the background color
+    pRenderer->SetBackground(0,0,0);
+    
+    // change the interactor style to a trackball
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    pVTKWindow->SetInteractorStyle(is);
 }
 
 void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)

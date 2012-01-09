@@ -44,8 +44,7 @@ set(BASE_SOURCES
    GrayScott_slow.hpp GrayScott_slow.cpp
    GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
    OpenCL_RD.hpp OpenCL_RD.cpp
-   OpenCL2D_2Chemicals.hpp OpenCL2D_2Chemicals.cpp
-   OpenCL3D_2Chemicals.hpp OpenCL3D_2Chemicals.cpp
+   OpenCL_nDim.hpp OpenCL_nDim.cpp
    utils.hpp utils.cpp
 )
 if (NOT APPLE)

@@ -18,14 +18,14 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-// base class for 3D OpenCL RD implementations with 2 chemicals, where the user can specify the kernel program
-class OpenCL3D_2Chemicals : public OpenCL_RD
+// base class for n-dimensional OpenCL RD implementations with n chemicals
+class OpenCL_nDim : public OpenCL_RD
 {
     public:
 
-        OpenCL3D_2Chemicals();
+        OpenCL_nDim();
 
-        void Allocate(int x,int y,int z);
+        void Allocate(int x,int y,int z,int nc);
         void InitWithBlobInCenter();
 
         void Update(int n_steps);
