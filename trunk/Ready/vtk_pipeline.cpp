@@ -136,6 +136,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->SetPosition(0,0,-5.1);
+        actor->RotateX(90.0);
         pRenderer->AddActor(actor);
     }
 
