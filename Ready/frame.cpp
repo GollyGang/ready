@@ -55,11 +55,6 @@ using namespace std;
 // IDs for the controls and the menu commands
 namespace ID { enum {
 
-   // some IDs have special values
-   Quit = wxID_EXIT,
-   About = wxID_ABOUT,
-   Help = wxID_HELP,
-
    // we can use IDs higher than this for our own purposes
    Dummy = wxID_HIGHEST+1,
 
@@ -96,7 +91,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_IDLE(MyFrame::OnIdle)
     EVT_SIZE(MyFrame::OnSize)
     // file menu
-    EVT_MENU(ID::Quit,  MyFrame::OnQuit)
+    EVT_MENU(wxID_EXIT,  MyFrame::OnQuit)
+    EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     // view menu
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
@@ -120,8 +116,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::ReplaceProgram,MyFrame::OnUpdateReplaceProgram)
     EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
     // help menu
-    EVT_MENU(ID::About, MyFrame::OnAbout)
-    EVT_MENU(ID::Help, MyFrame::OnHelp)
+    EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
+    EVT_MENU(wxID_HELP, MyFrame::OnHelp)
     // controls
     EVT_TREE_SEL_CHANGED(ID::PatternsTree,MyFrame::OnPatternsTreeSelChanged)
 END_EVENT_TABLE()
@@ -160,11 +156,11 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        //menu->Append(wxID_ANY, _("&Open\tCtrl-O"), _("Open a pattern"));
-        //menu->AppendSeparator();
-        //menu->Append(wxID_ANY, _("&Save\tCtrl-S"), _("Save the current pattern"));
-        //menu->AppendSeparator();
-        menu->Append(ID::Quit, _("E&xit\tAlt-F4"), _("Quit this program"));
+        menu->Append(wxID_OPEN);//, _("&Open\tCtrl-O"), _("Open a pattern"));
+        menu->AppendSeparator();
+        menu->Append(wxID_SAVE);//, _("&Save\tCtrl-S"), _("Save the current pattern"));
+        menu->AppendSeparator();
+        menu->Append(wxID_EXIT);
         menuBar->Append(menu, _("&File"));
     }
     {   // view menu:
@@ -196,9 +192,9 @@ void MyFrame::InitializeMenus()
     }
     {   // help menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::Help, _("&Help...\tF1"), _("Show information about how to use Ready"));
+        menu->Append(wxID_HELP,_("&Help...\tF1"),_("Show information about how to use Ready"));
         menu->AppendSeparator();
-        menu->Append(ID::About, _("&About..."), _("Show about dialog"));
+        menu->Append(wxID_ABOUT);
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
@@ -763,4 +759,14 @@ void MyFrame::OnHelp(wxCommandEvent &event)
     if(!pane.IsOk()) return;
     pane.Show();
     this->aui_mgr.Update();
+}
+
+void MyFrame::OnSavePattern(wxCommandEvent &event)
+{
+    /*
+    wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vtk"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
+        wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    if(filename.empty()) return; // user cancelled
+
+    */
 }

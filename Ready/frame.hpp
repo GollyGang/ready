@@ -65,6 +65,7 @@ private:
 private:
 
     // file menu
+    void OnSavePattern(wxCommandEvent& event);
     void OnQuit(wxCommandEvent& event);
 
     // view menu
