@@ -490,7 +490,7 @@ void MyFrame::UpdateWindows()
     }
     else
     {
-        this->kernel_pane->SetValue(_T(""));
+        this->kernel_pane->SetValue(_T("(this implementation has no editable kernel)"));
         this->kernel_pane->Enable(false);
     }
     this->Refresh(false);

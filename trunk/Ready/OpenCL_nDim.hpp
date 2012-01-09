@@ -18,7 +18,7 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-// base class for n-dimensional OpenCL RD implementations with n chemicals
+// base class for n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
 class OpenCL_nDim : public OpenCL_RD
 {
     public:
