@@ -5,7 +5,8 @@
 Build with CMake.
 Dependencies: VTK, wxWidgets, any OpenCL SDK
 Tested on: Windows, Linux, MacOS
-For help: http://code.google.com/p/reaction-diffusion/
+
+For build instructions, see BUILD.txt.
 
 ---------------------------------------------------------------------------------
                               Acknowledgements
