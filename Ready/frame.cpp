@@ -821,7 +821,7 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
     wxArrayString choices;
     for(int i=0;i<this->system->GetNumberOfChemicals();i++)
         choices.Add(wxString::Format(_T("%d"),i+1));
-    wxSingleChoiceDialog dlg(this,_("Select the OpenCL device to use:"),_("Select OpenCL device"),
+    wxSingleChoiceDialog dlg(this,_("Select the chemical to render:"),_("Select active chemical"),
         choices);
     dlg.SetSelection(this->iActiveChemical);
     if(dlg.ShowModal()!=wxID_OK) return;
