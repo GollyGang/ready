@@ -25,7 +25,7 @@ endif(COMMAND cmake_policy)
 
 project( Ready )
 
-set( READY_VERSION 0.1 )
+set( READY_VERSION 0.2 )
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if(APPLE OR WIN32)
@@ -197,7 +197,7 @@ endif()
 if(APPLE)
    # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
    add_custom_target( app_bundle
-      COMMAND sed -e "s/VERSION/${APP_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >Ready.app/Contents/Info.plist
+      COMMAND sed -e "s/VERSION/${READY_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >Ready.app/Contents/Info.plist
       COMMAND echo -n "APPLReDy" >Ready.app/Contents/PkgInfo
    )
    add_dependencies( ${APP_NAME} app_bundle )
@@ -225,7 +225,12 @@ install( TARGETS ${APP_NAME} DESTINATION "." )
 install( FILES ${PACKAGED_FILES} DESTINATION "." )
 
 include( InstallRequiredSystemLibraries )
+
 set( CPACK_GENERATOR "ZIP" )
+
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
+
 set( CPACK_SOURCE_GENERATOR "ZIP" )
+
 include( CPack )
+
