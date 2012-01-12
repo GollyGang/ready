@@ -41,7 +41,8 @@ class BaseRD
         int GetX() const;
         int GetY() const;
         int GetZ() const;
-        int GetNumberOfChemicals() const;
+        int GetNumberOfChemicals() const { return this->n_chemicals; }
+        void SetNumberOfChemicals(int n) { this->n_chemicals = n; }
 
         // advance the RD system by n timesteps
         virtual void Update(int n_steps)=0;
@@ -55,10 +56,10 @@ class BaseRD
         vtkImageData* GetImage(int iChemical) const;
         virtual void CopyFromImage(vtkImageData* im);
 
-        virtual bool HasEditableProgram() const =0;
-        std::string GetProgram() const;
-        virtual void TestProgram(std::string program_string) {}
-        virtual void SetProgram(std::string s);
+        virtual bool HasEditableFormula() const =0;
+        std::string GetFormula() const;
+        virtual void TestFormula(std::string program_string) {}
+        virtual void SetFormula(std::string s);
 
         virtual void InitWithBlobInCenter() =0;
 
@@ -83,6 +84,8 @@ class BaseRD
 
         std::string rule_name,rule_description,pattern_description;
 
+        int n_chemicals;
+
         std::vector<vtkImageData*> images; // one for each chemical
 
         std::vector<std::pair<std::string,float> > parameters;
@@ -90,8 +93,8 @@ class BaseRD
         float timestep;
         int timesteps_taken;
 
-        std::string program_string;
-        bool need_reload_program;
+        std::string formula;
+        bool need_reload_formula;
 
     protected:
 

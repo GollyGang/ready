@@ -488,8 +488,9 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
-    // fill the kernel pane
-    if(this->system->HasEditableProgram())
+    // fill the rule pane
+    /* TODO
+    if(this->system->HasEditableFormula())
     {
         this->kernel_pane->SetValue(wxString(this->system->GetProgram().c_str(),wxConvUTF8));
         this->kernel_pane->Enable(true);
@@ -498,7 +499,7 @@ void MyFrame::UpdateWindows()
     {
         this->kernel_pane->SetValue(_T("(this implementation has no editable kernel)"));
         this->kernel_pane->Enable(false);
-    }
+    }*/
     this->Refresh(false);
 }
 
@@ -607,6 +608,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 0:
                 {
                     GrayScott_slow *s = new GrayScott_slow();
+                    s->SetNumberOfChemicals(2);
                     s->Allocate(80,50,1,2);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
@@ -615,6 +617,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 1: 
                 {
                     GrayScott_slow_3D *s = new GrayScott_slow_3D();
+                    s->SetNumberOfChemicals(2);
                     s->Allocate(30,25,20,2);
                     s->InitWithBlobInCenter();
                     this->SetCurrentRDSystem(s);
@@ -623,6 +626,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 2:
                 {
                     OpenCL_nDim *s = new OpenCL_nDim();
+                    s->SetNumberOfChemicals(2);
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(128,1,1,2);
@@ -633,6 +637,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 3:
                 {
                     OpenCL_nDim *s = new OpenCL_nDim();
+                    s->SetNumberOfChemicals(2);
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(128,64,1,2);
@@ -673,7 +678,7 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
 {
     try 
     {
-        this->system->TestProgram(string(this->kernel_pane->GetValue().mb_str()));
+        this->system->TestFormula(string(this->kernel_pane->GetValue().mb_str()));
     }
     catch(const runtime_error& e)
     {
@@ -686,13 +691,13 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
         return;
     }
     // program compiled successfully
-    this->system->SetProgram(string(this->kernel_pane->GetValue().mb_str()));
+    this->system->SetFormula(string(this->kernel_pane->GetValue().mb_str()));
     this->kernel_pane->SetModified(false);
 }
 
 void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
 {
-    event.Enable(this->system->HasEditableProgram() && this->kernel_pane->IsModified());
+    event.Enable(this->system->HasEditableFormula() && this->kernel_pane->IsModified());
 }
 
 void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)

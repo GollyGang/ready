@@ -46,6 +46,7 @@ void SetSystemFromXML(BaseRD* system,vtkXMLDataElement* rd)
     string rule_name,rule_description,pattern_description,formula;
     vector<pair<string,float> > params;
     float timestep;
+    int n_chemicals;
 
     // first load everything into local variables (in case there's a problem)
     {
@@ -55,8 +56,10 @@ void SetSystemFromXML(BaseRD* system,vtkXMLDataElement* rd)
         s = rule->GetAttribute("name");
         if(!s) throw runtime_error("Failed to read rule attribute: name");
         rule_name = read_string(s);
+        s = rule->GetAttribute("number_of_chemicals");
+        if(!s || !from_string(s,n_chemicals)) throw runtime_error("Failed to read rule attribute: number_of_chemicals");
         s = rule->GetAttribute("timestep");
-        if(!s || !read_float(s,timestep)) throw runtime_error("Failed to read rule attribute: timestep");
+        if(!s || !from_string(s,timestep)) throw runtime_error("Failed to read rule attribute: timestep");
         vtkSmartPointer<vtkXMLDataElement> xml_rule_description = rule->FindNestedElementWithName("description");
         if(!xml_rule_description) rule_description=""; // optional, default is empty string
         else rule_description = read_string(xml_rule_description->GetCharacterData());
@@ -70,7 +73,7 @@ void SetSystemFromXML(BaseRD* system,vtkXMLDataElement* rd)
             if(!s) throw runtime_error("Failed to read param attribute: name");
             name = read_string(s);
             s = node->GetCharacterData();
-            if(!s || !read_float(s,val)) throw runtime_error("Failed to read param value");
+            if(!s || !from_string(s,val)) throw runtime_error("Failed to read param value");
             params.push_back(make_pair(name,val));
         }
         vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
@@ -86,11 +89,12 @@ void SetSystemFromXML(BaseRD* system,vtkXMLDataElement* rd)
     system->SetRuleDescription(rule_description);
     system->SetPatternDescription(pattern_description);
     system->SetTimestep(timestep);
+    system->SetNumberOfChemicals(n_chemicals);
     system->DeleteAllParameters();
     for(int i=0;i<(int)params.size();i++)
         system->AddParameter(params[i].first,params[i].second);
-    system->TestProgram(formula); // will throw on error
-    system->SetProgram(formula);
+    system->TestFormula(formula); // will throw on error
+    system->SetFormula(formula);
 }
 
 void RD_XMLReader::SetFromXML(BaseRD* rd_system)
@@ -102,7 +106,43 @@ void RD_XMLReader::SetFromXML(BaseRD* rd_system)
     SetSystemFromXML(rd_system,rd);
 }
 
-void RD_XMLWriter::WriteRDSystemXML(BaseRD* system,ostream& os,vtkIndent indent)
+vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system)
 {
-    // TODO
+    vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
+    rd->SetName("RD");
+    {
+        vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
+        rule->SetName("rule");
+        rule->SetAttribute("name",system->GetRuleName().c_str());
+        rule->SetAttribute("timestep",to_string(system->GetTimestep()).c_str());
+        {
+            vtkSmartPointer<vtkXMLDataElement> rule_description = vtkSmartPointer<vtkXMLDataElement>::New();
+            rule_description->SetName("description");
+            rule_description->SetCharacterData(system->GetRuleDescription().c_str(),(int)system->GetRuleDescription().length());
+            rule->AddNestedElement(rule_description);
+        }
+        for(int i=0;i<system->GetNumberOfParameters();i++)
+        {
+            vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();
+            param->SetName("param");
+            param->SetAttribute("name",system->GetParameterName(i).c_str());
+            string s = to_string(system->GetParameterValue(i));
+            param->SetCharacterData(s.c_str(),(int)s.length());
+            rule->AddNestedElement(param);
+        }
+        {
+            vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
+            formula->SetName("formula");
+            formula->SetCharacterData(system->GetFormula().c_str(),(int)system->GetFormula().length());
+            rule->AddNestedElement(formula);
+        }
+        rd->AddNestedElement(rule);
+    }
+    {
+        vtkSmartPointer<vtkXMLDataElement> pattern_description = vtkSmartPointer<vtkXMLDataElement>::New();
+        pattern_description->SetName("pattern_description");
+        pattern_description->SetCharacterData(system->GetPatternDescription().c_str(),(int)system->GetPatternDescription().length());
+        rd->AddNestedElement(pattern_description);
+    }
+    return rd;
 }

@@ -36,7 +36,7 @@ class GrayScott_slow : public BaseRD
 
         void Update(int n_steps);
 
-        bool HasEditableProgram() const { return false; }
+        bool HasEditableFormula() const { return false; }
 
     protected:
 

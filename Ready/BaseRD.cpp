@@ -34,7 +34,7 @@ using namespace std;
 BaseRD::BaseRD()
 {
     this->timesteps_taken = 0;
-    this->need_reload_program = true;
+    this->need_reload_formula = true;
 }
 
 BaseRD::~BaseRD()
@@ -44,7 +44,7 @@ BaseRD::~BaseRD()
 
 void BaseRD::Deallocate()
 {
-    for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
+    for(int iChem=0;iChem<(int)this->images.size();iChem++)
     {
         if(this->images[iChem])
             this->images[iChem]->Delete();
@@ -74,11 +74,6 @@ int BaseRD::GetY() const
 int BaseRD::GetZ() const
 {
     return this->images.front()->GetDimensions()[2];
-}
-
-int BaseRD::GetNumberOfChemicals() const
-{
-    return (int)this->images.size();
 }
 
 float BaseRD::GetTimestep() const
@@ -116,41 +111,23 @@ int BaseRD::GetTimestepsTaken() const
 
 void BaseRD::Allocate(int x,int y,int z,int nc)
 {
+    if(nc!=this->n_chemicals) throw runtime_error("BaseRD::Allocate : chemical count mismatch");
     this->Deallocate();
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);
 }
 
-vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z)
+void BaseRD::SetFormula(string s)
 {
-    vtkImageData *im = vtkImageData::New();
-    assert(im);
-    im->SetNumberOfScalarComponents(1);
-    im->SetScalarTypeToFloat();
-    im->SetDimensions(x,y,z);
-    im->AllocateScalars();
-    if(im->GetDimensions()[0]!=x || im->GetDimensions()[1]!=y || im->GetDimensions()[2]!=z)
-        throw runtime_error("BaseRD::AllocateVTKImage : Failed to allocate image data - dimensions too big?");
-    return im;
+    if(s != this->formula)
+        this->need_reload_formula = true;
+    this->formula = s;
 }
 
-float* BaseRD::vtk_at(float* origin,int x,int y,int z,int X,int Y)
+string BaseRD::GetFormula() const
 {
-    // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
-    return origin + x + X*(y + Y*z);
-}
-
-void BaseRD::SetProgram(string s)
-{
-    if(s != this->program_string)
-        this->need_reload_program = true;
-    this->program_string = s;
-}
-
-string BaseRD::GetProgram() const
-{
-    return this->program_string;
+    return this->formula;
 }
 
 std::string BaseRD::GetRuleName() const
@@ -185,7 +162,7 @@ void BaseRD::SetPatternDescription(std::string s)
 
 int BaseRD::GetNumberOfParameters() const
 {
-    return this->parameters.size();
+    return (int)this->parameters.size();
 }
 
 std::string BaseRD::GetParameterName(int iParam) const
@@ -221,4 +198,23 @@ void BaseRD::SetParameterName(int iParam,string s)
 void BaseRD::SetParameterValue(int iParam,float val)
 {
     this->parameters[iParam].second = val;
+}
+
+/* static */ vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z)
+{
+    vtkImageData *im = vtkImageData::New();
+    assert(im);
+    im->SetNumberOfScalarComponents(1);
+    im->SetScalarTypeToFloat();
+    im->SetDimensions(x,y,z);
+    im->AllocateScalars();
+    if(im->GetDimensions()[0]!=x || im->GetDimensions()[1]!=y || im->GetDimensions()[2]!=z)
+        throw runtime_error("BaseRD::AllocateVTKImage : Failed to allocate image data - dimensions too big?");
+    return im;
+}
+
+/* static */ float* BaseRD::vtk_at(float* origin,int x,int y,int z,int X,int Y)
+{
+    // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
+    return origin + x + X*(y + Y*z);
 }
