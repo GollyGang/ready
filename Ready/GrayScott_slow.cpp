@@ -34,6 +34,7 @@ using namespace std;
 GrayScott_slow::GrayScott_slow()
 {
     this->timestep = 1.0f;
+    this->rule_name = "Gray-Scott";
     this->r_a = 0.082f;
     this->r_b = 0.041f;
     // for spots:
