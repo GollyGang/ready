@@ -26,11 +26,12 @@ using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
+#include <vtkXMLDataElement.h>
 
 OpenCL_nDim::OpenCL_nDim()
 {
     this->timestep = 1.0f;
-    this->program_string = 
+    this->pre_formula_kernel = 
 "__kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global float4 *a_out,__global float4 *b_out)\n\
 {\n\
     const int x = get_global_id(0);\n\
@@ -45,7 +46,7 @@ OpenCL_nDim::OpenCL_nDim()
     const float4 b = b_in[i];\n\
 \n\
     // compute the Laplacians of u and v\n\
-    const int xm1 = ((x-1+X) & (X-1)); // (wrap, assumes X and Y are powers of 2)\n\
+    const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n\
     const int xp1 = ((x+1) & (X-1));\n\
     const int ym1 = ((y-1+Y) & (Y-1));\n\
     const int yp1 = ((y+1) & (Y-1));\n\
@@ -80,27 +81,22 @@ OpenCL_nDim::OpenCL_nDim()
                                     b_up.z + b.w + b_down.z + b.y + b_fore.z + b_back.z,\n\
                                     b_up.w + b_right.x + b_down.w + b.z + b_fore.w + b_back.w) - 6.0f*b\n\
                                     + (float4)(1e-6f,1e-6f,1e-6f,1e-6f); // (kill denormals)\n\
-\n\
-    float4 delta_a;\n\
-    float4 delta_b;\n\
-    float delta_t;\n\
-\n\
-    // --------- change the code inside this block --------------\n\
-    // compute the new rate of change\n\
+    \n\
+    float4 delta_a,delta_b;\n\n\
+    // compute the new rate of change\n";
+    this->post_formula_kernel = "\n\
+    // apply the change\n\
+    a_out[i] = a + delta_t * delta_a;\n\
+    b_out[i] = b + delta_t * delta_b;\n}";
+    // provide a placeholder:
+    this->program_string = this->pre_formula_kernel + "\
     float D_a = 0.082f;\n\
     float D_b = 0.041f;\n\
     float k = 0.06f;\n\
     float F = 0.035f;\n\
     delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
     delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;\n\
-    delta_t = 1.0f;\n\
-    // ----------------------------------------------------------\n\
-\n\
-    // apply the change\n\
-    a_out[i] = a + delta_t * delta_a;\n\
-    b_out[i] = b + delta_t * delta_b;\n\
-}";
-    // TODO: parameterize the kernel code
+    float delta_t = 1.0f;\n" + this->post_formula_kernel;
 }
 
 void OpenCL_nDim::Allocate(int x,int y,int z,int nc)

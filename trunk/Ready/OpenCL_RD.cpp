@@ -267,13 +267,43 @@ void OpenCL_RD::Update2Steps()
     throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
 }
 
-void OpenCL_RD::TestProgram(std::string test_program_string) const
+std::string OpenCL_RD::AssembleKernelSource(std::string formula) const
 {
+    const string indent = "    ";
+    ostringstream kernel_source;
+    kernel_source << fixed << setprecision(6);
+    // the first part of the kernel
+    kernel_source << this->pre_formula_kernel;
+    // the parameters (assume all float for now)
+    for(int i=0;i<(int)this->parameters.size();i++)
+        kernel_source << indent << "float " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
+    // the timestep
+    kernel_source << indent << "float delta_t = " << this->timestep << "f;\n";
+    // the formula
+    istringstream iss(formula);
+    string s;
+    while(iss.good())
+    {
+        getline(iss,s);
+        kernel_source << indent << s << "\n";
+    }
+    // the second part of the kernel
+    kernel_source << this->post_formula_kernel;
+    return kernel_source.str();
+}
+
+void OpenCL_RD::TestProgram(std::string test_program_string)
+{
+    this->need_reload_context = true;
+    this->ReloadContextIfNeeded();
+
+    string kernel_source = this->AssembleKernelSource(test_program_string);
+
     cl_int ret;
 
     // create the program
-    const char *source = test_program_string.c_str();
-    size_t source_size = test_program_string.length()+1;
+    const char *source = kernel_source.c_str();
+    size_t source_size = kernel_source.length()+1;
     cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCL_RD::TestProgram : Failed to create program with source: ");
 
@@ -292,7 +322,23 @@ void OpenCL_RD::TestProgram(std::string test_program_string) const
     }
 }
 
-std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
+void OpenCL_RD::SetProgram(string program_string)
+{
+    string kernel_source = this->AssembleKernelSource(program_string);
+    if(kernel_source != this->program_string)
+    {
+        this->program_string = kernel_source;
+        this->need_reload_program = true;
+    }
+}
+
+void OpenCL_RD::CopyFromImage(vtkImageData* im)
+{
+    BaseRD::CopyFromImage(im);
+    this->WriteToOpenCLBuffers();
+}
+
+/* static */ std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
 {
     // TODO: make this report more readable, retrieve numeric data too
     ostringstream report;
@@ -349,7 +395,7 @@ std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwi
     return report.str();
 }
 
-int OpenCL_RD::GetNumberOfPlatforms()
+/* static */ int OpenCL_RD::GetNumberOfPlatforms()
 {
     if(LinkOpenCL() != CL_SUCCESS)
         return 0;
@@ -362,7 +408,7 @@ int OpenCL_RD::GetNumberOfPlatforms()
     return num_platforms;
 }
 
-int OpenCL_RD::GetNumberOfDevices(int iPlatform)
+/* static */ int OpenCL_RD::GetNumberOfDevices(int iPlatform)
 {
     if(LinkOpenCL() != CL_SUCCESS)
         return 0;
@@ -383,7 +429,7 @@ int OpenCL_RD::GetNumberOfDevices(int iPlatform)
     return num_devices;
 }
 
-string OpenCL_RD::GetPlatformDescription(int iPlatform)
+/* static */ string OpenCL_RD::GetPlatformDescription(int iPlatform)
 {
     LinkOpenCL();
 
@@ -407,7 +453,7 @@ string OpenCL_RD::GetPlatformDescription(int iPlatform)
     return oss.str();
 }
 
-string OpenCL_RD::GetDeviceDescription(int iPlatform,int iDevice)
+/* static */ string OpenCL_RD::GetDeviceDescription(int iPlatform,int iDevice)
 {
     LinkOpenCL();
 
@@ -438,7 +484,7 @@ string OpenCL_RD::GetDeviceDescription(int iPlatform,int iDevice)
     return oss.str();
 }
 
-cl_int OpenCL_RD::LinkOpenCL()
+/* static */ cl_int OpenCL_RD::LinkOpenCL()
 {
 #ifdef __APPLE__
     return CL_SUCCESS;
@@ -448,7 +494,7 @@ cl_int OpenCL_RD::LinkOpenCL()
 }
 
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
-const char* OpenCL_RD::descriptionOfError(cl_int err) 
+/* static */ const char* OpenCL_RD::descriptionOfError(cl_int err) 
 {
     switch (err) {
         case CL_SUCCESS:                            return "Success!";

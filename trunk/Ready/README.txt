@@ -48,6 +48,12 @@ Copyright (c) Greg Turk, 1991
 The code for dynamically-linking OpenCL (OpenCL_Dyn_Load.c and .h) is from the 
 ElectroMag project: http://code.google.com/p/electromag-with-cuda   Thanks!
 
+Ready uses wxWidgets for its graphical user interface:
+http://wxwidgets.org
+
+Ready uses VTK for its rendering:
+http://vtk.org
+
 ---------------------------------------------------------------------------------
                                    License
 ---------------------------------------------------------------------------------

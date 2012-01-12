@@ -19,6 +19,7 @@
 #include "frame.hpp"
 #include "vtk_pipeline.hpp"
 #include "utils.hpp"
+#include "IO_XML.hpp"
 
 // readybase:
 #include "GrayScott_slow.hpp"
@@ -54,7 +55,6 @@ using namespace std;
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>
 #include <vtkImageAppendComponents.h>
-#include <vtkImageExtractComponents.h>
 
 // IDs for the controls and the menu commands
 namespace ID { enum {
@@ -133,7 +133,7 @@ END_EVENT_TABLE()
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
-       is_running(true),
+       is_running(false),
        timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
@@ -229,7 +229,8 @@ void MyFrame::InitializePanes()
                             wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
         this->kernel_pane->SetFont(wxFont(9,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
         wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
+        //sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
+        // TODO: kernel-editing temporarily disabled, can edit file instead for now
         sizer->Add(this->kernel_pane,wxSizerFlags(1).Expand());
         panel->SetSizer(sizer);
         this->aui_mgr.AddPane(panel,
@@ -283,8 +284,7 @@ void MyFrame::InitializePanes()
             "<h5>3. Working with the windows</h5>"
             "<p>The Patterns Pane, Help Pane and Kernel Pane can be shown or hidden by using the commands on the View menu. By dragging the panes by their title bar you can dock them into the "
             "Ready frame in different positions or float them as separate windows."
-            "<p>The Kernel Pane is only used when the current system is an OpenCL demo. It shows the current OpenCL kernel and "
-            "allows for editing - you can change the parameters or the RD formula. Use the compile button to use the new kernel."
+            "<p>The Kernel Pane is only used when the current system is an OpenCL demo. It shows the current OpenCL kernel."
             "<h5>4. More help</h5>"
             "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
             "<p>See the text files in the installation folder for more information."
@@ -773,15 +773,18 @@ void MyFrame::OnHelp(wxCommandEvent &event)
 
 void MyFrame::OnSavePattern(wxCommandEvent &event)
 {
-    wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vtk"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
+    wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
+        _("VTK image files (*.vti)|*.vti"),
         wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if(filename.empty()) return; // user cancelled
 
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
     for(int i=0;i<this->system->GetNumberOfChemicals();i++)
         iac->AddInput(this->system->GetImage(i));
+    iac->Update();
 
-    vtkSmartPointer<vtkXMLImageDataWriter> iw = vtkSmartPointer<vtkXMLImageDataWriter>::New();
+    vtkSmartPointer<RD_XMLWriter> iw = vtkSmartPointer<RD_XMLWriter>::New();
+    iw->SetSystem(this->system);
     iw->SetInputConnection(iac->GetOutputPort());
     iw->SetFileName(filename.mb_str());
     iw->Write();
@@ -789,31 +792,45 @@ void MyFrame::OnSavePattern(wxCommandEvent &event)
 
 void MyFrame::OnOpenPattern(wxCommandEvent &event)
 {
-    wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vtk"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
+    wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
         wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
 
-    vtkSmartPointer<vtkXMLImageDataReader> iw = vtkSmartPointer<vtkXMLImageDataReader>::New();
-    iw->SetFileName(filename.mb_str());
-    iw->Update();
+    vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
+    BaseRD *target_system;
+    try
+    {
+        // to load pattern files, the implementation must support editable kernels, which for now means OpenCL_nDim
+        {
+            OpenCL_nDim *s = new OpenCL_nDim();
+            s->SetPlatform(this->iOpenCLPlatform);
+            s->SetDevice(this->iOpenCLDevice);
+            target_system = s;
+        }
 
-    vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
-    iec->SetInputConnection(iw->GetOutputPort());
+        iw->SetFileName(filename.mb_str());
+        iw->Update();
+        iw->SetFromXML(target_system);
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(_("Failed to open file: ")+wxString(e.what(),wxConvUTF8));
+        delete target_system;
+        return;
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Failed to open file"));
+        delete target_system;
+        return;
+    }
 
     int dim[3];
     iw->GetOutput()->GetDimensions(dim);
     int nc = iw->GetOutput()->GetNumberOfScalarComponents();
-    this->system->Allocate(dim[0],dim[1],dim[2],nc);
-    for(int i=0;i<nc;i++)
-    {
-        iec->SetComponents(i);
-        iec->Update();
-        this->system->CopyFromImage(i,iec->GetOutput());
-    }
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
-    this->UpdateWindows();
-
-    // TODO: this isn't our pattern format, just a placeholder
+    target_system->Allocate(dim[0],dim[1],dim[2],nc);
+    target_system->CopyFromImage(iw->GetOutput());
+    this->SetCurrentRDSystem(target_system);
 }
 
 void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)

@@ -22,7 +22,10 @@
 #include <string>
 #include <vector>
 
+// VTK:
+#include <vtkSmartPointer.h>
 class vtkImageData;
+class vtkXMLDataElement;
 
 // abstract base classes for all reaction-diffusion systems
 class BaseRD 
@@ -44,25 +47,45 @@ class BaseRD
         virtual void Update(int n_steps)=0;
 
         float GetTimestep() const;
+        virtual void SetTimestep(float t);
 
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
 
         vtkImageData* GetImage(int iChemical) const;
-        virtual void CopyFromImage(int iChemical,vtkImageData* im);
+        virtual void CopyFromImage(vtkImageData* im);
 
         virtual bool HasEditableProgram() const =0;
-        void SetProgram(std::string s);
         std::string GetProgram() const;
-        virtual void TestProgram(std::string program_string) const {}
+        virtual void TestProgram(std::string program_string) {}
+        virtual void SetProgram(std::string s);
 
         virtual void InitWithBlobInCenter() =0;
 
         virtual void Allocate(int x,int y,int z,int nc);
 
+        std::string GetRuleName() const;
+        std::string GetRuleDescription() const;
+        std::string GetPatternDescription() const;
+        void SetRuleName(std::string s);
+        void SetRuleDescription(std::string s);
+        void SetPatternDescription(std::string s);
+        int GetNumberOfParameters() const;
+        std::string GetParameterName(int iParam) const;
+        float GetParameterValue(int iParam) const;
+        virtual void AddParameter(std::string name,float val);
+        virtual void DeleteParameter(int iParam);
+        virtual void DeleteAllParameters();
+        virtual void SetParameterName(int iParam,std::string s);
+        virtual void SetParameterValue(int iParam,float val);
+
     protected:
 
+        std::string rule_name,rule_description,pattern_description;
+
         std::vector<vtkImageData*> images; // one for each chemical
+
+        std::vector<std::pair<std::string,float> > parameters;
 
         float timestep;
         int timesteps_taken;

@@ -29,6 +29,7 @@ using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
+#include <vtkImageExtractComponents.h>
 
 BaseRD::BaseRD()
 {
@@ -85,14 +86,27 @@ float BaseRD::GetTimestep() const
     return this->timestep; 
 }
 
+void BaseRD::SetTimestep(float t)
+{
+    this->timestep = t;
+}
+
 vtkImageData* BaseRD::GetImage(int iChemical) const
 { 
     return this->images[iChemical];
 }
 
-void BaseRD::CopyFromImage(int iChemical,vtkImageData* im)
+void BaseRD::CopyFromImage(vtkImageData* im)
 {
-    this->images[iChemical]->DeepCopy(im);
+    if(im->GetNumberOfScalarComponents()!=this->GetNumberOfChemicals()) throw runtime_error("BaseRD::CopyFromImage : chemical count mismatch");
+    vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
+    iec->SetInput(im);
+    for(int i=0;i<this->GetNumberOfChemicals();i++)
+    {
+        iec->SetComponents(i);
+        iec->Update();
+        this->images[i]->DeepCopy(iec->GetOutput());
+    }
 }
 
 int BaseRD::GetTimestepsTaken() const
@@ -137,4 +151,74 @@ void BaseRD::SetProgram(string s)
 string BaseRD::GetProgram() const
 {
     return this->program_string;
+}
+
+std::string BaseRD::GetRuleName() const
+{
+    return this->rule_name;
+}
+
+std::string BaseRD::GetRuleDescription() const
+{
+    return this->rule_description;
+}
+
+std::string BaseRD::GetPatternDescription() const
+{
+    return this->pattern_description;
+}
+
+void BaseRD::SetRuleName(std::string s)
+{
+    this->rule_name = s;
+}
+
+void BaseRD::SetRuleDescription(std::string s)
+{
+    this->rule_description = s;
+}
+
+void BaseRD::SetPatternDescription(std::string s)
+{
+    this->pattern_description = s;
+}
+
+int BaseRD::GetNumberOfParameters() const
+{
+    return this->parameters.size();
+}
+
+std::string BaseRD::GetParameterName(int iParam) const
+{
+    return this->parameters[iParam].first;
+}
+
+float BaseRD::GetParameterValue(int iParam) const
+{
+    return this->parameters[iParam].second;
+}
+
+void BaseRD::AddParameter(std::string name,float val)
+{
+    this->parameters.push_back(make_pair(name,val));
+}
+
+void BaseRD::DeleteParameter(int iParam)
+{
+    this->parameters.erase(this->parameters.begin()+iParam);
+}
+
+void BaseRD::DeleteAllParameters()
+{
+    this->parameters.clear();
+}
+
+void BaseRD::SetParameterName(int iParam,string s)
+{
+    this->parameters[iParam].first = s;
+}
+
+void BaseRD::SetParameterValue(int iParam,float val)
+{
+    this->parameters[iParam].second = val;
 }
