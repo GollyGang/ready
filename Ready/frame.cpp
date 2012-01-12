@@ -802,9 +802,9 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
         wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
 
+	BaseRD *target_system;
     try
     {
-		BaseRD *target_system;
         // to load pattern files, the implementation must support editable kernels, which for now means OpenCL_nDim
         {
             OpenCL_nDim *s = new OpenCL_nDim();
