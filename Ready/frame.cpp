@@ -648,6 +648,7 @@ void MyFrame::LoadDemo(int iDemo)
             case 4:
                 {
                     OpenCL_nDim *s = new OpenCL_nDim();
+                    s->SetNumberOfChemicals(2);
                     s->SetPlatform(this->iOpenCLPlatform);
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(64,64,64,2);
