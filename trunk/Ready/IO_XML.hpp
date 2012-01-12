@@ -7,6 +7,7 @@ class BaseRD;
 #include <vtkXMLDataElement.h>
 #include <vtkObjectFactory.h>
 #include <vtkXMLDataElement.h>
+#include <vtkSmartPointer.h>
 
 class RD_XMLWriter : public vtkXMLImageDataWriter
 {
@@ -21,11 +22,11 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
 
         RD_XMLWriter() : system(NULL) {} 
 
-        static void WriteRDSystemXML(BaseRD* system,ostream& os,vtkIndent indent);
+        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(BaseRD* system);
 
         int WritePrimaryElement(ostream& os,vtkIndent indent)
         {
-            WriteRDSystemXML(this->system,os,indent);
+            BuildRDSystemXML(this->system)->PrintXML(os,indent);
             return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
         }
 

@@ -23,10 +23,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-// STL:
-#include <sstream>
-using namespace std;
-
 #ifdef _WIN32
     #include <sys/timeb.h>
     #include <sys/types.h>
@@ -63,11 +59,4 @@ double hypot2(double x,double y)
 double hypot3(double x,double y,double z) 
 { 
     return sqrt(x*x+y*y+z*z); 
-}
-
-bool read_float(const char* s,float& f)
-{
-    istringstream iss(s);
-    iss >> f;
-    return !iss.fail();
 }

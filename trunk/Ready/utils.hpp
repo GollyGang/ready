@@ -15,6 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// STL:
+#include <string>
+#include <sstream>
+
 double get_time_in_seconds();
 
 float frand(float lower,float upper);
@@ -27,4 +31,17 @@ double hypot3(double x,double y,double z);
 #define STRING_FROM_LITERAL(a) #a
 #define STR(a) STRING_FROM_LITERAL(a)
 
-bool read_float(const char* s,float& f);
+template <typename T> std::string to_string(const T& t) 
+{ 
+    std::ostringstream oss; 
+    oss << t; 
+    return oss.str(); 
+} 
+
+template <typename T> bool from_string(const std::string& s,T& val) 
+{ 
+    std::istringstream iss(s); 
+    iss >> val; 
+    return !iss.fail(); 
+} 
+

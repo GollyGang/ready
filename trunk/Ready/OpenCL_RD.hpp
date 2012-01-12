@@ -38,7 +38,7 @@ class OpenCL_RD : public BaseRD
         OpenCL_RD();
         ~OpenCL_RD();
 
-        bool HasEditableProgram() const { return true; }
+        bool HasEditableFormula() const { return true; }
 
         void SetPlatform(int i);
         void SetDevice(int i);
@@ -50,8 +50,7 @@ class OpenCL_RD : public BaseRD
         static std::string GetPlatformDescription(int iPlatform);
         static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
-        void SetProgram(std::string program_string);
-        void TestProgram(std::string program_string);
+        void TestFormula(std::string s);
 
         void CopyFromImage(vtkImageData* im);
 
@@ -74,7 +73,8 @@ class OpenCL_RD : public BaseRD
 
     protected:
 
-        std::string pre_formula_kernel,post_formula_kernel;
+        std::string kernel_part1,kernel_part2,kernel_part3,kernel_part4;
+        std::string kernel_source;
 
     private:
 

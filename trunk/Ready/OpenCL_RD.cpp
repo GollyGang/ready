@@ -17,6 +17,7 @@
 
 // local:
 #include "OpenCL_RD.hpp"
+#include "utils.hpp"
 
 // STL:
 #include <vector>
@@ -131,13 +132,14 @@ void OpenCL_RD::ReloadContextIfNeeded()
 
 void OpenCL_RD::ReloadKernelIfNeeded()
 {
-    if(!this->need_reload_program) return;
+    if(!this->need_reload_formula) return;
 
     cl_int ret;
 
     // create the program
-    const char *source = this->program_string.c_str();
-    size_t source_size = this->program_string.length()+1;
+    this->kernel_source = this->AssembleKernelSource(this->formula);
+    const char *source = this->kernel_source.c_str();
+    size_t source_size = this->kernel_source.length()+1;
     cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
@@ -188,7 +190,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     this->local_range[1] = wgy;
     this->local_range[2] = wgz;
 
-    this->need_reload_program = false;
+    this->need_reload_formula = false;
 }
 
 void OpenCL_RD::CreateOpenCLBuffers()
@@ -267,13 +269,54 @@ void OpenCL_RD::Update2Steps()
     throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
 }
 
+string Chem(int i) { return to_string((char)('a'+i)); } // a, b, c, ...
+
 std::string OpenCL_RD::AssembleKernelSource(std::string formula) const
 {
     const string indent = "    ";
+    const int NC = this->GetNumberOfChemicals();
+    const int NDIRS = 6;
+    const string dir[NDIRS]={"left","right","up","down","fore","back"};
+
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
-    // the first part of the kernel
-    kernel_source << this->pre_formula_kernel;
+    // output the function definition
+    kernel_source << this->kernel_part1;
+    for(int i=0;i<NC;i++)
+        kernel_source << "__global float4 *" << Chem(i) << "_in,";
+    for(int i=0;i<NC;i++)
+    {
+        kernel_source << "__global float4 *" << Chem(i) << "_out";
+        if(i<NC-1)
+            kernel_source << ",";
+    }
+    // output the first part of the body
+    kernel_source << this->kernel_part2;
+    for(int i=0;i<NC;i++)
+        kernel_source << indent << "float4 " << Chem(i) << " = " << Chem(i) << "_in[i];\n"; // "float4 a = a_in[i];"
+    // output the Laplacian part of the body
+    kernel_source << this->kernel_part3;
+    for(int iC=0;iC<NC;iC++)
+    {
+        for(int iDir=0;iDir<NDIRS;iDir++)
+        {
+            kernel_source << indent << "float4 " << Chem(iC) << "_" << dir[iDir] << " = " << Chem(iC) << "_in[i_" << dir[iDir] << "];\n";
+        }
+    }
+    for(int iC=0;iC<NC;iC++)
+    {
+        kernel_source << indent << "float4 laplacian_" << Chem(iC) << " = (float4)(" << Chem(iC) << "_up.x + " << Chem(iC) << ".y + " << Chem(iC) << "_down.x + " << Chem(iC) << "_left.w + " << Chem(iC) << "_fore.x + " << Chem(iC) << "_back.x,\n";
+        kernel_source << indent << Chem(iC) << "_up.y + " << Chem(iC) << ".z + " << Chem(iC) << "_down.y + " << Chem(iC) << ".x + " << Chem(iC) << "_fore.y + " << Chem(iC) << "_back.y,\n";
+        kernel_source << indent << Chem(iC) << "_up.z + " << Chem(iC) << ".w + " << Chem(iC) << "_down.z + " << Chem(iC) << ".y + " << Chem(iC) << "_fore.z + " << Chem(iC) << "_back.z,\n";
+        kernel_source << indent << Chem(iC) << "_up.w + " << Chem(iC) << "_right.x + " << Chem(iC) << "_down.w + " << Chem(iC) << ".z + " << Chem(iC) << "_fore.w + " << Chem(iC) << "_back.w) - 6.0f*" << Chem(iC) << "\n";
+        kernel_source << indent << "+ (float4)(1e-6f,1e-6f,1e-6f,1e-6f); // (kill denormals)\n";
+    }
+    kernel_source << "\n";
+    for(int iC=0;iC<NC;iC++)
+    {
+        kernel_source << indent << "float4 delta_" << Chem(iC) << ";\n";
+    }
+    kernel_source << "\n";
     // the parameters (assume all float for now)
     for(int i=0;i<(int)this->parameters.size();i++)
         kernel_source << indent << "float " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
@@ -287,17 +330,19 @@ std::string OpenCL_RD::AssembleKernelSource(std::string formula) const
         getline(iss,s);
         kernel_source << indent << s << "\n";
     }
-    // the second part of the kernel
-    kernel_source << this->post_formula_kernel;
+    // the last part of the kernel
+    for(int iC=0;iC<NC;iC++)
+        kernel_source << indent << Chem(iC) << "_out[i] = " << Chem(iC) << " + delta_t * delta_" << Chem(iC) << ";\n";
+    kernel_source << this->kernel_part4;
     return kernel_source.str();
 }
 
-void OpenCL_RD::TestProgram(std::string test_program_string)
+void OpenCL_RD::TestFormula(std::string formula)
 {
     this->need_reload_context = true;
     this->ReloadContextIfNeeded();
 
-    string kernel_source = this->AssembleKernelSource(test_program_string);
+    string kernel_source = this->AssembleKernelSource(formula);
 
     cl_int ret;
 
@@ -319,16 +364,6 @@ void OpenCL_RD::TestProgram(std::string test_program_string)
         ostringstream oss;
         oss << "OpenCL_RD::TestProgram : build failed:\n\n" << build_log;
         throw runtime_error(oss.str().c_str());
-    }
-}
-
-void OpenCL_RD::SetProgram(string program_string)
-{
-    string kernel_source = this->AssembleKernelSource(program_string);
-    if(kernel_source != this->program_string)
-    {
-        this->program_string = kernel_source;
-        this->need_reload_program = true;
     }
 }
 
