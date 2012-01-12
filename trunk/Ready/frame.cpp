@@ -802,10 +802,9 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
         wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
 
-    vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
-    BaseRD *target_system;
     try
     {
+		BaseRD *target_system;
         // to load pattern files, the implementation must support editable kernels, which for now means OpenCL_nDim
         {
             OpenCL_nDim *s = new OpenCL_nDim();
@@ -814,9 +813,17 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
             target_system = s;
         }
 
+		vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
         iw->SetFileName(filename.mb_str());
         iw->Update();
         iw->SetFromXML(target_system);
+
+		int dim[3];
+		iw->GetOutput()->GetDimensions(dim);
+		int nc = iw->GetOutput()->GetNumberOfScalarComponents();
+		target_system->Allocate(dim[0],dim[1],dim[2],nc);
+		target_system->CopyFromImage(iw->GetOutput());
+		this->SetCurrentRDSystem(target_system);
     }
     catch(const exception& e)
     {
@@ -830,13 +837,6 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
         delete target_system;
         return;
     }
-
-    int dim[3];
-    iw->GetOutput()->GetDimensions(dim);
-    int nc = iw->GetOutput()->GetNumberOfScalarComponents();
-    target_system->Allocate(dim[0],dim[1],dim[2],nc);
-    target_system->CopyFromImage(iw->GetOutput());
-    this->SetCurrentRDSystem(target_system);
 }
 
 void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
