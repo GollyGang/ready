@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <stdexcept>
 using namespace std;
 
 // stdlib:
@@ -114,6 +115,7 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
         vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
         rule->SetName("rule");
         rule->SetAttribute("name",system->GetRuleName().c_str());
+        rule->SetAttribute("number_of_chemicals",to_string(system->GetNumberOfChemicals()).c_str());
         rule->SetAttribute("timestep",to_string(system->GetTimestep()).c_str());
         {
             vtkSmartPointer<vtkXMLDataElement> rule_description = vtkSmartPointer<vtkXMLDataElement>::New();
