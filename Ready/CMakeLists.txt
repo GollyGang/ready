@@ -45,6 +45,7 @@ set(BASE_SOURCES
    GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
    OpenCL_RD.hpp OpenCL_RD.cpp
    OpenCL_nDim.hpp OpenCL_nDim.cpp
+   IO_XML.hpp IO_XML.cpp
    utils.hpp utils.cpp
 )
 if (NOT APPLE)
@@ -225,12 +226,8 @@ install( TARGETS ${APP_NAME} DESTINATION "." )
 install( FILES ${PACKAGED_FILES} DESTINATION "." )
 
 include( InstallRequiredSystemLibraries )
-
 set( CPACK_GENERATOR "ZIP" )
-
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
-
 set( CPACK_SOURCE_GENERATOR "ZIP" )
-
 include( CPack )
 

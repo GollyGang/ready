@@ -27,3 +27,4 @@ double hypot3(double x,double y,double z);
 #define STRING_FROM_LITERAL(a) #a
 #define STR(a) STRING_FROM_LITERAL(a)
 
+bool read_float(const char* s,float& f);

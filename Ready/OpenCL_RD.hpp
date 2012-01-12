@@ -50,9 +50,14 @@ class OpenCL_RD : public BaseRD
         static std::string GetPlatformDescription(int iPlatform);
         static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
-        void TestProgram(std::string program_string) const;
+        void SetProgram(std::string program_string);
+        void TestProgram(std::string program_string);
+
+        void CopyFromImage(vtkImageData* im);
 
     protected:
+
+        std::string AssembleKernelSource(std::string formula) const;
 
         void ReloadContextIfNeeded();
         void ReloadKernelIfNeeded();
@@ -66,6 +71,10 @@ class OpenCL_RD : public BaseRD
         static cl_int LinkOpenCL();
         static void throwOnError(cl_int ret,const char* message);
         static const char* descriptionOfError(cl_int err);
+
+    protected:
+
+        std::string pre_formula_kernel,post_formula_kernel;
 
     private:
 
