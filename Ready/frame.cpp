@@ -802,7 +802,7 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
         wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
 
-	BaseRD *target_system;
+    BaseRD *target_system;
     try
     {
         // to load pattern files, the implementation must support editable kernels, which for now means OpenCL_nDim
@@ -813,17 +813,17 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
             target_system = s;
         }
 
-		vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
+        vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
         iw->SetFileName(filename.mb_str());
         iw->Update();
         iw->SetFromXML(target_system);
 
-		int dim[3];
-		iw->GetOutput()->GetDimensions(dim);
-		int nc = iw->GetOutput()->GetNumberOfScalarComponents();
-		target_system->Allocate(dim[0],dim[1],dim[2],nc);
-		target_system->CopyFromImage(iw->GetOutput());
-		this->SetCurrentRDSystem(target_system);
+        int dim[3];
+        iw->GetOutput()->GetDimensions(dim);
+        int nc = iw->GetOutput()->GetNumberOfScalarComponents();
+        target_system->Allocate(dim[0],dim[1],dim[2],nc);
+        target_system->CopyFromImage(iw->GetOutput());
+        this->SetCurrentRDSystem(target_system);
     }
     catch(const exception& e)
     {
