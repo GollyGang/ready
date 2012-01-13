@@ -29,4 +29,6 @@ class OpenCL_nDim : public OpenCL_RD
         void InitWithBlobInCenter();
 
         void Update(int n_steps);
+
+        std::string AssembleKernelSourceFromFormula(std::string formula) const;
 };
