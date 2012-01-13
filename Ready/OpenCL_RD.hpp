@@ -56,7 +56,7 @@ class OpenCL_RD : public BaseRD
 
     protected:
 
-        std::string AssembleKernelSource(std::string formula) const;
+        std::string AssembleKernelSourceFromFormula(std::string formula) const;
 
         void ReloadContextIfNeeded();
         void ReloadKernelIfNeeded();
@@ -73,7 +73,6 @@ class OpenCL_RD : public BaseRD
 
     protected:
 
-        std::string kernel_part1,kernel_part2,kernel_part3,kernel_part4;
         std::string kernel_source;
 
     private:
