@@ -8,6 +8,9 @@ Tested on: Windows, Linux, MacOS
 
 For build instructions, see BUILD.txt.
 
+Ready is free software. Help us improve it.
+http://code.google.com/p/reaction-diffusion/
+
 ---------------------------------------------------------------------------------
                               Acknowledgements
 ---------------------------------------------------------------------------------

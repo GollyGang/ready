@@ -118,7 +118,6 @@ private:
     void UpdateWindows();
     void SetStatusBarText();
 
-    wxTreeCtrl* CreatePatternsCtrl();
     std::vector<wxTreeItemId> demo_ids;
 
     DECLARE_EVENT_TABLE()
