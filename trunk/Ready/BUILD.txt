@@ -66,14 +66,8 @@ Alternatively, use ccmake or cmake-gui.
  # svn checkout http://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion-read-only
  # And substitute "reaction-diffusion-read-only" for "reaction-diffusion" in the following
  #
- cd reaction-diffusion
  mkdir Ready_gui_build
- cd !$
+ cd Ready_gui_build
  cmake ../reaction-diffusion/Ready -DVTK_DIR:PATH=$HOME/devt/VTK/build
  make
-
-4. Finally, "open ." which will show the current directory in the Finder, and 
-   you should see the Ready icon. However my Finder will not let me run it, so I just type:
-
- ./Ready.app/Contents/MacOS/Ready
-
+ open Ready.app
