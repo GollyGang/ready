@@ -157,39 +157,17 @@ endif()
   
 #--------------------------copy pattern files to build folder---------------------------------
 
-# Copy files from source directory to destination directory, substituting any
-# variables. Create destination directory if it does not exist.
-# http://stackoverflow.com/a/697745/126823
-#macro(configure_files srcDir destDir)
-#    message(STATUS "Configuring directory ${destDir}")
-#    make_directory(${destDir})
-#    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
-#    foreach(templateFile ${templateFiles})
-#        set(srcTemplatePath ${srcDir}/${templateFile})
-#        if(NOT IS_DIRECTORY ${srcTemplatePath})
-#            message(STATUS "Configuring file ${templateFile}")
-#            configure_file(
-#                    ${srcTemplatePath}
-#                    ${destDir}/${templateFile}
-#                    @ONLY)
-#        endif(NOT IS_DIRECTORY ${srcTemplatePath})
-#    endforeach(templateFile)
-#endmacro(configure_files)
-#
-#configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/patterns ${CMAKE_CURRENT_BINARY_DIR}/patterns )
-
 file( GLOB_RECURSE pattern_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/" "patterns/*.vti" )
-message( STATUS "Copying pattern files ${pattern_files}" ) 
-
 foreach( pattern_file ${pattern_files} )
-  ADD_CUSTOM_COMMAND( 
+  add_custom_command( 
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}"
   )
   list( APPEND pattern_files_dest "${pattern_file}" )
 endforeach( pattern_file ) 
-ADD_CUSTOM_TARGET( CopyPatterns ALL DEPENDS ${pattern_files_dest} )  
+add_custom_target( CopyPatterns ALL DEPENDS ${pattern_files_dest} )
+# (will update the list of patterns to copy across only when configuring, so when you add new patterns you will need to re-configure)
 
 #-----------------------------------------------------------------------------------------------
 
@@ -264,7 +242,7 @@ install( FILES
   DESTINATION "." 
 )
 
-# copy the patterns into their own folder
+# copy the patterns from the source folder
 install( DIRECTORY "patterns" DESTINATION "." FILES_MATCHING PATTERN "*.vti")
 
 # put the system runtimes in root folder instead of "bin"
