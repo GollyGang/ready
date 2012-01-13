@@ -220,12 +220,14 @@ void FillTreeWithFilenames(wxTreeCtrl* tree,wxTreeItemId root,wxString folder,wx
     for(int i=0;i<as.size();i++)
         tree->AppendItem(root,wxFileName(as[i]).GetFullName(),1);
     // recurse down into each subdirectory
-    as.clear();
-    wxDir::GetAllFiles(folder,&as,wxEmptyString,wxDIR_DIRS);
-    for(int i=0;i<as.size();i++)
+    wxDir dir(folder);
+    wxString folder_name;
+    bool cont = dir.GetFirst(&folder_name,wxALL_FILES_PATTERN,wxDIR_DIRS);
+    while(cont)
     {
-        wxTreeItemId subfolder = tree->AppendItem(root,wxFileName(as[i]).GetName(),0);
-        FillTreeWithFilenames(tree,subfolder,as[i],filename_template);
+        wxTreeItemId subfolder = tree->AppendItem(root,folder_name,0);
+        FillTreeWithFilenames(tree,subfolder,folder+_T("/")+folder_name,filename_template);
+        cont = dir.GetNext(&folder_name);
     }
 }
 
