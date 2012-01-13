@@ -155,6 +155,28 @@ if(APPLE)
   link_libraries ( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
   
+#--------------------------copy pattern files to build folder---------------------------------
+
+# Copy files from source directory to destination directory, substituting any
+# variables.  Create destination directory if it does not exist.
+macro(configure_files srcDir destDir)
+    message(STATUS "Configuring directory ${destDir}")
+    make_directory(${destDir})
+    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
+    foreach(templateFile ${templateFiles})
+        set(srcTemplatePath ${srcDir}/${templateFile})
+        if(NOT IS_DIRECTORY ${srcTemplatePath})
+            message(STATUS "Configuring file ${templateFile}")
+            configure_file(
+                    ${srcTemplatePath}
+                    ${destDir}/${templateFile}
+                    @ONLY)
+        endif(NOT IS_DIRECTORY ${srcTemplatePath})
+    endforeach(templateFile)
+endmacro(configure_files)
+
+configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/patterns ${CMAKE_CURRENT_BINARY_DIR}/patterns )
+
 #-----------------------------------------------------------------------------------------------
 
 if(APPLE)
@@ -216,16 +238,34 @@ if(MSVC_IDE)
    set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
 endif()
 
-#----------------------------------------Packaging----------------------------------------------
+#----------------------------------------install------------------------------------------------
 
-set( PACKAGED_FILES
-  "README.txt" "CHANGES.txt" "COPYING.txt" "TODO.txt" 
+# put Ready in the root of the package folder
+install( TARGETS ${APP_NAME} DESTINATION "." )
+
+# put some text files there too
+install( FILES 
+  "README.txt" "CHANGES.txt" "COPYING.txt" "TODO.txt"
+  DESTINATION "." 
 )
 
-install( TARGETS ${APP_NAME} DESTINATION "." )
-install( FILES ${PACKAGED_FILES} DESTINATION "." )
+# copy the patterns into their own folder
+file( GLOB pattern_files "${CMAKE_CURRENT_SOURCE_DIR}/patterns/*.vti" )
+install( FILES ${pattern_files} DESTINATION "patterns" )
 
-include( InstallRequiredSystemLibraries )
+# Add install rules for required system runtimes such as MSVCRxx.dll
+SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
+INCLUDE(InstallRequiredSystemLibraries)
+IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+    DESTINATION "."
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
+GROUP_EXECUTE WORLD_READ
+    COMPONENT Runtime)
+ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+
+#----------------------------------------package----------------------------------------------
+
 set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
 set( CPACK_SOURCE_GENERATOR "ZIP" )
