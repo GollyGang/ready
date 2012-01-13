@@ -106,7 +106,10 @@ private:
 private:
 
     void InitializeMenus();
-    void InitializePanes();
+    void InitializePatternsPane();
+    void InitializeRulePane();
+    void InitializeHelpPane();
+    void InitializeRenderPane();
     void LoadSettings();
     void SaveSettings();
     void LoadDemo(int iDemo);

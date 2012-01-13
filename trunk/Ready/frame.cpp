@@ -148,7 +148,10 @@ MyFrame::MyFrame(const wxString& title)
     CreateStatusBar(1);
     SetStatusText(_("Ready"));
 
-    this->InitializePanes();
+    this->InitializePatternsPane();
+    this->InitializeRulePane();
+    this->InitializeHelpPane();
+    this->InitializeRenderPane();
     
     this->default_perspective = this->aui_mgr.SavePerspective();
     this->LoadSettings();
@@ -160,7 +163,6 @@ MyFrame::MyFrame(const wxString& title)
 
 void MyFrame::InitializeMenus()
 {
-    // add menus
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
@@ -210,7 +212,7 @@ void MyFrame::InitializeMenus()
     SetMenuBar(menuBar);
 }
 
-void MyFrame::InitializePanes()
+void MyFrame::InitializePatternsPane()
 {
     // a patterns file structure pane (currently just has some hard-wired demos)
     this->aui_mgr.AddPane(this->CreatePatternsCtrl(), wxAuiPaneInfo()
@@ -220,84 +222,91 @@ void MyFrame::InitializePanes()
                   .BestSize(300,300)
                   .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
-    // a rule-editing pane
-    {
-        wxPanel *panel = new wxPanel(this,wxID_ANY);
-        this->rule_pane = new wxTextCtrl(panel,wxID_ANY,
-                            _T(""),
-                            wxDefaultPosition,wxDefaultSize,
-                            wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
-        this->rule_pane->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
-        wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        //sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
-        // TODO: kernel-editing temporarily disabled, can edit file instead for now
-        sizer->Add(this->rule_pane,wxSizerFlags(1).Expand());
-        panel->SetSizer(sizer);
-        this->aui_mgr.AddPane(panel,
-                      wxAuiPaneInfo()
-                      .Name(PaneName(ID::RulePane))
-                      .Caption(_("Rule Pane"))
-                      .Right()
-                      .BestSize(400,400)
-                      .Layer(1) // layer 1 is further towards the edge
-                      .Hide()
-                      );
-    }
-    {
-        // http://wiki.wxwidgets.org/Calling_The_Default_Browser_In_WxHtmlWindow
-        class HtmlWindow: public wxHtmlWindow
-        {
-        public:
-            HtmlWindow(wxWindow *parent, wxWindowID id = -1,
-                const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
-                long style = wxHW_SCROLLBAR_AUTO, const wxString& name = _T("htmlWindow"))
-                : wxHtmlWindow(parent, id, pos, size, style, name) {}
+}
 
-            void OnLinkClicked(const wxHtmlLinkInfo& link)
-            {
-                if( link.GetHref().StartsWith(_T("http://")) || link.GetHref().StartsWith(_T("mailto://")) )
-                    wxLaunchDefaultBrowser(link.GetHref());
-                else
-                    wxHtmlWindow::OnLinkClicked(link);
-            }
-        };
-        // a help pane
-        HtmlWindow *html = new HtmlWindow(this,wxID_ANY);
-        html->SetPage(_("<html><body>"
-            "<h3>Quick start guide</h3>"
-            "<h5>1. Overview</h5>"
-            "<p>Ready " STR(READY_VERSION) " is an early release of a program to explore <a href=\"http://en.wikipedia.org/wiki/Reaction-diffusion_system\">reaction-diffusion</a> systems.</p>"
-            "<p>Click on the demos in the Patterns Pane to see some different systems."
-            "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
-            "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
-            "that will work with your CPU. Use the Settings menu commands to examine the OpenCL devices available."
-            "<h5>2. Interacting with the rendered scene</h5>"
-            "<p>From the Actions menu: Stop (F6) the system running, or start it running (F5), or take small Steps (F4)."
-            "<p><b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball"
-            "<p><b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out"
-            "<p><b>scroll wheel:</b> zoom in and out"
-            "<p><b>shift+left mouse:</b> pan"
-            "<p><b>ctrl+left mouse:</b> roll"
-            "<p><b>'r':</b> reset the view to make everything visible"
-            "<p><b>'w':</b> switch to wireframe view"
-            "<p><b>'s':</b> switch to surface view</ul>"
-            "<h5>3. Working with the windows</h5>"
-            "<p>The Patterns Pane, Help Pane and Kernel Pane can be shown or hidden by using the commands on the View menu. By dragging the panes by their title bar you can dock them into the "
-            "Ready frame in different positions or float them as separate windows."
-            "<p>The Kernel Pane is only used when the current system is an OpenCL demo. It shows the current OpenCL kernel."
-            "<h5>4. More help</h5>"
-            "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
-            "<p>See the text files in the installation folder for more information."
-            "</body></html>")); // TODO: split out into html files
-        this->aui_mgr.AddPane(html, 
-                      wxAuiPaneInfo()
-                      .Name(PaneName(ID::HelpPane))
-                      .Caption(_("Help Pane"))
-                      .Right()
-                      .BestSize(400,400)
-                      .Hide()
-                      );
-    }
+void MyFrame::InitializeRulePane()
+{
+    wxPanel *panel = new wxPanel(this,wxID_ANY);
+    this->rule_pane = new wxTextCtrl(panel,wxID_ANY,
+                        _T(""),
+                        wxDefaultPosition,wxDefaultSize,
+                        wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
+    this->rule_pane->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+    //sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
+    // TODO: kernel-editing temporarily disabled, can edit file instead for now
+    sizer->Add(this->rule_pane,wxSizerFlags(1).Expand());
+    panel->SetSizer(sizer);
+    this->aui_mgr.AddPane(panel,
+                  wxAuiPaneInfo()
+                  .Name(PaneName(ID::RulePane))
+                  .Caption(_("Rule Pane"))
+                  .Right()
+                  .BestSize(400,400)
+                  .Layer(1) // layer 1 is further towards the edge
+                  .Hide()
+                  );
+}
+
+void MyFrame::InitializeHelpPane()
+{
+    // http://wiki.wxwidgets.org/Calling_The_Default_Browser_In_WxHtmlWindow
+    class HtmlWindow: public wxHtmlWindow
+    {
+    public:
+        HtmlWindow(wxWindow *parent, wxWindowID id = -1,
+            const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
+            long style = wxHW_SCROLLBAR_AUTO, const wxString& name = _T("htmlWindow"))
+            : wxHtmlWindow(parent, id, pos, size, style, name) {}
+
+        void OnLinkClicked(const wxHtmlLinkInfo& link)
+        {
+            if( link.GetHref().StartsWith(_T("http://")) || link.GetHref().StartsWith(_T("mailto://")) )
+                wxLaunchDefaultBrowser(link.GetHref());
+            else
+                wxHtmlWindow::OnLinkClicked(link);
+        }
+    };
+    // a help pane
+    HtmlWindow *html = new HtmlWindow(this,wxID_ANY);
+    html->SetPage(_("<html><body>"
+        "<h3>Quick start guide</h3>"
+        "<h5>1. Overview</h5>"
+        "<p>Ready " STR(READY_VERSION) " is an early release of a program to explore <a href=\"http://en.wikipedia.org/wiki/Reaction-diffusion_system\">reaction-diffusion</a> systems.</p>"
+        "<p>Click on the demos in the Patterns Pane to see some different systems."
+        "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
+        "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
+        "that will work with your CPU. Use the Settings menu commands to examine the OpenCL devices available."
+        "<h5>2. Interacting with the rendered scene</h5>"
+        "<p>From the Actions menu: Stop (F6) the system running, or start it running (F5), or take small Steps (F4)."
+        "<p><b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball"
+        "<p><b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out"
+        "<p><b>scroll wheel:</b> zoom in and out"
+        "<p><b>shift+left mouse:</b> pan"
+        "<p><b>ctrl+left mouse:</b> roll"
+        "<p><b>'r':</b> reset the view to make everything visible"
+        "<p><b>'w':</b> switch to wireframe view"
+        "<p><b>'s':</b> switch to surface view</ul>"
+        "<h5>3. Working with the windows</h5>"
+        "<p>The Patterns Pane, Help Pane and Kernel Pane can be shown or hidden by using the commands on the View menu. By dragging the panes by their title bar you can dock them into the "
+        "Ready frame in different positions or float them as separate windows."
+        "<p>The Kernel Pane is only used when the current system is an OpenCL demo. It shows the current OpenCL kernel."
+        "<h5>4. More help</h5>"
+        "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
+        "<p>See the text files in the installation folder for more information."
+        "</body></html>")); // TODO: split out into html files
+    this->aui_mgr.AddPane(html, 
+                  wxAuiPaneInfo()
+                  .Name(PaneName(ID::HelpPane))
+                  .Caption(_("Help Pane"))
+                  .Right()
+                  .BestSize(400,400)
+                  .Hide()
+                  );
+}
+
+void MyFrame::InitializeRenderPane()
+{
     // for now the VTK window goes in the center pane (always visible) - we got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
