@@ -233,7 +233,7 @@ if(APPLE)
    target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
 endif()
 
-# hack to get around the "Debug" and "Release" folders Visual Studio adds on Windows
+# (Visual Studio only) put the executable in the root binary folder, not in "Debug" or "Release"
 # http://stackoverflow.com/questions/543203/cmake-runtime-output-directory-on-windows
 if(MSVC_IDE)
    set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
