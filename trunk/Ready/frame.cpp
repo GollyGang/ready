@@ -64,7 +64,7 @@ namespace ID { enum {
 
    // view menu
    PatternsPane,
-   KernelPane,
+   RulePane,
    CanvasPane,
    HelpPane,
    RestoreDefaultPerspective,
@@ -102,8 +102,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     // view menu
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
-    EVT_MENU(ID::KernelPane, MyFrame::OnToggleViewPane)
-    EVT_UPDATE_UI(ID::KernelPane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::RulePane, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::RulePane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective,MyFrame::OnRestoreDefaultPerspective)
@@ -174,7 +174,7 @@ void MyFrame::InitializeMenus()
     {   // view menu:
         wxMenu *menu = new wxMenu;
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns pane"), _("View the patterns pane"));
-        menu->AppendCheckItem(ID::KernelPane, _("&Kernel pane"), _("View the kernel pane"));
+        menu->AppendCheckItem(ID::RulePane, _("&Rule pane"), _("View the rule pane"));
         menu->AppendCheckItem(ID::HelpPane, _("&Help pane"), _("View the help pane"));
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
@@ -220,23 +220,23 @@ void MyFrame::InitializePanes()
                   .BestSize(300,300)
                   .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
-    // a kernel-editing pane
+    // a rule-editing pane
     {
         wxPanel *panel = new wxPanel(this,wxID_ANY);
-        this->kernel_pane = new wxTextCtrl(panel,wxID_ANY,
+        this->rule_pane = new wxTextCtrl(panel,wxID_ANY,
                             _T(""),
                             wxDefaultPosition,wxDefaultSize,
                             wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
-        this->kernel_pane->SetFont(wxFont(9,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+        this->rule_pane->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
         wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
         //sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
         // TODO: kernel-editing temporarily disabled, can edit file instead for now
-        sizer->Add(this->kernel_pane,wxSizerFlags(1).Expand());
+        sizer->Add(this->rule_pane,wxSizerFlags(1).Expand());
         panel->SetSizer(sizer);
         this->aui_mgr.AddPane(panel,
                       wxAuiPaneInfo()
-                      .Name(PaneName(ID::KernelPane))
-                      .Caption(_("Kernel Pane"))
+                      .Name(PaneName(ID::RulePane))
+                      .Caption(_("Rule Pane"))
                       .Right()
                       .BestSize(400,400)
                       .Layer(1) // layer 1 is further towards the edge
@@ -489,17 +489,16 @@ void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
     // fill the rule pane
-    /* TODO
     if(this->system->HasEditableFormula())
     {
-        this->kernel_pane->SetValue(wxString(this->system->GetProgram().c_str(),wxConvUTF8));
-        this->kernel_pane->Enable(true);
+        this->rule_pane->SetValue(wxString(this->system->GetFormula().c_str(),wxConvUTF8));
+        this->rule_pane->Enable(true);
     }
     else
     {
-        this->kernel_pane->SetValue(_T("(this implementation has no editable kernel)"));
-        this->kernel_pane->Enable(false);
-    }*/
+        this->rule_pane->SetValue(_T("(this implementation has no editable formula)"));
+        this->rule_pane->Enable(false);
+    }
     this->Refresh(false);
 }
 
@@ -679,11 +678,11 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
 {
     try 
     {
-        this->system->TestFormula(string(this->kernel_pane->GetValue().mb_str()));
+        this->system->TestFormula(string(this->rule_pane->GetValue().mb_str()));
     }
     catch(const runtime_error& e)
     {
-        wxMessageBox(_("Kernel program did not compile:\n\n")+wxString(e.what(),wxConvUTF8));
+        wxMessageBox(_("Formula did not compile:\n\n")+wxString(e.what(),wxConvUTF8));
         return;
     }
     catch(...)
@@ -692,13 +691,13 @@ void MyFrame::OnReplaceProgram(wxCommandEvent& event)
         return;
     }
     // program compiled successfully
-    this->system->SetFormula(string(this->kernel_pane->GetValue().mb_str()));
-    this->kernel_pane->SetModified(false);
+    this->system->SetFormula(string(this->rule_pane->GetValue().mb_str()));
+    this->rule_pane->SetModified(false);
 }
 
 void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
 {
-    event.Enable(this->system->HasEditableFormula() && this->kernel_pane->IsModified());
+    event.Enable(this->system->HasEditableFormula() && this->rule_pane->IsModified());
 }
 
 void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)

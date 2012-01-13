@@ -47,8 +47,8 @@ private:
     // VTK does the rendering
     wxVTKRenderWindowInteractor *pVTKWindow;
 
-    // the kernel pane allows the user to edit the code of the current RD system
-    wxTextCtrl *kernel_pane;
+    // the rule pane allows the user to edit the code of the current RD system and change the parameters
+    wxTextCtrl *rule_pane;
 
     // current system being simulated (in future we might want more than one)
     BaseRD *system;
