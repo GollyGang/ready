@@ -158,7 +158,8 @@ endif()
 #--------------------------copy pattern files to build folder---------------------------------
 
 # Copy files from source directory to destination directory, substituting any
-# variables.  Create destination directory if it does not exist.
+# variables. Create destination directory if it does not exist.
+# http://stackoverflow.com/a/697745/126823
 macro(configure_files srcDir destDir)
     message(STATUS "Configuring directory ${destDir}")
     make_directory(${destDir})
@@ -240,7 +241,7 @@ endif()
 
 #----------------------------------------install------------------------------------------------
 
-# put Ready in the root of the package folder
+# put Ready in the root of the package folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
 # put some text files there too
@@ -253,16 +254,18 @@ install( FILES
 file( GLOB pattern_files "${CMAKE_CURRENT_SOURCE_DIR}/patterns/*.vti" )
 install( FILES ${pattern_files} DESTINATION "patterns" )
 
-# Add install rules for required system runtimes such as MSVCRxx.dll
-SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
-INCLUDE(InstallRequiredSystemLibraries)
-IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+# Put the system runtimes in root folder instead of "bin"
+# http://www.cmake.org/pipermail/cmake/2011-January/041718.html
+set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON )
+include( InstallRequiredSystemLibraries )
+if( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
+  INSTALL( 
+    FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
     DESTINATION "."
-    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
-GROUP_EXECUTE WORLD_READ
-    COMPONENT Runtime)
-ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+    COMPONENT Runtime
+  )
+endif( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
 
 #----------------------------------------package----------------------------------------------
 
