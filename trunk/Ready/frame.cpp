@@ -284,7 +284,13 @@ void MyFrame::InitializeRulePane()
                         _T(""),
                         wxDefaultPosition,wxDefaultSize,
                         wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
-    this->rule_pane->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+    // TODO: provide UI for changing font size (ditto in Help pane)
+    #ifdef __WXMAC__
+        // need bigger font size on Mac
+        this->rule_pane->SetFont(wxFont(12,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+    #else
+        this->rule_pane->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
+    #endif
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
     //sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
     // TODO: kernel-editing temporarily disabled, can edit file instead for now
