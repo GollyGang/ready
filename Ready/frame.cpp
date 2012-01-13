@@ -806,6 +806,7 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
     try
     {
         // to load pattern files, the implementation must support editable kernels, which for now means OpenCL_nDim
+        // TODO: detect if opencl is available, abort if not
         {
             OpenCL_nDim *s = new OpenCL_nDim();
             s->SetPlatform(this->iOpenCLPlatform);
