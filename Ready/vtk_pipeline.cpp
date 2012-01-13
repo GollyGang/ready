@@ -126,7 +126,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iActiveChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-5.0);
+        warp->SetScaleFactor(-25.0);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();

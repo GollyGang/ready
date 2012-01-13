@@ -37,6 +37,7 @@
 #include <wx/filename.h>
 #include <wx/font.h>
 #include <wx/html/htmlwin.h>
+#include <wx/dir.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -212,10 +213,60 @@ void MyFrame::InitializeMenus()
     SetMenuBar(menuBar);
 }
 
+void FillTreeWithFilenames(wxTreeCtrl* tree,wxTreeItemId root,wxString folder,wxString filename_template)
+{
+    wxArrayString as;
+    wxDir::GetAllFiles(folder,&as,filename_template,wxDIR_FILES);
+    for(int i=0;i<as.size();i++)
+        tree->AppendItem(root,wxFileName(as[i]).GetFullName(),1);
+    // recurse down into each subdirectory
+    as.clear();
+    wxDir::GetAllFiles(folder,&as,wxEmptyString,wxDIR_DIRS);
+    for(int i=0;i<as.size();i++)
+    {
+        wxTreeItemId subfolder = tree->AppendItem(root,wxFileName(as[i]).GetName(),0);
+        FillTreeWithFilenames(tree,subfolder,as[i],filename_template);
+    }
+}
+
 void MyFrame::InitializePatternsPane()
 {
-    // a patterns file structure pane (currently just has some hard-wired demos)
-    this->aui_mgr.AddPane(this->CreatePatternsCtrl(), wxAuiPaneInfo()
+    wxTreeCtrl* tree = new wxTreeCtrl(this, ID::PatternsTree,
+                                      wxPoint(0,0), wxSize(240,250),
+                                      wxTR_DEFAULT_STYLE | wxNO_BORDER | wxTR_HIDE_ROOT);
+
+    wxImageList* imglist = new wxImageList(16, 16, true, 2);
+    imglist->Add(wxArtProvider::GetBitmap(wxART_FOLDER, wxART_OTHER, wxSize(16,16)));
+    imglist->Add(wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16,16)));
+    tree->AssignImageList(imglist);
+
+    wxTreeItemId root = tree->AddRoot(_(""), 0);
+    // add inbuilt patterns
+    {
+        wxTreeItemId inbuilt = tree->AppendItem(root,_("Inbuilt patterns"),0);
+        {
+            wxTreeItemId demos = tree->AppendItem(inbuilt, wxT("CPU demos"), 0);
+            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"),1));
+            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
+            tree->Expand(demos);
+        }
+        {
+            wxTreeItemId demos = tree->AppendItem(inbuilt, wxT("OpenCL demos"), 0);
+            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 1D"), 1));
+            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
+            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
+            tree->Expand(demos);
+        }
+        tree->Expand(inbuilt);
+    }
+    // add patterns from patterns folder
+    {
+        wxTreeItemId files = tree->AppendItem(root,_("Patterns folder"), 0);
+        FillTreeWithFilenames(tree,files,_T("patterns"),_T("*"));
+        tree->Expand(files);
+    }
+
+    this->aui_mgr.AddPane(tree, wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
                   .Caption(_("Patterns Pane"))
                   .Left()
@@ -377,37 +428,6 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.AddDeveloper(_T("Andrew Trevorrow"));
     info.AddDeveloper(_T("Tom Rokicki"));
     wxAboutBox(info);
-}
-
-wxTreeCtrl* MyFrame::CreatePatternsCtrl()
-{
-    wxTreeCtrl* tree = new wxTreeCtrl(this, ID::PatternsTree,
-                                      wxPoint(0,0), wxSize(240,250),
-                                      wxTR_DEFAULT_STYLE | wxNO_BORDER);
-
-    wxImageList* imglist = new wxImageList(16, 16, true, 2);
-    imglist->Add(wxArtProvider::GetBitmap(wxART_FOLDER, wxART_OTHER, wxSize(16,16)));
-    imglist->Add(wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16,16)));
-    tree->AssignImageList(imglist);
-
-    wxTreeItemId root = tree->AddRoot(_("Patterns"), 0);
-    {
-        wxTreeItemId demos = tree->AppendItem(root, wxT("CPU demos"), 0);
-        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"),1));
-        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
-        tree->Expand(demos);
-    }
-    {
-        wxTreeItemId demos = tree->AppendItem(root, wxT("OpenCL demos"), 0);
-        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 1D"), 1));
-        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
-        this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
-        tree->Expand(demos);
-    }
-    tree->Expand(root);
-    // TODO: parse the Patterns folder and add those instead of these hard-wired demos
-
-    return tree;
 }
 
 void MyFrame::OnToggleViewPane(wxCommandEvent &event)

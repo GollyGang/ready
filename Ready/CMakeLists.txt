@@ -160,23 +160,36 @@ endif()
 # Copy files from source directory to destination directory, substituting any
 # variables. Create destination directory if it does not exist.
 # http://stackoverflow.com/a/697745/126823
-macro(configure_files srcDir destDir)
-    message(STATUS "Configuring directory ${destDir}")
-    make_directory(${destDir})
-    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
-    foreach(templateFile ${templateFiles})
-        set(srcTemplatePath ${srcDir}/${templateFile})
-        if(NOT IS_DIRECTORY ${srcTemplatePath})
-            message(STATUS "Configuring file ${templateFile}")
-            configure_file(
-                    ${srcTemplatePath}
-                    ${destDir}/${templateFile}
-                    @ONLY)
-        endif(NOT IS_DIRECTORY ${srcTemplatePath})
-    endforeach(templateFile)
-endmacro(configure_files)
+#macro(configure_files srcDir destDir)
+#    message(STATUS "Configuring directory ${destDir}")
+#    make_directory(${destDir})
+#    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
+#    foreach(templateFile ${templateFiles})
+#        set(srcTemplatePath ${srcDir}/${templateFile})
+#        if(NOT IS_DIRECTORY ${srcTemplatePath})
+#            message(STATUS "Configuring file ${templateFile}")
+#            configure_file(
+#                    ${srcTemplatePath}
+#                    ${destDir}/${templateFile}
+#                    @ONLY)
+#        endif(NOT IS_DIRECTORY ${srcTemplatePath})
+#    endforeach(templateFile)
+#endmacro(configure_files)
+#
+#configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/patterns ${CMAKE_CURRENT_BINARY_DIR}/patterns )
 
-configure_files( ${CMAKE_CURRENT_SOURCE_DIR}/patterns ${CMAKE_CURRENT_BINARY_DIR}/patterns )
+file( GLOB_RECURSE pattern_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/" "patterns/*.vti" )
+message( STATUS "Copying pattern files ${pattern_files}" ) 
+
+foreach( pattern_file ${pattern_files} )
+  ADD_CUSTOM_COMMAND( 
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}"
+  )
+  list( APPEND pattern_files_dest "${pattern_file}" )
+endforeach( pattern_file ) 
+ADD_CUSTOM_TARGET( CopyPatterns ALL DEPENDS ${pattern_files_dest} )  
 
 #-----------------------------------------------------------------------------------------------
 
@@ -197,6 +210,7 @@ add_executable( ${APP_NAME}
    ${GUI_SOURCES}
    ${RESOURCES} 
 )
+add_dependencies( ${APP_NAME} CopyPatterns )
 
 target_link_libraries( ${APP_NAME}
   readybase
@@ -235,13 +249,13 @@ endif()
 
 # (Visual Studio only) put the executable in the root binary folder, not in "Debug" or "Release"
 # http://stackoverflow.com/questions/543203/cmake-runtime-output-directory-on-windows
-if(MSVC_IDE)
+if( MSVC_IDE )
    set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
 endif()
 
 #----------------------------------------install------------------------------------------------
 
-# put Ready in the root of the package folder instead of in "bin"
+# put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
 # put some text files there too
@@ -251,10 +265,9 @@ install( FILES
 )
 
 # copy the patterns into their own folder
-file( GLOB pattern_files "${CMAKE_CURRENT_SOURCE_DIR}/patterns/*.vti" )
-install( FILES ${pattern_files} DESTINATION "patterns" )
+install( DIRECTORY "patterns" DESTINATION "." FILES_MATCHING PATTERN "*.vti")
 
-# Put the system runtimes in root folder instead of "bin"
+# put the system runtimes in root folder instead of "bin"
 # http://www.cmake.org/pipermail/cmake/2011-January/041718.html
 set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON )
 include( InstallRequiredSystemLibraries )
