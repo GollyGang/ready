@@ -1,6 +1,7 @@
 0.2 - ?
 --------------
-- 1d implemented
+- 1d patterns now supported
+- patterns can be saved and loaded as VTK image data files (*.vti) extended with an extra XML element <RD>
 
 0.1 - Jan 2012
 --------------

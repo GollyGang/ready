@@ -1,25 +1,31 @@
-before 0.x release
-- file format for saving/loading rules and patterns
+before 0.2 release:
+- bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
 - populate a pattern library (primary UI for beginners is a list of examples to click)
+- patterns pane should show inbuilt demos, provided files and user files
 - control over size of world, running speed
+- controls for changing parameters, editing formula and descriptions
 - make a toolbar of icons for commonly-used functions
 
+before 0.x release:
+- file format should support random patches on top of the image (a constant value image compresses to almost nothing)
+- save out scene (e.g. OBJ) for external render (although paraview can load vti's)
+
 before 1.0 release:
+- bug: allow user to change OpenCL platform and device while a pattern is running
+- allow non-OpenCL implementations to load files (parsing formula somehow)
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
-- control over render pipeline: contouring level, color map, active components etc.
+- control over render pipeline: contouring level, color map, slice direction/height etc.
 - control over boundary conditions: wrap-around or constant value
 - save out videos
-- save out scene (e.g. OBJ) for external render
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
 
 future ideas:
-- allow user to change OpenCL platform and device while a pattern is running
 - parameter map(s) in a separate window, to allow user to explore parameters 
-- full control over scene graph; nodes+connections interface
+- full control over scene graph, e.g. nodes+connections interface
 - different topologies: e.g. arbitrary 2d mesh embedded in 3d: zebra, etc.
 - parameters driven by an input scene (for writhing logos, etc.)
-- multi-stage, multi-scale RD
-- radiosity rendering for better visualization of tangled structures
+- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
+- radiosity rendering for better visualization of tangled structures (embed a raytracer)
 - STL output, email file to shapeways for printing
 - discrete RD (simulation of individual chemicals, to compare with differential equations)
