@@ -27,7 +27,10 @@ using namespace std;
 #include <stdlib.h>
 #include <time.h>
 
-DECLARE_APP(MyApp)
+// Create a new application object: this macro will allow wxWidgets to create
+// the application object during program execution and also implements the
+// accessor function wxGetApp() which will return the reference of the correct
+// type (ie. MyApp and not wxApp).
 IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
@@ -37,9 +40,18 @@ bool MyApp::OnInit()
 
     srand((unsigned int)time(NULL));
 
-    wxFrame* frame = new MyFrame(_("Ready"));
-    SetTopWindow(frame);
-    frame->Show();
+    currframe = new MyFrame(_("Ready"));
+    SetTopWindow(currframe);
+    currframe->Show();
 
     return true;
 }
+
+#ifdef __WXMAC__
+// open a .vti file that was double-clicked or dropped onto app icon
+void MyApp::MacOpenFile(const wxString& fullPath)
+{
+    currframe->Raise();
+    currframe->OpenFile(fullPath);
+}
+#endif
