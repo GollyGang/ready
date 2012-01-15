@@ -24,8 +24,22 @@
     #include "wx/wx.h"
 #endif
 
+class MyFrame;
+
 class MyApp : public wxApp
 {
 public:
     virtual bool OnInit();
+
+    #ifdef __WXMAC__
+        // called in response to an open-document event which is sent
+        // if a .vti file is double-clicked or dropped onto the app icon
+        virtual void MacOpenFile(const wxString& fullPath);
+    #endif
+
+    // we only support one frame window at the moment,
+    // but eventually we might allow multiple frames
+    MyFrame* currframe;
 };
+
+DECLARE_APP(MyApp)   // so other files can use wxGetApp

@@ -837,11 +837,32 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
     wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
         wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
+    OpenFile(filename);
+}
 
+void MyFrame::OpenFile(const wxString& path, bool remember)
+{
+    /* AKT TODO!!!
+    if (IsHTMLFile(path)) {
+        // show HTML file in help pane
+        ShowHelp(path);
+        return;
+    }
+    
+    if (IsTextFile(path)) {
+        // open text file in user's preferred text editor
+        EditFile(path);
+        return;
+    }
+    */
+
+    if (remember) /* AKT TODO!!! AddRecentPattern(path) */;
+    
+    // load pattern file
     BaseRD *target_system;
     try
     {
-        // to load pattern files, the implementation must support editable kernels, which for now means OpenCL_nDim
+        // to load pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
         // TODO: detect if opencl is available, abort if not
         {
             OpenCL_nDim *s = new OpenCL_nDim();
@@ -851,7 +872,7 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
         }
 
         vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
-        iw->SetFileName(filename.mb_str());
+        iw->SetFileName(path.mb_str());
         iw->Update();
         iw->SetFromXML(target_system);
 

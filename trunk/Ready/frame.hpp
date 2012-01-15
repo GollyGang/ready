@@ -39,6 +39,8 @@ public:
     MyFrame(const wxString& title);
     ~MyFrame();
 
+    void OpenFile(const wxString& path, bool remember = true);
+
 private:
 
     // using wxAUI for window management
