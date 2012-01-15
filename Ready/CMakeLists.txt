@@ -65,7 +65,7 @@ set(RESOURCES
    ready.rc
    appicon.ico appicon16.ico appicon32.ico appicon48.ico appicon.xpm
    Info.plist.in
-   app.icns
+   app.icns file-vti.icns
 )
 
 #-------------------------------------------VTK----------------------------------------------
@@ -158,14 +158,23 @@ endif()
 #--------------------------copy pattern files to build folder---------------------------------
 
 file( GLOB_RECURSE pattern_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/" "patterns/*.vti" )
+
 foreach( pattern_file ${pattern_files} )
+
   add_custom_command( 
+
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
+
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
+
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}"
+
   )
+
   list( APPEND pattern_files_dest "${pattern_file}" )
+
 endforeach( pattern_file ) 
+
 add_custom_target( CopyPatterns ALL DEPENDS ${pattern_files_dest} )
 # (will update the list of patterns to copy across only when configuring, so when you add new patterns you will need to re-configure)
 
@@ -220,6 +229,7 @@ if(APPLE)
    
    # copy *.icns files into Resources directory inside .app bundle
    set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+   set_source_files_properties( ${CMAKE_SOURCE_DIR}/file-vti.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
    
    # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
    target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
@@ -246,16 +256,27 @@ install( FILES
 install( DIRECTORY "patterns" DESTINATION "." FILES_MATCHING PATTERN "*.vti")
 
 # put the system runtimes in root folder instead of "bin"
+
 # http://www.cmake.org/pipermail/cmake/2011-January/041718.html
+
 set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON )
+
 include( InstallRequiredSystemLibraries )
+
 if( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
+
   INSTALL( 
+
     FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+
     DESTINATION "."
+
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+
     COMPONENT Runtime
+
   )
+
 endif( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
 
 #----------------------------------------package----------------------------------------------

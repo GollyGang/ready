@@ -28,6 +28,20 @@
     <true/>
     <key>CFBundleDocumentTypes</key>
     <array>
+		  <dict>
+            <key>CFBundleTypeName</key>
+            <string>Ready Pattern File</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>file-vti.icns</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+            	 <string>vti</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true/>
+		  </dict>
         <dict>
             <key>CFBundleTypeName</key>
             <string>Pattern File</string>
