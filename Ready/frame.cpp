@@ -16,6 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
+#include "app.hpp"      // for wxGetApp
 #include "frame.hpp"
 #include "vtk_pipeline.hpp"
 #include "utils.hpp"
@@ -38,6 +39,7 @@
 #include <wx/font.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dir.h>
+#include <wx/dnd.h>           // for wxFileDropTarget
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -56,6 +58,10 @@ using namespace std;
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>
 #include <vtkImageAppendComponents.h>
+
+#ifdef __WXMAC__
+   #include <Carbon/Carbon.h>    // for GetCurrentProcess, etc
+#endif
 
 // IDs for the controls and the menu commands
 namespace ID { enum {
@@ -364,6 +370,44 @@ void MyFrame::InitializeHelpPane()
                   );
 }
 
+// -----------------------------------------------------------------------------
+
+#if wxUSE_DRAG_AND_DROP
+
+// derive a simple class for handling dropped files
+class DnDFile : public wxFileDropTarget
+{
+public:
+    DnDFile() {}
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+};
+
+bool DnDFile::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
+{
+    MyFrame* frameptr = wxGetApp().currframe;
+
+    // bring app to front
+    #ifdef __WXMAC__
+        ProcessSerialNumber process;
+        if ( GetCurrentProcess(&process) == noErr )
+            SetFrontProcess(&process);
+    #endif
+    #ifdef __WXMSW__
+        SetForegroundWindow( (HWND)frameptr->GetHandle() );
+    #endif
+    frameptr->Raise();
+   
+    size_t numfiles = filenames.GetCount();
+    for ( size_t n = 0; n < numfiles; n++ ) {
+        frameptr->OpenFile(filenames[n]);
+    }
+    return true;
+}
+
+#endif // wxUSE_DRAG_AND_DROP
+
+// -----------------------------------------------------------------------------
+
 void MyFrame::InitializeRenderPane()
 {
     // for now the VTK window goes in the center pane (always visible) - we got problems when had in a floating pane
@@ -374,6 +418,10 @@ void MyFrame::InitializeRenderPane()
                   .CenterPane()
                   .BestSize(400,400)
                   );
+    #if wxUSE_DRAG_AND_DROP
+        // let users drag-and-drop pattern files onto the render pane
+        this->pVTKWindow->SetDropTarget(new DnDFile());
+    #endif
 }
 
 void MyFrame::LoadSettings()
