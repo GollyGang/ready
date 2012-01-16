@@ -865,8 +865,7 @@ void MyFrame::OnHelp(wxCommandEvent &event)
 void MyFrame::OnSavePattern(wxCommandEvent &event)
 {
     wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
-        _("VTK image files (*.vti)|*.vti"),
-        wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+        _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if(filename.empty()) return; // user cancelled
 
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
@@ -883,8 +882,8 @@ void MyFrame::OnSavePattern(wxCommandEvent &event)
 
 void MyFrame::OnOpenPattern(wxCommandEvent &event)
 {
-    wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),wxEmptyString,wxFileSelectorDefaultWildcardStr,
-        wxFD_OPEN);
+    wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
+        _("VTK image files (*.vti)|*.vti"),wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
     OpenFile(filename);
 }
