@@ -158,21 +158,13 @@ endif()
 #--------------------------copy pattern files to build folder---------------------------------
 
 file( GLOB_RECURSE pattern_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/" "patterns/*.vti" )
-
 foreach( pattern_file ${pattern_files} )
-
   add_custom_command( 
-
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
-
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
-
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}"
-
   )
-
   list( APPEND pattern_files_dest "${pattern_file}" )
-
 endforeach( pattern_file ) 
 
 add_custom_target( CopyPatterns ALL DEPENDS ${pattern_files_dest} )
@@ -256,27 +248,16 @@ install( FILES
 install( DIRECTORY "patterns" DESTINATION "." FILES_MATCHING PATTERN "*.vti")
 
 # put the system runtimes in root folder instead of "bin"
-
 # http://www.cmake.org/pipermail/cmake/2011-January/041718.html
-
 set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON )
-
 include( InstallRequiredSystemLibraries )
-
 if( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
-
   INSTALL( 
-
     FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-
     DESTINATION "."
-
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
-
     COMPONENT Runtime
-
   )
-
 endif( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
 
 #----------------------------------------package----------------------------------------------
@@ -285,4 +266,3 @@ set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
 set( CPACK_SOURCE_GENERATOR "ZIP" )
 include( CPack )
-
