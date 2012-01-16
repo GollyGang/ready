@@ -262,7 +262,11 @@ endif( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
 
 #----------------------------------------package----------------------------------------------
 
-set( CPACK_GENERATOR "ZIP" )
+if( APPLE OR WIN32 )
+  set( CPACK_GENERATOR "ZIP" )
+else()
+  set( CPACK_GENERATOR "ZIP;DEB" )
+endif()
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
 set( CPACK_SOURCE_GENERATOR "ZIP" )
 include( CPack )
