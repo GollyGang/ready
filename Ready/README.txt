@@ -1,5 +1,16 @@
 ---------------------------------------------------------------------------------
-                                   Build
+                                    About
+---------------------------------------------------------------------------------
+
+On Linux you might need to install: libvtk5.4, libwxgtk2.8-0
+
+For help, visit: http://code.google.com/p/reaction-diffusion/
+Or email: reaction-diffusion@googlegroups.com
+
+Ready is free software. Help us improve it!
+
+---------------------------------------------------------------------------------
+                             Build from source
 ---------------------------------------------------------------------------------
 
 Build with CMake.
@@ -7,9 +18,6 @@ Dependencies: VTK, wxWidgets, any OpenCL SDK
 Tested on: Windows, Linux, MacOS
 
 For build instructions, see BUILD.txt.
-
-Ready is free software. Help us improve it.
-http://code.google.com/p/reaction-diffusion/
 
 ---------------------------------------------------------------------------------
                               Acknowledgements
