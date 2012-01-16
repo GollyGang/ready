@@ -48,6 +48,7 @@
 #include <vtkWarpScalar.h>
 #include <vtkImageDataGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkImageMirrorPad.h>
 // volume rendering
 #include <vtkVolumeRayCastCompositeFunction.h>
 #include <vtkVolumeRayCastMapper.h>
@@ -99,10 +100,15 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         lut->SetTableRange(0.0, 0.5);
         lut->SetHueRange(0.6, 0.0);
 
+        // pad the image a little so we can actually see it as a 2D strip rather than being invisible
+        vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
+        pad->SetInput(system->GetImage(iActiveChemical));
+        pad->SetOutputWholeExtent(0,system->GetX()-1,-1,system->GetY(),0,system->GetZ()-1);
+
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(system->GetImage(iActiveChemical));
+        image_mapper->SetInputConnection(pad->GetOutputPort());
       
         // an actor determines how a scene object is displayed
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
@@ -135,7 +141,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->SetPosition(0,0,-5.1);
+        actor->SetPosition(0,5,0);
         actor->RotateX(90.0);
         pRenderer->AddActor(actor);
     }
