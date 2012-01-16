@@ -566,6 +566,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
     this->system = sys;
+    this->iActiveChemical = min(this->iActiveChemical,this->system->GetNumberOfChemicals()-1);
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
     this->UpdateWindows();
 }
