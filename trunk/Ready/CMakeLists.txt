@@ -262,13 +262,7 @@ endif( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
 
 #----------------------------------------package----------------------------------------------
 
-if( APPLE OR WIN32 )
-  set( CPACK_GENERATOR "ZIP" )
-else()
-  set( CPACK_GENERATOR "ZIP;DEB" )
-  set( CPACK_PACKAGE_CONTACT "Tim Hutton <tim.hutton@gmail.com>" )
-  set( CPACK_DEBIAN_PACKAGE_DEPENDS "libvtk5.4 (>=5.4), libwxgtk2.8-0 (>=2.8)" )
-endif()
+set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
 set( CPACK_SOURCE_GENERATOR "ZIP" )
 include( CPack )
