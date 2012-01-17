@@ -15,14 +15,21 @@ Dependencies: VTK, wxWidgets, any OpenCL SDK.
 7. Eventually hit generate to generate the build files.
 8. Build in your chosen package. (e.g. open the .sln and build)
 
+Build the PACKAGE project to produce a binary distribution zip.
+
 =========================== Linux =================================
+
+Install: libvtk5-dev, libwxgtk2.8-dev, zlib1g-dev, any OpenCL SDK.
 
 mkdir Ready_build
 cd Ready_build
 cmake ../Ready_source_folder
 make
 
-Alternatively, use ccmake or cmake-gui.
+(Alternatively, use ccmake or cmake-gui for configuring.)
+
+make package
+make package_source
 
 =========================== MacOS =================================
 
