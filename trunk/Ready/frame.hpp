@@ -122,5 +122,8 @@ private:
 
     std::vector<wxTreeItemId> demo_ids;
 
+    wxTreeCtrl* patterntree;     // for listing folders and files in Patterns pane
+    wxTreeItemId patternroot;    // item id of Patterns folder
+
     DECLARE_EVENT_TABLE()
 };

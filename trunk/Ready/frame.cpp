@@ -233,48 +233,53 @@ void FillTreeWithFilenames(wxTreeCtrl* tree,wxTreeItemId root,wxString folder,wx
     {
         wxTreeItemId subfolder = tree->AppendItem(root,folder_name,0);
         FillTreeWithFilenames(tree,subfolder,folder+_T("/")+folder_name,filename_template);
+        tree->Expand(subfolder);
         cont = dir.GetNext(&folder_name);
     }
 }
 
 void MyFrame::InitializePatternsPane()
 {
-    wxTreeCtrl* tree = new wxTreeCtrl(this, ID::PatternsTree,
-                                      wxPoint(0,0), wxSize(240,250),
-                                      wxTR_DEFAULT_STYLE | wxNO_BORDER | wxTR_HIDE_ROOT);
-
+    patterntree = new wxTreeCtrl(this, ID::PatternsTree,
+                                 wxPoint(0,0), wxSize(240,250),
+                                 wxTR_DEFAULT_STYLE | wxNO_BORDER | wxTR_HIDE_ROOT);
+    
     wxImageList* imglist = new wxImageList(16, 16, true, 2);
     imglist->Add(wxArtProvider::GetBitmap(wxART_FOLDER, wxART_OTHER, wxSize(16,16)));
     imglist->Add(wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16,16)));
-    tree->AssignImageList(imglist);
+    patterntree->AssignImageList(imglist);
 
-    wxTreeItemId root = tree->AddRoot(_(""), 0);
+    wxTreeItemId root = patterntree->AddRoot(_(""), 0);
     // add inbuilt patterns
     {
-        wxTreeItemId inbuilt = tree->AppendItem(root,_("Inbuilt patterns"),0);
+        wxTreeItemId inbuilt = patterntree->AppendItem(root,_("Inbuilt patterns"),0);
         {
-            wxTreeItemId demos = tree->AppendItem(inbuilt, wxT("CPU demos"), 0);
-            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"),1));
-            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
-            tree->Expand(demos);
+            wxTreeItemId demos = patterntree->AppendItem(inbuilt, wxT("CPU demos"), 0);
+            this->demo_ids.push_back(patterntree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
+            this->demo_ids.push_back(patterntree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
+            patterntree->Expand(demos);
         }
         {
-            wxTreeItemId demos = tree->AppendItem(inbuilt, wxT("OpenCL demos"), 0);
-            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 1D"), 1));
-            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
-            this->demo_ids.push_back(tree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
-            tree->Expand(demos);
+            wxTreeItemId demos = patterntree->AppendItem(inbuilt, wxT("OpenCL demos"), 0);
+            this->demo_ids.push_back(patterntree->AppendItem(demos, wxT("Gray-Scott 1D"), 1));
+            this->demo_ids.push_back(patterntree->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
+            this->demo_ids.push_back(patterntree->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
+            patterntree->Expand(demos);
         }
-        tree->Expand(inbuilt);
+        patterntree->Expand(inbuilt);
     }
     // add patterns from patterns folder
     {
-        wxTreeItemId files = tree->AppendItem(root,_("Patterns folder"), 0);
-        FillTreeWithFilenames(tree,files,_T("patterns"),_T("*"));
-        tree->Expand(files);
+        // remember id of patterns folder for use in OnPatternsTreeSelChanged
+        // AKT TODO!!! change svn folder name to "Patterns"???
+        // also need to fix CMakeLists.txt so it copies any subfolders inside Patterns???
+        wxString foldername = _("patterns");
+        patternroot = patterntree->AppendItem(root,foldername, 0);
+        FillTreeWithFilenames(patterntree,patternroot,foldername,_T("*"));
+        patterntree->Expand(patternroot);
     }
 
-    this->aui_mgr.AddPane(tree, wxAuiPaneInfo()
+    this->aui_mgr.AddPane(patterntree, wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
                   .Caption(_("Patterns Pane"))
                   .Left()
@@ -849,9 +854,36 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
 
 void MyFrame::OnPatternsTreeSelChanged(wxTreeEvent& event)
 {
+    wxTreeItemId id = event.GetItem();
+    if (!id.IsOk()) return;
+    
+    // first check if an inbuilt demo was clicked
     for(int i=0;i<(int)this->demo_ids.size();i++)
-        if(event.GetItem()==this->demo_ids[i])
+        if(id==this->demo_ids[i]) {
             this->LoadDemo(i);
+            return;
+        }
+    
+    // return if folder was selected
+    // (use GetItemImage rather than ItemHasChildren because folder might be empty)
+    if (patterntree->GetItemImage(id) == 0) return;
+    
+    // AKT TODO!!! allow selected file to be loaded again
+    // (see Golly's MainFrame::OnDirTreeSelection for the horrible hack)
+    
+    // build path to selected file
+    wxString filepath = patterntree->GetItemText(id);
+    wxTreeItemId parent;
+    do {
+        parent = patterntree->GetItemParent(id);
+        if (!parent.IsOk()) break;   // play safe
+        wxString folder = patterntree->GetItemText(parent) + _T("/");
+        filepath = folder + filepath;
+        id = parent;
+    } while (parent != patternroot);
+    
+    // load selected file
+    OpenFile(filepath);
 }
 
 void MyFrame::OnHelp(wxCommandEvent &event)
