@@ -29,3 +29,5 @@ future ideas:
 - radiosity rendering for better visualization of tangled structures (embed a raytracer)
 - STL output, email file to shapeways for printing
 - discrete RD (simulation of individual chemicals, to compare with differential equations)
+- display the evolution of a 1D pattern as a 2D image, with time as the second axis, as here:
+  http://www.stephenwolfram.com/publications/recent/specialfunctions/images/Slide028_917x754.gif
