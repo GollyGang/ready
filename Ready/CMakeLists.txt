@@ -17,65 +17,68 @@
 #
 #--------------------------------------------------------------------------
     
-cmake_minimum_required(VERSION 2.6)
-
-if(COMMAND cmake_policy)
-cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+cmake_minimum_required( VERSION 2.6 )
+cmake_policy( SET CMP0003 NEW )
 
 project( Ready )
 
 set( READY_VERSION 0.2 )
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
-if(APPLE OR WIN32)
-   # app names are usually capitalized on Mac OS X and Windows
-   set( APP_NAME Ready )
+if( APPLE OR WIN32 )
+  # app names are usually capitalized on Mac OS X and Windows
+  set( APP_NAME Ready )
 else()
-   # Linux binaries are usually all lowercase
-   set( APP_NAME ready )
+  # Linux binaries are usually all lowercase
+  set( APP_NAME ready )
 endif()
 
 #-------------------------------------------source files----------------------------------------------
 
-# low-level code used in all executables
-set(BASE_SOURCES
-   BaseRD.hpp BaseRD.cpp
-   GrayScott_slow.hpp GrayScott_slow.cpp
-   GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
-   OpenCL_RD.hpp OpenCL_RD.cpp
-   OpenCL_nDim.hpp OpenCL_nDim.cpp
-   IO_XML.hpp IO_XML.cpp
-   utils.hpp utils.cpp
+set( BASE_SOURCES      # low-level code used in all executables
+  BaseRD.hpp BaseRD.cpp
+  GrayScott_slow.hpp GrayScott_slow.cpp
+  GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
+  OpenCL_RD.hpp OpenCL_RD.cpp
+  OpenCL_nDim.hpp OpenCL_nDim.cpp
+  IO_XML.hpp IO_XML.cpp
+  utils.hpp utils.cpp
 )
-if (NOT APPLE)
-   # dynamic loading of OpenCL is only done on Windows and Linux
-   set( BASE_SOURCES ${BASE_SOURCES} OpenCL_Dyn_Load.h OpenCL_Dyn_Load.c )
+if( NOT APPLE )
+  # dynamic loading of OpenCL is only done on Windows and Linux
+  set( BASE_SOURCES ${BASE_SOURCES} OpenCL_Dyn_Load.h OpenCL_Dyn_Load.c )
 endif()
 
-# high-level GUI code used only in Ready
-set(GUI_SOURCES
-   app.hpp app.cpp 
-   frame.hpp frame.cpp 
-   vtk_pipeline.hpp vtk_pipeline.cpp
-   wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx   # a local copy, since it gets released so infrequently
+set( GUI_SOURCES      # high-level GUI code used only in Ready
+  app.hpp app.cpp 
+  frame.hpp frame.cpp 
+  vtk_pipeline.hpp vtk_pipeline.cpp
+  wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx
 )
 
-set(RESOURCES
-   ready.rc
-   appicon.ico appicon16.ico appicon32.ico appicon48.ico appicon.xpm
-   Info.plist.in
-   app.icns file-vti.icns
+set( RESOURCES
+  ready.rc
+  appicon.ico appicon16.ico appicon32.ico appicon48.ico appicon.xpm
+  Info.plist.in
+  app.icns file-vti.icns
+)
+
+set( PATTERN_FILES
+  grayscott_demo.vti meinhardt_stripes.vti schlogl.vti
+)
+
+set( TEXT_FILES
+  README.txt CHANGES.txt COPYING.txt TODO.txt
 )
 
 #-------------------------------------------VTK----------------------------------------------
 
 find_package( VTK )
-IF(VTK_FOUND)
-  INCLUDE(${VTK_USE_FILE})
-ELSE(VTK_FOUND)
-  MESSAGE(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK variables.")
-ENDIF(VTK_FOUND)
+if( VTK_FOUND )
+  include( ${VTK_USE_FILE} )
+else()
+  message(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK variables.")
+endif()
 
 #-------------------------------------------wxVTK----------------------------------------------
 
@@ -109,76 +112,70 @@ ENDIF(WIN32)
 
 #-------------------------------------------wxWidgets----------------------------------------------
 
-if(APPLE)
-   # on Mac OS X it's better to use locally installed wxWidgets headers and libs
-   # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
-   set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
-   set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
+if( APPLE )
+  # on Mac OS X it's better to use locally installed wxWidgets headers and libs
+  # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
+  set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
+  set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
 elseif(UNIX)
-   # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
-   set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
+  # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
+  set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
 endif()
 
 # wxWidgets is required to build the project
-FIND_PACKAGE(wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
 
-IF(wxWidgets_FOUND)
+IF( wxWidgets_FOUND )
   INCLUDE( ${wxWidgets_USE_FILE} )
-ELSE(wxWidgets_FOUND)
-  MESSAGE(FATAL_ERROR
-   "Cannot build the executable without wxWidgets. Please set the wxWidgets variables.")
-ENDIF(wxWidgets_FOUND)
+ELSE()
+  MESSAGE( FATAL_ERROR "Cannot build the executable without wxWidgets. Please set the wxWidgets variables." )
+ENDIF()
 
 #-------------------------------------------zLib----------------------------------------------
 
-if(WIN32)
-   # use zlib library included in wxWidgets
-   set( ZLIB_INCLUDE_DIR ${wxWidgets_ROOT_DIR}/src/zlib )
-   set( ZLIB_LIBRARY ${wxWidgets_LIB_DIR}/wxzlib.lib )
+if( WIN32 )
+  # use zlib library included in wxWidgets
+  set( ZLIB_INCLUDE_DIR ${wxWidgets_ROOT_DIR}/src/zlib )
+  set( ZLIB_LIBRARY ${wxWidgets_LIB_DIR}/wxzlib.lib )
 endif()
 
 find_package( ZLIB REQUIRED )
-include_directories( 
-   ${ZLIB_INCLUDE_DIR}
-)
-#add_definitions( -DZLIB )
+include_directories( ${ZLIB_INCLUDE_DIR} )
+# add_definitions( -DZLIB ) # (conflicts with part of VTK, do we need this for anything?)
 
 #-------------------------------------------OpenCL----------------------------------------------
 
-set(CMAKE_MODULE_PATH ${Ready_SOURCE_DIR})
+set( CMAKE_MODULE_PATH ${Ready_SOURCE_DIR} )
 # (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
 
 # we need to build against OpenCL
-find_package ( OpenCL REQUIRED )
-include_directories ( ${OPENCL_INCLUDE_DIRS} )
-if(APPLE)
-  link_libraries ( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
+find_package( OpenCL REQUIRED )
+include_directories( ${OPENCL_INCLUDE_DIRS} )
+if( APPLE )
+  link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
   
 #--------------------------copy pattern files to build folder---------------------------------
 
-file( GLOB_RECURSE pattern_files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/" "patterns/*.vti" )
-foreach( pattern_file ${pattern_files} )
+foreach( pattern_file ${PATTERN_FILES} )
   add_custom_command( 
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/${pattern_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${pattern_file}"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/patterns/${pattern_file}"
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/patterns/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/patterns/${pattern_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/patterns/${pattern_file}"
   )
-  list( APPEND pattern_files_dest "${pattern_file}" )
+  list( APPEND pattern_files_dest "${CMAKE_CURRENT_BINARY_DIR}/patterns/${pattern_file}" )
 endforeach( pattern_file ) 
-
 add_custom_target( CopyPatterns ALL DEPENDS ${pattern_files_dest} )
-# (will update the list of patterns to copy across only when configuring, so when you add new patterns you will need to re-configure)
 
 #-----------------------------------------------------------------------------------------------
 
-if(APPLE)
-   # support Mac OS 10.5 or later
-   add_definitions(-mmacosx-version-min=10.5)
+if( APPLE )
+  # support Mac OS 10.5 or later
+  add_definitions( -mmacosx-version-min=10.5 )
 endif()
-if(APPLE OR UNIX)
-   # use same settings as in makefiles
-   add_definitions(-D_LARGE_FILES)
+if( APPLE OR UNIX )
+  # use same settings as in makefiles
+  add_definitions( -D_LARGE_FILES )
 endif()
 
 # create base library used by all executables
@@ -189,7 +186,6 @@ add_executable( ${APP_NAME}
    ${GUI_SOURCES}
    ${RESOURCES} 
 )
-add_dependencies( ${APP_NAME} CopyPatterns )
 
 target_link_libraries( ${APP_NAME}
   readybase
@@ -202,35 +198,35 @@ target_link_libraries( ${APP_NAME}
   vtkVolumeRendering
 )
 
-if(APPLE OR WIN32)
-   target_link_libraries( ${APP_NAME} ${ZLIB_LIBRARIES} )
+if( APPLE OR WIN32 )
+  target_link_libraries( ${APP_NAME} ${ZLIB_LIBRARIES} )
 else()
-   # on Linux we statically link zlib because some systems (eg. Ubuntu) have a non-standard zlib that contains gzopen64
-   add_library( static_zlib STATIC IMPORTED )
-   set_property( TARGET static_zlib PROPERTY IMPORTED_LOCATION /usr/lib/libz.a )
-   target_link_libraries( ${APP_NAME} static_zlib )
+  # on Linux we statically link zlib because some systems (eg. Ubuntu) have a non-standard zlib that contains gzopen64
+  add_library( static_zlib STATIC IMPORTED )
+  set_property( TARGET static_zlib PROPERTY IMPORTED_LOCATION /usr/lib/libz.a )
+  target_link_libraries( ${APP_NAME} static_zlib )
 endif()
 
-if(APPLE)
-   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
-   add_custom_target( app_bundle
-      COMMAND sed -e "s/VERSION/${READY_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >Ready.app/Contents/Info.plist
-      COMMAND echo -n "APPLReDy" >Ready.app/Contents/PkgInfo
-   )
-   add_dependencies( ${APP_NAME} app_bundle )
+if( APPLE )
+  # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
+  add_custom_target( app_bundle
+    COMMAND sed -e "s/VERSION/${READY_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >Ready.app/Contents/Info.plist
+    COMMAND echo -n "APPLReDy" >Ready.app/Contents/PkgInfo
+  )
+  add_dependencies( ${APP_NAME} app_bundle )
    
-   # copy *.icns files into Resources directory inside .app bundle
-   set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-   set_source_files_properties( ${CMAKE_SOURCE_DIR}/file-vti.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+  # copy *.icns files into Resources directory inside .app bundle
+  set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+  set_source_files_properties( ${CMAKE_SOURCE_DIR}/file-vti.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
    
-   # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
-   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
+  # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
+  target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
 endif()
 
 # (Visual Studio only) put the executable in the root binary folder, not in "Debug" or "Release"
 # http://stackoverflow.com/questions/543203/cmake-runtime-output-directory-on-windows
 if( MSVC_IDE )
-   set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
+  set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
 endif()
 
 #----------------------------------------install------------------------------------------------
@@ -238,27 +234,29 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
-# put some text files there too
-install( FILES 
-  "README.txt" "CHANGES.txt" "COPYING.txt" "TODO.txt"
-  DESTINATION "." 
-)
-
-# copy the patterns from the source folder
-install( DIRECTORY "patterns" DESTINATION "." FILES_MATCHING PATTERN "*.vti")
-
 # put the system runtimes in root folder instead of "bin"
 # http://www.cmake.org/pipermail/cmake/2011-January/041718.html
 set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON )
 include( InstallRequiredSystemLibraries )
 if( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
-  INSTALL( 
+  install( 
     FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
     DESTINATION "."
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
     COMPONENT Runtime
   )
-endif( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
+endif()
+
+# install some text files
+foreach( text_file ${TEXT_FILES} )
+  install( FILES ${text_file} DESTINATION "." )
+endforeach()
+
+# install our pattern files
+foreach( pattern_file ${PATTERN_FILES} )
+  get_filename_component( path_name "patterns/${pattern_file}" PATH )
+  install( FILES "patterns/${pattern_file}" DESTINATION ${path_name} )
+endforeach()
 
 #----------------------------------------package----------------------------------------------
 
