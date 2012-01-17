@@ -35,11 +35,11 @@ GrayScott_slow::GrayScott_slow()
 {
     this->timestep = 1.0f;
     this->rule_name = "Gray-Scott";
-    this->r_a = 0.082f;
-    this->r_b = 0.041f;
+    this->AddParameter("r_a",0.082f);
+    this->AddParameter("r_b",0.041f);
     // for spots:
-    this->k = 0.064f;
-    this->f = 0.035f;
+    this->AddParameter("k",0.064f);
+    this->AddParameter("F",0.035f);
 }
 
 void GrayScott_slow::Allocate(int x,int y,int z,int nc)
@@ -72,6 +72,11 @@ void GrayScott_slow::Update(int n_steps)
 {
     const int X = this->GetX();
     const int Y = this->GetY();
+
+    float r_a = this->GetParameterValue(0);
+    float r_b = this->GetParameterValue(1);
+    float k = this->GetParameterValue(2);
+    float F = this->GetParameterValue(3);
 
     // take approximately n_steps
     for(int iStepPair=0;iStepPair<(n_steps+1)/2;iStepPair++)
@@ -116,8 +121,8 @@ void GrayScott_slow::Update(int n_steps)
                                 *vtk_at(old_b,x_next,y,0,X,Y) - 4*bval;
      
                     // compute the new rate of change of a and b
-                    float da = this->r_a * dda - aval*bval*bval + this->f*(1-aval);
-                    float db = this->r_b * ddb + aval*bval*bval - (this->f+this->k)*bval;
+                    float da = r_a * dda - aval*bval*bval + F*(1-aval);
+                    float db = r_b * ddb + aval*bval*bval - (F+k)*bval;
 
                     // apply the change
                     *vtk_at(new_a,x,y,0,X,Y) = aval + this->timestep * da;
