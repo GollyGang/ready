@@ -915,4 +915,5 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
 void MyFrame::SetRuleName(string s)
 {
     this->system->SetRuleName(s);
+    // TODO: mark file as modified, to ask on exit whether should save
 }
