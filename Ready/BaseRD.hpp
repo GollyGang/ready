@@ -79,6 +79,10 @@ class BaseRD
         virtual void DeleteAllParameters();
         virtual void SetParameterName(int iParam,std::string s);
         virtual void SetParameterValue(int iParam,float val);
+        float GetParameterMin(int iParam) const { return 0.0f; }
+        void SetParameterMin(int iParam,float f) {}
+        float GetParameterMax(int iParam) const { return 0.1f; }
+        void SetParameterMax(int iParam,float f) {}
 
     protected:
 

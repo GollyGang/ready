@@ -23,6 +23,7 @@
 
 // STL:
 #include <string>
+#include <sstream>
 using namespace std;
 
 BEGIN_EVENT_TABLE(RulePanel, wxPanel)
@@ -47,7 +48,22 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
     }
 
     // add the parameters
-    // TODO
+    const int MAX_PARAMS=20;
+    for(int i=0;i<MAX_PARAMS;i++)
+    {
+        wxStaticBoxSizer *sbox = new wxStaticBoxSizer(wxHORIZONTAL,this);
+        this->parameter_names.push_back(sbox);
+
+        wxSlider *slider = new wxSlider(this,wxID_ANY,0,0,1000);
+        this->parameter_sliders.push_back(slider);
+        sbox->Add(slider,wxSizerFlags(1).Expand());
+
+        wxButton *button = new wxButton(this,wxID_ANY,_("..."),wxDefaultPosition,wxDefaultSize,wxBU_EXACTFIT);
+        this->parameter_buttons.push_back(button);
+        sbox->Add(button,wxSizerFlags().Expand());
+
+        sizer->Add(sbox,wxSizerFlags().Expand());
+    }
 
     // add a compile button
     //sizer->Add(new wxButton(this->rule_panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
@@ -73,10 +89,24 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
 
 void RulePanel::Update(const BaseRD* const system)
 {
-    // DEBUG
-    system->SetRuleName("blah");
     // set the rule name
     this->rule_name_ctrl->SetValue(wxString(system->GetRuleName().c_str(),wxConvUTF8));
+    // update the parameters controls
+    for(int i=0;i<(int)this->parameter_names.size();i++)
+    {
+        bool active = i<system->GetNumberOfParameters();
+        this->parameter_names[i]->Show(active);
+        this->parameter_buttons[i]->Show(active);
+        this->parameter_sliders[i]->Show(active);
+        if(active)
+        {
+            ostringstream label;
+            label << system->GetParameterName(i);
+            label << " = " << system->GetParameterValue(i);
+            this->parameter_names[i]->GetStaticBox()->SetLabel(wxString(label.str().c_str(),wxConvUTF8));
+            this->parameter_sliders[i]->SetValue(1000*(system->GetParameterValue(i)-system->GetParameterMin(i))/(system->GetParameterMax(i)-system->GetParameterMin(i)));
+        }
+    }
     // enable or disable the formula text box
     if(system->HasEditableFormula())
     {
@@ -88,6 +118,7 @@ void RulePanel::Update(const BaseRD* const system)
         this->formula_ctrl->SetValue(_T("(this implementation has no editable formula)"));
         this->formula_ctrl->Enable(false);
     }
+    this->Layout();
 }
 
 void RulePanel::OnSetRuleName(wxCommandEvent& event)
