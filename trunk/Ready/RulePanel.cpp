@@ -71,8 +71,10 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
     this->SetSizer(sizer);
 }
 
-void RulePanel::Update(BaseRD* system)
+void RulePanel::Update(const BaseRD* const system)
 {
+    // DEBUG
+    system->SetRuleName("blah");
     // set the rule name
     this->rule_name_ctrl->SetValue(wxString(system->GetRuleName().c_str(),wxConvUTF8));
     // enable or disable the formula text box
