@@ -21,6 +21,8 @@
 #include "vtk_pipeline.hpp"
 #include "utils.hpp"
 #include "IO_XML.hpp"
+#include "RulePanel.hpp"
+#include "IDs.hpp"
 
 // readybase:
 #include "GrayScott_slow.hpp"
@@ -61,37 +63,6 @@ using namespace std;
    #include <Carbon/Carbon.h>    // for GetCurrentProcess, etc
 #endif
 
-// IDs for the controls and the menu commands
-namespace ID { enum {
-
-   // we can use IDs higher than this for our own purposes
-   Dummy = wxID_HIGHEST+1,
-
-   // view menu
-   PatternsPane,
-   RulePane,
-   CanvasPane,
-   HelpPane,
-   RestoreDefaultPerspective,
-   Screenshot,
-   ChangeActiveChemical,
-
-   // settings menu
-   SelectOpenCLDevice,
-   OpenCLDiagnostics,
-
-   // actions menu
-   Step,
-   Run,
-   Stop,
-   ReplaceProgram,
-   InitWithBlobInCenter,
-
-   // controls
-   PatternsTree,
-
-}; };
-
 wxString PaneName(int id)
 {
     return wxString::Format(_T("%d"),id);
@@ -124,8 +95,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Run,MyFrame::OnUpdateRun)
     EVT_MENU(ID::Stop,MyFrame::OnStop)
     EVT_UPDATE_UI(ID::Stop,MyFrame::OnUpdateStop)
-    EVT_BUTTON(ID::ReplaceProgram,MyFrame::OnReplaceProgram)
-    EVT_UPDATE_UI(ID::ReplaceProgram,MyFrame::OnUpdateReplaceProgram)
     EVT_MENU(ID::InitWithBlobInCenter,MyFrame::OnInitWithBlobInCenter)
     // help menu
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
@@ -287,24 +256,9 @@ void MyFrame::InitializePatternsPane()
 
 void MyFrame::InitializeRulePane()
 {
-    wxPanel *panel = new wxPanel(this,wxID_ANY);
-    this->rule_pane = new wxTextCtrl(panel,wxID_ANY,
-                        _T(""),
-                        wxDefaultPosition,wxDefaultSize,
-                        wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
-    // TODO: provide UI for changing font size (ditto in Help pane)
-    #ifdef __WXMAC__
-        // need bigger font size on Mac
-        this->rule_pane->SetFont(wxFont(12,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
-    #else
-        this->rule_pane->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
-    #endif
-    wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    //sizer->Add(new wxButton(panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
-    // TODO: kernel-editing temporarily disabled, can edit file instead for now
-    sizer->Add(this->rule_pane,wxSizerFlags(1).Expand());
-    panel->SetSizer(sizer);
-    this->aui_mgr.AddPane(panel,
+    this->rule_panel = new RulePanel(this,wxID_ANY);
+    // add the panel to our window manager
+    this->aui_mgr.AddPane(this->rule_panel,
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::RulePane))
                   .Caption(_("Rule Pane"))
@@ -313,6 +267,11 @@ void MyFrame::InitializeRulePane()
                   .Layer(1) // layer 1 is further towards the edge
                   .Hide()
                   );
+}
+
+void MyFrame::UpdateRulePane()
+{
+    this->rule_panel->Update(this->system);
 }
 
 void MyFrame::InitializeHelpPane()
@@ -576,17 +535,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
-    // fill the rule pane
-    if(this->system->HasEditableFormula())
-    {
-        this->rule_pane->SetValue(wxString(this->system->GetFormula().c_str(),wxConvUTF8));
-        this->rule_pane->Enable(true);
-    }
-    else
-    {
-        this->rule_pane->SetValue(_T("(this implementation has no editable formula)"));
-        this->rule_pane->Enable(false);
-    }
+    this->UpdateRulePane();
     this->Refresh(false);
 }
 
@@ -760,32 +709,6 @@ void MyFrame::LoadDemo(int iDemo)
 void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
 {
     this->aui_mgr.LoadPerspective(this->default_perspective);
-}
-
-void MyFrame::OnReplaceProgram(wxCommandEvent& event)
-{
-    try 
-    {
-        this->system->TestFormula(string(this->rule_pane->GetValue().mb_str()));
-    }
-    catch(const runtime_error& e)
-    {
-        wxMessageBox(_("Formula did not compile:\n\n")+wxString(e.what(),wxConvUTF8));
-        return;
-    }
-    catch(...)
-    {
-        wxMessageBox(_("Unknown error during test compile"));
-        return;
-    }
-    // program compiled successfully
-    this->system->SetFormula(string(this->rule_pane->GetValue().mb_str()));
-    this->rule_pane->SetModified(false);
-}
-
-void MyFrame::OnUpdateReplaceProgram(wxUpdateUIEvent& event)
-{
-    event.Enable(this->system->HasEditableFormula() && this->rule_pane->IsModified());
 }
 
 void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)
@@ -987,4 +910,9 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
     this->UpdateWindows();
     // TODO: might have some visualization based on more than one chemical
+}
+
+void MyFrame::SetRuleName(string s)
+{
+    this->system->SetRuleName(s);
 }

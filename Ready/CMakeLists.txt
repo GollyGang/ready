@@ -52,6 +52,7 @@ endif()
 set( GUI_SOURCES      # high-level GUI code used only in Ready
   app.hpp app.cpp 
   frame.hpp frame.cpp 
+  RulePanel.hpp RulePanel.cpp
   vtk_pipeline.hpp vtk_pipeline.cpp
   wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx
 )
