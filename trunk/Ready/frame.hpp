@@ -26,6 +26,9 @@
 #include <wx/aui/aui.h>
 #include <wx/treectrl.h>
 
+// local:
+class RulePanel;
+
 // STL:
 #include <vector>
 
@@ -34,96 +37,100 @@ class BaseRD;
 
 class MyFrame : public wxFrame
 {
-public:
+    public:
 
-    MyFrame(const wxString& title);
-    ~MyFrame();
+        MyFrame(const wxString& title);
+        ~MyFrame();
 
-    void OpenFile(const wxString& path, bool remember = true);
+        void OpenFile(const wxString& path, bool remember = true);
 
-private:
+        // interface with RulePanel
+        void SetRuleName(std::string s);
 
-    // using wxAUI for window management
-    wxAuiManager aui_mgr;
+    private:
 
-    // VTK does the rendering
-    wxVTKRenderWindowInteractor *pVTKWindow;
+        // file menu
+        void OnOpenPattern(wxCommandEvent& event);
+        void OnSavePattern(wxCommandEvent& event);
+        void OnQuit(wxCommandEvent& event);
 
-    // the rule pane allows the user to edit the code of the current RD system and change the parameters
-    wxTextCtrl *rule_pane;
+        // view menu
+        void OnToggleViewPane(wxCommandEvent& event);
+        void OnUpdateViewPane(wxUpdateUIEvent& event);
+        void OnRestoreDefaultPerspective(wxCommandEvent& event);
+        void OnScreenshot(wxCommandEvent& event);
+        void OnChangeActiveChemical(wxCommandEvent& event);
 
-    // current system being simulated (in future we might want more than one)
-    BaseRD *system;
+        // settings menu
+        void OnSelectOpenCLDevice(wxCommandEvent& event);
+        void OnOpenCLDiagnostics(wxCommandEvent& event);
 
-    bool is_running;
-    int timesteps_per_render;
-    double frames_per_second,million_cell_generations_per_second;
+        // actions menu
+        void OnStep(wxCommandEvent& event);
+        void OnUpdateStep(wxUpdateUIEvent& event);
+        void OnRun(wxCommandEvent& event);
+        void OnUpdateRun(wxUpdateUIEvent& event);
+        void OnStop(wxCommandEvent& event);
+        void OnUpdateStop(wxUpdateUIEvent& event);
+        void OnInitWithBlobInCenter(wxCommandEvent& event);
 
-    wxString default_perspective;
-    wxString last_used_screenshot_folder;
-    int iActiveChemical;
+        // help menu
+        void OnAbout(wxCommandEvent& event);
+        void OnHelp(wxCommandEvent& event);
 
-    int iOpenCLPlatform,iOpenCLDevice;
+        // controls
+        void OnPatternsTreeSelChanged(wxTreeEvent& event);
 
-private:
+        // other event handlers
+        void OnIdle(wxIdleEvent& event);
+        void OnSize(wxSizeEvent& event);
 
-    // file menu
-    void OnOpenPattern(wxCommandEvent& event);
-    void OnSavePattern(wxCommandEvent& event);
-    void OnQuit(wxCommandEvent& event);
+        // internal functions
 
-    // view menu
-    void OnToggleViewPane(wxCommandEvent& event);
-    void OnUpdateViewPane(wxUpdateUIEvent& event);
-    void OnRestoreDefaultPerspective(wxCommandEvent& event);
-    void OnScreenshot(wxCommandEvent& event);
-    void OnChangeActiveChemical(wxCommandEvent& event);
+        void InitializeMenus();
+        void InitializePatternsPane();
+        void InitializeRulePane();
+        void UpdateRulePane();
+        void InitializeHelpPane();
+        void InitializeRenderPane();
+        void LoadSettings();
+        void SaveSettings();
+        void LoadDemo(int iDemo);
+       
+        void SetCurrentRDSystem(BaseRD* system);
+        void UpdateWindows();
+        void SetStatusBarText();
 
-    // settings menu
-    void OnSelectOpenCLDevice(wxCommandEvent& event);
-    void OnOpenCLDiagnostics(wxCommandEvent& event);
+    private:
 
-    // actions menu
-    void OnStep(wxCommandEvent& event);
-    void OnUpdateStep(wxUpdateUIEvent& event);
-    void OnRun(wxCommandEvent& event);
-    void OnUpdateRun(wxUpdateUIEvent& event);
-    void OnStop(wxCommandEvent& event);
-    void OnUpdateStop(wxUpdateUIEvent& event);
-    void OnReplaceProgram(wxCommandEvent& event);
-    void OnUpdateReplaceProgram(wxUpdateUIEvent& event);
-    void OnInitWithBlobInCenter(wxCommandEvent& event);
+        // using wxAUI for window management
+        wxAuiManager aui_mgr;
 
-    // help menu
-    void OnAbout(wxCommandEvent& event);
-    void OnHelp(wxCommandEvent& event);
+        // VTK does the rendering
+        wxVTKRenderWindowInteractor *pVTKWindow;
 
-    // controls
-    void OnPatternsTreeSelChanged(wxTreeEvent& event);
+        // current system being simulated (in future we might want more than one)
+        BaseRD *system;
 
-    // other event handlers
-    void OnIdle(wxIdleEvent& event);
-    void OnSize(wxSizeEvent& event);
+        // rule pane things:
+        RulePanel *rule_panel;
 
-private:
+        // patterns pane things:
+        std::vector<wxTreeItemId> demo_ids;
+        wxTreeCtrl* patterntree;     // for listing folders and files in Patterns pane
+        wxTreeItemId patternroot;    // item id of Patterns folder
 
-    void InitializeMenus();
-    void InitializePatternsPane();
-    void InitializeRulePane();
-    void InitializeHelpPane();
-    void InitializeRenderPane();
-    void LoadSettings();
-    void SaveSettings();
-    void LoadDemo(int iDemo);
-   
-    void SetCurrentRDSystem(BaseRD* system);
-    void UpdateWindows();
-    void SetStatusBarText();
+        // settings:
 
-    std::vector<wxTreeItemId> demo_ids;
+        bool is_running;
+        int timesteps_per_render;
+        double frames_per_second,million_cell_generations_per_second;
 
-    wxTreeCtrl* patterntree;     // for listing folders and files in Patterns pane
-    wxTreeItemId patternroot;    // item id of Patterns folder
+        wxString default_perspective;
+        wxString last_used_screenshot_folder;
+        int iActiveChemical;
 
-    DECLARE_EVENT_TABLE()
+        int iOpenCLPlatform,iOpenCLDevice;
+
+        DECLARE_EVENT_TABLE()
 };
