@@ -50,6 +50,8 @@ class OpenCL_RD : public BaseRD
         static std::string GetPlatformDescription(int iPlatform);
         static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
+        void SetParameterValue(int iParam,float val);
+
         void TestFormula(std::string s);
 
         void CopyFromImage(vtkImageData* im);

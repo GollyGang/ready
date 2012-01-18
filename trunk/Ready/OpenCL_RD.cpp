@@ -513,3 +513,10 @@ void OpenCL_RD::CopyFromImage(vtkImageData* im)
         default: return "Unknown";
     }
 }
+
+void OpenCL_RD::SetParameterValue(int iParam,float val)
+{
+    BaseRD::SetParameterValue(iParam,val);
+    this->need_reload_formula = true;
+    this->ReloadKernelIfNeeded();
+}
