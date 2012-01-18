@@ -28,6 +28,9 @@
 class MyFrame;
 class BaseRD;
 
+// STL:
+#include <vector>
+
 // our rule panel has controls to allow the user to change the parameters of an RD system
 // (it doesn't change the BaseRD itself though, MyFrame does that)
 class RulePanel : public wxPanel
@@ -47,6 +50,10 @@ class RulePanel : public wxPanel
 
         MyFrame *frame;
         wxTextCtrl *rule_name_ctrl,*formula_ctrl;
+
+        std::vector<wxStaticBoxSizer*> parameter_names;
+        std::vector<wxButton*> parameter_buttons;
+        std::vector<wxSlider*> parameter_sliders;
 
         DECLARE_EVENT_TABLE()
 };
