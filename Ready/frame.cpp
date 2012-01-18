@@ -238,8 +238,7 @@ void MyFrame::InitializePatternsPane()
     // add patterns from patterns folder
     {
         // remember id of patterns folder for use in OnPatternsTreeSelChanged
-        // AKT TODO!!! change svn folder name to "Patterns"???
-        wxString foldername = _("patterns");
+        wxString foldername = _("Patterns");
         patternroot = patterntree->AppendItem(root,foldername, 0);
         FillTreeWithFilenames(patterntree,patternroot,foldername,_T("*"));
         patterntree->Expand(patternroot);
