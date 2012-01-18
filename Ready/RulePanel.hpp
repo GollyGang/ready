@@ -29,14 +29,14 @@ class MyFrame;
 class BaseRD;
 
 // our rule panel has controls to allow the user to change the parameters of an RD system
-// (it doesn't talk to the BaseRD itself though, MyFrame does that)
+// (it doesn't change the BaseRD itself though, MyFrame does that)
 class RulePanel : public wxPanel
 {
     public:
 
         RulePanel(MyFrame* parent,wxWindowID id);
 
-        void Update(BaseRD *system);
+        void Update(const BaseRD* const system);
 
     private:
 
