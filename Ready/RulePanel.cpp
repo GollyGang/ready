@@ -30,6 +30,7 @@ BEGIN_EVENT_TABLE(RulePanel, wxPanel)
     // controls
     EVT_BUTTON(ID::SetRuleName,RulePanel::OnSetRuleName)
     EVT_UPDATE_UI(ID::SetRuleName,RulePanel::OnUpdateSetRuleName)
+    EVT_SCROLL(RulePanel::OnScroll)
 END_EVENT_TABLE()
 
 RulePanel::RulePanel(MyFrame* parent,wxWindowID id) 
@@ -92,6 +93,7 @@ void RulePanel::Update(const BaseRD* const system)
     // set the rule name
     this->rule_name_ctrl->SetValue(wxString(system->GetRuleName().c_str(),wxConvUTF8));
     // update the parameters controls
+    this->parameter_ranges.resize(this->parameter_names.size());
     for(int i=0;i<(int)this->parameter_names.size();i++)
     {
         bool active = i<system->GetNumberOfParameters();
@@ -105,6 +107,7 @@ void RulePanel::Update(const BaseRD* const system)
             label << " = " << system->GetParameterValue(i);
             this->parameter_names[i]->GetStaticBox()->SetLabel(wxString(label.str().c_str(),wxConvUTF8));
             this->parameter_sliders[i]->SetValue(1000*(system->GetParameterValue(i)-system->GetParameterMin(i))/(system->GetParameterMax(i)-system->GetParameterMin(i)));
+            this->parameter_ranges[i] = make_pair(system->GetParameterMin(i),system->GetParameterMax(i));
         }
     }
     // enable or disable the formula text box
@@ -130,4 +133,18 @@ void RulePanel::OnSetRuleName(wxCommandEvent& event)
 void RulePanel::OnUpdateSetRuleName(wxUpdateUIEvent& event)
 {
     event.Enable(this->rule_name_ctrl->IsModified());
+}
+
+void RulePanel::OnScroll(wxScrollEvent& event)
+{
+    for(int i=0;i<(int)this->parameter_sliders.size();i++)
+    {
+        wxSlider *slider = this->parameter_sliders[i];
+        if(event.GetEventObject()==slider)
+        {
+            float val = (slider->GetValue()-slider->GetMin()) / float(slider->GetMax()-slider->GetMin());
+            val = this->parameter_ranges[i].first + val*(this->parameter_ranges[i].second-this->parameter_ranges[i].first);
+            this->frame->SetParameter(i,val);
+        }
+    }
 }

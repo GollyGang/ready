@@ -916,3 +916,9 @@ void MyFrame::SetRuleName(string s)
     this->system->SetRuleName(s);
     // TODO: mark file as modified, to ask on exit whether should save
 }
+
+void MyFrame::SetParameter(int iParam,float val)
+{
+    this->system->SetParameterValue(iParam,val);
+    this->UpdateRulePane();
+}

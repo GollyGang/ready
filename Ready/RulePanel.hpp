@@ -45,6 +45,7 @@ class RulePanel : public wxPanel
 
         void OnSetRuleName(wxCommandEvent& event);
         void OnUpdateSetRuleName(wxUpdateUIEvent& event);
+        void OnScroll(wxScrollEvent& event);
 
     private:
 
@@ -54,6 +55,7 @@ class RulePanel : public wxPanel
         std::vector<wxStaticBoxSizer*> parameter_names;
         std::vector<wxButton*> parameter_buttons;
         std::vector<wxSlider*> parameter_sliders;
+        std::vector<std::pair<float,float> > parameter_ranges;
 
         DECLARE_EVENT_TABLE()
 };
