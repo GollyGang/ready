@@ -4,7 +4,13 @@ before 0.2 release:
 - patterns pane should show inbuilt demos, provided files and user files
 - control over size of world, running speed
 - controls for changing parameters, editing formula and descriptions
-- make a toolbar of icons for commonly-used functions
+
+Andrew's tasks for 0.2 (peripheral UI stuff so Tim & Robert can concentrate on
+the core RD stuff):
+- add a toolbar with buttons for commonly-used functions (run/stop, step, etc)
+  - also add slider for changing active chemical
+- add Edit menu with std items
+- add Help folder and populate with .html files (open from Help menu)
 
 before 0.x release:
 - file format should support random patches on top of the image (a constant value image compresses to almost nothing)
