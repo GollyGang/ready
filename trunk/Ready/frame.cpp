@@ -55,8 +55,6 @@ using namespace std;
 #include <vtkPNGWriter.h>
 #include <vtkJPEGWriter.h>
 #include <vtkSmartPointer.h>
-#include <vtkXMLImageDataWriter.h>
-#include <vtkXMLImageDataReader.h>
 #include <vtkImageAppendComponents.h>
 
 #ifdef __WXMAC__
@@ -272,7 +270,6 @@ void MyFrame::InitializePatternsPane()
     {
         // remember id of patterns folder for use in OnPatternsTreeSelChanged
         // AKT TODO!!! change svn folder name to "Patterns"???
-        // also need to fix CMakeLists.txt so it copies any subfolders inside Patterns???
         wxString foldername = _("patterns");
         patternroot = patterntree->AppendItem(root,foldername, 0);
         FillTreeWithFilenames(patterntree,patternroot,foldername,_T("*"));
