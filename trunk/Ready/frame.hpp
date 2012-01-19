@@ -48,6 +48,8 @@ class MyFrame : public wxFrame
 
         // interface with RulePanel
         void SetRuleName(std::string s);
+        void SetRuleDescription(std::string s);
+        void SetPatternDescription(std::string s);
         void SetParameter(int iParam,float val);
 
     private:
