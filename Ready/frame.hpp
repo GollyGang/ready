@@ -24,7 +24,8 @@
     #include <wx/wx.h>
 #endif
 #include <wx/aui/aui.h>
-#include <wx/treectrl.h>
+#include <wx/dirctrl.h>    // for wxGenericDirCtrl
+#include <wx/treectrl.h>   // for wxTreeCtrl, wxTreeEvent
 
 // local:
 class RulePanel;
@@ -43,6 +44,7 @@ class MyFrame : public wxFrame
         ~MyFrame();
 
         void OpenFile(const wxString& path, bool remember = true);
+        void EditFile(const wxString& path);
 
         // interface with RulePanel
         void SetRuleName(std::string s);
@@ -80,7 +82,10 @@ class MyFrame : public wxFrame
         void OnHelp(wxCommandEvent& event);
 
         // controls
-        void OnPatternsTreeSelChanged(wxTreeEvent& event);
+        void OnTreeSelChanged(wxTreeEvent& event);
+        void OnTreeExpand(wxTreeEvent& event);
+        void OnTreeCollapse(wxTreeEvent& event);
+        void OnTreeClick(wxMouseEvent& event);
 
         // other event handlers
         void OnIdle(wxIdleEvent& event);
@@ -97,6 +102,8 @@ class MyFrame : public wxFrame
         void LoadSettings();
         void SaveSettings();
         void LoadDemo(int iDemo);
+        void SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root);
+        void DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root);
        
         void SetCurrentRDSystem(BaseRD* system);
         void UpdateWindows();
@@ -117,9 +124,8 @@ class MyFrame : public wxFrame
         RulePanel *rule_panel;
 
         // patterns pane things:
+        wxGenericDirCtrl* patternctrl;
         std::vector<wxTreeItemId> demo_ids;
-        wxTreeCtrl* patterntree;     // for listing folders and files in Patterns pane
-        wxTreeItemId patternroot;    // item id of Patterns folder
 
         // settings:
 
