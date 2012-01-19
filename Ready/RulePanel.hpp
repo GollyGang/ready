@@ -29,6 +29,9 @@
 class MyFrame;
 class BaseRD;
 
+// STL:
+#include <vector>
+
 // our rule panel has controls to allow the user to change the parameters of an RD system
 // (it doesn't change the BaseRD itself though, MyFrame does that)
 class RulePanel : public wxPanel
@@ -42,8 +45,15 @@ class RulePanel : public wxPanel
 
     private:
 
+        void OnPropertyGridChanged(wxPropertyGridEvent& event);
+
+    private:
+
         MyFrame *frame; // keep a link so that we can alert the parent frame when user makes a change
+
         wxPropertyGrid *pgrid;
+        std::vector<wxPGProperty*> parameter_properties;
+        wxPGProperty *rule_name_property;
 
         DECLARE_EVENT_TABLE()
 };
