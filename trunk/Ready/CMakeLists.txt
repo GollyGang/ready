@@ -42,7 +42,6 @@ set( BASE_SOURCES      # low-level code used in all executables
   OpenCL_RD.hpp OpenCL_RD.cpp
   OpenCL_nDim.hpp OpenCL_nDim.cpp
   IO_XML.hpp IO_XML.cpp
-  IDs.hpp
   utils.hpp utils.cpp
 )
 if( NOT APPLE )
@@ -56,6 +55,7 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   RulePanel.hpp RulePanel.cpp
   vtk_pipeline.hpp vtk_pipeline.cpp
   wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx
+  IDs.hpp
 )
 
 set( RESOURCES
