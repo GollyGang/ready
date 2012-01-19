@@ -1116,6 +1116,20 @@ void MyFrame::SetRuleName(string s)
     // TODO: update anything else that needs to know
 }
 
+void MyFrame::SetRuleDescription(string s)
+{
+    this->system->SetRuleDescription(s);
+    // TODO: mark file as modified, to ask on exit whether should save
+    // TODO: update anything else that needs to know
+}
+
+void MyFrame::SetPatternDescription(string s)
+{
+    this->system->SetPatternDescription(s);
+    // TODO: mark file as modified, to ask on exit whether should save
+    // TODO: update anything else that needs to know
+}
+
 void MyFrame::SetParameter(int iParam,float val)
 {
     this->system->SetParameterValue(iParam,val);

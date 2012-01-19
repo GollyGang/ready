@@ -53,7 +53,7 @@ class RulePanel : public wxPanel
 
         wxPropertyGrid *pgrid;
         std::vector<wxPGProperty*> parameter_properties;
-        wxPGProperty *rule_name_property;
+        wxPGProperty *rule_name_property,*rule_description_property,*pattern_description_property;
 
         DECLARE_EVENT_TABLE()
 };

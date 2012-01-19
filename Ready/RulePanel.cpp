@@ -49,7 +49,8 @@ void RulePanel::Update(const BaseRD* const system)
     this->pgrid->Clear();
 
     this->rule_name_property = this->pgrid->Append(new wxStringProperty( _("Rule name"),wxPG_LABEL,system->GetRuleName()));
-    this->pgrid->Append(new wxLongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
+    this->rule_description_property = this->pgrid->Append(new wxLongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
+    this->pattern_description_property = this->pgrid->Append(new wxLongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
 
     this->parameter_properties.resize(system->GetNumberOfParameters());
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
@@ -75,7 +76,7 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
     wxPGProperty *property = event.GetProperty();
     if(!property) return;
 
-    // was is a parameter that changed?
+    // was it a parameter that changed?
     for(int iParam=0;iParam<(int)this->parameter_properties.size();iParam++)
     {
         if(property != this->parameter_properties[iParam]) continue;
@@ -84,4 +85,8 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
 
     if(property == this->rule_name_property) 
         this->frame->SetRuleName(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
+    if(property == this->rule_description_property) 
+        this->frame->SetRuleDescription(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
+    if(property == this->pattern_description_property) 
+        this->frame->SetPatternDescription(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
 }
