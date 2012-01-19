@@ -23,13 +23,11 @@
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
+#include <wx/propgrid/propgrid.h>
 
 // local:
 class MyFrame;
 class BaseRD;
-
-// STL:
-#include <vector>
 
 // our rule panel has controls to allow the user to change the parameters of an RD system
 // (it doesn't change the BaseRD itself though, MyFrame does that)
@@ -39,23 +37,13 @@ class RulePanel : public wxPanel
 
         RulePanel(MyFrame* parent,wxWindowID id);
 
+        // update the controls to the state of the RD system
         void Update(const BaseRD* const system);
 
     private:
 
-        void OnSetRuleName(wxCommandEvent& event);
-        void OnUpdateSetRuleName(wxUpdateUIEvent& event);
-        void OnScroll(wxScrollEvent& event);
-
-    private:
-
-        MyFrame *frame;
-        wxTextCtrl *rule_name_ctrl,*formula_ctrl;
-
-        std::vector<wxStaticBoxSizer*> parameter_names;
-        std::vector<wxButton*> parameter_buttons;
-        std::vector<wxSlider*> parameter_sliders;
-        std::vector<std::pair<float,float> > parameter_ranges;
+        MyFrame *frame; // keep a link so that we can alert the parent frame when user makes a change
+        wxPropertyGrid *pgrid;
 
         DECLARE_EVENT_TABLE()
 };

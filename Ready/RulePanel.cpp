@@ -27,10 +27,7 @@
 using namespace std;
 
 BEGIN_EVENT_TABLE(RulePanel, wxPanel)
-    // controls
-    EVT_BUTTON(ID::SetRuleName,RulePanel::OnSetRuleName)
-    EVT_UPDATE_UI(ID::SetRuleName,RulePanel::OnUpdateSetRuleName)
-    EVT_SCROLL(RulePanel::OnScroll)
+    //
 END_EVENT_TABLE()
 
 RulePanel::RulePanel(MyFrame* parent,wxWindowID id) 
@@ -38,113 +35,31 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
 {
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-    // add the rule name
-    sizer->Add(new wxStaticText(this,wxID_ANY,_("Rule name:")));
-    {
-        wxBoxSizer *h_sizer = new wxBoxSizer(wxHORIZONTAL);
-        this->rule_name_ctrl = new wxTextCtrl(this,wxID_ANY);
-        h_sizer->Add(this->rule_name_ctrl,wxSizerFlags(1).Expand());
-        h_sizer->Add(new wxButton(this,ID::SetRuleName,_("set")));
-        sizer->Add(h_sizer,wxSizerFlags().Expand());
-    }
+    this->pgrid = new wxPropertyGrid(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,
+        wxPG_SPLITTER_AUTO_CENTER );
 
-    // add the parameters
-    const int MAX_PARAMS=20;
-    for(int i=0;i<MAX_PARAMS;i++)
-    {
-        wxStaticBoxSizer *sbox = new wxStaticBoxSizer(wxHORIZONTAL,this);
-        this->parameter_names.push_back(sbox);
-
-        wxSlider *slider = new wxSlider(this,wxID_ANY,0,0,1000);
-        this->parameter_sliders.push_back(slider);
-        sbox->Add(slider,wxSizerFlags(1).Expand());
-
-        wxButton *button = new wxButton(this,wxID_ANY,_("..."),wxDefaultPosition,wxDefaultSize,wxBU_EXACTFIT);
-        this->parameter_buttons.push_back(button);
-        sbox->Add(button,wxSizerFlags().Expand());
-
-        sizer->Add(sbox,wxSizerFlags().Expand());
-    }
-
-    // add a compile button
-    //sizer->Add(new wxButton(this->rule_panel,ID::ReplaceProgram,_("Compile")),wxSizerFlags(0).Align(wxALIGN_RIGHT));
-    // TODO: kernel-editing temporarily disabled, can edit file instead for now
-
-    // add the formula box
-    sizer->Add(new wxStaticText(this,wxID_ANY,_("Formula:")));
-    this->formula_ctrl = new wxTextCtrl(this,wxID_ANY,
-                        _T(""),
-                        wxDefaultPosition,wxDefaultSize,
-                        wxTE_MULTILINE | wxTE_RICH2 | wxTE_DONTWRAP | wxTE_PROCESS_TAB );
-    // TODO: provide UI for changing font size (ditto in Help pane)
-    #ifdef __WXMAC__
-        // need bigger font size on Mac
-        this->formula_ctrl->SetFont(wxFont(12,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
-    #else
-        this->formula_ctrl->SetFont(wxFont(8,wxFONTFAMILY_TELETYPE,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD));
-    #endif
-    sizer->Add(this->formula_ctrl,wxSizerFlags(1).Expand());
-
+    sizer->Add(this->pgrid,wxSizerFlags(1).Expand());
     this->SetSizer(sizer);
 }
 
 void RulePanel::Update(const BaseRD* const system)
 {
-    // set the rule name
-    this->rule_name_ctrl->SetValue(wxString(system->GetRuleName().c_str(),wxConvUTF8));
-    // update the parameters controls
-    this->parameter_ranges.resize(this->parameter_names.size());
-    for(int i=0;i<(int)this->parameter_names.size();i++)
+    // remake the whole property grid (we don't know what changed)
+    this->pgrid->Clear();
+
+    this->pgrid->Append(new wxStringProperty( _T("Rule name"),wxPG_LABEL,system->GetRuleName()) );
+    this->pgrid->Append(new wxLongStringProperty( _T("Rule description"),wxPG_LABEL,system->GetRuleDescription()) );
+
+    for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
-        bool active = i<system->GetNumberOfParameters();
-        this->parameter_names[i]->Show(active);
-        this->parameter_buttons[i]->Show(active);
-        this->parameter_sliders[i]->Show(active);
-        if(active)
-        {
-            ostringstream label;
-            label << system->GetParameterName(i);
-            label << " = " << system->GetParameterValue(i);
-            this->parameter_names[i]->GetStaticBox()->SetLabel(wxString(label.str().c_str(),wxConvUTF8));
-            this->parameter_sliders[i]->SetValue(1000*(system->GetParameterValue(i)-system->GetParameterMin(i))/(system->GetParameterMax(i)-system->GetParameterMin(i)));
-            this->parameter_ranges[i] = make_pair(system->GetParameterMin(i),system->GetParameterMax(i));
-        }
+        wxPGProperty *cat = this->pgrid->Append(new wxFloatProperty(system->GetParameterName(iParam),wxPG_LABEL,system->GetParameterValue(iParam)));
+        this->pgrid->AppendIn(cat,new wxFloatProperty(_("min"),wxPG_LABEL,system->GetParameterMin(iParam)));
+        this->pgrid->AppendIn(cat,new wxFloatProperty(_("max"),wxPG_LABEL,system->GetParameterMax(iParam)));
+        this->pgrid->AppendIn(cat,new wxStringProperty(_("name"),wxPG_LABEL,system->GetParameterName(iParam)));
     }
-    // enable or disable the formula text box
+
     if(system->HasEditableFormula())
-    {
-        this->formula_ctrl->SetValue(wxString(system->GetFormula().c_str(),wxConvUTF8));
-        this->formula_ctrl->Enable(true);
-    }
-    else
-    {
-        this->formula_ctrl->SetValue(_T("(this implementation has no editable formula)"));
-        this->formula_ctrl->Enable(false);
-    }
-    this->Layout();
-}
+        this->pgrid->Append(new wxLongStringProperty(_("formula"),wxPG_LABEL,system->GetFormula()));
 
-void RulePanel::OnSetRuleName(wxCommandEvent& event)
-{
-    this->frame->SetRuleName(string(this->rule_name_ctrl->GetValue().mb_str()));
-    this->rule_name_ctrl->SetModified(false);
-}
-
-void RulePanel::OnUpdateSetRuleName(wxUpdateUIEvent& event)
-{
-    event.Enable(this->rule_name_ctrl->IsModified());
-}
-
-void RulePanel::OnScroll(wxScrollEvent& event)
-{
-    for(int i=0;i<(int)this->parameter_sliders.size();i++)
-    {
-        wxSlider *slider = this->parameter_sliders[i];
-        if(event.GetEventObject()==slider)
-        {
-            float val = (slider->GetValue()-slider->GetMin()) / float(slider->GetMax()-slider->GetMin());
-            val = this->parameter_ranges[i].first + val*(this->parameter_ranges[i].second-this->parameter_ranges[i].first);
-            this->frame->SetParameter(i,val);
-        }
-    }
+    this->pgrid->CollapseAll();
 }

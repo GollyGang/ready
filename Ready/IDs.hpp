@@ -55,8 +55,5 @@ namespace ID { enum {
    // MyFrame:
    PatternsTree,
    
-   // RulePanel:
-   SetRuleName,
-
 }; };
 
