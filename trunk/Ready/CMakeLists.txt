@@ -42,6 +42,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   OpenCL_RD.hpp OpenCL_RD.cpp
   OpenCL_nDim.hpp OpenCL_nDim.cpp
   IO_XML.hpp IO_XML.cpp
+  IDs.hpp
   utils.hpp utils.cpp
 )
 if( NOT APPLE )
@@ -124,7 +125,7 @@ elseif(UNIX)
 endif()
 
 # wxWidgets is required to build the project
-FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE( wxWidgets COMPONENTS propgrid html aui ${WXGLCANVASLIBS} core adv base )
 
 IF( wxWidgets_FOUND )
   INCLUDE( ${wxWidgets_USE_FILE} )
