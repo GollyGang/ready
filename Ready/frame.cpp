@@ -995,6 +995,8 @@ void MyFrame::OnSavePattern(wxCommandEvent &event)
         _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if(filename.empty()) return; // user cancelled
 
+    wxBusyCursor busy;
+
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
     for(int i=0;i<this->system->GetNumberOfChemicals();i++)
         iac->AddInput(this->system->GetImage(i));
@@ -1037,6 +1039,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     BaseRD *target_system;
     try
     {
+        wxBusyCursor busy;
         // to load pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
         // TODO: detect if opencl is available, abort if not
         {
