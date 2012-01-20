@@ -70,6 +70,7 @@ wxString PaneName(int id)
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_IDLE(MyFrame::OnIdle)
     EVT_SIZE(MyFrame::OnSize)
+    EVT_CLOSE(MyFrame::OnClose)
     // file menu
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
@@ -933,4 +934,10 @@ bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
     SaveFile(filename);
     
     return false;
+}
+
+void MyFrame::OnClose(wxCloseEvent& event)
+{
+    if(event.CanVeto() && this->UserWantsToCancelWhenAskedIfWantsToSave()) return;
+    event.Skip();
 }
