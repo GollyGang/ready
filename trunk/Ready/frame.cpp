@@ -22,6 +22,7 @@
 #include "utils.hpp"
 #include "IO_XML.hpp"
 #include "RulePanel.hpp"
+#include "PatternsPanel.hpp"
 #include "IDs.hpp"
 
 // readybase:
@@ -33,15 +34,13 @@
 #include "appicon16.xpm"
 
 // wxWidgets:
-#include <wx/artprov.h>
-#include <wx/imaglist.h>
 #include <wx/config.h>
 #include <wx/aboutdlg.h>
 #include <wx/filename.h>
 #include <wx/font.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dir.h>
-#include <wx/dnd.h>           // for wxFileDropTarget
+#include <wx/dnd.h>    // for wxFileDropTarget
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -62,19 +61,6 @@ using namespace std;
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>    // for GetCurrentProcess, etc
 #endif
-
-#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-    // ControlDown has been changed to mean Command key down
-    #define ControlDown RawControlDown
-#endif
-
-// some globals
-#ifdef __WXMSW__
-    static bool call_unselect = false;          // OnIdle needs to call Unselect?
-    static wxString editpath = wxEmptyString;   // OnIdle calls EditFile if this isn't empty
-    static bool ignore_selection = false;       // ignore spurious selection?
-#endif
-static bool edit_file = false;                  // edit the clicked file?
 
 wxString PaneName(int id)
 {
@@ -112,12 +98,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     // help menu
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(wxID_HELP, MyFrame::OnHelp)
-    // controls
-    EVT_TREE_SEL_CHANGED(wxID_TREECTRL, MyFrame::OnTreeSelChanged)
-#ifdef __WXMSW__
-    EVT_TREE_ITEM_EXPANDED(wxID_TREECTRL, MyFrame::OnTreeExpand)
-    EVT_TREE_ITEM_COLLAPSED(wxID_TREECTRL, MyFrame::OnTreeCollapse)
-#endif
 END_EVENT_TABLE()
 
 // frame constructor
@@ -203,106 +183,12 @@ void MyFrame::InitializeMenus()
     SetMenuBar(menuBar);
 }
 
-void MyFrame::SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root)
-{
-    // delete old tree (except root)
-    treectrl->DeleteChildren(root);
-
-    /* AKT!!! doesn't work -- get crash on Expand call
-    // add inbuilt demo patterns
-    {
-        wxTreeItemId inbuilt = treectrl->AppendItem(root, _("Inbuilt patterns"), 0);
-        {
-            wxTreeItemId demos = treectrl->AppendItem(inbuilt, wxT("CPU demos"), 0);
-            this->demo_ids.push_back(treectrl->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
-            this->demo_ids.push_back(treectrl->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
-            treectrl->Expand(demos);
-        }
-        {
-            wxTreeItemId demos = treectrl->AppendItem(inbuilt, wxT("OpenCL demos"), 0);
-            this->demo_ids.push_back(treectrl->AppendItem(demos, wxT("Gray-Scott 1D"), 1));
-            this->demo_ids.push_back(treectrl->AppendItem(demos, wxT("Gray-Scott 2D"), 1));
-            this->demo_ids.push_back(treectrl->AppendItem(demos, wxT("Gray-Scott 3D"), 1));
-            treectrl->Expand(demos);
-        }
-        treectrl->Expand(inbuilt);
-    }
-    */
-   
-    // remove any terminating separator from given directory path
-    wxString dir = indir;
-    if (dir.Last() == wxFILE_SEP_PATH) dir.Truncate(dir.Length()-1);
-
-    // append dir as child of root
-    wxDirItemData* diritem = new wxDirItemData(dir, dir, true);
-    wxTreeItemId id = treectrl->AppendItem(root, dir.AfterLast(wxFILE_SEP_PATH), 0, 0, diritem);
-    if ( diritem->HasFiles() || diritem->HasSubDirs() ) {
-        treectrl->SetItemHasChildren(id);
-        treectrl->Expand(id);
-        #ifndef __WXMSW__
-            // this causes crash on Windows
-            treectrl->ScrollTo(root);
-        #endif
-    }
-}
-
 void MyFrame::InitializePatternsPane()
 {
-    patternctrl = NULL;   // for 1st call of OnTreeSelChanged
-    patternctrl = new wxGenericDirCtrl(this, wxID_ANY, wxEmptyString,
-                                       wxPoint(0,0), wxSize(240,250),
-                                       #ifdef __WXMSW__
-                                           // speed up a bit
-                                           wxDIRCTRL_DIR_ONLY | wxNO_BORDER,
-                                       #else
-                                           wxNO_BORDER,
-                                       #endif
-                                       wxEmptyString   // see all file types
-                                      );
-    #ifdef __WXMSW__
-        // now remove wxDIRCTRL_DIR_ONLY so we'll see files
-        patternctrl->SetWindowStyle(wxNO_BORDER);
-    #endif
-
-    wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
-
-    #if defined(__WXGTK__)
-        // make sure background is white when using KDE's GTK theme
-        #if wxCHECK_VERSION(2,9,0)
-            treectrl->SetBackgroundStyle(wxBG_STYLE_ERASE);
-        #else
-            treectrl->SetBackgroundStyle(wxBG_STYLE_COLOUR);
-        #endif
-        treectrl->SetBackgroundColour(*wxWHITE);
-        // reduce indent a bit
-        treectrl->SetIndent(8);
-    #elif defined(__WXMAC__)
-        // reduce font size
-        wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-        font.SetPointSize(12);
-        treectrl->SetFont(font);
-    #elif defined(__WXMSW__)
-        // reduce indent a lot on Windows
-        treectrl->SetIndent(4);
-    #endif
-
-    // AKT TODO!!! let users change this folder (or nicer to append their folder???)
-    wxString patterndir = _("Patterns");
-    
-    if ( wxFileName::DirExists(patterndir) ) {
-        // only show patterndir and its contents
-        SimplifyTree(patterndir, treectrl, patternctrl->GetRootId());
-    }
-
-    // install event handler to detect control/right-click on a file
-    treectrl->Connect(wxID_ANY, wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame::OnTreeClick));
-    treectrl->Connect(wxID_ANY, wxEVT_RIGHT_DOWN, wxMouseEventHandler(MyFrame::OnTreeClick));
-    #ifdef __WXMSW__
-        // fix double-click problem
-        treectrl->Connect(wxID_ANY, wxEVT_LEFT_DCLICK, wxMouseEventHandler(MyFrame::OnTreeClick));
-    #endif
-
-    this->aui_mgr.AddPane(patternctrl, wxAuiPaneInfo()
+    this->patterns_panel = new PatternsPanel(this,wxID_ANY);
+    // add the panel to our window manager
+    this->aui_mgr.AddPane(this->patterns_panel,
+                  wxAuiPaneInfo()
                   .Name(PaneName(ID::PatternsPane))
                   .Caption(_("Patterns Pane"))
                   .Left()
@@ -645,17 +531,7 @@ void MyFrame::OnUpdateStop(wxUpdateUIEvent& event)
 
 void MyFrame::OnIdle(wxIdleEvent& event)
 {
-    #ifdef __WXMSW__
-        if ( call_unselect ) {
-            // deselect file so user can click the same item again
-            patternctrl->GetTreeCtrl()->Unselect();
-            call_unselect = false;
-        }
-        if (!editpath.IsEmpty()) {
-            EditFile(editpath);
-            editpath.Clear();
-        }
-    #endif
+    this->patterns_panel->DoIdleChecks();
     
     // we drive our game loop by onIdle events
     if(this->is_running)
@@ -842,143 +718,6 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
         iNewSelection -= nd;
     }
     // TODO: hot-change the current RD system
-}
-
-void MyFrame::DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root)
-{
-    // recursively traverse tree and reset each item background to white
-    wxTreeItemIdValue cookie;
-    wxTreeItemId id = treectrl->GetFirstChild(root, cookie);
-    while ( id.IsOk() ) {
-         wxColor currcolor = treectrl->GetItemBackgroundColour(id);
-         if ( currcolor != *wxWHITE ) {
-             // assume item is selected
-             treectrl->SetItemBackgroundColour(id, *wxWHITE);
-         }
-        if ( treectrl->ItemHasChildren(id) ) {
-            DeselectTree(treectrl, id);
-        }
-        id = treectrl->GetNextChild(root, cookie);
-    }
-}
-
-void MyFrame::OnTreeExpand(wxTreeEvent& WXUNUSED(event))
-{
-    #ifdef __WXMSW__
-        // avoid bug -- expanding/collapsing a folder can cause top visible item
-        // to become selected and thus OnTreeSelChanged gets called
-        ignore_selection = true;
-    #endif
-}
-
-void MyFrame::OnTreeCollapse(wxTreeEvent& WXUNUSED(event))
-{
-    #ifdef __WXMSW__
-        // avoid bug -- expanding/collapsing a folder can cause top visible item
-        // to become selected and thus OnTreeSelChanged gets called
-        ignore_selection = true;
-    #endif
-}
-
-void MyFrame::OnTreeClick(wxMouseEvent& event)
-{
-    // set global flag for testing in OnTreeSelChanged
-    edit_file = event.ControlDown() || event.RightDown();
-   
-#ifdef __WXMSW__
-    // this handler gets called even if user clicks outside an item,
-    // and in some cases can result in the top visible item becoming
-    // selected, so we need to avoid that
-    ignore_selection = false;
-    if (patternctrl) {
-        wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
-        if (treectrl) {
-            wxPoint pt = event.GetPosition();
-            int flags;
-            wxTreeItemId id = treectrl->HitTest(pt, flags);
-            if (id.IsOk() && (flags & wxTREE_HITTEST_ONITEMLABEL ||
-                              flags & wxTREE_HITTEST_ONITEMICON)) {
-                // fix problem with right-click
-                if (event.RightDown()) {
-                    treectrl->SelectItem(id, true);
-                    // OnTreeSelChanged gets called a few times for some reason
-                }
-                // fix problem with double-click
-                if (event.LeftDClick()) ignore_selection = true;
-            } else {
-                ignore_selection = true;
-            }
-        }
-    }
-#endif
-   
-    event.Skip();
-}
-
-void MyFrame::OnTreeSelChanged(wxTreeEvent& event)
-{
-    if (patternctrl == NULL) return;   // ignore 1st call
-    
-    wxTreeItemId id = event.GetItem();
-    if (!id.IsOk()) return;
-    
-    /* AKT: forget inbuilt demos!!! just create suitable pattern files???
-    // first check if an inbuilt demo was clicked
-    for(int i=0;i<(int)this->demo_ids.size();i++)
-        if(id==this->demo_ids[i]) {
-            this->LoadDemo(i);
-            return;
-        }
-    */
-
-    wxString filepath = patternctrl->GetFilePath();
-    
-    // deselect file/folder so this handler will be called if user clicks same item
-    wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
-    #ifdef __WXMSW__
-        // calling UnselectAll() or Unselect() here causes a crash
-        if (ignore_selection) {
-            // ignore spurious selection
-            ignore_selection = false;
-            call_unselect = true;
-            return;
-        }
-    #else
-        treectrl->UnselectAll();
-    #endif
-
-    if ( filepath.IsEmpty() ) {
-        // user clicked on a folder name
-        DeselectTree(treectrl, treectrl->GetRootItem());
-        treectrl->SetItemBackgroundColour(id, *wxLIGHT_GREY);
-
-    } else if (edit_file) {
-        // open file in text editor
-        #ifdef __WXMSW__
-            // call EditFile in later OnIdle to avoid right-click problem
-            editpath = filepath;
-        #else
-            EditFile(filepath);
-        #endif
-    
-    } else {
-        // user clicked on a pattern file
-        
-        // reset background of previously selected file by traversing entire tree;
-        // we can't just remember previously selected id because ids don't persist
-        // after a folder has been collapsed and expanded
-        DeselectTree(treectrl, treectrl->GetRootItem());
-
-        // indicate the selected file
-        treectrl->SetItemBackgroundColour(id, *wxLIGHT_GREY);
-
-        OpenFile(filepath);
-    }
-
-    #ifdef __WXMSW__
-        // calling Unselect() here causes a crash so do later in OnIdle
-        call_unselect = true;
-    #endif
 }
 
 void MyFrame::OnHelp(wxCommandEvent &event)
