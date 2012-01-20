@@ -51,6 +51,7 @@ class OpenCL_RD : public BaseRD
         static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
         void SetParameterValue(int iParam,float val);
+        void SetParameterName(int iParam,std::string s);
 
         void TestFormula(std::string s);
 

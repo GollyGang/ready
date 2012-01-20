@@ -46,13 +46,23 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
 
 void RulePanel::Update(const BaseRD* const system)
 {
+    class LongStringProperty : public wxLongStringProperty
+    {
+        public:
+            LongStringProperty(const wxString& label,const wxString& name,const wxString& value) 
+                : wxLongStringProperty(label,name,value)
+            {
+                this->m_flags |= wxPG_PROP_NO_ESCAPE;
+            }
+    };
+
     // remake the whole property grid (we don't know what changed)
     this->pgrid->Freeze();
     this->pgrid->Clear();
 
     this->rule_name_property = this->pgrid->Append(new wxStringProperty( _("Rule name"),wxPG_LABEL,system->GetRuleName()));
-    this->rule_description_property = this->pgrid->Append(new wxLongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
-    this->pattern_description_property = this->pgrid->Append(new wxLongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
+    this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
+    this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
 
     this->parameter_value_properties.resize(system->GetNumberOfParameters());
     this->parameter_name_properties.resize(system->GetNumberOfParameters());
@@ -64,7 +74,7 @@ void RulePanel::Update(const BaseRD* const system)
     }
 
     if(system->HasEditableFormula())
-        this->formula_property = this->pgrid->Append(new wxLongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
+        this->formula_property = this->pgrid->Append(new LongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
 
     //this->pgrid->Append(new wxFileProperty("Filename", wxPG_LABEL, wxEmptyString));
 
@@ -83,7 +93,11 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
         if(property == this->parameter_value_properties[iParam])
             this->frame->SetParameter(iParam,(wxAny(property->GetValue())).As<float>());
         if(property == this->parameter_name_properties[iParam])
-            this->frame->SetParameterName(iParam,string((wxAny(property->GetValue())).As<wxString>().mb_str()));
+        {
+            wxString new_name = (wxAny(property->GetValue())).As<wxString>();
+            this->parameter_value_properties[iParam]->SetLabel(new_name);
+            this->frame->SetParameterName(iParam,string(new_name.mb_str()));
+        }
     }
 
     if(property == this->rule_name_property) 
