@@ -139,7 +139,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     // create the program
     this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
     const char *source = this->kernel_source.c_str();
-    size_t source_size = this->kernel_source.length()+1;
+    size_t source_size = this->kernel_source.length();
     cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
@@ -280,7 +280,7 @@ void OpenCL_RD::TestFormula(std::string formula)
 
     // create the program
     const char *source = kernel_source.c_str();
-    size_t source_size = kernel_source.length()+1;
+    size_t source_size = kernel_source.length();
     cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCL_RD::TestProgram : Failed to create program with source: ");
 
