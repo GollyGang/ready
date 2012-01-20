@@ -479,7 +479,29 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 
 void MyFrame::UpdateWindowTitle()
 {
-    this->SetTitle(_T("Ready - ") + this->system->GetFilename() + (this->system->IsModified()?_T(" *"):_T("")));
+    wxString name = this->system->GetFilename();
+    if (name.IsEmpty()) {
+        // AKT TODO!!! this might not be needed when we implement New Pattern which should call SetFilename("untitled")
+        name = _("untitled");
+    } else {
+        // just show file's name, not full path
+        // AKT TODO!!! perhaps we should make this optional (via flag in Prefs > File)???
+        name = name.AfterLast(wxFILE_SEP_PATH);
+    }
+    
+    if (this->system->IsModified()) {
+        // prepend asterisk to indicate the current system has been modified
+        // (this is consistent with Golly and other Win/Linux apps)
+        name = _T("*") + name;
+    }
+    
+    #ifdef __WXMAC__
+        // Mac apps don't show app name in window title
+        this->SetTitle(name);
+    #else
+        // Win/Linux apps usually append the app name to the file name
+        this->SetTitle(name + _T(" - Ready"));
+    #endif
 }
 
 void MyFrame::UpdateWindows()
@@ -605,6 +627,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetNumberOfChemicals(2);
                     s->Allocate(80,50,1,2);
                     s->InitWithBlobInCenter();
+                    s->SetFilename("GrayScott 2D demo (CPU)");
                     s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
@@ -615,6 +638,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetNumberOfChemicals(2);
                     s->Allocate(30,25,20,2);
                     s->InitWithBlobInCenter();
+                    s->SetFilename("GrayScott 3D demo (CPU)");
                     s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
@@ -627,6 +651,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(128,1,1,2);
                     s->InitWithBlobInCenter();
+                    s->SetFilename("GrayScott 1D demo (OpenCL)");
                     s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
@@ -639,6 +664,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(128,64,1,2);
                     s->InitWithBlobInCenter();
+                    s->SetFilename("GrayScott 2D demo (OpenCL)");
                     s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
@@ -651,6 +677,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(64,64,64,2);
                     s->InitWithBlobInCenter();
+                    s->SetFilename("GrayScott 3D demo (OpenCL)");
                     s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
