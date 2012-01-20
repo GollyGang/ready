@@ -131,10 +131,10 @@ std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) co
     const int X = get_global_size(0);\n\
     const int Y = get_global_size(1);\n\
     const int Z = get_global_size(2);\n\
-    const int i = X*(Y*z + y) + x;\n\
+    const int i_here = X*(Y*z + y) + x;\n\
 \n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float4 " << Chem(i) << " = " << Chem(i) << "_in[i];\n"; // "float4 a = a_in[i];"
+        kernel_source << indent << "float4 " << Chem(i) << " = " << Chem(i) << "_in[i_here];\n"; // "float4 a = a_in[i_here];"
     // output the Laplacian part of the body
     kernel_source << "\
 \n\
@@ -181,7 +181,7 @@ std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) co
     }
     // the last part of the kernel
     for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << Chem(iC) << "_out[i] = " << Chem(iC) << " + delta_t * delta_" << Chem(iC) << ";\n";
+        kernel_source << indent << Chem(iC) << "_out[i_here] = " << Chem(iC) << " + delta_t * delta_" << Chem(iC) << ";\n";
     kernel_source << "}\n";
     return kernel_source.str();
 }
