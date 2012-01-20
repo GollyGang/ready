@@ -42,8 +42,10 @@ class MyFrame : public wxFrame
         MyFrame(const wxString& title);
         ~MyFrame();
 
+        // interface with PatternsPanel
         void OpenFile(const wxString& path, bool remember = true);
         void EditFile(const wxString& path);
+        bool UserWantsToCancelWhenAskedIfWantsToSave();
 
         // interface with RulePanel
         void SetRuleName(std::string s);
@@ -87,6 +89,7 @@ class MyFrame : public wxFrame
         // other event handlers
         void OnIdle(wxIdleEvent& event);
         void OnSize(wxSizeEvent& event);
+        void OnClose(wxCloseEvent& event);
 
         // internal functions
 
@@ -104,7 +107,6 @@ class MyFrame : public wxFrame
         void UpdateWindows();
         void UpdateWindowTitle();
         void SetStatusBarText();
-        bool UserWantsToCancelWhenAskedIfWantsToSave();
 
         void SaveFile(const wxString& path);
 

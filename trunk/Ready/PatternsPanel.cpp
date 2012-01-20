@@ -263,7 +263,8 @@ void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
         // indicate the selected file
         treectrl->SetItemBackgroundColour(id, *wxLIGHT_GREY);
 
-        frame->OpenFile(filepath);
+        if(!frame->UserWantsToCancelWhenAskedIfWantsToSave())
+            frame->OpenFile(filepath);
     }
 
     #ifdef __WXMSW__
