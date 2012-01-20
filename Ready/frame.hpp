@@ -50,6 +50,8 @@ class MyFrame : public wxFrame
         void SetRuleDescription(std::string s);
         void SetPatternDescription(std::string s);
         void SetParameter(int iParam,float val);
+        void SetParameterName(int iParam,std::string s);
+        void SetFormula(std::string s);
 
     private:
 
@@ -100,7 +102,11 @@ class MyFrame : public wxFrame
        
         void SetCurrentRDSystem(BaseRD* system);
         void UpdateWindows();
+        void UpdateWindowTitle();
         void SetStatusBarText();
+        bool UserWantsToCancelWhenAskedIfWantsToSave();
+
+        void SaveFile(const wxString& path);
 
     private:
 

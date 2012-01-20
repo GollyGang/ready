@@ -54,20 +54,19 @@ void RulePanel::Update(const BaseRD* const system)
     this->rule_description_property = this->pgrid->Append(new wxLongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
     this->pattern_description_property = this->pgrid->Append(new wxLongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
 
-    this->parameter_properties.resize(system->GetNumberOfParameters());
+    this->parameter_value_properties.resize(system->GetNumberOfParameters());
+    this->parameter_name_properties.resize(system->GetNumberOfParameters());
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
-        wxPGProperty *cat = this->pgrid->Append(new wxFloatProperty(system->GetParameterName(iParam),wxPG_LABEL,system->GetParameterValue(iParam)));
-        this->parameter_properties[iParam] = cat;
-        this->pgrid->AppendIn(cat,new wxFloatProperty(_("Min"),wxPG_LABEL,system->GetParameterMin(iParam)));
-        this->pgrid->AppendIn(cat,new wxFloatProperty(_("Max"),wxPG_LABEL,system->GetParameterMax(iParam)));
-        this->pgrid->AppendIn(cat,new wxStringProperty(_("Name"),wxPG_LABEL,system->GetParameterName(iParam)));
+        wxPGProperty *prop = this->pgrid->Append(new wxFloatProperty(system->GetParameterName(iParam),wxPG_LABEL,system->GetParameterValue(iParam)));
+        this->parameter_value_properties[iParam] = prop;
+        this->parameter_name_properties[iParam] = this->pgrid->AppendIn(prop,new wxStringProperty(_("Name"),wxPG_LABEL,system->GetParameterName(iParam)));
     }
 
     if(system->HasEditableFormula())
-        this->pgrid->Append(new wxLongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
+        this->formula_property = this->pgrid->Append(new wxLongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
 
-    this->pgrid->Append(new wxFileProperty("Filename", wxPG_LABEL, wxEmptyString));
+    //this->pgrid->Append(new wxFileProperty("Filename", wxPG_LABEL, wxEmptyString));
 
     this->pgrid->CollapseAll();
     this->pgrid->Thaw();
@@ -79,10 +78,12 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
     if(!property) return;
 
     // was it a parameter that changed?
-    for(int iParam=0;iParam<(int)this->parameter_properties.size();iParam++)
+    for(int iParam=0;iParam<(int)this->parameter_value_properties.size();iParam++)
     {
-        if(property != this->parameter_properties[iParam]) continue;
-        this->frame->SetParameter(iParam,(wxAny(property->GetValue())).As<float>());
+        if(property == this->parameter_value_properties[iParam])
+            this->frame->SetParameter(iParam,(wxAny(property->GetValue())).As<float>());
+        if(property == this->parameter_name_properties[iParam])
+            this->frame->SetParameterName(iParam,string((wxAny(property->GetValue())).As<wxString>().mb_str()));
     }
 
     if(property == this->rule_name_property) 
@@ -91,4 +92,6 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
         this->frame->SetRuleDescription(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
     if(property == this->pattern_description_property) 
         this->frame->SetPatternDescription(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
+    if(property == this->formula_property) 
+        this->frame->SetFormula(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
 }

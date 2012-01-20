@@ -372,6 +372,7 @@ MyFrame::~MyFrame()
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
+    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     Close(true);
 }
 
@@ -475,10 +476,16 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     this->UpdateWindows();
 }
 
+void MyFrame::UpdateWindowTitle()
+{
+    this->SetTitle(_T("Ready - ") + this->system->GetFilename() + (this->system->IsModified()?_T(" *"):_T("")));
+}
+
 void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
     this->UpdateRulePane();
+    this->UpdateWindowTitle();
     this->Refresh(false);
 }
 
@@ -498,6 +505,7 @@ void MyFrame::OnStep(wxCommandEvent &event)
         this->Destroy();
     }
     this->SetStatusBarText();
+    this->UpdateWindowTitle();
     Refresh(false);
 }
 
@@ -560,6 +568,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
    
         this->pVTKWindow->Refresh(false);
+        this->UpdateWindowTitle();
         this->SetStatusBarText();
    
         wxMilliSleep(30);
@@ -595,6 +604,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetNumberOfChemicals(2);
                     s->Allocate(80,50,1,2);
                     s->InitWithBlobInCenter();
+                    s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -604,6 +614,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetNumberOfChemicals(2);
                     s->Allocate(30,25,20,2);
                     s->InitWithBlobInCenter();
+                    s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -615,6 +626,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(128,1,1,2);
                     s->InitWithBlobInCenter();
+                    s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -626,6 +638,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(128,64,1,2);
                     s->InitWithBlobInCenter();
+                    s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -637,6 +650,7 @@ void MyFrame::LoadDemo(int iDemo)
                     s->SetDevice(this->iOpenCLDevice);
                     s->Allocate(64,64,64,2);
                     s->InitWithBlobInCenter();
+                    s->SetModified(false);
                     this->SetCurrentRDSystem(s);
                 }
                 break;
@@ -734,6 +748,15 @@ void MyFrame::OnSavePattern(wxCommandEvent &event)
         _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if(filename.empty()) return; // user cancelled
 
+    SaveFile(filename);
+
+    this->system->SetFilename(string(filename.mb_str()));
+    this->system->SetModified(false);
+    this->UpdateWindowTitle();
+}
+
+void MyFrame::SaveFile(const wxString& path)
+{
     wxBusyCursor busy;
 
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
@@ -744,12 +767,13 @@ void MyFrame::OnSavePattern(wxCommandEvent &event)
     vtkSmartPointer<RD_XMLWriter> iw = vtkSmartPointer<RD_XMLWriter>::New();
     iw->SetSystem(this->system);
     iw->SetInputConnection(iac->GetOutputPort());
-    iw->SetFileName(filename.mb_str());
+    iw->SetFileName(path.mb_str());
     iw->Write();
 }
 
 void MyFrame::OnOpenPattern(wxCommandEvent &event)
 {
+    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
         _("VTK image files (*.vti)|*.vti"),wxFD_OPEN);
     if(filename.empty()) return; // user cancelled
@@ -798,6 +822,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         int nc = iw->GetOutput()->GetNumberOfScalarComponents();
         target_system->Allocate(dim[0],dim[1],dim[2],nc);
         target_system->CopyFromImage(iw->GetOutput());
+        target_system->SetFilename(string(path.mb_str())); // TODO: display filetitle only (user option?)
+        target_system->SetModified(false);
         this->SetCurrentRDSystem(target_system);
     }
     catch(const exception& e)
@@ -854,27 +880,57 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
 void MyFrame::SetRuleName(string s)
 {
     this->system->SetRuleName(s);
-    // TODO: mark file as modified, to ask on exit whether should save
+    this->UpdateWindowTitle();
     // TODO: update anything else that needs to know
 }
 
 void MyFrame::SetRuleDescription(string s)
 {
     this->system->SetRuleDescription(s);
-    // TODO: mark file as modified, to ask on exit whether should save
+    this->UpdateWindowTitle();
     // TODO: update anything else that needs to know
 }
 
 void MyFrame::SetPatternDescription(string s)
 {
     this->system->SetPatternDescription(s);
-    // TODO: mark file as modified, to ask on exit whether should save
+    this->UpdateWindowTitle();
     // TODO: update anything else that needs to know
 }
 
 void MyFrame::SetParameter(int iParam,float val)
 {
     this->system->SetParameterValue(iParam,val);
-    // TODO: mark file as modified, to ask on exit whether should save
+    this->UpdateWindowTitle();
     // TODO: update anything else that needs to know
+}
+
+void MyFrame::SetParameterName(int iParam,std::string s)
+{
+    this->system->SetParameterName(iParam,s);
+    this->UpdateWindowTitle();
+    // TODO: update anything else that needs to know
+}
+
+void MyFrame::SetFormula(std::string s)
+{
+    this->system->SetFormula(s);
+    this->UpdateWindowTitle();
+    // TODO: update anything else that needs to know
+}
+
+bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
+{
+    if(!this->system->IsModified()) return false;
+    int ret = wxMessageBox(_("File is modified. Save?"),_("Save the current system?"),wxYES_NO|wxCANCEL);
+    if(ret==wxCANCEL) return true;
+    if(ret==wxNO) return false;
+
+    wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
+        _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    if(filename.empty()) return true; // user cancelled
+
+    SaveFile(filename);
+    
+    return false;
 }
