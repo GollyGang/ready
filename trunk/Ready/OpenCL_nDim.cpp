@@ -84,6 +84,7 @@ void OpenCL_nDim::InitWithBlobInCenter()
         this->images[i]->Modified();
     this->WriteToOpenCLBuffers();
     this->timesteps_taken = 0;
+    this->is_modified = true;
 }
 
 void OpenCL_nDim::Update(int n_steps)
@@ -99,6 +100,7 @@ void OpenCL_nDim::Update(int n_steps)
     }
 
     this->ReadFromOpenCLBuffers(); // buffer1 -> image
+    this->is_modified = true;
 }
 
 string Chem(int i) { return to_string((char)('a'+i)); } // a, b, c, ...

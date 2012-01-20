@@ -42,7 +42,7 @@ class BaseRD
         int GetY() const;
         int GetZ() const;
         int GetNumberOfChemicals() const { return this->n_chemicals; }
-        void SetNumberOfChemicals(int n) { this->n_chemicals = n; }
+        void SetNumberOfChemicals(int n) { this->n_chemicals = n; this->is_modified = true; }
 
         // advance the RD system by n timesteps
         virtual void Update(int n_steps)=0;
@@ -79,10 +79,11 @@ class BaseRD
         virtual void DeleteAllParameters();
         virtual void SetParameterName(int iParam,std::string s);
         virtual void SetParameterValue(int iParam,float val);
-        float GetParameterMin(int iParam) const { return 0.0f; }
-        void SetParameterMin(int iParam,float f) {}
-        float GetParameterMax(int iParam) const { return 0.1f; }
-        void SetParameterMax(int iParam,float f) {}
+
+        bool IsModified() const;
+        void SetModified(bool m);
+        std::string GetFilename() const;
+        void SetFilename(std::string s);
 
     protected:
 
@@ -99,6 +100,9 @@ class BaseRD
 
         std::string formula;
         bool need_reload_formula;
+
+        std::string filename;
+        bool is_modified;
 
     protected:
 

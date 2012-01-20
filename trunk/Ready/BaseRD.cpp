@@ -35,6 +35,7 @@ BaseRD::BaseRD()
 {
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
+    this->is_modified = false;
 }
 
 BaseRD::~BaseRD()
@@ -84,6 +85,7 @@ float BaseRD::GetTimestep() const
 void BaseRD::SetTimestep(float t)
 {
     this->timestep = t;
+    this->is_modified = true;
 }
 
 vtkImageData* BaseRD::GetImage(int iChemical) const
@@ -102,6 +104,7 @@ void BaseRD::CopyFromImage(vtkImageData* im)
         iec->Update();
         this->images[i]->DeepCopy(iec->GetOutput());
     }
+    this->is_modified = true;
 }
 
 int BaseRD::GetTimestepsTaken() const
@@ -116,6 +119,7 @@ void BaseRD::Allocate(int x,int y,int z,int nc)
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);
+    this->is_modified = true;
 }
 
 void BaseRD::SetFormula(string s)
@@ -123,6 +127,7 @@ void BaseRD::SetFormula(string s)
     if(s != this->formula)
         this->need_reload_formula = true;
     this->formula = s;
+    this->is_modified = true;
 }
 
 string BaseRD::GetFormula() const
@@ -148,16 +153,19 @@ std::string BaseRD::GetPatternDescription() const
 void BaseRD::SetRuleName(std::string s)
 {
     this->rule_name = s;
+    this->is_modified = true;
 }
 
 void BaseRD::SetRuleDescription(std::string s)
 {
     this->rule_description = s;
+    this->is_modified = true;
 }
 
 void BaseRD::SetPatternDescription(std::string s)
 {
     this->pattern_description = s;
+    this->is_modified = true;
 }
 
 int BaseRD::GetNumberOfParameters() const
@@ -178,26 +186,31 @@ float BaseRD::GetParameterValue(int iParam) const
 void BaseRD::AddParameter(std::string name,float val)
 {
     this->parameters.push_back(make_pair(name,val));
+    this->is_modified = true;
 }
 
 void BaseRD::DeleteParameter(int iParam)
 {
     this->parameters.erase(this->parameters.begin()+iParam);
+    this->is_modified = true;
 }
 
 void BaseRD::DeleteAllParameters()
 {
     this->parameters.clear();
+    this->is_modified = true;
 }
 
 void BaseRD::SetParameterName(int iParam,string s)
 {
     this->parameters[iParam].first = s;
+    this->is_modified = true;
 }
 
 void BaseRD::SetParameterValue(int iParam,float val)
 {
     this->parameters[iParam].second = val;
+    this->is_modified = true;
 }
 
 /* static */ vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z)
@@ -217,4 +230,24 @@ void BaseRD::SetParameterValue(int iParam,float val)
 {
     // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
     return origin + x + X*(y + Y*z);
+}
+
+bool BaseRD::IsModified() const
+{
+    return this->is_modified;
+}
+
+void BaseRD::SetModified(bool m)
+{
+    this->is_modified = m;
+}
+
+std::string BaseRD::GetFilename() const
+{
+    return this->filename;
+}
+
+void BaseRD::SetFilename(std::string s)
+{
+    this->filename = s;
 }

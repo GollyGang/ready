@@ -56,6 +56,7 @@ void OpenCL_RD::SetPlatform(int i)
     if(i != this->iPlatform)
         this->need_reload_context = true;
     this->iPlatform = i;
+    this->is_modified = true;
 }
 
 void OpenCL_RD::SetDevice(int i)
@@ -63,6 +64,7 @@ void OpenCL_RD::SetDevice(int i)
     if(i != this->iDevice)
         this->need_reload_context = true;
     this->iDevice = i;
+    this->is_modified = true;
 }
 
 int OpenCL_RD::GetPlatform() const
@@ -75,7 +77,7 @@ int OpenCL_RD::GetDevice() const
     return this->iDevice;
 }
 
-void OpenCL_RD::throwOnError(cl_int ret,const char* message)
+/* static */ void OpenCL_RD::throwOnError(cl_int ret,const char* message)
 {
     if(ret == CL_SUCCESS) return;
 
@@ -303,6 +305,7 @@ void OpenCL_RD::CopyFromImage(vtkImageData* im)
 {
     BaseRD::CopyFromImage(im);
     this->WriteToOpenCLBuffers();
+    this->is_modified = true;
 }
 
 /* static */ std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
@@ -519,4 +522,5 @@ void OpenCL_RD::SetParameterValue(int iParam,float val)
     BaseRD::SetParameterValue(iParam,val);
     this->need_reload_formula = true;
     this->ReloadKernelIfNeeded();
+    this->is_modified = true;
 }

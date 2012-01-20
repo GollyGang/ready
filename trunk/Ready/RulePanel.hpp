@@ -52,8 +52,10 @@ class RulePanel : public wxPanel
         MyFrame *frame; // keep a link so that we can alert the parent frame when user makes a change
 
         wxPropertyGrid *pgrid;
-        std::vector<wxPGProperty*> parameter_properties;
+        std::vector<wxPGProperty*> parameter_value_properties;
+        std::vector<wxPGProperty*> parameter_name_properties;
         wxPGProperty *rule_name_property,*rule_description_property,*pattern_description_property;
+        wxPGProperty *formula_property;
 
         DECLARE_EVENT_TABLE()
 };

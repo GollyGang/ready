@@ -134,6 +134,7 @@ void GrayScott_slow::Update(int n_steps)
     }
     this->images[0]->Modified();
     this->images[1]->Modified();
+    this->is_modified = true;
 }
 
 void GrayScott_slow::InitWithBlobInCenter()
@@ -165,4 +166,5 @@ void GrayScott_slow::InitWithBlobInCenter()
     a_image->Modified();
     b_image->Modified();
     this->timesteps_taken = 0;
+    this->is_modified = true;
 }
