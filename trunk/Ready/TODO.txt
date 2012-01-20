@@ -2,7 +2,7 @@ before 0.2 release:
 - bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
 - populate a pattern library (primary UI for beginners is a list of examples to click)
 - control over size of world, running speed
-- controls for changing parameters, editing formula and descriptions
+- allow non-OpenCL implementations to load some files, using <rule inbuilt="..." >
 
 Andrew's tasks for 0.2 (peripheral UI stuff so Tim & Robert can concentrate on
 the core RD stuff):
@@ -22,7 +22,6 @@ before 0.x release:
 
 before 1.0 release:
 - bug: allow user to change OpenCL platform and device while a pattern is running
-- allow non-OpenCL implementations to load files (parsing formula somehow)
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
 - control over render pipeline: contouring level, color map, slice direction/height etc.
@@ -41,3 +40,4 @@ future ideas:
 - discrete RD (simulation of individual chemicals, to compare with differential equations)
 - display the evolution of a 1D pattern as a 2D image, with time as the second axis, as here:
   http://www.stephenwolfram.com/publications/recent/specialfunctions/images/Slide028_917x754.gif
+- allow non-OpenCL implementations to load all files, by parsing formula

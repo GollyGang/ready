@@ -2,7 +2,7 @@ Ready uses CMake as a pre-build setup. You might need to read some
 CMake documentation to get the hang of it. We've put some hints
 below.
 
-Dependencies: VTK, wxWidgets, any OpenCL SDK.
+Dependencies: VTK, wxWidgets (2.9+), any OpenCL SDK.
 
 =========================== Windows =================================
 
@@ -19,7 +19,7 @@ Build the PACKAGE project to produce a binary distribution zip.
 
 =========================== Linux =================================
 
-Install: libvtk5-dev, libwxgtk2.8-dev, zlib1g-dev, any OpenCL SDK.
+Install: libvtk, libwxgtk (2.9+), zlib1g, any OpenCL SDK.
 
 mkdir Ready_build
 cd Ready_build
