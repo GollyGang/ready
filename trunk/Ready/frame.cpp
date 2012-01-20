@@ -947,13 +947,40 @@ void MyFrame::SetFormula(std::string s)
     // TODO: update anything else that needs to know
 }
 
+// AKT TODO!!! export this routine from utils???
+static int SaveChanges(const wxString& query, const wxString& msg)
+{
+    #ifdef __WXMAC__
+        // create a standard looking Mac dialog
+        wxMessageDialog dialog(wxGetActiveWindow(), msg, query,
+                               wxCENTER | wxNO_DEFAULT | wxYES_NO | wxCANCEL |
+                               wxICON_INFORMATION);
+        
+        // change button order to what Mac users expect to see
+        dialog.SetYesNoCancelLabels("Cancel", "Save", "Don't Save");
+       
+        switch ( dialog.ShowModal() ) {
+            case wxID_YES:    return wxCANCEL;  // Cancel
+            case wxID_NO:     return wxYES;     // Save
+            case wxID_CANCEL: return wxNO;      // Don't Save
+            default:          return wxCANCEL;  // should never happen
+        }
+    #else
+        // Windows/Linux
+        return wxMessageBox(msg, query, wxICON_QUESTION | wxYES_NO | wxCANCEL,
+                            wxGetActiveWindow());
+    #endif
+}
+
 bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
 {
     if(!this->system->IsModified()) return false;
-    int ret = wxMessageBox(_("File is modified. Save?"),_("Save the current system?"),wxYES_NO|wxCANCEL);
+    
+    int ret = SaveChanges(_("Save the current system?"),_("If you don't save, your changes will be lost."));
     if(ret==wxCANCEL) return true;
     if(ret==wxNO) return false;
 
+    // ret == wxYES
     wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
         _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
     if(filename.empty()) return true; // user cancelled
