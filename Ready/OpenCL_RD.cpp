@@ -156,11 +156,12 @@ void OpenCL_RD::ReloadKernelIfNeeded()
         const int MAX_BUILD_LOG = 10000;
         char build_log[MAX_BUILD_LOG];
         size_t build_log_length;
-        ret = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
-        throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : retrieving program build log failed: ");
+        cl_int ret2 = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
+        throwOnError(ret2,"OpenCL_RD::ReloadKernelIfNeeded : retrieving program build log failed: ");
+        { ofstream out("kernel.txt"); out << kernel_source; }
         ostringstream oss;
-        oss << "OpenCL_RD::ReloadKernelIfNeeded : build failed:\n\n" << build_log;
-        throw runtime_error(oss.str().c_str());
+        oss << "OpenCL_RD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << build_log;
+        throwOnError(ret,oss.str().c_str());
     }
 
     // create the kernel
@@ -293,11 +294,12 @@ void OpenCL_RD::TestFormula(std::string formula)
         const int MAX_BUILD_LOG = 10000;
         char build_log[MAX_BUILD_LOG];
         size_t build_log_length;
-        ret = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
-        throwOnError(ret,"OpenCL_RD::TestProgram : retrieving program build log failed: ");
+        cl_int ret2 = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
+        throwOnError(ret2,"OpenCL_RD::TestProgram : retrieving program build log failed: ");
+        { ofstream out("kernel.txt"); out << kernel_source; }
         ostringstream oss;
-        oss << "OpenCL_RD::TestProgram : build failed:\n\n" << build_log;
-        throw runtime_error(oss.str().c_str());
+        oss << "OpenCL_RD::TestProgram : build failed: (kernel saved as kernel.txt)\n\n" << build_log;
+        throwOnError(ret,oss.str().c_str());
     }
 }
 
@@ -521,6 +523,12 @@ void OpenCL_RD::SetParameterValue(int iParam,float val)
 {
     BaseRD::SetParameterValue(iParam,val);
     this->need_reload_formula = true;
-    this->ReloadKernelIfNeeded();
+    this->is_modified = true;
+}
+
+void OpenCL_RD::SetParameterName(int iParam,string s)
+{
+    BaseRD::SetParameterName(iParam,s);
+    this->need_reload_formula = true;
     this->is_modified = true;
 }
