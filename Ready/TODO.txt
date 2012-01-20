@@ -1,15 +1,19 @@
 before 0.2 release:
 - bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
 - populate a pattern library (primary UI for beginners is a list of examples to click)
-- patterns pane should show inbuilt demos, provided files and user files
 - control over size of world, running speed
 - controls for changing parameters, editing formula and descriptions
 
 Andrew's tasks for 0.2 (peripheral UI stuff so Tim & Robert can concentrate on
 the core RD stuff):
-- add a toolbar with buttons for commonly-used functions (run/stop, step, etc)
-  - also add slider for changing active chemical
+- tidy up menus (eg. move/rename some items)
 - add Edit menu with std items
+- replace wxConfig stuff with Golly-like prefs handling
+- implement File > Open Recent submenu
+- implement ctrl/right-click to edit file in patterns pane
+- patterns pane should show supplied files and user files (latter via File > Add My Patterns?)
+- add a toolbar with buttons for commonly-used functions (run/stop, step, reset, etc)
+- toolbar also has slider for changing active chemical (no need for menu item?)
 - add Help folder and populate with .html files (open from Help menu)
 
 before 0.x release:
