@@ -72,10 +72,8 @@ class MyFrame : public wxFrame
         // action menu
         void OnStep(wxCommandEvent& event);
         void OnUpdateStep(wxUpdateUIEvent& event);
-        void OnRun(wxCommandEvent& event);
-        void OnUpdateRun(wxUpdateUIEvent& event);
-        void OnStop(wxCommandEvent& event);
-        void OnUpdateStop(wxUpdateUIEvent& event);
+        void OnRunStop(wxCommandEvent& event);
+        void OnUpdateRunStop(wxUpdateUIEvent& event);
         void OnInitWithBlobInCenter(wxCommandEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);

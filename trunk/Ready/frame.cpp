@@ -88,10 +88,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     // action menu
     EVT_MENU(ID::Step, MyFrame::OnStep)
     EVT_UPDATE_UI(ID::Step, MyFrame::OnUpdateStep)
-    EVT_MENU(ID::Run, MyFrame::OnRun)
-    EVT_UPDATE_UI(ID::Run, MyFrame::OnUpdateRun)
-    EVT_MENU(ID::Stop, MyFrame::OnStop)
-    EVT_UPDATE_UI(ID::Stop, MyFrame::OnUpdateStop)
+    EVT_MENU(ID::RunStop, MyFrame::OnRunStop)
+    EVT_UPDATE_UI(ID::RunStop, MyFrame::OnUpdateRunStop)
     EVT_MENU(ID::InitWithBlobInCenter, MyFrame::OnInitWithBlobInCenter)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
@@ -159,8 +157,7 @@ void MyFrame::InitializeMenus()
     {   // action menu:
         wxMenu *menu = new wxMenu;
         menu->Append(ID::Step, _("&Step\tF4"), _("Advance the simulation by a single timestep"));
-        menu->Append(ID::Run, _("&Run\tF5"), _("Start running the simulation"));
-        menu->Append(ID::Stop, _("St&op\tF6"), _("Stop running the simulation"));
+        menu->Append(ID::RunStop, _("&Run\tF5"), _("Start or stop running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::InitWithBlobInCenter, _("Random &Blob"), _("Re-start with a random blob in the middle"));
         menu->AppendSeparator();
@@ -521,20 +518,7 @@ void MyFrame::OnStep(wxCommandEvent &event)
         this->Destroy();
     }
     this->SetStatusBarText();
-    this->UpdateWindowTitle();
-    Refresh(false);
-}
-
-void MyFrame::OnRun(wxCommandEvent &event)
-{
-    this->is_running = true;
-    Refresh(false);
-}
-
-void MyFrame::OnStop(wxCommandEvent &event)
-{
-    this->is_running = false;
-    this->SetStatusBarText();
+    this->UpdateWindowTitle();  // AKT TODO!!! remove if Update() calls no longer do is_modified = true
     Refresh(false);
 }
 
@@ -543,14 +527,27 @@ void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
     event.Enable(!this->is_running);
 }
 
-void MyFrame::OnUpdateRun(wxUpdateUIEvent& event)
+void MyFrame::OnRunStop(wxCommandEvent &event)
 {
-    event.Enable(!this->is_running);
+    if (this->is_running) {
+        this->is_running = false;
+        this->SetStatusBarText();
+    } else {
+        this->is_running = true;
+    }
+    Refresh(false);
 }
 
-void MyFrame::OnUpdateStop(wxUpdateUIEvent& event)
+void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 {
-    event.Enable(this->is_running);
+    wxMenuBar* mbar = this->GetMenuBar();
+    if (mbar) {
+        if (this->is_running) {
+            mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
+        } else {
+            mbar->SetLabel(ID::RunStop, _("Run\tF5"));
+        }
+    }
 }
 
 void MyFrame::OnIdle(wxIdleEvent& event)
@@ -584,7 +581,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
    
         this->pVTKWindow->Refresh(false);
-        this->UpdateWindowTitle();
+        this->UpdateWindowTitle();  // AKT TODO!!! remove if Update() calls no longer do is_modified = true
         this->SetStatusBarText();
    
         wxMilliSleep(30);
