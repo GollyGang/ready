@@ -26,34 +26,33 @@
 
 // IDs for the controls and the menu commands
 namespace ID { enum {
-
-   // we can use IDs higher than this for our own purposes
-   Dummy = wxID_HIGHEST+1,
-
-   // view menu
-   PatternsPane,
-   RulePane,
-   CanvasPane,
-   HelpPane,
-   RestoreDefaultPerspective,
-   Screenshot,
-   ChangeActiveChemical,
-
-   // settings menu
-   SelectOpenCLDevice,
-   OpenCLDiagnostics,
-
-   // actions menu
-   Step,
-   Run,
-   Stop,
-   ReplaceProgram,
-   InitWithBlobInCenter,
-
-   // controls:
-   
-   // MyFrame:
-   PatternsTree,
+    
+    // we can use IDs higher than this for our own purposes
+    Dummy = wxID_HIGHEST+1,
+    
+    // file menu
+    Screenshot,
+    
+    // view menu
+    PatternsPane,
+    RulePane,
+    CanvasPane,
+    HelpPane,
+    RestoreDefaultPerspective,
+    ChangeActiveChemical,
+    
+    // action menu
+    Step,
+    Run,
+    Stop,
+    InitWithBlobInCenter,
+    SelectOpenCLDevice,
+    OpenCLDiagnostics,
+    
+    // controls:
+    
+    // MyFrame:
+    PatternsTree,
    
 }; };
 
