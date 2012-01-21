@@ -85,10 +85,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
-    // settings menu
-    EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
-    EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
-    // actions menu
+    // action menu
     EVT_MENU(ID::Step, MyFrame::OnStep)
     EVT_UPDATE_UI(ID::Step, MyFrame::OnUpdateStep)
     EVT_MENU(ID::Run, MyFrame::OnRun)
@@ -96,6 +93,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::Stop, MyFrame::OnStop)
     EVT_UPDATE_UI(ID::Stop, MyFrame::OnUpdateStop)
     EVT_MENU(ID::InitWithBlobInCenter, MyFrame::OnInitWithBlobInCenter)
+    EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
+    EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(wxID_HELP, MyFrame::OnHelp)
@@ -138,47 +137,42 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_OPEN);
+        menu->Append(wxID_OPEN, _("Open Pattern...\tCtrl-O"), _("Choose a pattern file to open"));
         menu->AppendSeparator();
-        menu->Append(wxID_SAVE);
+        menu->Append(wxID_SAVE, _("Save Pattern...\tCtrl-S"), _("Save the current pattern"));
+        menu->Append(ID::Screenshot, _("Save Screenshot...\tF3"), _("Save a screenshot of the current view"));
         menu->AppendSeparator();
         menu->Append(wxID_EXIT);
         menuBar->Append(menu, _("&File"));
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
-        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns pane"), _("View the patterns pane"));
-        menu->AppendCheckItem(ID::RulePane, _("&Rule pane"), _("View the rule pane"));
-        menu->AppendCheckItem(ID::HelpPane, _("&Help pane"), _("View the help pane"));
+        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane"), _("View the patterns pane"));
+        menu->AppendCheckItem(ID::RulePane, _("&Rule Pane"), _("View the rule pane"));
+        menu->AppendCheckItem(ID::HelpPane, _("&Help Pane"), _("View the help pane"));
         menu->AppendSeparator();
-        menu->Append(ID::RestoreDefaultPerspective,_("&Restore default layout"),_("Put the windows back where they were"));
+        menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout"), _("Put the windows back where they were"));
         menu->AppendSeparator();
-        menu->Append(ID::Screenshot, _("Save &screenshot...\tF3"), _("Save a screenshot of the current view"));
-        menu->AppendSeparator();
-        menu->Append(ID::ChangeActiveChemical,_("&Change active chemical"),_("Change which chemical is being visualized"));
+        menu->Append(ID::ChangeActiveChemical, _("&Change Active Chemical..."), _("Change which chemical is being visualized"));
         menuBar->Append(menu, _("&View"));
     }
-    {   // settings menu:
+    {   // action menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::SelectOpenCLDevice,_("&Select OpenCL device to use..."),_("Choose which OpenCL device to run on"));
+        menu->Append(ID::Step, _("&Step\tF4"), _("Advance the simulation by a single timestep"));
+        menu->Append(ID::Run, _("&Run\tF5"), _("Start running the simulation"));
+        menu->Append(ID::Stop, _("St&op\tF6"), _("Stop running the simulation"));
         menu->AppendSeparator();
-        menu->Append(ID::OpenCLDiagnostics,_("Open&CL diagnostics..."),_("Show the available OpenCL devices and their attributes"));
-        menuBar->Append(menu,_("&Settings"));
-    }
-    {   // actions menu:
-        wxMenu *menu = new wxMenu;
-        menu->Append(ID::Step,_("&Step\tF4"),_("Advance the simulation by a single timestep"));
-        menu->Append(ID::Run,_("&Run\tF5"),_("Start running the simulation"));
-        menu->Append(ID::Stop,_("St&op\tF6"),_("Stop running the simulation"));
+        menu->Append(ID::InitWithBlobInCenter, _("Random &Blob"), _("Re-start with a random blob in the middle"));
         menu->AppendSeparator();
-        menu->Append(ID::InitWithBlobInCenter,_("Init with random blob"),_("Re-start with a random blob in the middle"));
-        menuBar->Append(menu,_("&Actions"));
+        menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device..."), _("Choose which OpenCL device to run on"));
+        menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics..."), _("Show the available OpenCL devices and their attributes"));
+        menuBar->Append(menu, _("&Action"));
     }
     {   // help menu:
         wxMenu *menu = new wxMenu;
         menu->Append(wxID_HELP,_("&Help...\tF1"),_("Show information about how to use Ready"));
         menu->AppendSeparator();
-        menu->Append(wxID_ABOUT);
+        menu->Append(wxID_ABOUT, _("&About Ready"));
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
@@ -246,9 +240,9 @@ void MyFrame::InitializeHelpPane()
         "<p>Click on the demos in the Patterns Pane to see some different systems."
         "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
         "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
-        "that will work with your CPU. Use the Settings menu commands to examine the OpenCL devices available."
+        "that will work with your CPU. Use the commands at the bottom of the Action menu to examine the OpenCL devices available."
         "<h5>2. Interacting with the rendered scene</h5>"
-        "<p>From the Actions menu: Stop (F6) the system running, or start it running (F5), or take small Steps (F4)."
+        "<p>From the Action menu: Stop (F6) the system running, or start it running (F5), or take small Steps (F4)."
         "<p><b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball"
         "<p><b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out"
         "<p><b>scroll wheel:</b> zoom in and out"
@@ -258,9 +252,8 @@ void MyFrame::InitializeHelpPane()
         "<p><b>'w':</b> switch to wireframe view"
         "<p><b>'s':</b> switch to surface view</ul>"
         "<h5>3. Working with the windows</h5>"
-        "<p>The Patterns Pane, Help Pane and Kernel Pane can be shown or hidden by using the commands on the View menu. By dragging the panes by their title bar you can dock them into the "
+        "<p>The Patterns Pane, Help Pane and Rule Pane can be shown or hidden by using the commands in the View menu. By dragging the panes by their title bar you can dock them into the "
         "Ready frame in different positions or float them as separate windows."
-        "<p>The Kernel Pane is only used when the current system is an OpenCL demo. It shows the current OpenCL kernel."
         "<h5>4. More help</h5>"
         "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
         "<p>See the text files in the installation folder for more information."
