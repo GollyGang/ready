@@ -58,6 +58,7 @@ class MyFrame : public wxFrame
     private:
 
         // file menu
+        void OnNewPattern(wxCommandEvent& event);
         void OnOpenPattern(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
         void OnScreenshot(wxCommandEvent& event);
@@ -74,6 +75,8 @@ class MyFrame : public wxFrame
         void OnUpdateStep(wxUpdateUIEvent& event);
         void OnRunStop(wxCommandEvent& event);
         void OnUpdateRunStop(wxUpdateUIEvent& event);
+        void OnReset(wxCommandEvent& event);
+        void OnUpdateReset(wxUpdateUIEvent& event);
         void OnInitWithBlobInCenter(wxCommandEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);
