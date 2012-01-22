@@ -27,6 +27,7 @@
 
 // local:
 class RulePanel;
+class HelpPanel;
 class PatternsPanel;
 
 // STL:
@@ -128,10 +129,9 @@ class MyFrame : public wxFrame
         // current system being simulated (in future we might want more than one)
         BaseRD *system;
 
-        // rule pane things:
+        // various panes:
         RulePanel *rule_panel;
-
-        // patterns pane things:
+        HelpPanel *help_panel;
         PatternsPanel *patterns_panel;
 
         // settings:

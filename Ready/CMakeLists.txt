@@ -50,13 +50,14 @@ if( NOT APPLE )
 endif()
 
 set( GUI_SOURCES      # high-level GUI code used only in Ready
+  IDs.hpp
   app.hpp app.cpp 
   frame.hpp frame.cpp 
   RulePanel.hpp RulePanel.cpp
+  HelpPanel.hpp HelpPanel.cpp
   PatternsPanel.hpp PatternsPanel.cpp
   vtk_pipeline.hpp vtk_pipeline.cpp
   wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx
-  IDs.hpp
 )
 
 set( RESOURCES
