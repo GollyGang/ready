@@ -64,6 +64,14 @@ class MyFrame : public wxFrame
         void OnScreenshot(wxCommandEvent& event);
         void OnQuit(wxCommandEvent& event);
 
+        // edit menu
+        void OnCut(wxCommandEvent& event);
+        void OnCopy(wxCommandEvent& event);
+        void OnPaste(wxCommandEvent& event);
+        void OnUpdatePaste(wxUpdateUIEvent& event);
+        void OnClear(wxCommandEvent& event);
+        void OnSelectAll(wxCommandEvent& event);
+
         // view menu
         void OnToggleViewPane(wxCommandEvent& event);
         void OnUpdateViewPane(wxUpdateUIEvent& event);
