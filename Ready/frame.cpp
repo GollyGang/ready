@@ -72,6 +72,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_SIZE(MyFrame::OnSize)
     EVT_CLOSE(MyFrame::OnClose)
     // file menu
+    EVT_MENU(wxID_NEW, MyFrame::OnNewPattern)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
@@ -90,6 +91,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Step, MyFrame::OnUpdateStep)
     EVT_MENU(ID::RunStop, MyFrame::OnRunStop)
     EVT_UPDATE_UI(ID::RunStop, MyFrame::OnUpdateRunStop)
+    EVT_MENU(ID::Reset, MyFrame::OnReset)
+    EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
     EVT_MENU(ID::InitWithBlobInCenter, MyFrame::OnInitWithBlobInCenter)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
@@ -135,6 +138,8 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
+        menu->Append(wxID_NEW, _("New Pattern...\tCtrl-N"), _("Create a new pattern"));
+        menu->AppendSeparator();
         menu->Append(wxID_OPEN, _("Open Pattern...\tCtrl-O"), _("Choose a pattern file to open"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...\tCtrl-S"), _("Save the current pattern"));
@@ -159,6 +164,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Step, _("&Step\tF4"), _("Advance the simulation by a single timestep"));
         menu->Append(ID::RunStop, _("&Run\tF5"), _("Start or stop running the simulation"));
         menu->AppendSeparator();
+        menu->Append(ID::Reset, _("Reset\tCtrl-R"), _("Go back to the starting pattern"));
         menu->Append(ID::InitWithBlobInCenter, _("Random &Blob"), _("Re-start with a random blob in the middle"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device..."), _("Choose which OpenCL device to run on"));
@@ -471,8 +477,8 @@ void MyFrame::UpdateWindowTitle()
 {
     wxString name = this->system->GetFilename();
     if (name.IsEmpty()) {
-        // AKT TODO!!! this might not be needed when we implement New Pattern which should call SetFilename("untitled")
-        name = _("untitled");
+        // this should probably never happen
+        name = _("unknown");
     } else {
         // just show file's name, not full path
         // AKT TODO!!! perhaps we should make this optional (via flag in Prefs > File)???
@@ -540,7 +546,7 @@ void MyFrame::OnRunStop(wxCommandEvent &event)
 
 void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 {
-    wxMenuBar* mbar = this->GetMenuBar();
+    wxMenuBar* mbar = GetMenuBar();
     if (mbar) {
         if (this->is_running) {
             mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
@@ -548,6 +554,23 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
             mbar->SetLabel(ID::RunStop, _("Run\tF5"));
         }
     }
+}
+
+void MyFrame::OnReset(wxCommandEvent &event)
+{
+    wxMessageBox(_("TODO!!!"));
+    /* presumably do something like this:
+    if (this->system->GetTimestepsTaken() > 0) {
+        // restore pattern and other info saved by SaveStartingPattern() which
+        // was called in OnStep/OnRunStop when GetTimestepsTaken() was 0
+        RestoreStartingPattern();
+    }
+    */
+}
+
+void MyFrame::OnUpdateReset(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->GetTimestepsTaken() > 0);
 }
 
 void MyFrame::OnIdle(wxIdleEvent& event)
@@ -787,6 +810,20 @@ void MyFrame::SaveFile(const wxString& path)
     iw->SetInputConnection(iac->GetOutputPort());
     iw->SetFileName(path.mb_str());
     iw->Write();
+}
+
+void MyFrame::OnNewPattern(wxCommandEvent &event)
+{
+    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+    
+    // TODO: call something like this->system->InitPattern() instead???
+    // or call InitWithBlobInCenter if Prefs > File has "Start with random blob" option ticked???
+    this->system->InitWithBlobInCenter();
+
+    this->is_running = false;
+    this->system->SetFilename("untitled");
+    this->system->SetModified(false);
+    this->UpdateWindows();
 }
 
 void MyFrame::OnOpenPattern(wxCommandEvent &event)

@@ -44,6 +44,7 @@ namespace ID { enum {
     // action menu
     Step,
     RunStop,
+    Reset,
     InitWithBlobInCenter,
     SelectOpenCLDevice,
     OpenCLDiagnostics,
