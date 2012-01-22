@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "app.hpp"      // for wxGetApp
+#include "app.hpp"          // for wxGetApp
 #include "frame.hpp"
 #include "vtk_pipeline.hpp"
 #include "utils.hpp"
@@ -40,7 +40,8 @@
 #include <wx/font.h>
 #include <wx/html/htmlwin.h>
 #include <wx/dir.h>
-#include <wx/dnd.h>    // for wxFileDropTarget
+#include <wx/dnd.h>         // for wxFileDropTarget
+#include <wx/clipbrd.h>     // for wxTheClipboard
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -76,6 +77,13 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
+    // edit menu
+    EVT_MENU(wxID_CUT, MyFrame::OnCut)
+    EVT_MENU(wxID_COPY, MyFrame::OnCopy)
+    EVT_MENU(wxID_PASTE, MyFrame::OnPaste)
+    EVT_UPDATE_UI(wxID_PASTE, MyFrame::OnUpdatePaste)
+    EVT_MENU(wxID_CLEAR, MyFrame::OnClear)
+    EVT_MENU(wxID_SELECTALL, MyFrame::OnSelectAll)
     // view menu
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
@@ -147,6 +155,16 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_EXIT);
         menuBar->Append(menu, _("&File"));
+    }
+    {   // edit menu:
+        wxMenu *menu = new wxMenu;
+        menu->Append(wxID_CUT, _("Cut\tCtrl-X"), _("Cut the selection and save it to the clipboard"));
+        menu->Append(wxID_COPY, _("Copy\tCtrl-C"), _("Copy the selection to the clipboard"));
+        menu->Append(wxID_PASTE, _("Paste\tCtrl-V"), _("Paste in the contents of the clipboard"));
+        menu->Append(wxID_CLEAR, _("Clear"), _("Clear the selection"));
+        menu->AppendSeparator();
+        menu->Append(wxID_SELECTALL, _("Select All\tCtrl-A"), _("Select everything"));
+        menuBar->Append(menu, _("&Edit"));
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
@@ -240,12 +258,12 @@ void MyFrame::InitializeHelpPane()
         "<h3>Quick start guide</h3>"
         "<h5>1. Overview</h5>"
         "<p>Ready " STR(READY_VERSION) " is an early release of a program to explore <a href=\"http://en.wikipedia.org/wiki/Reaction-diffusion_system\">reaction-diffusion</a> systems.</p>"
-        "<p>Click on the demos in the Patterns Pane to see some different systems."
+        "<p>Click on the files in the Patterns Pane to see some different systems."
         "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
         "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
         "that will work with your CPU. Use the commands at the bottom of the Action menu to examine the OpenCL devices available."
         "<h5>2. Interacting with the rendered scene</h5>"
-        "<p>From the Action menu: Stop (F6) the system running, or start it running (F5), or take small Steps (F4)."
+        "<p>From the Action menu: Start or Stop (F5) the system running, or take small Steps (F4)."
         "<p><b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball"
         "<p><b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out"
         "<p><b>scroll wheel:</b> zoom in and out"
@@ -386,6 +404,60 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.AddDeveloper(_T("Andrew Trevorrow"));
     info.AddDeveloper(_T("Tom Rokicki"));
     wxAboutBox(info);
+}
+
+void MyFrame::OnCut(wxCommandEvent& event)
+{
+    // TODO: action depends on which pane has focus
+    event.Skip();
+}
+
+void MyFrame::OnCopy(wxCommandEvent& event)
+{
+    // TODO: action depends on which pane has focus
+    event.Skip();
+}
+
+void MyFrame::OnPaste(wxCommandEvent& event)
+{
+    // TODO: action depends on which pane has focus
+    event.Skip();
+}
+
+// AKT TODO!!! export this routine from utils???
+static bool ClipboardHasText()
+{
+   bool hastext = false;
+   #ifdef __WXGTK__
+      // avoid re-entrancy bug in wxGTK 2.9.x
+      if (wxTheClipboard->IsOpened()) return false;
+   #endif
+   if (wxTheClipboard->Open()) {
+      hastext = wxTheClipboard->IsSupported(wxDF_TEXT);
+      if (!hastext) {
+         // TODO: we'll try to convert bitmap data to our pattern format???
+         hastext = wxTheClipboard->IsSupported(wxDF_BITMAP);
+      }
+      wxTheClipboard->Close();
+   }
+   return hastext;
+}
+
+void MyFrame::OnUpdatePaste(wxUpdateUIEvent& event)
+{
+    event.Enable(ClipboardHasText());
+}
+
+void MyFrame::OnClear(wxCommandEvent& event)
+{
+    // TODO: action depends on which pane has focus
+    event.Skip();
+}
+
+void MyFrame::OnSelectAll(wxCommandEvent& event)
+{
+    // TODO: action depends on which pane has focus
+    event.Skip();
 }
 
 void MyFrame::OnToggleViewPane(wxCommandEvent &event)
@@ -563,7 +635,9 @@ void MyFrame::OnReset(wxCommandEvent &event)
     if (this->system->GetTimestepsTaken() > 0) {
         // restore pattern and other info saved by SaveStartingPattern() which
         // was called in OnStep/OnRunStop when GetTimestepsTaken() was 0
-        RestoreStartingPattern();
+        this->RestoreStartingPattern();
+        this->is_running = false;
+        this->UpdateWindows();
     }
     */
 }
