@@ -3,49 +3,22 @@
 <body>
 
 <p>
+<h3>File Menu</h3>
+
+<p>
 <font size=+1><b>New Pattern</b></font>
 
 <p>
-Creates a new, empty universe and switches to a scale suitable for editing cells.
-Use <a href="prefs:file">Preferences > File</a> to set the scale (initially 1:16),
-the cursor mode, and whether any selection should be removed.
+Creates a new pattern with a random blob in the middle.
+Use <a href="prefs:file">Preferences > File</a> to specify various options
+when a new pattern is created. !!!???
 
 <p>
 <font size=+1><b>Open Pattern...</b></font>
 
 <p>
 Opens the standard file browser so you can select a pattern file.
-Golly can read all the common pattern formats:
-RLE, PC Life 1.05/1.06, dblife, some MCell files, and text patterns like "ooo...ooo".
-It can also read patterns in a "macrocell" format which allows huge,
-highly repetitive patterns to be stored in a very compact way.
-Such files usually have a .mc extension.  If a .mc file contains timeline data
-then Golly will load all the frames and automatically show the timeline bar.
-
-<p>
-All the above formats are text based and can have DOS/Mac/Unix line endings,
-or they can be compressed in a .gz file.
-
-<p>
-Golly can also read graphic files in a number of popular formats:
-BMP, GIF, PNG and TIFF.  The file name must end with an appropriate extension:
-.bmp, .gif, .png, .tif or .tiff.
-All the pure white pixels (RGB = 255,255,255) are treated as cells of state 0.
-All other pixels are treated as cells of state 1.
-This can be handy if you prefer to use a sophisticated drawing program
-to create your patterns.
-
-<p>
-Use <a href="prefs:file">Preferences > File</a> to set the cursor mode,
-and whether any selection should be removed.
-
-<p>
-<font size=+1><b>Open Clipboard</b></font>
-
-<p>
-Opens a pattern stored in the clipboard.
-The <a href="refs.html">References</a> section has links to
-a number of good sources for clipboard patterns.
+!!!
 
 <p>
 <font size=+1><b>Open Recent</b></font>
@@ -57,95 +30,18 @@ The maximum number of pattern files remembered is determined by a setting
 (initially 20) which you can change in <a href="prefs:file">Preferences > File</a>.
 
 <p>
-<font size=+1><b>Show Patterns</b></font>
-
-<p>
-if ticked then a scrollable pattern folder is displayed next to the viewport.
-Clicking on a pattern file will load it in.  The initial pattern folder is
-the Patterns collection supplied with Golly.  If you have your own collection
-then use Set Pattern Folder (see below) to select a different folder.
-
-<p>
-<font size=+1><b>Set Pattern Folder...</b></font>
-
-<p>
-Lets you change the pattern folder displayed by Show Patterns (see above).
-
-<p>
 <font size=+1><b>Save Pattern...</b></font>
 
 <p>
 Opens the standard file saving dialog so you can save the current pattern
-in RLE format (but only if all live cells are within coordinates of +/- 1 billion),
-or in macrocell format if the current algorithm supports hashing (all algorithms
-except QuickLife).  Note that if a timeline exists when you save a .mc file then
-<em>all</em> the frames will be stored in the file.
+in a .vti file.
 
 <p>
-You also have the option of saving patterns as compressed files
-(.rle.gz or .mc.gz).
-
-<a name="xrle"></a>
-<p>
-<font size=+1><b>Save Extended RLE</b></font>
+<font size=+1><b>Save Screenshot...</b></font>
 
 <p>
-If ticked, Golly will include additional information whenever it saves
-a pattern in an RLE file via the above Save Pattern item or the
-<b>save</b>/<b>store</b> script commands.
-The pattern's position is recorded, along with the current generation count
-if it's greater than zero.  This allows Golly to restore the pattern's
-position and generation count when the file is loaded at a later date.
-The extra information is stored in a special "#CXRLE" comment line at the
-start of the file.  Because it's a comment, other RLE-reading programs
-should have no problem loading such files.
-
-<p>
-Note that if the current grid is bounded (ie. has a finite width or height)
-then Golly ignores this item's setting and always records the pattern's
-position so it can be restored when the file is loaded.
-
-<p>
-<font size=+1><b>Run Script...</b></font>
-
-<p>
-Opens the standard file browser so you can run a selected Perl or Python script.
-Such scripts can be used to automate or extend Golly's user interface,
-or to construct complex patterns.  A number of sample scripts are provided
-in the Scripts folder.  More details about Golly's scripting capabilities
-can be found in the <a href="perl.html">Perl Scripting</a> and
-<a href="python.html">Python Scripting</a> help topics.
-
-<p>
-<font size=+1><b>Run Clipboard</b></font>
-
-<p>
-Runs the Perl or Python script stored in the clipboard.
-
-<p>
-<font size=+1><b>Run Recent</b></font>
-
-<p>
-This submenu lets you run a recently executed script file.
-The most recent script is always at the top.
-The maximum number of scripts remembered is determined by a setting
-(initially 20) which you can change in <a href="prefs:file">Preferences > File</a>.
-
-<p>
-<font size=+1><b>Show Scripts</b></font>
-
-<p>
-if ticked then a scrollable script folder is displayed next to the viewport.
-Clicking on a Perl or Python script file will execute it.  The initial script folder
-is the Scripts folder supplied with Golly.  If you want to write your own scripts
-then best to do so in a new folder and use Set Script Folder (see below)
-to select that folder.
-
-<p>
-<font size=+1><b>Set Script Folder...</b></font>
-
-<p>
-Lets you change the script folder displayed by Show Scripts (see above).
+Opens a dialog so you can save a screenshot of the current pattern
+in a .png or .jpg file.
 
 <a name="prefs"></a>
 <p>
@@ -153,23 +49,23 @@ Lets you change the script folder displayed by Show Scripts (see above).
 
 <p>
 Opens the <a href="prefs:">Preferences</a> dialog so you can change various settings.
-[On the Mac, this item is in the application menu.]
-All your settings are stored in a file called GollyPrefs.  This file is initially
+[On a Mac, this item is in the application menu.]
+All your settings are stored in a file called ReadyPrefs.  This file is initially
 saved in a user-specific data directory:
 <p>
 <dd>
 <table cellspacing=0 cellpadding=0>
 <tr><td>On Linux:</td><td width=20>
-    </td><td>~/.golly/</td></tr>
+    </td><td>~/.ready/</td></tr>
 <tr><td>On Mac:</td><td width=20>
-    </td><td>~/Library/Application Support/Golly/</td></tr>
+    </td><td>~/Library/Application Support/Ready/</td></tr>
 <tr><td>On Windows:</td><td width=20>
-    </td><td>C:\Documents and Settings\username\Application Data\Golly\</td></tr>
+    </td><td>C:\Documents and Settings\username\Application Data\Ready\</td></tr>
 </table>
 </dd>
 <p>
-You might prefer to move GollyPrefs into the same folder as the application.
-This allows multiple copies of Golly to have their own set of preferences.
+You might prefer to move ReadyPrefs into the same folder as the application.
+This allows multiple copies of Ready to have their own set of preferences.
 
 </body>
 </html>

@@ -77,7 +77,7 @@ set( HELP_FILES
 )
 
 set( TEXT_FILES
-  README.txt CHANGES.txt COPYING.txt TODO.txt
+  README.txt COPYING.txt TODO.txt
 )
 
 #-------------------------------------------VTK----------------------------------------------
