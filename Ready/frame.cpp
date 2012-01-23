@@ -581,7 +581,6 @@ void MyFrame::OnStep(wxCommandEvent &event)
         this->Destroy();
     }
     this->SetStatusBarText();
-    this->UpdateWindowTitle();  // AKT TODO!!! remove if Update() calls no longer do is_modified = true
     Refresh(false);
 }
 
@@ -663,7 +662,6 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
    
         this->pVTKWindow->Refresh(false);
-        this->UpdateWindowTitle();  // AKT TODO!!! remove if Update() calls no longer do is_modified = true
         this->SetStatusBarText();
    
         wxMilliSleep(30);

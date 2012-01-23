@@ -100,7 +100,6 @@ void OpenCL_nDim::Update(int n_steps)
     }
 
     this->ReadFromOpenCLBuffers(); // buffer1 -> image
-    this->is_modified = true;
 }
 
 string Chem(int i) { return to_string((char)('a'+i)); } // a, b, c, ...
