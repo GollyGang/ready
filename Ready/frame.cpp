@@ -152,7 +152,7 @@ MyFrame::MyFrame(const wxString& title)
     this->aui_mgr.Update();
 
     // initialize an RD system to get us started
-    this->OpenFile("Patterns/grayscott_demo.vti");
+    this->OpenFile("Patterns/CPU-only/grayscott.vti");
 }
 
 void MyFrame::InitializeMenus()
