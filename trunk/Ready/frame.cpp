@@ -152,7 +152,7 @@ MyFrame::MyFrame(const wxString& title)
     this->aui_mgr.Update();
 
     // initialize an RD system to get us started
-    this->LoadDemo(1);
+    this->OpenFile("Patterns/grayscott_demo.vti");
 }
 
 void MyFrame::InitializeMenus()
@@ -685,87 +685,6 @@ void MyFrame::SetStatusBarText()
         << wxString::Format(_T("%.0f"),this->million_cell_generations_per_second) 
         << _T(" mcgs)");
     SetStatusText(txt);
-}
-
-void MyFrame::LoadDemo(int iDemo)
-{
-    try 
-    {
-        switch(iDemo) 
-        {
-            case 0:
-                {
-                    GrayScott_slow *s = new GrayScott_slow();
-                    s->SetNumberOfChemicals(2);
-                    s->Allocate(80,50,1,2);
-                    s->InitWithBlobInCenter();
-                    s->SetFilename("GrayScott 2D demo (CPU)");
-                    s->SetModified(false);
-                    this->SetCurrentRDSystem(s);
-                }
-                break;
-            case 1: 
-                {
-                    GrayScott_slow_3D *s = new GrayScott_slow_3D();
-                    s->SetNumberOfChemicals(2);
-                    s->Allocate(30,25,20,2);
-                    s->InitWithBlobInCenter();
-                    s->SetFilename("GrayScott 3D demo (CPU)");
-                    s->SetModified(false);
-                    this->SetCurrentRDSystem(s);
-                }
-                break;
-            case 2:
-                {
-                    OpenCL_nDim *s = new OpenCL_nDim();
-                    s->SetNumberOfChemicals(2);
-                    s->SetPlatform(this->iOpenCLPlatform);
-                    s->SetDevice(this->iOpenCLDevice);
-                    s->Allocate(128,1,1,2);
-                    s->InitWithBlobInCenter();
-                    s->SetFilename("GrayScott 1D demo (OpenCL)");
-                    s->SetModified(false);
-                    this->SetCurrentRDSystem(s);
-                }
-                break;
-            case 3:
-                {
-                    OpenCL_nDim *s = new OpenCL_nDim();
-                    s->SetNumberOfChemicals(2);
-                    s->SetPlatform(this->iOpenCLPlatform);
-                    s->SetDevice(this->iOpenCLDevice);
-                    s->Allocate(128,64,1,2);
-                    s->InitWithBlobInCenter();
-                    s->SetFilename("GrayScott 2D demo (OpenCL)");
-                    s->SetModified(false);
-                    this->SetCurrentRDSystem(s);
-                }
-                break;
-            case 4:
-                {
-                    OpenCL_nDim *s = new OpenCL_nDim();
-                    s->SetNumberOfChemicals(2);
-                    s->SetPlatform(this->iOpenCLPlatform);
-                    s->SetDevice(this->iOpenCLDevice);
-                    s->Allocate(64,64,64,2);
-                    s->InitWithBlobInCenter();
-                    s->SetFilename("GrayScott 3D demo (OpenCL)");
-                    s->SetModified(false);
-                    this->SetCurrentRDSystem(s);
-                }
-                break;
-            default: throw runtime_error("MyFrame::LoadDemo : internal error: unknown demo ID");
-        }
-    }
-    catch(const exception& e)
-    {
-        wxMessageBox(_("Error during RD system initialization: ")+
-            wxString(e.what(),wxConvUTF8));
-    }
-    catch(...)
-    {
-        wxMessageBox(_("Unknown error during RD system initialization"));
-    }
 }
 
 void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
