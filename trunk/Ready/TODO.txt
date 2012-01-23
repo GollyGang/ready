@@ -2,7 +2,6 @@ before 0.2 release:
 - bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
 - populate a pattern library (primary UI for beginners is a list of examples to click)
 - control over size of world, running speed
-- allow non-OpenCL implementations to load some files, using <rule inbuilt="..." >
 
 Andrew's tasks for 0.2 (peripheral UI stuff so Tim & Robert can concentrate on
 the core RD stuff):
