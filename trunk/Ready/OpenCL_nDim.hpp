@@ -18,17 +18,17 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-// base class for n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
+// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
 class OpenCL_nDim : public OpenCL_RD
 {
     public:
 
         OpenCL_nDim();
 
-        void Allocate(int x,int y,int z,int nc);
-        void InitWithBlobInCenter();
+        virtual void Allocate(int x,int y,int z,int nc);
+        virtual void InitWithBlobInCenter();
 
-        void Update(int n_steps);
+        virtual void Update(int n_steps);
 
-        std::string AssembleKernelSourceFromFormula(std::string formula) const;
+        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
 };
