@@ -105,7 +105,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
-    EVT_MENU(ID::HelpIndex, MyFrame::OnHelp)
+    EVT_MENU(wxID_HELP, MyFrame::OnHelp)
     EVT_MENU(ID::HelpQuick, MyFrame::OnHelp)
     EVT_MENU(ID::HelpTips, MyFrame::OnHelp)
     EVT_MENU(ID::HelpKeyboard, MyFrame::OnHelp)
@@ -205,7 +205,7 @@ void MyFrame::InitializeMenus()
     }
     {   // help menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::HelpIndex,    _("Contents"));
+        menu->Append(wxID_HELP,        _("Contents"));
         menu->Append(ID::HelpQuick,    _("Quick Start"));
         menu->Append(ID::HelpTips,     _("Hints and Tips"));
         menu->Append(ID::HelpKeyboard, _("Keyboard Shortcuts"));
@@ -758,7 +758,7 @@ void MyFrame::OnHelp(wxCommandEvent &event)
     int id = event.GetId();
     switch (id)
     {
-        case ID::HelpIndex:     this->help_panel->ShowHelp(_("Help/index.html")); break;
+        case wxID_HELP:         this->help_panel->ShowHelp(_("Help/index.html")); break;
         case ID::HelpQuick:     this->help_panel->ShowHelp(_("Help/quickstart.html")); break;
         case ID::HelpTips:      this->help_panel->ShowHelp(_("Help/tips.html")); break;
         case ID::HelpKeyboard:  this->help_panel->ShowHelp(SHOW_KEYBOARD_SHORTCUTS); break;
