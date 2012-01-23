@@ -24,10 +24,13 @@
 #include <wx/filename.h>        // for wxFileName
 #include <wx/html/htmlwin.h>    // for wxHtmlWindow
 
-// AKT TODO!!!
 BEGIN_EVENT_TABLE(HelpPanel, wxPanel)
-    // !!!
+    EVT_BUTTON (ID::BackButton,     HelpPanel::OnBackButton)
+    EVT_BUTTON (ID::ForwardButton,  HelpPanel::OnForwardButton)
+    EVT_BUTTON (ID::ContentsButton, HelpPanel::OnContentsButton)
 END_EVENT_TABLE()
+
+const wxString helphome = _("Help/index.html");    // contents page
 
 // define a child window for displaying HTML info
 class HtmlView : public wxHtmlWindow
@@ -41,49 +44,107 @@ class HtmlView : public wxHtmlWindow
 
         void OnLinkClicked(const wxHtmlLinkInfo& link)
         {
-            // http://wiki.wxwidgets.org/Calling_The_Default_Browser_In_WxHtmlWindow
-            if( link.GetHref().StartsWith(_T("http://")) ||
-                link.GetHref().StartsWith(_T("mailto://")) )
-                wxLaunchDefaultBrowser(link.GetHref());
-            else
-                wxHtmlWindow::OnLinkClicked(link);
+            wxString url = link.GetHref();
+            if ( url.StartsWith(_T("http://")) || url.StartsWith(_T("mailto://")) ) {
+                wxLaunchDefaultBrowser(url);
+            } else {
+                // assume it's a link to a local target or another help file
+                HelpPanel* panel = (HelpPanel*)GetParent();
+                panel->ShowHelp(url);
+            }
+            // AKT TODO!!! look for special link prefixes like "prefs:"
         }
 };
 
 HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id) 
     : wxPanel(parent,id), frame(parent)
 {
-    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+    html = new HtmlView(this, wxID_ANY);
+    
+    // AKT TODO!!! html->SetFontSizes(helpfontsize);
 
-    this->html = new HtmlView(this, wxID_ANY);
+    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
-    sizer->Add(this->html, wxSizerFlags(1).Expand());
-    this->SetSizer(sizer);
+    // add buttons at top of html window
+    backbutt = new wxButton(this, ID::BackButton, _("<"), wxDefaultPosition, wxSize(40,wxDefaultCoord));
+    forwbutt = new wxButton(this, ID::ForwardButton, _(">"), wxDefaultPosition, wxSize(40,wxDefaultCoord));
+    contbutt = new wxButton(this, ID::ContentsButton, _("Contents"));
 
-    // AKT TODO!!! display quickstart.html file from Help folder
-    this->html->SetPage(_("<html><body>"
-        "<h3>Quick start guide</h3>"
-        "<h5>1. Overview</h5>"
-        "<p>Ready is a program for exploring <a href=\"http://en.wikipedia.org/wiki/Reaction-diffusion_system\">reaction-diffusion</a> systems.</p>"
-        "<p>Click on the files in the Patterns Pane to see some different systems."
-        "<p>The <a href=\"http://en.wikipedia.org/wiki/OpenCL\">OpenCL</a> demos will only work if you've got OpenCL installed. Either install the latest drivers for your graphics card, "
-        "or install one of the SDKs from <a href=\"http://developer.amd.com/appsdk\">AMD</a> or <a href=\"http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/\">Intel</a> "
-        "that will work with your CPU. Use the commands at the bottom of the Action menu to examine the OpenCL devices available."
-        "<h5>2. Interacting with the rendered scene</h5>"
-        "<p>From the Action menu: Start or Stop (F5) the system running, or take small Steps (F4)."
-        "<p><b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball"
-        "<p><b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out"
-        "<p><b>scroll wheel:</b> zoom in and out"
-        "<p><b>shift+left mouse:</b> pan"
-        "<p><b>ctrl+left mouse:</b> roll"
-        "<p><b>'r':</b> reset the view to make everything visible"
-        "<p><b>'w':</b> switch to wireframe view"
-        "<p><b>'s':</b> switch to surface view</ul>"
-        "<h5>3. Working with the windows</h5>"
-        "<p>The Patterns Pane, Help Pane and Rule Pane can be shown or hidden by using the commands in the View menu. By dragging the panes by their title bar you can dock them into the "
-        "Ready frame in different positions or float them as separate windows."
-        "<h5>4. More help</h5>"
-        "<p>Send an email to <a href=\"mailto://reaction-diffusion@googlegroups.com\">reaction-diffusion@googlegroups.com</a> if you have any problems, or want to get involved."
-        "<p>See the text files in the installation folder for more information."
-        "</body></html>"));
+    #ifdef __WXMAC__
+        // nicer to use smaller buttons -- TODO: also do for Win/Linux???
+        backbutt->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
+        forwbutt->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
+        contbutt->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
+    #endif
+
+    hbox->Add(backbutt, 0, wxALL | wxALIGN_LEFT, 10);
+    hbox->Add(forwbutt, 0, wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
+    hbox->Add(contbutt, 0, wxALL | wxALIGN_LEFT, 10);
+    hbox->AddStretchSpacer(1);
+    vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
+    vbox->Add(html, 1, wxEXPAND | wxALIGN_TOP, 0);
+    SetSizer(vbox);
+
+    ShowHelp(helphome);
+}
+
+void HelpPanel::ShowHelp(const wxString& filepath)
+{
+    if (filepath == SHOW_KEYBOARD_SHORTCUTS) {
+        /* AKT TODO!!!
+        // build HTML string to display current keyboard shortcuts
+        wxString contents = GetShortcutTable();
+        
+        // write contents to file and call LoadPage so that back/forwards buttons work
+        wxString htmlfile = tempdir + SHOW_KEYBOARD_SHORTCUTS;
+        wxFile outfile(htmlfile, wxFile::write);
+        if (outfile.IsOpened()) {
+            outfile.Write(contents);
+            outfile.Close();
+            html->LoadPage(htmlfile);
+        } else {
+            Warning(_("Could not create file:\n") + htmlfile);
+            // might as well show contents
+            html->SetPage(contents);
+        }
+        */
+        html->SetPage(_T("<html><body><p>Not yet implemented!!!</p></body></html>"));
+
+    } else if ( filepath.StartsWith(_("Help/")) ) {
+        // safer to prepend location of app
+        wxString fullpath = /* AKT TODO!!! readydir + */ filepath;
+        html->LoadPage(fullpath);
+    
+    } else {
+        // assume full path or local link
+        html->LoadPage(filepath);
+    }
+    
+    UpdateHelpButtons();
+}
+
+void HelpPanel::OnBackButton(wxCommandEvent& WXUNUSED(event))
+{
+    if ( html->HistoryBack() ) UpdateHelpButtons();
+}
+
+void HelpPanel::OnForwardButton(wxCommandEvent& WXUNUSED(event))
+{
+    if ( html->HistoryForward() ) UpdateHelpButtons();
+}
+
+void HelpPanel::OnContentsButton(wxCommandEvent& WXUNUSED(event))
+{
+    ShowHelp(helphome);
+}
+
+void HelpPanel::UpdateHelpButtons()
+{
+    backbutt->Enable( html->HistoryCanBack() );
+    forwbutt->Enable( html->HistoryCanForward() );
+    // check for title used in helphome
+    contbutt->Enable( html->GetOpenedPageTitle() != _("Ready Help: Contents") );
+      
+    html->SetFocus();       // for keyboard shortcuts
 }

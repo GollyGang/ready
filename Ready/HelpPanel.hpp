@@ -28,12 +28,15 @@
 class MyFrame;
 class HtmlView;
 
-// the help panel displays .html files stored in the Help folder
+// the help panel displays .html files (stored in the Help folder or elsewhere)
 class HelpPanel : public wxPanel
 {
     public:
 
         HelpPanel(MyFrame* parent, wxWindowID id);
+
+        // display given .html file
+        void ShowHelp(const wxString& filepath);
 
     private:
 
@@ -41,5 +44,20 @@ class HelpPanel : public wxPanel
 
         HtmlView* html;   // child window for rendering HTML data
 
+        wxButton* backbutt;     // back button
+        wxButton* forwbutt;     // forwards button
+        wxButton* contbutt;     // Contents button
+        
+        // event handlers
+        void OnBackButton(wxCommandEvent& event);
+        void OnForwardButton(wxCommandEvent& event);
+        void OnContentsButton(wxCommandEvent& event);
+        
+        void UpdateHelpButtons();
+
         DECLARE_EVENT_TABLE()
 };
+
+// If ShowHelp is called with this string then a temporary .html file
+// is created to show the user's current keyboard shortcuts.
+const wxString SHOW_KEYBOARD_SHORTCUTS = wxT("keyboard.html");

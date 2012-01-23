@@ -1,0 +1,201 @@
+<html>
+<title>Ready Help: Edit Menu</title>
+<body>
+
+<p>
+<font size=+1><b>Undo</b></font>
+
+<p>
+Lets you undo one or more recent changes, including all editing
+changes and generating changes, as well as changes to the
+selection, rule, hashing state and layer name.
+The number of changes you can undo is limited only by
+available memory and disk space.
+Multiple changes made by a script are treated like a single change
+and will be undone all at once.
+
+<p>
+Each layer maintains its own undo/redo history (but cloned
+layers share the same undo/redo history).
+The current layer's undo/redo history is automatically cleared
+after creating a new pattern or opening a pattern file.
+
+<p>
+<font size=+1><b>Redo</b></font>
+
+<p>
+Lets you redo one or more recently undone changes.
+Note that the redo history is automatically cleared after
+you make a new change; i.e., if you do something like rotate
+the current selection, undo the rotation, then edit some cells
+or change the selection, you can no longer redo the rotation.
+
+<p>
+<font size=+1><b>Disable Undo/Redo</b></font>
+
+<p>
+If ticked then the Undo and Redo items are disabled, and any
+existing undo/redo history for the current layer is cleared.
+When editing or generating a very large pattern you may want to
+temporarily disable undo/redo to speed up some operations.
+But be careful using this feature &mdash; if you switch to another
+layer when this item is ticked then that layer's undo/redo history
+is also cleared.
+
+<p>
+<font size=+1><b>Cut</b></font>
+
+<p>
+Copies the pattern in the current selection to the clipboard
+(in RLE format) and then kills all cells in the selection.
+
+<p>
+<font size=+1><b>Copy</b></font>
+
+<p>
+Copies the pattern in the current selection to the clipboard.
+The clipboard data is in RLE format.
+
+<p>
+<font size=+1><b>Clear</b></font>
+
+<p>
+Kills all cells in the current selection.
+
+<p>
+<font size=+1><b>Clear Outside</b></font>
+
+<p>
+Kills all cells outside the current selection.
+This is often the quickest way to delete escaping gliders.
+
+<p>
+<font size=+1><b>Paste</b></font>
+
+<p>
+Pastes a pattern stored in the clipboard into the existing pattern.
+After selecting this item you'll be asked to click where you want
+the paste to occur.
+Before clicking you can use keyboard shortcuts to scroll,
+change scale, etc.  The keyboard shortcuts normally used to
+flip/rotate the selection will instead modify the paste pattern.
+You can also type "M" to change the paste mode or "L" to change
+the paste location (see below).
+To cancel the paste, just click anywhere outside the view area
+or hit the escape key.
+
+<p>
+Settings in <a href="prefs:edit">Preferences > Edit</a> specify
+how to handle rule information in the clipboard pattern.
+You can tell Golly not to change the current rule, or only change
+the rule if the universe is empty, or always change to the given rule.
+Note that a rule change might cause the current algorithm to change.
+
+<p>
+The <a href="refs.html">References</a> section has links to
+a number of good sources for clipboard patterns.
+
+<p>
+<font size=+1><b>Paste Mode</b></font>
+
+<p>
+This submenu lets you choose the logical function used when pasting in
+a clipboard pattern.  The choices are Copy, Or and Xor.
+Typing "M" will cycle through all these modes, even after selecting
+the Paste command.
+
+<p>
+<font size=+1><b>Paste Location</b></font>
+
+<p>
+This submenu lets you choose the location of the cursor within the
+paste rectangle that appears after selecting the Paste command.
+You can choose any corner or the middle of the rectangle.
+Typing "L" will cycle through all possible locations, even after
+selecting the Paste command.
+
+<p>
+<font size=+1><b>Paste to Selection</b></font>
+
+<p>
+Pastes a clipboard pattern into the current selection, but only if it will fit.
+The paste always occurs at the top left corner of the selection.
+This command can be used as a quick check to see if the pattern in the
+clipboard matches the pattern in the selection &mdash; if Xor paste mode is
+used then all the resulting cells will be dead if the patterns match.
+
+<p>
+<font size=+1><b>Select All</b></font>
+
+<p>
+Selects the entire pattern, assuming there are one or more live cells.
+If there are no live cells then any existing selection is removed.
+
+<p>
+<font size=+1><b>Remove Selection</b></font>
+
+<p>
+Removes the current selection (without changing any cell states).
+
+<p>
+<font size=+1><b>Shrink Selection</b></font>
+
+<p>
+Reduces the size of the current selection to the smallest rectangle
+containing all of the selection's live cells.
+You can hit "s" to shrink the selection <em>and</em> fit it in the current view.
+
+<p>
+<font size=+1><b>Random Fill (n%)</b></font>
+
+<p>
+Randomly fills the current selection with the indicated percentage of live cells.
+Use <a href="prefs:edit">Preferences > Edit</a> to change the percentage
+(from 1 to 100).
+
+<p>
+<font size=+1><b>Flip Top-Bottom</b></font>
+
+<p>
+The cells in the current selection are reflected about its central
+horizontal axis.
+
+<p>
+<font size=+1><b>Flip Left-Right</b></font>
+
+<p>
+The cells in the current selection are reflected about its central
+vertical axis.
+
+<p>
+<font size=+1><b>Rotate Clockwise</b></font>
+
+<p>
+The current selection is rotated 90 degrees clockwise about its center.
+
+<p>
+<font size=+1><b>Rotate Anticlockwise</b></font>
+
+<p>
+As above, but the rotation is anticlockwise.
+
+<p>
+<font size=+1><b>Cursor Mode</b></font>
+
+<p>
+This submenu lets you choose a cursor mode for various editing operations:
+drawing cells, picking cell states, selecting cells, moving the view,
+and zooming into or out from a clicked cell.
+There are other (quicker) ways to change the cursor mode:
+
+<p>
+<ul>
+<li> Click on the corresponding buttons in the edit bar.
+<li> Hit the corresponding function keys (F2 to F7).
+<li> Hit "c" to cycle through all the cursor modes.
+<li> Press the shift key to temporarily toggle the draw/pick cursors
+     or the zoom in/out cursors.
+</ul>
+
+</body>
+</html>

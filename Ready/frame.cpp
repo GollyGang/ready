@@ -105,8 +105,22 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
+    EVT_MENU(ID::HelpIndex, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpQuick, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpTips, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpKeyboard, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpMouse, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpFile, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpEdit, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpView, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpAction, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpHelp, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpRefs, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpFormats, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpProblems, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpChanges, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpCredits, MyFrame::OnHelp)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
-    EVT_MENU(wxID_HELP, MyFrame::OnHelp)
 END_EVENT_TABLE()
 
 // frame constructor
@@ -170,7 +184,7 @@ void MyFrame::InitializeMenus()
         wxMenu *menu = new wxMenu;
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane"), _("View the patterns pane"));
         menu->AppendCheckItem(ID::RulePane, _("&Rule Pane"), _("View the rule pane"));
-        menu->AppendCheckItem(ID::HelpPane, _("&Help Pane"), _("View the help pane"));
+        menu->AppendCheckItem(ID::HelpPane, _("&Help Pane\tF1"), _("View the help pane"));
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout"), _("Put the windows back where they were"));
         menu->AppendSeparator();
@@ -191,9 +205,25 @@ void MyFrame::InitializeMenus()
     }
     {   // help menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_HELP,_("&Help...\tF1"),_("Show information about how to use Ready"));
+        menu->Append(ID::HelpIndex,    _("Contents"));
+        menu->Append(ID::HelpQuick,    _("Quick Start"));
+        menu->Append(ID::HelpTips,     _("Hints and Tips"));
+        menu->Append(ID::HelpKeyboard, _("Keyboard Shortcuts"));
+        menu->Append(ID::HelpMouse,    _("Mouse Shortcuts"));
         menu->AppendSeparator();
-        menu->Append(wxID_ABOUT, _("&About Ready"));
+        menu->Append(ID::HelpFile,     _("File Menu"));
+        menu->Append(ID::HelpEdit,     _("Edit Menu"));
+        menu->Append(ID::HelpView,     _("View Menu"));
+        menu->Append(ID::HelpAction,   _("Action Menu"));
+        menu->Append(ID::HelpHelp,     _("Help Menu"));
+        menu->AppendSeparator();
+        menu->Append(ID::HelpRefs,     _("References"));
+        menu->Append(ID::HelpFormats,  _("File Formats"));
+        menu->Append(ID::HelpProblems, _("Known Problems"));
+        menu->Append(ID::HelpChanges,  _("Changes"));
+        menu->Append(ID::HelpCredits,  _("Credits"));
+        menu->AppendSeparator();
+        menu->Append(wxID_ABOUT,       _("&About Ready"));
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
@@ -806,6 +836,29 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
 
 void MyFrame::OnHelp(wxCommandEvent &event)
 {
+    int id = event.GetId();
+    switch (id)
+    {
+        case ID::HelpIndex:     this->help_panel->ShowHelp(_("Help/index.html")); break;
+        case ID::HelpQuick:     this->help_panel->ShowHelp(_("Help/quickstart.html")); break;
+        case ID::HelpTips:      this->help_panel->ShowHelp(_("Help/tips.html")); break;
+        case ID::HelpKeyboard:  this->help_panel->ShowHelp(SHOW_KEYBOARD_SHORTCUTS); break;
+        case ID::HelpMouse:     this->help_panel->ShowHelp(_("Help/mouse.html")); break;
+        case ID::HelpFile:      this->help_panel->ShowHelp(_("Help/file.html")); break;
+        case ID::HelpEdit:      this->help_panel->ShowHelp(_("Help/edit.html")); break;
+        case ID::HelpView:      this->help_panel->ShowHelp(_("Help/view.html")); break;
+        case ID::HelpAction:    this->help_panel->ShowHelp(_("Help/action.html")); break;
+        case ID::HelpHelp:      this->help_panel->ShowHelp(_("Help/help.html")); break;
+        case ID::HelpRefs:      this->help_panel->ShowHelp(_("Help/refs.html")); break;
+        case ID::HelpFormats:   this->help_panel->ShowHelp(_("Help/formats.html")); break;
+        case ID::HelpProblems:  this->help_panel->ShowHelp(_("Help/problems.html")); break;
+        case ID::HelpChanges:   this->help_panel->ShowHelp(_("Help/changes.html")); break;
+        case ID::HelpCredits:   this->help_panel->ShowHelp(_("Help/credits.html")); break;
+        default:
+            wxMessageBox(_("Bug: Unexpected ID in OnHelp!"));
+            return;
+    }
+    
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
     if(!pane.IsOk()) return;
     pane.Show();
@@ -1015,7 +1068,8 @@ static int SaveChanges(const wxString& query, const wxString& msg)
         // change button order to what Mac users expect to see
         dialog.SetYesNoCancelLabels("Cancel", "Save", "Don't Save");
        
-        switch ( dialog.ShowModal() ) {
+        switch ( dialog.ShowModal() )
+        {
             case wxID_YES:    return wxCANCEL;  // Cancel
             case wxID_NO:     return wxYES;     // Save
             case wxID_CANCEL: return wxNO;      // Don't Save
