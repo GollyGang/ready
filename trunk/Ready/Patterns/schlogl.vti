@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD>
-    <rule name="Schlogl" number_of_chemicals="1" timestep="0.1">
+    <rule type="formula" name="Schlogl" number_of_chemicals="1" timestep="0.1">
       <formula>
         delta_a = laplacian_a + a - a*a*a;
       </formula>

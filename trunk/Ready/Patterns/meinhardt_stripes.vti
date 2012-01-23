@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD>
-    <rule name="Meinhardt" number_of_chemicals="6" timestep="0.1">
+    <rule type="formula" name="Meinhardt" number_of_chemicals="6" timestep="0.1">
       <param name="k_ab">0.04</param>
       <param name="k_c">0.06</param>
       <param name="k_de">0.04</param>

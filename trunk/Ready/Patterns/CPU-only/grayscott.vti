@@ -1,16 +1,12 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
     <RD>
-        <rule type="formula" name="Gray-Scott" number_of_chemicals="2" timestep="1.0">
+        <rule type="inbuilt" name="Gray-Scott" timestep="1.0">
             <description>This formula was blah blah blah.</description>
             <param name="D_a">0.082</param>
             <param name="D_b">0.041</param>
             <param name="k">0.06</param>
             <param name="F">0.035</param>
-            <formula>
-            delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
-            delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
-            </formula>
         </rule>
         <pattern_description>
             This pattern shows blah blah blah.

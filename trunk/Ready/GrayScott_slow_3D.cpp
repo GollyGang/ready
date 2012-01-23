@@ -34,7 +34,8 @@ using namespace std;
 GrayScott_slow_3D::GrayScott_slow_3D()
 {
     this->timestep = 1.0f;
-    this->rule_name = "Gray-Scott";
+    this->rule_name = "Gray-Scott_3D";
+    this->n_chemicals = 2;
     this->AddParameter("r_a",0.082f);
     this->AddParameter("r_b",0.041f);
     this->AddParameter("k",0.064f);

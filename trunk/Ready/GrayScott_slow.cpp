@@ -35,6 +35,7 @@ GrayScott_slow::GrayScott_slow()
 {
     this->timestep = 1.0f;
     this->rule_name = "Gray-Scott";
+    this->n_chemicals = 2;
     this->AddParameter("r_a",0.082f);
     this->AddParameter("r_b",0.041f);
     // for spots:
