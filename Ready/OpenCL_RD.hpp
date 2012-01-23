@@ -38,7 +38,7 @@ class OpenCL_RD : public BaseRD
         OpenCL_RD();
         ~OpenCL_RD();
 
-        bool HasEditableFormula() const { return true; }
+        virtual bool HasEditableFormula() const { return true; }
 
         void SetPlatform(int i);
         void SetDevice(int i);
@@ -50,12 +50,12 @@ class OpenCL_RD : public BaseRD
         static std::string GetPlatformDescription(int iPlatform);
         static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
-        void SetParameterValue(int iParam,float val);
-        void SetParameterName(int iParam,std::string s);
+        virtual void SetParameterValue(int iParam,float val);
+        virtual void SetParameterName(int iParam,std::string s);
 
-        void TestFormula(std::string s);
+        virtual void TestFormula(std::string s);
 
-        void CopyFromImage(vtkImageData* im);
+        virtual void CopyFromImage(vtkImageData* im);
 
     protected:
 

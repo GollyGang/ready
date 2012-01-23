@@ -27,12 +27,12 @@ class GrayScott_slow : public BaseRD
         GrayScott_slow();
         ~GrayScott_slow();
 
-        void Allocate(int x,int y,int z,int nc);
-        void InitWithBlobInCenter();
+        virtual void Allocate(int x,int y,int z,int nc);
+        virtual void InitWithBlobInCenter();
 
-        void Update(int n_steps);
+        virtual void Update(int n_steps);
 
-        bool HasEditableFormula() const { return false; }
+        virtual bool HasEditableFormula() const { return false; }
 
     protected:
 
