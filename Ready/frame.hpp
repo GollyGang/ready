@@ -109,7 +109,6 @@ class MyFrame : public wxFrame
         void InitializeRenderPane();
         void LoadSettings();
         void SaveSettings();
-        void LoadDemo(int iDemo);
        
         void SetCurrentRDSystem(BaseRD* system);
         void UpdateWindows();
