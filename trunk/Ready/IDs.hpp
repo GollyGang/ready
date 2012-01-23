@@ -50,7 +50,6 @@ namespace ID { enum {
     OpenCLDiagnostics,
     
     // help menu
-    HelpIndex,
     HelpQuick,
     HelpTips,
     HelpKeyboard,
@@ -66,12 +65,10 @@ namespace ID { enum {
     HelpChanges,
     HelpCredits,
     
-    // controls:
-    
-    // MyFrame:
+    // PatternsPanel:
     PatternsTree,
     
-    // HelpPanel buttons:
+    // HelpPanel:
     BackButton,
     ForwardButton,
     ContentsButton,
