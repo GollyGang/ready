@@ -31,6 +31,16 @@ make
 make package
 make package_source
 
+If you need to build wxWidgets yourself (if your distribution
+doesn't come with a recent enough version) then this is the method
+you'll need:
+
+cd wxWidgets
+./configure --with-gtk --disable-shared --enable-unicode
+make
+
+This produces the wx-config file that CMake needs.
+
 =========================== MacOS =================================
 
 1. To avoid the error "-- Could NOT find wxWidgets (missing:  wxWidgets_FOUND)", 
