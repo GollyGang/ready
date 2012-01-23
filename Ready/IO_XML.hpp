@@ -42,7 +42,10 @@ class RD_XMLReader : public vtkXMLImageDataReader
         vtkTypeMacro(RD_XMLReader, vtkXMLImageDataReader);
         static RD_XMLReader* New();
 
-        void SetFromXML(BaseRD* rd_system);
+        std::string GetType();
+        std::string GetName();
+        void SetSystemFromXMLWithFormula(BaseRD* rd_system);
+        void SetSystemFromXMLWithoutFormula(BaseRD* rd_system);
 
     protected:  
 

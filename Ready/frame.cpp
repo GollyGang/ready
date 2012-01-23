@@ -936,23 +936,42 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     if (remember) /* AKT TODO!!! AddRecentPattern(path) */;
     
     // load pattern file
-    BaseRD *target_system;
+    BaseRD *target_system = NULL;
     try
     {
         wxBusyCursor busy;
-        // to load pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
-        // TODO: detect if opencl is available, abort if not
-        {
-            OpenCL_nDim *s = new OpenCL_nDim();
-            s->SetPlatform(this->iOpenCLPlatform);
-            s->SetDevice(this->iOpenCLDevice);
-            target_system = s;
-        }
 
         vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
         iw->SetFileName(path.mb_str());
         iw->Update();
-        iw->SetFromXML(target_system);
+
+        string type = iw->GetType();
+        if(type=="inbuilt")
+        {
+            string name = iw->GetName();
+            if(name=="Gray-Scott")
+            {
+                GrayScott_slow *s = new GrayScott_slow();
+                target_system = s;
+            }
+            else 
+            {
+                throw runtime_error("Unsupported inbuilt implementation: "+name);
+            }
+            iw->SetSystemFromXMLWithoutFormula(target_system);
+        }
+        else if(type=="formula")
+        {
+            {
+                // to load type="formula" pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
+                // TODO: detect if opencl is available, abort if not
+                OpenCL_nDim *s = new OpenCL_nDim();
+                s->SetPlatform(this->iOpenCLPlatform);
+                s->SetDevice(this->iOpenCLDevice);
+                target_system = s;
+            }
+            iw->SetSystemFromXMLWithFormula(target_system);
+        }
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
