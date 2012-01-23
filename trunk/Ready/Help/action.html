@@ -1,0 +1,240 @@
+<html>
+<title>Ready Help: Action Menu</title>
+<body>
+
+<p>
+<font size=+1><b>Start</b>/<b>Stop Generating</b></font>
+
+<p>
+Starts or stops generating the current pattern.
+This item can also be used to stop a running script, but it's
+much easier to hit escape or click the tool bar's stop button.
+
+<p>
+<font size=+1><b>Next Generation</b></font>
+
+<p>
+Advances the pattern to the next generation.
+Note that you can hit control-space to advance only the current selection,
+or shift-space to advance everything outside the selection (in both cases
+the generation count will not change).
+
+<p>
+<font size=+1><b>Next Step</b></font>
+
+<p>
+Advances the pattern to the next step.  The current step size is displayed
+in the status bar as a number of the form "b^e" where b is the base step
+and e is the exponent.  The base step can be changed by the Set Base Step
+dialog (see below), and the exponent can be changed by the Faster/Slower
+items (see below).
+
+<p>
+<font size=+1><b>Reset</b></font>
+
+<p>
+Restores the starting pattern and generation count.
+It also resets the algorithm, rule, scale, location, step size, selection
+and layer name to the values they had at the starting generation.
+The starting generation is typically zero, but it can be larger after
+loading an RLE/macrocell file that stores a non-zero generation count.
+
+<p>
+<font size=+1><b>Set Generation...</b></font>
+
+<p>
+Opens a dialog to change the generation count.  You can enter
+readable numbers like "1,234,567", or include a leading +/- sign
+to specify a number relative to the current generation count.
+
+<p>
+<font size=+1><b>Faster</b></font>
+
+<p>
+Increases the step exponent in the status bar by 1.
+This increases the speed by displaying fewer generations.
+The step exponent is reset to 0 when you create a new pattern,
+load a pattern file, or switch to a different algorithm.
+
+<p>
+<font size=+1><b>Slower</b></font>
+
+<p>
+Decreases the step exponent in the status bar by 1.
+This decreases the speed by displaying more generations.
+The step exponent is reset to 0 when you create a new pattern,
+load a pattern file, or switch to a different algorithm.
+If the exponent is 0 when you select this item then a small delay
+will occur between each generation.
+Further slowing will double the delay until a maximum value is reached.
+Use <a href="prefs:control">Preferences > Control</a> to set the
+minimum and maximum delay times.
+
+<p>
+<font size=+1><b>Set Base Step...</b></font>
+
+<p>
+Opens a dialog to change the current base step, but only temporarily.
+Golly will restore the default base step
+(set in <a href="prefs:control">Preferences > Control</a>) when you create
+a new pattern, load a pattern file, or switch to a different algorithm.
+The base step can be any number from 2 to 10,000 (but be aware that
+Golly's hashing algorithms are most efficient when the base step is a
+power of 2).
+
+<p>
+<font size=+1><b>Auto Fit</b></font>
+
+<p>
+If ticked then Golly will automatically fit a generating pattern inside
+the view if any part of the pattern moves out of view.
+This option is only used when doing many generations via Start or Next Step
+(that's why it's in the Control menu rather than the View menu),
+or when displaying patterns in a timeline
+(see <a href="view.html#timeline">Show Timeline</a>).
+
+<p>
+Note that if you are generating a pattern and decide to change scale or
+do any sort of scrolling then the Auto Fit option is automatically
+turned off (the assumption being that you now want manual control
+over the scale and/or location).
+
+<p>
+TIP: If you find the Auto Fit option too confusing then leave it off
+and hit "f" to manually fit the pattern inside the view whenever you like.
+
+<p>
+<font size=+1><b>Hyperspeed</b></font>
+
+<p>
+If ticked, and the current algorithm uses hashing, then Golly will
+automatically increase the step exponent at regular intervals (every 64 steps).
+Hyperspeed mode is a convenient way to run a complex pattern as far as possible.
+(For very chaotic patterns, using QuickLife may actually run it further.)
+For highly regular patterns, hyperspeed mode quickly "runs away", generating
+exponentially fast.
+
+<p>
+<font size=+1><b>Show Hash Info</b></font>
+
+<p>
+Tick this option to turn on status messages that inform you when a
+hashing algorithm is doing garbage collection, resizing its internal
+hash table, or changing the step size (which can involve walking the
+entire hash).  The garbage collection messages say which garbage
+collection it is overall, and if it is a subsequent garbage collection
+for the same step (the count will be in parentheses), and the
+percentage of memory reclaimed.
+
+<p>
+Interpreting these numbers is more an art than a science because some
+patterns exhibit odd behavior, but in general, if a garbage collection
+is reclaiming less than 70% of the total memory, or more than ten
+garbage collections occur for a single step, you can be fairly certain
+that the algorithm is effectively stalled and further progress will be
+extremely slow.  Reducing the step size may help, but it may need to
+be reduced substantially in order to have an impact.  Increasing the
+maximum memory that the algorithm can use may also help.
+
+<a name="record"></a>
+<p>
+<font size=+1><b>Start</b>/<b>Stop Recording</b></font>
+
+<p>
+This item lets you start recording a new timeline (if none exists),
+or extend an existing timeline (always from its final frame).
+Golly will proceed to generate and save (in memory) a sequence of
+patterns separated by the current step size.
+
+<p>
+If a timeline is being recorded then this item will stop the recording.
+Note that it's probably easier to click on the start/stop button in the
+timeline bar (use <a href="view.html#timeline">Show Timeline</a> in the
+View menu to show/hide this bar).
+Recording will also stop if you hit the escape key, or if the maximum
+number of frames is reached (32,000).
+
+<p>
+A lot of Golly's functionality is disabled while a timeline exists
+(which includes when it's being recorded).  For example, you can't
+do any editing or generating, nor can you change the current algorithm,
+rule or step size.  You can however do the usual zooming and panning,
+and you can add/delete/switch layers (each non-cloned layer has its
+own separate timeline).  You can also make selections, but only the
+last selection is remembered when the timeline is deleted.
+
+<a name="deltime"></a>
+<p>
+<font size=+1><b>Delete Timeline</b></font>
+
+<p>
+Deletes the existing timeline.  The currently displayed frame
+becomes the current generation (any later frames are lost), but
+Golly saves the first frame of the timeline so you can Reset/Undo
+back to that generation.
+
+<p>
+<font size=+1><b>Set Algorithm</b></font>
+
+<p>
+This submenu lets you switch algorithms.
+Note that changing the current algorithm can change the current rule.
+If the new algorithm doesn't support the current rule then Golly
+will switch to the new algorithm's default rule.  If a pattern exists
+then some cell states might have to be modified if the new universe
+has fewer states than the old universe.
+
+<p>
+Golly assigns a different status bar color to each algorithm to give
+you some feedback about which algorithm is currently in use.
+You can use <a href="prefs:color">Preferences > Color</a> to change
+these colors.
+
+<p>
+Most of Golly's algorithms (all except QuickLife) use a hashing technique
+to generate patterns.
+This method performs brilliantly on patterns that have a lot of regularity
+in time or space.  Conversely, it can perform very poorly on chaotic patterns.
+A hashing algorithm may initially appear to be slow, but as the hash table
+fills up with knowledge about the pattern, it will run faster and faster,
+so be patient.
+
+<p>
+Use <a href="prefs:control">Preferences > Control</a> to set the maximum
+amount of hash memory for each algorithm.  The initial setting is 500MB.
+The higher you set the memory limit, the larger patterns you can run
+and the farther and faster you can run them.
+However, setting this limit high also increases the amount of time
+required to change the step size (both manually and in hyperspeed mode)
+and increases the length of the garbage collection pauses.
+Nonetheless, it is generally best to set this quite high &mdash; typically
+80% of the amount of physical memory in your computer.  Setting this number
+high enough often makes more than a difference of 1000 in performance.
+How high is high enough depends greatly on the pattern and the step size,
+however, in unpredictable ways.
+
+<p>
+<font size=+1><b>Set Rule...</b></font>
+
+<p>
+Opens a dialog to change the current rule (which is displayed
+inside square brackets in the main window's title bar).
+The dialog also allows you to change the current algorithm &mdash; if the
+current rule is not valid in the new algorithm then the algorithm's
+default rule will be used.
+
+<p>
+A help button can be used to expand the dialog and display information
+about the current algorithm along with examples of the rules it supports.
+If you click on one of the special rule links then the rule string is
+automatically pasted into the new rule box.
+Another way to enter a new rule is to choose one from the list of
+named rules.  You can add your own names to this list.
+
+<p>
+By default, all algorithms create an unbounded universe, but it's also
+possible to create a bounded universe by adding a special suffix to
+the usual rule.  See <a href="bounded.html">here</a> for details.
+
+</body>
+</html>

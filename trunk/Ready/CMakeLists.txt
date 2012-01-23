@@ -71,6 +71,11 @@ set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti
 )
 
+set( HELP_FILES
+  action.html credits.html file.html help.html mouse.html quickstart.html tips.html
+  changes.html edit.html formats.html index.html problems.html refs.html view.html
+)
+
 set( TEXT_FILES
   README.txt CHANGES.txt COPYING.txt TODO.txt
 )
@@ -159,7 +164,7 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
   
-#--------------------------copy pattern files to build folder---------------------------------
+#--------------------------copy pattern and help files to build folder--------------------------
 
 foreach( pattern_file ${PATTERN_FILES} )
   add_custom_command( 
@@ -170,6 +175,16 @@ foreach( pattern_file ${PATTERN_FILES} )
   list( APPEND pattern_files_dest "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}" )
 endforeach( pattern_file ) 
 add_custom_target( CopyPatterns ALL DEPENDS ${pattern_files_dest} )
+
+foreach( help_file ${HELP_FILES} )
+  add_custom_command( 
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}"
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}" "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}"
+  )
+  list( APPEND help_files_dest "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}" )
+endforeach( help_file ) 
+add_custom_target( CopyHelp ALL DEPENDS ${help_files_dest} )
 
 #-----------------------------------------------------------------------------------------------
 
@@ -260,6 +275,12 @@ endforeach()
 foreach( pattern_file ${PATTERN_FILES} )
   get_filename_component( path_name "Patterns/${pattern_file}" PATH )
   install( FILES "Patterns/${pattern_file}" DESTINATION ${path_name} )
+endforeach()
+
+# install our help files
+foreach( help_file ${HELP_FILES} )
+  get_filename_component( path_name "Help/${help_file}" PATH )
+  install( FILES "Help/${help_file}" DESTINATION ${path_name} )
 endforeach()
 
 #----------------------------------------package----------------------------------------------

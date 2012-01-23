@@ -1,0 +1,99 @@
+<html>
+<title>Ready Help: Help Menu</title>
+<body>
+
+<p>
+The Help menu items can be used to display information on a variety of topics.
+Each item corresponds to a HTML file in the Help folder.
+The information is displayed in a separate help window
+which behaves like a simplified browser.
+The size and location of this window is remembered when it closes.
+
+<p>
+<font size=+1><b>Keyboard shortcuts</b></font>
+
+<p>
+Various keyboard shortcuts can be used when the help window is in front:
+
+<p>
+<ul>
+<li> Hit "+" and "-" to change the font size.
+<li> Hit the left arrow or "[" to go back.
+<li> Hit the right arrow or "]" to go forwards.
+<li> Hit the home key to go to the Contents page.
+<li> Hit the up/down arrow keys or page up/down keys if a scroll bar appears.
+<li> Hit Ctrl-A on Windows/Linux or Cmd-A on Mac to select all text.
+<li> Hit Ctrl-C on Windows/Linux or Cmd-C on Mac to copy selected text
+     to the clipboard.
+<li> Hit escape or return to close the help window.
+</ul>
+
+<a name="links"></a>
+<p>
+<font size=+1><b>Special links</b></font>
+
+<p>
+The help window supports a number of Golly-specific links:
+
+<p>
+<ul>
+
+<li> <b>edit:</b><i>file</i><br>
+Open the given file in your <a href="prefs:file">preferred text editor</a>.
+A non-absolute path is relative to the location of the Golly application.
+
+<li> <b>get:</b><i>url</i><br>
+Download the specified file and process it according to its type:
+<ul>
+<li>
+A HTML file (.htm or .html) is displayed in the help window.
+Note that this HTML file can contain <b>get</b> links with partial URLs.
+For a good example of their use, see the
+<a href="get:http://www.conwaylife.com/golly.html">LifeWiki Pattern Archive</a>.
+<li>
+A text file (.txt or .doc or a name containing "readme") is opened in
+your text editor.
+<li>
+A zip file is opened and processed as described in the
+<a href="formats.html#zip">File Formats</a> help.
+<li>
+A rule-related file (.colors or .icons or .table or .tree) is
+installed into <a href="prefs:control">your rules folder</a>
+and Golly then switches to the corresponding rule.
+<li>
+A script file (.pl or .py) is run, but only if you answer "Yes" to the
+query dialog that appears.
+<li>
+A pattern file is loaded into the current layer.
+</ul>
+
+<li> <b>lexpatt:</b><i>pattern</i><br>
+Load the given <a href="Lexicon/lex.htm">Life Lexicon</a> pattern into a "lexicon"
+layer which is automatically created if it doesn't already exist.
+
+<li> <b>open:</b><i>file</i><br>
+Load the given pattern or run the given script.
+A non-absolute path is relative to the location of the Golly application.
+
+<li> <b>prefs:</b><i>pane</i><br>
+Open the Preferences dialog at the given pane.  The pane string must
+be lowercase and must match a known pane: file, edit, control, etc.
+
+<li> <b>rule:</b><i>rulename</i><br>
+Load the given rule.
+
+<li> <b>unzip:</b><i>zip:file</i><br>
+Extract a file from the given zip file and process it in the
+same manner as a <b>get</b> link (see above).
+Golly creates <b>unzip</b> links when it opens a zip file, so you probably
+won't ever need to use such links in your own HTML files.
+
+</ul>
+
+<p>
+Note that for some links (<b>get</b>, <b>open</b>, <b>unzip</b>) you can tell
+Golly to open the specified file in your text editor by control-clicking or
+right-clicking on the link.
+
+</body>
+</html>

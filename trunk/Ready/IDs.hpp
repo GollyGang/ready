@@ -49,10 +49,31 @@ namespace ID { enum {
     SelectOpenCLDevice,
     OpenCLDiagnostics,
     
+    // help menu
+    HelpIndex,
+    HelpQuick,
+    HelpTips,
+    HelpKeyboard,
+    HelpMouse,
+    HelpFile,
+    HelpEdit,
+    HelpView,
+    HelpAction,
+    HelpHelp,
+    HelpRefs,
+    HelpFormats,
+    HelpProblems,
+    HelpChanges,
+    HelpCredits,
+    
     // controls:
     
     // MyFrame:
     PatternsTree,
-   
-}; };
+    
+    // HelpPanel buttons:
+    BackButton,
+    ForwardButton,
+    ContentsButton,
 
+}; };

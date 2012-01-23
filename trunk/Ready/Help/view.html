@@ -1,0 +1,194 @@
+<html>
+<title>Ready Help: View Menu</title>
+<body>
+
+<p>
+<font size=+1><b>Full Screen</b></font>
+
+<p>
+Switches to full screen mode, automatically hiding the menu bar, the status bar,
+the tool bar, the layer bar, the edit bar, the pattern/script folder and
+the scroll bars.
+To exit from this mode just hit the menu item's keyboard shortcut
+or any unassigned key.
+
+<p>
+<font size=+1><b>Fit Pattern</b></font>
+
+<p>
+Changes the scale and location so the entire pattern fits within the current view.
+
+<p>
+<font size=+1><b>Fit Selection</b></font>
+
+<p>
+Changes the scale and location so the entire selection fits within the current view.
+
+<p>
+<font size=+1><b>Middle</b></font>
+
+<p>
+Moves the origin cell (0,0) to the middle of the view.
+
+<p>
+<font size=+1><b>Restore Origin</b></font>
+
+<p>
+Restores the true origin.
+The origin cell can be changed by hitting "0" while the cursor is over the
+view &mdash; the cell under the cursor will become the new origin and its location
+will be displayed as 0,0.  This can be handy for measuring distances or for
+saving a location and returning to it quickly by hitting "m".
+
+<p>
+<font size=+1><b>Zoom In</b></font>
+
+<p>
+Zooms in by doubling the current scale.
+If the scale is 1:16 then you can't zoom in any further.
+
+<p>
+<font size=+1><b>Zoom Out</b></font>
+
+<p>
+Zooms out by halving the current scale.
+You can zoom out as far as you like.
+
+<p>
+<font size=+1><b>Set Scale</b></font>
+
+<p>
+This submenu lets you set the scale from 1:1 to 1:16.
+A quicker method is to use these keyboard shortcuts:
+"1" for 1:1, "2" for 1:2, "4" for 1:4, "8" for 1:8 and "6" for 1:16.
+
+<p>
+<font size=+1><b>Show Tool Bar</b></font>
+
+<p>
+Shows or hides the tool bar at the left edge of the main window.
+
+<p>
+<font size=+1><b>Show Layer Bar</b></font>
+
+<p>
+Shows or hides the layer bar above the viewport window (and above the
+edit bar if it's visible).
+
+<p>
+<font size=+1><b>Show Edit Bar</b></font>
+
+<p>
+Shows or hides the edit bar above the viewport window.
+The edit bar contains buttons for undo and redo, buttons for
+changing the cursor mode, a button for showing/hiding all states
+(see below), boxes showing the current drawing state's color and
+icon, and a scroll bar for changing the drawing state.
+
+<p>
+<font size=+1><b>Show All States</b></font>
+
+<p>
+If ticked then the edit bar is made larger and the colors and icons
+for all cell states in the current universe are displayed.
+A box is drawn around the current drawing state; to change it just
+click on a different state.
+
+<p>
+<font size=+1><b>Show Status Bar</b></font>
+
+<p>
+Shows or hides the status bar at the top of the main window.
+
+<p>
+<font size=+1><b>Show Exact Numbers</b></font>
+
+<p>
+If ticked then the status bar is made larger and exact numbers are
+displayed instead of using scientific notation.
+
+<p>
+<font size=+1><b>Show Grid Lines</b></font>
+
+<p>
+Shows or hides the grid lines.
+Use <a href="prefs:view">Preferences > View</a>
+to turn off the bold grid lines or change their spacing.
+You can also set the minimum scale at which grid lines should be displayed
+(1:4, 1:8 or 1:16).
+
+<p>
+<font size=+1><b>Show Cell Icons</b></font>
+
+<p>
+If ticked then icons will be displayed at scales 1:8 and 1:16.
+Icons are small bitmaps that can have any shape but their color is
+automatically synchronized with the cell's state color.
+Each algorithm can have a different set of icons.  You can change these
+icons by loading suitably formatted files via the "Load Icons" button
+in <a href="prefs:color">Preferences > Color</a>.
+
+<p>
+It's also possible to have rule-specific icons.  Whenever Golly
+switches to a new rule it looks inside the Rules folder for a matching
+<i>rule</i>.icons file and, if it exists, loads the bitmaps stored in
+the file.  The format of a .icons file is identical to that used above.
+See <a href="formats.html#icons">Help > File Formats</a> for a
+description of the format.
+
+<p>
+<font size=+1><b>Invert Colors</b></font>
+
+<p>
+If ticked then the colors of all cell states in all layers are inverted;
+i.e., each RGB value is changed to 255-R, 255-G, 255-B.
+
+<p>
+<font size=+1><b>Buffered</b></font>
+
+<p>
+If ticked then window buffering is used to avoid flicker, but it does
+slow down pattern rendering a bit so you might prefer to live with the flicker.
+Note that buffering is always used if grid lines are displayed
+or if a selection is visible.
+
+<p>
+This option is disabled on Mac OS X and Linux/GTK because windows are
+automatically buffered on those systems.
+
+<a name="timeline"></a>
+<p>
+<font size=+1><b>Show Timeline</b></font>
+
+<p>
+Shows or hides the timeline bar below the viewport window.
+If the current algorithm supports timelines (only QuickLife doesn't)
+then the timeline bar has a button to start/stop recording a timeline.
+This button is equivalent to the Control menu's
+<a href="control.html#record">Start/Stop Recording</a> item.
+
+<p>
+When recording stops, or after a timeline is loaded from a .mc file,
+you'll see a scroll bar that lets you view any frame within the timeline.
+There are also buttons to automatically play the timeline
+forwards or backwards, a slider to adjust the speed of auto-play,
+and a button at the right edge to delete the timeline.
+Note that if the Control menu's Auto Fit option is ticked then Golly
+will force each timeline pattern to fit the viewport.
+
+<p>
+A number of keyboard shortcuts can be used while a timeline exists.
+Hit the escape key to stop recording or to stop auto-play.
+Hit your preferred keys for Faster/Slower to change the speed of auto-play.
+Hit your preferred key for Start Generating to play the timeline forwards
+and, if you wish, use <a href="prefs:keyboard">Preferences > Keyboard</a>
+to assign a keyboard shortcut for Play Timeline Backwards.
+
+<p>
+<font size=+1><b>Pattern Info</b></font>
+
+<p>
+Displays any comments in the current pattern file.
+
+</body>
+</html>
