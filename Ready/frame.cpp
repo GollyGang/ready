@@ -950,14 +950,11 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         {
             string name = iw->GetName();
             if(name=="Gray-Scott")
-            {
-                GrayScott_slow *s = new GrayScott_slow();
-                target_system = s;
-            }
+                target_system = new GrayScott_slow();
+            else if(name=="Gray-Scott_3D")
+                target_system = new GrayScott_slow_3D();
             else 
-            {
                 throw runtime_error("Unsupported inbuilt implementation: "+name);
-            }
             iw->SetSystemFromXMLWithoutFormula(target_system);
         }
         else if(type=="formula")
