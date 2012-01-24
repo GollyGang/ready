@@ -42,6 +42,7 @@
 #include <wx/dir.h>
 #include <wx/dnd.h>         // for wxFileDropTarget
 #include <wx/clipbrd.h>     // for wxTheClipboard
+#include <wx/artprov.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -138,6 +139,7 @@ MyFrame::MyFrame(const wxString& title)
     this->aui_mgr.SetManagedWindow(this);
 
     this->InitializeMenus();
+    this->InitializeToolbars();
 
     CreateStatusBar(1);
     SetStatusText(_("Ready"));
@@ -234,6 +236,22 @@ void MyFrame::InitializeMenus()
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
+}
+
+void MyFrame::InitializeToolbars()
+{
+    {   // file menu items
+        wxAuiToolBar *tb = new wxAuiToolBar(this,ID::FileToolbar);
+        tb->AddTool(wxID_NEW,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR));
+        tb->AddTool(wxID_OPEN,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR));
+        tb->AddTool(wxID_SAVE,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR));
+        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Floatable(false));
+    }
+    {   // action menu items
+        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
+        this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),wxEmptyString,wxITEM_CHECK);
+        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Floatable(false));
+    }
 }
 
 void MyFrame::InitializePatternsPane()
@@ -613,8 +631,10 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
     if (mbar) {
         if (this->is_running) {
             mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
+            event.Check(true);
         } else {
             mbar->SetLabel(ID::RunStop, _("Run\tF5"));
+            event.Check(false);
         }
     }
 }
