@@ -18,6 +18,9 @@
 #ifndef __BASERD__
 #define __BASERD__
 
+// local:
+class BaseOverlay;
+
 // STL:
 #include <string>
 #include <vector>
@@ -104,12 +107,19 @@ class BaseRD
         std::string filename;
         bool is_modified;
 
+        std::vector<BaseOverlay*> starting_pattern; // still experimental
+
     protected:
 
         void Deallocate();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
         static float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
+
+    private: // deliberately not implemented, to prevent use
+
+        BaseRD(BaseRD&);
+        BaseRD& operator=(BaseRD&);
 };
 
 #endif
