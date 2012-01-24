@@ -17,6 +17,12 @@ Dependencies: VTK, wxWidgets (2.9+), any OpenCL SDK.
 
 Build the PACKAGE project to produce a binary distribution zip.
 
+To build wxWidgets, open the Visual Studio Command prompt from the
+Start menu (this sets up the environment variables as you need):
+
+cd \wxWidgets\build\msw
+nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+
 =========================== Linux =================================
 
 Install: libvtk, libwxgtk (2.9+), zlib1g, any OpenCL SDK.
