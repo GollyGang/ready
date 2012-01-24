@@ -102,6 +102,7 @@ class MyFrame : public wxFrame
         // internal functions
 
         void InitializeMenus();
+        void InitializeToolbars();
         void InitializePatternsPane();
         void InitializeRulePane();
         void UpdateRulePane();
@@ -132,6 +133,7 @@ class MyFrame : public wxFrame
         RulePanel *rule_panel;
         HelpPanel *help_panel;
         PatternsPanel *patterns_panel;
+        wxAuiToolBar *action_toolbar;
 
         // settings:
 

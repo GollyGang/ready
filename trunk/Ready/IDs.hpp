@@ -73,4 +73,8 @@ namespace ID { enum {
     ForwardButton,
     ContentsButton,
 
+    // toolbars:
+    FileToolbar,
+    ActionToolbar,
+
 }; };
