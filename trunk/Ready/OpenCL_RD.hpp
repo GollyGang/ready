@@ -52,6 +52,7 @@ class OpenCL_RD : public BaseRD
 
         virtual void SetParameterValue(int iParam,float val);
         virtual void SetParameterName(int iParam,std::string s);
+        virtual void SetTimestep(float t);
 
         virtual void TestFormula(std::string s);
 

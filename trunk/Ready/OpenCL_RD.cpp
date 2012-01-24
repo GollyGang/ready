@@ -523,12 +523,16 @@ void OpenCL_RD::SetParameterValue(int iParam,float val)
 {
     BaseRD::SetParameterValue(iParam,val);
     this->need_reload_formula = true;
-    this->is_modified = true;
 }
 
 void OpenCL_RD::SetParameterName(int iParam,string s)
 {
     BaseRD::SetParameterName(iParam,s);
     this->need_reload_formula = true;
-    this->is_modified = true;
+}
+
+void OpenCL_RD::SetTimestep(float t)
+{
+    BaseRD::SetTimestep(t);
+    this->need_reload_formula = true;
 }

@@ -63,6 +63,7 @@ void RulePanel::Update(const BaseRD* const system)
     this->rule_name_property = this->pgrid->Append(new wxStringProperty( _("Rule name"),wxPG_LABEL,system->GetRuleName()));
     this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
     this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
+    this->timestep_property = this->pgrid->Append(new wxFloatProperty(_("Timestep"),wxPG_LABEL,system->GetTimestep()));
 
     this->parameter_value_properties.resize(system->GetNumberOfParameters());
     this->parameter_name_properties.resize(system->GetNumberOfParameters());
@@ -106,6 +107,8 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
         this->frame->SetRuleDescription(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
     if(property == this->pattern_description_property) 
         this->frame->SetPatternDescription(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
+    if(property == this->timestep_property)
+        this->frame->SetTimestep((wxAny(property->GetValue())).As<float>());
     if(property == this->formula_property) 
         this->frame->SetFormula(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
 }
