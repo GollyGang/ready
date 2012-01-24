@@ -152,7 +152,14 @@ MyFrame::MyFrame(const wxString& title)
     this->aui_mgr.Update();
 
     // initialize an RD system to get us started
-    this->OpenFile("Patterns/CPU-only/grayscott.vti");
+    const wxString initfile = _T("Patterns/CPU-only/grayscott.vti");
+    if (wxFileExists(initfile)) {
+        this->OpenFile(initfile);
+    } else {
+        // create new pattern
+        wxCommandEvent cmdevent(wxID_NEW);
+        OnNewPattern(cmdevent);
+    }
 }
 
 void MyFrame::InitializeMenus()
@@ -813,6 +820,17 @@ void MyFrame::SaveFile(const wxString& path)
 
 void MyFrame::OnNewPattern(wxCommandEvent &event)
 {
+    if(this->system == NULL) {
+        // initial call from MyFrame::MyFrame
+        GrayScott_slow_3D *s = new GrayScott_slow_3D();
+        s->Allocate(30,25,20,2);
+        s->InitWithBlobInCenter();
+        s->SetModified(false);
+        s->SetFilename("untitled");
+        this->SetCurrentRDSystem(s);
+        return;
+    }
+    
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     
     // TODO: call something like this->system->InitPattern() instead???
@@ -839,7 +857,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     /* AKT TODO!!!
     if (IsHTMLFile(path)) {
         // show HTML file in help pane
-        ShowHelp(path);
+        this->help_panel->ShowHelp(path);
         return;
     }
     
