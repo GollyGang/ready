@@ -242,14 +242,15 @@ void MyFrame::InitializeToolbars()
 {
     {   // file menu items
         wxAuiToolBar *tb = new wxAuiToolBar(this,ID::FileToolbar);
-        tb->AddTool(wxID_NEW,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR));
-        tb->AddTool(wxID_OPEN,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR));
-        tb->AddTool(wxID_SAVE,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR));
+        tb->AddTool(wxID_NEW,wxEmptyString,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),_("Create a new pattern"));
+        tb->AddTool(wxID_OPEN,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),_("Choose a pattern file to open"));
+        tb->AddTool(wxID_SAVE,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),_("Save the current pattern"));
         this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Floatable(false).Position(0));
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
-        this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),wxEmptyString,wxITEM_CHECK);
+        this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),
+            _("Start or stop running the simulation"),wxITEM_CHECK);
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Floatable(false).Position(1));
     }
 }
