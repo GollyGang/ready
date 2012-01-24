@@ -245,12 +245,12 @@ void MyFrame::InitializeToolbars()
         tb->AddTool(wxID_NEW,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR));
         tb->AddTool(wxID_OPEN,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR));
         tb->AddTool(wxID_SAVE,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR));
-        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Floatable(false));
+        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Floatable(false).Position(0));
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
         this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),wxEmptyString,wxITEM_CHECK);
-        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Floatable(false));
+        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Floatable(false).Position(1));
     }
 }
 
