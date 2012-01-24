@@ -251,6 +251,8 @@ void MyFrame::InitializeToolbars()
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
         this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),
             _("Start or stop running the simulation"),wxITEM_CHECK);
+        this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
+            _("Go back to the starting pattern"));
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Floatable(false).Position(1));
     }
 }
@@ -1024,6 +1026,13 @@ void MyFrame::SetParameterName(int iParam,std::string s)
 void MyFrame::SetFormula(std::string s)
 {
     this->system->SetFormula(s);
+    this->UpdateWindowTitle();
+    // TODO: update anything else that needs to know
+}
+
+void MyFrame::SetTimestep(float ts)
+{
+    this->system->SetTimestep(ts);
     this->UpdateWindowTitle();
     // TODO: update anything else that needs to know
 }
