@@ -137,6 +137,19 @@ void PatternsPanel::SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wx
     if ( diritem->HasFiles() || diritem->HasSubDirs() ) {
         treectrl->SetItemHasChildren(id);
         treectrl->Expand(id);
+        
+        // also nice to expand any subfolders, but only one level
+        if ( diritem->HasSubDirs() ) {
+            wxTreeItemIdValue cookie;
+            wxTreeItemId nextid = treectrl->GetFirstChild(id, cookie);
+            while ( nextid.IsOk() ) {
+                if ( treectrl->ItemHasChildren(nextid) ) {
+                    treectrl->Expand(nextid);
+                }
+                nextid = treectrl->GetNextChild(id, cookie);
+            }
+        }
+        
         #ifndef __WXMSW__
             // this causes crash on Windows
             treectrl->ScrollTo(root);
@@ -150,11 +163,11 @@ void PatternsPanel::DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root)
     wxTreeItemIdValue cookie;
     wxTreeItemId id = treectrl->GetFirstChild(root, cookie);
     while ( id.IsOk() ) {
-         wxColor currcolor = treectrl->GetItemBackgroundColour(id);
-         if ( currcolor != *wxWHITE ) {
-             // assume item is selected
-             treectrl->SetItemBackgroundColour(id, *wxWHITE);
-         }
+        wxColor currcolor = treectrl->GetItemBackgroundColour(id);
+        if ( currcolor != *wxWHITE ) {
+            // assume item is selected
+            treectrl->SetItemBackgroundColour(id, *wxWHITE);
+        }
         if ( treectrl->ItemHasChildren(id) ) {
             DeselectTree(treectrl, id);
         }
