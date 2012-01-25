@@ -32,6 +32,7 @@ namespace ID { enum {
     
     // file menu
     Screenshot,
+    Preferences,
     
     // view menu
     PatternsPane,

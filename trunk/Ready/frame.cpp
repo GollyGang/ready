@@ -76,6 +76,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_NEW, MyFrame::OnNewPattern)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
+    EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
+    EVT_MENU(ID::Preferences, MyFrame::OnPreferences)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
     // edit menu
     EVT_MENU(wxID_CUT, MyFrame::OnCut)
@@ -92,7 +94,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
-    EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
     // action menu
     EVT_MENU(ID::Step, MyFrame::OnStep)
@@ -176,6 +177,8 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...\tCtrl-S"), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...\tF3"), _("Save a screenshot of the current view"));
+        menu->AppendSeparator();
+        menu->Append(ID::Preferences, _("Preferences..."),_("Edit the preferences"));
         menu->AppendSeparator();
         menu->Append(wxID_EXIT);
         menuBar->Append(menu, _("&File"));
@@ -1100,4 +1103,9 @@ void MyFrame::OnClose(wxCloseEvent& event)
 {
     if(event.CanVeto() && this->UserWantsToCancelWhenAskedIfWantsToSave()) return;
     event.Skip();
+}
+
+void MyFrame::OnPreferences(wxCommandEvent &event)
+{
+    wxMessageBox(_("TODO!!!"));
 }
