@@ -19,6 +19,10 @@
 #include "BaseOverlay.hpp"
 #include "utils.hpp"
 
+// STL:
+#include <stdexcept>
+using namespace std;
+
 void RectangleOverlay::Apply(int iChemical,const PointND& at,float& value) const
 {
     if(iChemical != this->iChemical) return; // leave other channels untouched
@@ -32,7 +36,45 @@ void RectangleOverlay::Apply(int iChemical,const PointND& at,float& value) const
     }
     switch(this->paste_mode)
     {
-        case Copy: value = f; break;
+        case Overwrite: value = f; break;
         case Add: value += f; break;
     }
+}
+
+vtkSmartPointer<vtkXMLDataElement> PointND::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+    xml->SetName("PointND");
+    xml->SetIntAttribute("x",this->x);
+    xml->SetIntAttribute("y",this->y);
+    xml->SetIntAttribute("z",this->z);
+    return xml;
+}
+
+vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+    xml->SetName(RectangleOverlay::GetXMLName());
+    xml->SetIntAttribute("iChemical",this->iChemical);
+    xml->SetFloatAttribute("value1",this->value1);
+    if(this->fill_mode!=Constant)
+        xml->SetFloatAttribute("value2",this->value2);
+    switch(this->fill_mode) {
+        case Constant: xml->SetAttribute("fill_mode","Constant"); break;
+        case WhiteNoise: xml->SetAttribute("fill_mode","WhiteNoise"); break;
+    }
+    switch(this->paste_mode) {
+        case Overwrite: xml->SetAttribute("paste_mode","Overwrite"); break;
+        case Add: xml->SetAttribute("paste_mode","Add"); break;
+    }
+    xml->AddNestedElement(this->corner1.GetAsXML());
+    xml->AddNestedElement(this->corner2.GetAsXML());
+    return xml;
+}
+
+RectangleOverlay::RectangleOverlay(vtkXMLDataElement* node)
+{
+    // (check name matches?)
+    if(!from_string(node->GetAttribute("iChemical"),this->iChemical))
+        throw runtime_error("RectangleOverlay::RectangleOverlay : failed to read required attribute 'iChemical'");
 }

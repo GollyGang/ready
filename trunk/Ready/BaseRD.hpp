@@ -18,6 +18,9 @@
 #ifndef __BASERD__
 #define __BASERD__
 
+// local:
+class BaseOverlay;
+
 // STL:
 #include <string>
 #include <vector>
@@ -87,6 +90,8 @@ class BaseRD
         std::string GetFilename() const;
         void SetFilename(std::string s);
 
+        std::vector<BaseOverlay*>& GetInitialPatternGenerator() { return this->initial_pattern_generator; } // TJH is trying something
+
     protected:
 
         std::string rule_name,rule_description,pattern_description;
@@ -94,6 +99,8 @@ class BaseRD
         int n_chemicals;
 
         std::vector<vtkImageData*> images; // one for each chemical
+
+        std::vector<BaseOverlay*> initial_pattern_generator;
 
         std::vector<std::pair<std::string,float> > parameters;
 
