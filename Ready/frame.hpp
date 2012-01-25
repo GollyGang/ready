@@ -35,6 +35,7 @@ class PatternsPanel;
 
 class wxVTKRenderWindowInteractor;
 class BaseRD;
+class vtkImageData;
 
 class MyFrame : public wxFrame
 {
@@ -117,6 +118,9 @@ class MyFrame : public wxFrame
         void UpdateWindowTitle();
         void SetStatusBarText();
 
+        void SaveStartingPattern();
+        void RestoreStartingPattern();
+
         void SaveFile(const wxString& path);
 
     private:
@@ -129,6 +133,9 @@ class MyFrame : public wxFrame
 
         // current system being simulated (in future we might want more than one)
         BaseRD *system;
+
+        // we save the starting pattern, to allow the user to reset
+        vtkImageData *starting_pattern;
 
         // various panes:
         RulePanel *rule_panel;

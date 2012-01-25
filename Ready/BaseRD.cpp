@@ -29,6 +29,7 @@ using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
+#include <vtkImageAppendComponents.h>
 #include <vtkImageExtractComponents.h>
 
 BaseRD::BaseRD()
@@ -93,6 +94,16 @@ vtkImageData* BaseRD::GetImage(int iChemical) const
     return this->images[iChemical];
 }
 
+vtkSmartPointer<vtkImageData> BaseRD::GetImage() const
+{ 
+    vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
+    for(int i=0;i<this->GetNumberOfChemicals();i++)
+        iac->AddInput(this->GetImage(i));
+    iac->Update();
+    return iac->GetOutput();
+}
+
+
 void BaseRD::CopyFromImage(vtkImageData* im)
 {
     if(im->GetNumberOfScalarComponents()!=this->GetNumberOfChemicals()) throw runtime_error("BaseRD::CopyFromImage : chemical count mismatch");
@@ -104,7 +115,6 @@ void BaseRD::CopyFromImage(vtkImageData* im)
         iec->Update();
         this->images[i]->DeepCopy(iec->GetOutput());
     }
-    this->is_modified = true;
 }
 
 int BaseRD::GetTimestepsTaken() const
@@ -119,7 +129,6 @@ void BaseRD::Allocate(int x,int y,int z,int nc)
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);
-    this->is_modified = true;
 }
 
 void BaseRD::SetFormula(string s)

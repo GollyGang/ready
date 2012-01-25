@@ -18,9 +18,6 @@
 #ifndef __BASERD__
 #define __BASERD__
 
-// local:
-class BaseOverlay;
-
 // STL:
 #include <string>
 #include <vector>
@@ -55,7 +52,9 @@ class BaseRD
 
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
+        void SetTimestepsTaken(int t) { this->timesteps_taken=t; }
 
+        vtkSmartPointer<vtkImageData> GetImage() const;
         vtkImageData* GetImage(int iChemical) const;
         virtual void CopyFromImage(vtkImageData* im);
 
@@ -106,8 +105,6 @@ class BaseRD
 
         std::string filename;
         bool is_modified;
-
-        std::vector<BaseOverlay*> starting_pattern; // still experimental
 
     protected:
 
