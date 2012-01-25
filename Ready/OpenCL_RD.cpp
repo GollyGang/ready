@@ -124,7 +124,7 @@ void OpenCL_RD::ReloadContextIfNeeded()
     throwOnError(ret,"OpenCL_RD::ReloadContextIfNeeded : Failed to create context: ");
 
     // create the command queue
-    this->command_queue = clCreateCommandQueue(this->context,this->device_id,NULL,&ret);
+    this->command_queue = clCreateCommandQueue(this->context,this->device_id,0,&ret);
     throwOnError(ret,"OpenCL_RD::ReloadContextIfNeeded : Failed to create command queue: ");
 
     this->need_reload_context = false; 
