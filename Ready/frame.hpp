@@ -117,6 +117,7 @@ class MyFrame : public wxFrame
         void SetCurrentRDSystem(BaseRD* system);
         void UpdateWindows();
         void UpdateWindowTitle();
+        void UpdateToolbars();
         void SetStatusBarText();
 
         void SaveStartingPattern();

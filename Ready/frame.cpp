@@ -595,6 +595,7 @@ void MyFrame::UpdateWindows()
     this->SetStatusBarText();
     this->UpdateRulePane();
     this->UpdateWindowTitle();
+    this->UpdateToolbars();
     this->Refresh(false);
 }
 
@@ -633,10 +634,7 @@ void MyFrame::OnRunStop(wxCommandEvent &event)
     } else {
         this->is_running = true;
     }
-    this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
-        this->is_running ? wxArtProvider::GetBitmap(wxART_CROSS_MARK) : wxArtProvider::GetBitmap(wxART_GO_FORWARD) );
-    this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
-        this->is_running ? _("Stop running the simulation") : _("Start running the simulation") );
+    this->UpdateToolbars();
     Refresh(false);
 }
 
@@ -652,6 +650,14 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
             mbar->SetHelpString(ID::RunStop,_("Start running the simulation"));
         }
     }
+}
+
+void MyFrame::UpdateToolbars()
+{
+    this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
+        this->is_running ? wxArtProvider::GetBitmap(wxART_CROSS_MARK) : wxArtProvider::GetBitmap(wxART_GO_FORWARD) );
+    this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
+        this->is_running ? _("Stop running the simulation") : _("Start running the simulation") );
 }
 
 void MyFrame::OnReset(wxCommandEvent &event)
