@@ -17,6 +17,7 @@
 
 // local:
 #include "BaseRD.hpp"
+#include "BaseOverlay.hpp"
 
 // stdlib:
 #include <stdlib.h>
@@ -42,6 +43,9 @@ BaseRD::BaseRD()
 BaseRD::~BaseRD()
 {
     this->Deallocate();
+    for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
+        delete this->initial_pattern_generator[iOverlay];
+    this->initial_pattern_generator.clear();
 }
 
 void BaseRD::Deallocate()

@@ -19,6 +19,7 @@
 #include "IO_XML.hpp"
 #include "BaseRD.hpp"
 #include "utils.hpp"
+#include "BaseOverlay.hpp"
 
 // VTK:
 #include <vtkXMLUtilities.h>
@@ -66,6 +67,18 @@ string read_string(const char* s)
     return oss.str();
 }
 
+void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
+{
+    for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> node = ipg->GetNestedElement(i);
+        if(to_string(node->GetName())==to_string(RectangleOverlay::GetXMLName()))
+            system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node)); // TODO: use factory pattern
+        else
+            throw runtime_error("LoadInitialPatternGenerator : unknown node type");
+    }
+}
+
 string RD_XMLReader::GetType()
 {
     this->Update();
@@ -106,7 +119,6 @@ void RD_XMLReader::SetSystemFromXMLWithFormula(BaseRD* system)
     float timestep;
     int n_chemicals;
 
-    // first load everything into local variables (in case there's a problem)
     {
         const char *s;
         vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
@@ -140,6 +152,9 @@ void RD_XMLReader::SetSystemFromXMLWithFormula(BaseRD* system)
         vtkSmartPointer<vtkXMLDataElement> xml_pattern_description = rd->FindNestedElementWithName("pattern_description");
         if(!xml_pattern_description) pattern_description=""; // optional, default is empty string
         else pattern_description = read_string(xml_pattern_description->GetCharacterData());
+        vtkSmartPointer<vtkXMLDataElement> xml_initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
+        if(xml_initial_pattern_generator) // optional, default is none
+            LoadInitialPatternGenerator(xml_initial_pattern_generator,system);
     }
 
     // set the system properties from our local variables
@@ -196,6 +211,9 @@ void RD_XMLReader::SetSystemFromXMLWithoutFormula(BaseRD* system)
         vtkSmartPointer<vtkXMLDataElement> xml_pattern_description = rd->FindNestedElementWithName("pattern_description");
         if(!xml_pattern_description) pattern_description=""; // optional, default is empty string
         else pattern_description = read_string(xml_pattern_description->GetCharacterData());
+        vtkSmartPointer<vtkXMLDataElement> xml_initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
+        if(xml_initial_pattern_generator) // optional, default is none
+            LoadInitialPatternGenerator(xml_initial_pattern_generator,system);
     }
 
     // set the system properties from our local variables
@@ -254,5 +272,14 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
         pattern_description->SetCharacterData(system->GetPatternDescription().c_str(),(int)system->GetPatternDescription().length());
         rd->AddNestedElement(pattern_description);
     }
+    {   // TJH is trying something
+        vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
+        initial_pattern_generator->SetName("initial_pattern_generator");
+        const vector<BaseOverlay*>& overlays = system->GetInitialPatternGenerator();
+        for(int i=0;i<(int)overlays.size();i++)
+            initial_pattern_generator->AddNestedElement(overlays[i]->GetAsXML());
+        rd->AddNestedElement(initial_pattern_generator);
+    }
     return rd;
 }
+

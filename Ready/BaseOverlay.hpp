@@ -22,17 +22,15 @@
 #include <vtkSmartPointer.h>
 #include <vtkXMLDataElement.h>
 
-// a 1D or 2D or 3D point
+// a 1D or 2D or 3D integer point
 class PointND
 {
     public:
     
-        PointND(float xval) : x(xval),y(0),z(0) {}
-        PointND(float xval,float yval) : x(xval),y(yval),z(0) {}
-        PointND(float xval,float yval,float zval) : x(xval),y(yval),z(zval) {}
-        
-        PointND(const PointND& a) : x(a.x),y(a.y),z(a.z) {}
-        PointND& operator=(const PointND& a) { this->x = a.x; this->y = a.y; this->z = a.z; return *this; }
+        PointND() {}
+        PointND(int xval) : x(xval),y(0),z(0) {}
+        PointND(int xval,int yval) : x(xval),y(yval),z(0) {}
+        PointND(int xval,int yval,int zval) : x(xval),y(yval),z(zval) {}
         
         bool InRect(const PointND& corner1,const PointND& corner2) const 
         { 
@@ -40,9 +38,11 @@ class PointND
                    x<=corner2.x && y<=corner2.y && z<=corner2.z; 
         }
 
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
     public:
     
-        float x,y,z; // or ints?
+        int x,y,z;
 };
 
 // an overlay is a shape to be drawn on top of an image (think: stacked transparencies)
@@ -50,11 +50,12 @@ class BaseOverlay
 {
     public: // type definitions
     
-        enum TPasteMode { Copy, Add };
+        enum TPasteMode { Overwrite, Add };
         enum TFillMode { Constant, WhiteNoise };
         
     public:
     
+        BaseOverlay() {}
         BaseOverlay(float val1,TPasteMode pm)
             : fill_mode(Constant),value1(val1),paste_mode(pm) {}
         BaseOverlay(float val1,float val2,TPasteMode pm)
@@ -69,8 +70,7 @@ class BaseOverlay
         virtual void Apply(int iChemical,const PointND& at,float& value) const =0;
 
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
-        virtual void SetAsXML(vtkXMLDataElement* element) const =0;
-        
+
     protected:
     
         float value1,value2;
@@ -84,6 +84,7 @@ class RectangleOverlay : public BaseOverlay
         
     public:
     
+        RectangleOverlay(vtkXMLDataElement* node);
         RectangleOverlay(PointND corner_1,PointND corner_2,int iChem,float val1,TPasteMode pm)
             : BaseOverlay(val1,pm),iChemical(iChem),corner1(corner_1),corner2(corner_2) {}
         RectangleOverlay(PointND corner_1,PointND corner_2,int iChem,float val1,float val2,TPasteMode pm)
@@ -96,6 +97,10 @@ class RectangleOverlay : public BaseOverlay
         }
 
         virtual void Apply(int iChemical,const PointND& at,float& value) const;
+        
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
+        static const char* GetXMLName() { return "RectangleOverlay"; }
         
     protected:
     
