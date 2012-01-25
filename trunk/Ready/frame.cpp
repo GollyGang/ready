@@ -661,7 +661,7 @@ void MyFrame::OnReset(wxCommandEvent &event)
         // restore pattern and other info saved by SaveStartingPattern() which
         // was called in OnStep/OnRunStop when GetTimestepsTaken() was 0
         this->RestoreStartingPattern();
-        // this->is_running = false; // do we want to always stop it?
+        this->is_running = false;
         this->UpdateWindows();
     }
 }
