@@ -164,22 +164,19 @@ static int wxvtk_attributes[]={
 #endif
 
 //---------------------------------------------------------------------------
-#if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
+wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor() 
 
-  #if wxCHECK_VERSION(2, 9, 0) // the order of the parameters to wxGLCanvas::wxGLCanvas has changed
-		wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor() 
-			: wxGLCanvas(0, -1, wxvtk_attributes, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor")), 
-			  vtkRenderWindowInteractor()
+#if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
+    #if wxCHECK_VERSION(2, 9, 0) // the order of the parameters to wxGLCanvas::wxGLCanvas has changed
+		: wxGLCanvas(0, -1, wxvtk_attributes, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor")), 
 	#else
-		wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor() 
-			: wxGLCanvas(0, -1, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor"), wxvtk_attributes), 
-			  vtkRenderWindowInteractor()
+		: wxGLCanvas(0, -1, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor"), wxvtk_attributes), 
 	#endif
 #else
-wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor() 
-	: wxWindow(), 
-	  vtkRenderWindowInteractor()
+		: wxWindow(), 
 #endif //__WXGTK__
+
+	  vtkRenderWindowInteractor()
       , timer(this, ID_wxVTKRenderWindowInteractor_TIMER)
       , ActiveButton(wxEVT_NULL)
       , Stereo(0)
@@ -203,10 +200,15 @@ wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor(wxWindow *parent,
                                                          long style,
                                                          const wxString &name)
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
-      : wxGLCanvas(parent, id, pos, size, style, name, wxvtk_attributes), vtkRenderWindowInteractor()
+    #if wxCHECK_VERSION(2, 9, 0) // the order of the parameters to wxGLCanvas::wxGLCanvas has changed
+      : wxGLCanvas(parent, id, wxvtk_attributes, pos, size, style, name)
+    #else
+      : wxGLCanvas(parent, id, pos, size, style, name, wxvtk_attributes)
+    #endif
 #else
-      : wxWindow(parent, id, pos, size, style, name), vtkRenderWindowInteractor()
+      : wxWindow(parent, id, pos, size, style, name)
 #endif //__WXGTK__
+	  , vtkRenderWindowInteractor()
       , timer(this, ID_wxVTKRenderWindowInteractor_TIMER)
       , ActiveButton(wxEVT_NULL)
       , Stereo(0)
@@ -264,7 +266,7 @@ void wxVTKRenderWindowInteractor::Enable()
   // that's it
   Enabled = 1;
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
-  SetCurrent();
+  SetCurrent(); // (deprecated in wx2.9 but I'm not sure how to fix this)
 #endif
   Modified();
 }
