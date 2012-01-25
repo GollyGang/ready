@@ -56,7 +56,6 @@ void OpenCL_RD::SetPlatform(int i)
     if(i != this->iPlatform)
         this->need_reload_context = true;
     this->iPlatform = i;
-    this->is_modified = true;
 }
 
 void OpenCL_RD::SetDevice(int i)
@@ -64,7 +63,6 @@ void OpenCL_RD::SetDevice(int i)
     if(i != this->iDevice)
         this->need_reload_context = true;
     this->iDevice = i;
-    this->is_modified = true;
 }
 
 int OpenCL_RD::GetPlatform() const
@@ -307,7 +305,6 @@ void OpenCL_RD::CopyFromImage(vtkImageData* im)
 {
     BaseRD::CopyFromImage(im);
     this->WriteToOpenCLBuffers();
-    this->is_modified = true;
 }
 
 /* static */ std::string OpenCL_RD::GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
