@@ -533,3 +533,9 @@ void OpenCL_RD::SetTimestep(float t)
     BaseRD::SetTimestep(t);
     this->need_reload_formula = true;
 }
+
+void OpenCL_RD::GenerateInitialPattern()
+{
+	BaseRD::GenerateInitialPattern();
+    this->WriteToOpenCLBuffers();
+}
