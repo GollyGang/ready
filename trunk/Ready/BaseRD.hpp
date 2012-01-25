@@ -90,7 +90,8 @@ class BaseRD
         std::string GetFilename() const;
         void SetFilename(std::string s);
 
-        std::vector<BaseOverlay*>& GetInitialPatternGenerator() { return this->initial_pattern_generator; } // TJH is trying something
+        std::vector<BaseOverlay*>& GetInitialPatternGenerator() { return this->initial_pattern_generator; }
+        virtual void GenerateInitialPattern();
 
     protected:
 

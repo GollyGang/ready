@@ -880,9 +880,7 @@ void MyFrame::OnNewPattern(wxCommandEvent &event)
     
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     
-    // TODO: call something like this->system->InitPattern() instead???
-    // or call InitWithBlobInCenter if Prefs > File has "Start with random blob" option ticked???
-    this->system->InitWithBlobInCenter();
+    this->system->GenerateInitialPattern();
 
     this->is_running = false;
     this->system->SetFilename("untitled");

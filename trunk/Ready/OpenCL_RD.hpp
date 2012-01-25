@@ -58,6 +58,8 @@ class OpenCL_RD : public BaseRD
 
         virtual void CopyFromImage(vtkImageData* im);
 
+		virtual void GenerateInitialPattern();
+		
     protected:
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;

@@ -32,6 +32,7 @@ using namespace std;
 #include <vtkImageData.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageExtractComponents.h>
+#include <vtkPointData.h>
 
 BaseRD::BaseRD()
 {
@@ -263,4 +264,16 @@ std::string BaseRD::GetFilename() const
 void BaseRD::SetFilename(std::string s)
 {
     this->filename = s;
+}
+
+void BaseRD::GenerateInitialPattern()
+{
+	// first fill each image with zero
+	for(int i=0;i<(int)this->images.size();i++)
+	{
+		this->images[i]->GetPointData()->GetScalars()->FillComponent(0,0.0);
+		this->images[i]->Modified();
+	}
+	// TODO: apply overlays
+	this->timesteps_taken = 0;
 }
