@@ -18,6 +18,10 @@
 // STL:
 #include <string>
 
+// VTK:
+#include <vtkSmartPointer.h>
+#include <vtkXMLDataElement.h>
+
 // a 1D or 2D or 3D point
 class PointND
 {
@@ -63,7 +67,9 @@ class BaseOverlay
         }
         
         virtual void Apply(int iChemical,const PointND& at,float& value) const =0;
-        virtual std::string GetAsXML() const =0;
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
+        virtual void SetAsXML(vtkXMLDataElement* element) const =0;
         
     protected:
     

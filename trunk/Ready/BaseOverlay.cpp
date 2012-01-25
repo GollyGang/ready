@@ -19,10 +19,6 @@
 #include "BaseOverlay.hpp"
 #include "utils.hpp"
 
-// STL:
-#include <stdexcept>
-using namespace std;
-
 void RectangleOverlay::Apply(int iChemical,const PointND& at,float& value) const
 {
     if(!at.InRect(this->corner1,this->corner2)) return; // leave points outside untouched
@@ -32,12 +28,10 @@ void RectangleOverlay::Apply(int iChemical,const PointND& at,float& value) const
     {
         case Constant: f = this->value1; break;
         case WhiteNoise: f = frand(this->value1,this->value2); break;
-        default: throw runtime_error("RectangleOverlay::Apply : Unsupported fill mode");
     }
     switch(this->paste_mode)
     {
         case Copy: value = f; break;
         case Add: value += f; break;
-        default: throw runtime_error("RectangleOverlay::Apply : Unsupported paste mode");
     }
 }

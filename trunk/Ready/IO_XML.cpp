@@ -24,6 +24,7 @@
 #include <vtkXMLUtilities.h>
 #include <vtkSmartPointer.h>
 #include <vtkXMLDataParser.h>
+#include <vtkImageData.h>
 
 // STL:
 #include <string>
@@ -37,6 +38,12 @@ using namespace std;
 
 vtkStandardNewMacro(RD_XMLWriter);
 vtkStandardNewMacro(RD_XMLReader);
+
+void RD_XMLWriter::SetSystem(BaseRD* rd_system) 
+{ 
+    this->system = rd_system; 
+    this->SetInput(rd_system->GetImage());
+}
 
 // read a multiline string, outputting whitespace-trimmed lines
 string read_string(const char* s)

@@ -33,7 +33,7 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
         vtkTypeMacro(RD_XMLWriter, vtkXMLImageDataWriter);
         static RD_XMLWriter* New();
 
-        void SetSystem(BaseRD* rd_system) { this->system = rd_system; }
+        void SetSystem(BaseRD* rd_system);
 
     protected:  
 

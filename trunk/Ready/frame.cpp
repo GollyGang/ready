@@ -58,7 +58,6 @@ using namespace std;
 #include <vtkPNGWriter.h>
 #include <vtkJPEGWriter.h>
 #include <vtkSmartPointer.h>
-#include <vtkImageAppendComponents.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>    // for GetCurrentProcess, etc
@@ -162,6 +161,8 @@ MyFrame::MyFrame(const wxString& title)
         wxCommandEvent cmdevent(wxID_NEW);
         OnNewPattern(cmdevent);
     }
+
+    this->starting_pattern = vtkImageData::New();
 }
 
 void MyFrame::InitializeMenus()
@@ -396,6 +397,7 @@ MyFrame::~MyFrame()
     this->aui_mgr.UnInit();
     this->pVTKWindow->Delete();
     delete this->system;
+    this->starting_pattern->Delete();
 }
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -595,6 +597,9 @@ void MyFrame::UpdateWindows()
 
 void MyFrame::OnStep(wxCommandEvent &event)
 {
+    if(this->system->GetTimestepsTaken()==0)
+        this->SaveStartingPattern();
+
     try {
         this->system->Update(1);
     }
@@ -631,7 +636,7 @@ void MyFrame::OnRunStop(wxCommandEvent &event)
 void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 {
     wxMenuBar* mbar = GetMenuBar();
-    if (mbar) {
+    if(mbar) {
         if (this->is_running) {
             mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
             event.Check(true);
@@ -644,16 +649,25 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 
 void MyFrame::OnReset(wxCommandEvent &event)
 {
-    wxMessageBox(_("TODO!!!"));
-    /* presumably do something like this:
-    if (this->system->GetTimestepsTaken() > 0) {
+    if(this->system->GetTimestepsTaken() > 0) 
+    {
         // restore pattern and other info saved by SaveStartingPattern() which
         // was called in OnStep/OnRunStop when GetTimestepsTaken() was 0
         this->RestoreStartingPattern();
-        this->is_running = false;
+        // this->is_running = false; // do we want to always stop it?
         this->UpdateWindows();
     }
-    */
+}
+
+void MyFrame::SaveStartingPattern()
+{
+    this->starting_pattern->DeepCopy(this->system->GetImage());
+}
+
+void MyFrame::RestoreStartingPattern()
+{
+    this->system->CopyFromImage(this->starting_pattern);
+    this->system->SetTimestepsTaken(0);
 }
 
 void MyFrame::OnUpdateReset(wxUpdateUIEvent& event)
@@ -668,6 +682,9 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our game loop by onIdle events
     if(this->is_running)
     {
+        if(this->system->GetTimestepsTaken()==0)
+            this->SaveStartingPattern();
+
         int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
    
         double time_before = get_time_in_seconds();
@@ -829,14 +846,8 @@ void MyFrame::SaveFile(const wxString& path)
 {
     wxBusyCursor busy;
 
-    vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
-    for(int i=0;i<this->system->GetNumberOfChemicals();i++)
-        iac->AddInput(this->system->GetImage(i));
-    iac->Update();
-
     vtkSmartPointer<RD_XMLWriter> iw = vtkSmartPointer<RD_XMLWriter>::New();
     iw->SetSystem(this->system);
-    iw->SetInputConnection(iac->GetOutputPort());
     iw->SetFileName(path.mb_str());
     iw->Write();
 }
