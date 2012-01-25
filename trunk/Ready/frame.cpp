@@ -204,7 +204,7 @@ void MyFrame::InitializeMenus()
     {   // action menu:
         wxMenu *menu = new wxMenu;
         menu->Append(ID::Step, _("&Step\tF4"), _("Advance the simulation by a single timestep"));
-        menu->Append(ID::RunStop, _("&Run\tF5"), _("Start or stop running the simulation"));
+        menu->Append(ID::RunStop, _("&Run\tF5"), _("Start running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset\tCtrl-R"), _("Go back to the starting pattern"));
         menu->Append(ID::InitWithBlobInCenter, _("Random &Blob"), _("Re-start with a random blob in the middle"));
@@ -246,15 +246,15 @@ void MyFrame::InitializeToolbars()
         tb->AddTool(wxID_NEW,wxEmptyString,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),_("Create a new pattern"));
         tb->AddTool(wxID_OPEN,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),_("Choose a pattern file to open"));
         tb->AddTool(wxID_SAVE,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),_("Save the current pattern"));
-        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Floatable(false).Position(0));
+        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Position(0));
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
         this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),
-            _("Start or stop running the simulation"),wxITEM_CHECK);
+            _("Start running the simulation"));
         this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
             _("Go back to the starting pattern"));
-        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Floatable(false).Position(1));
+        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Position(1));
     }
 }
 
@@ -630,6 +630,10 @@ void MyFrame::OnRunStop(wxCommandEvent &event)
     } else {
         this->is_running = true;
     }
+    this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
+        this->is_running ? wxArtProvider::GetBitmap(wxART_CROSS_MARK) : wxArtProvider::GetBitmap(wxART_GO_FORWARD) );
+    this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
+        this->is_running ? _("Stop running the simulation") : _("Start running the simulation") );
     Refresh(false);
 }
 
@@ -639,10 +643,10 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
     if(mbar) {
         if (this->is_running) {
             mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
-            event.Check(true);
+            mbar->SetHelpString(ID::RunStop,_("Stop running the simulation"));
         } else {
             mbar->SetLabel(ID::RunStop, _("Run\tF5"));
-            event.Check(false);
+            mbar->SetHelpString(ID::RunStop,_("Start running the simulation"));
         }
     }
 }
