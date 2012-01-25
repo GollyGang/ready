@@ -21,6 +21,7 @@
 
 void RectangleOverlay::Apply(int iChemical,const PointND& at,float& value) const
 {
+    if(iChemical != this->iChemical) return; // leave other channels untouched
     if(!at.InRect(this->corner1,this->corner2)) return; // leave points outside untouched
     
     float f;
