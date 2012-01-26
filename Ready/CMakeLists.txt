@@ -71,7 +71,7 @@ set( RESOURCES
 
 set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti 
-  CPU-only/grayscott.vti 
+  CPU-only/grayscott.vti CPU-only/grayscott3d.vti 
 )
 
 set( HELP_FILES
