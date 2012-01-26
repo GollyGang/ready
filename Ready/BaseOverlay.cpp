@@ -75,7 +75,6 @@ vtkSmartPointer<vtkXMLDataElement> BaseOverlay::GetAsXML() const
     xml->SetFloatAttribute("value1",this->value1);
     if(this->fill_mode!=Constant)
         xml->SetFloatAttribute("value2",this->value2);
-    xml->SetIntAttribute("apply_when_loading",this->apply_when_loading?1:0);
     return xml;
 }
 
@@ -104,11 +103,6 @@ BaseOverlay::BaseOverlay(vtkXMLDataElement* node)
     if(s=="Overwrite") this->paste_mode=Overwrite;
     else if(s=="Add") this->paste_mode=Add;
     else throw runtime_error("BaseOverlay::BaseOverlay : unsupported paste_mode");
-    int b;
-    if(!from_string(node->GetAttribute("apply_when_loading"),b))
-        this->apply_when_loading = false; // optional, default to false
-    else
-        this->apply_when_loading = (b==1);
 }
 
 RectangleOverlay::RectangleOverlay(vtkXMLDataElement* node) : BaseOverlay(node)

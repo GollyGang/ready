@@ -992,7 +992,10 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         iw->GetOutput()->GetDimensions(dim);
         int nc = iw->GetOutput()->GetNumberOfScalarComponents();
         target_system->Allocate(dim[0],dim[1],dim[2],nc);
-        target_system->CopyFromImage(iw->GetOutput());
+        if(iw->ShouldGenerateInitialPatternWhenLoading())
+            target_system->GenerateInitialPattern();
+        else
+            target_system->CopyFromImage(iw->GetOutput());
         target_system->SetFilename(string(path.mb_str())); // TODO: display filetitle only (user option?)
         target_system->SetModified(false);
         this->SetCurrentRDSystem(target_system);
