@@ -61,8 +61,7 @@ class RD_XMLReader : public vtkXMLImageDataReader
 
         std::string GetType();
         std::string GetName();
-        void SetSystemFromXMLWithFormula(BaseRD* rd_system);
-        void SetSystemFromXMLWithoutFormula(BaseRD* rd_system);
+        void SetSystemFromXML(BaseRD* rd_system);
 
     protected:  
 

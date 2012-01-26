@@ -61,14 +61,9 @@ PointND::PointND(vtkXMLDataElement *node)
         throw runtime_error("PointND::PointND : unable to read required attribute 'z'");
 }
 
-vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> BaseOverlay::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
-    xml->SetName(RectangleOverlay::GetXMLName());
-    xml->SetIntAttribute("iChemical",this->iChemical);
-    xml->SetFloatAttribute("value1",this->value1);
-    if(this->fill_mode!=Constant)
-        xml->SetFloatAttribute("value2",this->value2);
     switch(this->fill_mode) {
         case Constant: xml->SetAttribute("fill_mode","Constant"); break;
         case WhiteNoise: xml->SetAttribute("fill_mode","WhiteNoise"); break;
@@ -77,6 +72,18 @@ vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
         case Overwrite: xml->SetAttribute("paste_mode","Overwrite"); break;
         case Add: xml->SetAttribute("paste_mode","Add"); break;
     }
+    xml->SetFloatAttribute("value1",this->value1);
+    if(this->fill_mode!=Constant)
+        xml->SetFloatAttribute("value2",this->value2);
+    xml->SetIntAttribute("apply_when_loading",this->apply_when_loading?1:0);
+    return xml;
+}
+
+vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = BaseOverlay::GetAsXML();
+    xml->SetName(RectangleOverlay::GetXMLName());
+    xml->SetIntAttribute("iChemical",this->iChemical);
     xml->AddNestedElement(this->corner1.GetAsXML());
     xml->AddNestedElement(this->corner2.GetAsXML());
     return xml;
@@ -84,7 +91,7 @@ vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
 
 BaseOverlay::BaseOverlay(vtkXMLDataElement* node)
 {
-   string s;
+    string s;
     from_string(node->GetAttribute("fill_mode"),s);
     if(s=="Constant") this->fill_mode=Constant;
     else if(s=="WhiteNoise") this->fill_mode=WhiteNoise;
@@ -97,7 +104,12 @@ BaseOverlay::BaseOverlay(vtkXMLDataElement* node)
     if(s=="Overwrite") this->paste_mode=Overwrite;
     else if(s=="Add") this->paste_mode=Add;
     else throw runtime_error("BaseOverlay::BaseOverlay : unsupported paste_mode");
- }
+    int b;
+    if(!from_string(node->GetAttribute("apply_when_loading"),b))
+        this->apply_when_loading = false; // optional, default to false
+    else
+        this->apply_when_loading = (b==1);
+}
 
 RectangleOverlay::RectangleOverlay(vtkXMLDataElement* node) : BaseOverlay(node)
 {
