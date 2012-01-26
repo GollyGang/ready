@@ -40,9 +40,9 @@ BaseRD::BaseRD()
     this->need_reload_formula = true;
     this->is_modified = false;
     // initialise the initial-pattern-generator for inbuilt rules (placeholder behaviour only)
-    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0,0,0),PointND(1e6,1e6,1e6),0,1.0f,BaseOverlay::Overwrite));
-    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(10,10,0),PointND(20,20,1e6),0,0.0f,1.0f,BaseOverlay::Overwrite));
-    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(10,10,0),PointND(20,20,1e6),1,0.0f,1.0f,BaseOverlay::Overwrite));
+    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0,0,0),PointND(1,1,1),0,1.0f,BaseOverlay::Overwrite));
+    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0.2,0.2,0),PointND(0.4,0.5,1),0,0.0f,1.0f,BaseOverlay::Overwrite));
+    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0.2,0.2,0),PointND(0.4,0.5,1),1,0.0f,1.0f,BaseOverlay::Overwrite));
 }
 
 BaseRD::~BaseRD()
@@ -274,18 +274,22 @@ void BaseRD::GenerateInitialPattern()
 {
     this->BlankImage();
 
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
+
 	for(int iImage=0;iImage<(int)this->images.size();iImage++)
 	{
         float* origin = static_cast<float*>(this->images[iImage]->GetScalarPointer());
-        for(int z=0;z<this->GetZ();z++)
+        for(int z=0;z<Z;z++)
         {
-            for(int y=0;y<this->GetY();y++)
+            for(int y=0;y<Y;y++)
             {
-                for(int x=0;x<this->GetX();x++)
+                for(int x=0;x<X;x++)
                 {
                     float& value = *vtk_at(origin,x,y,z,this->GetX(),this->GetY());
                     for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
-                        this->initial_pattern_generator[iOverlay]->Apply(iImage,PointND(x,y,z),value);
+                        this->initial_pattern_generator[iOverlay]->Apply(iImage,PointND(x/float(X),y/float(Y),z/float(Z)),value);
                 }
             }
         }

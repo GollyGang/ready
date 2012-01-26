@@ -22,13 +22,13 @@
 #include <vtkSmartPointer.h>
 #include <vtkXMLDataElement.h>
 
-// a 1D or 2D or 3D integer point
+// a 1D or 2D or 3D float point
 class PointND
 {
     public:
     
         PointND() {}
-        PointND(int x,int y,int z) :x(x),y(y),z(z) {}
+        PointND(float x,float y,float z) :x(x),y(y),z(z) {}
         PointND(vtkXMLDataElement *node);
         
         bool InRect(const PointND& corner1,const PointND& corner2) const 
@@ -39,9 +39,9 @@ class PointND
 
         vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
-    public:
+    protected:
     
-        int x,y,z;
+        float x,y,z;
 };
 
 // an overlay is a shape to be drawn on top of an image (think: stacked transparencies)
@@ -76,6 +76,7 @@ class BaseOverlay
 };
  
 // single-channel axis-aligned-rectangle overlay with a fixed location
+// (spatial coordinates are [0,1] i.e. relative to the image size)
 class RectangleOverlay : public BaseOverlay
 {
     public:
