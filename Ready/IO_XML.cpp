@@ -69,7 +69,12 @@ string read_string(const char* s)
 
 void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
 {
-    system->GetInitialPatternGenerator().clear();
+    // delete all the overlays (TODO: BaseRD should do this for us)
+    {
+        for(int i=0;i<(int)system->GetInitialPatternGenerator().size();i++)
+            delete system->GetInitialPatternGenerator()[i];
+        system->GetInitialPatternGenerator().clear();
+    }
     for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = ipg->GetNestedElement(i);
@@ -245,6 +250,7 @@ bool RD_XMLReader::ShouldGenerateInitialPatternWhenLoading()
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
     if(!initial_pattern_generator) return false; // (element is optional)
     int i;
-    bool read_ok = from_string(initial_pattern_generator->GetAttribute("apply_when_loading"),i);
+    const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
+    bool read_ok = s && from_string(s,i);
     return read_ok && i==1;
 }
