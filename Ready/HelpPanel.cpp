@@ -19,6 +19,8 @@
 #include "HelpPanel.hpp"
 #include "frame.hpp"
 #include "IDs.hpp"
+#include "prefs.hpp"            // for readydir, GetShortcutTable
+#include "wxutils.hpp"          // for Warning
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
@@ -37,29 +39,40 @@ class HtmlView : public wxHtmlWindow
 {
     public:
 
-        HtmlView(wxWindow* parent, wxWindowID id = wxID_ANY,
+        HtmlView(wxWindow* parent, MyFrame* myframe, wxWindowID id = wxID_ANY,
             const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
             long style = wxHW_SCROLLBAR_AUTO)
-            : wxHtmlWindow(parent, id, pos, size, style) {}
+            : wxHtmlWindow(parent, id, pos, size, style)
+        {
+            frame = myframe;
+        }
 
         void OnLinkClicked(const wxHtmlLinkInfo& link)
         {
             wxString url = link.GetHref();
             if ( url.StartsWith(_T("http://")) || url.StartsWith(_T("mailto://")) ) {
                 wxLaunchDefaultBrowser(url);
+
+            } else if ( url.StartsWith(_T("prefs:")) ) {
+                // user clicked on link to Preferences dialog
+                frame->ShowPrefsDialog( url.AfterFirst(':') );
+
             } else {
                 // assume it's a link to a local target or another help file
                 HelpPanel* panel = (HelpPanel*)GetParent();
                 panel->ShowHelp(url);
             }
-            // AKT TODO!!! look for special link prefixes like "prefs:"
         }
+
+    private:
+        
+        MyFrame* frame;
 };
 
 HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id) 
     : wxPanel(parent,id), frame(parent)
 {
-    html = new HtmlView(this, wxID_ANY);
+    html = new HtmlView(this, frame, wxID_ANY);
     
     // AKT TODO!!! html->SetFontSizes(helpfontsize);
 
@@ -92,7 +105,6 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
 void HelpPanel::ShowHelp(const wxString& filepath)
 {
     if (filepath == SHOW_KEYBOARD_SHORTCUTS) {
-        /* AKT TODO!!!
         // build HTML string to display current keyboard shortcuts
         wxString contents = GetShortcutTable();
         
@@ -108,12 +120,10 @@ void HelpPanel::ShowHelp(const wxString& filepath)
             // might as well show contents
             html->SetPage(contents);
         }
-        */
-        html->SetPage(_T("<html><body><p>Not yet implemented!!!</p></body></html>"));
 
     } else if ( filepath.StartsWith(_("Help/")) ) {
         // safer to prepend location of app
-        wxString fullpath = /* AKT TODO!!! readydir + */ filepath;
+        wxString fullpath = readydir + filepath;
         html->LoadPage(fullpath);
     
     } else {

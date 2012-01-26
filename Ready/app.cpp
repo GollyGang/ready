@@ -18,11 +18,12 @@
 // local:
 #include "app.hpp"
 #include "frame.hpp"
-#include "utils.hpp"    // for STR
+#include "utils.hpp"        // for STR
+#include "prefs.hpp"        // for readydir, maximize
 
 // wxWidgets:
-#include "wx/stdpaths.h"   // for wxStandardPaths
-#include "wx/filename.h"   // for wxFileName
+#include "wx/stdpaths.h"    // for wxStandardPaths
+#include "wx/filename.h"    // for wxFileName
 
 // STL:
 #include <stdexcept>
@@ -105,17 +106,19 @@ bool MyApp::OnInit()
     SetAppDirectory( wxString(argv[0]).mb_str(wxConvLocal) );
     
     // now set global readydir for use elsewhere
-    wxString readydir;  // AKT TODO!!! export from prefs.h
     readydir = wxFileName::GetCwd();
     if (readydir.Last() != wxFILE_SEP_PATH) readydir += wxFILE_SEP_PATH;
 
     currframe = new MyFrame(_("Ready"));
+    
+    // prefs file has now been loaded
+    if (maximize) currframe->Maximize(true);
+    currframe->Show(true);
     SetTopWindow(currframe);
-    currframe->Show();
    
     // argc is > 1 if command line has one or more pattern files
     for (int n = 1; n < argc; n++) {
-    wxFileName filename(argv[n]);
+        wxFileName filename(argv[n]);
         // convert given path to a full path if not one already; this allows users
         // to do things like "../ready foo.vti" from within Patterns folder
         if (!filename.IsAbsolute()) filename = initdir + argv[n];
