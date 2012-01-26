@@ -45,9 +45,9 @@ vtkSmartPointer<vtkXMLDataElement> PointND::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
     xml->SetName("PointND");
-    xml->SetIntAttribute("x",this->x);
-    xml->SetIntAttribute("y",this->y);
-    xml->SetIntAttribute("z",this->z);
+    xml->SetFloatAttribute("x",this->x);
+    xml->SetFloatAttribute("y",this->y);
+    xml->SetFloatAttribute("z",this->z);
     return xml;
 }
 
