@@ -51,7 +51,7 @@ void GrayScott::Allocate(int x,int y,int z,int nc)
     this->DeleteBuffers();
     this->buffer_images.resize(2);
     for(int i=0;i<2;i++)
-        this->buffer_images[i] = AllocateVTKImage(x,y,1);
+        this->buffer_images[i] = AllocateVTKImage(x,y,z);
 }
 
 GrayScott::~GrayScott()
