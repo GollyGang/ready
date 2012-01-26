@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "GrayScott_slow_3D.hpp"
+#include "GrayScott.hpp"
 #include "utils.hpp"
 
 // stdlib:
@@ -31,23 +31,35 @@ using namespace std;
 // VTK:
 #include <vtkImageData.h>
 
-GrayScott_slow_3D::GrayScott_slow_3D()
+GrayScott::GrayScott()
 {
     this->timestep = 1.0f;
-    this->rule_name = "Gray-Scott_3D";
+    this->rule_name = "Gray-Scott";
     this->n_chemicals = 2;
     this->AddParameter("D_a",0.082f);
     this->AddParameter("D_b",0.041f);
+    // for spots:
     this->AddParameter("k",0.064f);
     this->AddParameter("F",0.035f);
 }
 
-GrayScott_slow_3D::~GrayScott_slow_3D()
+void GrayScott::Allocate(int x,int y,int z,int nc)
+{
+    if(nc!=2) throw runtime_error("GrayScott_slow::Allocate : this implementation is for 2 chemicals only"); 
+    BaseRD::Allocate(x,y,z,2);
+    // also allocate our buffer images
+    this->DeleteBuffers();
+    this->buffer_images.resize(2);
+    for(int i=0;i<2;i++)
+        this->buffer_images[i] = AllocateVTKImage(x,y,1);
+}
+
+GrayScott::~GrayScott()
 {
     this->DeleteBuffers();
 }
 
-void GrayScott_slow_3D::DeleteBuffers()
+void GrayScott::DeleteBuffers()
 {
     for(int i=0;i<(int)this->buffer_images.size();i++)
     {
@@ -56,23 +68,13 @@ void GrayScott_slow_3D::DeleteBuffers()
     }
 }
 
-void GrayScott_slow_3D::Allocate(int x,int y,int z,int nc)
-{
-    if(nc!=2) throw runtime_error("GrayScott_slow_3D::Allocate : this implementation is for 2 chemicals only");
-    BaseRD::Allocate(x,y,z,2);
-    // also allocate our buffers
-    this->DeleteBuffers();
-    this->buffer_images.resize(2);
-    for(int i=0;i<2;i++)
-        this->buffer_images[i] = AllocateVTKImage(x,y,z);
-}
-
-void GrayScott_slow_3D::Update(int n_steps)
+void GrayScott::Update(int n_steps)
 {
     const int X = this->GetX();
     const int Y = this->GetY();
     const int Z = this->GetZ();
 
+    // TODO: check that parameter names haven't changed?
     float D_a = this->GetParameterValue(0);
     float D_b = this->GetParameterValue(1);
     float k = this->GetParameterValue(2);
@@ -97,18 +99,18 @@ void GrayScott_slow_3D::Update(int n_steps)
                         break;
             }
 
-            for(int x=0;x<X;x++)
+            for(int z=0;z<Z;z++)
             {
-                int x_prev = (x-1+X)%X;
-                int x_next = (x+1)%X;
+                int z_prev = (z-1+Z)%Z;
+                int z_next = (z+1)%Z;
                 for(int y=0;y<Y;y++)
                 {
                     int y_prev = (y-1+Y)%Y;
                     int y_next = (y+1)%Y;
-                    for(int z=0;z<Z;z++)
+                    for(int x=0;x<X;x++)
                     {
-                        int z_prev = (z-1+Z)%Z;
-                        int z_next = (z+1)%Z;
+                        int x_prev = (x-1+X)%X;
+                        int x_next = (x+1)%X;
 
                         float aval = *vtk_at(old_a,x,y,z,X,Y);
                         float bval = *vtk_at(old_b,x,y,z,X,Y);
@@ -120,16 +122,14 @@ void GrayScott_slow_3D::Update(int n_steps)
                                     *vtk_at(old_a,x_prev,y,z,X,Y) + 
                                     *vtk_at(old_a,x_next,y,z,X,Y) +
                                     *vtk_at(old_a,x,y,z_prev,X,Y) + 
-                                    *vtk_at(old_a,x,y,z_next,X,Y) +
-                                    - 6*aval;
+                                    *vtk_at(old_a,x,y,z_next,X,Y) - 6*aval;
                         float ddb = *vtk_at(old_b,x,y_prev,z,X,Y) +
                                     *vtk_at(old_b,x,y_next,z,X,Y) +
                                     *vtk_at(old_b,x_prev,y,z,X,Y) + 
                                     *vtk_at(old_b,x_next,y,z,X,Y) +
                                     *vtk_at(old_b,x,y,z_prev,X,Y) + 
-                                    *vtk_at(old_b,x,y,z_next,X,Y) +
-                                    - 6*bval; 
-
+                                    *vtk_at(old_b,x,y,z_next,X,Y) - 6*bval;
+         
                         // compute the new rate of change of a and b
                         float da = D_a * dda - aval*bval*bval + F*(1-aval);
                         float db = D_b * ddb + aval*bval*bval - (F+k)*bval;
@@ -140,7 +140,6 @@ void GrayScott_slow_3D::Update(int n_steps)
                     }
                 }
             }
-
         }
         this->timesteps_taken+=2;
     }

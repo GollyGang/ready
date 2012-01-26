@@ -29,8 +29,7 @@
 #include "IDs.hpp"
 
 // readybase:
-#include "GrayScott_slow.hpp"
-#include "GrayScott_slow_3D.hpp"
+#include "GrayScott.hpp"
 #include "OpenCL_nDim.hpp"
 
 // local resources:
@@ -904,7 +903,7 @@ void MyFrame::OnNewPattern(wxCommandEvent &event)
 {
     if(this->system == NULL) {
         // initial call from MyFrame::MyFrame
-        GrayScott_slow_3D *s = new GrayScott_slow_3D();
+        GrayScott *s = new GrayScott();
         s->Allocate(30,25,20,2);
         s->SetModified(false);
         s->SetFilename("untitled");
@@ -969,22 +968,18 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         {
             string name = iw->GetName();
             if(name=="Gray-Scott")
-                target_system = new GrayScott_slow();
-            else if(name=="Gray-Scott_3D")
-                target_system = new GrayScott_slow_3D();
+                target_system = new GrayScott();
             else 
                 throw runtime_error("Unsupported inbuilt implementation: "+name);
         }
         else if(type=="formula")
         {
-            {
-                // to load type="formula" pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
-                // TODO: detect if opencl is available, abort if not
-                OpenCL_nDim *s = new OpenCL_nDim();
-                s->SetPlatform(this->iOpenCLPlatform);
-                s->SetDevice(this->iOpenCLDevice);
-                target_system = s;
-            }
+            // to load type="formula" pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
+            // TODO: detect if opencl is available, abort if not
+            OpenCL_nDim *s = new OpenCL_nDim();
+            s->SetPlatform(this->iOpenCLPlatform);
+            s->SetDevice(this->iOpenCLDevice);
+            target_system = s;
         }
         iw->SetSystemFromXML(target_system);
 
