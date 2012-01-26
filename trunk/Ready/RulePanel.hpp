@@ -56,6 +56,7 @@ class RulePanel : public wxPanel
         std::vector<wxPGProperty*> parameter_name_properties;
         wxPGProperty *rule_name_property,*rule_description_property,*pattern_description_property;
         wxPGProperty *formula_property,*timestep_property;
+        wxPGProperty *dimensions_property;
 
         DECLARE_EVENT_TABLE()
 };

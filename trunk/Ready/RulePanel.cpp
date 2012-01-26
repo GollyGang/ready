@@ -62,7 +62,6 @@ void RulePanel::Update(const BaseRD* const system)
 
     this->rule_name_property = this->pgrid->Append(new wxStringProperty( _("Rule name"),wxPG_LABEL,system->GetRuleName()));
     this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
-    this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
     this->timestep_property = this->pgrid->Append(new wxFloatProperty(_("Timestep"),wxPG_LABEL,system->GetTimestep()));
 
     this->parameter_value_properties.resize(system->GetNumberOfParameters());
@@ -77,7 +76,12 @@ void RulePanel::Update(const BaseRD* const system)
     if(system->HasEditableFormula())
         this->formula_property = this->pgrid->Append(new LongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
 
-    //this->pgrid->Append(new wxFileProperty("Filename", wxPG_LABEL, wxEmptyString));
+    this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
+
+    this->dimensions_property = this->pgrid->Append(new wxStringProperty("Dimensions", wxPG_LABEL,_T("<composed>")));
+    this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("X",wxPG_LABEL,system->GetX()));
+    this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Y",wxPG_LABEL,system->GetY()));
+    this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Z",wxPG_LABEL,system->GetZ()));
 
     this->pgrid->CollapseAll();
     this->pgrid->Thaw();
