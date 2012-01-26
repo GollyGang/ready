@@ -58,6 +58,9 @@ class MyFrame : public wxFrame
         void SetTimestep(float ts);
         void SetFormula(std::string s);
 
+        // display the Preferences dialog
+        void ShowPrefsDialog(const wxString& page = wxEmptyString);
+
     private:
 
         // file menu

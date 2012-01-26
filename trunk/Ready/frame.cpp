@@ -16,10 +16,12 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "app.hpp"          // for wxGetApp
+#include "app.hpp"              // for wxGetApp
 #include "frame.hpp"
 #include "vtk_pipeline.hpp"
 #include "utils.hpp"
+#include "wxutils.hpp"
+#include "prefs.hpp"            // for GetPrefs, SavePrefs, etc
 #include "IO_XML.hpp"
 #include "RulePanel.hpp"
 #include "HelpPanel.hpp"
@@ -40,11 +42,10 @@
 #include <wx/filename.h>
 #include <wx/font.h>
 #include <wx/dir.h>
-#include <wx/dnd.h>         // for wxFileDropTarget
-#include <wx/clipbrd.h>     // for wxTheClipboard
+#include <wx/dnd.h>             // for wxFileDropTarget
 #include <wx/artprov.h>
 #if wxUSE_TOOLTIPS
-   #include "wx/tooltip.h"  // for wxToolTip
+   #include "wx/tooltip.h"      // for wxToolTip
 #endif
 
 // wxVTK: (local copy)
@@ -63,7 +64,7 @@ using namespace std;
 #include <vtkSmartPointer.h>
 
 #ifdef __WXMAC__
-    #include <Carbon/Carbon.h>    // for GetCurrentProcess, etc
+    #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
 #endif
 
 wxString PaneName(int id)
@@ -80,7 +81,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
-    EVT_MENU(ID::Preferences, MyFrame::OnPreferences)
+    EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
     // edit menu
     EVT_MENU(wxID_CUT, MyFrame::OnCut)
@@ -140,6 +141,8 @@ MyFrame::MyFrame(const wxString& title)
 {
     this->SetIcon(wxICON(appicon16));
     this->aui_mgr.SetManagedWindow(this);
+    
+    GetPrefs();     // must be called before InitializeMenus
 
     this->InitializeMenus();
     this->InitializeToolbars();
@@ -159,7 +162,7 @@ MyFrame::MyFrame(const wxString& title)
     // enable/disable tool tips
     #if wxUSE_TOOLTIPS
         // AKT TODO!!! fix bug: not seeing any tips in Mac app (bug in wxAUI???)
-        wxToolTip::Enable(true);        // AKT TODO!!! use showtips
+        wxToolTip::Enable(showtips);
         #ifdef __WXMAC__
             wxToolTip::SetDelay(1500);  // 1.5 secs is better on Mac
         #endif
@@ -186,11 +189,12 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_NEW, _("New Pattern...\tCtrl-N"), _("Create a new pattern"));
         menu->AppendSeparator();
         menu->Append(wxID_OPEN, _("Open Pattern...\tCtrl-O"), _("Choose a pattern file to open"));
+        menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...\tCtrl-S"), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...\tF3"), _("Save a screenshot of the current view"));
         menu->AppendSeparator();
-        menu->Append(ID::Preferences, _("Preferences..."),_("Edit the preferences"));
+        menu->Append(wxID_PREFERENCES, _("Preferences...")+GetAccelerator(DO_PREFS), _("Edit the preferences"));
         menu->AppendSeparator();
         menu->Append(wxID_EXIT);
         menuBar->Append(menu, _("&File"));
@@ -386,36 +390,27 @@ void MyFrame::InitializeRenderPane()
 
 void MyFrame::LoadSettings()
 {
-    // (uses registry or files, depending on platform)
-    wxConfig config(_T("Ready"));
-    wxString str;
-    if(config.Read(_T("WindowLayout"),&str))
-        this->aui_mgr.LoadPerspective(str);
-    int x=800,y=600;
-    config.Read(_T("AppWidth"),&x);
-    config.Read(_T("AppHeight"),&y);
-    this->SetSize(x,y);
-    x=200; y=200;
-    config.Read(_T("AppX"),&x);
-    config.Read(_T("AppY"),&y);
-    this->SetPosition(wxPoint(x,y));
-    config.Read(_T("iOpenCLPlatform"),&this->iOpenCLPlatform);
-    config.Read(_T("iOpenCLDevice"),&this->iOpenCLDevice);
-    config.Read(_T("LastUsedScreenshotFolder"),&this->last_used_screenshot_folder);
+    // use global info set by GetPrefs()
+    this->SetPosition(wxPoint(mainx,mainy));
+    this->SetSize(mainwd,mainht);
+    if (auilayout.length() > 0) this->aui_mgr.LoadPerspective(auilayout);
+
+    // AKT TODO!!! remove iOpenCLPlatform etc and use globals from prefs.h, or make them public???
+    this->iOpenCLPlatform = opencl_platform;
+    this->iOpenCLDevice = opencl_device;
+    this->last_used_screenshot_folder = screenshotdir;
 }
 
 void MyFrame::SaveSettings()
 {
-    // (uses registry or files, depending on platform)
-    wxConfig config(_T("Ready"));
-    config.Write(_T("WindowLayout"),this->aui_mgr.SavePerspective());
-    config.Write(_T("AppWidth"),this->GetSize().x);
-    config.Write(_T("AppHeight"),this->GetSize().y);
-    config.Write(_T("AppX"),this->GetPosition().x);
-    config.Write(_T("AppY"),this->GetPosition().y);
-    config.Write(_T("iOpenCLPlatform"),this->iOpenCLPlatform);
-    config.Write(_T("iOpenCLDevice"),this->iOpenCLDevice);
-    config.Write(_T("LastUsedScreenshotFolder"),this->last_used_screenshot_folder);
+    auilayout = this->aui_mgr.SavePerspective();
+    
+    // AKT TODO!!! remove iOpenCLPlatform etc and use globals from prefs.h, or make them public???
+    opencl_platform = this->iOpenCLPlatform;
+    opencl_device = this->iOpenCLDevice;
+    screenshotdir = this->last_used_screenshot_folder;
+    
+    SavePrefs();
 }
 
 MyFrame::~MyFrame()
@@ -466,25 +461,6 @@ void MyFrame::OnPaste(wxCommandEvent& event)
     event.Skip();
 }
 
-// AKT TODO!!! export this routine from utils???
-static bool ClipboardHasText()
-{
-   bool hastext = false;
-   #ifdef __WXGTK__
-      // avoid re-entrancy bug in wxGTK 2.9.x
-      if (wxTheClipboard->IsOpened()) return false;
-   #endif
-   if (wxTheClipboard->Open()) {
-      hastext = wxTheClipboard->IsSupported(wxDF_TEXT);
-      if (!hastext) {
-         // TODO: we'll try to convert bitmap data to our pattern format???
-         hastext = wxTheClipboard->IsSupported(wxDF_BITMAP);
-      }
-      wxTheClipboard->Close();
-   }
-   return hastext;
-}
-
 void MyFrame::OnUpdatePaste(wxUpdateUIEvent& event)
 {
     event.Enable(ClipboardHasText());
@@ -527,6 +503,16 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
 
 void MyFrame::OnSize(wxSizeEvent& event)
 {
+    #ifdef __WXMSW__
+        // save current location and size for use in SavePrefs if app
+        // is closed when window is minimized
+        wxRect r = GetRect();
+        mainx = r.x;
+        mainy = r.y;
+        mainwd = r.width;
+        mainht = r.height;
+    #endif
+
     // trigger a redraw
     if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
     
@@ -926,10 +912,15 @@ void MyFrame::OnOpenPattern(wxCommandEvent &event)
 
 void MyFrame::OpenFile(const wxString& path, bool remember)
 {
-    /* AKT TODO!!!
     if (IsHTMLFile(path)) {
         // show HTML file in help pane
         this->help_panel->ShowHelp(path);
+    
+        wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
+        if(!pane.IsOk()) return;
+        pane.Show();
+        this->aui_mgr.Update();
+        
         return;
     }
     
@@ -938,7 +929,6 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         EditFile(path);
         return;
     }
-    */
 
     if (remember) /* AKT TODO!!! AddRecentPattern(path) */;
     
@@ -1002,8 +992,6 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
 void MyFrame::EditFile(const wxString& path)
 {
-    wxMessageBox(_("This file will eventually be opened in your text editor:\n") + path);
-    /* AKT TODO!!!
     // prompt user if text editor hasn't been set yet
     if (texteditor.IsEmpty()) {
         ChooseTextEditor(this, texteditor);
@@ -1019,7 +1007,6 @@ void MyFrame::EditFile(const wxString& path)
         cmd = wxString::Format(wxT("\"%s\" \"%s\""), texteditor.c_str(), path.c_str());
     #endif
     wxExecute(cmd, wxEXEC_ASYNC);
-    */
 }
 
 void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
@@ -1086,32 +1073,6 @@ void MyFrame::SetTimestep(float ts)
     // TODO: update anything else that needs to know
 }
 
-// AKT TODO!!! export this routine from utils???
-static int SaveChanges(const wxString& query, const wxString& msg)
-{
-    #ifdef __WXMAC__
-        // create a standard looking Mac dialog
-        wxMessageDialog dialog(wxGetActiveWindow(), msg, query,
-                               wxCENTER | wxNO_DEFAULT | wxYES_NO | wxCANCEL |
-                               wxICON_INFORMATION);
-        
-        // change button order to what Mac users expect to see
-        dialog.SetYesNoCancelLabels("Cancel", "Save", "Don't Save");
-       
-        switch ( dialog.ShowModal() )
-        {
-            case wxID_YES:    return wxCANCEL;  // Cancel
-            case wxID_NO:     return wxYES;     // Save
-            case wxID_CANCEL: return wxNO;      // Don't Save
-            default:          return wxCANCEL;  // should never happen
-        }
-    #else
-        // Windows/Linux
-        return wxMessageBox(msg, query, wxICON_QUESTION | wxYES_NO | wxCANCEL,
-                            wxGetActiveWindow());
-    #endif
-}
-
 bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
 {
     if(!this->system->IsModified()) return false;
@@ -1136,7 +1097,17 @@ void MyFrame::OnClose(wxCloseEvent& event)
     event.Skip();
 }
 
+void MyFrame::ShowPrefsDialog(const wxString& page)
+{
+    if(ChangePrefs(page)) {
+        // user hit OK button so might as well save prefs now
+        SaveSettings();
+    }
+    // safer to update everything even if user hit Cancel
+    this->UpdateWindows();
+}
+
 void MyFrame::OnPreferences(wxCommandEvent &event)
 {
-    wxMessageBox(_("TODO!!!"));
+    ShowPrefsDialog();
 }

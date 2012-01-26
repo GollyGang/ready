@@ -24,6 +24,8 @@
     #include <wx/wx.h>
 #endif
 
+const int MAX_RECENT = 100;     // maximum files in Open Recent submenu
+
 // IDs for the controls and the menu commands
 namespace ID { enum {
     
@@ -31,8 +33,11 @@ namespace ID { enum {
     Dummy = wxID_HIGHEST+1,
     
     // file menu
+    OpenRecent,
+    // next are the last 2 items in Open Recent submenu
+    ClearMissingPatterns = OpenRecent + MAX_RECENT + 1,
+    ClearAllPatterns,
     Screenshot,
-    Preferences,
     
     // view menu
     PatternsPane,
