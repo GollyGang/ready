@@ -63,7 +63,7 @@ class MyFrame : public wxFrame
 
     private:
 
-        // file menu
+        // File menu
         void OnNewPattern(wxCommandEvent& event);
         void OnOpenPattern(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
@@ -71,7 +71,14 @@ class MyFrame : public wxFrame
         void OnPreferences(wxCommandEvent& event);
         void OnQuit(wxCommandEvent& event);
 
-        // edit menu
+        // Open Recent submenu
+        void OnOpenRecent(wxCommandEvent& event);
+        void AddRecentPattern(const wxString& path);
+        void OpenRecentPattern(int id);
+        void ClearMissingPatterns();
+        void ClearAllPatterns();
+
+        // Edit menu
         void OnCut(wxCommandEvent& event);
         void OnCopy(wxCommandEvent& event);
         void OnPaste(wxCommandEvent& event);
@@ -79,13 +86,13 @@ class MyFrame : public wxFrame
         void OnClear(wxCommandEvent& event);
         void OnSelectAll(wxCommandEvent& event);
 
-        // view menu
+        // View menu
         void OnToggleViewPane(wxCommandEvent& event);
         void OnUpdateViewPane(wxUpdateUIEvent& event);
         void OnRestoreDefaultPerspective(wxCommandEvent& event);
         void OnChangeActiveChemical(wxCommandEvent& event);
 
-        // action menu
+        // Action menu
         void OnStep(wxCommandEvent& event);
         void OnUpdateStep(wxUpdateUIEvent& event);
         void OnRunStop(wxCommandEvent& event);
@@ -96,7 +103,7 @@ class MyFrame : public wxFrame
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);
 
-        // help menu
+        // Help menu
         void OnAbout(wxCommandEvent& event);
         void OnHelp(wxCommandEvent& event);
 
