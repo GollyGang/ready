@@ -73,10 +73,14 @@ void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
     for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = ipg->GetNestedElement(i);
-        if(to_string(node->GetName())==to_string(RectangleOverlay::GetXMLName()))
-            system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node)); // TODO: use factory pattern
+
+        if(to_string(node->GetName())==to_string(RectangleOverlay::GetXMLName())) // TODO: use factory pattern
+        {
+
+        }
         else
             throw runtime_error("LoadInitialPatternGenerator : unknown node type");
+        system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node));
     }
 }
 
@@ -231,3 +235,16 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
     return rd;
 }
 
+bool RD_XMLReader::ShouldGenerateInitialPatternWhenLoading()
+{
+    this->Update();
+    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
+    if(!root) throw runtime_error("No XML found in file");
+    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
+    if(!rd) throw runtime_error("RD node not found in file");
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
+    if(!initial_pattern_generator) return false; // (element is optional)
+    int i;
+    bool read_ok = from_string(initial_pattern_generator->GetAttribute("apply_when_loading"),i);
+    return read_ok && i==1;
+}

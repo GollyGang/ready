@@ -60,8 +60,6 @@ class BaseOverlay
         // for saving to file, get the overlay as an XML element
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
-        bool ShouldApplyWhenLoading() const { return this->apply_when_loading; }
-
     protected:
 
         BaseOverlay(vtkXMLDataElement* node);
@@ -75,7 +73,6 @@ class BaseOverlay
         float value1,value2;
         TPasteMode paste_mode;
         TFillMode fill_mode;
-        bool apply_when_loading;
 };
  
 // single-channel axis-aligned-rectangle overlay with a fixed location

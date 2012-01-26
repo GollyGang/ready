@@ -61,6 +61,7 @@ class RD_XMLReader : public vtkXMLImageDataReader
 
         std::string GetType();
         std::string GetName();
+        bool ShouldGenerateInitialPatternWhenLoading();
         void SetSystemFromXML(BaseRD* rd_system);
 
     protected:  
