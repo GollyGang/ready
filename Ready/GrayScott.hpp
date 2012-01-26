@@ -18,14 +18,13 @@
 // local:
 #include "BaseRD.hpp"
 
-// a basic RD system, provided as a placeholder
-// N.B. Work in progress. Most implementations will use a generic 'algorithm' instead (e.g. 'RD_OpenCL_2D')
-class GrayScott_slow_3D : public BaseRD
+// inbuilt implementation: n-dimensional Gray-Scott
+class GrayScott : public BaseRD
 {
     public:
 
-        GrayScott_slow_3D();
-        ~GrayScott_slow_3D();
+        GrayScott();
+        ~GrayScott();
 
         virtual void Allocate(int x,int y,int z,int nc);
 

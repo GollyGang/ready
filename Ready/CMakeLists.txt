@@ -37,8 +37,7 @@ endif()
 
 set( BASE_SOURCES      # low-level code used in all executables
   BaseRD.hpp BaseRD.cpp
-  GrayScott_slow.hpp GrayScott_slow.cpp
-  GrayScott_slow_3D.hpp GrayScott_slow_3D.cpp
+  GrayScott.hpp GrayScott.cpp
   OpenCL_RD.hpp OpenCL_RD.cpp
   OpenCL_nDim.hpp OpenCL_nDim.cpp
   IO_XML.hpp IO_XML.cpp
