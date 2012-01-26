@@ -14,6 +14,7 @@ the core RD stuff):
 - add a toolbar with buttons for commonly-used functions (run/stop, step, reset, etc)
 - toolbar also has slider for changing active chemical (no need for menu item?)
 - add Help folder and populate with .html files (open from Help menu)
+- fix cosmetic glitches in Rule Pane (remove focus ring, remember split pos, increase row ht?)
 
 before 0.x release:
 - file format should support random patches on top of the image (a constant value image compresses to almost nothing)

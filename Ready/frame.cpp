@@ -43,6 +43,9 @@
 #include <wx/dnd.h>         // for wxFileDropTarget
 #include <wx/clipbrd.h>     // for wxTheClipboard
 #include <wx/artprov.h>
+#if wxUSE_TOOLTIPS
+   #include "wx/tooltip.h"  // for wxToolTip
+#endif
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -153,6 +156,15 @@ MyFrame::MyFrame(const wxString& title)
     this->LoadSettings();
     this->aui_mgr.Update();
 
+    // enable/disable tool tips
+    #if wxUSE_TOOLTIPS
+        // AKT TODO!!! fix bug: not seeing any tips in Mac app (bug in wxAUI???)
+        wxToolTip::Enable(true);        // AKT TODO!!! use showtips
+        #ifdef __WXMAC__
+            wxToolTip::SetDelay(1500);  // 1.5 secs is better on Mac
+        #endif
+    #endif
+
     // initialize an RD system to get us started
     const wxString initfile = _T("Patterns/CPU-only/grayscott.vti");
     if (wxFileExists(initfile)) {
@@ -242,6 +254,12 @@ void MyFrame::InitializeMenus()
     SetMenuBar(menuBar);
 }
 
+#ifdef __WXMAC__
+    // smaller toolbar bitmaps look much nicer on Mac
+    #undef wxART_TOOLBAR
+    #define wxART_TOOLBAR wxART_BUTTON
+#endif
+
 void MyFrame::InitializeToolbars()
 {
     {   // file menu items
@@ -249,6 +267,9 @@ void MyFrame::InitializeToolbars()
         tb->AddTool(wxID_NEW,wxEmptyString,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),_("Create a new pattern"));
         tb->AddTool(wxID_OPEN,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),_("Choose a pattern file to open"));
         tb->AddTool(wxID_SAVE,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),_("Save the current pattern"));
+        #ifdef __WXMAC__
+            tb->SetToolBorderPadding(10);
+        #endif
         this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Position(0));
     }
     {   // action menu items
@@ -257,6 +278,9 @@ void MyFrame::InitializeToolbars()
             _("Start running the simulation"));
         this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
             _("Go back to the starting pattern"));
+        #ifdef __WXMAC__
+            this->action_toolbar->SetToolBorderPadding(10);
+        #endif
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Position(1));
     }
 }
@@ -628,7 +652,7 @@ void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
 
 void MyFrame::OnRunStop(wxCommandEvent &event)
 {
-    if (this->is_running) {
+    if(this->is_running) {
         this->is_running = false;
         this->SetStatusBarText();
     } else {
@@ -642,7 +666,7 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 {
     wxMenuBar* mbar = GetMenuBar();
     if(mbar) {
-        if (this->is_running) {
+        if(this->is_running) {
             mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
             mbar->SetHelpString(ID::RunStop,_("Stop running the simulation"));
         } else {
@@ -655,9 +679,12 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 void MyFrame::UpdateToolbars()
 {
     this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
-        this->is_running ? wxArtProvider::GetBitmap(wxART_CROSS_MARK) : wxArtProvider::GetBitmap(wxART_GO_FORWARD) );
+        this->is_running ? wxArtProvider::GetBitmap(wxART_CROSS_MARK,wxART_TOOLBAR)
+                         : wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR) );
+    
     this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
-        this->is_running ? _("Stop running the simulation") : _("Start running the simulation") );
+        this->is_running ? _("Stop running the simulation")
+                         : _("Start running the simulation") );
 }
 
 void MyFrame::OnReset(wxCommandEvent &event)
