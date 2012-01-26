@@ -1746,6 +1746,8 @@ wxPanel* PrefsDialog::CreateFilePrefs(wxWindow* parent)
     hebox->Add(editorbutt, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 0);
     hebox->Add(editorbox, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, LRGAP);
 
+    // position things
+    vbox->AddSpacer(5);
     vbox->Add(hpbox, 0, wxLEFT | wxRIGHT, LRGAP);
     vbox->AddSpacer(10);
     vbox->Add(hebox, 0, wxLEFT | wxRIGHT, LRGAP);
@@ -1774,6 +1776,8 @@ wxPanel* PrefsDialog::CreateEditPrefs(wxWindow* parent)
 
     wxCheckBox* beepcheck = new wxCheckBox(panel, PREF_BEEP, _("Allow beep sound"));
 
+    // position things
+    vbox->AddSpacer(5);
     vbox->Add(beepcheck, 0, wxLEFT | wxRIGHT, LRGAP);
 
     // init control values
@@ -1796,7 +1800,7 @@ wxPanel* PrefsDialog::CreateViewPrefs(wxWindow* parent)
     // show_tips
 
 #if wxUSE_TOOLTIPS
-    wxCheckBox* toolcheck = new wxCheckBox(panel, PREF_SHOW_TIPS, _("Show button tips"));
+    wxCheckBox* toolcheck = new wxCheckBox(panel, PREF_SHOW_TIPS, _("Show tool tips"));
 #endif
 
     // position things
@@ -1908,6 +1912,7 @@ wxPanel* PrefsDialog::CreateKeyboardPrefs(wxWindow* parent)
     wxBoxSizer* hbox3 = new wxBoxSizer(wxHORIZONTAL);
     hbox3->Add(new wxStaticText(panel, wxID_STATIC, notes));
 
+    // position things
     vbox->AddSpacer(5);
     vbox->Add(hbox0, 0, wxLEFT, LRGAP);
     vbox->AddSpacer(15);

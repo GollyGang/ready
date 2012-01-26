@@ -67,6 +67,12 @@ using namespace std;
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
 #endif
 
+#if wxCHECK_VERSION(2,9,0)
+    // some wxMenuItem method names have changed in wx 2.9
+    #define GetText GetItemLabel
+    #define SetText SetItemLabel
+#endif
+
 wxString PaneName(int id)
 {
     return wxString::Format(_T("%d"),id);
@@ -126,6 +132,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::HelpChanges, MyFrame::OnHelp)
     EVT_MENU(ID::HelpCredits, MyFrame::OnHelp)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
+    // items in Open Recent submenu must be handled last
+    EVT_MENU(wxID_ANY, MyFrame::OnOpenRecent)
 END_EVENT_TABLE()
 
 // frame constructor
@@ -186,17 +194,23 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_NEW, _("New Pattern...\tCtrl-N"), _("Create a new pattern"));
+        menu->Append(wxID_NEW, _("New Pattern\tCtrl-N"), _("Create a new pattern"));
         menu->AppendSeparator();
         menu->Append(wxID_OPEN, _("Open Pattern...\tCtrl-O"), _("Choose a pattern file to open"));
         menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...\tCtrl-S"), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...\tF3"), _("Save a screenshot of the current view"));
-        menu->AppendSeparator();
+        #if !defined(__WXOSX_COCOA__)
+            menu->AppendSeparator();
+        #endif
+        // on the Mac the wxID_PREFERENCES item is moved to the app menu
         menu->Append(wxID_PREFERENCES, _("Preferences...")+GetAccelerator(DO_PREFS), _("Edit the preferences"));
-        menu->AppendSeparator();
-        menu->Append(wxID_EXIT);
+        #if !defined(__WXOSX_COCOA__)
+            menu->AppendSeparator();
+        #endif
+        // on the Mac the wxID_EXIT item is moved to the app menu and the app name is appended to "Quit "
+        menu->Append(wxID_EXIT, _("Quit")+GetAccelerator(DO_QUIT));
         menuBar->Append(menu, _("&File"));
     }
     {   // edit menu:
@@ -938,7 +952,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         return;
     }
 
-    if (remember) /* AKT TODO!!! AddRecentPattern(path) */;
+    if (remember) AddRecentPattern(path);
     
     // load pattern file
     BaseRD *target_system = NULL;
@@ -996,6 +1010,161 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         delete target_system;
         return;
     }
+}
+
+void MyFrame::OnOpenRecent(wxCommandEvent &event)
+{
+    int id = event.GetId();
+    if (id == ID::ClearMissingPatterns) {
+        ClearMissingPatterns();
+    } else if (id == ID::ClearAllPatterns) {
+        ClearAllPatterns();
+    } else if ( id > ID::OpenRecent && id <= ID::OpenRecent + numpatterns ) {
+        OpenRecentPattern(id);
+    }
+}
+
+void MyFrame::AddRecentPattern(const wxString& inpath)
+{
+    if (inpath.IsEmpty()) return;
+    wxString path = inpath;
+    if (path.StartsWith(readydir)) {
+        // remove readydir from start of path
+        path.erase(0, readydir.length());
+    }
+
+    // duplicate any ampersands so they appear in menu
+    path.Replace(wxT("&"), wxT("&&"));
+
+    // put given path at start of patternSubMenu
+    #ifdef __WXGTK__
+        // avoid wxGTK bug in FindItem if path contains underscores
+        int id = wxNOT_FOUND;
+        for (int i = 0; i < numpatterns; i++) {
+            wxMenuItem* item = patternSubMenu->FindItemByPosition(i);
+            wxString temp = item->GetText();
+            temp.Replace(wxT("__"), wxT("_"));
+            temp.Replace(wxT("&"), wxT("&&"));
+            if (temp == path) {
+                id = ID::OpenRecent + 1 + i;
+                break;
+            }
+        }
+    #else
+        int id = patternSubMenu->FindItem(path);
+    #endif
+    if ( id == wxNOT_FOUND ) {
+        if ( numpatterns < maxpatterns ) {
+            // add new path
+            numpatterns++;
+            id = ID::OpenRecent + numpatterns;
+            patternSubMenu->Insert(numpatterns - 1, id, path);
+        } else {
+            // replace last item with new path
+            wxMenuItem* item = patternSubMenu->FindItemByPosition(maxpatterns - 1);
+            item->SetText(path);
+            id = ID::OpenRecent + maxpatterns;
+        }
+    }
+    
+    // path exists in patternSubMenu
+    if ( id > ID::OpenRecent + 1 ) {
+        // move path to start of menu
+        wxMenuItem* item;
+        while ( id > ID::OpenRecent + 1 ) {
+            wxMenuItem* previtem = patternSubMenu->FindItem(id - 1);
+            wxString prevpath = previtem->GetText();
+            #ifdef __WXGTK__
+                // remove duplicate underscores
+                prevpath.Replace(wxT("__"), wxT("_"));
+                prevpath.Replace(wxT("&"), wxT("&&"));
+            #endif
+            item = patternSubMenu->FindItem(id);
+            item->SetText(prevpath);
+            id--;
+        }
+        item = patternSubMenu->FindItem(id);
+        item->SetText(path);
+    }
+    
+    wxMenuBar* mbar = GetMenuBar();
+    if (mbar) mbar->Enable(ID::OpenRecent, numpatterns > 0);
+}
+
+void MyFrame::OpenRecentPattern(int id)
+{
+    wxMenuItem* item = patternSubMenu->FindItem(id);
+    if (item) {
+        wxString path = item->GetText();
+        #ifdef __WXGTK__
+            // remove duplicate underscores
+            path.Replace(wxT("__"), wxT("_"));
+        #endif
+        // remove duplicate ampersands
+        path.Replace(wxT("&&"), wxT("&"));
+
+        // if path isn't absolute then prepend Ready directory
+        wxFileName fname(path);
+        if (!fname.IsAbsolute()) path = readydir + path;
+
+        OpenFile(path);
+    }
+}
+
+void MyFrame::ClearMissingPatterns()
+{
+    int pos = 0;
+    while (pos < numpatterns) {
+        wxMenuItem* item = patternSubMenu->FindItemByPosition(pos);
+        wxString path = item->GetText();
+        #ifdef __WXGTK__
+            // remove duplicate underscores
+            path.Replace(wxT("__"), wxT("_"));
+        #endif
+        // remove duplicate ampersands
+        path.Replace(wxT("&&"), wxT("&"));
+
+        // if path isn't absolute then prepend Ready directory
+        wxFileName fname(path);
+        if (!fname.IsAbsolute()) path = readydir + path;
+
+        if (wxFileExists(path)) {
+            // keep this item
+            pos++;
+        } else {
+            // remove this item by shifting up later items
+            int nextpos = pos + 1;
+            while (nextpos < numpatterns) {
+                wxMenuItem* nextitem = patternSubMenu->FindItemByPosition(nextpos);
+                #ifdef __WXGTK__
+                    // avoid wxGTK bug if item contains underscore
+                    wxString temp = nextitem->GetText();
+                    temp.Replace(wxT("__"), wxT("_"));
+                    temp.Replace(wxT("&"), wxT("&&"));
+                    item->SetText( temp );
+                #else
+                    item->SetText( nextitem->GetText() );
+                #endif
+                item = nextitem;
+                nextpos++;
+            }
+            // delete last item
+            patternSubMenu->Delete(item);
+            numpatterns--;
+        }
+    }
+    wxMenuBar* mbar = GetMenuBar();
+    if (mbar) mbar->Enable(ID::OpenRecent, numpatterns > 0);
+}
+
+void MyFrame::ClearAllPatterns()
+{
+    while (numpatterns > 0) {
+        patternSubMenu->Delete( patternSubMenu->FindItemByPosition(0) );
+        numpatterns--;
+    }
+    wxMenuBar* mbar = GetMenuBar();
+    if (mbar) mbar->Enable(ID::OpenRecent, false);
 }
 
 void MyFrame::EditFile(const wxString& path)
