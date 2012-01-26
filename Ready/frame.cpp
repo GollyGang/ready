@@ -974,7 +974,6 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
                 target_system = new GrayScott_slow_3D();
             else 
                 throw runtime_error("Unsupported inbuilt implementation: "+name);
-            iw->SetSystemFromXMLWithoutFormula(target_system);
         }
         else if(type=="formula")
         {
@@ -986,8 +985,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
                 s->SetDevice(this->iOpenCLDevice);
                 target_system = s;
             }
-            iw->SetSystemFromXMLWithFormula(target_system);
         }
+        iw->SetSystemFromXML(target_system);
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
