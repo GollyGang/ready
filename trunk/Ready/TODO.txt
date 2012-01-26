@@ -2,19 +2,17 @@ before 0.2 release:
 - bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
 - populate a pattern library (primary UI for beginners is a list of examples to click)
 - control over size of world, running speed
+- finish documenting stuff in Help/*.html (search for "!!!")
 
-Andrew's tasks for 0.2 (peripheral UI stuff so Tim & Robert can concentrate on
-the core RD stuff):
-- tidy up menus (eg. move/rename some items)
-- add Edit menu with std items
-- replace wxConfig stuff with Golly-like prefs handling
-- implement File > Open Recent submenu
-- implement ctrl/right-click to edit file in patterns pane
-- patterns pane should show supplied files and user files (latter via File > Add My Patterns?)
-- add a toolbar with buttons for commonly-used functions (run/stop, step, reset, etc)
-- toolbar also has slider for changing active chemical (no need for menu item?)
-- add Help folder and populate with .html files (open from Help menu)
+Andrew's tasks for 0.2:
+- finish implementing keyboard shortcuts
+- implement File > Add My Patterns... (or Set Pattern Folder... if that fails)
+- allow user to change font size in Help pane (add + and - buttons?)
 - fix cosmetic glitches in Rule Pane (remove focus ring, remember split pos, increase row ht?)
+- fix bug: tool tips not appearing (Mac app only?)
+- use better (big) toolbar icons in Mac app
+- make About box a modal dialog using Help/about.html
+- do any other "AKT TODO" tasks
 
 before 0.x release:
 - file format should support random patches on top of the image (a constant value image compresses to almost nothing)
