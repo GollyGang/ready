@@ -51,7 +51,7 @@ namespace ID { enum {
     Step,
     RunStop,
     Reset,
-    InitWithBlobInCenter,
+    GenerateInitialPattern,
     SelectOpenCLDevice,
     OpenCLDiagnostics,
     

@@ -92,7 +92,7 @@ class MyFrame : public wxFrame
         void OnUpdateRunStop(wxUpdateUIEvent& event);
         void OnReset(wxCommandEvent& event);
         void OnUpdateReset(wxUpdateUIEvent& event);
-        void OnInitWithBlobInCenter(wxCommandEvent& event);
+        void OnGenerateInitialPattern(wxCommandEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);
 

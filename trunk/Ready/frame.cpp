@@ -106,7 +106,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::RunStop, MyFrame::OnUpdateRunStop)
     EVT_MENU(ID::Reset, MyFrame::OnReset)
     EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
-    EVT_MENU(ID::InitWithBlobInCenter, MyFrame::OnInitWithBlobInCenter)
+    EVT_MENU(ID::GenerateInitialPattern, MyFrame::OnGenerateInitialPattern)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
@@ -226,7 +226,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::RunStop, _("&Run\tF5"), _("Start running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset\tCtrl-R"), _("Go back to the starting pattern"));
-        menu->Append(ID::InitWithBlobInCenter, _("Random &Blob"), _("Re-start with a random blob in the middle"));
+        menu->Append(ID::GenerateInitialPattern, _("Generate &Pattern"), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device..."), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics..."), _("Show the available OpenCL devices and their attributes"));
@@ -282,6 +282,8 @@ void MyFrame::InitializeToolbars()
             _("Start running the simulation"));
         this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
             _("Go back to the starting pattern"));
+        this->action_toolbar->AddTool(ID::GenerateInitialPattern,wxEmptyString,wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE,wxART_TOOLBAR),
+            _("Run the Initial Pattern Generator"));
         #ifdef __WXMAC__
             this->action_toolbar->SetToolBorderPadding(10);
         #endif
@@ -763,9 +765,15 @@ void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
     this->aui_mgr.LoadPerspective(this->default_perspective);
 }
 
-void MyFrame::OnInitWithBlobInCenter(wxCommandEvent& event)
+void MyFrame::OnGenerateInitialPattern(wxCommandEvent& event)
 {
-    this->system->InitWithBlobInCenter();
+    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+    
+    this->system->GenerateInitialPattern();
+
+    this->is_running = false;
+    this->system->SetFilename("untitled");
+    this->system->SetModified(false);
     this->UpdateWindows();
 }
 
@@ -884,16 +892,16 @@ void MyFrame::OnNewPattern(wxCommandEvent &event)
         // initial call from MyFrame::MyFrame
         GrayScott_slow_3D *s = new GrayScott_slow_3D();
         s->Allocate(30,25,20,2);
-        s->InitWithBlobInCenter();
         s->SetModified(false);
         s->SetFilename("untitled");
+        s->GenerateInitialPattern();
         this->SetCurrentRDSystem(s);
         return;
     }
     
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     
-    this->system->GenerateInitialPattern();
+    this->system->BlankImage();
 
     this->is_running = false;
     this->system->SetFilename("untitled");

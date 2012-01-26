@@ -26,7 +26,6 @@ class OpenCL_nDim : public OpenCL_RD
         OpenCL_nDim();
 
         virtual void Allocate(int x,int y,int z,int nc);
-        virtual void InitWithBlobInCenter();
 
         virtual void Update(int n_steps);
 

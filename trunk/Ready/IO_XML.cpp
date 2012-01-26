@@ -69,6 +69,7 @@ string read_string(const char* s)
 
 void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
 {
+    system->GetInitialPatternGenerator().clear();
     for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = ipg->GetNestedElement(i);
@@ -272,7 +273,7 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
         pattern_description->SetCharacterData(system->GetPatternDescription().c_str(),(int)system->GetPatternDescription().length());
         rd->AddNestedElement(pattern_description);
     }
-    {   // TJH is trying something
+    {
         vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
         initial_pattern_generator->SetName("initial_pattern_generator");
         const vector<BaseOverlay*>& overlays = system->GetInitialPatternGenerator();

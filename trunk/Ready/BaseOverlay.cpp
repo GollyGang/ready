@@ -51,6 +51,16 @@ vtkSmartPointer<vtkXMLDataElement> PointND::GetAsXML() const
     return xml;
 }
 
+PointND::PointND(vtkXMLDataElement *node)
+{
+    if(!from_string(node->GetAttribute("x"),this->x))
+        throw runtime_error("PointND::PointND : unable to read required attribute 'x'");
+    if(!from_string(node->GetAttribute("y"),this->y))
+        throw runtime_error("PointND::PointND : unable to read required attribute 'y'");
+    if(!from_string(node->GetAttribute("z"),this->z))
+        throw runtime_error("PointND::PointND : unable to read required attribute 'z'");
+}
+
 vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
@@ -72,9 +82,29 @@ vtkSmartPointer<vtkXMLDataElement> RectangleOverlay::GetAsXML() const
     return xml;
 }
 
-RectangleOverlay::RectangleOverlay(vtkXMLDataElement* node)
+BaseOverlay::BaseOverlay(vtkXMLDataElement* node)
 {
-    // (check name matches?)
+   string s;
+    from_string(node->GetAttribute("fill_mode"),s);
+    if(s=="Constant") this->fill_mode=Constant;
+    else if(s=="WhiteNoise") this->fill_mode=WhiteNoise;
+    else throw runtime_error("BaseOverlay::BaseOverlay : unsupported fill_mode");
+    if(!from_string(node->GetAttribute("value1"),this->value1))
+        throw runtime_error("BaseOverlay::BaseOverlay : failed to read required attribute 'value1'");
+    if(this->fill_mode!=Constant && !from_string(node->GetAttribute("value2"),this->value2))
+        throw runtime_error("BaseOverlay::BaseOverlay : failed to read required attribute 'value2'");
+    from_string(node->GetAttribute("paste_mode"),s);
+    if(s=="Overwrite") this->paste_mode=Overwrite;
+    else if(s=="Add") this->paste_mode=Add;
+    else throw runtime_error("BaseOverlay::BaseOverlay : unsupported paste_mode");
+ }
+
+RectangleOverlay::RectangleOverlay(vtkXMLDataElement* node) : BaseOverlay(node)
+{
     if(!from_string(node->GetAttribute("iChemical"),this->iChemical))
         throw runtime_error("RectangleOverlay::RectangleOverlay : failed to read required attribute 'iChemical'");
+    if(node->GetNumberOfNestedElements()!=2)
+        throw runtime_error("RectangleOverlay::RectangleOverlay : should have two corners");
+    this->corner1 = PointND(node->GetNestedElement(0));
+    this->corner2 = PointND(node->GetNestedElement(1));
 }

@@ -28,9 +28,8 @@ class PointND
     public:
     
         PointND() {}
-        PointND(int xval) : x(xval),y(0),z(0) {}
-        PointND(int xval,int yval) : x(xval),y(yval),z(0) {}
-        PointND(int xval,int yval,int zval) : x(xval),y(yval),z(zval) {}
+        PointND(int x,int y,int z) :x(x),y(y),z(z) {}
+        PointND(vtkXMLDataElement *node);
         
         bool InRect(const PointND& corner1,const PointND& corner2) const 
         { 
@@ -55,22 +54,20 @@ class BaseOverlay
         
     public:
     
-        BaseOverlay() {}
+        // apply the overlay at the specified pixel for the specified chemical
+        virtual void Apply(int iChemical,const PointND& at,float& value) const =0;
+
+        // for saving to file, get the overlay as an XML element
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
+
+    protected:
+
+        BaseOverlay(vtkXMLDataElement* node);
         BaseOverlay(float val1,TPasteMode pm)
             : fill_mode(Constant),value1(val1),paste_mode(pm) {}
         BaseOverlay(float val1,float val2,TPasteMode pm)
             : fill_mode(WhiteNoise),value1(val1),value2(val2),paste_mode(pm) {}
             
-        BaseOverlay(const BaseOverlay& a) 
-            : value1(a.value1),value2(a.value2),paste_mode(a.paste_mode),fill_mode(a.fill_mode) {}
-        BaseOverlay& operator=(const BaseOverlay& a) { 
-            this->value1 = a.value1; this->value2 = a.value2; this->paste_mode = a.paste_mode; this->fill_mode = a.fill_mode; return *this; 
-        }
-        
-        virtual void Apply(int iChemical,const PointND& at,float& value) const =0;
-
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
-
     protected:
     
         float value1,value2;
@@ -81,21 +78,16 @@ class BaseOverlay
 // single-channel axis-aligned-rectangle overlay with a fixed location
 class RectangleOverlay : public BaseOverlay
 {
-        
     public:
     
+        // can initialise from XML, for loading from file
         RectangleOverlay(vtkXMLDataElement* node);
+        // can initialise manually
         RectangleOverlay(PointND corner_1,PointND corner_2,int iChem,float val1,TPasteMode pm)
             : BaseOverlay(val1,pm),iChemical(iChem),corner1(corner_1),corner2(corner_2) {}
         RectangleOverlay(PointND corner_1,PointND corner_2,int iChem,float val1,float val2,TPasteMode pm)
             : BaseOverlay(val1,val2,pm),iChemical(iChem),corner1(corner_1),corner2(corner_2) {}
             
-        RectangleOverlay(const RectangleOverlay& a) 
-            : BaseOverlay(a),iChemical(a.iChemical),corner1(a.corner1),corner2(a.corner2) {}
-        RectangleOverlay& operator=(const RectangleOverlay& a) { 
-            this->iChemical = a.iChemical; this->corner1 = a.corner1; this->corner2 = a.corner2; return *this; 
-        }
-
         virtual void Apply(int iChemical,const PointND& at,float& value) const;
         
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;

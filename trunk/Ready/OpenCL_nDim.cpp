@@ -52,41 +52,6 @@ void OpenCL_nDim::Allocate(int x,int y,int z,int nc)
     this->CreateOpenCLBuffers();
 }
 
-void OpenCL_nDim::InitWithBlobInCenter()
-{
-    vector<float*> image_data(this->GetNumberOfChemicals());
-    for(int i=0;i<this->GetNumberOfChemicals();i++)
-        image_data[i] = static_cast<float*>(this->images[i]->GetScalarPointer());
-
-    const int X = this->GetX();
-    const int Y = this->GetY();
-    const int Z = this->GetZ();
-    for(int x=0;x<X;x++)
-    {
-        for(int y=0;y<Y;y++)
-        {
-            for(int z=0;z<Z;z++)
-            {
-                if(hypot3(x-X/2,(y-Y/2)/1.5,z-Z/2)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
-                {
-                    for(int i=0;i<this->GetNumberOfChemicals();i++)
-                        *vtk_at(image_data[i],x,y,z,X,Y) = (float)(i%2);
-                }
-                else 
-                {
-                    for(int i=0;i<this->GetNumberOfChemicals();i++)
-                        *vtk_at(image_data[i],x,y,z,X,Y) = (float)(1-(i%2));
-                }
-            }
-        }
-    }
-    for(int i=0;i<this->GetNumberOfChemicals();i++)
-        this->images[i]->Modified();
-    this->WriteToOpenCLBuffers();
-    this->timesteps_taken = 0;
-    this->is_modified = true;
-}
-
 void OpenCL_nDim::Update(int n_steps)
 {
     this->ReloadContextIfNeeded();
