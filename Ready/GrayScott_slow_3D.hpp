@@ -28,7 +28,6 @@ class GrayScott_slow_3D : public BaseRD
         ~GrayScott_slow_3D();
 
         virtual void Allocate(int x,int y,int z,int nc);
-        virtual void InitWithBlobInCenter();
 
         virtual void Update(int n_steps);
 

@@ -136,35 +136,3 @@ void GrayScott_slow::Update(int n_steps)
     this->images[0]->Modified();
     this->images[1]->Modified();
 }
-
-void GrayScott_slow::InitWithBlobInCenter()
-{
-    const int X = this->GetX();
-    const int Y = this->GetY();
-
-    vtkImageData *a_image = this->images[0];
-    vtkImageData *b_image = this->images[1];
-    float* a_data = static_cast<float*>(a_image->GetScalarPointer());
-    float* b_data = static_cast<float*>(b_image->GetScalarPointer());
-
-    for(int x=0;x<X;x++)
-    {
-        for(int y=0;y<Y;y++)
-        {
-            if(hypot2(x-X/2,(y-Y/2)/1.5)<=frand(2.0f,5.0f)) // start with a uniform field with an approximate circle in the middle
-            {
-                *vtk_at(a_data,x,y,0,X,Y) = 0.0f;
-                *vtk_at(b_data,x,y,0,X,Y) = 1.0f;
-            }
-            else 
-            {
-                *vtk_at(a_data,x,y,0,X,Y) = 1.0f;
-                *vtk_at(b_data,x,y,0,X,Y) = 0.0f;
-            }
-        }
-    }
-    a_image->Modified();
-    b_image->Modified();
-    this->timesteps_taken = 0;
-    this->is_modified = true;
-}

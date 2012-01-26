@@ -59,6 +59,7 @@ class OpenCL_RD : public BaseRD
         virtual void CopyFromImage(vtkImageData* im);
 
 		virtual void GenerateInitialPattern();
+		virtual void BlankImage();
 		
     protected:
 

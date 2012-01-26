@@ -539,3 +539,9 @@ void OpenCL_RD::GenerateInitialPattern()
 	BaseRD::GenerateInitialPattern();
     this->WriteToOpenCLBuffers();
 }
+
+void OpenCL_RD::BlankImage()
+{
+	BaseRD::BlankImage();
+    this->WriteToOpenCLBuffers();
+}

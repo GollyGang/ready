@@ -66,8 +66,6 @@ class BaseRD
         virtual void TestFormula(std::string program_string) {}
         virtual void SetFormula(std::string s);
 
-        virtual void InitWithBlobInCenter() =0;
-
         virtual void Allocate(int x,int y,int z,int nc);
 
         std::string GetRuleName() const;
@@ -92,6 +90,7 @@ class BaseRD
 
         std::vector<BaseOverlay*>& GetInitialPatternGenerator() { return this->initial_pattern_generator; }
         virtual void GenerateInitialPattern();
+        virtual void BlankImage();
 
     protected:
 

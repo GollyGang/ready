@@ -39,6 +39,10 @@ BaseRD::BaseRD()
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
     this->is_modified = false;
+    // initialise the initial-pattern-generator for inbuilt rules (placeholder behaviour only)
+    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0,0,0),PointND(1e6,1e6,1e6),0,1.0f,BaseOverlay::Overwrite));
+    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(10,10,0),PointND(20,20,1e6),0,0.0f,1.0f,BaseOverlay::Overwrite));
+    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(10,10,0),PointND(20,20,1e6),1,0.0f,1.0f,BaseOverlay::Overwrite));
 }
 
 BaseRD::~BaseRD()
@@ -268,12 +272,34 @@ void BaseRD::SetFilename(std::string s)
 
 void BaseRD::GenerateInitialPattern()
 {
-	// first fill each image with zero
-	for(int i=0;i<(int)this->images.size();i++)
+    this->BlankImage();
+
+	for(int iImage=0;iImage<(int)this->images.size();iImage++)
 	{
-		this->images[i]->GetPointData()->GetScalars()->FillComponent(0,0.0);
-		this->images[i]->Modified();
+        float* origin = static_cast<float*>(this->images[iImage]->GetScalarPointer());
+        for(int z=0;z<this->GetZ();z++)
+        {
+            for(int y=0;y<this->GetY();y++)
+            {
+                for(int x=0;x<this->GetX();x++)
+                {
+                    float& value = *vtk_at(origin,x,y,z,this->GetX(),this->GetY());
+                    for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
+                        this->initial_pattern_generator[iOverlay]->Apply(iImage,PointND(x,y,z),value);
+                }
+            }
+        }
+		this->images[iImage]->Modified();
 	}
-	// TODO: apply overlays
+	this->timesteps_taken = 0;
+}
+
+void BaseRD::BlankImage()
+{
+	for(int iImage=0;iImage<(int)this->images.size();iImage++)
+	{
+		this->images[iImage]->GetPointData()->GetScalars()->FillComponent(0,0.0);
+		this->images[iImage]->Modified();
+	}
 	this->timesteps_taken = 0;
 }
