@@ -86,6 +86,8 @@ void RulePanel::Update(const BaseRD* const system)
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Y",wxPG_LABEL,system->GetY()));
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Z",wxPG_LABEL,system->GetZ()));
 
+    this->pgrid->SetVerticalSpacing(3); // increase row height
+
     this->pgrid->CollapseAll();
     this->pgrid->Thaw();
 
@@ -120,4 +122,6 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
         this->frame->SetTimestep((wxAny(property->GetValue())).As<float>());
     if(property == this->formula_property) 
         this->frame->SetFormula(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
+    if(property == this->dimensions_property)
+        wxMessageBox(_T("TODO!!!"));
 }
