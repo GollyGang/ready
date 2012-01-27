@@ -1,9 +1,11 @@
 before 0.2 release:
-- bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
+- bug: crash if OpenCL isn't available and an OpenCL file is clicked on
 - bug: occasional crash on Linux when docking panes
-- populate a pattern library with some basics, including descriptions and initial-pattern-generators: Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl
+- populate a pattern library with some basics, including descriptions and initial-pattern-generators: Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, heat equation
 - control over size of world, running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
+- allow user to add/remove parameters (for formula implementations)
+- fix: window size and position not being remembered
 
 Andrew's tasks for 0.2:
 - finish implementing keyboard shortcuts
@@ -15,15 +17,18 @@ Andrew's tasks for 0.2:
 - make About box a modal dialog using Help/about.html
 - do any other "AKT TODO" tasks
 
+before 0.3 release:
+- control over render pipeline: contouring level, color map (ranges, palette), slice direction/height etc. in XML and UI
+- UI for editing the initial-pattern-generator overlay stack
+
 before 0.x release:
-- save out scene (e.g. OBJ) for external render (although paraview can load vti's)
 
 before 1.0 release:
+- save out scene (e.g. OBJ) for external render (although paraview can load vti's)
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
 - bug: allow user to change OpenCL platform and device while a pattern is running
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
-- control over render pipeline: contouring level, color map, slice direction/height etc.
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)

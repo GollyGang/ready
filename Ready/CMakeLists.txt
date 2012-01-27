@@ -70,7 +70,7 @@ set( RESOURCES
 )
 
 set( PATTERN_FILES
-  grayscott_demo.vti meinhardt_stripes.vti schlogl.vti 
+  grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti
   CPU-only/grayscott.vti CPU-only/grayscott3d.vti 
 )
 
