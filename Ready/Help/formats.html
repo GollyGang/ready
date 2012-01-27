@@ -17,17 +17,67 @@ The only file format currently supported by Ready is an extended version of <a h
 <p>
 This is the standard VTK format but with an <tt>RD</tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
 
-<h4>1. The <tt>&lt;RD&gt;</tt> tag</h4>
+<h4>The <tt>&lt;RD&gt;</tt> tag</h4>
 
-<p>The <tt>&lt;RD&gt;</tt> element contains the current rule and information about the pattern. It has no attributes. It contains one <tt>&lt;rule&gt;</tt> (required), one <tt>&lt;pattern_description&gt;</tt> (optional) and one <tt>&lt;initial_pattern_generator&gt;</tt> (optional).
+Specifies the current rule and information about the pattern. 
+<h5>Attributes:</h5> None.
+<h5>Nested elements:</h5>
+<ul><li><tt>&lt;rule&gt;</tt> (required)
+<li><tt>&lt;pattern_description&gt;</tt> (optional)
+<li><tt>&lt;initial_pattern_generator&gt;</tt> (optional)
+</ul>
 
-<h4>2. The <tt>&lt;rule&gt;</tt> tag</h4>
+<h4>The <tt>&lt;rule&gt;</tt> tag</h4>
 
-<p>There rule element may contain the 
+<h5>Attributes:</h5>
+<ul><li><tt>type</tt> (required) : Either "inbuilt" for inbuilt rules (name must match one) or "formula".
+<li><tt>name</tt> (required) : The name of this rule.
+<li><tt>number_of_chemicals</tt> (required if type="formula") : The number of chemicals in this rule.
+<li><tt>timestep</tt> (required) : The amount of time between each iteration. Smaller values give more accurate results but take longer to compute. Larger values may result in numerical instability.
+</ul>
+<h5>Nested elements:</h5>
+<ul><li><tt>&lt;description&gt;</tt> (optional) : A description of this rule.
+<li><tt>&lt;param&gt;</tt> (multiple, optional) : The parameters of the rule. For inbuilt rules, their names must match those expected. For formula rules, their names should appear in the formula.
+<li><tt>&lt;formula&gt;</tt> (required if rule type="inbuilt") : The differential equation that specifies this reaction-diffusion rule.
+</ul>
 
-<h4>3. The <tt>&lt;description&gt;</tt> tag</h4>
+<h4>The <tt>&lt;description&gt;</tt> tag</h4>
 
-<!-- TODO: finish this, when the format has matured -->
+A description of something.
+<h5>Attributes:</h5> None.
+<h5>Nested elements:</h5> Plain text.
+
+<h4>The <tt>&lt;param&gt;</tt> tag</h4>
+
+<h5>Attributes:</h5>
+<ul><li><tt>name</tt> (required) : The name of this parameter.
+</ul>
+<h5>Nested elements:</h5> The value of this parameter.
+
+<h4>The <tt>&lt;formula&gt;</tt> tag</h4>
+
+<h5>Attributes:</h5> None.
+<h5>Nested elements:</h5> TODO
+
+<h4>The <tt>&lt;pattern_description&gt;</tt> tag</h4>
+
+<h5>Attributes:</h5> None.
+<h5>Nested elements:</h5> TODO
+
+<h4>The <tt>&lt;initial_pattern_generator&gt;</tt> tag</h4>
+
+<h5>Attributes:</h5> TODO
+<h5>Nested elements:</h5> TODO
+
+<h4>The <tt>&lt;RectangleOverlay&gt;</tt> tag</h4>
+
+<h5>Attributes:</h5> TODO
+<h5>Nested elements:</h5> TODO
+
+<h4>The <tt>&lt;PointND&gt;</tt> tag</h4>
+
+<h5>Attributes:</h5> TODO
+<h5>Nested elements:</h5> TODO
 
 </ul>
 </ul>
