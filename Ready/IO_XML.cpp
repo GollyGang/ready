@@ -84,7 +84,9 @@ void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
 
         }
         else
-            throw runtime_error("LoadInitialPatternGenerator : unknown node type");
+        {
+            // TODO: unknown overlay type from the future or from a mistake: should continue anyway but might want to warn the user
+        }
         system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node));
     }
 }
