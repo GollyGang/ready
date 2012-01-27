@@ -15,15 +15,17 @@ The only file format currently supported by Ready is an extended version of <a h
 <pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;<br/>&lt;VTKFile type=&quot;ImageData&quot; version=&quot;0.1&quot; byte_order=&quot;LittleEndian&quot; compressor=&quot;vtkZLibDataCompressor&quot;&gt;<br/>  &lt;RD&gt;<br/>    &lt;rule type=&quot;formula&quot; name=&quot;Schlogl&quot; number_of_chemicals=&quot;1&quot; timestep=&quot;0.1&quot;&gt;<br/>      &lt;formula&gt;<br/>        delta_a = laplacian_a + a - a*a*a;<br/>      &lt;/formula&gt;<br/>    &lt;/rule&gt;<br/>  &lt;/RD&gt;<br/>  &lt;ImageData WholeExtent=&quot;0 127 0 63 0 0&quot; Origin=&quot;0 0 0&quot; Spacing=&quot;1 1 1&quot;&gt;<br/>    &lt;Piece Extent=&quot;0 127 0 63 0 0&quot;&gt;<br/>      &lt;PointData Scalars=&quot;Scalars_&quot;&gt;<br/>        &lt;DataArray type=&quot;Float32&quot; Name=&quot;Scalars_&quot; format=&quot;appended&quot; RangeMin=&quot;-0.0010000000475&quot; RangeMax=&quot;0.00099975580815&quot; offset=&quot;0&quot; /&gt;<br/>      &lt;/PointData&gt;<br/>      &lt;CellData&gt;<br/>      &lt;/CellData&gt;<br/>    &lt;/Piece&gt;<br/>  &lt;/ImageData&gt;<br/>  &lt;AppendedData encoding=&quot;base64&quot;&gt;<br/>   _AQAAAACAAAAAAAAAqXAAAA==eJwkXHtcjPn3n6SbS5KQJGmTJBlJPedsMpIUUhQVRRGSJEmSth1t2 ... lots of data ... 3nudNY=<br/>  &lt;/AppendedData&gt;<br/>&lt;/VTKFile&gt;</tt></pre>
 
 <p>
-This is the standard VTK format but with an <tt>RD</tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>.
+This is the standard VTK format but with an <tt>RD</tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
 
-<p>
-<table border="1">
-<tr><td><tt>&lt;RD&gt;&lt;<b>rule</b>&nbsp;...</tt></td><td>This block describes the way the RD system operates. (required)</td></tr>
-<tr><td><tt>&lt;RD&gt;&lt;rule&nbsp;<b>type="..."</b></tt></td><td>Can take two values. If <tt>type="formula"</tt> then the rule is specified by a differential equation in the <tt>formula</tt> element below. If <tt>type="inbuilt"</tt> then the rule is implemented in Ready itself. (required)</td></tr>
-<tr><td><tt>&lt;RD&gt;&lt;rule&nbsp;<b>name="..."</b></tt></td><td>Contains the name of the rule. If <tt>type="inbuilt"</tt> then this must exactly match the name of one of Ready's inbuilt implementations. (required)</td></tr>
-<tr><td><tt>&lt;RD&gt;&lt;<b>pattern_description</b>&nbsp;...</tt></td><td>This block describes the current image. (optional)</td></tr>
-</table>
+<h4>1. The <tt>&lt;RD&gt;</tt> tag</h4>
+
+<p>The <tt>&lt;RD&gt;</tt> element contains the current rule and information about the pattern. It has no attributes. It contains one <tt>&lt;rule&gt;</tt> (required), one <tt>&lt;pattern_description&gt;</tt> (optional) and one <tt>&lt;initial_pattern_generator&gt;</tt> (optional).
+
+<h4>2. The <tt>&lt;rule&gt;</tt> tag</h4>
+
+<p>There rule element may contain the 
+
+<h4>3. The <tt>&lt;description&gt;</tt> tag</h4>
 
 <!-- TODO: finish this, when the format has matured -->
 

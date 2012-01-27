@@ -201,6 +201,14 @@ float BaseRD::GetParameterValue(int iParam) const
     return this->parameters[iParam].second;
 }
 
+float BaseRD::GetParameterValueByName(std::string name) const
+{
+    for(int iParam=0;iParam<(int)this->parameters.size();iParam++)
+        if(this->parameters[iParam].first == name)
+            return this->parameters[iParam].second;
+    throw runtime_error("BaseRD::GetParameterValueByName : parameter name not found: "+name);
+}
+
 void BaseRD::AddParameter(std::string name,float val)
 {
     this->parameters.push_back(make_pair(name,val));

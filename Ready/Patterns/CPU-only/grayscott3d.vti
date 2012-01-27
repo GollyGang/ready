@@ -2,10 +2,10 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD>
     <rule type="inbuilt" name="Gray-Scott" timestep="1">
-      <param name="r_a">
+      <param name="D_a">
         0.082
       </param>
-      <param name="r_b">
+      <param name="D_b">
         0.041
       </param>
       <param name="k">
