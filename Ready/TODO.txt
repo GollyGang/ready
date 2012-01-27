@@ -4,6 +4,8 @@ before 0.2 release:
 - finish documenting stuff in Help/*.html (search for "!!!")
 - allow user to add/remove parameters (for formula implementations)
 - fix: window size and position not being remembered
+- show rule description and pattern description in a better way (just for reading)
+- add a simple introduction to RD help page
 
 Andrew's tasks for 0.2:
 - finish implementing keyboard shortcuts
