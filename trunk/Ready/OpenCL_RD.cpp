@@ -37,6 +37,12 @@ OpenCL_RD::OpenCL_RD()
     this->need_reload_context = true;
     this->kernel_function_name = "rd_compute";
 
+    // initialise the opencl things to null in case we fail to create them
+    this->device_id = NULL;
+    this->context = NULL;
+    this->command_queue = NULL;
+    this->kernel = NULL;
+
     if(LinkOpenCL()!= CL_SUCCESS)
         throw runtime_error("Failed to load dynamic library for OpenCL");
 }
@@ -127,7 +133,7 @@ void OpenCL_RD::ReloadContextIfNeeded()
     this->command_queue = clCreateCommandQueue(this->context,this->device_id,0,&ret);
     throwOnError(ret,"OpenCL_RD::ReloadContextIfNeeded : Failed to create command queue: ");
 
-    this->need_reload_context = false; 
+    this->need_reload_context = false;
 }
 
 void OpenCL_RD::ReloadKernelIfNeeded()
@@ -177,7 +183,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     ret = clGetKernelWorkGroupInfo(this->kernel,this->device_id,CL_KERNEL_WORK_GROUP_SIZE,sizeof(size_t),&wgs,&returned_size);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : retrieving kernel work group size failed: ");
     // TODO: allow user override (this value isn't always optimal)
-    if(wgs&(wgs-1)) 
+    if(wgs&(wgs-1))
         throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2");
     // spread the work group over the dimensions, preferring x over y and y over z because of memory alignment
     size_t wgx,wgy,wgz;
@@ -463,7 +469,7 @@ void OpenCL_RD::CopyFromImage(vtkImageData* im)
 }
 
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
-/* static */ const char* OpenCL_RD::descriptionOfError(cl_int err) 
+/* static */ const char* OpenCL_RD::descriptionOfError(cl_int err)
 {
     switch (err) {
         case CL_SUCCESS:                            return "Success!";
