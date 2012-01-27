@@ -287,7 +287,8 @@ void MyFrame::InitializeToolbars()
         #ifdef __WXMAC__
             tb->SetToolBorderPadding(10);
         #endif
-        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar)).Position(0));
+        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
+            .Position(0).Caption(_("File tools")));
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
@@ -300,7 +301,8 @@ void MyFrame::InitializeToolbars()
         #ifdef __WXMAC__
             this->action_toolbar->SetToolBorderPadding(10);
         #endif
-        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::ActionToolbar)).Position(1));
+        this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top()
+            .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
     }
 }
 
