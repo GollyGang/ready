@@ -81,13 +81,12 @@ void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
 
         if(to_string(node->GetName())==to_string(RectangleOverlay::GetXMLName())) // TODO: use factory pattern
         {
-
+            system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node));
         }
         else
         {
             // TODO: unknown overlay type from the future or from a mistake: should continue anyway but might want to warn the user
         }
-        system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node));
     }
 }
 
