@@ -1,7 +1,8 @@
 before 0.2 release:
 - bug: Ready shouldn't crash if OpenCL isn't available and a file is loaded
-- populate a pattern library (primary UI for beginners is a list of examples to click)
-- control over size of world, running speed
+- bug: occasional crash on Linux when docking panes
+- populate a pattern library with some basics, including descriptions and initial-pattern-generators: Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl
+- control over size of world, running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
 
 Andrew's tasks for 0.2:
@@ -15,10 +16,10 @@ Andrew's tasks for 0.2:
 - do any other "AKT TODO" tasks
 
 before 0.x release:
-- file format should support random patches on top of the image (a constant value image compresses to almost nothing)
 - save out scene (e.g. OBJ) for external render (although paraview can load vti's)
 
 before 1.0 release:
+- lots of patterns in library (primary UI for beginners is a list of examples to click)
 - bug: allow user to change OpenCL platform and device while a pattern is running
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
@@ -39,3 +40,4 @@ future ideas:
 - display the evolution of a 1D pattern as a 2D image, with time as the second axis, as here:
   http://www.stephenwolfram.com/publications/recent/specialfunctions/images/Slide028_917x754.gif
 - allow non-OpenCL implementations to load all files, by parsing formula
+- integer systems (including GoL)
