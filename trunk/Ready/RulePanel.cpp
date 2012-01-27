@@ -64,17 +64,20 @@ void RulePanel::Update(const BaseRD* const system)
     this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
     this->timestep_property = this->pgrid->Append(new wxFloatProperty(_("Timestep"),wxPG_LABEL,system->GetTimestep()));
 
-    this->parameter_value_properties.resize(system->GetNumberOfParameters());
-    this->parameter_name_properties.resize(system->GetNumberOfParameters());
+    this->parameter_value_properties.resize(system->GetNumberOfParameters(),NULL);
+    this->parameter_name_properties.resize(system->GetNumberOfParameters(),NULL);
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
         wxPGProperty *prop = this->pgrid->Append(new wxFloatProperty(system->GetParameterName(iParam),wxPG_LABEL,system->GetParameterValue(iParam)));
         this->parameter_value_properties[iParam] = prop;
-        this->parameter_name_properties[iParam] = this->pgrid->AppendIn(prop,new wxStringProperty(_("Name"),wxPG_LABEL,system->GetParameterName(iParam)));
+        if(system->HasEditableFormula()) // (don't allow name editing for inbuilt rules)
+            this->parameter_name_properties[iParam] = this->pgrid->AppendIn(prop,new wxStringProperty(_("Name"),wxPG_LABEL,system->GetParameterName(iParam)));
     }
 
     if(system->HasEditableFormula())
         this->formula_property = this->pgrid->Append(new LongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
+    else
+        this->formula_property = NULL;
 
     this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
 
@@ -85,6 +88,8 @@ void RulePanel::Update(const BaseRD* const system)
 
     this->pgrid->CollapseAll();
     this->pgrid->Thaw();
+
+    // TODO: remember collapsed/expanded state, and splitter position
 }
 
 void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)

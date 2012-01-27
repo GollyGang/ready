@@ -74,11 +74,10 @@ void GrayScott::Update(int n_steps)
     const int Y = this->GetY();
     const int Z = this->GetZ();
 
-    // TODO: check that parameter names haven't changed?
-    float D_a = this->GetParameterValue(0);
-    float D_b = this->GetParameterValue(1);
-    float k = this->GetParameterValue(2);
-    float F = this->GetParameterValue(3);
+    float D_a = this->GetParameterValueByName("D_a");
+    float D_b = this->GetParameterValueByName("D_b");
+    float k = this->GetParameterValueByName("k");
+    float F = this->GetParameterValueByName("F");
 
     // take approximately n_steps
     for(int iStepPair=0;iStepPair<(n_steps+1)/2;iStepPair++)

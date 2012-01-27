@@ -77,6 +77,7 @@ class BaseRD
         int GetNumberOfParameters() const;
         std::string GetParameterName(int iParam) const;
         float GetParameterValue(int iParam) const;
+        float GetParameterValueByName(std::string name) const;
         virtual void AddParameter(std::string name,float val);
         virtual void DeleteParameter(int iParam);
         virtual void DeleteAllParameters();
