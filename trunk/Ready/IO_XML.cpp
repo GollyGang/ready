@@ -101,12 +101,7 @@ string RD_XMLReader::GetType()
 
 string RD_XMLReader::GetName()
 {
-    this->Update();
-    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
-    if(!root) throw runtime_error("No XML found in file");
-    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
-    if(!rd) throw runtime_error("RD node not found in file");
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
     const char *s = rule->GetAttribute("name");
     if(!s) throw runtime_error("Failed to read rule attribute: name");
