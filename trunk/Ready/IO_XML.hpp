@@ -68,5 +68,6 @@ class RD_XMLReader : public vtkXMLImageDataReader
 
         RD_XMLReader() {} 
 
+        vtkXMLDataElement* GetRDElement();
 };
 
