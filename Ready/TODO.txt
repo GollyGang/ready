@@ -1,5 +1,4 @@
 before 0.2 release:
-- bug: occasional crash on Linux when docking panes
 - populate a pattern library with some basics, including descriptions and initial-pattern-generators: Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, heat equation
 - control over size of world, running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")

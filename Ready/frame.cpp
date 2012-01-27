@@ -147,6 +147,10 @@ MyFrame::MyFrame(const wxString& title)
        iActiveChemical(1)
 {
     this->SetIcon(wxICON(appicon16));
+    #ifdef __WXGTK__
+        // advanced docking hints cause problems on xfce (and probably others)
+        this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_RECTANGLE_HINT );
+    #endif
     this->aui_mgr.SetManagedWindow(this);
     
     GetPrefs();     // must be called before InitializeMenus
