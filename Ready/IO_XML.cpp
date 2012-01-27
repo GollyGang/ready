@@ -92,12 +92,7 @@ void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
 
 string RD_XMLReader::GetType()
 {
-    this->Update();
-    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
-    if(!root) throw runtime_error("No XML found in file");
-    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
-    if(!rd) throw runtime_error("RD node not found in file");
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
     const char *s = rule->GetAttribute("type");
     if(!s) throw runtime_error("Failed to read rule attribute: type");
@@ -120,10 +115,7 @@ string RD_XMLReader::GetName()
 
 void RD_XMLReader::SetSystemFromXML(BaseRD* system)
 {
-    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
-    if(!root) throw runtime_error("No XML found in file");
-    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
-    if(!rd) throw runtime_error("RD node not found in file");
+    vtkXMLDataElement* rd = this->GetRDElement();
 
     const char *s;
     float f;
@@ -243,15 +235,20 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
 
 bool RD_XMLReader::ShouldGenerateInitialPatternWhenLoading()
 {
-    this->Update();
-    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
-    if(!root) throw runtime_error("No XML found in file");
-    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
-    if(!rd) throw runtime_error("RD node not found in file");
-    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
     if(!initial_pattern_generator) return false; // (element is optional)
     int i;
     const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
     bool read_ok = s && from_string(s,i);
     return read_ok && i==1;
+}
+
+vtkXMLDataElement* RD_XMLReader::GetRDElement()
+{
+    this->Update();
+    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
+    if(!root) throw runtime_error("No XML found in file");
+    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
+    if(!rd) throw runtime_error("RD node not found in file");
+    return rd;
 }
