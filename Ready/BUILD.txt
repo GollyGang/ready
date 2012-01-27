@@ -2,7 +2,7 @@ Ready uses CMake as a pre-build setup. You might need to read some
 CMake documentation to get the hang of it. We've put some hints
 below.
 
-Dependencies: VTK, wxWidgets (2.9+), any OpenCL SDK.
+Dependencies: VTK, wxWidgets (2.9.2+), any OpenCL SDK.
 
 =========================== Windows =================================
 

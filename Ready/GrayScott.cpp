@@ -45,7 +45,7 @@ GrayScott::GrayScott()
 
 void GrayScott::Allocate(int x,int y,int z,int nc)
 {
-    if(nc!=2) throw runtime_error("GrayScott_slow::Allocate : this implementation is for 2 chemicals only"); 
+    if(nc!=2) throw runtime_error("GrayScott::Allocate : this implementation is for 2 chemicals only"); 
     BaseRD::Allocate(x,y,z,2);
     // also allocate our buffer images
     this->DeleteBuffers();
