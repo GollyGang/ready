@@ -269,8 +269,7 @@ void AddDefaultKeyActions()
     keyaction[(int)'p'][mk_CMD].id =    DO_PATTERNS;
     keyaction[IK_HELP][0].id =          DO_HELP;
 #ifdef __WXMAC__
-    // cmd-? is the usual shortcut in Mac apps
-    keyaction[(int)'?'][mk_CMD].id =    DO_HELP;
+    keyaction[(int)'/'][mk_CMD].id =    DO_HELP;
 #else
     // F1 is the usual shortcut in Win/Linux apps
     keyaction[IK_F1][0].id =            DO_HELP;
@@ -292,6 +291,7 @@ const char* GetActionName(action_id action)
         case DO_OPENFILE:       return "Open:";
         // File menu
         case DO_NEWPATT:        return "New Pattern";
+        case DO_RANDOM:         return "Random Pattern";
         case DO_OPENPATT:       return "Open Pattern...";
         case DO_SAVE:           return "Save Pattern...";
         case DO_SCREENSHOT:     return "Save Screenshot...";
@@ -304,9 +304,9 @@ const char* GetActionName(action_id action)
         case DO_CLEAR:          return "Clear Selection";
         case DO_SELALL:         return "Select All";
         // View menu
-        case DO_HELP:           return "Show Help Pane";
         case DO_PATTERNS:       return "Show Patterns Pane";
         case DO_RULE:           return "Show Rule Pane";
+        case DO_HELP:           return "Show Help Pane";
         case DO_RESTORE:        return "Restore Default Layout";
         case DO_CHEMICAL:       return "Change Active Chemical...";
         // Action menu
@@ -728,12 +728,12 @@ void UpdateAcceleratorStrings()
                     key == IK_DELETE ||
                     key == IK_TAB ||
                     key == IK_RETURN;
-#ifdef __WXMSW__
+                #ifdef __WXMSW__
                 if (modset & mk_CMD) {
                     // Windows only allows Ctrl+alphanumeric
                     validaccel = (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9');
                 }
-#endif
+                #endif
                 if (validaccel) {
                     CreateAccelerator(action, modset, key);
                 }
@@ -749,10 +749,10 @@ void UpdateAcceleratorStrings()
             action_info info = keyaction[key][modset];
             action_id action = info.id;
             if (action != DO_NOTHING && (modset & mk_CMD)
-    #ifdef __WXMSW__
+                #ifdef __WXMSW__
                 // Windows only allows Ctrl+alphanumeric
                 && ((key >= 'a' && key <= 'z') || (key >= '0' && key <= '9'))
-    #endif
+                #endif
             ) {
                 CreateAccelerator(action, modset, key);
             }
@@ -2268,7 +2268,7 @@ bool ChangePrefs(const wxString& page)
                 if (savekeyaction[key][modset].id != keyaction[key][modset].id) {
                     // first update accelerator array
                     UpdateAcceleratorStrings();
-                    // AKT TODO!!! frameptr->UpdateMenuAccelerators();
+                    frameptr->UpdateMenuAccelerators();
                     goto done;
                 }
         done:

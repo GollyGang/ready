@@ -11,6 +11,7 @@ Andrew's tasks for 0.2:
 - finish implementing keyboard shortcuts
 - implement File > Add My Patterns... (or Set Pattern Folder... if that fails)
 - allow user to change font size in Help pane (add + and - buttons?)
+  and show link info to right of buttons
 - fix cosmetic glitches in Rule Pane (remove focus ring, remember split pos, increase row ht?)
 - fix bug: tool tips not appearing (Mac app only?)
 - use better (big) toolbar icons in Mac app
@@ -20,6 +21,7 @@ Andrew's tasks for 0.2:
 before 0.3 release:
 - control over render pipeline: contouring level, color map (ranges, palette), slice direction/height etc. in XML and UI
 - UI for editing the initial-pattern-generator overlay stack
+- add Full Screen command at top of View menu
 
 before 0.x release:
 

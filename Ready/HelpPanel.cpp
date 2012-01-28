@@ -57,6 +57,8 @@ class HtmlView : public wxHtmlWindow
                 // user clicked on link to Preferences dialog
                 frame->ShowPrefsDialog( url.AfterFirst(':') );
 
+            // AKT TODO!!! implement "edit:" and "open:", and allow ctrl/right-click to edit file
+
             } else {
                 // assume it's a link to a local target or another help file
                 HelpPanel* panel = (HelpPanel*)GetParent();
@@ -65,6 +67,8 @@ class HtmlView : public wxHtmlWindow
         }
 
     private:
+
+        // AKT TODO!!! add OnSize and OnChar handlers for HtmlView
         
         MyFrame* frame;
 };
@@ -80,8 +84,8 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
     // add buttons at top of html window
-    backbutt = new wxButton(this, ID::BackButton, _("<"), wxDefaultPosition, wxSize(40,wxDefaultCoord));
-    forwbutt = new wxButton(this, ID::ForwardButton, _(">"), wxDefaultPosition, wxSize(40,wxDefaultCoord));
+    backbutt = new wxButton(this, ID::BackButton, _("<"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
+    forwbutt = new wxButton(this, ID::ForwardButton, _(">"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
     contbutt = new wxButton(this, ID::ContentsButton, _("Contents"));
 
     #ifdef __WXMAC__
