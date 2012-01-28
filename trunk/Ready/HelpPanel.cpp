@@ -19,8 +19,8 @@
 #include "HelpPanel.hpp"
 #include "frame.hpp"
 #include "IDs.hpp"
-#include "prefs.hpp"            // for readydir, GetShortcutTable
-#include "wxutils.hpp"          // for Warning
+#include "prefs.hpp"            // for GetShortcutTable, readydir, etc
+#include "wxutils.hpp"          // for Warning, CopyTextToClipboard
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
@@ -440,4 +440,28 @@ void HelpPanel::UpdateHelpButtons()
     
     html->ClearStatus();
     html->SetFocus();       // for keyboard shortcuts
+}
+
+// -----------------------------------------------------------------------------
+
+bool HelpPanel::HtmlHasFocus()
+{
+    return html->HasFocus();
+}
+
+// -----------------------------------------------------------------------------
+
+void HelpPanel::SelectAllText()
+{
+    html->SelectAll();
+}
+
+// -----------------------------------------------------------------------------
+
+void HelpPanel::CopySelection()
+{
+    wxString text = html->SelectionToText();
+    if (text.length() > 0) {
+        CopyTextToClipboard(text);
+    }
 }

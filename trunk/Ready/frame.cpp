@@ -472,7 +472,11 @@ void MyFrame::OnCut(wxCommandEvent& event)
 
 void MyFrame::OnCopy(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus
+    // action depends on which pane has focus
+    if (this->help_panel->HtmlHasFocus()) {
+        this->help_panel->CopySelection();
+        return;
+    }
     event.Skip();
 }
 
@@ -495,7 +499,11 @@ void MyFrame::OnClear(wxCommandEvent& event)
 
 void MyFrame::OnSelectAll(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus
+    // action depends on which pane has focus, if any
+    if (this->help_panel->HtmlHasFocus()) {
+        this->help_panel->SelectAllText();
+        return;
+    }
     event.Skip();
 }
 
