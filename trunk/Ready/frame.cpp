@@ -197,56 +197,56 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_NEW, _("New Pattern\tCtrl-N"), _("Create a new pattern"));
+        menu->Append(wxID_NEW, _("New Pattern") + GetAccelerator(DO_NEWPATT), _("Create a new pattern"));
         menu->AppendSeparator();
-        menu->Append(wxID_OPEN, _("Open Pattern...\tCtrl-O"), _("Choose a pattern file to open"));
+        menu->Append(wxID_OPEN, _("Open Pattern...") + GetAccelerator(DO_OPENPATT), _("Choose a pattern file to open"));
         menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
         menu->AppendSeparator();
-        menu->Append(wxID_SAVE, _("Save Pattern...\tCtrl-S"), _("Save the current pattern"));
-        menu->Append(ID::Screenshot, _("Save Screenshot...\tF3"), _("Save a screenshot of the current view"));
+        menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
+        menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
         #if !defined(__WXOSX_COCOA__)
             menu->AppendSeparator();
         #endif
         // on the Mac the wxID_PREFERENCES item is moved to the app menu
-        menu->Append(wxID_PREFERENCES, _("Preferences...")+GetAccelerator(DO_PREFS), _("Edit the preferences"));
+        menu->Append(wxID_PREFERENCES, _("Preferences...") + GetAccelerator(DO_PREFS), _("Edit the preferences"));
         #if !defined(__WXOSX_COCOA__)
             menu->AppendSeparator();
         #endif
         // on the Mac the wxID_EXIT item is moved to the app menu and the app name is appended to "Quit "
-        menu->Append(wxID_EXIT, _("Quit")+GetAccelerator(DO_QUIT));
+        menu->Append(wxID_EXIT, _("Quit") + GetAccelerator(DO_QUIT));
         menuBar->Append(menu, _("&File"));
     }
     {   // edit menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_CUT, _("Cut\tCtrl-X"), _("Cut the selection and save it to the clipboard"));
-        menu->Append(wxID_COPY, _("Copy\tCtrl-C"), _("Copy the selection to the clipboard"));
-        menu->Append(wxID_PASTE, _("Paste\tCtrl-V"), _("Paste in the contents of the clipboard"));
-        menu->Append(wxID_CLEAR, _("Clear"), _("Clear the selection"));
+        menu->Append(wxID_CUT, _("Cut") + GetAccelerator(DO_CUT), _("Cut the selection and save it to the clipboard"));
+        menu->Append(wxID_COPY, _("Copy") + GetAccelerator(DO_COPY), _("Copy the selection to the clipboard"));
+        menu->Append(wxID_PASTE, _("Paste") + GetAccelerator(DO_PASTE), _("Paste in the contents of the clipboard"));
+        menu->Append(wxID_CLEAR, _("Clear") + GetAccelerator(DO_CLEAR), _("Clear the selection"));
         menu->AppendSeparator();
-        menu->Append(wxID_SELECTALL, _("Select All\tCtrl-A"), _("Select everything"));
+        menu->Append(wxID_SELECTALL, _("Select All") + GetAccelerator(DO_SELALL), _("Select everything"));
         menuBar->Append(menu, _("&Edit"));
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
-        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane"), _("View the patterns pane"));
-        menu->AppendCheckItem(ID::RulePane, _("&Rule Pane"), _("View the rule pane"));
-        menu->AppendCheckItem(ID::HelpPane, _("&Help Pane\tF1"), _("View the help pane"));
+        menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane") + GetAccelerator(DO_PATTERNS), _("View the patterns pane"));
+        menu->AppendCheckItem(ID::RulePane, _("&Rule Pane") + GetAccelerator(DO_RULE), _("View the rule pane"));
+        menu->AppendCheckItem(ID::HelpPane, _("&Help Pane") + GetAccelerator(DO_HELP), _("View the help pane"));
         menu->AppendSeparator();
-        menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout"), _("Put the windows back where they were"));
+        menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout") + GetAccelerator(DO_RESTORE), _("Put the windows back where they were"));
         menu->AppendSeparator();
-        menu->Append(ID::ChangeActiveChemical, _("&Change Active Chemical..."), _("Change which chemical is being visualized"));
+        menu->Append(ID::ChangeActiveChemical, _("&Change Active Chemical...") + GetAccelerator(DO_CHEMICAL), _("Change which chemical is being visualized"));
         menuBar->Append(menu, _("&View"));
     }
     {   // action menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::Step, _("&Step\tF4"), _("Advance the simulation by a single timestep"));
-        menu->Append(ID::RunStop, _("&Run\tF5"), _("Start running the simulation"));
+        menu->Append(ID::Step, _("&Step") + GetAccelerator(DO_STEP), _("Advance the simulation by a single timestep"));
+        menu->Append(ID::RunStop, _("&Run") + GetAccelerator(DO_RUNSTOP), _("Start running the simulation"));
         menu->AppendSeparator();
-        menu->Append(ID::Reset, _("Reset\tCtrl-R"), _("Go back to the starting pattern"));
-        menu->Append(ID::GenerateInitialPattern, _("Generate &Pattern"), _("Run the Initial Pattern Generator"));
+        menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
+        menu->Append(ID::GenerateInitialPattern, _("Generate &Pattern") + GetAccelerator(DO_RANDOM), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
-        menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device..."), _("Choose which OpenCL device to run on"));
-        menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics..."), _("Show the available OpenCL devices and their attributes"));
+        menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
+        menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu, _("&Action"));
     }
     {   // help menu:
@@ -269,7 +269,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::HelpChanges,  _("Changes"));
         menu->Append(ID::HelpCredits,  _("Credits"));
         menu->AppendSeparator();
-        menu->Append(wxID_ABOUT,       _("&About Ready"));
+        menu->Append(wxID_ABOUT,       _("&About Ready") + GetAccelerator(DO_ABOUT));
         menuBar->Append(menu, _("&Help"));
     }
     SetMenuBar(menuBar);
@@ -675,10 +675,10 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
     wxMenuBar* mbar = GetMenuBar();
     if(mbar) {
         if(this->is_running) {
-            mbar->SetLabel(ID::RunStop, _("Stop\tF5"));
+            mbar->SetLabel(ID::RunStop, _("Stop") + GetAccelerator(DO_RUNSTOP));
             mbar->SetHelpString(ID::RunStop,_("Stop running the simulation"));
         } else {
-            mbar->SetLabel(ID::RunStop, _("Run\tF5"));
+            mbar->SetLabel(ID::RunStop, _("Run") + GetAccelerator(DO_RUNSTOP));
             mbar->SetHelpString(ID::RunStop,_("Start running the simulation"));
         }
     }
@@ -1025,6 +1025,8 @@ void MyFrame::OnOpenRecent(wxCommandEvent &event)
         ClearAllPatterns();
     } else if ( id > ID::OpenRecent && id <= ID::OpenRecent + numpatterns ) {
         OpenRecentPattern(id);
+    } else {
+        event.Skip();
     }
 }
 
@@ -1278,9 +1280,46 @@ void MyFrame::OnClose(wxCloseEvent& event)
     event.Skip();
 }
 
+void MyFrame::UpdateMenuAccelerators()
+{
+    // keyboard shortcuts have changed, so update all menu item accelerators
+    wxMenuBar* mbar = GetMenuBar();
+    if (mbar) {
+        // wxMac bug: these app menu items aren't updated (but user isn't likely
+        // to change them so don't bother trying to fix the bug)
+        SetAccelerator(mbar, wxID_ABOUT,                    DO_ABOUT);
+        SetAccelerator(mbar, wxID_PREFERENCES,              DO_PREFS);
+        SetAccelerator(mbar, wxID_EXIT,                     DO_QUIT);
+        
+        SetAccelerator(mbar, wxID_NEW,                      DO_NEWPATT);
+        SetAccelerator(mbar, wxID_OPEN,                     DO_OPENPATT);
+        SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
+        SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
+        
+        SetAccelerator(mbar, wxID_CUT,                      DO_CUT);
+        SetAccelerator(mbar, wxID_COPY,                     DO_COPY);
+        SetAccelerator(mbar, wxID_PASTE,                    DO_PASTE);
+        SetAccelerator(mbar, wxID_CLEAR,                    DO_CLEAR);
+        SetAccelerator(mbar, wxID_SELECTALL,                DO_SELALL);
+        
+        SetAccelerator(mbar, ID::PatternsPane,              DO_PATTERNS);
+        SetAccelerator(mbar, ID::RulePane,                  DO_RULE);
+        SetAccelerator(mbar, ID::HelpPane,                  DO_HELP);
+        SetAccelerator(mbar, ID::RestoreDefaultPerspective, DO_RESTORE);
+        SetAccelerator(mbar, ID::ChangeActiveChemical,      DO_CHEMICAL);
+        
+        SetAccelerator(mbar, ID::Step,                      DO_STEP);
+        SetAccelerator(mbar, ID::RunStop,                   DO_RUNSTOP);
+        SetAccelerator(mbar, ID::Reset,                     DO_RESET);
+        SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_RANDOM);
+        SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
+        SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
+    }
+}
+
 void MyFrame::ShowPrefsDialog(const wxString& page)
 {
-    if(ChangePrefs(page)) {
+    if (ChangePrefs(page)) {
         // user hit OK button so might as well save prefs now
         SaveSettings();
     }

@@ -88,6 +88,7 @@ typedef enum
     DO_PASTE,                    // paste
     DO_PREFS,                    // preferences...
     DO_QUIT,                     // quit Ready
+    DO_RANDOM,                   // random pattern
     DO_RESET,                    // reset
     DO_RESTORE,                  // restore default layout
     DO_RUNSTOP,                  // run/stop
