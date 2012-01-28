@@ -37,6 +37,12 @@ class HelpPanel : public wxPanel
 
         // display given .html file
         void ShowHelp(const wxString& filepath);
+        
+        // update buttons at top of help panel
+        void UpdateHelpButtons();
+        
+        // display link info in status line
+        void SetStatus(const wxString& text) { status->SetLabel(text); }
 
     private:
 
@@ -44,16 +50,20 @@ class HelpPanel : public wxPanel
 
         HtmlView* html;   // child window for rendering HTML data
 
-        wxButton* backbutt;     // back button
-        wxButton* forwbutt;     // forwards button
-        wxButton* contbutt;     // Contents button
+        wxButton* backbutt;     // go back in history
+        wxButton* forwbutt;     // go forwards in history
+        wxButton* contbutt;     // go to Contents page
+        wxButton* smallerbutt;  // smaller text
+        wxButton* biggerbutt;   // bigger text
+   
+        wxStaticText* status;   // for link info
         
         // event handlers
         void OnBackButton(wxCommandEvent& event);
         void OnForwardButton(wxCommandEvent& event);
         void OnContentsButton(wxCommandEvent& event);
-        
-        void UpdateHelpButtons();
+        void OnSmallerButton(wxCommandEvent& event);
+        void OnBiggerButton(wxCommandEvent& event);
 
         DECLARE_EVENT_TABLE()
 };

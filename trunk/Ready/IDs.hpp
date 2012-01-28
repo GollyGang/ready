@@ -78,6 +78,8 @@ namespace ID { enum {
     BackButton,
     ForwardButton,
     ContentsButton,
+    SmallerButton,
+    BiggerButton,
 
     // toolbars:
     FileToolbar,

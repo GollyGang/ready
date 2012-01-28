@@ -512,7 +512,9 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(event.GetId()));
     if(!pane.IsOk()) return;
     event.Check(pane.IsShown());
-    this->aui_mgr.Update();
+    // AKT: following call isn't necessary and can cause unwanted flashing
+    // in help pane (due to HtmlView::OnSize being called)
+    // this->aui_mgr.Update();
 }
 
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
@@ -878,9 +880,10 @@ void MyFrame::OnHelp(wxCommandEvent &event)
     }
     
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
-    if(!pane.IsOk()) return;
-    pane.Show();
-    this->aui_mgr.Update();
+    if(pane.IsOk() && !pane.IsShown()) {
+        pane.Show();
+        this->aui_mgr.Update();
+    }
 }
 
 void MyFrame::OnSavePattern(wxCommandEvent &event)
@@ -945,9 +948,10 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         this->help_panel->ShowHelp(path);
     
         wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
-        if(!pane.IsOk()) return;
-        pane.Show();
-        this->aui_mgr.Update();
+        if(pane.IsOk() && !pane.IsShown()) {
+            pane.Show();
+            this->aui_mgr.Update();
+        }
         
         return;
     }
