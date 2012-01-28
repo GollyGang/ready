@@ -266,6 +266,7 @@ void AddDefaultKeyActions()
     keyaction[(int)'a'][mk_CMD].id =    DO_SELALL;
 
     // View menu
+    keyaction[IK_F1+10][0].id =         DO_FULLSCREEN;
     keyaction[(int)'p'][mk_CMD].id =    DO_PATTERNS;
     keyaction[IK_HELP][0].id =          DO_HELP;
 #ifdef __WXMAC__
@@ -304,6 +305,7 @@ const char* GetActionName(action_id action)
         case DO_CLEAR:          return "Clear Selection";
         case DO_SELALL:         return "Select All";
         // View menu
+        case DO_FULLSCREEN:     return "Full Screen";
         case DO_PATTERNS:       return "Show Patterns Pane";
         case DO_RULE:           return "Show Rule Pane";
         case DO_HELP:           return "Show Help Pane";
@@ -854,7 +856,6 @@ void SavePrefs()
 
     // save main window's location and size
     MyFrame* frameptr = wxGetApp().currframe;
-    /* AKT TODO!!! implement Full Screen command (top of View menu)
     #ifdef __WXMSW__
     if (frameptr->fullscreen || frameptr->IsIconized()) {
         // use mainx, mainy, mainwd, mainht set by frameptr->OnFullScreen()
@@ -864,15 +865,12 @@ void SavePrefs()
         // use mainx, mainy, mainwd, mainht set by frameptr->OnFullScreen()
     #endif
     } else {
-    */
         wxRect r = frameptr->GetRect();
         mainx = r.x;
         mainy = r.y;
         mainwd = r.width;
         mainht = r.height;
-    /* AKT TODO!!!
     }
-    */
     fprintf(f, "main_window=%d,%d,%d,%d\n", mainx, mainy, mainwd, mainht);
     fprintf(f, "maximize=%d\n", frameptr->IsMaximized() ? 1 : 0);
 
@@ -1828,7 +1826,7 @@ wxPanel* PrefsDialog::CreateActionPrefs(wxWindow* parent)
     wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 
-    wxString note = _("No prefs here as yet!!!");
+    wxString note = _("No settings here as yet.");
     wxBoxSizer* notebox = new wxBoxSizer(wxHORIZONTAL);
     notebox->Add(new wxStaticText(panel, wxID_STATIC, note));
 
@@ -2130,7 +2128,7 @@ bool PrefsDialog::BadSpinVal(int id, int minval, int maxval, const wxString& pre
     wxSpinCtrl* spinctrl = (wxSpinCtrl*) FindWindow(id);
 #if defined(__WXMSW__) || defined(__WXGTK__)
     // spinctrl->GetValue() always returns a value within range even if
-    // the text ctrl doesn't contain a valid number -- yuk!!!
+    // the text ctrl doesn't contain a valid number -- yuk!
     int i = spinctrl->GetValue();
     if (i < minval || i > maxval)
 #else

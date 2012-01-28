@@ -96,6 +96,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_CLEAR, MyFrame::OnClear)
     EVT_MENU(wxID_SELECTALL, MyFrame::OnSelectAll)
     // view menu
+    EVT_MENU(ID::FullScreen, MyFrame::OnFullScreen)
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RulePane, MyFrame::OnToggleViewPane)
@@ -144,7 +145,8 @@ MyFrame::MyFrame(const wxString& title)
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
        iOpenCLPlatform(0),iOpenCLDevice(0),
-       iActiveChemical(1)
+       iActiveChemical(1),
+       fullscreen(false)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -228,6 +230,8 @@ void MyFrame::InitializeMenus()
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
+        menu->AppendCheckItem(ID::FullScreen, _("Full Screen") + GetAccelerator(DO_FULLSCREEN), _("Toggle full screen mode"));
+        menu->AppendSeparator();
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane") + GetAccelerator(DO_PATTERNS), _("View the patterns pane"));
         menu->AppendCheckItem(ID::RulePane, _("&Rule Pane") + GetAccelerator(DO_RULE), _("View the rule pane"));
         menu->AppendCheckItem(ID::HelpPane, _("&Help Pane") + GetAccelerator(DO_HELP), _("View the help pane"));
@@ -424,7 +428,11 @@ void MyFrame::LoadSettings()
 
 void MyFrame::SaveSettings()
 {
-    auilayout = this->aui_mgr.SavePerspective();
+    if (fullscreen) {
+        // use auilayout saved earlier in OnFullScreen
+    } else {
+        auilayout = this->aui_mgr.SavePerspective();
+    }
     
     // AKT TODO!!! remove iOpenCLPlatform etc and use globals from prefs.h, or make them public???
     opencl_platform = this->iOpenCLPlatform;
@@ -505,6 +513,55 @@ void MyFrame::OnSelectAll(wxCommandEvent& event)
         return;
     }
     event.Skip();
+}
+
+void MyFrame::OnFullScreen(wxCommandEvent &event)
+{
+    static bool restorestatus;  // restore the status bar?
+    
+    wxStatusBar* statusbar = GetStatusBar();
+    
+    if (!fullscreen) {
+        // save current location and size for use in SavePrefs
+        wxRect r = GetRect();
+        mainx = r.x;
+        mainy = r.y;
+        mainwd = r.width;
+        mainht = r.height;
+        // also save current perspective
+        auilayout = this->aui_mgr.SavePerspective();
+    } else {
+        // restore status bar before calling ShowFullScreen (so we see status text in Mac app)
+        if (restorestatus) statusbar->Show();
+    }
+
+    fullscreen = !fullscreen;
+    ShowFullScreen(fullscreen, wxFULLSCREEN_NOMENUBAR | wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
+
+    if (fullscreen) {
+        // hide the status bar
+        restorestatus = statusbar && statusbar->IsShown();
+        if (restorestatus) statusbar->Hide();
+
+        // hide all currently shown panes
+        wxAuiPaneInfo &pattpane = this->aui_mgr.GetPane(PaneName(ID::PatternsPane));
+        wxAuiPaneInfo &rulepane = this->aui_mgr.GetPane(PaneName(ID::RulePane));
+        wxAuiPaneInfo &helppane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
+        wxAuiPaneInfo &filepane = this->aui_mgr.GetPane(PaneName(ID::FileToolbar));
+        wxAuiPaneInfo &actionpane = this->aui_mgr.GetPane(PaneName(ID::ActionToolbar));
+        
+        if (pattpane.IsOk() && pattpane.IsShown()) pattpane.Show(false);
+        if (rulepane.IsOk() && rulepane.IsShown()) rulepane.Show(false);
+        if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
+        if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
+        if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
+
+    } else {
+        // restore saved perspective
+        this->aui_mgr.LoadPerspective(auilayout);
+    }
+    
+    this->aui_mgr.Update();
 }
 
 void MyFrame::OnToggleViewPane(wxCommandEvent &event)
@@ -1314,6 +1371,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, wxID_CLEAR,                    DO_CLEAR);
         SetAccelerator(mbar, wxID_SELECTALL,                DO_SELALL);
         
+        SetAccelerator(mbar, ID::FullScreen,                DO_FULLSCREEN);
         SetAccelerator(mbar, ID::PatternsPane,              DO_PATTERNS);
         SetAccelerator(mbar, ID::RulePane,                  DO_RULE);
         SetAccelerator(mbar, ID::HelpPane,                  DO_HELP);
