@@ -1,21 +1,29 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+    
   <RD>
+      
     <rule type="formula" name="Schlogl" number_of_chemicals="1" timestep="0.1">
       <description>
+        Schlögl’s model is the canonical example of a chemical reaction system that exhibits bistability.
+        Schlögl, F. (1972) Chemical reaction models for non-equilibrium phase transition. Z. Physik. 253, 147–161.
       </description>
       <formula>
         delta_a = laplacian_a + a - a*a*a;
       </formula>
     </rule>
+    
     <pattern_description>
+        The initial pattern is simply random values at each pixel, between -0.005 and 0.005. This low-amplitude noise quickly develops into large areas of matching values.
     </pattern_description>
+    
     <initial_pattern_generator apply_when_loading="1">
       <RectangleOverlay fill_mode="WhiteNoise" paste_mode="Overwrite" value1="-0.005" value2="0.005" iChemical="0">
         <PointND x="0" y="0" z="0" />
         <PointND x="1" y="1" z="1" />
       </RectangleOverlay>
     </initial_pattern_generator>
+    
   </RD>
   
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
