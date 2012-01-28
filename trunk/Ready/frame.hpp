@@ -62,6 +62,8 @@ class MyFrame : public wxFrame
         void ShowPrefsDialog(const wxString& page = wxEmptyString);
         void UpdateMenuAccelerators();
 
+        bool fullscreen;    // in full screen mode?
+
     private:
 
         // File menu
@@ -88,6 +90,7 @@ class MyFrame : public wxFrame
         void OnSelectAll(wxCommandEvent& event);
 
         // View menu
+        void OnFullScreen(wxCommandEvent& event);
         void OnToggleViewPane(wxCommandEvent& event);
         void OnUpdateViewPane(wxUpdateUIEvent& event);
         void OnRestoreDefaultPerspective(wxCommandEvent& event);

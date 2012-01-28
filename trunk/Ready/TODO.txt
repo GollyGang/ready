@@ -19,7 +19,6 @@ Andrew's tasks for 0.2:
 before 0.3 release:
 - control over render pipeline: contouring level, color map (ranges, palette), slice direction/height etc. in XML and UI
 - UI for editing the initial-pattern-generator overlay stack
-- add Full Screen command at top of View menu
 
 before 0.x release:
 

@@ -83,6 +83,7 @@ typedef enum
     DO_CLEAR,                    // clear selection
     DO_COPY,                     // copy selection
     DO_CUT,                      // cut selection
+    DO_FULLSCREEN,               // full screen
     DO_NEWPATT,                  // new pattern
     DO_OPENPATT,                 // open pattern...
     DO_PASTE,                    // paste

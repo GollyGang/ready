@@ -34,12 +34,13 @@ namespace ID { enum {
     
     // file menu
     OpenRecent,
-    // next are the last 2 items in Open Recent submenu
+    // next 2 are the last items in the Open Recent submenu
     ClearMissingPatterns = OpenRecent + MAX_RECENT + 1,
     ClearAllPatterns,
     Screenshot,
     
     // view menu
+    FullScreen,
     PatternsPane,
     RulePane,
     CanvasPane,
