@@ -43,12 +43,16 @@ class HelpPanel : public wxPanel
         
         // display link info in status line
         void SetStatus(const wxString& text) { status->SetLabel(text); }
-
+        
+        bool HtmlHasFocus();    // html window has keyboard focus?
+        void SelectAllText();   // select all text in html window
+        void CopySelection();   // copy selected text to clipboard
+        
     private:
 
-        MyFrame* frame;   // link to parent frame
+        MyFrame* frame;         // link to parent frame
 
-        HtmlView* html;   // child window for rendering HTML data
+        HtmlView* html;         // child window for rendering HTML data
 
         wxButton* backbutt;     // go back in history
         wxButton* forwbutt;     // go forwards in history

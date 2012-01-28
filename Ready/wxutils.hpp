@@ -60,4 +60,7 @@ int SaveChanges(const wxString& query, const wxString& msg);
 bool ClipboardHasText();
 // Return true if the clipboard contains text.
 
+bool CopyTextToClipboard(const wxString& text);
+// Copy given text to the clipboard.
+
 #endif

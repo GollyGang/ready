@@ -455,3 +455,21 @@ bool ClipboardHasText()
     }
     return hastext;
 }
+
+// -----------------------------------------------------------------------------
+
+bool CopyTextToClipboard(const wxString& text)
+{
+    bool result = true;
+    if (wxTheClipboard->Open()) {
+        if ( !wxTheClipboard->SetData(new wxTextDataObject(text)) ) {
+            Warning(_("Could not copy text to clipboard!"));
+            result = false;
+        }
+        wxTheClipboard->Close();
+    } else {
+        Warning(_("Could not open clipboard!"));
+        result = false;
+    }
+    return result;
+}

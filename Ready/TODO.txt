@@ -10,7 +10,6 @@ before 0.2 release:
 Andrew's tasks for 0.2:
 - finish implementing keyboard shortcuts
 - implement File > Add My Patterns... (or Set Pattern Folder... if that fails)
-- handle Select All and Copy in Help pane
 - fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
 - fix bug: tool tips not appearing (Mac app only?)
 - use better (big) toolbar icons in Mac app
