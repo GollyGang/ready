@@ -1265,7 +1265,7 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
 {
     wxArrayString choices;
     for(int i=0;i<this->system->GetNumberOfChemicals();i++)
-        choices.Add(wxString::Format(_T("%d"),i+1));
+        choices.Add(wxString::Format(_T("%c"),'a'+i));
     wxSingleChoiceDialog dlg(this,_("Select the chemical to render:"),_("Select active chemical"),
         choices);
     dlg.SetSelection(this->iActiveChemical);
