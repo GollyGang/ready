@@ -91,45 +91,41 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
     pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
 
-    // assemble the scene
-    {
-        // create a lookup table for mapping values to colors
-        vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-        lut->SetRampToLinear();
-        lut->SetScaleToLinear();
-        lut->SetTableRange(0.0, 0.5);
-        lut->SetHueRange(0.6, 0.0);
+    // create a lookup table for mapping values to colors
+    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+    lut->SetRampToLinear();
+    lut->SetScaleToLinear();
+    lut->SetTableRange(0.0, 0.5);
+    lut->SetHueRange(0.6, 0.0);
 
-        // pad the image a little so we can actually see it as a 2D strip rather than being invisible
-        vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
-        pad->SetInput(system->GetImage(iActiveChemical));
-        pad->SetOutputWholeExtent(0,system->GetX()-1,-1,system->GetY(),0,system->GetZ()-1);
+    // pad the image a little so we can actually see it as a 2D strip rather than being invisible
+    vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
+    pad->SetInput(system->GetImage(iActiveChemical));
+    pad->SetOutputWholeExtent(0,system->GetX()-1,-1,system->GetY(),0,system->GetZ()-1);
 
-        // pass the image through the lookup table
-        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
-        image_mapper->SetLookupTable(lut);
-        image_mapper->SetInputConnection(pad->GetOutputPort());
-      
-        // an actor determines how a scene object is displayed
-        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-        actor->SetInput(image_mapper->GetOutput());
-        //actor->InterpolateOff();
+    // pass the image through the lookup table
+    vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+    image_mapper->SetLookupTable(lut);
+    image_mapper->SetInputConnection(pad->GetOutputPort());
+  
+    // an actor determines how a scene object is displayed
+    vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+    actor->SetInput(image_mapper->GetOutput());
+    //actor->InterpolateOff();
 
-        // add the actor to the renderer's scene
-        pRenderer->AddActor(actor);
+    // add the actor to the renderer's scene
+    pRenderer->AddActor(actor);
 
-        // also add a scalar bar to show how the colors correspond to values
-        {
-            vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalar_bar->SetLookupTable(lut);
-            pRenderer->AddActor2D(scalar_bar);
-        }
-    }
+    // also add a scalar bar to show how the colors correspond to values
+    vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+    scalar_bar->SetLookupTable(lut);
+    pRenderer->AddActor2D(scalar_bar);
 
-    // also add a displacement-mapped surface
+    // add a line graph for all the chemicals (active one highlighted)
+    for(int iChemical=0;iChemical<system->GetNumberOfChemicals();iChemical++)
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInput(system->GetImage(iActiveChemical));
+        plane->SetInput(system->GetImage(iChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
         warp->SetScaleFactor(-25.0);
@@ -142,6 +138,10 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->SetPosition(0,5,0);
+        if(iChemical==iActiveChemical)
+            actor->GetProperty()->SetColor(1,1,1);
+        else
+            actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
         pRenderer->AddActor(actor);
     }
