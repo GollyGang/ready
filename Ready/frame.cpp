@@ -186,8 +186,7 @@ MyFrame::MyFrame(const wxString& title)
     #endif
 
     // initialize an RD system to get us started
-    //const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
-    const wxString initfile = _T("Patterns/CPU-only/test.vti"); // DEBUG!
+    const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
     if (wxFileExists(initfile)) {
         this->OpenFile(initfile);
     } else {
