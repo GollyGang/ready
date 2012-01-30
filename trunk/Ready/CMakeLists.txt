@@ -41,7 +41,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   OpenCL_RD.hpp OpenCL_RD.cpp
   OpenCL_nDim.hpp OpenCL_nDim.cpp
   IO_XML.hpp IO_XML.cpp
-  BaseOverlay.hpp BaseOverlay.cpp
+  overlays.hpp overlays.cpp
   utils.hpp utils.cpp
 )
 if( NOT APPLE )

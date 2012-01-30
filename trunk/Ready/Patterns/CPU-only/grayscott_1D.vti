@@ -10,25 +10,34 @@
     </rule>
     
     <initial_pattern_generator apply_when_loading="1">
-      <RectangleOverlay fill_mode="Constant" paste_mode="Overwrite" value1="1" iChemical="0">
-        <PointND x="0" y="0" z="0" />
-        <PointND x="1" y="1" z="1" />
-      </RectangleOverlay>
-      <RectangleOverlay fill_mode="WhiteNoise" paste_mode="Overwrite" value1="0" value2="1" iChemical="0">
-        <PointND x="0.35" y="0" z="0" />
-        <PointND x="0.4" y="1" z="1" />
-      </RectangleOverlay>
-      <RectangleOverlay fill_mode="WhiteNoise" paste_mode="Overwrite" value1="0" value2="1" iChemical="1">
-        <PointND x="0.35" y="0" z="0" />
-        <PointND x="0.4" y="1" z="1" />
-      </RectangleOverlay>
+        <overlay chemical="1">
+            <overwrite />
+            <constant value="1" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="0">
+            <overwrite />
+            <white_noise low="0" high="1" />
+            <rectangle>
+                <Point3D x="0.3" y="0" z="0" />
+                <Point3D x="0.4" y="1" z="1" />
+            </rectangle>
+        </overlay>
+        <overlay chemical="1">
+            <subtract />
+            <other_chemical chemical="0" />
+            <rectangle>
+                <Point3D x="0.3" y="0" z="0" />
+                <Point3D x="0.4" y="1" z="1" />
+            </rectangle>
+        </overlay>
     </initial_pattern_generator>
     
   </RD>
   <ImageData WholeExtent="0 127 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 0 0 0">
       <PointData Scalars="Scalars_">
-        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="2" format="appended" RangeMin="1"                    RangeMax="1"                    offset="0"                   />
+        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="2" format="appended" RangeMin="1" RangeMax="1" offset="0" />
       </PointData>
       <CellData>
       </CellData>

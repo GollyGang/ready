@@ -19,7 +19,7 @@
 #define __BASERD__
 
 // local:
-class BaseOverlay;
+class Overlay;
 
 // STL:
 #include <string>
@@ -89,7 +89,7 @@ class BaseRD
         std::string GetFilename() const;
         void SetFilename(std::string s);
 
-        std::vector<BaseOverlay*>& GetInitialPatternGenerator() { return this->initial_pattern_generator; }
+        std::vector<Overlay*>& GetInitialPatternGenerator() { return this->initial_pattern_generator; }
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
 
@@ -101,7 +101,7 @@ class BaseRD
 
         std::vector<vtkImageData*> images; // one for each chemical
 
-        std::vector<BaseOverlay*> initial_pattern_generator;
+        std::vector<Overlay*> initial_pattern_generator;
 
         std::vector<std::pair<std::string,float> > parameters;
 
@@ -119,7 +119,6 @@ class BaseRD
         void Deallocate();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
-        static float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
 
     private: // deliberately not implemented, to prevent use
 

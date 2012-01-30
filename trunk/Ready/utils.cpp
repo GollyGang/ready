@@ -60,3 +60,9 @@ double hypot3(double x,double y,double z)
 { 
     return sqrt(x*x+y*y+z*z); 
 }
+
+float* vtk_at(float* origin,int x,int y,int z,int X,int Y)
+{
+    // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
+    return origin + x + X*(y + Y*z);
+}

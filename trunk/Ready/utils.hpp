@@ -45,3 +45,4 @@ template <typename T> bool from_string(const std::string& s,T& val)
     return !iss.fail(); 
 } 
 
+float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
