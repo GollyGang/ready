@@ -2,6 +2,7 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
     
   <RD format_version="1">
+      
     <rule type="formula" name="Heat equation" number_of_chemicals="1" timestep="0.1">
       <description>
           The heat equation, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.
@@ -10,11 +11,13 @@
         delta_a = laplacian_a;
       </formula>
     </rule>
+    
     <pattern_description>
         Any pattern would do to show the heat equation in action. From any starting point the chemical levels will spread out and equalise.
     </pattern_description>
+    
     <initial_pattern_generator apply_when_loading="1">
-        <overlay chemical="0">
+        <overlay chemical="a">
             <overwrite />
             <white_noise low="0" high="1" />
             <rectangle>
@@ -23,6 +26,7 @@
             </rectangle>
         </overlay>
     </initial_pattern_generator>
+    
   </RD>
   
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">

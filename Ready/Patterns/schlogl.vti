@@ -18,7 +18,7 @@
     </pattern_description>
     
     <initial_pattern_generator apply_when_loading="1">
-        <overlay chemical="0">
+        <overlay chemical="a">
             <overwrite />
             <white_noise low="-0.005" high="0.005" />
             <everywhere />
