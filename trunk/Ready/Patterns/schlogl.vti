@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
     
-  <RD>
+  <RD format_version="1">
       
     <rule type="formula" name="Schlogl" number_of_chemicals="1" timestep="0.1">
       <description>

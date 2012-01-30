@@ -108,13 +108,21 @@ string RD_XMLReader::GetName()
     return string(s);
 }
 
-void RD_XMLReader::SetSystemFromXML(BaseRD* system)
+void RD_XMLReader::SetSystemFromXML(BaseRD* system,bool& warn_to_update)
 {
-    vtkXMLDataElement* rd = this->GetRDElement();
-
     const char *s;
     float f;
     int i;
+
+    vtkXMLDataElement* rd = this->GetRDElement();
+    // check whether we should warn the user that they need to update Ready
+    {
+        int v;
+        s = rd->GetAttribute("format_version");
+        if(!s || !from_string(s,v)) throw runtime_error("Failed to read RD attribute: format_version");
+        warn_to_update = (v>1);
+        // (we will still proceed and try to read the file but it might fail or give poor results)
+    }
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -175,6 +183,8 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
 {
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
+    rd->SetAttribute("format_version","1");
+    // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
     {
         vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
         rule->SetName("rule");
