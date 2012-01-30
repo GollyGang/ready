@@ -18,10 +18,11 @@
     </pattern_description>
     
     <initial_pattern_generator apply_when_loading="1">
-      <RectangleOverlay fill_mode="WhiteNoise" paste_mode="Overwrite" value1="-0.005" value2="0.005" iChemical="0">
-        <PointND x="0" y="0" z="0" />
-        <PointND x="1" y="1" z="1" />
-      </RectangleOverlay>
+        <overlay chemical="0">
+            <overwrite />
+            <white_noise low="-0.005" high="0.005" />
+            <everywhere />
+        </overlay>
     </initial_pattern_generator>
     
   </RD>
