@@ -620,7 +620,8 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
 
 void MyFrame::OnSize(wxSizeEvent& event)
 {
-    #ifdef __WXMSW__
+#ifdef __WXMSW__
+    if(this->pVTKWindow) {
         // save current location and size for use in SavePrefs if app
         // is closed when window is minimized
         wxRect r = GetRect();
@@ -628,7 +629,8 @@ void MyFrame::OnSize(wxSizeEvent& event)
         mainy = r.y;
         mainwd = r.width;
         mainht = r.height;
-    #endif
+    }
+#endif
 
     // trigger a redraw
     if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
