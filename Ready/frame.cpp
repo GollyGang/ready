@@ -97,6 +97,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_SELECTALL, MyFrame::OnSelectAll)
     // view menu
     EVT_MENU(ID::FullScreen, MyFrame::OnFullScreen)
+    EVT_MENU(ID::FitPattern, MyFrame::OnFitPattern)
+    EVT_MENU(ID::Wireframe, MyFrame::OnWireframe)
+    EVT_UPDATE_UI(ID::Wireframe, MyFrame::OnUpdateWireframe)
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RulePane, MyFrame::OnToggleViewPane)
@@ -141,6 +144,7 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(false),
+       is_wireframe(false),
        timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
@@ -182,7 +186,7 @@ MyFrame::MyFrame(const wxString& title)
     #endif
 
     // initialize an RD system to get us started
-    const wxString initfile = _T("Patterns/CPU-only/grayscott.vti");
+    const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
     if (wxFileExists(initfile)) {
         this->OpenFile(initfile);
     } else {
@@ -230,7 +234,9 @@ void MyFrame::InitializeMenus()
     }
     {   // view menu:
         wxMenu *menu = new wxMenu;
-        menu->AppendCheckItem(ID::FullScreen, _("Full Screen") + GetAccelerator(DO_FULLSCREEN), _("Toggle full screen mode"));
+        menu->Append(ID::FullScreen, _("Full Screen") + GetAccelerator(DO_FULLSCREEN), _("Toggle full screen mode"));
+        menu->Append(ID::FitPattern, _("Fit Pattern") + GetAccelerator(DO_FIT), _("Restore view so all of pattern is visible"));
+        menu->AppendCheckItem(ID::Wireframe, _("Wireframe") + GetAccelerator(DO_WIREFRAME), _("Wireframe or surface view"));
         menu->AppendSeparator();
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane") + GetAccelerator(DO_PATTERNS), _("View the patterns pane"));
         menu->AppendCheckItem(ID::RulePane, _("&Rule Pane") + GetAccelerator(DO_RULE), _("View the rule pane"));
@@ -407,10 +413,14 @@ void MyFrame::InitializeRenderPane()
                   .CenterPane()
                   .BestSize(400,400)
                   );
+
     #if wxUSE_DRAG_AND_DROP
         // let users drag-and-drop pattern files onto the render pane
         this->pVTKWindow->SetDropTarget(new DnDFile());
     #endif
+
+    // install event handler to detect keyboard shortcuts when render window has focus
+    this->pVTKWindow->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, this);
 }
 
 void MyFrame::LoadSettings()
@@ -515,7 +525,7 @@ void MyFrame::OnSelectAll(wxCommandEvent& event)
     event.Skip();
 }
 
-void MyFrame::OnFullScreen(wxCommandEvent &event)
+void MyFrame::OnFullScreen(wxCommandEvent& event)
 {
     static bool restorestatus;  // restore the status bar?
     
@@ -555,6 +565,9 @@ void MyFrame::OnFullScreen(wxCommandEvent &event)
         if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
         if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
         if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
+        
+        // ensure the render window sees keyboard shortcuts
+        this->pVTKWindow->SetFocus();
 
     } else {
         // restore saved perspective
@@ -564,7 +577,23 @@ void MyFrame::OnFullScreen(wxCommandEvent &event)
     this->aui_mgr.Update();
 }
 
-void MyFrame::OnToggleViewPane(wxCommandEvent &event)
+void MyFrame::OnFitPattern(wxCommandEvent& event)
+{
+    this->pVTKWindow->DoCharEvent('r');
+}
+
+void MyFrame::OnWireframe(wxCommandEvent& event)
+{
+    this->pVTKWindow->DoCharEvent(this->is_wireframe ? 's' : 'w');
+    this->is_wireframe = !this->is_wireframe;
+}
+
+void MyFrame::OnUpdateWireframe(wxUpdateUIEvent& event)
+{
+    event.Check(this->is_wireframe);
+}
+
+void MyFrame::OnToggleViewPane(wxCommandEvent& event)
 {
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(event.GetId()));
     if(!pane.IsOk()) return;
@@ -582,7 +611,7 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
     // this->aui_mgr.Update();
 }
 
-void MyFrame::OnOpenCLDiagnostics(wxCommandEvent &event)
+void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
 {
     // TODO: merge this with SelectOpenCLDevice?
     wxBusyCursor busy;
@@ -698,7 +727,7 @@ void MyFrame::UpdateWindows()
     this->Refresh(false);
 }
 
-void MyFrame::OnStep(wxCommandEvent &event)
+void MyFrame::OnStep(wxCommandEvent& event)
 {
     if(this->system->GetTimestepsTaken()==0)
         this->SaveStartingPattern();
@@ -725,7 +754,7 @@ void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
     event.Enable(!this->is_running);
 }
 
-void MyFrame::OnRunStop(wxCommandEvent &event)
+void MyFrame::OnRunStop(wxCommandEvent& event)
 {
     if(this->is_running) {
         this->is_running = false;
@@ -762,7 +791,7 @@ void MyFrame::UpdateToolbars()
                          : _("Start running the simulation") );
 }
 
-void MyFrame::OnReset(wxCommandEvent &event)
+void MyFrame::OnReset(wxCommandEvent& event)
 {
     if(this->system->GetTimestepsTaken() > 0) 
     {
@@ -919,7 +948,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     // TODO: hot-change the current RD system
 }
 
-void MyFrame::OnHelp(wxCommandEvent &event)
+void MyFrame::OnHelp(wxCommandEvent& event)
 {
     int id = event.GetId();
     switch (id)
@@ -951,7 +980,7 @@ void MyFrame::OnHelp(wxCommandEvent &event)
     }
 }
 
-void MyFrame::OnSavePattern(wxCommandEvent &event)
+void MyFrame::OnSavePattern(wxCommandEvent& event)
 {
     wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
         _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
@@ -974,7 +1003,7 @@ void MyFrame::SaveFile(const wxString& path)
     iw->Write();
 }
 
-void MyFrame::OnNewPattern(wxCommandEvent &event)
+void MyFrame::OnNewPattern(wxCommandEvent& event)
 {
     if(this->system == NULL) {
         // initial call from MyFrame::MyFrame
@@ -997,7 +1026,7 @@ void MyFrame::OnNewPattern(wxCommandEvent &event)
     this->UpdateWindows();
 }
 
-void MyFrame::OnOpenPattern(wxCommandEvent &event)
+void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
@@ -1085,7 +1114,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     }
 }
 
-void MyFrame::OnOpenRecent(wxCommandEvent &event)
+void MyFrame::OnOpenRecent(wxCommandEvent& event)
 {
     int id = event.GetId();
     if (id == ID::ClearMissingPatterns) {
@@ -1261,7 +1290,7 @@ void MyFrame::EditFile(const wxString& path)
     wxExecute(cmd, wxEXEC_ASYNC);
 }
 
-void MyFrame::OnChangeActiveChemical(wxCommandEvent &event)
+void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
 {
     wxArrayString choices;
     for(int i=0;i<this->system->GetNumberOfChemicals();i++)
@@ -1372,6 +1401,8 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, wxID_SELECTALL,                DO_SELALL);
         
         SetAccelerator(mbar, ID::FullScreen,                DO_FULLSCREEN);
+        SetAccelerator(mbar, ID::FitPattern,                DO_FIT);
+        SetAccelerator(mbar, ID::Wireframe,                 DO_WIREFRAME);
         SetAccelerator(mbar, ID::PatternsPane,              DO_PATTERNS);
         SetAccelerator(mbar, ID::RulePane,                  DO_RULE);
         SetAccelerator(mbar, ID::HelpPane,                  DO_HELP);
@@ -1397,7 +1428,78 @@ void MyFrame::ShowPrefsDialog(const wxString& page)
     this->UpdateWindows();
 }
 
-void MyFrame::OnPreferences(wxCommandEvent &event)
+void MyFrame::OnPreferences(wxCommandEvent& event)
 {
     ShowPrefsDialog();
+}
+
+void MyFrame::ProcessKey(int key, int modifiers)
+{
+    int cmdid = 0;
+    action_info action = FindAction(key, modifiers);
+    
+    switch (action.id)
+    {
+        case DO_NOTHING:    // any unassigned key (including escape) turns off full screen mode
+                            if (fullscreen) cmdid = ID::FullScreen; break;
+        
+        case DO_OPENFILE:   OpenFile(action.file);
+                            return;
+        
+        // File menu
+        case DO_NEWPATT:    cmdid = wxID_NEW; break;
+        case DO_OPENPATT:   cmdid = wxID_OPEN; break;
+        case DO_SAVE:       cmdid = wxID_SAVE; break;
+        case DO_SCREENSHOT: cmdid = ID::Screenshot; break;
+        case DO_PREFS:      cmdid = wxID_PREFERENCES; break;
+        case DO_QUIT:       cmdid = wxID_EXIT; break;
+        
+        // Edit menu
+        case DO_CUT:        cmdid = wxID_CUT; break;
+        case DO_COPY:       cmdid = wxID_COPY; break;
+        case DO_PASTE:      cmdid = wxID_PASTE; break;
+        case DO_CLEAR:      cmdid = wxID_CLEAR; break;
+        case DO_SELALL:     cmdid = wxID_SELECTALL; break;
+        
+        // View menu
+        case DO_FULLSCREEN: cmdid = ID::FullScreen; break;
+        case DO_FIT:        cmdid = ID::FitPattern; break;
+        case DO_WIREFRAME:  cmdid = ID::Wireframe; break;
+        case DO_PATTERNS:   cmdid = ID::PatternsPane; break;
+        case DO_RULE:       cmdid = ID::RulePane; break;
+        case DO_HELP:       cmdid = ID::HelpPane; break;
+        case DO_RESTORE:    cmdid = ID::RestoreDefaultPerspective; break;
+        case DO_CHEMICAL:   cmdid = ID::ChangeActiveChemical; break;
+        
+        // Action menu
+        case DO_STEP:       cmdid = ID::Step; break;
+        case DO_RUNSTOP:    cmdid = ID::RunStop; break;
+        case DO_RESET:      cmdid = ID::Reset; break;
+        case DO_RANDOM:     cmdid = ID::GenerateInitialPattern; break;
+        case DO_DEVICE:     cmdid = ID::SelectOpenCLDevice; break;
+        case DO_OPENCL:     cmdid = ID::OpenCLDiagnostics; break;
+        
+        // Help menu
+        case DO_ABOUT:      cmdid = wxID_ABOUT; break;
+        
+        default:            Warning(_("Bug detected in ProcessKey!"));
+    }
+   
+    if (cmdid != 0) {
+        wxCommandEvent cmdevent(wxEVT_COMMAND_MENU_SELECTED, cmdid);
+        cmdevent.SetEventObject(this);
+        this->GetEventHandler()->ProcessEvent(cmdevent);
+    }
+}
+
+void MyFrame::OnChar(wxKeyEvent& event)
+{
+    // this handler is connected to the render window (pVTKWindow)
+    int key = event.GetKeyCode();
+    int mods = event.GetModifiers();
+    
+    ProcessKey(key, mods);
+    
+    // don't call default handler (wxVTKRenderWindowInteractor::OnChar)
+    // event.Skip();
 }

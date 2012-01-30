@@ -83,6 +83,7 @@ typedef enum
     DO_CLEAR,                    // clear selection
     DO_COPY,                     // copy selection
     DO_CUT,                      // cut selection
+    DO_FIT,                      // fit pattern
     DO_FULLSCREEN,               // full screen
     DO_NEWPATT,                  // new pattern
     DO_OPENPATT,                 // open pattern...
@@ -102,6 +103,7 @@ typedef enum
     DO_PATTERNS,                 // show patterns pane
     DO_RULE,                     // show rule pane
     DO_STEP,                     // step
+    DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;
 

@@ -46,6 +46,7 @@ class RulePanel : public wxPanel
     private:
 
         void OnPropertyGridChanged(wxPropertyGridEvent& event);
+        void OnChar(wxKeyEvent& event);
 
     private:
 

@@ -8,12 +8,11 @@ before 0.2 release:
 - add a simple introduction to RD help page
 
 Andrew's tasks for 0.2:
-- finish implementing keyboard shortcuts
 - implement File > Add My Patterns... (or Set Pattern Folder... if that fails)
+- make About box a modal dialog using Help/about.html
 - fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
 - fix bug: tool tips not appearing (Mac app only?)
 - use better (big) toolbar icons in Mac app
-- make About box a modal dialog using Help/about.html
 - do any other "AKT TODO" tasks
 
 before 0.3 release:
@@ -23,6 +22,7 @@ before 0.3 release:
 before 0.x release:
 
 before 1.0 release:
+- create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
 - save out scene (e.g. OBJ) for external render (although paraview can load vti's)
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
 - bug: allow user to change OpenCL platform and device while a pattern is running

@@ -157,7 +157,7 @@ action_info keyaction[MAX_KEYCODES][MAX_MODS] = { { nullaction } };
 wxString accelerator[MAX_ACTIONS];
 
 #if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-    // wxMOD_CONTROL has been changed to mean Command key down (sheesh!)
+    // wxMOD_CONTROL has been changed to mean Command key down
     #define wxMOD_CONTROL wxMOD_RAW_CONTROL
     #define ControlDown RawControlDown
 #endif
@@ -267,6 +267,8 @@ void AddDefaultKeyActions()
 
     // View menu
     keyaction[IK_F1+10][0].id =         DO_FULLSCREEN;
+    keyaction[(int)'f'][mk_CMD].id =    DO_FIT;
+    keyaction[(int)'w'][0].id =         DO_WIREFRAME;
     keyaction[(int)'p'][mk_CMD].id =    DO_PATTERNS;
     keyaction[IK_HELP][0].id =          DO_HELP;
 #ifdef __WXMAC__
@@ -306,6 +308,8 @@ const char* GetActionName(action_id action)
         case DO_SELALL:         return "Select All";
         // View menu
         case DO_FULLSCREEN:     return "Full Screen";
+        case DO_FIT:            return "Fit Pattern";
+        case DO_WIREFRAME:      return "Wireframe";
         case DO_PATTERNS:       return "Show Patterns Pane";
         case DO_RULE:           return "Show Rule Pane";
         case DO_HELP:           return "Show Help Pane";
