@@ -291,6 +291,35 @@ class OtherChemical : public BaseFill
         int iOtherChemical;
 };
 
+class Parameter : public BaseFill
+{
+    public:
+
+        Parameter(vtkXMLDataElement* node) : BaseFill(node)
+        {
+            read_required_attribute(node,"name",this->parameter_name);
+        }
+
+        static const char* GetTypeName() { return "parameter"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(Parameter::GetTypeName());
+            xml->SetAttribute("name",this->parameter_name.c_str());
+            return xml;
+        }
+
+        virtual float GetValue(BaseRD *system,int x,int y,int z) const
+        {
+            return 0.5f;//system->GetParameterValueByName(this->parameter_name.c_str());
+        }
+
+    protected:
+
+        string parameter_name;
+};
+
 class WhiteNoise : public BaseFill
 {
     public:
@@ -394,6 +423,7 @@ class Rectangle : public BaseShape
     if(name==Constant::GetTypeName())             return new Constant(node);
     else if(name==WhiteNoise::GetTypeName())      return new WhiteNoise(node);
     else if(name==OtherChemical::GetTypeName())   return new OtherChemical(node);
+    else if(name==Parameter::GetTypeName())       return new Parameter(node);
     else throw runtime_error("Unsupported fill type: "+name);
 }
 
