@@ -1088,8 +1088,6 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             target_system = s;
         }
         iw->SetSystemFromXML(target_system,warn_to_update);
-        if(warn_to_update)
-            wxMessageBox("This file is from a more recent version of Ready. For best results you should download a newer version.");
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
@@ -1105,15 +1103,27 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     }
     catch(const exception& e)
     {
-        wxMessageBox(_("Failed to open file: ")+wxString(e.what(),wxConvUTF8));
+        if(warn_to_update)
+            wxMessageBox(_("This file is from a more recent version of Ready. You should download a newer version.\n\nError: ")
+                +wxString(e.what(),wxConvUTF8),_("Error reading file"),wxOK | wxICON_ERROR);
+        else
+            wxMessageBox(_("Failed to open file: ")+wxString(e.what(),wxConvUTF8),_("Error reading file"),wxOK | wxICON_ERROR);
         delete target_system;
         return;
     }
     catch(...)
     {
-        wxMessageBox(_("Failed to open file"));
+        if(warn_to_update)
+            wxMessageBox(_("This file is from a more recent version of Ready. You should download a newer version."),_("Error reading file"),wxOK | wxICON_ERROR);
+        else
+            wxMessageBox(_("Failed to open file"),_("Error reading file"),wxOK | wxICON_ERROR);
         delete target_system;
         return;
+    }
+    if(warn_to_update)
+    {
+        wxMessageBox("This file is from a more recent version of Ready. For best results you should download a newer version.");
+        // TODO: allow user to stop this message from appearing every time
     }
 }
 
