@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-    <RD>
+    <RD format_version="1">
         <rule type="formula" name="Gray-Scott" number_of_chemicals="2" timestep="1.0">
             <description>This formula was blah blah blah.</description>
             <param name="D_a">0.082</param>

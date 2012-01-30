@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
     
-  <RD>
+  <RD format_version="1">
     <rule type="formula" name="Heat equation" number_of_chemicals="1" timestep="0.1">
       <description>
           The heat equation, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.

@@ -1059,6 +1059,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     if (remember) AddRecentPattern(path);
     
     // load pattern file
+    bool warn_to_update = false;
     BaseRD *target_system = NULL;
     try
     {
@@ -1086,7 +1087,9 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             s->SetDevice(this->iOpenCLDevice);
             target_system = s;
         }
-        iw->SetSystemFromXML(target_system);
+        iw->SetSystemFromXML(target_system,warn_to_update);
+        if(warn_to_update)
+            wxMessageBox("This file is from a more recent version of Ready. For best results you should download a newer version.");
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
