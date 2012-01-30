@@ -16,18 +16,27 @@
       </param>
     </rule>
     <initial_pattern_generator apply_when_loading="1">
-      <RectangleOverlay fill_mode="Constant" paste_mode="Overwrite" value1="1" iChemical="0">
-        <PointND x="0" y="0" z="0" />
-        <PointND x="1" y="1" z="1" />
-      </RectangleOverlay>
-      <RectangleOverlay fill_mode="WhiteNoise" paste_mode="Overwrite" value1="0" value2="1" iChemical="0">
-        <PointND x="0.2" y="0.2" z="0.6" />
-        <PointND x="0.4" y="0.5" z="0.8" />
-      </RectangleOverlay>
-      <RectangleOverlay fill_mode="WhiteNoise" paste_mode="Overwrite" value1="0" value2="1" iChemical="1">
-        <PointND x="0.2" y="0.2" z="0.6" />
-        <PointND x="0.4" y="0.5" z="0.8" />
-      </RectangleOverlay>
+        <overlay chemical="0">
+            <overwrite />
+            <constant value="1" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="1">
+            <overwrite />
+            <white_noise low="0" high="1" />
+            <rectangle>
+                <Point3D x="0.2" y="0.2" z="0.6" />
+                <Point3D x="0.4" y="0.5" z="0.8" />
+            </rectangle>
+        </overlay>
+        <overlay chemical="0">
+            <subtract />
+            <other_chemical chemical="1" />
+            <rectangle>
+                <Point3D x="0.2" y="0.2" z="0.6" />
+                <Point3D x="0.4" y="0.5" z="0.8" />
+            </rectangle>
+        </overlay>
     </initial_pattern_generator>
   </RD>
 
