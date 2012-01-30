@@ -28,14 +28,66 @@
 #include <stdexcept>
 using namespace std;
 
-// TODO: expose this for re-use in IO_XML.cpp
-template <typename T> 
-void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val) 
-{ 
-    const char *str = e->GetAttribute(name.c_str());
-    if(!str || !from_string(str,val))
-        throw runtime_error(to_string(e->GetName())+" : failed to read required attribute: "+name);
-} 
+class Point3D : public XML_Object
+{
+    public:
+    
+        Point3D(vtkXMLDataElement *node);
+        
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
+        static const char* GetTypeName() { return "Point3D"; }
+
+    public:
+    
+        float x,y,z;
+};
+
+class BaseOperation : public Reusable_XML_Object
+{
+    public:
+
+        // construct when we don't know the derived type
+        static BaseOperation* New(vtkXMLDataElement* node);
+
+        virtual void Apply(float& target,float value) const =0;
+
+    protected:
+        
+        // can construct from an XML node
+        BaseOperation(vtkXMLDataElement* node) : Reusable_XML_Object(node) {}
+};
+
+class BaseFill : public Reusable_XML_Object
+{
+    public:
+
+        // construct when we don't know the derived type
+        static BaseFill* New(vtkXMLDataElement* node);
+
+        // what value would this fill type be at the given location, given the existing image as in system
+        virtual float GetValue(BaseRD *system,int x,int y,int z) const =0;
+
+    protected:
+
+        // can construct from an XML node
+        BaseFill(vtkXMLDataElement* node) : Reusable_XML_Object(node) {}
+};
+ 
+class BaseShape : public Reusable_XML_Object
+{
+    public:
+
+        // construct when we don't know the derived type
+        static BaseShape* New(vtkXMLDataElement* node);
+
+        virtual bool IsInside(float x,float y,float z,int dimensionality) const =0;
+
+    protected:
+
+        // can construct from an XML node
+        BaseShape(vtkXMLDataElement* node) : Reusable_XML_Object(node) {}
+};
 
 Point3D::Point3D(vtkXMLDataElement *node)
 {
@@ -56,7 +108,9 @@ vtkSmartPointer<vtkXMLDataElement> Point3D::GetAsXML() const
 
 Overlay::Overlay(vtkXMLDataElement* node)
 {
-    read_required_attribute(node,"chemical",this->iTargetChemical);
+    char c;
+    read_required_attribute(node,"chemical",c);
+    this->iTargetChemical = c-'a';
     if(node->GetNumberOfNestedElements()!=3)
         throw runtime_error("overlay : expected 3 nested elements (operation, fill, shape)");
     this->op = BaseOperation::New(node->GetNestedElement(0));
@@ -68,7 +122,7 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
     xml->SetName(Overlay::GetTypeName());
-    xml->SetAttribute("chemical",to_string(this->iTargetChemical).c_str());
+    xml->SetAttribute("chemical",string(1,'a'+this->iTargetChemical).c_str());
     xml->AddNestedElement(this->op->GetAsXML());
     xml->AddNestedElement(this->fill->GetAsXML());
     xml->AddNestedElement(this->shape->GetAsXML());
@@ -211,7 +265,9 @@ class OtherChemical : public BaseFill
 
         OtherChemical(vtkXMLDataElement* node) : BaseFill(node)
         {
-            read_required_attribute(node,"chemical",this->iOtherChemical);
+            char c;
+            read_required_attribute(node,"chemical",c);
+            this->iOtherChemical = c-'a';
         }
 
         static const char* GetTypeName() { return "other_chemical"; }
@@ -220,7 +276,7 @@ class OtherChemical : public BaseFill
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(OtherChemical::GetTypeName());
-            xml->SetIntAttribute("chemical",this->iOtherChemical);
+            xml->SetAttribute("chemical",string(1,'a'+this->iOtherChemical).c_str());
             return xml;
         }
 
@@ -336,8 +392,8 @@ class Rectangle : public BaseShape
 /* static */ BaseFill* BaseFill::New(vtkXMLDataElement* node)
 {
     string name(node->GetName());
-    if(name==Constant::GetTypeName())          return new Constant(node);
-    else if(name==WhiteNoise::GetTypeName())   return new WhiteNoise(node);
+    if(name==Constant::GetTypeName())             return new Constant(node);
+    else if(name==WhiteNoise::GetTypeName())      return new WhiteNoise(node);
     else if(name==OtherChemical::GetTypeName())   return new OtherChemical(node);
     else throw runtime_error("Unsupported fill type: "+name);
 }

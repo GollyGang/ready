@@ -18,6 +18,10 @@
 // STL:
 #include <string>
 #include <sstream>
+#include <stdexcept>
+
+// VTK:
+#include <vtkXMLDataElement.h>
 
 double get_time_in_seconds();
 
@@ -46,3 +50,11 @@ template <typename T> bool from_string(const std::string& s,T& val)
 } 
 
 float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
+
+template <typename T> 
+void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val) 
+{ 
+    const char *str = e->GetAttribute(name.c_str());
+    if(!str || !from_string(str,val))
+        throw std::runtime_error(to_string(e->GetName())+" : failed to read required attribute: "+name);
+} 
