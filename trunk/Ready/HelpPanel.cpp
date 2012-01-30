@@ -210,28 +210,51 @@ void HtmlView::OnChar(wxKeyEvent& event)
         return;
     }
     */
+    
     int key = event.GetKeyCode();
-    if ( key == '+' || key == '=' || key == WXK_ADD ) {
-        if ( helpfontsize < maxfontsize ) {
-            helpfontsize++;
-            ChangeFontSizes(helpfontsize);
+    int mods = event.GetModifiers();
+    
+    if ( mods == wxMOD_NONE || (mods == wxMOD_SHIFT && key == '+') ) {
+        if ( key == '+' || key == '=' || key == WXK_ADD ) {
+            if ( helpfontsize < maxfontsize ) {
+                helpfontsize++;
+                ChangeFontSizes(helpfontsize);
+            }
+            return;
         }
-    } else if ( key == '-' || key == WXK_SUBTRACT ) {
-        if ( helpfontsize > minfontsize ) {
-            helpfontsize--;
-            ChangeFontSizes(helpfontsize);
+        if ( key == '-' || key == WXK_SUBTRACT ) {
+            if ( helpfontsize > minfontsize ) {
+                helpfontsize--;
+                ChangeFontSizes(helpfontsize);
+            }
+            return;
         }
-    } else if ( key == '[' || key == WXK_LEFT ) {
-        if ( HistoryBack() ) {
-            panel->UpdateHelpButtons();
+        if ( key == '[' ) {
+            if ( HistoryBack() ) {
+                panel->UpdateHelpButtons();
+            }
+            return;
         }
-    } else if ( key == ']' || key == WXK_RIGHT ) {
-        if ( HistoryForward() ) {
-            panel->UpdateHelpButtons();
+        if ( key == ']' ) {
+            if ( HistoryForward() ) {
+                panel->UpdateHelpButtons();
+            }
+            return;
         }
-    } else {
-        event.Skip();     // so up/down arrows and pg up/down keys work
+        if ( key == WXK_HOME ) {
+            panel->ShowHelp(helphome);
+            return;
+        }
+        if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ||
+             key == WXK_PAGEUP || key == WXK_PAGEDOWN ) {
+            // let default handler see arrow keys and pg up/down keys (for scroll bars)
+            event.Skip();
+            return;
+        }
     }
+    
+    // check for other keyboard shortcuts
+    frame->ProcessKey(key, mods);
 }
 
 // -----------------------------------------------------------------------------
@@ -282,7 +305,7 @@ void HtmlView::ChangeFontSizes(int size)
     int x, y;
     GetViewStart(&x, &y);
     SetFontSizes(size);
-    if (y > 0) Scroll(-1, y);
+    Scroll(x, y);
     // AKT TODO!!! fix display bug (Mac only?) when size increases so that scroll bar appears
     panel->UpdateHelpButtons();
 }

@@ -37,6 +37,11 @@
 #define __WXCOCOA__
 #endif
 
+#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
+    // AKT: ControlDown has been changed to mean Command key down
+    #define ControlDown RawControlDown
+#endif
+
 #ifdef __WXMAC__
 #ifdef __WXCOCOA__
 #include "vtkCocoaRenderWindow.h"
@@ -607,6 +612,16 @@ void wxVTKRenderWindowInteractor::OnKeyUp(wxKeyEvent &event)
   event.Skip();
 }
 #endif //!(VTK_MAJOR_VERSION == 3 && VTK_MINOR_VERSION == 1)
+
+//---------------------------------------------------------------------------
+// AKT: added for Ready (is there a better way???)
+void wxVTKRenderWindowInteractor::DoCharEvent(char key)
+{
+  wxPoint mousePos = ScreenToClient(wxGetMousePosition());
+  SetEventInformationFlipY(mousePos.x, mousePos.y, false, false, key, 0, NULL);
+  InvokeEvent(vtkCommand::CharEvent, NULL);
+}
+
 //---------------------------------------------------------------------------
 void wxVTKRenderWindowInteractor::OnChar(wxKeyEvent &event)
 {

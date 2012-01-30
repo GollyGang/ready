@@ -42,6 +42,9 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
     sizer->AddStretchSpacer(0); // fill any gap at the bottom of the panel, to avoid that part of the screen getting corrupted
 
     this->SetSizer(sizer);
+
+    // install event handler to detect keyboard shortcuts
+    this->pgrid->Connect(wxEVT_CHAR, wxKeyEventHandler(RulePanel::OnChar), NULL, this);
 }
 
 void RulePanel::Update(const BaseRD* const system)
@@ -124,4 +127,22 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
         this->frame->SetFormula(string((wxAny(property->GetValue())).As<wxString>().mb_str()));
     if(property == this->dimensions_property)
         wxMessageBox(_T("TODO!!!"));
+}
+
+void RulePanel::OnChar(wxKeyEvent& event)
+{
+    int key = event.GetKeyCode();
+    int mods = event.GetModifiers();
+    
+    if ( mods == wxMOD_NONE ) {
+        if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ||
+             key == WXK_TAB ) {
+            // let default handler see tab and arrow keys (to select rows, etc)
+            event.Skip();
+            return;
+        }
+    }
+   
+    // check for other keyboard shortcuts
+    frame->ProcessKey(key, mods);
 }

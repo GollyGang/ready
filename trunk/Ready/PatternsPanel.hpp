@@ -47,6 +47,7 @@ class PatternsPanel : public wxPanel
         void OnTreeExpand(wxTreeEvent& event);
         void OnTreeCollapse(wxTreeEvent& event);
         void OnTreeClick(wxMouseEvent& event);
+        void OnChar(wxKeyEvent& event);
 
     private:
 

@@ -105,6 +105,9 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         // fix double-click problem
         treectrl->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
     #endif
+
+    // install event handler to detect keyboard shortcuts
+    treectrl->Connect(wxEVT_CHAR, wxKeyEventHandler(PatternsPanel::OnChar), NULL, this);
 }
 
 void PatternsPanel::DoIdleChecks()
@@ -193,41 +196,6 @@ void PatternsPanel::OnTreeCollapse(wxTreeEvent& WXUNUSED(event))
     #endif
 }
 
-void PatternsPanel::OnTreeClick(wxMouseEvent& event)
-{
-    // set global flag for testing in OnTreeSelChanged
-    edit_file = event.ControlDown() || event.RightDown();
-   
-    #ifdef __WXMSW__
-        // this handler gets called even if user clicks outside an item,
-        // and in some cases can result in the top visible item becoming
-        // selected, so we need to avoid that
-        ignore_selection = false;
-        if (patternctrl) {
-            wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
-            if (treectrl) {
-                wxPoint pt = event.GetPosition();
-                int flags;
-                wxTreeItemId id = treectrl->HitTest(pt, flags);
-                if (id.IsOk() && (flags & wxTREE_HITTEST_ONITEMLABEL ||
-                                  flags & wxTREE_HITTEST_ONITEMICON)) {
-                    // fix problem with right-click
-                    if (event.RightDown()) {
-                        treectrl->SelectItem(id, true);
-                        // OnTreeSelChanged gets called a few times for some reason
-                    }
-                    // fix problem with double-click
-                    if (event.LeftDClick()) ignore_selection = true;
-                } else {
-                    ignore_selection = true;
-                }
-            }
-        }
-    #endif
-   
-    event.Skip();
-}
-
 void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
 {
     if (patternctrl == NULL) return;   // ignore 1st call
@@ -284,4 +252,56 @@ void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
         // calling Unselect() here causes a crash so do later in DoIdleChecks
         call_unselect = true;
     #endif
+}
+
+void PatternsPanel::OnTreeClick(wxMouseEvent& event)
+{
+    // set global flag for testing in OnTreeSelChanged
+    edit_file = event.ControlDown() || event.RightDown();
+   
+    #ifdef __WXMSW__
+        // this handler gets called even if user clicks outside an item,
+        // and in some cases can result in the top visible item becoming
+        // selected, so we need to avoid that
+        ignore_selection = false;
+        if (patternctrl) {
+            wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
+            if (treectrl) {
+                wxPoint pt = event.GetPosition();
+                int flags;
+                wxTreeItemId id = treectrl->HitTest(pt, flags);
+                if (id.IsOk() && (flags & wxTREE_HITTEST_ONITEMLABEL ||
+                                  flags & wxTREE_HITTEST_ONITEMICON)) {
+                    // fix problem with right-click
+                    if (event.RightDown()) {
+                        treectrl->SelectItem(id, true);
+                        // OnTreeSelChanged gets called a few times for some reason
+                    }
+                    // fix problem with double-click
+                    if (event.LeftDClick()) ignore_selection = true;
+                } else {
+                    ignore_selection = true;
+                }
+            }
+        }
+    #endif
+   
+    event.Skip();
+}
+
+void PatternsPanel::OnChar(wxKeyEvent& event)
+{
+    int key = event.GetKeyCode();
+    int mods = event.GetModifiers();
+    
+    if ( mods == wxMOD_NONE ) {
+        if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ) {
+            // let default handler see arrow keys (to select files or open/close folders)
+            event.Skip();
+            return;
+        }
+    }
+   
+    // check for other keyboard shortcuts
+    frame->ProcessKey(key, mods);
 }

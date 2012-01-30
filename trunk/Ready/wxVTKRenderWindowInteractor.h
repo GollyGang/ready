@@ -102,6 +102,8 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
 	  //destructor
     ~wxVTKRenderWindowInteractor();
 
+    void DoCharEvent(char key);   // AKT: added for Ready
+
     // vtkRenderWindowInteractor overrides
     void Initialize();
     void Enable();

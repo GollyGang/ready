@@ -41,6 +41,8 @@ namespace ID { enum {
     
     // view menu
     FullScreen,
+    FitPattern,
+    Wireframe,
     PatternsPane,
     RulePane,
     CanvasPane,

@@ -61,6 +61,9 @@ class MyFrame : public wxFrame
         // interface with Preferences dialog
         void ShowPrefsDialog(const wxString& page = wxEmptyString);
         void UpdateMenuAccelerators();
+        
+        // handle keyboard shortcuts not appearing in menu items
+        void ProcessKey(int key, int modifiers);
 
         bool fullscreen;    // in full screen mode?
 
@@ -91,6 +94,9 @@ class MyFrame : public wxFrame
 
         // View menu
         void OnFullScreen(wxCommandEvent& event);
+        void OnFitPattern(wxCommandEvent& event);
+        void OnWireframe(wxCommandEvent& event);
+        void OnUpdateWireframe(wxUpdateUIEvent& event);
         void OnToggleViewPane(wxCommandEvent& event);
         void OnUpdateViewPane(wxUpdateUIEvent& event);
         void OnRestoreDefaultPerspective(wxCommandEvent& event);
@@ -115,6 +121,7 @@ class MyFrame : public wxFrame
         void OnIdle(wxIdleEvent& event);
         void OnSize(wxSizeEvent& event);
         void OnClose(wxCloseEvent& event);
+        void OnChar(wxKeyEvent& event);
 
         // internal functions
 
@@ -162,6 +169,7 @@ class MyFrame : public wxFrame
         // settings:
 
         bool is_running;
+        bool is_wireframe;
         int timesteps_per_render;
         double frames_per_second,million_cell_generations_per_second;
 
