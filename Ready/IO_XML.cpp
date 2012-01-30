@@ -19,7 +19,7 @@
 #include "IO_XML.hpp"
 #include "BaseRD.hpp"
 #include "utils.hpp"
-#include "BaseOverlay.hpp"
+#include "overlays.hpp"
 
 // VTK:
 #include <vtkXMLUtilities.h>
@@ -76,18 +76,7 @@ void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
         system->GetInitialPatternGenerator().clear();
     }
     for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
-    {
-        vtkSmartPointer<vtkXMLDataElement> node = ipg->GetNestedElement(i);
-
-        if(to_string(node->GetName())==to_string(RectangleOverlay::GetXMLName())) // TODO: use factory pattern
-        {
-            system->GetInitialPatternGenerator().push_back(new RectangleOverlay(node));
-        }
-        else
-        {
-            // TODO: unknown overlay type from the future or from a mistake: should continue anyway but might want to warn the user
-        }
-    }
+        system->GetInitialPatternGenerator().push_back(new Overlay(ipg->GetNestedElement(i)));
 }
 
 string RD_XMLReader::GetType()
@@ -230,7 +219,7 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
     {
         vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
         initial_pattern_generator->SetName("initial_pattern_generator");
-        const vector<BaseOverlay*>& overlays = system->GetInitialPatternGenerator();
+        const vector<Overlay*>& overlays = system->GetInitialPatternGenerator();
         for(int i=0;i<(int)overlays.size();i++)
             initial_pattern_generator->AddNestedElement(overlays[i]->GetAsXML());
         rd->AddNestedElement(initial_pattern_generator);

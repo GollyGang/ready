@@ -17,7 +17,8 @@
 
 // local:
 #include "BaseRD.hpp"
-#include "BaseOverlay.hpp"
+#include "overlays.hpp"
+#include "utils.hpp"
 
 // stdlib:
 #include <stdlib.h>
@@ -39,10 +40,6 @@ BaseRD::BaseRD()
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
     this->is_modified = false;
-    // initialise the initial-pattern-generator for inbuilt rules (placeholder behaviour only)
-    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0,0,0),PointND(1,1,1),0,1.0f,BaseOverlay::Overwrite));
-    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0.2,0.2,0),PointND(0.4,0.5,1),0,0.0f,1.0f,BaseOverlay::Overwrite));
-    this->initial_pattern_generator.push_back(new RectangleOverlay(PointND(0.2,0.2,0),PointND(0.4,0.5,1),1,0.0f,1.0f,BaseOverlay::Overwrite));
 }
 
 BaseRD::~BaseRD()
@@ -252,12 +249,6 @@ void BaseRD::SetParameterValue(int iParam,float val)
     return im;
 }
 
-/* static */ float* BaseRD::vtk_at(float* origin,int x,int y,int z,int X,int Y)
-{
-    // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
-    return origin + x + X*(y + Y*z);
-}
-
 bool BaseRD::IsModified() const
 {
     return this->is_modified;
@@ -286,23 +277,19 @@ void BaseRD::GenerateInitialPattern()
     const int Y = this->GetY();
     const int Z = this->GetZ();
 
-	for(int iImage=0;iImage<(int)this->images.size();iImage++)
-	{
-        float* origin = static_cast<float*>(this->images[iImage]->GetScalarPointer());
-        for(int z=0;z<Z;z++)
+    for(int z=0;z<Z;z++)
+    {
+        for(int y=0;y<Y;y++)
         {
-            for(int y=0;y<Y;y++)
+            for(int x=0;x<X;x++)
             {
-                for(int x=0;x<X;x++)
-                {
-                    float& value = *vtk_at(origin,x,y,z,this->GetX(),this->GetY());
-                    for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
-                        this->initial_pattern_generator[iOverlay]->Apply(iImage,PointND(x/float(X),y/float(Y),z/float(Z)),value);
-                }
+                for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
+                    this->initial_pattern_generator[iOverlay]->Apply(this,x,y,z);
             }
         }
-		this->images[iImage]->Modified();
-	}
+    }
+    for(int i=0;i<(int)this->images.size();i++)
+	    this->images[i]->Modified();
 	this->timesteps_taken = 0;
 }
 
