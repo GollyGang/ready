@@ -344,9 +344,8 @@ class Rectangle : public BaseShape
 {
     public:
 
-        Rectangle(vtkXMLDataElement* node) : BaseShape(node),a(node->GetNestedElement(0)),b(node->GetNestedElement(1))
-        {
-        }
+        Rectangle(vtkXMLDataElement* node) : BaseShape(node),
+            a(node->GetNestedElement(0)), b(node->GetNestedElement(1)) {}
 
         static const char* GetTypeName() { return "rectangle"; }
 
@@ -354,8 +353,8 @@ class Rectangle : public BaseShape
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Rectangle::GetTypeName());
-            xml->AddNestedElement(a.GetAsXML());
-            xml->AddNestedElement(b.GetAsXML());
+            xml->AddNestedElement(this->a.GetAsXML());
+            xml->AddNestedElement(this->b.GetAsXML());
             return xml;
         }
 
