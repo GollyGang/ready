@@ -36,7 +36,12 @@ class PatternsPanel : public wxPanel
 
         PatternsPanel(MyFrame* parent,wxWindowID id);
 
-        void DoIdleChecks();   // called from MyFrame's OnIdle handler
+        void DoIdleChecks();    // called from MyFrame's OnIdle handler
+        
+        bool TreeHasFocus();    // tree ctrl has keyboard focus?
+        
+        // return false if key event should be passed to default handler
+        bool DoKey(int key, int mods);
 
     private:
 
@@ -47,7 +52,6 @@ class PatternsPanel : public wxPanel
         void OnTreeExpand(wxTreeEvent& event);
         void OnTreeCollapse(wxTreeEvent& event);
         void OnTreeClick(wxMouseEvent& event);
-        void OnChar(wxKeyEvent& event);
 
     private:
 

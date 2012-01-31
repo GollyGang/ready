@@ -42,6 +42,11 @@ class RulePanel : public wxPanel
 
         // update the controls to the state of the RD system
         void Update(const BaseRD* const system);
+        
+        bool GridHasFocus();    // pgrid has keyboard focus?
+        
+        // return false if key event should be passed to default handler
+        bool DoKey(int key, int mods);
 
     private:
 

@@ -106,8 +106,9 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         treectrl->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
     #endif
 
-    // install event handler to detect keyboard shortcuts
-    treectrl->Connect(wxEVT_CHAR, wxKeyEventHandler(PatternsPanel::OnChar), NULL, this);
+    // install event handlers to detect keyboard shortcuts when treectrl has focus
+    treectrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, frame);
+    treectrl->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
 }
 
 void PatternsPanel::DoIdleChecks()
@@ -289,19 +290,23 @@ void PatternsPanel::OnTreeClick(wxMouseEvent& event)
     event.Skip();
 }
 
-void PatternsPanel::OnChar(wxKeyEvent& event)
+bool PatternsPanel::TreeHasFocus()
 {
-    int key = event.GetKeyCode();
-    int mods = event.GetModifiers();
-    
+    wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
+    return treectrl && treectrl->HasFocus();
+}
+
+bool PatternsPanel::DoKey(int key, int mods)
+{
+    // first look for keys that should be passed to the default handler
     if ( mods == wxMOD_NONE ) {
         if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ) {
             // let default handler see arrow keys (to select files or open/close folders)
-            event.Skip();
-            return;
+            return false;
         }
     }
-   
-    // check for other keyboard shortcuts
+    
+    // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
+    return true;
 }

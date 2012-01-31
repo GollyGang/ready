@@ -72,6 +72,12 @@ using namespace std;
     #define SetText SetItemLabel
 #endif
 
+#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
+    // wxMOD_CONTROL has been changed to mean Command key down
+    #define wxMOD_CONTROL wxMOD_RAW_CONTROL
+    #define ControlDown RawControlDown
+#endif
+
 wxString PaneName(int id)
 {
     return wxString::Format(_T("%d"),id);
@@ -418,7 +424,8 @@ void MyFrame::InitializeRenderPane()
         this->pVTKWindow->SetDropTarget(new DnDFile());
     #endif
 
-    // install event handler to detect keyboard shortcuts when render window has focus
+    // install event handlers to detect keyboard shortcuts when render window has focus
+    this->pVTKWindow->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, this);
     this->pVTKWindow->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, this);
 }
 
@@ -597,7 +604,7 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(event.GetId()));
     if(!pane.IsOk()) return;
     event.Check(pane.IsShown());
-    // AKT: following call isn't necessary and can cause unwanted flashing
+    // following call isn't necessary and can cause unwanted flashing
     // in help pane (due to HtmlView::OnSize being called)
     // this->aui_mgr.Update();
 }
@@ -812,9 +819,32 @@ void MyFrame::OnUpdateReset(wxUpdateUIEvent& event)
     event.Enable(this->system->GetTimestepsTaken() > 0);
 }
 
+void MyFrame::CheckFocus()
+{
+    // ensure one of our panes (or a text ctrl) has the focus so keyboard shortcuts always work
+    if ( this->pVTKWindow->HasFocus() ||
+         this->patterns_panel->TreeHasFocus() ||
+         this->rule_panel->GridHasFocus() ||
+         this->help_panel->HtmlHasFocus() ) {
+        // good, no need to change focus
+    } else {
+        // check if a text ctrl has the focus
+        wxWindow* win = wxWindow::FindFocus();
+        wxTextCtrl* textctrl = (win == NULL) ? NULL : wxDynamicCast(win,wxTextCtrl);
+        if (textctrl) {
+            // don't change focus
+        } else {
+            // best to restore focus to render window
+            this->pVTKWindow->SetFocus();
+        }
+    }
+}
+
 void MyFrame::OnIdle(wxIdleEvent& event)
 {
     this->patterns_panel->DoIdleChecks();
+    
+    if (this->IsActive()) this->CheckFocus();
     
     // we drive our game loop by onIdle events
     if(this->is_running)
@@ -1525,14 +1555,120 @@ void MyFrame::ProcessKey(int key, int modifiers)
     }
 }
 
+// this global is used to pass info from OnKeyDown to OnChar
+static int realkey;
+
+void MyFrame::OnKeyDown(wxKeyEvent& event)
+{
+    #ifdef __WXMAC__
+        // close any open tool tip window (fixes wxMac bug?)
+        wxToolTip::RemoveToolTips();
+    #endif
+
+    realkey = event.GetKeyCode();
+    int mods = event.GetModifiers();
+
+    // WARNING: logic must match that in KeyComboCtrl::OnKeyDown in prefs.cpp
+    if (mods == wxMOD_NONE || realkey == WXK_ESCAPE || realkey > 127) {
+        // tell OnChar handler to ignore realkey
+        realkey = 0;
+    }
+
+    #ifdef __WXOSX__
+        // pass ctrl/cmd-key combos directly to OnChar
+        if (realkey > 0 && ((mods & wxMOD_CONTROL) || (mods & wxMOD_CMD))) {
+            this->OnChar(event);
+            return;
+        }
+    #endif
+    
+    #ifdef __WXMSW__
+        // on Windows, OnChar is NOT called for some ctrl-key combos like
+        // ctrl-0..9 or ctrl-alt-key, so we call OnChar ourselves
+        if (realkey > 0 && (mods & wxMOD_CONTROL)) {
+            this->OnChar(event);
+            return;
+        }
+    #endif
+
+    #ifdef __WXGTK__
+        if (realkey == ' ' && mods == wxMOD_SHIFT) {
+            // fix wxGTK bug (curiously, the bug isn't seen in the prefs dialog);
+            // OnChar won't see the shift modifier, so set realkey to a special
+            // value to tell OnChar that shift-space was pressed
+            realkey = -666;
+        }
+    #endif
+
+    event.Skip();
+}
+
 void MyFrame::OnChar(wxKeyEvent& event)
 {
-    // this handler is connected to the render window (pVTKWindow)
     int key = event.GetKeyCode();
     int mods = event.GetModifiers();
+
+    // WARNING: logic here must match that in KeyComboCtrl::OnChar in prefs.cpp
+    if (realkey > 0 && mods != wxMOD_NONE) {
+        #ifdef __WXGTK__
+            // sigh... wxGTK returns inconsistent results for shift-comma combos
+            // so we assume that '<' is produced by pressing shift-comma
+            // (which might only be true for US keyboards)
+            if (key == '<' && (mods & wxMOD_SHIFT)) realkey = ',';
+        #endif
+        #ifdef __WXMSW__
+            // sigh... wxMSW returns inconsistent results for some shift-key combos
+            // so again we assume we're using a US keyboard
+            if (key == '~' && (mods & wxMOD_SHIFT)) realkey = '`';
+            if (key == '+' && (mods & wxMOD_SHIFT)) realkey = '=';
+        #endif
+        if (mods == wxMOD_SHIFT && key != realkey) {
+            // use translated key code but remove shift key;
+            // eg. we want shift-'/' to be seen as '?'
+            mods = wxMOD_NONE;
+        } else {
+            // use key code seen by OnKeyDown
+            key = realkey;
+            if (key >= 'A' && key <= 'Z') key += 32;  // convert A..Z to a..z
+        }
+    }
     
-    ProcessKey(key, mods);
+    #ifdef __WXGTK__
+        if (realkey == -666) {
+            // OnKeyDown saw that shift-space was pressed but for some reason
+            // OnChar doesn't see the modifier (ie. mods is wxMOD_NONE)
+            key = ' ';
+            mods = wxMOD_SHIFT;
+        }
+    #endif
     
-    // don't call default handler (wxVTKRenderWindowInteractor::OnChar)
-    // event.Skip();
+    if (this->pVTKWindow->HasFocus()) {
+        ProcessKey(key, mods);
+        // don't call default handler (wxVTKRenderWindowInteractor::OnChar)
+        return;
+    }
+    
+    if (this->patterns_panel->TreeHasFocus()) {
+        // process keyboard shortcut for patterns panel
+        if (this->patterns_panel->DoKey(key, mods)) return;
+        // else call default handler
+        event.Skip();
+        return;
+    }
+    
+    if (this->rule_panel->GridHasFocus()) {
+        // process keyboard shortcut for rule panel
+        if (this->rule_panel->DoKey(key, mods)) return;
+        // else call default handler
+        event.Skip();
+        return;
+    }
+    
+    if (this->help_panel->HtmlHasFocus()) {
+        // process keyboard shortcut for help panel
+        if (this->help_panel->DoKey(key, mods)) return;
+        // else call default handler
+        event.Skip();
+        return;
+    }
 }

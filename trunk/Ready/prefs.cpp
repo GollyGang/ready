@@ -203,11 +203,10 @@ bool ConvertKeyAndModifiers(int wxkey, int wxmods, int* newkey, int* newmods)
             case WXK_PAGEDOWN:      ourkey = IK_PAGEDOWN; break;
             case WXK_HELP:          ourkey = IK_HELP; break;
             case WXK_INSERT:        ourkey = IK_INSERT; break;
-            case WXK_BACK:       // treat backspace like delete
+            case WXK_BACK:          // treat backspace like delete
             case WXK_DELETE:        ourkey = IK_DELETE; break;
             case WXK_TAB:           ourkey = IK_TAB; break;
-                                 // treat enter like return
-            case WXK_NUMPAD_ENTER:
+            case WXK_NUMPAD_ENTER:  // treat enter like return
             case WXK_RETURN:        ourkey = IK_RETURN; break;
             case WXK_LEFT:          ourkey = IK_LEFT; break;
             case WXK_RIGHT:         ourkey = IK_RIGHT; break;
@@ -1388,7 +1387,7 @@ void KeyComboCtrl::OnKeyDown(wxKeyEvent& event)
     }
 #endif
 
-    // WARNING: logic must match that in PatternView::OnKeyDown
+    // WARNING: logic must match that in MyFrame::OnKeyDown
     if (mods == wxMOD_NONE || realkey > 127) {
         // tell OnChar handler to ignore realkey
         realkey = 0;
@@ -1451,7 +1450,7 @@ void KeyComboCtrl::OnChar(wxKeyEvent& event)
         Warning(debugkey);
     }
 
-    // WARNING: logic must match that in PatternView::OnChar
+    // WARNING: logic must match that in MyFrame::OnChar
     if (realkey > 0 && mods != wxMOD_NONE) {
         #ifdef __WXGTK__
             // sigh... wxGTK returns inconsistent results for shift-comma combos
@@ -1469,12 +1468,10 @@ void KeyComboCtrl::OnChar(wxKeyEvent& event)
             // use translated key code but remove shift key;
             // eg. we want shift-'/' to be seen as '?'
             mods = wxMOD_NONE;
-        }
-        else {
+        } else {
             // use key code seen by OnKeyDown
             key = realkey;
-                                 // convert A..Z to a..z
-            if (key >= 'A' && key <= 'Z') key += 32;
+            if (key >= 'A' && key <= 'Z') key += 32;   // convert A..Z to a..z
         }
     }
 
