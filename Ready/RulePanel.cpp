@@ -35,8 +35,7 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
 {
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-    this->pgrid = new wxPropertyGrid(this,wxID_ANY,wxDefaultPosition,wxDefaultSize,
-        wxPG_SPLITTER_AUTO_CENTER );
+    this->pgrid = new wxPropertyGrid(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
     sizer->Add(this->pgrid,wxSizerFlags(1).Expand());
 
     sizer->AddStretchSpacer(0); // fill any gap at the bottom of the panel, to avoid that part of the screen getting corrupted

@@ -144,6 +144,7 @@ class MyFrame : public wxFrame
         void SaveStartingPattern();
         void RestoreStartingPattern();
 
+        wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
 
     private:
@@ -174,10 +175,7 @@ class MyFrame : public wxFrame
         double frames_per_second,million_cell_generations_per_second;
 
         wxString default_perspective;
-        wxString last_used_screenshot_folder;
         int iActiveChemical;
-
-        int iOpenCLPlatform,iOpenCLDevice;
 
         DECLARE_EVENT_TABLE()
 };

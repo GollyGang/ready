@@ -148,7 +148,6 @@ MyFrame::MyFrame(const wxString& title)
        timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
-       iOpenCLPlatform(0),iOpenCLDevice(0),
        iActiveChemical(1),
        fullscreen(false)
 {
@@ -429,11 +428,6 @@ void MyFrame::LoadSettings()
     this->SetPosition(wxPoint(mainx,mainy));
     this->SetSize(mainwd,mainht);
     if (auilayout.length() > 0) this->aui_mgr.LoadPerspective(auilayout);
-
-    // AKT TODO!!! remove iOpenCLPlatform etc and use globals from prefs.h, or make them public???
-    this->iOpenCLPlatform = opencl_platform;
-    this->iOpenCLDevice = opencl_device;
-    this->last_used_screenshot_folder = screenshotdir;
 }
 
 void MyFrame::SaveSettings()
@@ -443,12 +437,6 @@ void MyFrame::SaveSettings()
     } else {
         auilayout = this->aui_mgr.SavePerspective();
     }
-    
-    // AKT TODO!!! remove iOpenCLPlatform etc and use globals from prefs.h, or make them public???
-    opencl_platform = this->iOpenCLPlatform;
-    opencl_device = this->iOpenCLDevice;
-    screenshotdir = this->last_used_screenshot_folder;
-    
     SavePrefs();
 }
 
@@ -485,12 +473,13 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 void MyFrame::OnCut(wxCommandEvent& event)
 {
     // TODO: action depends on which pane has focus
+    if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
 
 void MyFrame::OnCopy(wxCommandEvent& event)
 {
-    // action depends on which pane has focus
+    // TODO: action depends on which pane has focus
     if (this->help_panel->HtmlHasFocus()) {
         this->help_panel->CopySelection();
         return;
@@ -501,6 +490,7 @@ void MyFrame::OnCopy(wxCommandEvent& event)
 void MyFrame::OnPaste(wxCommandEvent& event)
 {
     // TODO: action depends on which pane has focus
+    if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
 
@@ -512,12 +502,13 @@ void MyFrame::OnUpdatePaste(wxUpdateUIEvent& event)
 void MyFrame::OnClear(wxCommandEvent& event)
 {
     // TODO: action depends on which pane has focus
+    if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
 
 void MyFrame::OnSelectAll(wxCommandEvent& event)
 {
-    // action depends on which pane has focus, if any
+    // TODO: action depends on which pane has focus, if any
     if (this->help_panel->HtmlHasFocus()) {
         this->help_panel->SelectAllText();
         return;
@@ -647,7 +638,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     int unused_value = 0;
     wxString filename;
     wxString extension,folder;
-    folder = this->last_used_screenshot_folder;
+    folder = screenshotdir;
     do {
         filename = default_filename_root;
         filename << wxString::Format(_("%04d."),unused_value) << default_filename_ext;
@@ -657,7 +648,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     // ask the user for confirmation
     bool accepted = true;
     do {
-        filename = wxFileSelector(_("Specify the screenshot filename:"),folder,filename,default_filename_ext,
+        filename = wxFileSelector(_("Specify the screenshot filename"),folder,filename,default_filename_ext,
             _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
             wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
         if(filename.empty()) return; // user cancelled
@@ -670,7 +661,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
         }
     } while(!accepted);
 
-    this->last_used_screenshot_folder = folder;
+    screenshotdir = folder;
 
     vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
     screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
@@ -921,7 +912,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
         int nd = OpenCL_RD::GetNumberOfDevices(ip);
         for(int id=0;id<nd;id++)
         {
-            if(ip==this->iOpenCLPlatform && id==this->iOpenCLDevice)
+            if(ip==opencl_platform && id==opencl_device)
                 iOldSelection = (int)choices.size();
             wxString s(OpenCL_RD::GetPlatformDescription(ip).c_str(),wxConvUTF8);
             s << _T(" : ") << wxString(OpenCL_RD::GetDeviceDescription(ip,id).c_str(),wxConvUTF8);
@@ -941,8 +932,8 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
         int nd = OpenCL_RD::GetNumberOfDevices(ip);
         if(iNewSelection < nd)
         {
-            this->iOpenCLPlatform = ip;
-            this->iOpenCLDevice = iNewSelection;
+            opencl_platform = ip;
+            opencl_device = iNewSelection;
             break;
         }
         iNewSelection -= nd;
@@ -982,17 +973,32 @@ void MyFrame::OnHelp(wxCommandEvent& event)
     }
 }
 
+wxString MyFrame::SavePatternDialog()
+{
+    wxString filename = wxEmptyString;
+    wxString currname = this->system->GetFilename();
+    currname = currname.AfterLast(wxFILE_SEP_PATH);
+    
+    wxFileDialog savedlg(this, _("Specify the pattern filename"), opensavedir, currname,
+                         _("VTK image files (*.vti)|*.vti"),
+                         wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    #ifdef __WXGTK__
+        // opensavedir is ignored above (bug in wxGTK 2.8.0???)
+        savedlg.SetDirectory(opensavedir);
+    #endif
+    if(savedlg.ShowModal() == wxID_OK) {
+        wxFileName fullpath( savedlg.GetPath() );
+        opensavedir = fullpath.GetPath();
+        filename = savedlg.GetPath();
+    }
+    
+    return filename;
+}
+
 void MyFrame::OnSavePattern(wxCommandEvent& event)
 {
-    wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
-        _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-    if(filename.empty()) return; // user cancelled
-
-    SaveFile(filename);
-
-    this->system->SetFilename(string(filename.mb_str()));
-    this->system->SetModified(false);
-    this->UpdateWindowTitle();
+    wxString filename = SavePatternDialog();
+    if(!filename.empty()) SaveFile(filename);
 }
 
 void MyFrame::SaveFile(const wxString& path)
@@ -1003,6 +1009,11 @@ void MyFrame::SaveFile(const wxString& path)
     iw->SetSystem(this->system);
     iw->SetFileName(path.mb_str());
     iw->Write();
+
+    AddRecentPattern(path);
+    this->system->SetFilename(string(path.mb_str()));
+    this->system->SetModified(false);
+    this->UpdateWindowTitle();
 }
 
 void MyFrame::OnNewPattern(wxCommandEvent& event)
@@ -1031,10 +1042,19 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-    wxString filename = wxFileSelector(_("Specify the input filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
-        _("VTK image files (*.vti)|*.vti"),wxFD_OPEN);
-    if(filename.empty()) return; // user cancelled
-    OpenFile(filename);
+        
+    wxFileDialog opendlg(this, _("Choose a pattern file"), opensavedir, wxEmptyString,
+                         _("VTK image files (*.vti)|*.vti"),
+                         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    #ifdef __WXGTK__
+        // opensavedir is ignored above (bug in wxGTK 2.8.x???)
+        opendlg.SetDirectory(opensavedir);
+    #endif
+    if(opendlg.ShowModal() == wxID_OK) {
+        wxFileName fullpath( opendlg.GetPath() );
+        opensavedir = fullpath.GetPath();
+        OpenFile( opendlg.GetPath() );
+    }
 }
 
 void MyFrame::OpenFile(const wxString& path, bool remember)
@@ -1085,8 +1105,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             // to load type="formula" pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
             // TODO: detect if opencl is available, abort if not
             OpenCL_nDim *s = new OpenCL_nDim();
-            s->SetPlatform(this->iOpenCLPlatform);
-            s->SetDevice(this->iOpenCLDevice);
+            s->SetPlatform(opencl_platform);
+            s->SetDevice(opencl_device);
             target_system = s;
         }
         iw->SetSystemFromXML(target_system,warn_to_update);
@@ -1378,12 +1398,10 @@ bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
     if(ret==wxNO) return false;
 
     // ret == wxYES
-    wxString filename = wxFileSelector(_("Specify the output filename:"),wxEmptyString,_("pattern.vti"),_T("vti"),
-        _("VTK image files (*.vti)|*.vti"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    wxString filename = SavePatternDialog();
     if(filename.empty()) return true; // user cancelled
 
     SaveFile(filename);
-    
     return false;
 }
 
