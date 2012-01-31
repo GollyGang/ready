@@ -19,6 +19,7 @@
 #include "PatternsPanel.hpp"
 #include "frame.hpp"
 #include "IDs.hpp"
+#include "prefs.hpp"        // for patterndir
 
 // wxWidgets:
 #include <wx/filename.h>    // for wxFileName
@@ -90,8 +91,7 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         treectrl->SetIndent(4);
     #endif
 
-    // AKT TODO!!! let users change this folder (or nicer to append their folder???)
-    wxString patterndir = _("Patterns");
+    // AKT TODO!!! let users change patterndir (or nicer to append their folder???)
     
     if ( wxFileName::DirExists(patterndir) ) {
         // only show patterndir and its contents
@@ -159,6 +159,11 @@ void PatternsPanel::SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wx
             treectrl->ScrollTo(root);
         #endif
     }
+    
+    // select top folder so hitting left key can collapse it and won't cause an assert
+    wxTreeItemIdValue cookie;
+    id = treectrl->GetFirstChild(root, cookie);
+    if (id.IsOk()) treectrl->SelectItem(id);
 }
 
 void PatternsPanel::DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root)
