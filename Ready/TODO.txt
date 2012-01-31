@@ -17,8 +17,11 @@ Andrew's tasks for 0.2:
 before 0.3 release:
 - control over render pipeline: contouring level, color map (ranges, palette), slice direction/height etc. in XML and UI
 - UI for editing the initial-pattern-generator overlay stack
+- allow full-kernel rules, which supply the entire OpenCL kernel instead of just a formula, plus option to convert formula rules
+  into full-kernel rules
 
 before 0.x release:
+-
 
 before 1.0 release:
 - create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
