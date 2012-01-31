@@ -294,7 +294,6 @@ const char* GetActionName(action_id action)
         case DO_OPENFILE:       return "Open:";
         // File menu
         case DO_NEWPATT:        return "New Pattern";
-        case DO_RANDOM:         return "Random Pattern";
         case DO_OPENPATT:       return "Open Pattern...";
         case DO_SAVE:           return "Save Pattern...";
         case DO_SCREENSHOT:     return "Save Screenshot...";
@@ -319,6 +318,7 @@ const char* GetActionName(action_id action)
         case DO_RUNSTOP:        return "Run/Stop";
         case DO_STEP:           return "Step";
         case DO_RESET:          return "Reset";
+        case DO_GENPATT:        return "Generate Pattern";
         case DO_DEVICE:         return "Select OpenCL Device...";
         case DO_OPENCL:         return "Show OpenCL Diagnostics...";
         // Help menu

@@ -85,12 +85,12 @@ typedef enum
     DO_CUT,                      // cut selection
     DO_FIT,                      // fit pattern
     DO_FULLSCREEN,               // full screen
+    DO_GENPATT,                  // generate pattern
     DO_NEWPATT,                  // new pattern
     DO_OPENPATT,                 // open pattern...
     DO_PASTE,                    // paste
     DO_PREFS,                    // preferences...
     DO_QUIT,                     // quit Ready
-    DO_RANDOM,                   // random pattern
     DO_RESET,                    // reset
     DO_RESTORE,                  // restore default layout
     DO_RUNSTOP,                  // run/stop
