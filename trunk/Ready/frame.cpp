@@ -252,7 +252,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::RunStop, _("&Run") + GetAccelerator(DO_RUNSTOP), _("Start running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
-        menu->Append(ID::GenerateInitialPattern, _("Generate &Pattern") + GetAccelerator(DO_RANDOM), _("Run the Initial Pattern Generator"));
+        menu->Append(ID::GenerateInitialPattern, _("Generate &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
@@ -1445,7 +1445,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Step,                      DO_STEP);
         SetAccelerator(mbar, ID::RunStop,                   DO_RUNSTOP);
         SetAccelerator(mbar, ID::Reset,                     DO_RESET);
-        SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_RANDOM);
+        SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_GENPATT);
         SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
         SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
     }
@@ -1508,7 +1508,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_STEP:       cmdid = ID::Step; break;
         case DO_RUNSTOP:    cmdid = ID::RunStop; break;
         case DO_RESET:      cmdid = ID::Reset; break;
-        case DO_RANDOM:     cmdid = ID::GenerateInitialPattern; break;
+        case DO_GENPATT:    cmdid = ID::GenerateInitialPattern; break;
         case DO_DEVICE:     cmdid = ID::SelectOpenCLDevice; break;
         case DO_OPENCL:     cmdid = ID::OpenCLDiagnostics; break;
         
