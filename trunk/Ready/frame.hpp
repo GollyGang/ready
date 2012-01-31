@@ -76,6 +76,7 @@ class MyFrame : public wxFrame
         void OnOpenPattern(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
         void OnScreenshot(wxCommandEvent& event);
+        void OnAddMyPatterns(wxCommandEvent& event);
         void OnPreferences(wxCommandEvent& event);
         void OnQuit(wxCommandEvent& event);
 

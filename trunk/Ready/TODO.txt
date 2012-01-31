@@ -7,7 +7,6 @@ before 0.2 release:
 - add a simple introduction to RD help page
 
 Andrew's tasks for 0.2:
-- implement File > Add My Patterns... (or Set Pattern Folder... if that fails)
 - make About box a modal dialog using Help/about.html
 - fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
 - fix bug: tool tips not appearing (Mac app only?)

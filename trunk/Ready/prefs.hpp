@@ -41,9 +41,10 @@ const int maxfontsize = 30;      // maximum value of helpfontsize
 
 // Global directory paths:
 
-extern wxString readydir;        // path of directory containing app
-extern wxString datadir;         // path of directory for user-specific data
-extern wxString tempdir;         // path of directory for temporary data
+extern wxString readydir;        // directory containing app
+extern wxString datadir;         // directory for user-specific data
+extern wxString tempdir;         // directory for temporary data
+extern wxString patterndir;      // directory for supplied patterns
 
 // Global preference data:
 
@@ -64,7 +65,7 @@ extern bool askonload;           // ask to save changes before loading pattern f
 extern bool askonquit;           // ask to save changes before quitting app?
 extern wxString opensavedir;     // directory for Open/Save Pattern dialogs
 extern wxString screenshotdir;   // directory for Save Screenshot dialog
-extern wxString patterndir;      // directory used by patterns pane
+extern wxString userdir;         // directory for user's patterns
 extern wxString texteditor;      // path of user's preferred text editor
 extern wxMenu* patternSubMenu;   // submenu of recent pattern files
 extern int numpatterns;          // current number of recent pattern files
@@ -79,6 +80,7 @@ typedef enum
     DO_OPENFILE,                 // open a chosen pattern/html file
                                  // the rest are in (mostly) alphabetical order:
     DO_ABOUT,                    // about Ready
+    DO_ADDPATTS,                 // add my patterns...
     DO_CHEMICAL,                 // change active chemical...
     DO_CLEAR,                    // clear selection
     DO_COPY,                     // copy selection

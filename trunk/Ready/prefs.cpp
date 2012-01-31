@@ -59,9 +59,10 @@ const int PREF_LINE_SIZE = 5000; // must be quite long for storing file paths
 const int minmainwd = 200;       // main window's minimum width
 const int minmainht = 100;       // main window's minimum height
 
-wxString readydir;               // path of directory containing app
-wxString datadir;                // path of directory for user-specific data
-wxString tempdir;                // path of directory for temporary data
+wxString readydir;               // directory containing app
+wxString datadir;                // directory for user-specific data
+wxString tempdir;                // directory for temporary data
+wxString patterndir;             // directory for supplied patterns
 
 // initialize exported preferences:
 
@@ -86,7 +87,7 @@ bool askonload = true;           // ask to save changes before loading pattern f
 bool askonquit = true;           // ask to save changes before quitting app?
 wxString opensavedir;            // directory for Open/Save Pattern dialogs
 wxString screenshotdir;          // directory for Save Screenshot dialog
-wxString patterndir;             // directory used by Show Patterns
+wxString userdir;                // directory for user's patterns
 wxString texteditor;             // path of user's preferred text editor
 wxMenu* patternSubMenu = NULL;   // submenu of recent pattern files
 int numpatterns = 0;             // current number of recent pattern files
@@ -296,6 +297,7 @@ const char* GetActionName(action_id action)
         case DO_OPENPATT:       return "Open Pattern...";
         case DO_SAVE:           return "Save Pattern...";
         case DO_SCREENSHOT:     return "Save Screenshot...";
+        case DO_ADDPATTS:       return "Add My Patterns...";
         case DO_PREFS:          return "Preferences...";
         case DO_QUIT:           return "Quit Ready";
         // Edit menu
@@ -894,8 +896,8 @@ void SavePrefs()
 
     SaveRelPath(f, "open_save_dir", opensavedir);
     SaveRelPath(f, "screenshot_dir", screenshotdir);
-    SaveRelPath(f, "pattern_dir", patterndir);
     SaveRelPath(f, "choose_dir", choosedir);
+    SaveRelPath(f, "user_dir", userdir);
 
     fputs("\n", f);
 
@@ -1085,6 +1087,8 @@ void InitPaths()
     if ( !wxFileExists(prefspath) ) {
         prefspath = datadir + PREFS_NAME;
     }
+    
+    patterndir = readydir + PATT_DIR;
 }
 
 // -----------------------------------------------------------------------------
@@ -1093,12 +1097,12 @@ void GetPrefs()
 {
     bool sawkeyaction = false;   // saw at least one key_action entry?
 
-    InitPaths();                 // init datadir, tempdir and prefspath
+    InitPaths();                 // init datadir, tempdir, prefspath, patterndir
 
     opensavedir = readydir + PATT_DIR;
     screenshotdir = readydir + PATT_DIR;
-    patterndir = readydir + PATT_DIR;
     choosedir = readydir;
+    userdir = wxT(":\\/:");     // better if initially an illegal dir name
 
     // init the text editor to something reasonable
 #ifdef __WXMSW__
@@ -1184,8 +1188,8 @@ void GetPrefs()
 
         } else if (strcmp(keyword, "open_save_dir") == 0)  { GetRelPath(value, opensavedir, PATT_DIR);
         } else if (strcmp(keyword, "screenshot_dir") == 0) { GetRelPath(value, screenshotdir, PATT_DIR);
-        } else if (strcmp(keyword, "pattern_dir") == 0)    { GetRelPath(value, patterndir, PATT_DIR);
         } else if (strcmp(keyword, "choose_dir") == 0)     { GetRelPath(value, choosedir);
+        } else if (strcmp(keyword, "user_dir") == 0)       { GetRelPath(value, userdir);
         
         } else if (strcmp(keyword, "text_editor") == 0) {
             texteditor = wxString(value,wxConvLocal);
