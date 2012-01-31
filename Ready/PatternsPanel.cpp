@@ -19,7 +19,7 @@
 #include "PatternsPanel.hpp"
 #include "frame.hpp"
 #include "IDs.hpp"
-#include "prefs.hpp"        // for patterndir
+#include "prefs.hpp"        // for patterndir, userdir
 
 // wxWidgets:
 #include <wx/filename.h>    // for wxFileName
@@ -90,13 +90,8 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         // reduce indent a lot on Windows
         treectrl->SetIndent(4);
     #endif
-
-    // AKT TODO!!! let users change patterndir (or nicer to append their folder???)
     
-    if ( wxFileName::DirExists(patterndir) ) {
-        // only show patterndir and its contents
-        SimplifyTree(patterndir, treectrl, patternctrl->GetRootId());
-    }
+    BuildTree();
 
     // install event handler to detect control/right-click on a file
     treectrl->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
@@ -126,23 +121,17 @@ void PatternsPanel::DoIdleChecks()
     #endif
 }
 
-void PatternsPanel::SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root)
+void PatternsPanel::AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root)
 {
-    // delete old tree (except root)
-    treectrl->DeleteChildren(root);
-   
-    // remove any terminating separator from given directory path
     wxString dir = indir;
     if (dir.Last() == wxFILE_SEP_PATH) dir.Truncate(dir.Length()-1);
-
-    // append dir as child of root
     wxDirItemData* diritem = new wxDirItemData(dir, dir, true);
     wxTreeItemId id = treectrl->AppendItem(root, dir.AfterLast(wxFILE_SEP_PATH), 0, 0, diritem);
     if ( diritem->HasFiles() || diritem->HasSubDirs() ) {
         treectrl->SetItemHasChildren(id);
         treectrl->Expand(id);
         
-        // also nice to expand any subfolders, but only one level
+        // also expand any subfolders, but only one level
         if ( diritem->HasSubDirs() ) {
             wxTreeItemIdValue cookie;
             wxTreeItemId nextid = treectrl->GetFirstChild(id, cookie);
@@ -153,16 +142,29 @@ void PatternsPanel::SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wx
                 nextid = treectrl->GetNextChild(id, cookie);
             }
         }
-        
-        #ifndef __WXMSW__
-            // this causes crash on Windows
-            treectrl->ScrollTo(root);
-        #endif
     }
-    
-    // select top folder so hitting left key can collapse it and won't cause an assert
+}
+
+void PatternsPanel::BuildTree()
+{
+    // delete old tree (except root)
+    wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
+    wxTreeItemId root = patternctrl->GetRootId();
+    treectrl->DeleteChildren(root);
+   
+    if ( wxFileName::DirExists(patterndir) ) {
+        // append Ready's pattern folder as first child of root
+        AppendDir(patterndir, treectrl, root);
+    }
+
+    if ( wxFileName::DirExists(userdir) ) {
+        // append user's pattern folder as another child of root
+        AppendDir(userdir, treectrl, root);
+    }
+
+    // select top folder so hitting left arrow can collapse it and won't cause an assert
     wxTreeItemIdValue cookie;
-    id = treectrl->GetFirstChild(root, cookie);
+    wxTreeItemId id = treectrl->GetFirstChild(root, cookie);
     if (id.IsOk()) treectrl->SelectItem(id);
 }
 

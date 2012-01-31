@@ -38,6 +38,7 @@ namespace ID { enum {
     ClearMissingPatterns = OpenRecent + MAX_RECENT + 1,
     ClearAllPatterns,
     Screenshot,
+    AddMyPatterns,
     
     // view menu
     FullScreen,

@@ -37,7 +37,7 @@ class PatternsPanel : public wxPanel
         PatternsPanel(MyFrame* parent,wxWindowID id);
 
         void DoIdleChecks();    // called from MyFrame's OnIdle handler
-        
+        void BuildTree();       // build tree of pattern files
         bool TreeHasFocus();    // tree ctrl has keyboard focus?
         
         // return false if key event should be passed to default handler
@@ -45,7 +45,7 @@ class PatternsPanel : public wxPanel
 
     private:
 
-        void SimplifyTree(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root);
+        void AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root);
         void DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root);
 
         void OnTreeSelChanged(wxTreeEvent& event);

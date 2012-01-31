@@ -92,6 +92,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
+    EVT_MENU(ID::AddMyPatterns, MyFrame::OnAddMyPatterns)
     EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
     // edit menu
@@ -215,6 +216,8 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
+        menu->AppendSeparator();
+        menu->Append(ID::AddMyPatterns, _("Add My Patterns...") + GetAccelerator(DO_ADDPATTS), _("Add chosen folder to patterns pane"));
         #if !defined(__WXOSX_COCOA__)
             menu->AppendSeparator();
         #endif
@@ -679,6 +682,22 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     writer->SetFileName(filename.mb_str());
     writer->SetInputConnection(screenshot->GetOutputPort());
     writer->Write();
+}
+
+void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
+{
+    // first make sure the patterns pane is visible
+    wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::PatternsPane));
+    if(pane.IsOk() && !pane.IsShown()) {
+        pane.Show();
+        this->aui_mgr.Update();
+    }
+
+    wxDirDialog dirdlg(this, _("Choose your pattern folder"), userdir, wxDD_NEW_DIR_BUTTON);
+    if (dirdlg.ShowModal() == wxID_OK) {
+        userdir = dirdlg.GetPath();
+        this->patterns_panel->BuildTree();
+    }
 }
 
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
@@ -1456,6 +1475,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, wxID_OPEN,                     DO_OPENPATT);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
+        SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
         
         SetAccelerator(mbar, wxID_CUT,                      DO_CUT);
         SetAccelerator(mbar, wxID_COPY,                     DO_COPY);
@@ -1514,6 +1534,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_OPENPATT:   cmdid = wxID_OPEN; break;
         case DO_SAVE:       cmdid = wxID_SAVE; break;
         case DO_SCREENSHOT: cmdid = ID::Screenshot; break;
+        case DO_ADDPATTS:   cmdid = ID::AddMyPatterns; break;
         case DO_PREFS:      cmdid = wxID_PREFERENCES; break;
         case DO_QUIT:       cmdid = wxID_EXIT; break;
         
