@@ -63,6 +63,8 @@ class MyFrame : public wxFrame
         void UpdateMenuAccelerators();
         
         // handle keyboard shortcuts not appearing in menu items
+        void OnKeyDown(wxKeyEvent& event);
+        void OnChar(wxKeyEvent& event);
         void ProcessKey(int key, int modifiers);
 
         bool fullscreen;    // in full screen mode?
@@ -121,7 +123,6 @@ class MyFrame : public wxFrame
         void OnIdle(wxIdleEvent& event);
         void OnSize(wxSizeEvent& event);
         void OnClose(wxCloseEvent& event);
-        void OnChar(wxKeyEvent& event);
 
         // internal functions
 
@@ -134,6 +135,7 @@ class MyFrame : public wxFrame
         void InitializeRenderPane();
         void LoadSettings();
         void SaveSettings();
+        void CheckFocus();
        
         void SetCurrentRDSystem(BaseRD* system);
         void UpdateWindows();

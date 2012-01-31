@@ -48,6 +48,9 @@ class HelpPanel : public wxPanel
         void SelectAllText();   // select all text in html window
         void CopySelection();   // copy selected text to clipboard
         
+        // return false if key event should be passed to default handler
+        bool DoKey(int key, int mods);
+        
     private:
 
         MyFrame* frame;         // link to parent frame

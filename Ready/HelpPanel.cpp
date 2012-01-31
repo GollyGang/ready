@@ -64,7 +64,6 @@ class HtmlView : public wxHtmlWindow
 
     private:
 
-        void OnChar(wxKeyEvent& event);
         void OnSize(wxSizeEvent& event);
         void OnMouseMotion(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
@@ -80,7 +79,6 @@ class HtmlView : public wxHtmlWindow
 };
 
 BEGIN_EVENT_TABLE(HtmlView, wxHtmlWindow)
-    EVT_CHAR          (HtmlView::OnChar)
     EVT_SIZE          (HtmlView::OnSize)
     EVT_MOTION        (HtmlView::OnMouseMotion)
     EVT_ENTER_WINDOW  (HtmlView::OnMouseMotion)
@@ -201,64 +199,6 @@ void HtmlView::OnMouseDown(wxMouseEvent& event)
 
 // -----------------------------------------------------------------------------
 
-void HtmlView::OnChar(wxKeyEvent& event)
-{
-    /* AKT TODO!!!
-    // this handler is also called from ShowAboutBox
-    if ( helpptr == NULL || !helpptr->infront ) {
-        event.Skip();
-        return;
-    }
-    */
-    
-    int key = event.GetKeyCode();
-    int mods = event.GetModifiers();
-    
-    if ( mods == wxMOD_NONE || (mods == wxMOD_SHIFT && key == '+') ) {
-        if ( key == '+' || key == '=' || key == WXK_ADD ) {
-            if ( helpfontsize < maxfontsize ) {
-                helpfontsize++;
-                ChangeFontSizes(helpfontsize);
-            }
-            return;
-        }
-        if ( key == '-' || key == WXK_SUBTRACT ) {
-            if ( helpfontsize > minfontsize ) {
-                helpfontsize--;
-                ChangeFontSizes(helpfontsize);
-            }
-            return;
-        }
-        if ( key == '[' ) {
-            if ( HistoryBack() ) {
-                panel->UpdateHelpButtons();
-            }
-            return;
-        }
-        if ( key == ']' ) {
-            if ( HistoryForward() ) {
-                panel->UpdateHelpButtons();
-            }
-            return;
-        }
-        if ( key == WXK_HOME ) {
-            panel->ShowHelp(helphome);
-            return;
-        }
-        if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ||
-             key == WXK_PAGEUP || key == WXK_PAGEDOWN ) {
-            // let default handler see arrow keys and pg up/down keys (for scroll bars)
-            event.Skip();
-            return;
-        }
-    }
-    
-    // check for other keyboard shortcuts
-    frame->ProcessKey(key, mods);
-}
-
-// -----------------------------------------------------------------------------
-
 // avoid scroll position being reset to top when wxHtmlWindow is resized
 void HtmlView::OnSize(wxSizeEvent& event)
 {
@@ -371,6 +311,10 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     html->canreload = false;
     ShowHelp(helphome);
     html->canreload = true;
+
+    // install event handlers to detect keyboard shortcuts when html window has focus
+    html->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, frame);
+    html->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
 }
 
 // -----------------------------------------------------------------------------
@@ -487,4 +431,52 @@ void HelpPanel::CopySelection()
     if (text.length() > 0) {
         CopyTextToClipboard(text);
     }
+}
+
+// -----------------------------------------------------------------------------
+
+bool HelpPanel::DoKey(int key, int mods)
+{
+    // first look for keys that should be passed to the default handler
+    if ( mods == wxMOD_NONE ) {
+        if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ||
+             key == WXK_PAGEUP || key == WXK_PAGEDOWN ) {
+            // let default handler see arrow keys and page up/down keys (for scroll bars)
+            return false;
+        }
+    }
+    
+    // now do keyboard shortcuts specific to help pane
+    if ( mods == wxMOD_NONE ) {
+        if ( key == '+' || key == '=' || key == WXK_ADD ) {
+            if ( helpfontsize < maxfontsize ) {
+                helpfontsize++;
+                html->ChangeFontSizes(helpfontsize);
+            }
+            return true;
+        }
+        if ( key == '-' || key == WXK_SUBTRACT ) {
+            if ( helpfontsize > minfontsize ) {
+                helpfontsize--;
+                html->ChangeFontSizes(helpfontsize);
+            }
+            return true;
+        }
+        if ( key == '[' ) {
+            if ( html->HistoryBack() ) UpdateHelpButtons();
+            return true;
+        }
+        if ( key == ']' ) {
+            if ( html->HistoryForward() ) UpdateHelpButtons();
+            return true;
+        }
+        if ( key == WXK_HOME ) {
+            ShowHelp(helphome);
+            return true;
+        }
+    }
+    
+    // finally do other keyboard shortcuts
+    frame->ProcessKey(key, mods);
+    return true;
 }

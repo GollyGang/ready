@@ -42,8 +42,9 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
 
     this->SetSizer(sizer);
 
-    // install event handler to detect keyboard shortcuts
-    this->pgrid->Connect(wxEVT_CHAR, wxKeyEventHandler(RulePanel::OnChar), NULL, this);
+    // install event handler to detect keyboard shortcuts when rule panel has focus
+    this->pgrid->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, frame);
+    this->pgrid->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
 }
 
 void RulePanel::Update(const BaseRD* const system)
@@ -128,20 +129,23 @@ void RulePanel::OnPropertyGridChanged(wxPropertyGridEvent& event)
         wxMessageBox(_T("TODO!!!"));
 }
 
-void RulePanel::OnChar(wxKeyEvent& event)
+bool RulePanel::GridHasFocus()
 {
-    int key = event.GetKeyCode();
-    int mods = event.GetModifiers();
-    
+    return this->pgrid->HasFocus();
+}
+
+bool RulePanel::DoKey(int key, int mods)
+{
+    // first look for keys that should be passed to the default handler
     if ( mods == wxMOD_NONE ) {
         if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ||
              key == WXK_TAB ) {
             // let default handler see tab and arrow keys (to select rows, etc)
-            event.Skip();
-            return;
+            return false;
         }
     }
-   
-    // check for other keyboard shortcuts
+    
+    // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
+    return true;
 }
