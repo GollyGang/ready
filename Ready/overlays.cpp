@@ -316,7 +316,7 @@ class Parameter : public BaseFill
 
         virtual float GetValue(BaseRD *system,int x,int y,int z) const
         {
-            return 0.5f;//system->GetParameterValueByName(this->parameter_name.c_str());
+            return system->GetParameterValueByName(this->parameter_name.c_str());
         }
 
     protected:
