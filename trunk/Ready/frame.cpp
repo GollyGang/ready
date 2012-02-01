@@ -174,10 +174,10 @@ MyFrame::MyFrame(const wxString& title)
     SetStatusText(_("Ready"));
 
     this->InitializePatternsPane();
-    this->InitializeRulePane();
     this->InitializeHelpPane();
+    this->InitializeRulePane();
     this->InitializeRenderPane();
-    
+
     this->default_perspective = this->aui_mgr.SavePerspective();
     this->LoadSettings();
     this->aui_mgr.Update();
@@ -336,7 +336,7 @@ void MyFrame::InitializePatternsPane()
                   .Name(PaneName(ID::PatternsPane))
                   .Caption(_("Patterns Pane"))
                   .Left()
-                  .BestSize(300,300)
+                  .BestSize(220,600)
                   .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
 }
@@ -349,9 +349,8 @@ void MyFrame::InitializeRulePane()
                   .Name(PaneName(ID::RulePane))
                   .Caption(_("Rule Pane"))
                   .Right()
-                  .BestSize(400,400)
-                  .Layer(1) // layer 1 is further towards the edge
-                  .Hide()
+                  .BestSize(500,300)
+                  .Layer(1)
                   );
 }
 
@@ -368,8 +367,8 @@ void MyFrame::InitializeHelpPane()
                   .Name(PaneName(ID::HelpPane))
                   .Caption(_("Help Pane"))
                   .Right()
-                  .BestSize(400,400)
-                  .Hide()
+                  .BestSize(500,300)
+                  .Layer(1)
                   );
 }
 
