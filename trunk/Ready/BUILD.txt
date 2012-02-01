@@ -23,6 +23,9 @@ Start menu (this sets up the environment variables as you need):
 cd \wxWidgets\build\msw
 nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
 
+(Although on some installations (e.g. wx2.9.3 on winXP) this doesn't work and you should
+ use the provided .sln file in build\msw.)
+
 =========================== Linux =================================
 
 Install: libvtk, libwxgtk (2.9+), zlib1g, any OpenCL SDK.
