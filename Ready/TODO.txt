@@ -8,6 +8,7 @@ before 0.2 release:
 
 Andrew's tasks for 0.2:
 - make About box a modal dialog using Help/about.html
+- change default layout to show all panes
 - fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
 - fix bug: tool tips not appearing (Mac app only?)
 - use better (big) toolbar icons in Mac app
