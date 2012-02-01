@@ -78,3 +78,6 @@ class HelpPanel : public wxPanel
 // If ShowHelp is called with this string then a temporary .html file
 // is created to show the user's current keyboard shortcuts.
 const wxString SHOW_KEYBOARD_SHORTCUTS = wxT("keyboard.html");
+
+// Open a modal dialog and display info about the app.
+void ShowAboutBox();
