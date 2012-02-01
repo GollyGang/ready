@@ -92,6 +92,7 @@ void RulePanel::Update(const BaseRD* const system)
     this->pgrid->SetVerticalSpacing(3); // increase row height
 
     this->pgrid->CollapseAll();
+    this->pgrid->SetLineColour(wxColour(240,240,240)); // de-emphasising the lines
     this->pgrid->Thaw();
 
     // TODO: remember collapsed/expanded state, and splitter position
