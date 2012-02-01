@@ -4,7 +4,8 @@ before 0.2 release:
 - finish documenting stuff in Help/*.html (search for "!!!")
 - allow user to add/remove parameters (for formula implementations)
 - show rule description and pattern description in a better way (just for reading)
-- add a simple introduction to RD help page
+- add a simple introduction-to-RD help page
+- bug: umlaut on Schlogl causing problems on Windows (Mac too?)
 
 Andrew's tasks for 0.2:
 - fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
@@ -19,7 +20,8 @@ before 0.3 release:
   into full-kernel rules
 
 before 0.x release:
--
+- image import (user can specify how colors map onto chemicals), import Robert's patterns
+- image export (likewise)
 
 before 1.0 release:
 - create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
@@ -31,6 +33,7 @@ before 1.0 release:
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
+- image import (user can specify how colors map onto chemicals)
 
 future ideas:
 - parameter map(s) in a separate window, to allow user to explore parameters 
