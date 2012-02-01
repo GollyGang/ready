@@ -17,6 +17,7 @@
 
 // local:
 #include "HelpPanel.hpp"
+#include "app.hpp"              // for wxGetApp
 #include "frame.hpp"
 #include "IDs.hpp"
 #include "prefs.hpp"            // for GetShortcutTable, readydir, etc
@@ -50,6 +51,7 @@ class HtmlView : public wxHtmlWindow
             panel = (HelpPanel*)parent;
             editlink = false;
             linkrect = wxRect(0,0,0,0);
+            inAbout = false;
         }
 
         virtual void OnLinkClicked(const wxHtmlLinkInfo& link);
@@ -60,7 +62,8 @@ class HtmlView : public wxHtmlWindow
         void SetFontSizes(int size);
         void ChangeFontSizes(int size);
 
-        bool canreload;      // can OnSize call ShowHelp?
+        bool canreload;     // can OnSize call ShowHelp?
+        bool inAbout;       // in ShowAboutBox?
 
     private:
 
@@ -148,6 +151,8 @@ void HtmlView::OnLinkClicked(const wxHtmlLinkInfo& link)
 
 void HtmlView::OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y)
 {
+    if (inAbout || cell == NULL) return;
+    
     wxHtmlLinkInfo* link = cell->GetLink(x,y);
     if (link) {
         wxString href = link->GetHref();
@@ -164,7 +169,7 @@ void HtmlView::OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y)
 
 void HtmlView::OnMouseMotion(wxMouseEvent& event)
 {
-    if (!linkrect.IsEmpty()) {
+    if (!inAbout && !linkrect.IsEmpty()) {
         int x = event.GetX();
         int y = event.GetY();
         if (!linkrect.Contains(x,y)) ClearStatus();
@@ -184,6 +189,8 @@ void HtmlView::OnMouseLeave(wxMouseEvent& event)
 
 void HtmlView::ClearStatus()
 {
+    if (inAbout) return;
+    
     panel->SetStatus(wxEmptyString);
     linkrect = wxRect(0,0,0,0);
 }
@@ -479,4 +486,47 @@ bool HelpPanel::DoKey(int key, int mods)
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;
+}
+
+// -----------------------------------------------------------------------------
+
+void ShowAboutBox()
+{
+    wxBoxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
+    wxDialog dlg(wxGetApp().currframe, wxID_ANY, wxString(_("About Ready")));
+    
+    HtmlView* html = new HtmlView(&dlg, wxGetApp().currframe, wxID_ANY, wxDefaultPosition,
+                                  #if defined(__WXOSX_COCOA__)
+                                      // work around SetSize bug below
+                                      wxSize(400, 450),
+                                  #elif defined(__WXGTK__)
+                                      wxSize(420, 420),
+                                  #else
+                                      wxSize(400, 400),
+                                  #endif
+                                  wxHW_SCROLLBAR_NEVER | wxSUNKEN_BORDER);
+    html->inAbout = true;
+    html->SetBorders(0);
+    #ifdef __WXOSX_COCOA__
+        html->SetFontSizes(13);
+    #endif
+    html->LoadPage(readydir + _("Help/about.html"));
+    
+    // avoid HtmlView::OnSize calling ShowHelp
+    html->canreload = false;
+    
+    // this call seems to be ignored if __WXOSX_COCOA__
+    html->SetSize(html->GetInternalRepresentation()->GetWidth(),
+                  html->GetInternalRepresentation()->GetHeight());
+    
+    topsizer->Add(html, 1, wxALL, 10);
+
+    wxButton* okbutt = new wxButton(&dlg, wxID_OK, _("OK"));
+    okbutt->SetDefault();
+    topsizer->Add(okbutt, 0, wxBOTTOM | wxALIGN_CENTER, 10);
+    
+    dlg.SetSizer(topsizer);
+    topsizer->Fit(&dlg);
+    dlg.Centre();
+    dlg.ShowModal();
 }

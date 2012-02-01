@@ -75,6 +75,7 @@ set( PATTERN_FILES
 )
 
 set( HELP_FILES
+  about.gif about.html
   action.html credits.html file.html help.html mouse.html quickstart.html tips.html
   changes.html edit.html formats.html index.html problems.html refs.html view.html
 )
