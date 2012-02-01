@@ -337,7 +337,6 @@ void MyFrame::InitializePatternsPane()
                   .Caption(_("Patterns Pane"))
                   .Left()
                   .BestSize(220,600)
-                  .Layer(0) // layer 0 is the innermost ring around the central pane
                   );
 }
 
@@ -350,7 +349,7 @@ void MyFrame::InitializeRulePane()
                   .Caption(_("Rule Pane"))
                   .Right()
                   .BestSize(500,300)
-                  .Layer(1)
+                  .Position(0)
                   );
 }
 
@@ -368,7 +367,7 @@ void MyFrame::InitializeHelpPane()
                   .Caption(_("Help Pane"))
                   .Right()
                   .BestSize(500,300)
-                  .Layer(1)
+                  .Position(1)
                   );
 }
 
