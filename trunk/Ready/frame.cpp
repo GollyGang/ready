@@ -851,7 +851,9 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 {
     this->patterns_panel->DoIdleChecks();
     
-    if (this->IsActive()) this->CheckFocus();
+    #ifdef __WXMAC__
+        if (this->IsActive()) this->CheckFocus();
+    #endif
     
     // we drive our game loop by onIdle events
     if(this->is_running)
