@@ -51,6 +51,7 @@ class RulePanel : public wxPanel
     private:
 
         void OnPropertyGridChanged(wxPropertyGridEvent& event);
+        void OnTextChanged(wxCommandEvent& event);
         void OnChar(wxKeyEvent& event);
 
     private:
@@ -60,9 +61,11 @@ class RulePanel : public wxPanel
         wxPropertyGrid *pgrid;
         std::vector<wxPGProperty*> parameter_value_properties;
         std::vector<wxPGProperty*> parameter_name_properties;
-        wxPGProperty *rule_name_property,*rule_description_property,*pattern_description_property;
+        wxPGProperty *rule_name_property;
         wxPGProperty *formula_property,*timestep_property;
         wxPGProperty *dimensions_property;
+        wxPGProperty *rule_description_property,*pattern_description_property;
+        wxTextCtrl *description_ctrl;
 
         DECLARE_EVENT_TABLE()
 };
