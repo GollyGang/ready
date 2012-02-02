@@ -736,10 +736,17 @@ void UpdateAcceleratorStrings()
                     key == IK_TAB ||
                     key == IK_RETURN;
                 #ifdef __WXMSW__
-                if (modset & mk_CMD) {
-                    // Windows only allows Ctrl+alphanumeric
-                    validaccel = (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9');
-                }
+                    if (modset & mk_CMD) {
+                        // Windows only allows Ctrl+alphanumeric
+                        validaccel = (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9');
+                    }
+                    // on Windows it seems that menu commands are processed before a wxTextCtrl
+                    // sees a keyboard event, so to ensure normal characters are passed to a
+                    // wxTextCtrl we only create menu item accelerators that contain
+                    // Ctrl or Alt or a function key
+                    if ( !(modset & mk_CMD) && !(modset & mk_ALT) &&
+                         !(key >= IK_F1 && key <= IK_F24)
+                       ) validaccel = false;
                 #endif
                 if (validaccel) {
                     CreateAccelerator(action, modset, key);
@@ -756,14 +763,12 @@ void UpdateAcceleratorStrings()
             action_info info = keyaction[key][modset];
             action_id action = info.id;
             if (action != DO_NOTHING && (modset & mk_CMD)
-                #ifdef __WXMSW__
-                // Windows only allows Ctrl+alphanumeric
-                && ((key >= 'a' && key <= 'z') || (key >= '0' && key <= '9'))
-                #endif
-            ) {
-                CreateAccelerator(action, modset, key);
-            }
-        }
+                    #ifdef __WXMSW__
+                        // Windows only allows Ctrl+alphanumeric
+                        && ((key >= 'a' && key <= 'z') || (key >= '0' && key <= '9'))
+                    #endif
+               ) CreateAccelerator(action, modset, key);
+         }
     }
 }
 
@@ -1912,6 +1917,7 @@ wxPanel* PrefsDialog::CreateKeyboardPrefs(wxWindow* parent)
     wxString notes = _("Note:");
     notes += _("\n- Different key combinations can be assigned to the same action.");
     notes += _("\n- The Escape key is reserved for hard-wired actions.");
+    notes += _("\n- Click OK to save changes (the Return key can be assigned to an action).");
     wxBoxSizer* hbox3 = new wxBoxSizer(wxHORIZONTAL);
     hbox3->Add(new wxStaticText(panel, wxID_STATIC, notes));
 
