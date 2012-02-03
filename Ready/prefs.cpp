@@ -735,23 +735,22 @@ void UpdateAcceleratorStrings()
                     key == IK_DELETE ||
                     key == IK_TAB ||
                     key == IK_RETURN;
+                
                 #ifdef __WXMSW__
                     if (modset & mk_CMD) {
                         // Windows only allows Ctrl+alphanumeric
                         validaccel = (key >= 'a' && key <= 'z') || (key >= '0' && key <= '9');
                     }
-                    // on Windows it seems that menu commands are processed before a wxTextCtrl
-                    // sees a keyboard event, so to ensure normal characters are passed to a
-                    // wxTextCtrl we only create menu item accelerators that contain
-                    // Ctrl or Alt or a function key
-                    if ( !(modset & mk_CMD) && !(modset & mk_ALT) &&
-                         !(key >= IK_F1 && key <= IK_F24)
-                       ) validaccel = false;
                 #endif
-                if (validaccel) {
-                    CreateAccelerator(action, modset, key);
-                }
-            }
+                
+                // menu commands can be processed before a wxTextCtrl gets a keyboard event,
+                // so to ensure normal characters are passed to a wxTextCtrl we only create
+                // menu item accelerators that contain Ctrl or Alt or a function key
+                if ( !(modset & mk_CMD) && !(modset & mk_ALT) &&
+                     !(key >= IK_F1 && key <= IK_F24) ) validaccel = false;
+                
+                if (validaccel) CreateAccelerator(action, modset, key);
+             }
         }
     }
 
