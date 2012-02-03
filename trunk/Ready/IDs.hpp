@@ -48,6 +48,7 @@ namespace ID { enum {
     RulePane,
     CanvasPane,
     HelpPane,
+    InfoPane,
     RestoreDefaultPerspective,
     ChangeActiveChemical,
     

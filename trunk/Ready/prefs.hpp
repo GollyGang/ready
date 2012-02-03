@@ -103,6 +103,7 @@ typedef enum
     DO_OPENCL,                   // show OpenCL diagnostics...
     DO_HELP,                     // show help pane
     DO_PATTERNS,                 // show patterns pane
+    DO_INFO,                     // show info pane
     DO_RULE,                     // show rule pane
     DO_STEP,                     // step
     DO_WIREFRAME,                // wireframe

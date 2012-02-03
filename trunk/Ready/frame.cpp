@@ -26,6 +26,7 @@
 #include "RulePanel.hpp"
 #include "HelpPanel.hpp"
 #include "PatternsPanel.hpp"
+#include "InfoPanel.hpp"
 #include "IDs.hpp"
 
 // readybase:
@@ -113,6 +114,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::RulePane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::InfoPane, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::InfoPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
     // action menu
@@ -177,6 +180,7 @@ MyFrame::MyFrame(const wxString& title)
     this->InitializeHelpPane();
     this->InitializeRulePane();
     this->InitializeRenderPane();
+    this->InitializeInfoPane();
 
     this->default_perspective = this->aui_mgr.SavePerspective();
     this->LoadSettings();
@@ -247,6 +251,7 @@ void MyFrame::InitializeMenus()
         menu->AppendCheckItem(ID::Wireframe, _("Wireframe") + GetAccelerator(DO_WIREFRAME), _("Wireframe or surface view"));
         menu->AppendSeparator();
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane") + GetAccelerator(DO_PATTERNS), _("View the patterns pane"));
+        menu->AppendCheckItem(ID::InfoPane, _("&Info Pane") + GetAccelerator(DO_INFO), _("View the info pane"));
         menu->AppendCheckItem(ID::RulePane, _("&Rule Pane") + GetAccelerator(DO_RULE), _("View the rule pane"));
         menu->AppendCheckItem(ID::HelpPane, _("&Help Pane") + GetAccelerator(DO_HELP), _("View the help pane"));
         menu->AppendSeparator();
@@ -337,6 +342,7 @@ void MyFrame::InitializePatternsPane()
                   .Caption(_("Patterns Pane"))
                   .Left()
                   .BestSize(220,600)
+                  .Position(0)
                   );
 }
 
@@ -358,6 +364,11 @@ void MyFrame::UpdateRulePane()
     this->rule_panel->Update(this->system);
 }
 
+void MyFrame::UpdateInfoPane()
+{
+    this->info_panel->Update(this->system);
+}
+
 void MyFrame::InitializeHelpPane()
 {
     this->help_panel = new HelpPanel(this,wxID_ANY);
@@ -366,6 +377,19 @@ void MyFrame::InitializeHelpPane()
                   .Name(PaneName(ID::HelpPane))
                   .Caption(_("Help Pane"))
                   .Right()
+                  .BestSize(500,300)
+                  .Position(1)
+                  );
+}
+
+void MyFrame::InitializeInfoPane()
+{
+    this->info_panel = new InfoPanel(this,wxID_ANY);
+    this->aui_mgr.AddPane(this->info_panel,
+                  wxAuiPaneInfo()
+                  .Name(PaneName(ID::InfoPane))
+                  .Caption(_("Info Pane"))
+                  .Left()
                   .BestSize(500,300)
                   .Position(1)
                   );
@@ -729,6 +753,7 @@ void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
     this->UpdateRulePane();
+    this->UpdateInfoPane();
     this->UpdateWindowTitle();
     this->UpdateToolbars();
     this->Refresh(false);
@@ -1383,6 +1408,7 @@ void MyFrame::SetRuleName(string s)
 {
     this->system->SetRuleName(s);
     this->UpdateWindowTitle();
+    this->UpdateInfoPane();
     // TODO: update anything else that needs to know
 }
 
@@ -1390,6 +1416,7 @@ void MyFrame::SetRuleDescription(string s)
 {
     this->system->SetRuleDescription(s);
     this->UpdateWindowTitle();
+    this->UpdateInfoPane();
     // TODO: update anything else that needs to know
 }
 
@@ -1397,6 +1424,7 @@ void MyFrame::SetPatternDescription(string s)
 {
     this->system->SetPatternDescription(s);
     this->UpdateWindowTitle();
+    this->UpdateInfoPane();
     // TODO: update anything else that needs to know
 }
 

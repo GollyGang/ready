@@ -29,6 +29,7 @@
 class RulePanel;
 class HelpPanel;
 class PatternsPanel;
+class InfoPanel;
 
 // STL:
 #include <vector>
@@ -131,7 +132,9 @@ class MyFrame : public wxFrame
         void InitializeToolbars();
         void InitializePatternsPane();
         void InitializeRulePane();
+        void InitializeInfoPane();
         void UpdateRulePane();
+        void UpdateInfoPane();
         void InitializeHelpPane();
         void InitializeRenderPane();
         void LoadSettings();
@@ -168,6 +171,7 @@ class MyFrame : public wxFrame
         RulePanel *rule_panel;
         HelpPanel *help_panel;
         PatternsPanel *patterns_panel;
+        InfoPanel *info_panel;
         wxAuiToolBar *action_toolbar;
 
         // settings:
