@@ -1,12 +1,15 @@
 before 0.2 release:
-- populate a pattern library with some basics, including descriptions and initial-pattern-generators: Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, heat equation
+- populate a pattern library with some basics, including descriptions and initial-pattern-generators: 
+  Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, 
+  heat equation
 - control over size of world, running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - allow user to add/remove parameters (for formula implementations)
-- show rule description and pattern description in a better way (just for reading)
 - add a simple introduction-to-RD help page
 - bug: umlaut on Schlogl causing problems on Windows (Mac too?)
+- bug: newlines appear as unknown chars in text edit box on Linux (Mac too?)
 - bug: quit button doesn't work while editing text control in the property grid, on Linux
+- bug: rule name getting trimmed too much (internal whitespace)
 
 Andrew's tasks for 0.2:
 - fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
@@ -34,7 +37,6 @@ before 1.0 release:
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
-- image import (user can specify how colors map onto chemicals)
 
 future ideas:
 - parameter map(s) in a separate window, to allow user to explore parameters 
