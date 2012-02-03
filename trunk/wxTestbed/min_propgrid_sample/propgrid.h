@@ -53,7 +53,6 @@ public:
 
     void PopulateWithExamples();
     
-    void OnCloseClick( wxCommandEvent& event );
     void OnLabelTextChange( wxCommandEvent& event );
 
     void OnColourScheme( wxCommandEvent& event );
@@ -111,38 +110,17 @@ public:
 
     void OnExtendedKeyNav( wxCommandEvent& event );
 
-    void OnPropertyGridChange( wxPropertyGridEvent& event );
-    void OnPropertyGridChanging( wxPropertyGridEvent& event );
-    void OnPropertyGridSelect( wxPropertyGridEvent& event );
-    void OnPropertyGridHighlight( wxPropertyGridEvent& event );
-    void OnPropertyGridItemRightClick( wxPropertyGridEvent& event );
-    void OnPropertyGridItemDoubleClick( wxPropertyGridEvent& event );
-    void OnPropertyGridPageChange( wxPropertyGridEvent& event );
-    void OnPropertyGridButtonClick( wxCommandEvent& event );
-    void OnPropertyGridTextUpdate( wxCommandEvent& event );
-    void OnPropertyGridKeyEvent( wxKeyEvent& event );
-    void OnPropertyGridItemCollapse( wxPropertyGridEvent& event );
-    void OnPropertyGridItemExpand( wxPropertyGridEvent& event );
-    void OnPropertyGridLabelEditBegin( wxPropertyGridEvent& event );
-    void OnPropertyGridLabelEditEnding( wxPropertyGridEvent& event );
-    void OnPropertyGridColBeginDrag( wxPropertyGridEvent& event );
-    void OnPropertyGridColDragging( wxPropertyGridEvent& event );
-    void OnPropertyGridColEndDrag( wxPropertyGridEvent& event );
-
     void OnAbout( wxCommandEvent& event );
 
     void OnResize( wxSizeEvent& event );
     void OnPaint( wxPaintEvent& event );
     void OnCloseEvent( wxCloseEvent& event );
 
-    void OnIdle( wxIdleEvent& event );
+    //void OnIdle( wxIdleEvent& event );
 
     void AddTestProperties( wxPropertyGridPage* pg );
 
     bool RunTests( bool fullTest, bool interactive = false );
-
-private:
-    DECLARE_EVENT_TABLE()
 };
 
 // -----------------------------------------------------------------------
