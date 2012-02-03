@@ -35,9 +35,9 @@ InfoPanel::InfoPanel(MyFrame* parent,wxWindowID id)
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
     this->description_ctrl = new wxTextCtrl(this,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
-        wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH2|wxTE_AUTO_URL);
+        wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH2|wxTE_AUTO_URL|wxBORDER_NONE);
 
-    this->description_ctrl->SetBackgroundColour(*wxLIGHT_GREY);    
+    this->description_ctrl->SetBackgroundColour(wxColour(240,240,240));    
     this->description_ctrl->SetForegroundColour(*wxBLACK);    
     
     sizer->Add(this->description_ctrl,wxSizerFlags(1).Expand());
