@@ -90,8 +90,13 @@ void RulePanel::Update(const BaseRD* const system)
     this->pgrid->SetVerticalSpacing(3); // increase row height
 
     this->pgrid->CollapseAll();
+#ifndef __WXMAC__
+    // following causes problems on Mac:
+    // - very 1st update has no white lines
+    // - selected property has a white background
     this->pgrid->SetCellBackgroundColour(wxColour(240,235,235));
     this->pgrid->SetLineColour(*wxWHITE);
+#endif
     this->pgrid->Thaw();
 
     // TODO: remember collapsed/expanded state, and splitter position
