@@ -26,6 +26,7 @@
 using namespace std;
 
 BEGIN_EVENT_TABLE(InfoPanel, wxPanel)
+    EVT_TEXT_URL(wxID_ANY,InfoPanel::OnLinkClicked)
 END_EVENT_TABLE()
 
 InfoPanel::InfoPanel(MyFrame* parent,wxWindowID id) 
@@ -33,9 +34,9 @@ InfoPanel::InfoPanel(MyFrame* parent,wxWindowID id)
 {
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-    this->description_ctrl = new wxTextCtrl(this,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH2|wxTE_AUTO_URL);
+    this->description_ctrl = new wxTextCtrl(this,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,
+        wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH2|wxTE_AUTO_URL);
 
-    this->description_ctrl->Enable(false);
     this->description_ctrl->SetBackgroundColour(*wxLIGHT_GREY);    
     this->description_ctrl->SetForegroundColour(*wxBLACK);    
     
@@ -53,4 +54,14 @@ void InfoPanel::Update(const BaseRD* const system)
     if(!system->GetPatternDescription().empty())
         oss << system->GetPatternDescription();
     this->description_ctrl->ChangeValue(wxString(oss.str().c_str(),wxConvUTF8));
+}
+
+void InfoPanel::OnLinkClicked(wxTextUrlEvent& event)
+{
+    if(event.GetMouseEvent().LeftUp())
+    {
+        wxLaunchDefaultBrowser(this->description_ctrl->GetValue().Mid(
+            event.GetURLStart(),event.GetURLEnd() - event.GetURLStart()));
+    }
+    event.Skip();
 }

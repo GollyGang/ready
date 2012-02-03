@@ -39,6 +39,10 @@ class InfoPanel : public wxPanel
         void Update(const BaseRD* const system);
         
     private:
+    
+        void OnLinkClicked(wxTextUrlEvent& event);
+        
+    private:
 
         MyFrame *frame; // keep a link so that we can alert the parent frame when user makes a change
 
