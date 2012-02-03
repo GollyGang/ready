@@ -35,8 +35,13 @@ class InfoPanel : public wxPanel
 
         InfoPanel(MyFrame* parent,wxWindowID id);
 
-        // update the controls to the state of the RD system
+        // update the text in description_ctrl
         void Update(const BaseRD* const system);
+
+        bool TextHasFocus();    // description_ctrl has keyboard focus?
+        
+        // return false if key event should be passed to default handler
+        bool DoKey(int key, int mods);
         
     private:
     
@@ -44,7 +49,7 @@ class InfoPanel : public wxPanel
         
     private:
 
-        MyFrame *frame; // keep a link so that we can alert the parent frame when user makes a change
+        MyFrame *frame; // link to parent frame
 
         wxTextCtrl *description_ctrl;
 

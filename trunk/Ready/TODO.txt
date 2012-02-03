@@ -12,7 +12,6 @@ before 0.2 release:
 - bug: rule name getting trimmed too much (internal whitespace)
 
 Andrew's tasks for 0.2:
-- fix cosmetic glitches in Rule pane (remove focus ring, remember split pos, increase row ht?)
 - fix bug: tool tips not appearing (Mac app only?)
 - use better (big) toolbar icons in Mac app
 - do any other "AKT TODO" tasks
