@@ -12,120 +12,6 @@
 #ifndef _WX_SAMPLES_PROPGRID_PROPGRID_H_
 #define _WX_SAMPLES_PROPGRID_PROPGRID_H_
 
-// -----------------------------------------------------------------------
-
-class wxAdvImageFileProperty : public wxFileProperty
-{
-    WX_PG_DECLARE_PROPERTY_CLASS(wxAdvImageFileProperty)
-public:
-
-    wxAdvImageFileProperty( const wxString& label = wxPG_LABEL,
-                            const wxString& name = wxPG_LABEL,
-                            const wxString& value = wxEmptyString );
-    virtual ~wxAdvImageFileProperty ();
-
-    virtual void OnSetValue();  // Override to allow image loading.
-
-    virtual bool IntToValue( wxVariant& variant, int number, int argFlags = 0 ) const;
-    virtual bool OnEvent( wxPropertyGrid* propgrid, wxWindow* primary, wxEvent& event );
-    virtual wxSize OnMeasureImage( int item ) const;
-    virtual void OnCustomPaint( wxDC& dc,
-                                const wxRect& rect, wxPGPaintData& paintdata );
-
-    void LoadThumbnails( size_t n );
-
-protected:
-    wxImage*    m_pImage; // Temporary thumbnail data.
-
-    static wxPGChoices ms_choices;
-
-    int m_index; // Index required for choice behaviour.
-};
-
-// -----------------------------------------------------------------------
-
-class wxVector3f
-{
-public:
-    wxVector3f()
-    {
-        x = y = z = 0.0;
-    }
-    wxVector3f( double x, double y, double z )
-    {
-        x = x; y = y; z = z;
-    }
-
-    double x, y, z;
-};
-
-inline bool operator == (const wxVector3f& a, const wxVector3f& b)
-{
-    return (a.x == b.x && a.y == b.y && a.z == b.z);
-}
-
-WX_PG_DECLARE_VARIANT_DATA(wxVector3f)
-
-class wxVectorProperty : public wxPGProperty
-{
-    WX_PG_DECLARE_PROPERTY_CLASS(wxVectorProperty)
-public:
-
-    wxVectorProperty( const wxString& label = wxPG_LABEL,
-                    const wxString& name = wxPG_LABEL,
-                    const wxVector3f& value = wxVector3f() );
-    virtual ~wxVectorProperty();
-
-    virtual wxVariant ChildChanged( wxVariant& thisValue,
-                                    int childIndex,
-                                    wxVariant& childValue ) const;
-    virtual void RefreshChildren();
-
-protected:
-};
-
-// -----------------------------------------------------------------------
-
-class wxTriangle
-{
-public:
-    wxVector3f a, b, c;
-};
-
-inline bool operator == (const wxTriangle& a, const wxTriangle& b)
-{
-    return (a.a == b.a && a.b == b.b && a.c == b.c);
-}
-
-WX_PG_DECLARE_VARIANT_DATA(wxTriangle)
-
-class wxTriangleProperty : public wxPGProperty
-{
-    WX_PG_DECLARE_PROPERTY_CLASS(wxTriangleProperty)
-public:
-
-    wxTriangleProperty( const wxString& label = wxPG_LABEL,
-                        const wxString& name = wxPG_LABEL,
-                        const wxTriangle& value = wxTriangle() );
-    virtual ~wxTriangleProperty();
-
-    virtual wxVariant ChildChanged( wxVariant& thisValue,
-                                    int childIndex,
-                                    wxVariant& childValue ) const;
-    virtual void RefreshChildren();
-
-protected:
-};
-
-// -----------------------------------------------------------------------
-
-enum
-{
-    ID_COLOURSCHEME4 = 100
-};
-
-// -----------------------------------------------------------------------
-
 class FormMain : public wxFrame
 {
 public:
@@ -165,10 +51,8 @@ public:
     void PopulateGrid();
     void FinalizePanel( bool wasCreated = true );
 
-    void PopulateWithStandardItems();
     void PopulateWithExamples();
-    void PopulateWithLibraryConfig();
-
+    
     void OnCloseClick( wxCommandEvent& event );
     void OnLabelTextChange( wxCommandEvent& event );
 
@@ -197,7 +81,6 @@ public:
     void OnSetColumns( wxCommandEvent& event );
     void OnMisc( wxCommandEvent& event );
     void OnPopulateClick( wxCommandEvent& event );
-    void OnSetSpinCtrlEditorClick( wxCommandEvent& event );
     void OnTestReplaceClick( wxCommandEvent& event );
     void OnTestXRC( wxCommandEvent& event );
     void OnEnableCommonValues( wxCommandEvent& event );
@@ -248,7 +131,6 @@ public:
 
     void OnAbout( wxCommandEvent& event );
 
-    void OnMove( wxMoveEvent& event );
     void OnResize( wxSizeEvent& event );
     void OnPaint( wxPaintEvent& event );
     void OnCloseEvent( wxCloseEvent& event );
