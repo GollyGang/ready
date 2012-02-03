@@ -43,6 +43,10 @@ InfoPanel::InfoPanel(MyFrame* parent,wxWindowID id)
     sizer->Add(this->description_ctrl,wxSizerFlags(1).Expand());
 
     this->SetSizer(sizer);
+
+    // install event handlers to detect keyboard shortcuts when description_ctrl has focus
+    this->description_ctrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, frame);
+    this->description_ctrl->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
 }
 
 void InfoPanel::Update(const BaseRD* const system)
@@ -64,4 +68,24 @@ void InfoPanel::OnLinkClicked(wxTextUrlEvent& event)
             event.GetURLStart(),event.GetURLEnd() - event.GetURLStart()));
     }
     event.Skip();
+}
+
+bool InfoPanel::TextHasFocus()
+{
+    return this->description_ctrl->HasFocus();
+}
+
+bool InfoPanel::DoKey(int key, int mods)
+{
+    // first look for keys that should be passed to the default handler
+    if ( mods == wxMOD_NONE ) {
+        if ( key == WXK_UP || key == WXK_DOWN || key == WXK_LEFT || key == WXK_RIGHT ) {
+            // let default handler see arrow keys (for scrolling)
+            return false;
+        }
+    }
+    
+    // finally do other keyboard shortcuts
+    frame->ProcessKey(key, mods);
+    return true;
 }

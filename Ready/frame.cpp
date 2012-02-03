@@ -494,7 +494,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnCut(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus
+    // action depends on which pane has focus
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
@@ -511,7 +511,7 @@ void MyFrame::OnCopy(wxCommandEvent& event)
 
 void MyFrame::OnPaste(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus
+    // action depends on which pane has focus
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
@@ -523,14 +523,14 @@ void MyFrame::OnUpdatePaste(wxUpdateUIEvent& event)
 
 void MyFrame::OnClear(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus
+    // action depends on which pane has focus
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
 
 void MyFrame::OnSelectAll(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus, if any
+    // action depends on which pane has focus
     if (this->help_panel->HtmlHasFocus()) {
         this->help_panel->SelectAllText();
         return;
@@ -568,6 +568,7 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
 
         // hide all currently shown panes
         wxAuiPaneInfo &pattpane = this->aui_mgr.GetPane(PaneName(ID::PatternsPane));
+        wxAuiPaneInfo &infopane = this->aui_mgr.GetPane(PaneName(ID::InfoPane));
         wxAuiPaneInfo &rulepane = this->aui_mgr.GetPane(PaneName(ID::RulePane));
         wxAuiPaneInfo &helppane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
         wxAuiPaneInfo &filepane = this->aui_mgr.GetPane(PaneName(ID::FileToolbar));
@@ -575,6 +576,7 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
         
         if (pattpane.IsOk() && pattpane.IsShown()) pattpane.Show(false);
         if (rulepane.IsOk() && rulepane.IsShown()) rulepane.Show(false);
+        if (infopane.IsOk() && infopane.IsShown()) infopane.Show(false);
         if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
         if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
         if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
@@ -730,7 +732,6 @@ void MyFrame::UpdateWindowTitle()
         name = _("unknown");
     } else {
         // just show file's name, not full path
-        // AKT TODO!!! perhaps we should make this optional (via flag in Prefs > File)???
         name = name.AfterLast(wxFILE_SEP_PATH);
     }
     
@@ -856,6 +857,7 @@ void MyFrame::CheckFocus()
     // ensure one of our panes (or a text ctrl) has the focus so keyboard shortcuts always work
     if ( this->pVTKWindow->HasFocus() ||
          this->patterns_panel->TreeHasFocus() ||
+         this->info_panel->TextHasFocus() ||
          this->rule_panel->GridHasFocus() ||
          this->help_panel->HtmlHasFocus() ) {
         // good, no need to change focus
@@ -1505,6 +1507,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::FitPattern,                DO_FIT);
         SetAccelerator(mbar, ID::Wireframe,                 DO_WIREFRAME);
         SetAccelerator(mbar, ID::PatternsPane,              DO_PATTERNS);
+        SetAccelerator(mbar, ID::InfoPane,                  DO_INFO);
         SetAccelerator(mbar, ID::RulePane,                  DO_RULE);
         SetAccelerator(mbar, ID::HelpPane,                  DO_HELP);
         SetAccelerator(mbar, ID::RestoreDefaultPerspective, DO_RESTORE);
@@ -1568,6 +1571,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_FIT:        cmdid = ID::FitPattern; break;
         case DO_WIREFRAME:  cmdid = ID::Wireframe; break;
         case DO_PATTERNS:   cmdid = ID::PatternsPane; break;
+        case DO_INFO:       cmdid = ID::InfoPane; break;
         case DO_RULE:       cmdid = ID::RulePane; break;
         case DO_HELP:       cmdid = ID::HelpPane; break;
         case DO_RESTORE:    cmdid = ID::RestoreDefaultPerspective; break;
@@ -1690,6 +1694,14 @@ void MyFrame::OnChar(wxKeyEvent& event)
     if (this->patterns_panel->TreeHasFocus()) {
         // process keyboard shortcut for patterns panel
         if (this->patterns_panel->DoKey(key, mods)) return;
+        // else call default handler
+        event.Skip();
+        return;
+    }
+    
+    if (this->info_panel->TextHasFocus()) {
+        // process keyboard shortcut for info panel
+        if (this->info_panel->DoKey(key, mods)) return;
         // else call default handler
         event.Skip();
         return;
