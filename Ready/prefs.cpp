@@ -270,6 +270,7 @@ void AddDefaultKeyActions()
     keyaction[(int)'f'][mk_CMD].id =    DO_FIT;
     keyaction[(int)'w'][0].id =         DO_WIREFRAME;
     keyaction[(int)'p'][mk_CMD].id =    DO_PATTERNS;
+    keyaction[(int)'i'][mk_CMD].id =    DO_INFO;
     keyaction[IK_HELP][0].id =          DO_HELP;
 #ifdef __WXMAC__
     keyaction[(int)'/'][mk_CMD].id =    DO_HELP;
@@ -311,6 +312,7 @@ const char* GetActionName(action_id action)
         case DO_FIT:            return "Fit Pattern";
         case DO_WIREFRAME:      return "Wireframe";
         case DO_PATTERNS:       return "Show Patterns Pane";
+        case DO_INFO:           return "Show Info Pane";
         case DO_RULE:           return "Show Rule Pane";
         case DO_HELP:           return "Show Help Pane";
         case DO_RESTORE:        return "Restore Default Layout";

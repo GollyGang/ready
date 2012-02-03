@@ -58,6 +58,7 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   RulePanel.hpp RulePanel.cpp
   HelpPanel.hpp HelpPanel.cpp
   PatternsPanel.hpp PatternsPanel.cpp
+  InfoPanel.hpp InfoPanel.cpp
   vtk_pipeline.hpp vtk_pipeline.cpp
   wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx
 )

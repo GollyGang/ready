@@ -28,32 +28,16 @@ using namespace std;
 
 BEGIN_EVENT_TABLE(RulePanel, wxPanel)
     EVT_PG_CHANGED(wxID_ANY,RulePanel::OnPropertyGridChanged)
-    EVT_TEXT(wxID_ANY,RulePanel::OnTextChanged)
 END_EVENT_TABLE()
 
 RulePanel::RulePanel(MyFrame* parent,wxWindowID id) 
     : wxPanel(parent,id), frame(parent)
 {
-    wxBookCtrl *tabs_ctrl = new wxBookCtrl(this,wxID_ANY);
-    {
-        wxPanel *panel = new wxPanel(tabs_ctrl);
-        wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        panel->SetSizer(sizer);
-        this->description_ctrl = new wxTextCtrl(panel,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,wxTE_MULTILINE);
-        sizer->Add(this->description_ctrl,wxSizerFlags(1).Expand());
-        tabs_ctrl->AddPage(panel,_("Overview"));
-    }
-    {
-        wxPanel *panel = new wxPanel(tabs_ctrl);
-        wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        panel->SetSizer(sizer);
-        this->pgrid = new wxPropertyGrid(panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
-        sizer->Add(this->pgrid,wxSizerFlags(1).Expand());
-        tabs_ctrl->AddPage(panel,_("Details"));
-    }
-
     wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(tabs_ctrl,wxSizerFlags(1).Expand());
+
+    this->pgrid = new wxPropertyGrid(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
+    sizer->Add(this->pgrid,wxSizerFlags(1).Expand());
+
     this->SetSizer(sizer);
 
     // install event handler to detect keyboard shortcuts when rule panel has focus
@@ -78,7 +62,6 @@ void RulePanel::Update(const BaseRD* const system)
     this->pgrid->Clear();
 
     this->rule_name_property = this->pgrid->Append(new wxStringProperty( _("Rule name"),wxPG_LABEL,system->GetRuleName()));
-    //this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
     this->timestep_property = this->pgrid->Append(new wxFloatProperty(_("Timestep"),wxPG_LABEL,system->GetTimestep()));
 
     this->parameter_value_properties.resize(system->GetNumberOfParameters(),NULL);
@@ -96,13 +79,13 @@ void RulePanel::Update(const BaseRD* const system)
     else
         this->formula_property = NULL;
 
-    //this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
-    this->description_ctrl->ChangeValue(system->GetPatternDescription());
-
     this->dimensions_property = this->pgrid->Append(new wxStringProperty("Dimensions", wxPG_LABEL,_T("<composed>")));
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("X",wxPG_LABEL,system->GetX()));
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Y",wxPG_LABEL,system->GetY()));
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Z",wxPG_LABEL,system->GetZ()));
+
+    this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
+    this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
 
     this->pgrid->SetVerticalSpacing(3); // increase row height
 
@@ -165,10 +148,4 @@ bool RulePanel::DoKey(int key, int mods)
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;
-}
-
-void RulePanel::OnTextChanged(wxCommandEvent& event)
-{
-    if(event.GetEventObject()==this->description_ctrl)
-        this->frame->SetPatternDescription(string(this->description_ctrl->GetValue().mb_str()));
 }

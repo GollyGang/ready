@@ -23,47 +23,26 @@
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
-#include <wx/propgrid/propgrid.h>
 
 // local:
 class MyFrame;
 class BaseRD;
 
-// STL:
-#include <vector>
-
-// our rule panel has controls to allow the user to change the parameters of an RD system
-// (it doesn't change the BaseRD itself though, MyFrame does that)
-class RulePanel : public wxPanel
+// displays some information about the current pattern
+class InfoPanel : public wxPanel
 {
     public:
 
-        RulePanel(MyFrame* parent,wxWindowID id);
+        InfoPanel(MyFrame* parent,wxWindowID id);
 
         // update the controls to the state of the RD system
         void Update(const BaseRD* const system);
         
-        bool GridHasFocus();    // pgrid has keyboard focus?
-        
-        // return false if key event should be passed to default handler
-        bool DoKey(int key, int mods);
-
-    private:
-
-        void OnPropertyGridChanged(wxPropertyGridEvent& event);
-        void OnChar(wxKeyEvent& event);
-
     private:
 
         MyFrame *frame; // keep a link so that we can alert the parent frame when user makes a change
 
-        wxPropertyGrid *pgrid;
-        std::vector<wxPGProperty*> parameter_value_properties;
-        std::vector<wxPGProperty*> parameter_name_properties;
-        wxPGProperty *rule_name_property;
-        wxPGProperty *formula_property,*timestep_property;
-        wxPGProperty *dimensions_property;
-        wxPGProperty *rule_description_property,*pattern_description_property;
+        wxTextCtrl *description_ctrl;
 
         DECLARE_EVENT_TABLE()
 };
