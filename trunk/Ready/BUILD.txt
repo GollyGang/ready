@@ -23,8 +23,15 @@ Start menu (this sets up the environment variables as you need):
 cd \wxWidgets\build\msw
 nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
 
-(Although on some installations (e.g. wx2.9.3 on winXP) this doesn't work and you should
- use the provided .sln file in build\msw.)
+Also edit \wxWidgets\build\msw\config.vc and set
+
+ BUILD=release
+ RUNTIME_LIBS=static
+ UNICODE=1
+ DEBUG_INFO=0
+ DEBUG_FLAG=0
+
+(If this doesn't work try using the provided .sln file in build\msw.)
 
 =========================== Linux =================================
 

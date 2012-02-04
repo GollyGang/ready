@@ -31,7 +31,12 @@
     void gettimeofday(struct timeval* t,void* timezone)
     {
         struct _timeb timebuffer;
-        _ftime_s( &timebuffer );
+        #if _MSC_VER < 1400
+            _ftime( &timebuffer );
+        #else
+            // MSVC 2005+
+            _ftime_s( &timebuffer );
+        #endif
         t->tv_sec = (long)timebuffer.time;
         t->tv_usec = 1000 * timebuffer.millitm;
     }
