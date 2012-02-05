@@ -496,13 +496,11 @@ void ShowAboutBox()
     wxDialog dlg(wxGetApp().currframe, wxID_ANY, wxString(_("About Ready")));
     
     HtmlView* html = new HtmlView(&dlg, wxGetApp().currframe, wxID_ANY, wxDefaultPosition,
-                                  #if defined(__WXOSX_COCOA__)
+                                  #if wxCHECK_VERSION(2,9,0)
                                       // work around SetSize bug below
-                                      wxSize(400, 450),
-                                  #elif defined(__WXGTK__)
-                                      wxSize(420, 420),
+                                      wxSize(400, 460),
                                   #else
-                                      wxSize(400, 400),
+                                      wxSize(300, 300),
                                   #endif
                                   wxHW_SCROLLBAR_NEVER | wxSUNKEN_BORDER);
     html->inAbout = true;
@@ -515,7 +513,7 @@ void ShowAboutBox()
     // avoid HtmlView::OnSize calling ShowHelp
     html->canreload = false;
     
-    // this call seems to be ignored if __WXOSX_COCOA__
+    // this call seems to be ignored in wx 2.9.x
     html->SetSize(html->GetInternalRepresentation()->GetWidth(),
                   html->GetInternalRepresentation()->GetHeight());
     
