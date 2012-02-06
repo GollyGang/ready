@@ -8,7 +8,6 @@ before 0.2 release:
 - add a simple introduction-to-RD help page
 - bug: umlaut on Schlogl causing problems on Windows (Mac too?)
 - bug: newlines appear as unknown chars in text edit box on Linux (Mac too?)
-- bug: rule name getting trimmed too much (internal whitespace)
 
 Andrew's tasks for 0.2:
 - fix bug: tool tips not appearing (Mac app only?)
