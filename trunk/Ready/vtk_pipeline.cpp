@@ -49,6 +49,7 @@
 #include <vtkImageDataGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkImageMirrorPad.h>
+#include <vtkCubeAxesActor2D.h>
 // volume rendering
 #include <vtkVolumeRayCastCompositeFunction.h>
 #include <vtkVolumeRayCastMapper.h>
@@ -86,6 +87,9 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
 
 void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
 {
+    float low=0.0f,high=1.0f; // TODO: will be render properties
+    float scale=25.0f; // vertical scale of the graph (TODO: will be a render property)
+    
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
@@ -95,7 +99,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetRampToLinear();
     lut->SetScaleToLinear();
-    lut->SetTableRange(0.0, 0.5);
+    lut->SetTableRange(low,high);
     lut->SetHueRange(0.6, 0.0);
 
     // pad the image a little so we can actually see it as a 2D strip rather than being invisible
@@ -111,6 +115,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // an actor determines how a scene object is displayed
     vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
     actor->SetInput(image_mapper->GetOutput());
+    actor->SetPosition(0,-5,0);
     //actor->InterpolateOff();
 
     // add the actor to the renderer's scene
@@ -128,7 +133,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-25.0);
+        warp->SetScaleFactor(-scale);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();
@@ -137,7 +142,6 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->SetPosition(0,5,0);
         if(iChemical==iActiveChemical)
             actor->GetProperty()->SetColor(1,1,1);
         else
@@ -145,13 +149,30 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         actor->RotateX(90.0);
         pRenderer->AddActor(actor);
     }
-
+    
+    // add an axis
+    vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+    axis->SetCamera(pRenderer->GetActiveCamera());
+    axis->SetBounds(0,0,low*scale,high*scale,0,0);
+    axis->SetRanges(0,0,low,high,0,0);
+    axis->UseRangesOn();
+    axis->XAxisVisibilityOff();
+    axis->ZAxisVisibilityOff();
+    axis->SetYLabel("");
+    axis->SetLabelFormat("%.2f");
+    axis->SetInertia(10000);
+    axis->SetCornerOffset(0);
+    axis->SetNumberOfLabels(5);
+    pRenderer->AddActor(axis);
+    
     // set the background color
     pRenderer->SetBackground(0,0,0);
     
     // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     pVTKWindow->SetInteractorStyle(is);
+    
+    pRenderer->ResetCamera();
 }
 
 void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
