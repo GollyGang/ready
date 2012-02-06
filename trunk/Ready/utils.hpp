@@ -48,6 +48,8 @@ template <typename T> bool from_string(const std::string& s,T& val)
     iss >> val; 
     return !iss.fail(); 
 } 
+// we provide a specialized version of from_string for string types, to avoid the problem of multiple space-separated words
+template <> bool from_string<std::string> (const std::string& s,std::string& val);
 
 float* vtk_at(float* origin,int x,int y,int z,int X,int Y);
 
