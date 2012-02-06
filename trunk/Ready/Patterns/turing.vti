@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+    <rule type="formula" name="Turing" number_of_chemicals="2" timestep="1">
+        
+      <description>
+        This formula was blah blah blah.
+      </description>
+      
+      <param name="D_a">  0.125    </param>
+      <param name="D_b">  0.03125  </param>
+      <param name="k_a">  0.0125   </param>
+      
+      <formula>
+		  delta_a = k_a * ((float4)(16.0f,16.0f,16.0f,16.0f) - a * b) + D_a * laplacian_a;
+		  delta_b = k_a * (a * b - b - (float4)(12.0f,12.0f,12.0f,12.0f)) + D_b * laplacian_b;
+      </formula>
+      
+    </rule>
+    
+    <pattern_description>
+      This pattern shows blah blah blah.
+    </pattern_description>
+    
+    <initial_pattern_generator apply_when_loading="1">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="3.995" high="4.005" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <white_noise low="3.995" high="4.005" />
+		<everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 63 0 0">
+      <PointData Scalars="Scalars_">
+        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="2" format="appended" RangeMin="0"                    RangeMax="0"                    offset="0"                   />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+  </AppendedData>
+</VTKFile>
