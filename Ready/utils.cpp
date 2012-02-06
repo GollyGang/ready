@@ -71,3 +71,9 @@ float* vtk_at(float* origin,int x,int y,int z,int X,int Y)
     // single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z
     return origin + x + X*(y + Y*z);
 }
+
+template <> bool from_string<std::string> (const std::string& s,std::string& val) 
+{ 
+    val = s;
+    return true;
+} 
