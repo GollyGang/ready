@@ -47,16 +47,6 @@ RulePanel::RulePanel(MyFrame* parent,wxWindowID id)
 
 void RulePanel::Update(const BaseRD* const system)
 {
-    class LongStringProperty : public wxLongStringProperty
-    {
-        public:
-            LongStringProperty(const wxString& label,const wxString& name,const wxString& value) 
-                : wxLongStringProperty(label,name,value)
-            {
-                this->m_flags |= wxPG_PROP_NO_ESCAPE;
-            }
-    };
-
     // remake the whole property grid (we don't know what changed)
     this->pgrid->Freeze();
     this->pgrid->Clear();
@@ -75,7 +65,7 @@ void RulePanel::Update(const BaseRD* const system)
     }
 
     if(system->HasEditableFormula())
-        this->formula_property = this->pgrid->Append(new LongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
+        this->formula_property = this->pgrid->Append(new wxLongStringProperty(_("Formula"),wxPG_LABEL,system->GetFormula()));
     else
         this->formula_property = NULL;
 
@@ -84,8 +74,8 @@ void RulePanel::Update(const BaseRD* const system)
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Y",wxPG_LABEL,system->GetY()));
     this->pgrid->AppendIn(this->dimensions_property,new wxIntProperty("Z",wxPG_LABEL,system->GetZ()));
 
-    this->rule_description_property = this->pgrid->Append(new LongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
-    this->pattern_description_property = this->pgrid->Append(new LongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
+    this->rule_description_property = this->pgrid->Append(new wxLongStringProperty( _("Rule description"),wxPG_LABEL,system->GetRuleDescription()));
+    this->pattern_description_property = this->pgrid->Append(new wxLongStringProperty( _("Pattern description"),wxPG_LABEL,system->GetPatternDescription()));
 
     this->pgrid->SetVerticalSpacing(3); // increase row height
 
