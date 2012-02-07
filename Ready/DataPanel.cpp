@@ -326,9 +326,15 @@ void DataPanel::Update(const BaseRD* const system)
     contents += _("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     rownum = 0;
-    contents += AppendRow(_("Rule name"), system->GetRuleName());
-    contents += AppendRow(_("Rule description"), system->GetRuleDescription());
-    contents += AppendRow(_("Pattern description"), system->GetPatternDescription());
+    wxString s(system->GetRuleName().c_str(),wxConvUTF8);
+    s.Replace(wxT("\n"), wxT("<br>"));
+    contents += AppendRow(_("Rule name"), s);
+    s = wxString(system->GetRuleDescription().c_str(),wxConvUTF8);
+    s.Replace(wxT("\n"), wxT("<br>"));
+    contents += AppendRow(_("Rule description"), s);
+    s = wxString(system->GetPatternDescription().c_str(),wxConvUTF8);
+    s.Replace(wxT("\n"), wxT("<br>"));
+    contents += AppendRow(_("Pattern description"), s);
     contents += AppendRow(_("Timestep"), FormatFloat(system->GetTimestep()));
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
