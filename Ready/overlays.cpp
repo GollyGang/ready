@@ -384,8 +384,14 @@ class Rectangle : public BaseShape
 {
     public:
 
-        Rectangle(vtkXMLDataElement* node) : BaseShape(node),
-            a(node->GetNestedElement(0)), b(node->GetNestedElement(1)) {}
+        Rectangle(vtkXMLDataElement* node) : BaseShape(node)
+        {
+            if(node->GetNumberOfNestedElements()!=2)
+                throw runtime_error("rectangle: expected two nested elements (point3d,point3d)");
+            this->a = new Point3D(node->GetNestedElement(0));
+            this->b = new Point3D(node->GetNestedElement(1));
+        }
+        ~Rectangle() { delete this->a; delete this->b; }
 
         static const char* GetTypeName() { return "rectangle"; }
 
@@ -393,8 +399,8 @@ class Rectangle : public BaseShape
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Rectangle::GetTypeName());
-            xml->AddNestedElement(this->a.GetAsXML());
-            xml->AddNestedElement(this->b.GetAsXML());
+            xml->AddNestedElement(this->a->GetAsXML());
+            xml->AddNestedElement(this->b->GetAsXML());
             return xml;
         }
 
@@ -402,16 +408,16 @@ class Rectangle : public BaseShape
         {
             switch(dimensionality)
             {
-                case 1: return x>=this->a.x && x<=this->b.x;
-                case 2: return x>=this->a.x && x<=this->b.x && y>=this->a.y && y<=this->b.y;
-                case 3: return x>=this->a.x && x<=this->b.x && y>=this->a.y && y<=this->b.y && z>=this->a.z && z<=this->b.z;
+                case 1: return x>=this->a->x && x<=this->b->x;
+                case 2: return x>=this->a->x && x<=this->b->x && y>=this->a->y && y<=this->b->y;
+                case 3: return x>=this->a->x && x<=this->b->x && y>=this->a->y && y<=this->b->y && z>=this->a->z && z<=this->b->z;
                 default: throw runtime_error("Rectangle::IsInside : unsupported dimensionality");
             }
         }
 
     protected:
 
-        Point3D a,b;
+        Point3D *a,*b;
 };
 
 // -------------------------------------------------------------------------------
