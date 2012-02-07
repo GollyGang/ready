@@ -27,6 +27,7 @@
 
 // local:
 class RulePanel;
+class DataPanel;
 class HelpPanel;
 class PatternsPanel;
 class InfoPanel;
@@ -50,7 +51,7 @@ class MyFrame : public wxFrame
         void EditFile(const wxString& path);
         bool UserWantsToCancelWhenAskedIfWantsToSave();
 
-        // interface with RulePanel
+        // interface with RulePanel/DataPanel
         void SetRuleName(std::string s);
         void SetRuleDescription(std::string s);
         void SetPatternDescription(std::string s);
@@ -132,6 +133,7 @@ class MyFrame : public wxFrame
         void InitializeToolbars();
         void InitializePatternsPane();
         void InitializeRulePane();
+        void InitializeDataPane();
         void InitializeInfoPane();
         void UpdateRulePane();
         void UpdateInfoPane();
@@ -169,6 +171,7 @@ class MyFrame : public wxFrame
 
         // various panes:
         RulePanel *rule_panel;
+        DataPanel *data_panel;
         HelpPanel *help_panel;
         PatternsPanel *patterns_panel;
         InfoPanel *info_panel;
