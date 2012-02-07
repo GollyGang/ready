@@ -321,8 +321,7 @@ void DataPanel::Update(const BaseRD* const system)
     wxString contents;
     
     contents += _("<html><body>");
-    contents += _("<center>Click on a link in the left column to change the corresponding setting.");
-    contents += _("</center><p><center>");
+    contents += _("<p><center>");
     contents += _("<table border=1 cellspacing=0 cellpadding=1 width=\"99%\"><tr><td>");
     contents += _("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
@@ -373,15 +372,20 @@ wxString DataPanel::AppendRow(const wxString& label, const wxString& value)
         result += _("<tr>");
 
     result += _("<td valign=top width=\"25%\">");
+    result += _("<b>");
+    result += label;
+    result += _("</b>");
+    result += _("</a>");
+    result += _("</td><td width=10> </td>");
+    result += _("<td valign=top>");
+    result += value;
+    result += _("</td>");
+
+    result += _("<td>");
     result += _("<a href=\"");
     result += change_prefix;
     result += label;
-    result += _("\"><b>");
-    result += label;
-    result += _("</b></a></td><td width=10> </td>");
-
-    result += _("<td valign=top>");
-    result += value;
+    result += _("\">edit</a>");
     result += _("</td>");
     
     result += _("</tr>");
