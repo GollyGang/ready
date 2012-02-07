@@ -46,6 +46,7 @@ namespace ID { enum {
     Wireframe,
     PatternsPane,
     RulePane,
+    DataPane,
     CanvasPane,
     HelpPane,
     InfoPane,

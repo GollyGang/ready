@@ -24,6 +24,7 @@
 #include "prefs.hpp"            // for GetPrefs, SavePrefs, etc
 #include "IO_XML.hpp"
 #include "RulePanel.hpp"
+#include "DataPanel.hpp"
 #include "HelpPanel.hpp"
 #include "PatternsPanel.hpp"
 #include "InfoPanel.hpp"
@@ -112,6 +113,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RulePane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::RulePane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::DataPane, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::DataPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::InfoPane, MyFrame::OnToggleViewPane)
@@ -179,6 +182,7 @@ MyFrame::MyFrame(const wxString& title)
     this->InitializePatternsPane();
     this->InitializeHelpPane();
     this->InitializeRulePane();
+    this->InitializeDataPane();
     this->InitializeRenderPane();
     this->InitializeInfoPane();
 
@@ -253,6 +257,7 @@ void MyFrame::InitializeMenus()
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane") + GetAccelerator(DO_PATTERNS), _("View the patterns pane"));
         menu->AppendCheckItem(ID::InfoPane, _("&Info Pane") + GetAccelerator(DO_INFO), _("View the info pane"));
         menu->AppendCheckItem(ID::RulePane, _("&Rule Pane") + GetAccelerator(DO_RULE), _("View the rule pane"));
+        menu->AppendCheckItem(ID::DataPane, _("&Data Pane") /* !!!??? + GetAccelerator(DO_RULE) */, _("View the data pane"));
         menu->AppendCheckItem(ID::HelpPane, _("&Help Pane") + GetAccelerator(DO_HELP), _("View the help pane"));
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout") + GetAccelerator(DO_RESTORE), _("Put the windows back where they were"));
@@ -359,9 +364,22 @@ void MyFrame::InitializeRulePane()
                   );
 }
 
+void MyFrame::InitializeDataPane()
+{
+    this->data_panel = new DataPanel(this,wxID_ANY);
+    this->aui_mgr.AddPane(this->data_panel,
+                  wxAuiPaneInfo()
+                  .Name(PaneName(ID::DataPane))
+                  .Caption(_("Data Pane"))
+                  .BestSize(500,700)
+                  .Float()
+                  );
+}
+
 void MyFrame::UpdateRulePane()
 {
     this->rule_panel->Update(this->system);
+    this->data_panel->Update(this->system);   // keep in sync while testing!!!
 }
 
 void MyFrame::UpdateInfoPane()
@@ -570,13 +588,15 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
         wxAuiPaneInfo &pattpane = this->aui_mgr.GetPane(PaneName(ID::PatternsPane));
         wxAuiPaneInfo &infopane = this->aui_mgr.GetPane(PaneName(ID::InfoPane));
         wxAuiPaneInfo &rulepane = this->aui_mgr.GetPane(PaneName(ID::RulePane));
+        wxAuiPaneInfo &datapane = this->aui_mgr.GetPane(PaneName(ID::DataPane));
         wxAuiPaneInfo &helppane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
         wxAuiPaneInfo &filepane = this->aui_mgr.GetPane(PaneName(ID::FileToolbar));
         wxAuiPaneInfo &actionpane = this->aui_mgr.GetPane(PaneName(ID::ActionToolbar));
         
         if (pattpane.IsOk() && pattpane.IsShown()) pattpane.Show(false);
-        if (rulepane.IsOk() && rulepane.IsShown()) rulepane.Show(false);
         if (infopane.IsOk() && infopane.IsShown()) infopane.Show(false);
+        if (rulepane.IsOk() && rulepane.IsShown()) rulepane.Show(false);
+        if (datapane.IsOk() && datapane.IsShown()) datapane.Show(false);
         if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
         if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
         if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
@@ -859,6 +879,7 @@ void MyFrame::CheckFocus()
          this->patterns_panel->TreeHasFocus() ||
          this->info_panel->TextHasFocus() ||
          this->rule_panel->GridHasFocus() ||
+         this->data_panel->HtmlHasFocus() ||
          this->help_panel->HtmlHasFocus() ) {
         // good, no need to change focus
     } else {
@@ -1411,6 +1432,7 @@ void MyFrame::SetRuleName(string s)
     this->system->SetRuleName(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1419,6 +1441,7 @@ void MyFrame::SetRuleDescription(string s)
     this->system->SetRuleDescription(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1427,6 +1450,7 @@ void MyFrame::SetPatternDescription(string s)
     this->system->SetPatternDescription(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1434,6 +1458,7 @@ void MyFrame::SetParameter(int iParam,float val)
 {
     this->system->SetParameterValue(iParam,val);
     this->UpdateWindowTitle();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1441,6 +1466,7 @@ void MyFrame::SetParameterName(int iParam,std::string s)
 {
     this->system->SetParameterName(iParam,s);
     this->UpdateWindowTitle();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1448,6 +1474,7 @@ void MyFrame::SetFormula(std::string s)
 {
     this->system->SetFormula(s);
     this->UpdateWindowTitle();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1455,6 +1482,7 @@ void MyFrame::SetTimestep(float ts)
 {
     this->system->SetTimestep(ts);
     this->UpdateWindowTitle();
+    this->data_panel->Update(this->system); //!!!???
     // TODO: update anything else that needs to know
 }
 
@@ -1710,6 +1738,14 @@ void MyFrame::OnChar(wxKeyEvent& event)
     if (this->rule_panel->GridHasFocus()) {
         // process keyboard shortcut for rule panel
         if (this->rule_panel->DoKey(key, mods)) return;
+        // else call default handler
+        event.Skip();
+        return;
+    }
+    
+    if (this->data_panel->HtmlHasFocus()) {
+        // process keyboard shortcut for data panel
+        if (this->data_panel->DoKey(key, mods)) return;
         // else call default handler
         event.Skip();
         return;

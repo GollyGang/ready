@@ -102,7 +102,8 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
 	  //destructor
     ~wxVTKRenderWindowInteractor();
 
-    void DoCharEvent(char key);   // AKT: added for Ready
+    // AKT: added so users can change the default keyboard shortcuts
+    void DoCharEvent(char key);
 
     // vtkRenderWindowInteractor overrides
     void Initialize();
