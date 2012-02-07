@@ -1167,13 +1167,13 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     if (remember) AddRecentPattern(path);
     
+    wxBusyCursor busy;
+
     // load pattern file
     bool warn_to_update = false;
     BaseRD *target_system = NULL;
     try
     {
-        wxBusyCursor busy;
-
         vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
         iw->SetFileName(path.mb_str());
         iw->Update();

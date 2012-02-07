@@ -77,4 +77,9 @@ class Overlay : public XML_Object
         BaseOperation *op;   // e.g. overwrite, add, multiply, etc.
         BaseFill *fill;     // e.g. constant value, white noise, named parameter, other chemical, etc.
         BaseShape *shape;  // e.g. rectangle, sphere, scattered shapes, etc.
+
+    private:
+
+        Overlay();          // not implemented
+        Overlay(Overlay&); // not implemented
 };
