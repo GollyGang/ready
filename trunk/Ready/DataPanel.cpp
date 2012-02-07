@@ -387,7 +387,7 @@ wxString DataPanel::AppendRow(const wxString& label, const wxString& value)
     result += value;
     result += _("</td>");
 
-    result += _("<td>");
+    result += _("<td align=right>");
     result += _("<a href=\"");
     result += change_prefix;
     result += label;
