@@ -118,6 +118,13 @@ Overlay::Overlay(vtkXMLDataElement* node)
     this->shape = BaseShape::New(node->GetNestedElement(2));
 }
 
+Overlay::~Overlay()
+{
+    delete this->op;
+    delete this->fill;
+    delete this->shape;
+}
+
 vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();

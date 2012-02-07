@@ -61,6 +61,7 @@ class Overlay : public XML_Object
     
         // can construct from an XML node
         Overlay(vtkXMLDataElement* node);
+        ~Overlay();
             
         // apply the overlay
         void Apply(BaseRD *system,int x,int y,int z) const;
