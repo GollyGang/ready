@@ -76,8 +76,10 @@ int opencl_platform = 0;         // current OpenCL platform
 int opencl_device = 0;           // current OpenCL device
 int debuglevel = 0;              // for displaying debug info if > 0
 #ifdef __WXMAC__
+    int infofontsize = 12;       // font size in Mac info pane
     int helpfontsize = 12;       // font size in Mac help pane
 #else
+    int infofontsize = 10;       // font size in Win/Linux info pane
     int helpfontsize = 10;       // font size in Win/Linux help pane
 #endif
 bool showtips = true;            // show button tips?
@@ -313,7 +315,6 @@ const char* GetActionName(action_id action)
         case DO_WIREFRAME:      return "Wireframe";
         case DO_PATTERNS:       return "Show Patterns Pane";
         case DO_INFO:           return "Show Info Pane";
-        case DO_RULE:           return "Show Rule Pane";
         case DO_HELP:           return "Show Help Pane";
         case DO_RESTORE:        return "Restore Default Layout";
         case DO_CHEMICAL:       return "Change Active Chemical...";
@@ -891,6 +892,7 @@ void SavePrefs()
 
     SaveKeyActions(f);
     
+    fprintf(f, "info_font_size=%d (%d..%d)\n", infofontsize, minfontsize, maxfontsize);
     fprintf(f, "help_font_size=%d (%d..%d)\n", helpfontsize, minfontsize, maxfontsize);
     fprintf(f, "show_tips=%d\n", showtips ? 1 : 0);
     fprintf(f, "allow_beep=%d\n", allowbeep ? 1 : 0);
@@ -1180,6 +1182,11 @@ void GetPrefs()
         } else if (strcmp(keyword, "key_action") == 0) {
             GetKeyAction(value);
             sawkeyaction = true;
+
+        } else if (strcmp(keyword, "info_font_size") == 0) {
+            sscanf(value, "%d", &infofontsize);
+            if (infofontsize < minfontsize) infofontsize = minfontsize;
+            if (infofontsize > maxfontsize) infofontsize = maxfontsize;
 
         } else if (strcmp(keyword, "help_font_size") == 0) {
             sscanf(value, "%d", &helpfontsize);

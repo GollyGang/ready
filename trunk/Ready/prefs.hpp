@@ -36,8 +36,8 @@ void ChooseTextEditor(wxWindow* parent, wxString& result);
 
 // Various constants:
 
-const int minfontsize = 6;       // minimum value of helpfontsize
-const int maxfontsize = 30;      // maximum value of helpfontsize
+const int minfontsize = 8;       // minimum value of infofontsize/helpfontsize
+const int maxfontsize = 30;      // maximum value of infofontsize/helpfontsize
 
 // Global directory paths:
 
@@ -57,6 +57,7 @@ extern wxString auilayout;       // wxAUI layout info
 extern int opencl_platform;      // current OpenCL platform
 extern int opencl_device;        // current OpenCL device
 extern int debuglevel;           // for displaying debug info if > 0
+extern int infofontsize;         // font size in info pane
 extern int helpfontsize;         // font size in help pane
 extern bool showtips;            // show button tips?
 extern bool allowbeep;           // okay to play beep sound?
@@ -101,10 +102,9 @@ typedef enum
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
     DO_OPENCL,                   // show OpenCL diagnostics...
-    DO_HELP,                     // show help pane
     DO_PATTERNS,                 // show patterns pane
     DO_INFO,                     // show info pane
-    DO_RULE,                     // show rule pane
+    DO_HELP,                     // show help pane
     DO_STEP,                     // step
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS

@@ -25,33 +25,52 @@
 #endif
 
 // local:
-class MyFrame;
 class BaseRD;
+class MyFrame;
+class HtmlInfo;
 
-// displays some information about the current pattern
+// this panel allows the user to change the parameters of an RD system
+// (it doesn't change the BaseRD itself though, MyFrame does that)
 class InfoPanel : public wxPanel
 {
     public:
 
-        InfoPanel(MyFrame* parent,wxWindowID id);
+        InfoPanel(MyFrame* parent, wxWindowID id);
 
-        // update the text in description_ctrl
+        // update the displayed info to reflect the state of the RD system
         void Update(const BaseRD* const system);
-
-        bool TextHasFocus();    // description_ctrl has keyboard focus?
+        
+        // update buttons at top of panel
+        void UpdateButtons();
+        
+        // display link info in status line
+        void SetStatus(const wxString& text) { status->SetLabel(text); }
+        
+        bool HtmlHasFocus();    // html window has keyboard focus?
+        void SelectAllText();   // select all text in html window
+        void CopySelection();   // copy selected text to clipboard
         
         // return false if key event should be passed to default handler
         bool DoKey(int key, int mods);
         
     private:
-    
-        void OnLinkClicked(wxTextUrlEvent& event);
+
+        MyFrame* frame;         // link to parent frame
+
+        HtmlInfo* html;         // child window for rendering HTML info
+
+        wxButton* smallerbutt;  // smaller text
+        wxButton* biggerbutt;   // bigger text
+   
+        wxStaticText* status;   // for link info
         
-    private:
-
-        MyFrame *frame; // link to parent frame
-
-        wxTextCtrl *description_ctrl;
+        // event handlers
+        void OnSmallerButton(wxCommandEvent& event);
+        void OnBiggerButton(wxCommandEvent& event);
+        
+        // helper routines for building HTML info
+        wxString AppendRow(const wxString& label, const wxString& value);
+        wxString FormatFloat(const float& f);
 
         DECLARE_EVENT_TABLE()
 };
