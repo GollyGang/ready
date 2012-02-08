@@ -60,3 +60,6 @@ void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val
     if(!str || !from_string(str,val))
         throw std::runtime_error(to_string(e->GetName())+" : failed to read required attribute: "+name);
 } 
+
+std::string GetChemicalName(int i); // a, b, c, ... z, aa, ab, ...
+int IndexFromChemicalName(const std::string& s);

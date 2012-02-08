@@ -25,9 +25,5 @@ class OpenCL_nDim : public OpenCL_RD
 
         OpenCL_nDim();
 
-        virtual void Allocate(int x,int y,int z,int nc);
-
-        virtual void Update(int n_steps);
-
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
 };

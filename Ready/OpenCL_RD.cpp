@@ -551,3 +551,29 @@ void OpenCL_RD::BlankImage()
 	BaseRD::BlankImage();
     this->WriteToOpenCLBuffers();
 }
+
+void OpenCL_RD::Allocate(int x,int y,int z,int nc)
+{
+    if(x&(x-1) || y&(y-1) || z&(z-1))
+        throw runtime_error("OpenCL_RD::Allocate : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
+    BaseRD::Allocate(x,y,z,nc);
+    this->need_reload_formula = true;
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
+    this->CreateOpenCLBuffers();
+}
+
+void OpenCL_RD::Update(int n_steps)
+{
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
+
+    // take approximately n_steps steps
+    for(int it=0;it<(n_steps+1)/2;it++)
+    {
+        this->Update2Steps(); // take data from buffer1, leaves output in buffer1
+        this->timesteps_taken += 2;
+    }
+
+    this->ReadFromOpenCLBuffers(); // buffer1 -> image
+}

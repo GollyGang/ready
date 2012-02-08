@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+// STL:
+using namespace std;
+
 #ifdef _WIN32
     #include <sys/timeb.h>
     #include <sys/types.h>
@@ -72,8 +75,25 @@ float* vtk_at(float* origin,int x,int y,int z,int X,int Y)
     return origin + x + X*(y + Y*z);
 }
 
-template <> bool from_string<std::string> (const std::string& s,std::string& val) 
+template <> bool from_string<string> (const string& s,string& val) 
 { 
     val = s;
     return true;
 } 
+
+string GetChemicalName(int i)
+{ 
+    if(i<26)
+        return string(1,'a'+i); 
+    else if(i<26*27)
+        return GetChemicalName(i/26-1)+GetChemicalName(i%26);
+    throw runtime_error("GetChemicalName: out of range");
+}
+
+int IndexFromChemicalName(const string& s)
+{
+    for(int i=0;i<26*27;i++)
+        if(s==GetChemicalName(i))
+            return i;
+    throw runtime_error("IndexFromChemicalName: unrecognised chemical name: "+s);
+}

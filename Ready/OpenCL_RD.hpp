@@ -61,6 +61,10 @@ class OpenCL_RD : public BaseRD
 		virtual void GenerateInitialPattern();
 		virtual void BlankImage();
 		
+        virtual void Allocate(int x,int y,int z,int nc);
+
+        virtual void Update(int n_steps);
+
     protected:
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
