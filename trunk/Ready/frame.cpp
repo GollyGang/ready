@@ -163,6 +163,9 @@ MyFrame::MyFrame(const wxString& title)
         // advanced docking hints cause problems on xfce (and probably others)
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_RECTANGLE_HINT );
     #endif
+    #ifdef __WXMAC__
+        this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
+    #endif
     this->aui_mgr.SetManagedWindow(this);
     
     GetPrefs();     // must be called before InitializeMenus
@@ -421,8 +424,11 @@ void MyFrame::InitializeRenderPane()
     // for now the VTK window goes in the center pane (always visible) - we got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
     this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
-    this->aui_mgr.AddPane(this->pVTKWindow, wxAuiPaneInfo()
+    this->aui_mgr.AddPane(this->pVTKWindow,
+                  wxAuiPaneInfo()
                   .Name(PaneName(ID::CanvasPane))
+                  // AKT TODO!!! why don't we see caption??? (I'd like to see when it has focus)
+                  .Caption(_("Render Pane")).CaptionVisible()
                   .CenterPane()
                   .BestSize(400,400)
                   );
