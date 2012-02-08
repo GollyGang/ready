@@ -17,7 +17,6 @@
 
 // STL:
 #include <string>
-#include <map>
 
 // VTK:
 #include <vtkSmartPointer.h>
