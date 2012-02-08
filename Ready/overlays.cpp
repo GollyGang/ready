@@ -43,9 +43,11 @@ class Point3D : public XML_Object
         float x,y,z;
 };
 
-class BaseOperation : public Reusable_XML_Object
+class BaseOperation : public XML_Object
 {
     public:
+
+        virtual ~BaseOperation() {}
 
         // construct when we don't know the derived type
         static BaseOperation* New(vtkXMLDataElement* node);
@@ -55,12 +57,14 @@ class BaseOperation : public Reusable_XML_Object
     protected:
         
         // can construct from an XML node
-        BaseOperation(vtkXMLDataElement* node) : Reusable_XML_Object(node) {}
+        BaseOperation(vtkXMLDataElement* node) : XML_Object(node) {}
 };
 
-class BaseFill : public Reusable_XML_Object
+class BaseFill : public XML_Object
 {
     public:
+
+        virtual ~BaseFill() {}
 
         // construct when we don't know the derived type
         static BaseFill* New(vtkXMLDataElement* node);
@@ -71,12 +75,14 @@ class BaseFill : public Reusable_XML_Object
     protected:
 
         // can construct from an XML node
-        BaseFill(vtkXMLDataElement* node) : Reusable_XML_Object(node) {}
+        BaseFill(vtkXMLDataElement* node) : XML_Object(node) {}
 };
  
-class BaseShape : public Reusable_XML_Object
+class BaseShape : public XML_Object
 {
     public:
+
+        virtual ~BaseShape() {}
 
         // construct when we don't know the derived type
         static BaseShape* New(vtkXMLDataElement* node);
@@ -86,10 +92,10 @@ class BaseShape : public Reusable_XML_Object
     protected:
 
         // can construct from an XML node
-        BaseShape(vtkXMLDataElement* node) : Reusable_XML_Object(node) {}
+        BaseShape(vtkXMLDataElement* node) : XML_Object(node) {}
 };
 
-Point3D::Point3D(vtkXMLDataElement *node)
+Point3D::Point3D(vtkXMLDataElement *node) : XML_Object(node)
 {
     read_required_attribute(node,"x",this->x);
     read_required_attribute(node,"y",this->y);
@@ -106,7 +112,7 @@ vtkSmartPointer<vtkXMLDataElement> Point3D::GetAsXML() const
     return xml;
 }
 
-Overlay::Overlay(vtkXMLDataElement* node)
+Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
 {
     char c;
     read_required_attribute(node,"chemical",c);
@@ -134,26 +140,6 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
     xml->AddNestedElement(this->fill->GetAsXML());
     xml->AddNestedElement(this->shape->GetAsXML());
     return xml;
-}
-
-Reusable_XML_Object::Reusable_XML_Object(vtkXMLDataElement *node)
-{
-    /* TODO: this is not yet functional!
-    const char *s;
-    s = node->GetAttribute("label");
-    if(s)
-    {
-        from_string(s,this->label);
-        // TODO: add this instance to some external list
-    }
-    s = node->GetAttribute("ref");
-    if(s)
-    {
-        string ref;
-        from_string(s,ref);
-        // TODO: load the previous instance
-    }
-    */
 }
 
 void Overlay::Apply(BaseRD* system,int x,int y,int z) const
@@ -391,7 +377,7 @@ class Rectangle : public BaseShape
             this->a = new Point3D(node->GetNestedElement(0));
             this->b = new Point3D(node->GetNestedElement(1));
         }
-        ~Rectangle() { delete this->a; delete this->b; }
+        virtual ~Rectangle() { delete this->a; delete this->b; }
 
         static const char* GetTypeName() { return "rectangle"; }
 

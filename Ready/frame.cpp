@@ -197,7 +197,7 @@ MyFrame::MyFrame(const wxString& title)
     // initialize an RD system to get us started
     #ifdef __WXMSW__
         // use back slashes on Windows
-        const wxString initfile = _T("Patterns\CPU-only\grayscott_3D.vti");
+        const wxString initfile = _T("Patterns\\CPU-only\\grayscott_3D.vti");
     #else
         // use forward slashes on Mac/Linux
         const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
