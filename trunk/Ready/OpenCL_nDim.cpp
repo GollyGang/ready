@@ -41,34 +41,6 @@ OpenCL_nDim::OpenCL_nDim()
     this->SetTimestep(1.0f);
 }
 
-void OpenCL_nDim::Allocate(int x,int y,int z,int nc)
-{
-    if(x&(x-1) || y&(y-1) || z&(z-1))
-        throw runtime_error("OpenCL_nDim::Allocate : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
-    OpenCL_RD::Allocate(x,y,z,nc);
-    this->need_reload_formula = true;
-    this->ReloadContextIfNeeded();
-    this->ReloadKernelIfNeeded();
-    this->CreateOpenCLBuffers();
-}
-
-void OpenCL_nDim::Update(int n_steps)
-{
-    this->ReloadContextIfNeeded();
-    this->ReloadKernelIfNeeded();
-
-    // take approximately n_steps steps
-    for(int it=0;it<(n_steps+1)/2;it++)
-    {
-        this->Update2Steps(); // take data from buffer1, leaves output in buffer1
-        this->timesteps_taken += 2;
-    }
-
-    this->ReadFromOpenCLBuffers(); // buffer1 -> image
-}
-
-string Chem(int i) { return to_string((char)('a'+i)); } // a, b, c, ...
-
 std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) const
 {
     const string indent = "    ";
@@ -81,10 +53,10 @@ std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) co
     // output the function definition
     kernel_source << "__kernel void rd_compute(";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global float4 *" << Chem(i) << "_in,";
+        kernel_source << "__global float4 *" << GetChemicalName(i) << "_in,";
     for(int i=0;i<NC;i++)
     {
-        kernel_source << "__global float4 *" << Chem(i) << "_out";
+        kernel_source << "__global float4 *" << GetChemicalName(i) << "_out";
         if(i<NC-1)
             kernel_source << ",";
     }
@@ -100,7 +72,7 @@ std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) co
     const int i_here = X*(Y*z + y) + x;\n\
 \n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float4 " << Chem(i) << " = " << Chem(i) << "_in[i_here];\n"; // "float4 a = a_in[i_here];"
+        kernel_source << indent << "float4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[i_here];\n"; // "float4 a = a_in[i_here];"
     // output the Laplacian part of the body
     kernel_source << "\
 \n\
@@ -119,18 +91,18 @@ std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) co
     const int i_back =  X*(Y*zp1 + y) + x;\n";
     for(int iC=0;iC<NC;iC++)
         for(int iDir=0;iDir<NDIRS;iDir++)
-            kernel_source << indent << "float4 " << Chem(iC) << "_" << dir[iDir] << " = " << Chem(iC) << "_in[i_" << dir[iDir] << "];\n";
+            kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
     for(int iC=0;iC<NC;iC++)
     {
-        kernel_source << indent << "float4 laplacian_" << Chem(iC) << " = (float4)(" << Chem(iC) << "_up.x + " << Chem(iC) << ".y + " << Chem(iC) << "_down.x + " << Chem(iC) << "_left.w + " << Chem(iC) << "_fore.x + " << Chem(iC) << "_back.x,\n";
-        kernel_source << indent << Chem(iC) << "_up.y + " << Chem(iC) << ".z + " << Chem(iC) << "_down.y + " << Chem(iC) << ".x + " << Chem(iC) << "_fore.y + " << Chem(iC) << "_back.y,\n";
-        kernel_source << indent << Chem(iC) << "_up.z + " << Chem(iC) << ".w + " << Chem(iC) << "_down.z + " << Chem(iC) << ".y + " << Chem(iC) << "_fore.z + " << Chem(iC) << "_back.z,\n";
-        kernel_source << indent << Chem(iC) << "_up.w + " << Chem(iC) << "_right.x + " << Chem(iC) << "_down.w + " << Chem(iC) << ".z + " << Chem(iC) << "_fore.w + " << Chem(iC) << "_back.w) - 6.0f*" << Chem(iC) << "\n";
+        kernel_source << indent << "float4 laplacian_" << GetChemicalName(iC) << " = (float4)(" << GetChemicalName(iC) << "_up.x + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_down.x + " << GetChemicalName(iC) << "_left.w + " << GetChemicalName(iC) << "_fore.x + " << GetChemicalName(iC) << "_back.x,\n";
+        kernel_source << indent << GetChemicalName(iC) << "_up.y + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_down.y + " << GetChemicalName(iC) << ".x + " << GetChemicalName(iC) << "_fore.y + " << GetChemicalName(iC) << "_back.y,\n";
+        kernel_source << indent << GetChemicalName(iC) << "_up.z + " << GetChemicalName(iC) << ".w + " << GetChemicalName(iC) << "_down.z + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_fore.z + " << GetChemicalName(iC) << "_back.z,\n";
+        kernel_source << indent << GetChemicalName(iC) << "_up.w + " << GetChemicalName(iC) << "_right.x + " << GetChemicalName(iC) << "_down.w + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_fore.w + " << GetChemicalName(iC) << "_back.w) - 6.0f*" << GetChemicalName(iC) << "\n";
         kernel_source << indent << "+ (float4)(1e-6f,1e-6f,1e-6f,1e-6f); // (kill denormals)\n";
     }
     kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << "float4 delta_" << Chem(iC) << ";\n";
+        kernel_source << indent << "float4 delta_" << GetChemicalName(iC) << ";\n";
     kernel_source << "\n";
     // the parameters (assume all float for now)
     for(int i=0;i<(int)this->parameters.size();i++)
@@ -147,7 +119,7 @@ std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) co
     }
     // the last part of the kernel
     for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << Chem(iC) << "_out[i_here] = " << Chem(iC) << " + delta_t * delta_" << Chem(iC) << ";\n";
+        kernel_source << indent << GetChemicalName(iC) << "_out[i_here] = " << GetChemicalName(iC) << " + delta_t * delta_" << GetChemicalName(iC) << ";\n";
     kernel_source << "}\n";
     return kernel_source.str();
 }

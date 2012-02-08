@@ -114,9 +114,9 @@ vtkSmartPointer<vtkXMLDataElement> Point3D::GetAsXML() const
 
 Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
 {
-    char c;
-    read_required_attribute(node,"chemical",c);
-    this->iTargetChemical = c-'a';
+    string s;
+    read_required_attribute(node,"chemical",s);
+    this->iTargetChemical = IndexFromChemicalName(s);
     if(node->GetNumberOfNestedElements()!=3)
         throw runtime_error("overlay : expected 3 nested elements (operation, fill, shape)");
     this->op = BaseOperation::New(node->GetNestedElement(0));
@@ -135,7 +135,7 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
     xml->SetName(Overlay::GetTypeName());
-    xml->SetAttribute("chemical",string(1,'a'+this->iTargetChemical).c_str());
+    xml->SetAttribute("chemical",GetChemicalName(this->iTargetChemical).c_str());
     xml->AddNestedElement(this->op->GetAsXML());
     xml->AddNestedElement(this->fill->GetAsXML());
     xml->AddNestedElement(this->shape->GetAsXML());
@@ -260,9 +260,9 @@ class OtherChemical : public BaseFill
 
         OtherChemical(vtkXMLDataElement* node) : BaseFill(node)
         {
-            char c;
-            read_required_attribute(node,"chemical",c);
-            this->iOtherChemical = c-'a';
+            string s;
+            read_required_attribute(node,"chemical",s);
+            this->iOtherChemical = IndexFromChemicalName(s);
         }
 
         static const char* GetTypeName() { return "other_chemical"; }
@@ -271,7 +271,7 @@ class OtherChemical : public BaseFill
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(OtherChemical::GetTypeName());
-            xml->SetAttribute("chemical",string(1,'a'+this->iOtherChemical).c_str());
+            xml->SetAttribute("chemical",GetChemicalName(this->iOtherChemical).c_str());
             return xml;
         }
 
