@@ -1,13 +1,13 @@
 before 0.2 release:
 - populate a pattern library with some basics, including descriptions and initial-pattern-generators: 
   Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, 
-  heat equation
+  heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
 - control over size of world, running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - allow user to add/remove parameters (for formula implementations)
 - add a simple introduction-to-RD help page
-- bug: umlaut on Schlogl causing problems on Windows (Mac too?)
-- bug: newlines appear as unknown chars in text edit box on Linux (Mac too?)
+- allow user to change the number of chemicals (for formula implementations)
+- bug: step takes 2 steps, run takes even number of steps
 
 Andrew's tasks for 0.2:
 - fix bug: tool tips not appearing (Mac app only)
