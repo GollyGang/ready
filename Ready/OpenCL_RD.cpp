@@ -173,7 +173,7 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : kernel creation failed: ");
 
     // decide the size of the work-groups
-    const size_t X = this->GetX() / 4; // using float4 in kernels
+    const size_t X = this->GetX() / this->GetBlockSizeX();
     const size_t Y = this->GetY();
     const size_t Z = this->GetZ();
     this->global_range[0] = X;

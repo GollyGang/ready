@@ -25,5 +25,7 @@ class OpenCL_nDim : public OpenCL_RD
 
         OpenCL_nDim();
 
+        virtual int GetBlockSizeX() const { return 4; } // we use float4 (for speed)
+
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
 };
