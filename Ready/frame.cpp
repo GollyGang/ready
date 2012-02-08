@@ -23,11 +23,9 @@
 #include "wxutils.hpp"
 #include "prefs.hpp"            // for GetPrefs, SavePrefs, etc
 #include "IO_XML.hpp"
-#include "RulePanel.hpp"
-#include "DataPanel.hpp"
-#include "HelpPanel.hpp"
 #include "PatternsPanel.hpp"
 #include "InfoPanel.hpp"
+#include "HelpPanel.hpp"
 #include "IDs.hpp"
 
 // readybase:
@@ -111,14 +109,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Wireframe, MyFrame::OnUpdateWireframe)
     EVT_MENU(ID::PatternsPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::PatternsPane, MyFrame::OnUpdateViewPane)
-    EVT_MENU(ID::RulePane, MyFrame::OnToggleViewPane)
-    EVT_UPDATE_UI(ID::RulePane, MyFrame::OnUpdateViewPane)
-    EVT_MENU(ID::DataPane, MyFrame::OnToggleViewPane)
-    EVT_UPDATE_UI(ID::DataPane, MyFrame::OnUpdateViewPane)
-    EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
-    EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::InfoPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::InfoPane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
     // action menu
@@ -180,11 +174,9 @@ MyFrame::MyFrame(const wxString& title)
     SetStatusText(_("Ready"));
 
     this->InitializePatternsPane();
-    this->InitializeHelpPane();
-    this->InitializeRulePane();
-    this->InitializeDataPane();
-    this->InitializeRenderPane();
     this->InitializeInfoPane();
+    this->InitializeHelpPane();
+    this->InitializeRenderPane();
 
     this->default_perspective = this->aui_mgr.SavePerspective();
     this->LoadSettings();
@@ -192,7 +184,7 @@ MyFrame::MyFrame(const wxString& title)
 
     // enable/disable tool tips
     #if wxUSE_TOOLTIPS
-        // AKT TODO!!! fix bug: not seeing any tips in Mac app (bug in wxAUI???)
+        // AKT TODO!!! fix bug: not seeing any tips in Mac app (bug is in wxOSX-Cocoa)
         wxToolTip::Enable(showtips);
         #ifdef __WXMAC__
             wxToolTip::SetDelay(1500);  // 1.5 secs is better on Mac
@@ -200,7 +192,13 @@ MyFrame::MyFrame(const wxString& title)
     #endif
 
     // initialize an RD system to get us started
-    const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
+    #ifdef __WXMSW__
+        // use back slashes on Windows
+        const wxString initfile = _T("Patterns\CPU-only\grayscott_3D.vti");
+    #else
+        // use forward slashes on Mac/Linux
+        const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
+    #endif
     if (wxFileExists(initfile)) {
         this->OpenFile(initfile);
     } else {
@@ -256,8 +254,6 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->AppendCheckItem(ID::PatternsPane, _("&Patterns Pane") + GetAccelerator(DO_PATTERNS), _("View the patterns pane"));
         menu->AppendCheckItem(ID::InfoPane, _("&Info Pane") + GetAccelerator(DO_INFO), _("View the info pane"));
-        menu->AppendCheckItem(ID::RulePane, _("&Rule Pane") + GetAccelerator(DO_RULE), _("View the rule pane"));
-        menu->AppendCheckItem(ID::DataPane, _("&Data Pane") /* !!!??? + GetAccelerator(DO_RULE) */, _("View the data pane"));
         menu->AppendCheckItem(ID::HelpPane, _("&Help Pane") + GetAccelerator(DO_HELP), _("View the help pane"));
         menu->AppendSeparator();
         menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout") + GetAccelerator(DO_RESTORE), _("Put the windows back where they were"));
@@ -351,35 +347,17 @@ void MyFrame::InitializePatternsPane()
                   );
 }
 
-void MyFrame::InitializeRulePane()
+void MyFrame::InitializeInfoPane()
 {
-    this->rule_panel = new RulePanel(this,wxID_ANY);
-    this->aui_mgr.AddPane(this->rule_panel,
+    this->info_panel = new InfoPanel(this,wxID_ANY);
+    this->aui_mgr.AddPane(this->info_panel,
                   wxAuiPaneInfo()
-                  .Name(PaneName(ID::RulePane))
-                  .Caption(_("Rule Pane"))
+                  .Name(PaneName(ID::InfoPane))
+                  .Caption(_("Info Pane"))
                   .Right()
                   .BestSize(500,300)
                   .Position(0)
                   );
-}
-
-void MyFrame::InitializeDataPane()
-{
-    this->data_panel = new DataPanel(this,wxID_ANY);
-    this->aui_mgr.AddPane(this->data_panel,
-                  wxAuiPaneInfo()
-                  .Name(PaneName(ID::DataPane))
-                  .Caption(_("Data Pane"))
-                  .BestSize(500,700)
-                  .Float()
-                  );
-}
-
-void MyFrame::UpdateRulePane()
-{
-    this->rule_panel->Update(this->system);
-    this->data_panel->Update(this->system);   // keep in sync while testing!!!
 }
 
 void MyFrame::UpdateInfoPane()
@@ -395,19 +373,6 @@ void MyFrame::InitializeHelpPane()
                   .Name(PaneName(ID::HelpPane))
                   .Caption(_("Help Pane"))
                   .Right()
-                  .BestSize(500,300)
-                  .Position(1)
-                  );
-}
-
-void MyFrame::InitializeInfoPane()
-{
-    this->info_panel = new InfoPanel(this,wxID_ANY);
-    this->aui_mgr.AddPane(this->info_panel,
-                  wxAuiPaneInfo()
-                  .Name(PaneName(ID::InfoPane))
-                  .Caption(_("Info Pane"))
-                  .Left()
                   .BestSize(500,300)
                   .Position(1)
                   );
@@ -587,16 +552,12 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
         // hide all currently shown panes
         wxAuiPaneInfo &pattpane = this->aui_mgr.GetPane(PaneName(ID::PatternsPane));
         wxAuiPaneInfo &infopane = this->aui_mgr.GetPane(PaneName(ID::InfoPane));
-        wxAuiPaneInfo &rulepane = this->aui_mgr.GetPane(PaneName(ID::RulePane));
-        wxAuiPaneInfo &datapane = this->aui_mgr.GetPane(PaneName(ID::DataPane));
         wxAuiPaneInfo &helppane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
         wxAuiPaneInfo &filepane = this->aui_mgr.GetPane(PaneName(ID::FileToolbar));
         wxAuiPaneInfo &actionpane = this->aui_mgr.GetPane(PaneName(ID::ActionToolbar));
         
         if (pattpane.IsOk() && pattpane.IsShown()) pattpane.Show(false);
         if (infopane.IsOk() && infopane.IsShown()) infopane.Show(false);
-        if (rulepane.IsOk() && rulepane.IsShown()) rulepane.Show(false);
-        if (datapane.IsOk() && datapane.IsShown()) datapane.Show(false);
         if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
         if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
         if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
@@ -773,7 +734,6 @@ void MyFrame::UpdateWindowTitle()
 void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
-    this->UpdateRulePane();
     this->UpdateInfoPane();
     this->UpdateWindowTitle();
     this->UpdateToolbars();
@@ -874,24 +834,15 @@ void MyFrame::OnUpdateReset(wxUpdateUIEvent& event)
 
 void MyFrame::CheckFocus()
 {
-    // ensure one of our panes (or a text ctrl) has the focus so keyboard shortcuts always work
+    // ensure one of our panes has the focus so keyboard shortcuts always work
     if ( this->pVTKWindow->HasFocus() ||
          this->patterns_panel->TreeHasFocus() ||
-         this->info_panel->TextHasFocus() ||
-         this->rule_panel->GridHasFocus() ||
-         this->data_panel->HtmlHasFocus() ||
+         this->info_panel->HtmlHasFocus() ||
          this->help_panel->HtmlHasFocus() ) {
         // good, no need to change focus
     } else {
-        // check if a text ctrl has the focus
-        wxWindow* win = wxWindow::FindFocus();
-        wxTextCtrl* textctrl = (win == NULL) ? NULL : wxDynamicCast(win,wxTextCtrl);
-        if (textctrl) {
-            // don't change focus
-        } else {
-            // best to restore focus to render window
-            this->pVTKWindow->SetFocus();
-        }
+        // best to restore focus to render window
+        this->pVTKWindow->SetFocus();
     }
 }
 
@@ -899,6 +850,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 {
     this->patterns_panel->DoIdleChecks();
     
+    // AKT TODO!!! check if this is now safe to call on Windows
     #ifdef __WXMAC__
         if (this->IsActive()) this->CheckFocus();
     #endif
@@ -1432,8 +1384,6 @@ void MyFrame::SetRuleName(string s)
     this->system->SetRuleName(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
 }
 
 void MyFrame::SetRuleDescription(string s)
@@ -1441,8 +1391,6 @@ void MyFrame::SetRuleDescription(string s)
     this->system->SetRuleDescription(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
 }
 
 void MyFrame::SetPatternDescription(string s)
@@ -1450,40 +1398,34 @@ void MyFrame::SetPatternDescription(string s)
     this->system->SetPatternDescription(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
 }
 
 void MyFrame::SetParameter(int iParam,float val)
 {
     this->system->SetParameterValue(iParam,val);
     this->UpdateWindowTitle();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
+    this->UpdateInfoPane();
 }
 
 void MyFrame::SetParameterName(int iParam,std::string s)
 {
     this->system->SetParameterName(iParam,s);
     this->UpdateWindowTitle();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
+    this->UpdateInfoPane();
 }
 
 void MyFrame::SetFormula(std::string s)
 {
     this->system->SetFormula(s);
     this->UpdateWindowTitle();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
+    this->UpdateInfoPane();
 }
 
 void MyFrame::SetTimestep(float ts)
 {
     this->system->SetTimestep(ts);
     this->UpdateWindowTitle();
-    this->data_panel->Update(this->system); //!!!???
-    // TODO: update anything else that needs to know
+    this->UpdateInfoPane();
 }
 
 bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
@@ -1506,6 +1448,21 @@ void MyFrame::OnClose(wxCloseEvent& event)
 {
     if(event.CanVeto() && this->UserWantsToCancelWhenAskedIfWantsToSave()) return;
     event.Skip();
+}
+
+void MyFrame::ShowPrefsDialog(const wxString& page)
+{
+    if (ChangePrefs(page)) {
+        // user hit OK button so might as well save prefs now
+        SaveSettings();
+    }
+    // safer to update everything even if user hit Cancel
+    this->UpdateWindows();
+}
+
+void MyFrame::OnPreferences(wxCommandEvent& event)
+{
+    ShowPrefsDialog();
 }
 
 void MyFrame::UpdateMenuAccelerators()
@@ -1536,7 +1493,6 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Wireframe,                 DO_WIREFRAME);
         SetAccelerator(mbar, ID::PatternsPane,              DO_PATTERNS);
         SetAccelerator(mbar, ID::InfoPane,                  DO_INFO);
-        SetAccelerator(mbar, ID::RulePane,                  DO_RULE);
         SetAccelerator(mbar, ID::HelpPane,                  DO_HELP);
         SetAccelerator(mbar, ID::RestoreDefaultPerspective, DO_RESTORE);
         SetAccelerator(mbar, ID::ChangeActiveChemical,      DO_CHEMICAL);
@@ -1548,21 +1504,6 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
         SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
     }
-}
-
-void MyFrame::ShowPrefsDialog(const wxString& page)
-{
-    if (ChangePrefs(page)) {
-        // user hit OK button so might as well save prefs now
-        SaveSettings();
-    }
-    // safer to update everything even if user hit Cancel
-    this->UpdateWindows();
-}
-
-void MyFrame::OnPreferences(wxCommandEvent& event)
-{
-    ShowPrefsDialog();
 }
 
 void MyFrame::ProcessKey(int key, int modifiers)
@@ -1600,7 +1541,6 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_WIREFRAME:  cmdid = ID::Wireframe; break;
         case DO_PATTERNS:   cmdid = ID::PatternsPane; break;
         case DO_INFO:       cmdid = ID::InfoPane; break;
-        case DO_RULE:       cmdid = ID::RulePane; break;
         case DO_HELP:       cmdid = ID::HelpPane; break;
         case DO_RESTORE:    cmdid = ID::RestoreDefaultPerspective; break;
         case DO_CHEMICAL:   cmdid = ID::ChangeActiveChemical; break;
@@ -1727,25 +1667,9 @@ void MyFrame::OnChar(wxKeyEvent& event)
         return;
     }
     
-    if (this->info_panel->TextHasFocus()) {
+    if (this->info_panel->HtmlHasFocus()) {
         // process keyboard shortcut for info panel
         if (this->info_panel->DoKey(key, mods)) return;
-        // else call default handler
-        event.Skip();
-        return;
-    }
-    
-    if (this->rule_panel->GridHasFocus()) {
-        // process keyboard shortcut for rule panel
-        if (this->rule_panel->DoKey(key, mods)) return;
-        // else call default handler
-        event.Skip();
-        return;
-    }
-    
-    if (this->data_panel->HtmlHasFocus()) {
-        // process keyboard shortcut for data panel
-        if (this->data_panel->DoKey(key, mods)) return;
         // else call default handler
         event.Skip();
         return;

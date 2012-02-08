@@ -26,11 +26,9 @@
 #include <wx/aui/aui.h>
 
 // local:
-class RulePanel;
-class DataPanel;
-class HelpPanel;
 class PatternsPanel;
 class InfoPanel;
+class HelpPanel;
 
 // STL:
 #include <vector>
@@ -51,7 +49,7 @@ class MyFrame : public wxFrame
         void EditFile(const wxString& path);
         bool UserWantsToCancelWhenAskedIfWantsToSave();
 
-        // interface with RulePanel/DataPanel
+        // interface with InfoPanel
         void SetRuleName(std::string s);
         void SetRuleDescription(std::string s);
         void SetPatternDescription(std::string s);
@@ -132,10 +130,7 @@ class MyFrame : public wxFrame
         void InitializeMenus();
         void InitializeToolbars();
         void InitializePatternsPane();
-        void InitializeRulePane();
-        void InitializeDataPane();
         void InitializeInfoPane();
-        void UpdateRulePane();
         void UpdateInfoPane();
         void InitializeHelpPane();
         void InitializeRenderPane();
@@ -169,12 +164,11 @@ class MyFrame : public wxFrame
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;
 
-        // various panes:
-        RulePanel *rule_panel;
-        DataPanel *data_panel;
-        HelpPanel *help_panel;
+        // panes and toolbars:
+        
         PatternsPanel *patterns_panel;
         InfoPanel *info_panel;
+        HelpPanel *help_panel;
         wxAuiToolBar *action_toolbar;
 
         // settings:
