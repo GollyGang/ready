@@ -18,14 +18,16 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
+// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals, specified as
+// a short formula involving delta_a, laplacian_a, etc. implemented with Euler integration
+// and float4 blocks for speed
 class OpenCL_nDim : public OpenCL_RD
 {
     public:
 
         OpenCL_nDim();
 
-        virtual int GetBlockSizeX() const { return 4; } // we use float4 (for speed)
+        virtual int GetBlockSizeX() const { return 4; } // we use float4 in a 4x1x1 block
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
 };
