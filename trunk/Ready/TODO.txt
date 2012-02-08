@@ -10,7 +10,7 @@ before 0.2 release:
 - bug: newlines appear as unknown chars in text edit box on Linux (Mac too?)
 
 Andrew's tasks for 0.2:
-- fix bug: tool tips not appearing (Mac app only?)
+- fix bug: tool tips not appearing (Mac app only)
 - use better (big) toolbar icons in Mac app
 - do any other "AKT TODO" tasks
 

@@ -273,6 +273,7 @@ InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
 {
     html = new HtmlInfo(this, frame, wxID_ANY);
     
+    html->SetBorders(0);
     html->SetFontSizes(infofontsize);
 
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
@@ -320,10 +321,7 @@ void InfoPanel::Update(const BaseRD* const system)
     // build HTML string to display current parameters
     wxString contents;
     
-    contents += _("<html><body>");
-    contents += _("<p><center>");
-    contents += _("<table border=1 cellspacing=0 cellpadding=1 width=\"99%\"><tr><td>");
-    contents += _("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
+    contents += _("<html><body><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     rownum = 0;
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
@@ -361,8 +359,7 @@ void InfoPanel::Update(const BaseRD* const system)
     contents += AppendRow(_("Dimensions"), wxString::Format(wxT("XYZ = %d; %d; %d"),
                                            system->GetX(),system->GetY(),system->GetZ()));
 
-    contents += _("</table></td></tr></table></center>");
-    contents += _("</body></html>");
+    contents += _("</table></body></html>");
     
     html->SetPage(contents);
 }
@@ -372,28 +369,22 @@ void InfoPanel::Update(const BaseRD* const system)
 wxString InfoPanel::AppendRow(const wxString& label, const wxString& value)
 {
     wxString result;
-    rownum++;
     if (rownum & 1)
         result += _("<tr bgcolor=\"#F0F0F0\">");
     else
         result += _("<tr>");
+    rownum++;
 
-    result += _("<td valign=top width=\"30%\">");
-    result += _("<b>");
+    result += _("<td width=3></td><td valign=top width=\"30%\"><b>");
     result += label;
-    result += _("</b>");
-    result += _("</a>");
-    result += _("</td><td width=10> </td>");
-    result += _("<td valign=top>");
+    result += _("</b></td><td valign=top>");
     result += value;
     result += _("</td>");
 
-    result += _("<td align=right>");
-    result += _("<a href=\"");
+    result += _("<td align=right><a href=\"");
     result += change_prefix;
     result += label;
-    result += _("\">edit</a>");
-    result += _("</td>");
+    result += _("\">edit</a></td><td width=3></td>");
     
     result += _("</tr>");
     return result;

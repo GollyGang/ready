@@ -478,6 +478,7 @@ void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 void MyFrame::OnCut(wxCommandEvent& event)
 {
     // action depends on which pane has focus
+    if (this->info_panel->HtmlHasFocus()) return;
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
@@ -485,6 +486,10 @@ void MyFrame::OnCut(wxCommandEvent& event)
 void MyFrame::OnCopy(wxCommandEvent& event)
 {
     // TODO: action depends on which pane has focus
+    if (this->info_panel->HtmlHasFocus()) {
+        this->info_panel->CopySelection();
+        return;
+    }
     if (this->help_panel->HtmlHasFocus()) {
         this->help_panel->CopySelection();
         return;
@@ -495,6 +500,7 @@ void MyFrame::OnCopy(wxCommandEvent& event)
 void MyFrame::OnPaste(wxCommandEvent& event)
 {
     // action depends on which pane has focus
+    if (this->info_panel->HtmlHasFocus()) return;
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
@@ -507,6 +513,7 @@ void MyFrame::OnUpdatePaste(wxUpdateUIEvent& event)
 void MyFrame::OnClear(wxCommandEvent& event)
 {
     // action depends on which pane has focus
+    if (this->info_panel->HtmlHasFocus()) return;
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
@@ -514,6 +521,10 @@ void MyFrame::OnClear(wxCommandEvent& event)
 void MyFrame::OnSelectAll(wxCommandEvent& event)
 {
     // action depends on which pane has focus
+    if (this->info_panel->HtmlHasFocus()) {
+        this->info_panel->SelectAllText();
+        return;
+    }
     if (this->help_panel->HtmlHasFocus()) {
         this->help_panel->SelectAllText();
         return;
