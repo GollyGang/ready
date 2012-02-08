@@ -17,6 +17,7 @@
 
 // STL:
 #include <string>
+#include <map>
 
 // VTK:
 #include <vtkSmartPointer.h>
@@ -25,29 +26,13 @@
 // local:
 class BaseRD;
 
-// TODO: split this into separate files when matured
-
 // XML object interface
 class XML_Object
 {
     public:
 
+        XML_Object(const vtkXMLDataElement* node) {}
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
-};
-
-// general mechanism for allowing re-use of XML nodes through label="..." and ref="..."
-// TODO: this is not yet functional!
-class Reusable_XML_Object : public XML_Object
-{
-    protected:
-
-        Reusable_XML_Object(vtkXMLDataElement *node);
-
-        std::string GetLabel() const { return this->label; }
-
-    protected:
-
-        std::string label;
 };
 
 class BaseOperation;

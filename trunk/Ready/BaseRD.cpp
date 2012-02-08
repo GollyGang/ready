@@ -45,9 +45,7 @@ BaseRD::BaseRD()
 BaseRD::~BaseRD()
 {
     this->Deallocate();
-    for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
-        delete this->initial_pattern_generator[iOverlay];
-    this->initial_pattern_generator.clear();
+    this->ClearInitialPatternGenerator();
 }
 
 void BaseRD::Deallocate()
@@ -57,6 +55,18 @@ void BaseRD::Deallocate()
         if(this->images[iChem])
             this->images[iChem]->Delete();
     }
+}
+
+void BaseRD::ClearInitialPatternGenerator()
+{
+    for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
+        delete this->initial_pattern_generator[iOverlay];
+    this->initial_pattern_generator.clear();
+}
+
+void BaseRD::AddInitialPatternGeneratorOverlay(Overlay* overlay)
+{
+    this->initial_pattern_generator.push_back(overlay);
 }
 
 int BaseRD::GetDimensionality() const

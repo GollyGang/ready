@@ -69,14 +69,9 @@ string trim_multiline_string(const char* s)
 
 void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
 {
-    // delete all the overlays (TODO: BaseRD should do this for us)
-    {
-        for(int i=0;i<(int)system->GetInitialPatternGenerator().size();i++)
-            delete system->GetInitialPatternGenerator()[i];
-        system->GetInitialPatternGenerator().clear();
-    }
+    system->ClearInitialPatternGenerator();
     for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
-        system->GetInitialPatternGenerator().push_back(new Overlay(ipg->GetNestedElement(i)));
+        system->AddInitialPatternGeneratorOverlay(new Overlay(ipg->GetNestedElement(i)));
 }
 
 string RD_XMLReader::GetType()
@@ -214,9 +209,8 @@ vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system
     {
         vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
         initial_pattern_generator->SetName("initial_pattern_generator");
-        const vector<Overlay*>& overlays = system->GetInitialPatternGenerator();
-        for(int i=0;i<(int)overlays.size();i++)
-            initial_pattern_generator->AddNestedElement(overlays[i]->GetAsXML());
+        for(int i=0;i<system->GetNumberOfInitialPatternGeneratorOverlays();i++)
+            initial_pattern_generator->AddNestedElement(system->GetInitialPatternGeneratorOverlay(i)->GetAsXML());
         rd->AddNestedElement(initial_pattern_generator);
     }
     return rd;
