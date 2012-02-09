@@ -23,6 +23,9 @@
 #include <string>
 using namespace std;
 
+// VTK:
+#include <vtkXMLUtilities.h>
+
 OpenCL_FullKernel::OpenCL_FullKernel()
 {
     this->SetRuleName("Full kernel example");
@@ -30,10 +33,51 @@ OpenCL_FullKernel::OpenCL_FullKernel()
     this->block_size[0]=1;
     this->block_size[1]=1;
     this->block_size[2]=1;
-    this->SetTimestep(1.0f);
 }
 
 string OpenCL_FullKernel::AssembleKernelSourceFromFormula(std::string formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
+}
+
+void OpenCL_FullKernel::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+{
+    OpenCL_RD::InitializeFromXML(rd,warn_to_update);
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+
+    // kernel:
+    vtkSmartPointer<vtkXMLDataElement> xml_kernel = rule->FindNestedElementWithName("kernel");
+    if(!xml_kernel) throw runtime_error("kernel node not found in file");
+    string formula = trim_multiline_string(xml_kernel->GetCharacterData());
+    read_required_attribute(xml_kernel,"block_size_x",this->block_size[0]);
+    read_required_attribute(xml_kernel,"block_size_y",this->block_size[1]);
+    read_required_attribute(xml_kernel,"block_size_z",this->block_size[2]);
+
+    // do this last, because it requires everything else to be set up first
+    this->TestFormula(formula); // will throw on error but won't set
+    this->SetFormula(formula); // will set but won't throw
+}
+
+vtkSmartPointer<vtkXMLDataElement> OpenCL_FullKernel::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCL_RD::GetAsXML();
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found");
+
+    rule->SetAttribute("type","kernel");
+
+    vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
+    kernel->SetName("kernel");
+    kernel->SetIntAttribute("block_size_x",this->block_size[0]);
+    kernel->SetIntAttribute("block_size_y",this->block_size[1]);
+    kernel->SetIntAttribute("block_size_z",this->block_size[2]);
+    ostringstream oss;
+    vtkXMLUtilities::EncodeString(this->GetFormula().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+    kernel->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+    rule->AddNestedElement(kernel);
+
+    return rd;
 }

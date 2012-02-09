@@ -26,6 +26,8 @@ class GrayScott : public BaseRD
         GrayScott();
         ~GrayScott();
 
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
         virtual void Allocate(int x,int y,int z,int nc);
 
         virtual void Update(int n_steps);

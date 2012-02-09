@@ -46,32 +46,10 @@ void RD_XMLWriter::SetSystem(BaseRD* rd_system)
     this->SetInput(rd_system->GetImage());
 }
 
-// read a multiline string, outputting whitespace-trimmed lines
-string trim_multiline_string(const char* s)
+int RD_XMLWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 {
-    const char *whitespace = " \r\t\n";
-    istringstream iss(s);
-    ostringstream oss;
-    string str;
-    while(iss.good())
-    {
-        getline(iss,str);
-        // trim whitespace at start and end
-        if(str.find_first_not_of(whitespace)==string::npos)
-            continue; // skip whitespace-only lines
-        str = str.substr(str.find_first_not_of(whitespace),str.find_last_not_of(whitespace)+1);
-        if(!oss.str().empty()) // insert a newline if there have been previous lines
-            oss << "\n";
-        oss << str;
-    }
-    return oss.str();
-}
-
-void LoadInitialPatternGenerator(vtkXMLDataElement *ipg,BaseRD* system)
-{
-    system->ClearInitialPatternGenerator();
-    for(int i=0;i<ipg->GetNumberOfNestedElements();i++)
-        system->AddInitialPatternGeneratorOverlay(new Overlay(ipg->GetNestedElement(i)));
+    this->system->GetAsXML()->PrintXML(os,indent);
+    return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
 }
 
 string RD_XMLReader::GetType()
@@ -92,134 +70,10 @@ string RD_XMLReader::GetName()
     return s;
 }
 
-void RD_XMLReader::SetSystemFromXML(BaseRD* system,bool& warn_to_update)
-{
-    string str;
-    const char *s;
-    float f;
-    int i;
-
-    vtkXMLDataElement* rd = this->GetRDElement();
-    // check whether we should warn the user that they need to update Ready
-    {
-        read_required_attribute(rd,"format_version",i);
-        warn_to_update = (i>1);
-        // (we will still proceed and try to read the file but it might fail or give poor results)
-    }
-
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
-    if(!rule) throw runtime_error("rule node not found in file");
-    // rule_name:
-    read_required_attribute(rule,"name",str);
-    system->SetRuleName(str);
-    // number_of_chemicals:
-    if(system->HasEditableFormula())
-    {
-        read_required_attribute(rule,"number_of_chemicals",i);
-        system->SetNumberOfChemicals(i);
-    }
-    // timestep:
-    read_required_attribute(rule,"timestep",f);
-    system->SetTimestep(f);
-    // rule_description:
-    vtkSmartPointer<vtkXMLDataElement> xml_rule_description = rule->FindNestedElementWithName("description");
-    if(!xml_rule_description) system->SetRuleDescription(""); // optional, default is empty string
-    else system->SetRuleDescription(trim_multiline_string(xml_rule_description->GetCharacterData()));
-    // parameters:
-    system->DeleteAllParameters();
-    for(int i=0;i<rule->GetNumberOfNestedElements();i++)
-    {
-        vtkSmartPointer<vtkXMLDataElement> node = rule->GetNestedElement(i);
-        if(string(node->GetName())!="param") continue;
-        string name;
-        s = node->GetAttribute("name");
-        if(!s) throw runtime_error("Failed to read param attribute: name");
-        name = trim_multiline_string(s);
-        s = node->GetCharacterData();
-        if(!s || !from_string(s,f)) throw runtime_error("Failed to read param value");
-        system->AddParameter(name,f);
-    }
-    // formula:
-    if(system->HasEditableFormula())
-    {
-        vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
-        if(!xml_formula) throw runtime_error("formula node not found in file");
-        string formula = trim_multiline_string(xml_formula->GetCharacterData());
-        system->TestFormula(formula); // will throw on error
-        system->SetFormula(formula); // (won't throw yet)
-    }
-    // pattern_description:
-    vtkSmartPointer<vtkXMLDataElement> xml_pattern_description = rd->FindNestedElementWithName("pattern_description");
-    if(!xml_pattern_description) system->SetPatternDescription(""); // optional, default is empty string
-    else system->SetPatternDescription(trim_multiline_string(xml_pattern_description->GetCharacterData()));
-    // initial_pattern_generator:
-    vtkSmartPointer<vtkXMLDataElement> xml_initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
-    if(xml_initial_pattern_generator) // optional, default is none
-        LoadInitialPatternGenerator(xml_initial_pattern_generator,system);
-}
-
-vtkSmartPointer<vtkXMLDataElement> RD_XMLWriter::BuildRDSystemXML(BaseRD* system)
-{
-    vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
-    rd->SetName("RD");
-    rd->SetAttribute("format_version","1");
-    // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
-    {
-        vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
-        rule->SetName("rule");
-        bool is_inbuilt = !system->HasEditableFormula();
-        if(is_inbuilt)
-            rule->SetAttribute("type","inbuilt");
-        else
-            rule->SetAttribute("type","formula");
-        rule->SetAttribute("name",system->GetRuleName().c_str());
-        if(!is_inbuilt)
-            rule->SetAttribute("number_of_chemicals",to_string(system->GetNumberOfChemicals()).c_str());
-        rule->SetAttribute("timestep",to_string(system->GetTimestep()).c_str());
-        {
-            vtkSmartPointer<vtkXMLDataElement> rule_description = vtkSmartPointer<vtkXMLDataElement>::New();
-            rule_description->SetName("description");
-            rule_description->SetCharacterData(system->GetRuleDescription().c_str(),(int)system->GetRuleDescription().length());
-            rule->AddNestedElement(rule_description);
-        }
-        for(int i=0;i<system->GetNumberOfParameters();i++)
-        {
-            vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();
-            param->SetName("param");
-            param->SetAttribute("name",system->GetParameterName(i).c_str());
-            string s = to_string(system->GetParameterValue(i));
-            param->SetCharacterData(s.c_str(),(int)s.length());
-            rule->AddNestedElement(param);
-        }
-        if(!is_inbuilt)
-        {
-            vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
-            formula->SetName("formula");
-            formula->SetCharacterData(system->GetFormula().c_str(),(int)system->GetFormula().length());
-            rule->AddNestedElement(formula);
-        }
-        rd->AddNestedElement(rule);
-    }
-    {
-        vtkSmartPointer<vtkXMLDataElement> pattern_description = vtkSmartPointer<vtkXMLDataElement>::New();
-        pattern_description->SetName("pattern_description");
-        pattern_description->SetCharacterData(system->GetPatternDescription().c_str(),(int)system->GetPatternDescription().length());
-        rd->AddNestedElement(pattern_description);
-    }
-    {
-        vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
-        initial_pattern_generator->SetName("initial_pattern_generator");
-        for(int i=0;i<system->GetNumberOfInitialPatternGeneratorOverlays();i++)
-            initial_pattern_generator->AddNestedElement(system->GetInitialPatternGeneratorOverlay(i)->GetAsXML());
-        rd->AddNestedElement(initial_pattern_generator);
-    }
-    return rd;
-}
-
 bool RD_XMLReader::ShouldGenerateInitialPatternWhenLoading()
 {
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
-    if(!initial_pattern_generator) return false; // (element is optional)
+    if(!initial_pattern_generator) return false; // (element is optional, defaults to false)
     int i;
     const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
     bool read_ok = s && from_string(s,i);

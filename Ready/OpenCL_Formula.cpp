@@ -24,9 +24,13 @@
 #include <sstream>
 using namespace std;
 
+// VTK:
+#include <vtkXMLUtilities.h>
+
 OpenCL_Formula::OpenCL_Formula()
 {
     this->SetRuleName("Gray-Scott");
+    this->AddParameter("timestep",1.0f);
     this->AddParameter("D_a",0.082f);
     this->AddParameter("D_b",0.041f);
     this->AddParameter("k",0.06f);
@@ -34,7 +38,6 @@ OpenCL_Formula::OpenCL_Formula()
     this->SetFormula("\
     delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
     delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;\n");
-    this->SetTimestep(1.0f);
 }
 
 std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula) const
@@ -104,7 +107,7 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
     for(int i=0;i<(int)this->parameters.size();i++)
         kernel_source << indent << "float " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
     // the timestep
-    kernel_source << indent << "float delta_t = " << this->timestep << "f;\n";
+    kernel_source << indent << "float delta_t = " << this->GetParameterValueByName("timestep") << "f;\n";
     // the formula
     istringstream iss(formula);
     string s;
@@ -120,3 +123,37 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
     return kernel_source.str();
 }
 
+void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+{
+    OpenCL_RD::InitializeFromXML(rd,warn_to_update);
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+
+    // formula:
+    vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
+    if(!xml_formula) throw runtime_error("formula node not found in file");
+    string formula = trim_multiline_string(xml_formula->GetCharacterData());
+    this->TestFormula(formula); // will throw on error
+    this->SetFormula(formula); // (won't throw yet)
+}
+
+vtkSmartPointer<vtkXMLDataElement> OpenCL_Formula::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCL_RD::GetAsXML();
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found");
+
+    rule->SetAttribute("type","formula");
+
+    // formula
+    vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
+    formula->SetName("formula");
+    ostringstream oss;
+    vtkXMLUtilities::EncodeString(this->GetFormula().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+    formula->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+    rule->AddNestedElement(formula);
+
+    return rd;
+}

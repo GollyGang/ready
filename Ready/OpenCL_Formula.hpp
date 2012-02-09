@@ -27,6 +27,9 @@ class OpenCL_Formula : public OpenCL_RD
 
         OpenCL_Formula();
 
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
         virtual int GetBlockSizeX() const { return 4; } // we use float4 in a 4x1x1 block
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;

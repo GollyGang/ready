@@ -26,6 +26,9 @@ class OpenCL_FullKernel : public OpenCL_RD
 
         OpenCL_FullKernel();
 
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
         virtual int GetBlockSizeX() const { return this->block_size[0]; }
         virtual int GetBlockSizeY() const { return this->block_size[1]; }
         virtual int GetBlockSizeZ() const { return this->block_size[2]; }

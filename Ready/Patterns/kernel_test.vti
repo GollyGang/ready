@@ -2,13 +2,13 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
   
-    <rule type="kernel" name="Kernel test" number_of_chemicals="1" timestep="0.1">
+    <rule type="kernel" name="Kernel test" number_of_chemicals="1">
     
       <description>
-        This is a placeholder rule using OpenCL_FullKernel, where we give the whole OpenCL kernel instead of just a formula. Note that we use float instead of float4.
+        This is a placeholder rule using OpenCL_FullKernel, where we give the whole OpenCL kernel instead of just a formula. Note that we can use float (or float2) instead of float4.
       </description>
       
-      <formula block_size_x="1">
+      <kernel block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float* a_in,__global float* a_out) 
         {
             const int x = get_global_id(0);
@@ -16,27 +16,17 @@
             const int z = get_global_id(2);
             const int X = get_global_size(0);
             const int Y = get_global_size(1);
-            const int Z = get_global_size(2);
             const int i_here = X*(Y*z + y) + x;
 
             const int xm1 = ((x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
             const int xp1 = ((x+1) &amp; (X-1));
-            const int ym1 = ((y-1+Y) &amp; (Y-1));
-            const int yp1 = ((y+1) &amp; (Y-1));
-            const int zm1 = ((z-1+Z) &amp; (Z-1));
-            const int zp1 = ((z+1) &amp; (Z-1));
             const int i_left =  X*(Y*z + y) + xm1;
             const int i_right = X*(Y*z + y) + xp1;
-            const int i_up =    X*(Y*z + ym1) + x;
-            const int i_down =  X*(Y*z + yp1) + x;
-            const int i_fore =  X*(Y*zm1 + y) + x;
-            const int i_back =  X*(Y*zp1 + y) + x;
 
-            float a = a_in[i_here];
-
-            a_out[i_here] = (a+a_in[i_left]+a_in[i_right])/3.0f;
+            // blur in the x-direction
+            a_out[i_here] = (a_in[i_here] + a_in[i_left] + a_in[i_right]) / 3.0f;
         }
-      </formula>
+      </kernel>
       
     </rule>
 

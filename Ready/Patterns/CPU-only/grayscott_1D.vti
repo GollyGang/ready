@@ -2,7 +2,8 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
       
-    <rule type="inbuilt" name="Gray-Scott" timestep="1">
+    <rule type="inbuilt" name="Gray-Scott">
+      <param name="timestep">1.0</param>
       <param name="D_a">0.082</param>
       <param name="D_b">0.041</param>
       <param name="k">0.06</param>

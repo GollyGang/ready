@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
-    <rule type="formula" name="Turing" number_of_chemicals="2" timestep="1">
+    <rule type="formula" name="Turing" number_of_chemicals="2">
         
       <description>
         This formula was blah blah blah.
       </description>
       
+      <param name="timestep"> 1.0  </param>
       <param name="D_a">  0.125    </param>
       <param name="D_b">  0.03125  </param>
       <param name="k_a">  0.0125   </param>

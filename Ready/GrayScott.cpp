@@ -32,9 +32,9 @@ using namespace std;
 
 GrayScott::GrayScott()
 {
-    this->timestep = 1.0f;
     this->rule_name = "Gray-Scott";
     this->n_chemicals = 2;
+    this->AddParameter("timestep",1.0f);
     this->AddParameter("D_a",0.082f);
     this->AddParameter("D_b",0.041f);
     // for spots:
@@ -73,6 +73,7 @@ void GrayScott::Update(int n_steps)
     const int Y = this->GetY();
     const int Z = this->GetZ();
 
+    float timestep = this->GetParameterValueByName("timestep");
     float D_a = this->GetParameterValueByName("D_a");
     float D_b = this->GetParameterValueByName("D_b");
     float k = this->GetParameterValueByName("k");
@@ -133,8 +134,8 @@ void GrayScott::Update(int n_steps)
                         float db = D_b * ddb + aval*bval*bval - (F+k)*bval;
 
                         // apply the change
-                        *vtk_at(new_a,x,y,z,X,Y) = aval + this->timestep * da;
-                        *vtk_at(new_b,x,y,z,X,Y) = bval + this->timestep * db;
+                        *vtk_at(new_a,x,y,z,X,Y) = aval + timestep * da;
+                        *vtk_at(new_b,x,y,z,X,Y) = bval + timestep * db;
                     }
                 }
             }
@@ -143,4 +144,16 @@ void GrayScott::Update(int n_steps)
     }
     this->images[0]->Modified();
     this->images[1]->Modified();
+}
+
+vtkSmartPointer<vtkXMLDataElement> GrayScott::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> rd = BaseRD::GetAsXML();
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found");
+
+    rule->SetAttribute("type","inbuilt");
+
+    return rd;
 }
