@@ -360,6 +360,12 @@ void InfoPanel::Update(const BaseRD* const system)
     contents += AppendRow(_("Dimensions"), wxString::Format(wxT("XYZ = %d; %d; %d"),
                                            system->GetX(),system->GetY(),system->GetZ()));
 
+    if(system->HasEditableBlockSize())
+    {
+        contents += AppendRow(_("Block size"), wxString::Format(wxT("XYZ = %d; %d; %d"),
+                                               system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()));
+    }
+
     contents += _("</table></body></html>");
     
     html->SetPage(contents);
