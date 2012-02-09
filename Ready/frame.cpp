@@ -30,7 +30,8 @@
 
 // readybase:
 #include "GrayScott.hpp"
-#include "OpenCL_nDim.hpp"
+#include "OpenCL_Formula.hpp"
+#include "OpenCL_FullKernel.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -1136,8 +1137,6 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     if (remember) AddRecentPattern(path);
     
-    wxBusyCursor busy;
-
     // load pattern file
     bool warn_to_update = false;
     BaseRD *target_system = NULL;
@@ -1158,13 +1157,21 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         }
         else if(type=="formula")
         {
-            // to load type="formula" pattern files the implementation must support editable kernels, which for now means OpenCL_nDim
             // TODO: detect if opencl is available, abort if not
-            OpenCL_nDim *s = new OpenCL_nDim();
+            OpenCL_Formula *s = new OpenCL_Formula();
             s->SetPlatform(opencl_platform);
             s->SetDevice(opencl_device);
             target_system = s;
         }
+        else if(type=="kernel")
+        {
+            // TODO: detect if opencl is available, abort if not
+            OpenCL_FullKernel *s = new OpenCL_FullKernel();
+            s->SetPlatform(opencl_platform);
+            s->SetDevice(opencl_device);
+            target_system = s;
+        }
+        else throw runtime_error("Unsupported rule type: "+type);
         iw->SetSystemFromXML(target_system,warn_to_update);
 
         int dim[3];
@@ -1181,20 +1188,18 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     }
     catch(const exception& e)
     {
-        if(warn_to_update)
-            wxMessageBox(_("This file is from a more recent version of Ready. You should download a newer version.\n\nError: ")
-                +wxString(e.what(),wxConvUTF8),_("Error reading file"),wxOK | wxICON_ERROR);
-        else
-            wxMessageBox(_("Failed to open file: ")+wxString(e.what(),wxConvUTF8),_("Error reading file"),wxOK | wxICON_ERROR);
+        wxString message = warn_to_update ? _("This file is from a more recent version of Ready. You should download a newer version.\n\n") : _("");
+        message += _("Failed to open file. Error:\n\n");
+        message += wxString(e.what(),wxConvUTF8);
+        MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
         delete target_system;
         return;
     }
     catch(...)
     {
-        if(warn_to_update)
-            wxMessageBox(_("This file is from a more recent version of Ready. You should download a newer version."),_("Error reading file"),wxOK | wxICON_ERROR);
-        else
-            wxMessageBox(_("Failed to open file"),_("Error reading file"),wxOK | wxICON_ERROR);
+        wxString message = warn_to_update ? _("This file is from a more recent version of Ready. You should download a newer version.\n\n") : _("");
+        message += _("Failed to open file.");
+        MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
         delete target_system;
         return;
     }

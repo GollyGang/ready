@@ -174,8 +174,8 @@ void OpenCL_RD::ReloadKernelIfNeeded()
 
     // decide the size of the work-groups
     const size_t X = this->GetX() / this->GetBlockSizeX();
-    const size_t Y = this->GetY();
-    const size_t Z = this->GetZ();
+    const size_t Y = this->GetY() / this->GetBlockSizeY();
+    const size_t Z = this->GetZ() / this->GetBlockSizeZ();
     this->global_range[0] = X;
     this->global_range[1] = Y;
     this->global_range[2] = Z;

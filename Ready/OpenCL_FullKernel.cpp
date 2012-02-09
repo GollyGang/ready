@@ -16,18 +16,29 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "OpenCL_RD.hpp"
+#include "OpenCL_FullKernel.hpp"
+#include "utils.hpp"
 
-// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals, specified as
-// a short formula involving delta_a, laplacian_a, etc. implemented with Euler integration
-// and float4 blocks for speed
-class OpenCL_nDim : public OpenCL_RD
+// STL:
+#include <cassert>
+#include <stdexcept>
+using namespace std;
+
+// VTK:
+#include <vtkImageData.h>
+#include <vtkXMLDataElement.h>
+
+OpenCL_FullKernel::OpenCL_FullKernel()
 {
-    public:
+    this->SetRuleName("Full kernel example");
+    this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");
+    this->block_size[0]=1;
+    this->block_size[1]=1;
+    this->block_size[2]=1;
+    this->SetTimestep(1.0f);
+}
 
-        OpenCL_nDim();
-
-        virtual int GetBlockSizeX() const { return 4; } // we use float4 in a 4x1x1 block
-
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
-};
+std::string OpenCL_FullKernel::AssembleKernelSourceFromFormula(std::string formula) const
+{
+    return formula; // here the formula is a full OpenCL kernel
+}

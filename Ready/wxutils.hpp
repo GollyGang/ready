@@ -15,8 +15,16 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#ifndef _WXUTILS_H_
-#define _WXUTILS_H_
+// wxWidgets:
+#include <wx/wxprec.h>
+#ifdef __BORLANDC__
+    #pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+#include <wx/artprov.h>
+#include <wx/string.h>
 
 // Various utility routines:
 
@@ -63,4 +71,8 @@ bool ClipboardHasText();
 bool CopyTextToClipboard(const wxString& text);
 // Copy given text to the clipboard.
 
-#endif
+// sometimes useful to display a block of text in a monospace font
+class MonospaceMessageBox: public wxDialog
+{
+    public: MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon);
+};

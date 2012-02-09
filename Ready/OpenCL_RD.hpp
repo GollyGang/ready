@@ -68,7 +68,9 @@ class OpenCL_RD : public BaseRD
     protected:
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
-        virtual int GetBlockSizeX() const =0; // e.g. 4 for float4 kernels
+        virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
+        virtual int GetBlockSizeY() const { return 1; }
+        virtual int GetBlockSizeZ() const { return 1; }
 
         void ReloadContextIfNeeded();
         void ReloadKernelIfNeeded();

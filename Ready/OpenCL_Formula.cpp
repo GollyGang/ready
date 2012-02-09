@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "OpenCL_nDim.hpp"
+#include "OpenCL_Formula.hpp"
 #include "utils.hpp"
 
 // STL:
@@ -28,7 +28,7 @@ using namespace std;
 #include <vtkImageData.h>
 #include <vtkXMLDataElement.h>
 
-OpenCL_nDim::OpenCL_nDim()
+OpenCL_Formula::OpenCL_Formula()
 {
     this->SetRuleName("Gray-Scott");
     this->AddParameter("D_a",0.082f);
@@ -41,7 +41,7 @@ OpenCL_nDim::OpenCL_nDim()
     this->SetTimestep(1.0f);
 }
 
-std::string OpenCL_nDim::AssembleKernelSourceFromFormula(std::string formula) const
+std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula) const
 {
     const string indent = "    ";
     const int NC = this->GetNumberOfChemicals();

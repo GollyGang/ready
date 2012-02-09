@@ -15,17 +15,14 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#include "wx/wxprec.h"      // for compilers that support precompilation
-#ifndef WX_PRECOMP
-   #include "wx/wx.h"       // for all others include the necessary headers
-#endif
-
-#include <wx/spinctrl.h>    // for wxSpinCtrl
-#include <wx/clipbrd.h>     // for wxTheClipboard
-
+// local
+#include "wxutils.hpp"
 #include "app.hpp"          // for wxGetApp
 #include "prefs.hpp"        // for allowbeep
-#include "wxutils.hpp"
+
+// wxWidgets:
+#include <wx/spinctrl.h>    // for wxSpinCtrl
+#include <wx/clipbrd.h>     // for wxTheClipboard
 
 // -----------------------------------------------------------------------------
 
@@ -472,4 +469,22 @@ bool CopyTextToClipboard(const wxString& text)
         result = false;
     }
     return result;
+}
+
+MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon) 
+     : wxDialog(NULL,wxID_ANY,title,wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
+{
+    wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
+    wxFont font(10,wxTELETYPE,wxFONTSTYLE_NORMAL,wxNORMAL,false,_T("Monospace"),wxFONTENCODING_DEFAULT);
+    wxTextCtrl *text = new wxTextCtrl(this,wxID_ANY,message,wxDefaultPosition,wxDefaultSize,
+        wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
+    text->SetFont(font);
+    text->SetMinSize(wxSize(800,200));
+    text->SetBackgroundColour(this->GetBackgroundColour());
+    text->SetForegroundColour(*wxBLACK);
+    this->SetIcon(wxArtProvider::GetIcon(icon));
+    vbox->Add(text,wxSizerFlags(1).Expand().DoubleBorder());
+    vbox->Add(this->CreateButtonSizer(wxOK),wxSizerFlags(0).Expand().DoubleBorder());
+    this->SetSizerAndFit(vbox);
+    this->ShowModal();
 }
