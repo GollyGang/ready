@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <rule type="kernel" name="B3/S23">
+    
+      <description>
+        Conway's Game of Life, just because we can. Not an efficient way to do this, since everything is stored as floats.
+      </description>
+      
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float* a_in,__global float* a_out) 
+        {
+            const int x = get_global_id(0);
+            const int y = get_global_id(1);
+            const int z = get_global_id(2);
+            const int X = get_global_size(0);
+            const int Y = get_global_size(1);
+            const int i_here = X*(Y*z + y) + x;
+
+            const int xm1 = ((x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+            const int xp1 = ((x+1) &amp; (X-1));
+            const int ym1 = ((y-1+Y) &amp; (Y-1));
+            const int yp1 = ((y+1) &amp; (Y-1));
+            const int i_w =  X*(Y*z + y) + xm1;
+            const int i_e = X*(Y*z + y) + xp1;
+            const int i_n =  X*(Y*z + ym1) + x;
+            const int i_s = X*(Y*z + yp1) + x;
+            const int i_nw =  X*(Y*z + ym1) + xm1;
+            const int i_ne = X*(Y*z + ym1) + xp1;
+            const int i_sw =  X*(Y*z + yp1) + xm1;
+            const int i_se = X*(Y*z + yp1) + xp1;
+
+            float n = a_in[i_n]+a_in[i_ne]+a_in[i_e]+a_in[i_se]+a_in[i_s]+a_in[i_sw]+a_in[i_w]+a_in[i_nw];
+            if(a_in[i_here]&lt;0.5f) {
+                if(n&gt;2.5f &amp;&amp; n&lt;3.5f) a_out[i_here]=1.0f; // B3
+                else a_out[i_here]=0.0f;
+            }
+            else {
+                if(n&gt;1.5f &amp;&amp; n&lt;3.5f) a_out[i_here]=1.0f; // S23
+                else a_out[i_here]=0.0f;
+            }
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator>
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <rectangle>
+          <Point3D x="0.2" y="0.3" z="0" />
+          <Point3D x="0.5" y="0.6" z="1" />
+        </rectangle>
+      </overlay>
+    </initial_pattern_generator>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 63 0 0">
+      <PointData Scalars="Scalars_">
+        <DataArray type="Float32" Name="Scalars_" format="appended" RangeMin="0"                    RangeMax="0.99932861328"        offset="0"                   />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAAAAAAIwsAAA==eJzt2f9fzXcbB/AOkpCEJC0540iSdsT6dt6vlzO62xmxgygVzp2QaQlJkpxZa7Gb+/i2uwk7rKUR8nVFtx3zLQ3LhCOx0LqN2PFl2zGbGz/fP7f78dj7+Se8X5/relzX9XFwkCRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJ+t/CgrxZXdCIK7a7aEyeyyTjYExyC0BrvYK/mLOoSF6K9JIKvDN8KD9tGsNG4wPN4+gnSDSr8Z/Q+ehano+23ssw0HE97GmLGbTdkxXn4jnr5BD+0GEePwk9A7v+KbZG1eBp4BJOsuzQ5BUP59+ValFkGouRUSp2UefjbPV0drcs1/QN7sLy1HjGeA/kn/02fwWRpq0irTwEh/tMZl1SM94O3Yb11tPY7RtDV4MTrGl3xemmaXTRfiDO/OMH7DgezYO6OH4UegJ9TG5oMM+hZ35H6qb05Zvqz7DsYy0dLj7DufwZmO12ANsU48OVKzrzmuWeJjlpCPedsUKf2J+ZRYexKEjwmKUBB811iDRvFUbDV+JLv3hM3OrPPSor/uy3+SvwzehKB8VSkbExnM05CxiR/CoCkrozIy+cCsNSkV92TFy1N6OkaDznO4fBoH2N7pXLkVF0COr0HkzPCGO30OVwePBMzAkOYWRyH/i848r2Qx05+fgg/qzK4uPMJ3jkv4gasQlXmmZz8TNBP+NajLX3x61LaZykCNDYtAtRnD2OXZTOYuTm5z2h8UOZfwtI0O7U7LZewt6yWHzpeBWbk8YwumwAR5YUoW1Aa55J+AHxdwI481wQH6bYcUhfL3Y2TMBO9US+bu+JUGOhKFk2nqn6YOxRx+Kt5r68cW4O9/jFIijOk33tJmzPi+Zu2yWozKvxRoAZiZllqP5HIz4N/RaTvALYztoaG41ncX1XKi8ofgx3NeeJjJHhsv+3gIUdNBzVoOIxu4Gdwp34b+cpyN4MnlfeRuqKYH7j/QNK9BfEV3VT+MdvS1inS+HtvfO5alwkf2Q69zyL4atqE/5wz2F/sRZdy5xRuWEyv7Bc0NRG/Yj+im7hc60hzM89hrXVOr7IvpuyvZgVuh9TvXcjM1NDffk2xJYNROtdCvolrcXdxnSGWLxk/beAmJP+PFozFUFGTx48Escff59PXcJnOM0kLnTU0KDfjeW2EbjRNIfxqp14pcYFV5rvIiX2db5905cG3Wv4tHkMu912hmNiK0bF9WObBqOo3/wuRwtfjlb6ijZ+rVCbOosdPduyLiuFYy3bRGXUZL7oORXWePzdWY0E7SBOtgxiSMArHKboHVptSJL13wJy099gfuwITvMdzMikrbjq9i7XGKs0s+z7ULY5hv9RPMK9mp+Fw1AHTtEG4temLH7CKJ4WSXTZ0JbZBnDh8XCWmS/jiP66SDdUiLCHr/ADx68xT1+OIu1YnPZPYl1ECl/0lU3Ws/Ayu4hHtkxOMQfCmnQXz78RjllXjA9q3qB942J2edyOg7w/lvXfAk4pponlyuOoOBPPyMw+zNJX4njlDQyq6s4rltli5/GLeGjOFOmlFcgyCFG1eRrjYgNQa5jF9xQWXFXeE7Pr96NvgwlvK7aF36j5CTd1adgVPZET7g9ganEwS9MuikvmO7gbuoCnXKbx5MhErjmi4wJbGL51mclrylQ+Cc/mzDNB7HmpI+PiAngyMlHWfwuYaguEwzc5TMoazJrMmYwyfA632HY84BeHOV4hnKDyZ0B6d3b36MCn1uznWU7g1lQ9ezh15JSyQHzjMZ2o3YSQS16MOxjwsu7Dwr0ZXTAAhx/XY4R6C5Z8B0bnf4FfzL+JIbYC8anf2y/2DJbpLwvXyjxUiHp8ojyDRbbDeGJ9in7NXbhj6ASZfws4Wvs92tvfx1GFQROm3ojRwb7MLX+D3yt+0lS4J3C6bTDPpE9nG8dW7FnfkdtU4+mRvAI3tTbhNLw1R//Sj5sN5zAjMYin3RpxsWoWFysg3FPbc0foRcwzhWJFTgSj9w6gb0pXmkreZOJGNXf7xbDQdzRnWfZpfApcWWz6DjsdJ7Iheg47WT7QaFN7y/xbwGG3ydTu7f1yN4+K6MdRFhWu1N7FJdM7qCyezBW7IjjMrTd8PnZlwqpBLMgZxRrDTLH5yBiuf3wa/R3Xwn+rOzs/dOKhknq8GmrC17EGPDi3kOfKmzBdESRuec3lSveTGOjanU9vZ7+8F733+zBuc7uA9S7VSDSqGZs5EAd+m8ToiC8wJtYX73lrZf4tQOT2YmPWXL5fpUVw6QbkRhyFcn9ntlO8j1v1NoxSf45xpX4cEbAF6yLe4n1dBu5VLcDK2r+xt+qfWGvVcUSDkpbYqbhvyHixN4qupfkoz4zHCcsNzW3tI5xyu4Wosn6oy0/hvy3XNMHLvOhR3oGtGpZivaoaq61vwmVNW/rkubJzQx78jnRjF5d8Of+1gECzh+jp5cJqfaM475rMQuVoLFccfzG30z/NnfdsP6NjsyM3VY/mh9avcdl/NlMrD2L7lGjOmBHEgoJRL++CelN/bM+N5onaG9jTIZbGzGFoe/w99GroJJzMrbk9LZo3k2wYV+bH16o9GKvfgUMzEriz+SL89e5c4H4IB8vr8PmZsbxemsoKRYL4s9/mr2BDdtTLvT7kthebsxawTbOCA23rcNX9Hlq5KViwdxSvr0nlTMUQvPgv4292F49qM/nP1m+yPv9d/qRayJH6IihzOnNcegkqVM9nhpo9WG8/jcd5i/jlwzgea2jADvUEaCwbcX3jfTxws4ulvsM4zO5DbWRvdrrflr1CV2HkMhXXmHRoX9+G79oOyPpvAcuytYwt2oEyXQxWWk/g2bwcDs9RcpUhEv6mdSLZvA/rCk6juWQBdtsvYbjOjL4Wk8irHM5fyn4DqjZhYc0hsc0+jn8MfYafQ7MYZn0F9wsyWJfdDEvkVHprVwI+PtxgjBLKeZ3pX+zOb6oasdguOEcdwgT9IITqC9GofaBZ6RwJH6OrZprbYJl/C1jaRMLJh56xH+GzDmN5vyQDfY648alYwkuZd9BkeIh10W+xsuAa9hsnYcOYKA5QubNPvhv+xj605z/FRt1olhonaA4Z60VqSjD713VljGIHYiN24EDNFbHAHoYlfkRhYxQDIz2ez4UzkGM4ItbWVEHM68Xe4Z25VPUVHC7k8PLQu+hqdBY/KRbK/t8CVj8+hfnfhbJLYzuuK3+LPawdYEwfxvrke2CRD7eo9FQbewhP40filtsDsSzZgpToA0jWDeGo4yruKprItNQQBhzsztDcQmwwRKEsOoZbLN9q4kpLsdgDdI9YjnHZflToHQgPHxbEjmKhJYo3DWm44pjCQs+zGK43w2Q8JQzm10RHSy56W11l/beAiIItUCf04Os1n4iHuzJ53j+Z88PDOKayGI3GB+KJczZczU5ihNOrHGrsKW5vfIQq0zSWmWIY7zmIGWPC2da7NQP060W1OUnYUn7FV1XX0ap5KTopnZBnHK4peWc8q5JuoVeAKyN1W9G33gSXKW3Z4/cVaNI/xPe372ORZyXsSU9f3BiZVvIl3MuXy/xbwBC7J9aYqpCX/DUm3R9IlW41JotAZucDV6tSWJl2DWuKdCx0P4u5DSFwn9Ge+boRKDKcF5+pz4v9xivYZvsOPpmr0L9rN8503IdzuU24Y3ws1Np/aaZaA3m0g4Hxv5ficu0dPC5ZhF+DF/Mj5QkcNNaJflWrYSmeyvykEbxsu4PscrBhyhwOUK+T+UuSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEn/t/4L5L3K5g==
+  </AppendedData>
+</VTKFile>
