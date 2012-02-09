@@ -2,13 +2,13 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
   
-    <rule type="kernel" name="Kernel test" number_of_chemicals="1">
+    <rule type="kernel" name="Kernel test">
     
       <description>
         This is a placeholder rule using OpenCL_FullKernel, where we give the whole OpenCL kernel instead of just a formula. Note that we can use float (or float2) instead of float4.
       </description>
       
-      <kernel block_size_x="1" block_size_y="1" block_size_z="1">
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float* a_in,__global float* a_out) 
         {
             const int x = get_global_id(0);

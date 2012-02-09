@@ -23,9 +23,9 @@
 
 // VTK:
 #include <vtkXMLUtilities.h>
-#include <vtkSmartPointer.h>
 #include <vtkXMLDataParser.h>
 #include <vtkImageData.h>
+#include <vtkObjectFactory.h>
 
 // STL:
 #include <string>
@@ -33,9 +33,6 @@
 #include <sstream>
 #include <stdexcept>
 using namespace std;
-
-// stdlib:
-#include <stdio.h>
 
 vtkStandardNewMacro(RD_XMLWriter);
 vtkStandardNewMacro(RD_XMLReader);

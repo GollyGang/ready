@@ -42,6 +42,8 @@ string OpenCL_FullKernel::AssembleKernelSourceFromFormula(std::string formula) c
 
 void OpenCL_FullKernel::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
+    int i;
+
     OpenCL_RD::InitializeFromXML(rd,warn_to_update);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
@@ -54,6 +56,10 @@ void OpenCL_FullKernel::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_u
     read_required_attribute(xml_kernel,"block_size_x",this->block_size[0]);
     read_required_attribute(xml_kernel,"block_size_y",this->block_size[1]);
     read_required_attribute(xml_kernel,"block_size_z",this->block_size[2]);
+
+    // number_of_chemicals:
+    read_required_attribute(xml_kernel,"number_of_chemicals",i);
+    this->SetNumberOfChemicals(i);
 
     // do this last, because it requires everything else to be set up first
     this->TestFormula(formula); // will throw on error but won't set
@@ -71,6 +77,7 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_FullKernel::GetAsXML() const
 
     vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
     kernel->SetName("kernel");
+    kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
     kernel->SetIntAttribute("block_size_x",this->block_size[0]);
     kernel->SetIntAttribute("block_size_y",this->block_size[1]);
     kernel->SetIntAttribute("block_size_z",this->block_size[2]);

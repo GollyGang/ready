@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
-    <rule type="formula" name="Turing" number_of_chemicals="2">
+    <rule type="formula" name="Turing">
         
       <description>
         This formula was blah blah blah.
@@ -12,7 +12,7 @@
       <param name="D_b">  0.03125  </param>
       <param name="k_a">  0.0125   </param>
       
-      <formula>
+      <formula number_of_chemicals="2">
 		  delta_a = k_a * (16.0f - a * b) + D_a * laplacian_a;
 		  delta_b = k_a * (a * b - b - 12.0f) + D_b * laplacian_b;
       </formula>
