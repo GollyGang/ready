@@ -532,11 +532,11 @@ void OpenCL_RD::Update(int n_steps)
             {
                 // a_in, b_in, ... a_out, b_out ...
                 ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[iBuffer][ic]);
-                throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
+                throwOnError(ret,"OpenCL_RD::Update : clSetKernelArg failed: ");
             }
         }
         ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
-        throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
+        throwOnError(ret,"OpenCL_RD::Update : clEnqueueNDRangeKernel failed: ");
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
     this->timesteps_taken += n_steps;
@@ -547,7 +547,7 @@ void OpenCL_RD::Update(int n_steps)
     {
         float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-        throwOnError(ret,"OpenCL_RD::ReadFromBuffers : buffer reading failed: ");
+        throwOnError(ret,"OpenCL_RD::Update : buffer reading failed: ");
         this->images[ic]->Modified();
     }
 }
