@@ -242,7 +242,7 @@ void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
         #endif
     
     } else {
-        // user clicked on a pattern file
+        // user clicked on a pattern/html/txt file
         
         // reset background of previously selected file by traversing entire tree;
         // we can't just remember previously selected id because ids don't persist
@@ -252,8 +252,7 @@ void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
         // indicate the selected file
         treectrl->SetItemBackgroundColour(id, *wxLIGHT_GREY);
 
-        if(!frame->UserWantsToCancelWhenAskedIfWantsToSave())
-            frame->OpenFile(filepath);
+        frame->OpenFile(filepath);
     }
 
     #ifdef __WXMSW__

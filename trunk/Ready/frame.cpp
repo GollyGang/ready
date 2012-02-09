@@ -1102,8 +1102,6 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
 void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
-    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-        
     wxFileDialog opendlg(this, _("Choose a pattern file"), opensavedir, wxEmptyString,
                          _("VTK image files (*.vti)|*.vti"),
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
@@ -1138,6 +1136,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         EditFile(path);
         return;
     }
+
+    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     if (remember) AddRecentPattern(path);
     
@@ -1449,7 +1449,7 @@ void MyFrame::SetFormula(std::string s)
 
 bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
 {
-    if(!this->system->IsModified()) return false;
+    if(this->system == NULL || !this->system->IsModified()) return false;
     
     int ret = SaveChanges(_("Save the current system?"),_("If you don't save, your changes will be lost."));
     if(ret==wxCANCEL) return true;
