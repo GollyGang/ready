@@ -36,7 +36,7 @@ class OpenCL_RD : public BaseRD
     public:
 
         OpenCL_RD();
-        ~OpenCL_RD();
+        virtual ~OpenCL_RD();
 
         virtual bool HasEditableFormula() const { return true; }
 
