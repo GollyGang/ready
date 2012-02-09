@@ -47,6 +47,9 @@ class BaseRD
         int GetX() const;
         int GetY() const;
         int GetZ() const;
+
+        // inbuilt implementations cannot have their number_of_chemicals edited
+        virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
         void SetNumberOfChemicals(int n) { this->n_chemicals = n; this->is_modified = true; }
 
@@ -61,11 +64,13 @@ class BaseRD
         vtkImageData* GetImage(int iChemical) const;
         virtual void CopyFromImage(vtkImageData* im);
 
+        // inbuilt implementations cannot have their formula edited
         virtual bool HasEditableFormula() const =0;
         std::string GetFormula() const;
         virtual void TestFormula(std::string program_string) {}
         virtual void SetFormula(std::string s);
 
+        // only some implementations (OpenCL_FullKernel) can have their block size edited
         virtual bool HasEditableBlockSize() const { return false; }
         virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
         virtual int GetBlockSizeY() const { return 1; }
@@ -77,11 +82,16 @@ class BaseRD
         virtual void Allocate(int x,int y,int z,int nc);
 
         std::string GetRuleName() const;
-        std::string GetRuleDescription() const;
-        std::string GetPatternDescription() const;
         void SetRuleName(std::string s);
+
+        std::string GetRuleDescription() const;
         void SetRuleDescription(std::string s);
+
+        std::string GetPatternDescription() const;
         void SetPatternDescription(std::string s);
+
+        // every implementation has parameters that can be edited and changed 
+        // (will cause errors if they don't match the inbuilt names, the formula or the kernel)
         int GetNumberOfParameters() const;
         std::string GetParameterName(int iParam) const;
         float GetParameterValue(int iParam) const;
@@ -92,8 +102,10 @@ class BaseRD
         virtual void SetParameterName(int iParam,std::string s);
         virtual void SetParameterValue(int iParam,float val);
 
+        // should the user be asked if they want to save?
         bool IsModified() const;
         void SetModified(bool m);
+
         std::string GetFilename() const;
         void SetFilename(std::string s);
 
@@ -106,7 +118,7 @@ class BaseRD
 
     protected:
 
-        std::string rule_name,rule_description,pattern_description;
+        std::string rule_name, rule_description, pattern_description;
 
         int n_chemicals;
 

@@ -18,21 +18,27 @@
 // local:
 #include "BaseRD.hpp"
 
+// a base class for all the inbuilt implementations (TODO: put in separate files when we have more than one derived class)
+class BaseInbuilt_RD : public BaseRD
+{
+    public:
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
+        virtual bool HasEditableFormula() const { return false; }
+        virtual bool HasEditableNumberOfChemicals() const { return false; }
+};
+
 // inbuilt implementation: n-dimensional Gray-Scott
-class GrayScott : public BaseRD
+class GrayScott : public BaseInbuilt_RD
 {
     public:
 
         GrayScott();
         ~GrayScott();
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
         virtual void Allocate(int x,int y,int z,int nc);
-
         virtual void Update(int n_steps);
-
-        virtual bool HasEditableFormula() const { return false; }
 
     protected:
 

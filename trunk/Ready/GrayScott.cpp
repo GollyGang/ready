@@ -146,7 +146,7 @@ void GrayScott::Update(int n_steps)
     this->images[1]->Modified();
 }
 
-vtkSmartPointer<vtkXMLDataElement> GrayScott::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> BaseInbuilt_RD::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> rd = BaseRD::GetAsXML();
 
