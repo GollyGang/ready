@@ -97,3 +97,24 @@ int IndexFromChemicalName(const string& s)
             return i;
     throw runtime_error("IndexFromChemicalName: unrecognised chemical name: "+s);
 }
+
+// read a multiline string, outputting whitespace-trimmed lines
+string trim_multiline_string(const char* s)
+{
+    const char *whitespace = " \r\t\n";
+    istringstream iss(s);
+    ostringstream oss;
+    string str;
+    while(iss.good())
+    {
+        getline(iss,str);
+        // trim whitespace at start and end
+        if(str.find_first_not_of(whitespace)==string::npos)
+            continue; // skip whitespace-only lines
+        str = str.substr(str.find_first_not_of(whitespace),str.find_last_not_of(whitespace)+1);
+        if(!oss.str().empty()) // insert a newline if there have been previous lines
+            oss << "\n";
+        oss << str;
+    }
+    return oss.str();
+}

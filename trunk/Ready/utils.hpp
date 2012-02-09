@@ -63,3 +63,6 @@ void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val
 
 std::string GetChemicalName(int i); // a, b, c, ... z, aa, ab, ...
 int IndexFromChemicalName(const std::string& s);
+
+// read a multiline string, outputting whitespace-trimmed lines
+std::string trim_multiline_string(const char* s);

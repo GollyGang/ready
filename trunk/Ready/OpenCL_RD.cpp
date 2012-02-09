@@ -534,12 +534,6 @@ void OpenCL_RD::SetParameterName(int iParam,string s)
     this->need_reload_formula = true;
 }
 
-void OpenCL_RD::SetTimestep(float t)
-{
-    BaseRD::SetTimestep(t);
-    this->need_reload_formula = true;
-}
-
 void OpenCL_RD::GenerateInitialPattern()
 {
 	BaseRD::GenerateInitialPattern();
@@ -576,4 +570,30 @@ void OpenCL_RD::Update(int n_steps)
     }
 
     this->ReadFromOpenCLBuffers(); // buffer1 -> image
+}
+
+void OpenCL_RD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+{
+    BaseRD::InitializeFromXML(rd,warn_to_update);
+
+    int i;
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+
+    // number_of_chemicals:
+    read_required_attribute(rule,"number_of_chemicals",i);
+    this->SetNumberOfChemicals(i);
+}
+
+vtkSmartPointer<vtkXMLDataElement> OpenCL_RD::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> rd = BaseRD::GetAsXML();
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found");
+
+    rule->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+
+    return rd;
 }

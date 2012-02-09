@@ -34,6 +34,7 @@ using namespace std;
 #include <vtkImageAppendComponents.h>
 #include <vtkImageExtractComponents.h>
 #include <vtkPointData.h>
+#include <vtkXMLUtilities.h>
 
 BaseRD::BaseRD()
 {
@@ -92,17 +93,6 @@ int BaseRD::GetY() const
 int BaseRD::GetZ() const
 {
     return this->images.front()->GetDimensions()[2];
-}
-
-float BaseRD::GetTimestep() const
-{ 
-    return this->timestep; 
-}
-
-void BaseRD::SetTimestep(float t)
-{
-    this->timestep = t;
-    this->is_modified = true;
 }
 
 vtkImageData* BaseRD::GetImage(int iChemical) const
@@ -311,4 +301,116 @@ void BaseRD::BlankImage()
 		this->images[iImage]->Modified();
 	}
 	this->timesteps_taken = 0;
+}
+
+// load things from the XML that are standard across all implementations
+void BaseRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+{
+    string str;
+    const char *s;
+    float f;
+    int i;
+
+    // check whether we should warn the user that they need to update Ready
+    {
+        read_required_attribute(rd,"format_version",i);
+        warn_to_update = (i>1);
+        // (we will still proceed and try to read the file but it might fail or give poor results)
+    }
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+
+    // rule_name:
+    read_required_attribute(rule,"name",str);
+    this->SetRuleName(str);
+
+    // rule_description:
+    vtkSmartPointer<vtkXMLDataElement> xml_rule_description = rule->FindNestedElementWithName("description");
+    if(!xml_rule_description) this->SetRuleDescription(""); // optional, default is empty string
+    else this->SetRuleDescription(trim_multiline_string(xml_rule_description->GetCharacterData()));
+
+    // parameters:
+    this->DeleteAllParameters();
+    for(int i=0;i<rule->GetNumberOfNestedElements();i++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> node = rule->GetNestedElement(i);
+        if(string(node->GetName())!="param") continue;
+        string name;
+        s = node->GetAttribute("name");
+        if(!s) throw runtime_error("Failed to read param attribute: name");
+        name = trim_multiline_string(s);
+        s = node->GetCharacterData();
+        if(!s || !from_string(s,f)) throw runtime_error("Failed to read param value");
+        this->AddParameter(name,f);
+    }
+
+    // pattern_description:
+    vtkSmartPointer<vtkXMLDataElement> xml_pattern_description = rd->FindNestedElementWithName("pattern_description");
+    if(!xml_pattern_description) this->SetPatternDescription(""); // optional, default is empty string
+    else this->SetPatternDescription(trim_multiline_string(xml_pattern_description->GetCharacterData()));
+
+    // initial_pattern_generator:
+    this->ClearInitialPatternGenerator();
+    vtkSmartPointer<vtkXMLDataElement> xml_initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
+    if(xml_initial_pattern_generator) // optional, default is none
+    {
+        for(int i=0;i<xml_initial_pattern_generator->GetNumberOfNestedElements();i++)
+            this->AddInitialPatternGeneratorOverlay(new Overlay(xml_initial_pattern_generator->GetNestedElement(i)));
+    }
+}
+
+// TODO: BaseRD could inherit from XML_Object (but as VTKFile element, not RD element!)
+vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
+    rd->SetName("RD");
+    rd->SetAttribute("format_version","1");
+    // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
+
+    vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
+    rule->SetName("rule");
+    rule->SetAttribute("name",this->GetRuleName().c_str());
+
+    // rule description
+    vtkSmartPointer<vtkXMLDataElement> rule_description = vtkSmartPointer<vtkXMLDataElement>::New();
+    rule_description->SetName("description");
+    {
+        ostringstream oss;
+        vtkXMLUtilities::EncodeString(this->GetRuleDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+        rule_description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+    }
+    rule->AddNestedElement(rule_description);
+
+    // parameters
+    for(int i=0;i<this->GetNumberOfParameters();i++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();
+        param->SetName("param");
+        param->SetAttribute("name",this->GetParameterName(i).c_str());
+        string s = to_string(this->GetParameterValue(i));
+        param->SetCharacterData(s.c_str(),(int)s.length());
+        rule->AddNestedElement(param);
+    }
+
+    rd->AddNestedElement(rule);
+
+    // pattern description
+    vtkSmartPointer<vtkXMLDataElement> pattern_description = vtkSmartPointer<vtkXMLDataElement>::New();
+    pattern_description->SetName("pattern_description");
+    {
+        ostringstream oss;
+        vtkXMLUtilities::EncodeString(this->GetPatternDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+        pattern_description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+    }
+    rd->AddNestedElement(pattern_description);
+
+    // initial pattern generator
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
+    initial_pattern_generator->SetName("initial_pattern_generator");
+    for(int i=0;i<this->GetNumberOfInitialPatternGeneratorOverlays();i++)
+        initial_pattern_generator->AddNestedElement(this->GetInitialPatternGeneratorOverlay(i)->GetAsXML());
+    rd->AddNestedElement(initial_pattern_generator);
+
+    return rd;
 }

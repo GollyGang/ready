@@ -38,6 +38,9 @@ class BaseRD
         BaseRD();
         virtual ~BaseRD();
 
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
         // e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality() const;
 
@@ -49,9 +52,6 @@ class BaseRD
 
         // advance the RD system by n timesteps
         virtual void Update(int n_steps)=0;
-
-        float GetTimestep() const;
-        virtual void SetTimestep(float t);
 
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
@@ -93,8 +93,8 @@ class BaseRD
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
         void ClearInitialPatternGenerator();
-        int GetNumberOfInitialPatternGeneratorOverlays() { return (int)this->initial_pattern_generator.size(); }
-        Overlay* GetInitialPatternGeneratorOverlay(int i) { return this->initial_pattern_generator[i]; }
+        int GetNumberOfInitialPatternGeneratorOverlays() const { return (int)this->initial_pattern_generator.size(); }
+        Overlay* GetInitialPatternGeneratorOverlay(int i) const { return this->initial_pattern_generator[i]; }
 
     protected:
 
@@ -108,7 +108,6 @@ class BaseRD
 
         std::vector<std::pair<std::string,float> > parameters;
 
-        float timestep;
         int timesteps_taken;
 
         std::string formula;

@@ -41,11 +41,7 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(BaseRD* system);
 
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent)
-        {
-            BuildRDSystemXML(this->system)->PrintXML(os,indent);
-            return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
-        }
+        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
 
     protected:
 
@@ -61,13 +57,11 @@ class RD_XMLReader : public vtkXMLImageDataReader
 
         std::string GetType();
         std::string GetName();
+        vtkXMLDataElement* GetRDElement();
         bool ShouldGenerateInitialPatternWhenLoading();
-        void SetSystemFromXML(BaseRD* rd_system,bool& warn_to_update);
 
     protected:  
 
         RD_XMLReader() {} 
 
-        vtkXMLDataElement* GetRDElement();
 };
-

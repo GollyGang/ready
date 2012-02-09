@@ -55,7 +55,6 @@ class MyFrame : public wxFrame
         void SetPatternDescription(std::string s);
         void SetParameter(int iParam,float val);
         void SetParameterName(int iParam,std::string s);
-        void SetTimestep(float ts);
         void SetFormula(std::string s);
 
         // interface with Preferences dialog

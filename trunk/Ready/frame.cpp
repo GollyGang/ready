@@ -1172,7 +1172,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             target_system = s;
         }
         else throw runtime_error("Unsupported rule type: "+type);
-        iw->SetSystemFromXML(target_system,warn_to_update);
+        target_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
@@ -1439,13 +1439,6 @@ void MyFrame::SetParameterName(int iParam,std::string s)
 void MyFrame::SetFormula(std::string s)
 {
     this->system->SetFormula(s);
-    this->UpdateWindowTitle();
-    this->UpdateInfoPane();
-}
-
-void MyFrame::SetTimestep(float ts)
-{
-    this->system->SetTimestep(ts);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
 }

@@ -38,6 +38,9 @@ class OpenCL_RD : public BaseRD
         OpenCL_RD();
         ~OpenCL_RD();
 
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
         virtual bool HasEditableFormula() const { return true; }
 
         void SetPlatform(int i);
@@ -52,7 +55,6 @@ class OpenCL_RD : public BaseRD
 
         virtual void SetParameterValue(int iParam,float val);
         virtual void SetParameterName(int iParam,std::string s);
-        virtual void SetTimestep(float t);
 
         virtual void TestFormula(std::string s);
 

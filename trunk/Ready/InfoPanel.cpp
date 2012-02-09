@@ -336,7 +336,6 @@ void InfoPanel::Update(const BaseRD* const system)
     s.Replace(wxT("\n"), wxT("<br>"));
     contents += AppendRow(_("Pattern description"), s);
     contents += AppendRow(_("Number of chemicals"), wxString::Format(_T("%d"),system->GetNumberOfChemicals()));
-    contents += AppendRow(_("Timestep"), FormatFloat(system->GetTimestep()));
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {

@@ -7,11 +7,12 @@
         This formula was blah blah blah.
       </description>
       
-      <param name="D_a">  0.082  </param>
-      <param name="D_b">  0.041  </param>
-      <param name="k">    0.06   </param>
-      <param name="F">    0.035  </param>
-      
+      <param name="timestep"> 1.0    </param>
+      <param name="D_a">      0.082  </param>
+      <param name="D_b">      0.041  </param>
+      <param name="k">        0.06   </param>
+      <param name="F">        0.035  </param>
+
       <formula>
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
