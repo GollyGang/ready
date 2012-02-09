@@ -22,8 +22,8 @@
 #include "prefs.hpp"        // for readydir, maximize
 
 // wxWidgets:
-#include "wx/stdpaths.h"    // for wxStandardPaths
-#include "wx/filename.h"    // for wxFileName
+#include <wx/stdpaths.h>    // for wxStandardPaths
+#include <wx/filename.h>    // for wxFileName
 
 // STL:
 #include <stdexcept>

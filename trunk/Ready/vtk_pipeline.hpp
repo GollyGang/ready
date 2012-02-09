@@ -15,7 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// local:
 class wxVTKRenderWindowInteractor;
+
+// readybase:
 class BaseRD;
 
 void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);

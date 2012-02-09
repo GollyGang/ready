@@ -17,12 +17,10 @@
 
 // local:
 #include "vtk_pipeline.hpp"
+#include "wxVTKRenderWindowInteractor.h"
 
 // readybase:
 #include "BaseRD.hpp"
-
-// wxVTK: (local copy)
-#include "wxVTKRenderWindowInteractor.h"
 
 // VTK:
 #include <vtkInteractorStyleTrackballCamera.h>
