@@ -335,7 +335,12 @@ void InfoPanel::Update(const BaseRD* const system)
     s = wxString(system->GetPatternDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
     contents += AppendRow(_("Pattern description"), s);
-    contents += AppendRow(_("Number of chemicals"), wxString::Format(_T("%d"),system->GetNumberOfChemicals()));
+
+    if(system->HasEditableNumberOfChemicals())
+    {
+        contents += AppendRow(_("Number of chemicals"), wxString::Format(_T("%d"),system->GetNumberOfChemicals()));
+    }
+    // TODO!!! we might want to show the number of chemicals but not allow editing (e.g. inbuilt rules)
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
@@ -356,6 +361,7 @@ void InfoPanel::Update(const BaseRD* const system)
         formula.Replace(wxT(";\n"), wxT(";<br>"));
         contents += AppendRow(_("Formula"), formula);
     }
+    // TODO!!! we might want to show the formula but not allow editing (e.g. inbuilt rules)
 
     contents += AppendRow(_("Dimensions"), wxString::Format(wxT("XYZ = %d; %d; %d"),
                                            system->GetX(),system->GetY(),system->GetZ()));
