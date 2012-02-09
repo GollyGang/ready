@@ -22,8 +22,10 @@
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
 
 // STL:
+#include <vector>
 using namespace std;
 
 #ifdef _WIN32
@@ -98,23 +100,29 @@ int IndexFromChemicalName(const string& s)
     throw runtime_error("IndexFromChemicalName: unrecognised chemical name: "+s);
 }
 
-// read a multiline string, outputting whitespace-trimmed lines
+// read a multiline string, strip leading whitespace where shared by all lines
 string trim_multiline_string(const char* s)
 {
-    const char *whitespace = " \r\t\n";
+    return string(s);
+    /* TODO: maybe use something like this when we've worked out all the issues
+    vector<string> vs;
     istringstream iss(s);
-    ostringstream oss;
-    string str;
-    while(iss.good())
+    string item;
+    int minLeadingWhitespace = INT_MAX;
+    while(getline(iss, item, '\n'))
     {
-        getline(iss,str);
-        // trim whitespace at start and end
-        if(str.find_first_not_of(whitespace)==string::npos)
-            continue; // skip whitespace-only lines
-        str = str.substr(str.find_first_not_of(whitespace),str.find_last_not_of(whitespace)+1);
-        if(!oss.str().empty()) // insert a newline if there have been previous lines
-            oss << "\n";
-        oss << str;
+        vs.push_back(item);
+        int leadingWhitespace = (int)item.find_first_not_of(" \t");
+        if(leadingWhitespace!=string::npos)
+            minLeadingWhitespace = min(minLeadingWhitespace,leadingWhitespace);
     }
-    return oss.str();
+    ostringstream oss;
+    for(int i=0;i<(int)vs.size();i++)
+    {
+        if(minLeadingWhitespace<vs[i].size())
+            oss << vs[i].substr(minLeadingWhitespace) << "\n";
+        else
+            oss << "\n";
+    }
+    return oss.str();*/
 }
