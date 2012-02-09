@@ -8,6 +8,7 @@ before 0.2 release:
 - add a simple introduction-to-RD help page
 - allow user to change the number of chemicals (for formula implementations)
 - bug: step takes 2 steps, run takes even number of steps
+- bug: timestep not used in full-kernel rules, block_size not read from XML
 
 Andrew's tasks for 0.2:
 - fix bug: tool tips not appearing (Mac app only)
@@ -17,8 +18,7 @@ Andrew's tasks for 0.2:
 before 0.3 release:
 - control over render pipeline: contouring level, color map (ranges, palette), slice direction/height etc. in XML and UI
 - UI for editing the initial-pattern-generator overlay stack
-- allow full-kernel rules, which supply the entire OpenCL kernel instead of just a formula, plus option to convert formula rules
-  into full-kernel rules
+- add option to convert formula rules into full-kernel rules
 
 before 0.x release:
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
