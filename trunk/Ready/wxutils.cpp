@@ -471,6 +471,8 @@ bool CopyTextToClipboard(const wxString& text)
     return result;
 }
 
+// -----------------------------------------------------------------------------
+
 MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon) 
      : wxDialog(NULL,wxID_ANY,title,wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
