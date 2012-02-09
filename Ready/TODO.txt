@@ -12,7 +12,8 @@ before 0.2 release:
 - bug: should only trim leading whitespace in multi-line strings where shared by all lines
 
 Andrew's tasks for 0.2:
-- fix bug: tool tips not appearing (Mac app only)
+- improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
+- fix bug: tool tips not appearing (Mac app only; bug is in wxOSX-Cocoa and not easy to fix)
 - use better (big) toolbar icons in Mac app
 - do any other "AKT TODO" tasks
 
