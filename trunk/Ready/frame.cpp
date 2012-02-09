@@ -628,8 +628,12 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
 {
     // TODO: merge this with SelectOpenCLDevice?
-    wxBusyCursor busy;
-    wxMessageBox(wxString(OpenCL_RD::GetOpenCLDiagnostics().c_str(),wxConvUTF8));
+    wxString txt;
+    {
+        wxBusyCursor busy;
+        txt = wxString(OpenCL_RD::GetOpenCLDiagnostics().c_str(),wxConvUTF8);
+    }
+    MonospaceMessageBox(txt,_("OpenCL diagnostics"),wxART_INFORMATION);
 }
 
 void MyFrame::OnSize(wxSizeEvent& event)

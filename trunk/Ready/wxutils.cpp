@@ -481,7 +481,7 @@ MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString
     wxTextCtrl *text = new wxTextCtrl(this,wxID_ANY,message,wxDefaultPosition,wxDefaultSize,
         wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
     text->SetFont(font);
-    text->SetMinSize(wxSize(800,200));
+    text->SetMinSize(wxSize(800,500));
     text->SetBackgroundColour(this->GetBackgroundColour());
     text->SetForegroundColour(*wxBLACK);
     this->SetIcon(wxArtProvider::GetIcon(icon));
