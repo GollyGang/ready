@@ -38,9 +38,6 @@ class OpenCL_RD : public BaseRD
         OpenCL_RD();
         ~OpenCL_RD();
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
         virtual bool HasEditableFormula() const { return true; }
 
         void SetPlatform(int i);

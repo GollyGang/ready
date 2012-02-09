@@ -125,6 +125,8 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
 
 void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
+    int i;
+
     OpenCL_RD::InitializeFromXML(rd,warn_to_update);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
@@ -133,6 +135,11 @@ void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_upda
     // formula:
     vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
     if(!xml_formula) throw runtime_error("formula node not found in file");
+
+    // number_of_chemicals:
+    read_required_attribute(xml_formula,"number_of_chemicals",i);
+    this->SetNumberOfChemicals(i);
+
     string formula = trim_multiline_string(xml_formula->GetCharacterData());
     this->TestFormula(formula); // will throw on error
     this->SetFormula(formula); // (won't throw yet)
@@ -152,6 +159,7 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_Formula::GetAsXML() const
     formula->SetName("formula");
     ostringstream oss;
     vtkXMLUtilities::EncodeString(this->GetFormula().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+    formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
     formula->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
     rule->AddNestedElement(formula);
 

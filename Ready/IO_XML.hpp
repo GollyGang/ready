@@ -22,8 +22,6 @@ class BaseRD;
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>
 #include <vtkXMLDataElement.h>
-#include <vtkObjectFactory.h>
-#include <vtkXMLDataElement.h>
 #include <vtkSmartPointer.h>
 
 class RD_XMLWriter : public vtkXMLImageDataWriter
