@@ -9,6 +9,7 @@ before 0.2 release:
 - allow user to change the number of chemicals (where HasEditableNumberOfChemicals)
 - allow user to change the block size (where HasEditableBlockSize)
 - bug: step takes 2 steps, run takes even number of steps
+- bug: should only trim leading whitespace in multi-line strings where shared by all lines
 
 Andrew's tasks for 0.2:
 - fix bug: tool tips not appearing (Mac app only)
