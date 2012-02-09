@@ -51,8 +51,7 @@ class MyFrame : public wxFrame
 
         // interface with InfoPanel
         void SetRuleName(std::string s);
-        void SetRuleDescription(std::string s);
-        void SetPatternDescription(std::string s);
+        void SetDescription(std::string s);
         void SetParameter(int iParam,float val);
         void SetParameterName(int iParam,std::string s);
         void SetFormula(std::string s);

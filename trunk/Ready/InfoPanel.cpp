@@ -329,12 +329,9 @@ void InfoPanel::Update(const BaseRD* const system)
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
     contents += AppendRow(_("Rule name"), s);
-    s = wxString(system->GetRuleDescription().c_str(),wxConvUTF8);
+    s = wxString(system->GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(_("Rule info"), s);
-    s = wxString(system->GetPatternDescription().c_str(),wxConvUTF8);
-    s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(_("Pattern info"), s);
+    contents += AppendRow(_("Description"), s);
 
     if(system->HasEditableNumberOfChemicals())
     {

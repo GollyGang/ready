@@ -84,11 +84,8 @@ class BaseRD
         std::string GetRuleName() const;
         void SetRuleName(std::string s);
 
-        std::string GetRuleDescription() const;
-        void SetRuleDescription(std::string s);
-
-        std::string GetPatternDescription() const;
-        void SetPatternDescription(std::string s);
+        std::string GetDescription() const;
+        void SetDescription(std::string s);
 
         // every implementation has parameters that can be edited and changed 
         // (will cause errors if they don't match the inbuilt names, the formula or the kernel)
@@ -118,7 +115,7 @@ class BaseRD
 
     protected:
 
-        std::string rule_name, rule_description, pattern_description;
+        std::string rule_name, description;
 
         int n_chemicals;
 

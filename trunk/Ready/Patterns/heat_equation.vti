@@ -3,19 +3,16 @@
     
   <RD format_version="1">
       
+    <description>
+        The &lt;a href="http://en.wikipedia.org/wiki/Heat_equation"&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid. Any pattern would do to show the heat equation in action. From any starting point the chemical levels will spread out and equalise.
+    </description>
+    
     <rule type="formula" name="Heat equation">
-      <description>
-          The &lt;a href="http://en.wikipedia.org/wiki/Heat_equation"&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid. 
-      </description>
       <param name="timestep"> 0.1 </param>
       <formula number_of_chemicals="1">
         delta_a = laplacian_a;
       </formula>
     </rule>
-    
-    <pattern_description>
-        Any pattern would do to show the heat equation in action. From any starting point the chemical levels will spread out and equalise.
-    </pattern_description>
     
     <initial_pattern_generator apply_when_loading="1">
         <overlay chemical="a">

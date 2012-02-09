@@ -1,13 +1,20 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
+      
+    <pattern_description>
+        Meinhardt stripes
+    </pattern_description>
+    
     <rule type="formula" name="Meinhardt">
+        
       <param name="timestep">0.1</param>
       <param name="k_ab">0.04</param>
       <param name="k_c">0.06</param>
       <param name="k_de">0.04</param>
       <param name="diff1">0.009</param>
       <param name="diff2">0.2</param>
+      
       <formula number_of_chemicals="6">
         delta_a = 0.01f * a * a * e * f / c - a * k_ab + diff1 * laplacian_a;
         delta_b = 0.01f * b * b * d / c - b * k_ab + diff1 * laplacian_b;
@@ -16,11 +23,8 @@
         delta_e = (b - e) * k_de + diff2 * laplacian_e;
         delta_f = 0.0f;
       </formula>
+      
     </rule>
-    
-    <pattern_description>
-        Meinhardt stripes
-    </pattern_description>
     
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
