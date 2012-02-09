@@ -42,7 +42,7 @@ class GrayScott : public BaseInbuilt_RD
 
     protected:
 
-        std::vector<vtkImageData*> buffer_images;
+        std::vector<vtkImageData*> buffer_images; // one for each chemical
 
     protected:
 

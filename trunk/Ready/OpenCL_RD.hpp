@@ -73,9 +73,6 @@ class OpenCL_RD : public BaseRD
 
         void CreateOpenCLBuffers();
         void WriteToOpenCLBuffers();
-        void ReadFromOpenCLBuffers();
-
-        void Update2Steps();
 
         static cl_int LinkOpenCL();
         static void throwOnError(cl_int ret,const char* message);
@@ -99,6 +96,8 @@ class OpenCL_RD : public BaseRD
 
         int iPlatform,iDevice;
         bool need_reload_context;
+        
+        int iCurrentBuffer;
 };
 
 #endif
