@@ -39,7 +39,8 @@ set( BASE_SOURCES      # low-level code used in all executables
   BaseRD.hpp BaseRD.cpp
   GrayScott.hpp GrayScott.cpp
   OpenCL_RD.hpp OpenCL_RD.cpp
-  OpenCL_nDim.hpp OpenCL_nDim.cpp
+  OpenCL_Formula.hpp OpenCL_Formula.cpp
+  OpenCL_FullKernel.hpp OpenCL_FullKernel.cpp
   IO_XML.hpp IO_XML.cpp
   overlays.hpp overlays.cpp
   utils.hpp utils.cpp
@@ -71,6 +72,7 @@ set( RESOURCES
 
 set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti turing.vti
+  kernel_test.vti
   CPU-only/grayscott_1D.vti CPU-only/grayscott_2D.vti CPU-only/grayscott_3D.vti
 )
 
