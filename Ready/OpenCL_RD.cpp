@@ -45,6 +45,8 @@ OpenCL_RD::OpenCL_RD()
 
     if(LinkOpenCL()!= CL_SUCCESS)
         throw runtime_error("Failed to load dynamic library for OpenCL");
+        
+    this->iCurrentBuffer = 0;
 }
 
 OpenCL_RD::~OpenCL_RD()
@@ -229,51 +231,6 @@ void OpenCL_RD::WriteToOpenCLBuffers()
         cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[io][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCL_RD::WriteToBuffers : buffer writing failed: ");
     }
-}
-
-void OpenCL_RD::ReadFromOpenCLBuffers()
-{
-    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
-
-    const int io = 0;
-    for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
-    {
-        float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
-        cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[io][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-        throwOnError(ret,"OpenCL_RD::ReadFromBuffers : buffer reading failed: ");
-        this->images[ic]->Modified();
-    }
-}
-
-void OpenCL_RD::Update2Steps()
-{
-    // (buffer-switching)
-
-    cl_int ret;
-
-    const int NC = this->GetNumberOfChemicals();
-
-    for(int io=0;io<2;io++)
-    {
-        for(int ic=0;ic<NC;ic++)
-        {
-            ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[io][ic]); // 0=input, 1=output
-            throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
-        }
-    }
-    ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
-    throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
-
-    for(int io=0;io<2;io++)
-    {
-        for(int ic=0;ic<NC;ic++)
-        {
-            ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[1-io][ic]); // 1=input, 0=output
-            throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
-        }
-    }
-    ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
-    throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
 }
 
 void OpenCL_RD::TestFormula(std::string formula)
@@ -562,12 +519,35 @@ void OpenCL_RD::Update(int n_steps)
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
 
-    // take approximately n_steps steps
-    for(int it=0;it<(n_steps+1)/2;it++)
-    {
-        this->Update2Steps(); // take data from buffer1, leaves output in buffer1
-        this->timesteps_taken += 2;
-    }
+    cl_int ret;
+    int iBuffer;
+    const int NC = this->GetNumberOfChemicals();
 
-    this->ReadFromOpenCLBuffers(); // buffer1 -> image
+    for(int it=0;it<n_steps;it++)
+    {
+        for(int io=0;io<2;io++) // first input buffers (io=0) then output buffers (io=1)
+        {
+            iBuffer = (this->iCurrentBuffer+io)%2;
+            for(int ic=0;ic<NC;ic++)
+            {
+                // a_in, b_in, ... a_out, b_out ...
+                ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[iBuffer][ic]);
+                throwOnError(ret,"OpenCL_RD::Update2Steps : clSetKernelArg failed: ");
+            }
+        }
+        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
+        throwOnError(ret,"OpenCL_RD::Update2Steps : clEnqueueNDRangeKernel failed: ");
+        this->iCurrentBuffer = 1 - this->iCurrentBuffer;
+    }
+    this->timesteps_taken += n_steps;
+
+    // read from opencl buffers into our image
+    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+    for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
+    {
+        float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
+        cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
+        throwOnError(ret,"OpenCL_RD::ReadFromBuffers : buffer reading failed: ");
+        this->images[ic]->Modified();
+    }
 }
