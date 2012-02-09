@@ -331,14 +331,14 @@ void InfoPanel::Update(const BaseRD* const system)
     contents += AppendRow(_("Rule name"), s);
     s = wxString(system->GetRuleDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(_("Rule description"), s);
+    contents += AppendRow(_("Rule info"), s);
     s = wxString(system->GetPatternDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(_("Pattern description"), s);
+    contents += AppendRow(_("Pattern info"), s);
 
     if(system->HasEditableNumberOfChemicals())
     {
-        contents += AppendRow(_("Number of chemicals"), wxString::Format(_T("%d"),system->GetNumberOfChemicals()));
+        contents += AppendRow(_("# of chemicals"), wxString::Format(_T("%d"),system->GetNumberOfChemicals()));
     }
     // TODO!!! we might want to show the number of chemicals but not allow editing (e.g. inbuilt rules)
     
@@ -396,7 +396,7 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value)
         result += _("<tr>");
     rownum++;
 
-    result += _("<td width=3></td><td valign=top width=\"30%\"><b>");
+    result += _("<td width=3></td><td valign=top width=\"22%\"><b>");
     result += label;
     result += _("</b></td><td valign=top>");
     result += value;
