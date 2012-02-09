@@ -66,6 +66,14 @@ class BaseRD
         virtual void TestFormula(std::string program_string) {}
         virtual void SetFormula(std::string s);
 
+        virtual bool HasEditableBlockSize() const { return false; }
+        virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
+        virtual int GetBlockSizeY() const { return 1; }
+        virtual int GetBlockSizeZ() const { return 1; }
+        virtual void SetBlockSizeX(int n) {}
+        virtual void SetBlockSizeY(int n) {}
+        virtual void SetBlockSizeZ(int n) {}
+
         virtual void Allocate(int x,int y,int z,int nc);
 
         std::string GetRuleName() const;

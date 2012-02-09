@@ -29,9 +29,13 @@ class OpenCL_FullKernel : public OpenCL_RD
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
+        virtual bool HasEditableBlockSize() const { return true; }
         virtual int GetBlockSizeX() const { return this->block_size[0]; }
         virtual int GetBlockSizeY() const { return this->block_size[1]; }
         virtual int GetBlockSizeZ() const { return this->block_size[2]; }
+        virtual void SetBlockSizeX(int n) { this->block_size[0]=n; }
+        virtual void SetBlockSizeY(int n) { this->block_size[1]=n; }
+        virtual void SetBlockSizeZ(int n) { this->block_size[2]=n; }
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
         
