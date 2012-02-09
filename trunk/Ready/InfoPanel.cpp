@@ -357,8 +357,16 @@ void InfoPanel::Update(const BaseRD* const system)
     if(system->HasEditableFormula())
     {
         wxString formula = system->GetFormula();
-        // force linebreak after each ';' (except last)
-        formula.Replace(wxT(";\n"), wxT(";<br>"));
+        // escape special characters
+        formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
+        formula.Replace(wxT("<"), wxT("&lt;"));
+        formula.Replace(wxT(">"), wxT("&gt;"));
+        // deal with line endings
+        formula.Replace(wxT("\r\n"), wxT("<br>"));
+        formula.Replace(wxT("\n\r"), wxT("<br>"));
+        formula.Replace(wxT("\r"), wxT("<br>"));
+        formula.Replace(wxT("\n"), wxT("<br>"));
+        // add an entry
         contents += AppendRow(_("Formula"), formula);
     }
     // TODO!!! we might want to show the formula but not allow editing (e.g. inbuilt rules)
