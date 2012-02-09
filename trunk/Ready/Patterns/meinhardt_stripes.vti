@@ -17,14 +17,16 @@
         delta_f = 0.0f;
       </formula>
     </rule>
+    
     <pattern_description>
         Meinhardt stripes
     </pattern_description>
+    
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">
       <PointData Scalars="Scalars_">
-        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="6" format="appended" RangeMin="1.8054925877"         RangeMax="1.8110186747"         offset="0"                   />
+        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="6" format="appended" RangeMin="1.8054925877" RangeMax="1.8110186747" offset="0" />
       </PointData>
       <CellData>
       </CellData>
