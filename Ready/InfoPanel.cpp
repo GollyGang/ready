@@ -17,12 +17,14 @@
 
 // local:
 #include "InfoPanel.hpp"
-#include "BaseRD.hpp"
 #include "app.hpp"              // for wxGetApp
 #include "frame.hpp"
 #include "IDs.hpp"
 #include "prefs.hpp"            // for readydir, etc
 #include "wxutils.hpp"          // for Warning, CopyTextToClipboard
+
+// readybase:
+#include "BaseRD.hpp"
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName

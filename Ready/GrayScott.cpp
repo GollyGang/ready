@@ -25,7 +25,6 @@
 
 // STL:
 #include <stdexcept>
-#include <cassert>
 using namespace std;
 
 // VTK:

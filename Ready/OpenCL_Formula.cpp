@@ -20,13 +20,9 @@
 #include "utils.hpp"
 
 // STL:
-#include <cassert>
-#include <stdexcept>
+#include <string>
+#include <sstream>
 using namespace std;
-
-// VTK:
-#include <vtkImageData.h>
-#include <vtkXMLDataElement.h>
 
 OpenCL_Formula::OpenCL_Formula()
 {

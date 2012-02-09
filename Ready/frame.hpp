@@ -29,12 +29,12 @@
 class PatternsPanel;
 class InfoPanel;
 class HelpPanel;
-
-// STL:
-#include <vector>
-
 class wxVTKRenderWindowInteractor;
+
+// readybase
 class BaseRD;
+
+// VTK:
 class vtkImageData;
 
 class MyFrame : public wxFrame

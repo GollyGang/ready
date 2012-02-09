@@ -16,19 +16,19 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "app.hpp"              // for wxGetApp
 #include "frame.hpp"
+#include "app.hpp"              // for wxGetApp
 #include "vtk_pipeline.hpp"
-#include "utils.hpp"
 #include "wxutils.hpp"
 #include "prefs.hpp"            // for GetPrefs, SavePrefs, etc
-#include "IO_XML.hpp"
 #include "PatternsPanel.hpp"
 #include "InfoPanel.hpp"
 #include "HelpPanel.hpp"
 #include "IDs.hpp"
 
 // readybase:
+#include "utils.hpp"
+#include "IO_XML.hpp"
 #include "GrayScott.hpp"
 #include "OpenCL_Formula.hpp"
 #include "OpenCL_FullKernel.hpp"

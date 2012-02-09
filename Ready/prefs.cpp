@@ -15,21 +15,22 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// wxWidgets:
 #include "wx/wxprec.h"           // for compilers that support precompilation
 #ifndef WX_PRECOMP
-#include "wx/wx.h"               // for all others include the necessary headers
+  #include "wx/wx.h"               // for all others include the necessary headers
 #endif
-
-#include "wx/stdpaths.h"         // for wxStandardPaths
-#include "wx/filename.h"         // for wxFileName
-#include "wx/propdlg.h"          // for wxPropertySheetDialog
-#include "wx/bookctrl.h"         // for wxBookCtrlBase
-#include "wx/notebook.h"         // for wxNotebookEvent
-#include "wx/spinctrl.h"         // for wxSpinCtrl
+#include <wx/stdpaths.h>         // for wxStandardPaths
+#include <wx/filename.h>         // for wxFileName
+#include <wx/propdlg.h>          // for wxPropertySheetDialog
+#include <wx/bookctrl.h>         // for wxBookCtrlBase
+#include <wx/notebook.h>         // for wxNotebookEvent
+#include <wx/spinctrl.h>         // for wxSpinCtrl
 #if wxUSE_TOOLTIPS
-    #include "wx/tooltip.h"      // for wxToolTip
+    #include <wx/tooltip.h>      // for wxToolTip
 #endif
 
+// local:
 #include "IDs.hpp"               // for MAX_RECENT, etc
 #include "app.hpp"               // for wxGetApp
 #include "frame.hpp"             // for MyFrame

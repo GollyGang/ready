@@ -20,13 +20,8 @@
 #include "utils.hpp"
 
 // STL:
-#include <cassert>
-#include <stdexcept>
+#include <string>
 using namespace std;
-
-// VTK:
-#include <vtkImageData.h>
-#include <vtkXMLDataElement.h>
 
 OpenCL_FullKernel::OpenCL_FullKernel()
 {
@@ -38,7 +33,7 @@ OpenCL_FullKernel::OpenCL_FullKernel()
     this->SetTimestep(1.0f);
 }
 
-std::string OpenCL_FullKernel::AssembleKernelSourceFromFormula(std::string formula) const
+string OpenCL_FullKernel::AssembleKernelSourceFromFormula(std::string formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }

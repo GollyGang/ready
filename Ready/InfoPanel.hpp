@@ -25,9 +25,11 @@
 #endif
 
 // local:
-class BaseRD;
 class MyFrame;
 class HtmlInfo;
+
+// readybase:
+class BaseRD;
 
 // this panel allows the user to change the parameters of an RD system
 // (it doesn't change the BaseRD itself though, MyFrame does that)
