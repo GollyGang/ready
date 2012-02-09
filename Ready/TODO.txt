@@ -4,11 +4,11 @@ before 0.2 release:
   heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
 - control over size of world, running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
-- allow user to add/remove parameters (for formula implementations)
+- allow user to add/remove parameters
 - add a simple introduction-to-RD help page
-- allow user to change the number of chemicals (for formula implementations)
+- allow user to change the number of chemicals (where HasEditableNumberOfChemicals)
+- allow user to change the block size (where HasEditableBlockSize)
 - bug: step takes 2 steps, run takes even number of steps
-- bug: timestep not used in full-kernel rules, block_size not read from XML
 
 Andrew's tasks for 0.2:
 - fix bug: tool tips not appearing (Mac app only)
