@@ -155,14 +155,9 @@ std::string BaseRD::GetRuleName() const
     return this->rule_name;
 }
 
-std::string BaseRD::GetRuleDescription() const
+std::string BaseRD::GetDescription() const
 {
-    return this->rule_description;
-}
-
-std::string BaseRD::GetPatternDescription() const
-{
-    return this->pattern_description;
+    return this->description;
 }
 
 void BaseRD::SetRuleName(std::string s)
@@ -171,15 +166,9 @@ void BaseRD::SetRuleName(std::string s)
     this->is_modified = true;
 }
 
-void BaseRD::SetRuleDescription(std::string s)
+void BaseRD::SetDescription(std::string s)
 {
-    this->rule_description = s;
-    this->is_modified = true;
-}
-
-void BaseRD::SetPatternDescription(std::string s)
-{
-    this->pattern_description = s;
+    this->description = s;
     this->is_modified = true;
 }
 
@@ -325,11 +314,6 @@ void BaseRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
     read_required_attribute(rule,"name",str);
     this->SetRuleName(str);
 
-    // rule_description:
-    vtkSmartPointer<vtkXMLDataElement> xml_rule_description = rule->FindNestedElementWithName("description");
-    if(!xml_rule_description) this->SetRuleDescription(""); // optional, default is empty string
-    else this->SetRuleDescription(trim_multiline_string(xml_rule_description->GetCharacterData()));
-
     // parameters:
     this->DeleteAllParameters();
     for(int i=0;i<rule->GetNumberOfNestedElements();i++)
@@ -345,10 +329,10 @@ void BaseRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
         this->AddParameter(name,f);
     }
 
-    // pattern_description:
-    vtkSmartPointer<vtkXMLDataElement> xml_pattern_description = rd->FindNestedElementWithName("pattern_description");
-    if(!xml_pattern_description) this->SetPatternDescription(""); // optional, default is empty string
-    else this->SetPatternDescription(trim_multiline_string(xml_pattern_description->GetCharacterData()));
+    // description:
+    vtkSmartPointer<vtkXMLDataElement> xml_description = rd->FindNestedElementWithName("description");
+    if(!xml_description) this->SetDescription(""); // optional, default is empty string
+    else this->SetDescription(trim_multiline_string(xml_description->GetCharacterData()));
 
     // initial_pattern_generator:
     this->ClearInitialPatternGenerator();
@@ -372,16 +356,6 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
     rule->SetName("rule");
     rule->SetAttribute("name",this->GetRuleName().c_str());
 
-    // rule description
-    vtkSmartPointer<vtkXMLDataElement> rule_description = vtkSmartPointer<vtkXMLDataElement>::New();
-    rule_description->SetName("description");
-    {
-        ostringstream oss;
-        vtkXMLUtilities::EncodeString(this->GetRuleDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
-        rule_description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
-    }
-    rule->AddNestedElement(rule_description);
-
     // parameters
     for(int i=0;i<this->GetNumberOfParameters();i++)
     {
@@ -395,15 +369,15 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
 
     rd->AddNestedElement(rule);
 
-    // pattern description
-    vtkSmartPointer<vtkXMLDataElement> pattern_description = vtkSmartPointer<vtkXMLDataElement>::New();
-    pattern_description->SetName("pattern_description");
+    // description
+    vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
+    description->SetName("description");
     {
         ostringstream oss;
-        vtkXMLUtilities::EncodeString(this->GetPatternDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
-        pattern_description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+        vtkXMLUtilities::EncodeString(this->GetDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+        description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
     }
-    rd->AddNestedElement(pattern_description);
+    rd->AddNestedElement(description);
 
     // initial pattern generator
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();

@@ -2,10 +2,12 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
 
   <RD format_version="1">
+      
+    <description>
+        Blah blah blah.
+    </description>
+    
     <rule type="inbuilt" name="Gray-Scott">
-      <description>
-        This formula was blah blah blah.
-      </description>
       <param name="timestep">1.0</param>
       <param name="D_a">
         0.082
@@ -20,9 +22,7 @@
         0.035
       </param>
     </rule>
-    <pattern_description>
-      This pattern shows blah blah blah.
-    </pattern_description>
+
     <initial_pattern_generator apply_when_loading="1">
         <overlay chemical="a">
             <overwrite />

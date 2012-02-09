@@ -1412,16 +1412,9 @@ void MyFrame::SetRuleName(string s)
     this->UpdateInfoPane();
 }
 
-void MyFrame::SetRuleDescription(string s)
+void MyFrame::SetDescription(string s)
 {
-    this->system->SetRuleDescription(s);
-    this->UpdateWindowTitle();
-    this->UpdateInfoPane();
-}
-
-void MyFrame::SetPatternDescription(string s)
-{
-    this->system->SetPatternDescription(s);
+    this->system->SetDescription(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
 }
