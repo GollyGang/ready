@@ -31,7 +31,8 @@
             const int i_sw =  X*(Y*z + yp1) + xm1;
             const int i_se = X*(Y*z + yp1) + xp1;
 
-            float n = a_in[i_n]+a_in[i_ne]+a_in[i_e]+a_in[i_se]+a_in[i_s]+a_in[i_sw]+a_in[i_w]+a_in[i_nw];
+            float n = a_in[i_n] + a_in[i_ne] + a_in[i_e] + a_in[i_se]
+                    + a_in[i_s] + a_in[i_sw] + a_in[i_w] + a_in[i_nw];
             if(a_in[i_here]&lt;0.5f) {
                 if(n&gt;2.5f &amp;&amp; n&lt;3.5f) a_out[i_here]=1.0f; // B3
                 else a_out[i_here]=0.0f;
