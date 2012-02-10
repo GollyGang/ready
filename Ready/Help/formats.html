@@ -14,13 +14,13 @@ The only file format currently supported by Ready is an extended version of <a h
 <pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
 &lt;VTKFile type=&quot;ImageData&quot; version=&quot;0.1&quot; byte_order=&quot;LittleEndian&quot; compressor=&quot;vtkZLibDataCompressor&quot;&gt;
 
-  &lt;RD format_version=&quot;1&quot;&gt;
+  &lt;<a href="#RD">RD</a> format_version=&quot;1&quot;&gt;
   
-    &lt;rule type=&quot;formula&quot; name=&quot;Schlogl&quot;&gt;
+    &lt;<a href="#rule">rule</a> type=&quot;formula&quot; name=&quot;Schlogl&quot;&gt;
     
-      &lt;param name=&quot;timestep&quot;&gt;  0.1  &lt;/param&gt;
+      &lt;<a href="#param">param</a> name=&quot;timestep&quot;&gt;  0.1  &lt;/param&gt;
       
-      &lt;formula number_of_chemicals=&quot;1&quot;&gt;
+      &lt;<a href="#formula">formula</a> number_of_chemicals=&quot;1&quot;&gt;
       
         delta_a = laplacian_a + a - a*a*a;
         
@@ -46,9 +46,9 @@ The only file format currently supported by Ready is an extended version of <a h
 </tt></pre>
 
 <p>
-This is the standard VTK format but with an <tt>RD</tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
+This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
 
-<h4>The <tt>&lt;RD&gt;</tt> element</h4>
+<h4><a name="RD"></a>The <tt>&lt;RD&gt;</tt> element</h4>
 <p>
 Specifies the current rule and information about the pattern. 
 <p><b>Attributes:</b>
@@ -57,18 +57,18 @@ Specifies the current rule and information about the pattern.
 </ul>
 <b>Nested elements:</b>
 <ul>
-<li><tt>&lt;description&gt;</tt> (optional)
-<li><tt>&lt;rule&gt;</tt> (required)
-<li><tt>&lt;initial_pattern_generator&gt;</tt> (optional)
+<li><tt><a href="#description">&lt;description&gt;</a></tt> (optional)
+<li><tt><a href="#rule">&lt;rule&gt;</a></tt> (required)
+<li><tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt> (optional)
 </ul>
 
-<h4>The <tt>&lt;description&gt;</tt> element</h4>
+<h4><a name="description"></a>The <tt>&lt;description&gt;</tt> element</h4>
 <p>
 A description of the pattern.
 <p><b>Attributes:</b> None.
 <p><b>Nested elements:</b> Plain text.
 
-<h4>The <tt>&lt;rule&gt;</tt> element</h4>
+<h4><a name="rule"></a>The <tt>&lt;rule&gt;</tt> element</h4>
 <p>
 <b>Attributes:</b>
 <ul><li><tt>type</tt> (required) : "inbuilt" or "formula" or "kernel"
@@ -76,12 +76,12 @@ A description of the pattern.
 </ul>
 <b>Nested elements:</b>
 <ul>
-<li><tt>&lt;param&gt;</tt> (multiple, optional)
-<li><tt>&lt;formula&gt;</tt> (required if rule type="inbuilt")
-<li><tt>&lt;kernel&gt;</tt> (required if rule type="kernel")
+<li><tt><a href="#param">&lt;param&gt;</a></tt> (multiple, optional)
+<li><tt><a href="#formula">&lt;formula&gt;</a></tt> (required if rule type="inbuilt")
+<li><tt><a href="#kernel">&lt;kernel&gt;</a></tt> (required if rule type="kernel")
 </ul>
 
-<h4>The <tt>&lt;param&gt;</tt> element</h4>
+<h4><a name="param"></a>The <tt>&lt;param&gt;</tt> element</h4>
 <p>
 A parameter of the rule. Most rules require one or more named parameters, such as <tt>timestep</tt>.
 <p>
@@ -90,7 +90,7 @@ A parameter of the rule. Most rules require one or more named parameters, such a
 </ul>
 <b>Nested elements:</b> The value of this parameter.
 
-<h4>The <tt>&lt;formula&gt;</tt> element</h4>
+<h4><a name="formula"></a>The <tt>&lt;formula&gt;</tt> element</h4>
 
 <p><b>Attributes:</b>
 <ul>
@@ -99,7 +99,7 @@ A parameter of the rule. Most rules require one or more named parameters, such a
 <p><b>Nested elements:</b> The formula. An OpenCL kernel snippet, where the chemicals are named a, b, c, etc. 
 The formula specifies the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.)
 
-<h4>The <tt>&lt;kernel&gt;</tt> element</h4>
+<h4><a name="kernel"></a>The <tt>&lt;kernel&gt;</tt> element</h4>
 
 <p><b>Attributes:</b>
 <ul>
@@ -111,7 +111,7 @@ E.g. for float4 we typically use a block size of 4x1x1. For kernels that process
 </ul>
 <p><b>Nested elements:</b> A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules.
 
-<h4>The <tt>&lt;initial_pattern_generator&gt;</tt> element</h4>
+<h4><a name="initial_pattern_generator"></a>The <tt>&lt;initial_pattern_generator&gt;</tt> element</h4>
 
 The initial pattern generator is a way to describe typical reaction-diffusion starting conditions. The Schlogl rule, for example, can be initialized with low-amplitude random noise.
 <p><b>Attributes:</b>
@@ -120,10 +120,10 @@ The initial pattern generator is a way to describe typical reaction-diffusion st
 </ul>
 <p><b>Nested elements:</b>
 <ul>
-<li><tt>overlay</tt> (multiple)
+<li><tt><a href="#overlay">overlay</a></tt> (multiple)
 </ul>
 
-<h4>The <tt>&lt;overlay&gt;</tt> element</h4>
+<h4><a name="overlay"></a>The <tt>&lt;overlay&gt;</tt> element</h4>
 
 Each overlay changes the values of a single chemical across the image. Overlays apply in the order given in the file, from a starting point where every chemical is zero.
 <p><b>Attributes:</b>
@@ -132,32 +132,32 @@ Each overlay changes the values of a single chemical across the image. Overlays 
 </ul>
 <p><b>Nested elements:</b>
 <ol>
-<li>operation (required) : one of <tt>overwrite</tt>, <tt>add</tt>, <tt>subtract</tt> or <tt>multiply</tt>.
-<li>fill (required) : one of <tt>constant</tt>, <tt>white_noise</tt>, <tt>other_chemical</tt> or <tt>parameter</tt>.
-<li>shape (required) : one of <tt>everywhere</tt> or <tt>rectangle</tt>.
+<li>operation (required) : one of <tt><a href="#overwrite">overwrite</a></tt>, <tt><a href="#add">add</a></tt>, <tt><a href="#subtract">subtract</a></tt> or <tt><a href="#multiply">multiply</a></tt>.
+<li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
+<li>shape (required) : one of <tt><a href="#everywhere">everywhere</a></tt> or <tt><a href="#rectangle">rectangle</a></tt>.
 </ol>
 
-<h4>The <tt>&lt;overwrite&gt;</tt> element</h4>
+<h4><a name="overwrite"></a>The <tt>&lt;overwrite&gt;</tt> element</h4>
 Specifies that this overlay should overwrite any existing values in the image.
 <p><b>Attributes:</b> None
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;add&gt;</tt> element</h4>
+<h4><a name="add"></a>The <tt>&lt;add&gt;</tt> element</h4>
 Specifies that this overlay should add to the existing values in the image.
 <p><b>Attributes:</b> None
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;subtract&gt;</tt> element</h4>
+<h4><a name="subtract"></a>The <tt>&lt;subtract&gt;</tt> element</h4>
 Specifies that this overlay should subtract from the existing values in the image.
 <p><b>Attributes:</b> None
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;multiply&gt;</tt> element</h4>
+<h4><a name="multiply"></a>The <tt>&lt;multiply&gt;</tt> element</h4>
 Specifies that this overlay should multiply the existing values in the image.
 <p><b>Attributes:</b> None
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;constant&gt;</tt> element</h4>
+<h4><a name="constant"></a>The <tt>&lt;constant&gt;</tt> element</h4>
 Specifies that the values in this overlay are constant.
 <p><b>Attributes:</b>
 <ul>
@@ -165,7 +165,7 @@ Specifies that the values in this overlay are constant.
 </ul>
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;white_noise&gt;</tt> element</h4>
+<h4><a name="white_noise"></a>The <tt>&lt;white_noise&gt;</tt> element</h4>
 Specifies that the values in this overlay are spatially-uncorrelated random values from a flat distribution between low and high.
 <p><b>Attributes:</b>
 <ul>
@@ -174,7 +174,7 @@ Specifies that the values in this overlay are spatially-uncorrelated random valu
 </ul>
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;other_chemical&gt;</tt> element</h4>
+<h4><a name="other_chemical"></a>The <tt>&lt;other_chemical&gt;</tt> element</h4>
 Specifies that the values in this overlay are given by the current value of a different chemical.
 <p><b>Attributes:</b>
 <ul>
@@ -182,7 +182,7 @@ Specifies that the values in this overlay are given by the current value of a di
 </ul>
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;parameter&gt;</tt> element</h4>
+<h4><a name="parameter"></a>The <tt>&lt;parameter&gt;</tt> element</h4>
 Specifies that the values in this overlay are given by the current value of a named parameter.
 <p><b>Attributes:</b>
 <ul>
@@ -190,21 +190,21 @@ Specifies that the values in this overlay are given by the current value of a na
 </ul>
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;everywhere&gt;</tt> element</h4>
+<h4><a name="everywhere"></a>The <tt>&lt;everywhere&gt;</tt> element</h4>
 Specifies that the overlay applies everywhere in the image.
 <p><b>Attributes:</b> None
 <p><b>Nested elements:</b> None
 
-<h4>The <tt>&lt;rectangle&gt;</tt> element</h4>
+<h4><a name="rectangle"></a>The <tt>&lt;rectangle&gt;</tt> element</h4>
 Specifies that the overlay applies to a rectangle in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p><b>Attributes:</b> None
 <p><b>Nested elements:</b>
 <ul>
-<li><tt>Point3D</tt> (required) : the first corner of the rectangle
-<li><tt>Point3D</tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
+<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the first corner of the rectangle
+<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
 </ul>
 
-<h4>The <tt>&lt;Point3D&gt;</tt> element</h4>
+<h4><a name="Point3D"></a>The <tt>&lt;Point3D&gt;</tt> element</h4>
 
 A location in space. Coordinates are in the range from zero to one and are given as a proportion of the image size.
 <p><b>Attributes:</b>
@@ -214,9 +214,6 @@ A location in space. Coordinates are in the range from zero to one and are given
 <li><tt>z</tt> (required) : the z-coordinate
 </ul>
 <p><b>Nested elements:</b> None
-
-</ul>
-</ul>
 
 </body>
 </html>
