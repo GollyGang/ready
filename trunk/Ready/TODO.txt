@@ -8,7 +8,6 @@ before 0.2 release:
 - add a simple introduction-to-RD help page
 - allow user to change the number of chemicals (where HasEditableNumberOfChemicals)
 - allow user to change the block size (where HasEditableBlockSize)
-- bug: should only trim leading whitespace in multi-line strings where shared by all lines
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
