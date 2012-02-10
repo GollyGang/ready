@@ -103,26 +103,34 @@ int IndexFromChemicalName(const string& s)
 // read a multiline string, strip leading whitespace where shared by all lines
 string trim_multiline_string(const char* s)
 {
-    return string(s);
-    /* TODO: maybe use something like this when we've worked out all the issues
     vector<string> vs;
     istringstream iss(s);
     string item;
-    int minLeadingWhitespace = INT_MAX;
+    int minLeadingWhitespace = INT_MAX,tailtrim = 0;
     while(getline(iss, item, '\n'))
     {
-        vs.push_back(item);
         int leadingWhitespace = (int)item.find_first_not_of(" \t");
         if(leadingWhitespace!=string::npos)
+        {
             minLeadingWhitespace = min(minLeadingWhitespace,leadingWhitespace);
+            vs.push_back(item);
+            tailtrim=0;
+        }
+        else
+        {
+            if(!vs.empty()) 
+                vs.push_back("\n");
+            // (lines with all-whitespace don't contribute to minLeadingWhitespace)
+            tailtrim++;
+        }
     }
     ostringstream oss;
-    for(int i=0;i<(int)vs.size();i++)
+    for(int i=0;i<(int)vs.size()-tailtrim;i++)
     {
         if(minLeadingWhitespace<vs[i].size())
-            oss << vs[i].substr(minLeadingWhitespace) << "\n";
-        else
+            oss << vs[i].substr(minLeadingWhitespace);
+        if(i<(int)vs.size()-tailtrim-1)
             oss << "\n";
     }
-    return oss.str();*/
+    return oss.str();
 }

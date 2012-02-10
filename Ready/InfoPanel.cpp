@@ -354,7 +354,7 @@ void InfoPanel::Update(const BaseRD* const system)
     if(system->HasEditableFormula())
     {
         wxString formula = system->GetFormula();
-        // escape special characters
+        // escape HTML reserved characters
         formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
         formula.Replace(wxT("<"), wxT("&lt;"));
         formula.Replace(wxT(">"), wxT("&gt;"));
@@ -363,7 +363,11 @@ void InfoPanel::Update(const BaseRD* const system)
         formula.Replace(wxT("\n\r"), wxT("<br>"));
         formula.Replace(wxT("\r"), wxT("<br>"));
         formula.Replace(wxT("\n"), wxT("<br>"));
-        // add an entry
+        // convert whitespace to &nbsp; so we can use the <code> block
+        formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
+        // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
+        //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
+        formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
         contents += AppendRow(_("Formula"), formula);
     }
     // TODO!!! we might want to show the formula but not allow editing (e.g. inbuilt rules)
