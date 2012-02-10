@@ -65,7 +65,8 @@ Specifies the current rule and information about the pattern.
 <h4><a name="description"></a>The <tt>&lt;description&gt;</tt> element</h4>
 <p>
 A description of the pattern.
-<p><b>Contains:</b> Plain text.
+<p><b>Contains:</b>
+<p>Plain text.
 
 <h4><a name="rule"></a>The <tt>&lt;rule&gt;</tt> element</h4>
 <p>
@@ -87,7 +88,8 @@ A parameter of the rule. Most rules require one or more named parameters, such a
 <b>Attributes:</b>
 <ul><li><tt>name</tt> (required) : The name of this parameter.
 </ul>
-<b>Contains:</b> The value of this parameter.
+<b>Contains:</b>
+<p>The value of this parameter.
 
 <h4><a name="formula"></a>The <tt>&lt;formula&gt;</tt> element</h4>
 
@@ -95,7 +97,8 @@ A parameter of the rule. Most rules require one or more named parameters, such a
 <ul>
 <li><tt>number_of_chemicals</tt> (required) : The number of chemicals used.
 </ul>
-<p><b>Contains:</b> An OpenCL kernel snippet, where the chemicals are named a, b, c, etc. 
+<p><b>Contains:</b>
+<p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc. 
 The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.)
 
 <h4><a name="kernel"></a>The <tt>&lt;kernel&gt;</tt> element</h4>
@@ -108,7 +111,8 @@ E.g. for float4 we typically use a block size of 4x1x1. For kernels that process
 <li><tt>block_size_y</tt> (required) : The y component.
 <li><tt>block_size_z</tt> (required) : The z component.
 </ul>
-<p><b>Contains:</b> A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules.
+<p><b>Contains:</b>
+<p>A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules.
 
 <h4><a name="initial_pattern_generator"></a>The <tt>&lt;initial_pattern_generator&gt;</tt> element</h4>
 
