@@ -324,6 +324,8 @@ void MyFrame::InitializeToolbars()
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
+        this->action_toolbar->AddTool(ID::Step,wxEmptyString,wxArtProvider::GetBitmap(wxART_PLUS,wxART_TOOLBAR),
+            _("Step"));
         this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),
             _("Start running the simulation"));
         this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
