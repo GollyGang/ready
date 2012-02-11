@@ -60,7 +60,8 @@ class MyFrame : public wxFrame
         // interface with Preferences dialog
         void ShowPrefsDialog(const wxString& page = wxEmptyString);
         void UpdateMenuAccelerators();
-        
+        void EnableAllMenus(bool enable);
+
         // handle keyboard shortcuts not appearing in menu items
         void OnKeyDown(wxKeyEvent& event);
         void OnChar(wxKeyEvent& event);

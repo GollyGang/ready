@@ -355,12 +355,6 @@ void InfoPanel::Update(const BaseRD* const system)
     {
         contents += AppendRow(system->GetParameterName(iParam),
                               FormatFloat(system->GetParameterValue(iParam)), true);
-        if(system->HasEditableFormula()) {
-            //!!! need nice way to let user change parameter name
-            // maybe just bring up a dialog containing 2 edit boxes (for name and value)???
-        } else {
-            // don't allow name editing for inbuilt rules
-        }
     }
 
     if(system->HasEditableFormula())
@@ -445,7 +439,21 @@ wxString InfoPanel::FormatFloat(const float& f)
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
-    Warning(_("TODO!!!"));
+    BaseRD* sys = frame->GetCurrentRDSystem();
+    int iParam = 0;
+    while (iParam < (int)sys->GetNumberOfParameters()) {
+        if (parameter == sys->GetParameterName(iParam)) break;
+        iParam++;
+    }
+    if (iParam == (int)sys->GetNumberOfParameters()) {
+        Warning(_("Bug in ChangeParameter! Unknown parameter: ") + parameter);
+        return;
+    }
+
+    // TODO!!! create a dialog for editing parameter name and/or value, but
+    // only allow name editing if frame->GetCurrentRDSystem()->HasEditableFormula()
+
+    Warning(_("TODO!!! change this parameter: ") + parameter);
 }
 
 // -----------------------------------------------------------------------------
