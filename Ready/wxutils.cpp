@@ -87,7 +87,8 @@ class StringDialog : public wxDialog
 {
 public:
     StringDialog(wxWindow* parent, const wxString& title,
-                     const wxString& prompt, const wxString& instring);
+                 const wxString& prompt, const wxString& instring,
+                 const wxPoint& pos, const wxSize& size);
 
     virtual bool TransferDataFromWindow();     // called when user hits OK
 
@@ -101,9 +102,10 @@ private:
 // -----------------------------------------------------------------------------
 
 StringDialog::StringDialog(wxWindow* parent, const wxString& title,
-                           const wxString& prompt, const wxString& instring)
+                           const wxString& prompt, const wxString& instring,
+                           const wxPoint& pos, const wxSize& size)
 {
-    Create(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
+    Create(parent, wxID_ANY, title, pos, size);
 
     // create the controls
     wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
@@ -133,7 +135,9 @@ StringDialog::StringDialog(wxWindow* parent, const wxString& title,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    Centre();
+    
+    if (pos == wxDefaultPosition) Centre();
+    if (size != wxDefaultSize) SetSize(size);
 
     // select initial string (must do this last on Windows)
     textbox->SetFocus();
@@ -151,9 +155,10 @@ bool StringDialog::TransferDataFromWindow()
 // -----------------------------------------------------------------------------
 
 bool GetString(const wxString& title, const wxString& prompt,
-               const wxString& instring, wxString& outstring)
+               const wxString& instring, wxString& outstring,
+               const wxPoint& pos, const wxSize& size)
 {
-    StringDialog dialog(wxGetApp().GetTopWindow(), title, prompt, instring);
+    StringDialog dialog(wxGetApp().GetTopWindow(), title, prompt, instring, pos, size);
     if ( dialog.ShowModal() == wxID_OK ) {
         outstring = dialog.GetValue();
         return true;

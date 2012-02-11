@@ -42,6 +42,9 @@ class InfoPanel : public wxPanel
         // update the displayed info to reflect the state of the RD system
         void Update(const BaseRD* const system);
         
+        // bring up a suitable dialog for changing the given setting
+        void ChangeInfo(const wxString& label);
+
         // update buttons at top of panel
         void UpdateButtons();
         
@@ -66,13 +69,22 @@ class InfoPanel : public wxPanel
    
         wxStaticText* status;   // for link info
         
+        // helper routines for building HTML info
+        wxString AppendRow(const wxString& label, const wxString& value, bool is_parameter = false);
+        wxString FormatFloat(const float& f);
+
+        // routines for making changes
+        void ChangeParameter(const wxString& parameter);
+        void ChangeRuleName();
+        void ChangeDescription();
+        void ChangeNumChemicals();
+        void ChangeFormula();
+        void ChangeDimensions();
+        void ChangeBlockSize();
+        
         // event handlers
         void OnSmallerButton(wxCommandEvent& event);
         void OnBiggerButton(wxCommandEvent& event);
-        
-        // helper routines for building HTML info
-        wxString AppendRow(const wxString& label, const wxString& value);
-        wxString FormatFloat(const float& f);
 
         DECLARE_EVENT_TABLE()
 };
