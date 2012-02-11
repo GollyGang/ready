@@ -41,7 +41,9 @@ void Beep();
 // Play beep sound, depending on preference setting.
 
 bool GetString(const wxString& title, const wxString& prompt,
-               const wxString& instring, wxString& outstring);
+               const wxString& instring, wxString& outstring,
+               const wxPoint& pos = wxDefaultPosition,
+               const wxSize& size = wxDefaultSize);
 // Display a dialog box to get a string from the user.
 // Returns false if user hits Cancel button.
 

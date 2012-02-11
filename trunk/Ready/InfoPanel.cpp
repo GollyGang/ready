@@ -30,13 +30,26 @@
 #include <wx/filename.h>        // for wxFileName
 #include <wx/html/htmlwin.h>    // for wxHtmlWindow
 
+// STL:
+#include <string>
+using namespace std;
+
 #if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
     // wxMOD_CONTROL has been changed to mean Command key down
     #define wxMOD_CONTROL wxMOD_RAW_CONTROL
     #define ControlDown RawControlDown
 #endif
 
-const wxString change_prefix = wxT("change: ");
+const wxString change_prefix = wxT("change: ");         // must end with space
+const wxString parameter_prefix = wxT("parameter ");    // ditto
+
+// labels in 1st column
+const wxString rule_name_label = wxT("Rule name");
+const wxString description_label = wxT("Description");
+const wxString num_chemicals_label = wxT("# of chemicals");
+const wxString formula_label = wxT("Formula");
+const wxString dimensions_label = wxT("Dimensions");
+const wxString block_size_label = wxT("Block size");
 
 // -----------------------------------------------------------------------------
 
@@ -66,6 +79,8 @@ class HtmlInfo : public wxHtmlWindow
         void SetFontSizes(int size);
         void ChangeFontSizes(int size);
 
+        wxRect linkrect;     // rect for cell containing link
+
     private:
 
         void OnSize(wxSizeEvent& event);
@@ -77,7 +92,6 @@ class HtmlInfo : public wxHtmlWindow
         InfoPanel* panel;
         
         bool editlink;       // open clicked file in editor?
-        wxRect linkrect;     // rect for cell containing link
 
         DECLARE_EVENT_TABLE()
 };
@@ -113,13 +127,11 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
     #endif
 
     } else if ( url.StartsWith(change_prefix) ) {
-        Warning(_("Not yet implemented!!!"));
-        //!!! panel->ChangeInfo( url.AfterFirst(' ') );
-        
+        panel->ChangeInfo( url.AfterFirst(' ') );
         // safer to reset focus after dialog closes
         SetFocus();
 
-    } else if ( url.StartsWith(_T("prefs:")) ) {
+    } else if ( url.StartsWith(wxT("prefs:")) ) {
         // user clicked on link to Preferences dialog
         frame->ShowPrefsDialog( url.AfterFirst(':') );
 
@@ -328,21 +340,21 @@ void InfoPanel::Update(const BaseRD* const system)
     rownum = 0;
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(_("Rule name"), s);
+    contents += AppendRow(rule_name_label, s);
     s = wxString(system->GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(_("Description"), s);
+    contents += AppendRow(description_label, s);
 
     if(system->HasEditableNumberOfChemicals())
     {
-        contents += AppendRow(_("# of chemicals"), wxString::Format(_T("%d"),system->GetNumberOfChemicals()));
+        contents += AppendRow(num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()));
     }
     // TODO!!! we might want to show the number of chemicals but not allow editing (e.g. inbuilt rules)
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
         contents += AppendRow(system->GetParameterName(iParam),
-                              FormatFloat(system->GetParameterValue(iParam)));
+                              FormatFloat(system->GetParameterValue(iParam)), true);
         if(system->HasEditableFormula()) {
             //!!! need nice way to let user change parameter name
             // maybe just bring up a dialog containing 2 edit boxes (for name and value)???
@@ -368,17 +380,17 @@ void InfoPanel::Update(const BaseRD* const system)
         // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
-        contents += AppendRow(_("Formula"), formula);
+        contents += AppendRow(formula_label, formula);
     }
     // TODO!!! we might want to show the formula but not allow editing (e.g. inbuilt rules)
 
-    contents += AppendRow(_("Dimensions"), wxString::Format(wxT("XYZ = %d; %d; %d"),
-                                           system->GetX(),system->GetY(),system->GetZ()));
+    contents += AppendRow(dimensions_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
+                                            system->GetX(),system->GetY(),system->GetZ()));
 
     if(system->HasEditableBlockSize())
     {
-        contents += AppendRow(_("Block size"), wxString::Format(wxT("XYZ = %d; %d; %d"),
-                                               system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()));
+        contents += AppendRow(block_size_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
+                                                system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()));
     }
 
     contents += _("</table></body></html>");
@@ -388,7 +400,7 @@ void InfoPanel::Update(const BaseRD* const system)
 
 // -----------------------------------------------------------------------------
 
-wxString InfoPanel::AppendRow(const wxString& label, const wxString& value)
+wxString InfoPanel::AppendRow(const wxString& label, const wxString& value, bool is_parameter)
 {
     wxString result;
     if (rownum & 1)
@@ -405,6 +417,7 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value)
 
     result += _("<td align=right><a href=\"");
     result += change_prefix;
+    if (is_parameter) result += parameter_prefix;
     result += label;
     result += _("\">edit</a></td><td width=3></td>");
     
@@ -426,6 +439,97 @@ wxString InfoPanel::FormatFloat(const float& f)
         result.Truncate(result.Length()-1);
     }
     return result;
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeParameter(const wxString& parameter)
+{
+    Warning(_("Not yet implemented!!!"));
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeRuleName()
+{
+    wxString oldname(frame->GetCurrentRDSystem()->GetRuleName().c_str(),wxConvUTF8);
+    wxString newname;
+    
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    int dlgwd = 300;
+    pos.x -= dlgwd + 20;
+
+    if ( GetString(_("Change rule name"), _("Enter a new rule name:"),
+                   oldname, newname, pos, wxSize(dlgwd,-1)) && newname != oldname )
+    {
+        frame->SetRuleName(string(newname.mb_str()));
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeDescription()
+{
+    Warning(_("Not yet implemented!!!"));
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeNumChemicals()
+{
+    Warning(_("Not yet implemented!!!"));
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeFormula()
+{
+    Warning(_("Not yet implemented!!!"));
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeDimensions()
+{
+    Warning(_("Not yet implemented!!!"));
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeBlockSize()
+{
+    Warning(_("Not yet implemented!!!"));
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeInfo(const wxString& label)
+{
+    if ( label.StartsWith(parameter_prefix) ) {
+        ChangeParameter(label.AfterFirst(' '));
+
+    } else if ( label == rule_name_label ) {
+        ChangeRuleName();
+
+    } else if ( label == description_label ) {
+        ChangeDescription();
+
+    } else if ( label == num_chemicals_label ) {
+        ChangeNumChemicals();
+
+    } else if ( label == formula_label ) {
+        ChangeFormula();
+
+    } else if ( label == dimensions_label ) {
+        ChangeDimensions();
+
+    } else if ( label == block_size_label ) {
+        ChangeBlockSize();
+
+    } else {
+        Warning(_("Bug in ChangeInfo! Unexpected label: ") + label);
+    }
 }
 
 // -----------------------------------------------------------------------------

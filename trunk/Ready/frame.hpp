@@ -50,6 +50,7 @@ class MyFrame : public wxFrame
         bool UserWantsToCancelWhenAskedIfWantsToSave();
 
         // interface with InfoPanel
+        BaseRD* GetCurrentRDSystem() { return system; }
         void SetRuleName(std::string s);
         void SetDescription(std::string s);
         void SetParameter(int iParam,float val);
