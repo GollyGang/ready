@@ -62,7 +62,7 @@ class HtmlView : public wxHtmlWindow
         void SetFontSizes(int size);
         void ChangeFontSizes(int size);
 
-        bool canreload;     // can OnSize call ShowHelp?
+        bool canreload;     // can OnSize call LoadPage?
         bool inAbout;       // in ShowAboutBox?
 
     private:
@@ -206,9 +206,9 @@ void HtmlView::OnMouseDown(wxMouseEvent& event)
 
 // -----------------------------------------------------------------------------
 
-// avoid scroll position being reset to top when wxHtmlWindow is resized
 void HtmlView::OnSize(wxSizeEvent& event)
 {
+    // avoid scroll position being reset to top when wxHtmlWindow is resized
     int x, y;
     GetViewStart(&x, &y);            // save current position
 
@@ -216,7 +216,7 @@ void HtmlView::OnSize(wxSizeEvent& event)
 
     wxString currpage = GetOpenedPage();
     if ( !currpage.IsEmpty() && canreload ) {
-        panel->ShowHelp(currpage);  // reload page
+        LoadPage(currpage);         // reload page
         Scroll(x, y);               // scroll to old position
     }
     
@@ -314,7 +314,7 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     vbox->Add(html, 1, wxEXPAND | wxALIGN_TOP, 0);
     SetSizer(vbox);
          
-    // prevent HtmlView::OnSize calling ShowHelp twice
+    // prevent HtmlView::OnSize calling LoadPage twice
     html->canreload = false;
     ShowHelp(helphome);
     html->canreload = true;
@@ -510,7 +510,7 @@ void ShowAboutBox()
     #endif
     html->LoadPage(readydir + _("Help/about.html"));
     
-    // avoid HtmlView::OnSize calling ShowHelp
+    // avoid HtmlView::OnSize calling LoadPage
     html->canreload = false;
     
     // this call seems to be ignored in wx 2.9.x
