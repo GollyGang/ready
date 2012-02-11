@@ -445,7 +445,7 @@ wxString InfoPanel::FormatFloat(const float& f)
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
-    Warning(_("Not yet implemented!!!"));
+    Warning(_("TODO!!!"));
 }
 
 // -----------------------------------------------------------------------------
@@ -460,10 +460,10 @@ void InfoPanel::ChangeRuleName()
     int dlgwd = 300;
     pos.x -= dlgwd + 20;
 
-    if ( GetString(_("Change rule name"), _("Enter a new rule name:"),
-                   oldname, newname, pos, wxSize(dlgwd,-1)) && newname != oldname )
+    if ( GetString(_("Change rule name"), _("Enter the new rule name:"),
+                   oldname, newname, pos, wxSize(dlgwd,-1)) )
     {
-        frame->SetRuleName(string(newname.mb_str()));
+        if (newname != oldname) frame->SetRuleName(string(newname.mb_str()));
     }
 }
 
@@ -471,35 +471,69 @@ void InfoPanel::ChangeRuleName()
 
 void InfoPanel::ChangeDescription()
 {
-    Warning(_("Not yet implemented!!!"));
+    wxString oldtext(frame->GetCurrentRDSystem()->GetDescription().c_str(),wxConvUTF8);
+    wxString newtext;
+
+    // AKT TODO!!! adding wxRESIZE_BORDER to style flags didn't work
+    // so we might need to implement our own dialog
+    wxTextEntryDialog dialog(frame, _("Enter the new description:"),
+                             _("Change description"), oldtext,
+                             wxOK | wxCANCEL | wxTE_MULTILINE);
+    
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    dialog.SetSize(pos.x - 520, pos.y, 500, 300);
+
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        newtext = dialog.GetValue();
+        if (newtext != oldtext) frame->SetDescription(string(newtext.mb_str()));
+    }
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeNumChemicals()
 {
-    Warning(_("Not yet implemented!!!"));
+    Warning(_("TODO!!!"));
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeFormula()
 {
-    Warning(_("Not yet implemented!!!"));
+    wxString oldcode(frame->GetCurrentRDSystem()->GetFormula().c_str(),wxConvUTF8);
+    wxString newcode;
+
+    // AKT TODO!!! adding wxRESIZE_BORDER to style flags didn't work
+    // so we might need to implement our own dialog
+    wxTextEntryDialog dialog(frame, _("Enter the new formula:"),
+                             _("Change formula"), oldcode,
+                             wxOK | wxCANCEL | wxTE_MULTILINE);
+    
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    dialog.SetSize(pos.x - 520, pos.y, 500, 300);
+
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        newcode = dialog.GetValue();
+        if (newcode != oldcode) frame->SetFormula(string(newcode.mb_str()));
+    }
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeDimensions()
 {
-    Warning(_("Not yet implemented!!!"));
+    Warning(_("TODO!!!"));
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeBlockSize()
 {
-    Warning(_("Not yet implemented!!!"));
+    Warning(_("TODO!!!"));
 }
 
 // -----------------------------------------------------------------------------
