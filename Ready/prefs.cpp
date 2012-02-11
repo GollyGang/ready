@@ -1420,14 +1420,9 @@ void KeyComboCtrl::OnKeyDown(wxKeyEvent& event)
 #endif
 
 #ifdef __WXMAC__
-    // prevent ctrl-[ cancelling dialog (it translates to escape)
-    if (realkey == '[' && (mods & wxMOD_CONTROL)) {
-        OnChar(event);
-        return;
-    }
     // avoid translating option-E/I/N/U/`
     if (mods == wxMOD_ALT && (realkey == 'E' || realkey == 'I' || realkey == 'N' ||
-    realkey == 'U' || realkey == '`')) {
+                              realkey == 'U' || realkey == '`')) {
         OnChar(event);
         return;
     }
@@ -2273,6 +2268,11 @@ bool ChangePrefs(const wxString& page)
             savekeyaction[key][modset] = keyaction[key][modset];
     
     MyFrame* frameptr = wxGetApp().currframe;
+
+    #ifdef __WXMAC__
+        // disable all menu items to ensure KeyComboCtrl::OnKeyDown sees all key combos
+        frameptr->EnableAllMenus(false);
+    #endif
     
     PrefsDialog dialog(frameptr, page);
 
@@ -2286,7 +2286,6 @@ bool ChangePrefs(const wxString& page)
                 if (savekeyaction[key][modset].id != keyaction[key][modset].id) {
                     // first update accelerator array
                     UpdateAcceleratorStrings();
-                    frameptr->UpdateMenuAccelerators();
                     goto done;
                 }
         done:
@@ -2307,6 +2306,13 @@ bool ChangePrefs(const wxString& page)
 
         result = false;
     }
+
+    #ifdef __WXMAC__
+        // restore menus
+        frameptr->EnableAllMenus(true);
+    #endif
+    
+    frameptr->UpdateMenuAccelerators();
 
     return result;
 }

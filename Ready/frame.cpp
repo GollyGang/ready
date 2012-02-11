@@ -1479,12 +1479,31 @@ void MyFrame::OnPreferences(wxCommandEvent& event)
     ShowPrefsDialog();
 }
 
+void MyFrame::EnableAllMenus(bool enable)
+{
+    wxMenuBar* mbar = GetMenuBar();
+    if (mbar) {
+        int count = mbar->GetMenuCount();
+        int i;
+        for (i = 0; i < count; i++) {
+            mbar->EnableTop(i, enable);
+        }
+        #ifdef __WXOSX_COCOA__
+            // enable/disable items in app menu
+            //!!! they fail to disable due to wxOSX-Cocoa bug
+            mbar->Enable(wxID_ABOUT, enable);
+            mbar->Enable(wxID_PREFERENCES, enable);
+            mbar->Enable(wxID_EXIT, enable);
+        #endif
+    }
+}
+
 void MyFrame::UpdateMenuAccelerators()
 {
     // keyboard shortcuts have changed, so update all menu item accelerators
     wxMenuBar* mbar = GetMenuBar();
     if (mbar) {
-        // wxMac bug: these app menu items aren't updated (but user isn't likely
+        // wxOSX-Cocoa bug: these app menu items aren't updated (but user isn't likely
         // to change them so don't bother trying to fix the bug)
         SetAccelerator(mbar, wxID_ABOUT,                    DO_ABOUT);
         SetAccelerator(mbar, wxID_PREFERENCES,              DO_PREFS);
