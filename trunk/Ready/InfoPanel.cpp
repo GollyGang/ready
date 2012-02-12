@@ -127,6 +127,7 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
     #endif
 
     } else if ( url.StartsWith(change_prefix) ) {
+        // AKT TODO!!! fix bug (in wxMac?): linkrect can be empty if click was in outer edge of link
         panel->ChangeInfo( url.AfterFirst(' ') );
         // safer to reset focus after dialog closes
         SetFocus();
@@ -330,6 +331,22 @@ static int rownum;  // for alternating row background colors
 
 // -----------------------------------------------------------------------------
 
+static wxString FormatFloat(float f)
+{
+    wxString result = wxString::Format(wxT("%f"),f);
+    // strip any trailing zeros
+    while (result.GetChar(result.Length()-1) == wxChar('0')) {
+        result.Truncate(result.Length()-1);
+    }
+    // strip any trailing '.'
+    if (result.GetChar(result.Length()-1) == wxChar('.')) {
+        result.Truncate(result.Length()-1);
+    }
+    return result;
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::Update(const BaseRD* const system)
 {
     // build HTML string to display current parameters
@@ -419,23 +436,176 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value, bool
     return result;
 }
 
+// =============================================================================
+
+// define a modal dialog for editing a parameter name and/or value
+
+class ParameterDialog : public wxDialog
+{
+public:
+    ParameterDialog(wxWindow* parent, bool can_edit_name,
+                    const wxString& inname, float inval,
+                    const wxPoint& pos, const wxSize& size);
+
+    #ifdef __WXOSX__
+        ~ParameterDialog() { delete onetimer; }
+        void OnOneTimer(wxTimerEvent& event);
+        void OnChar(wxKeyEvent& event);
+    #endif
+
+    virtual bool TransferDataFromWindow();  // called when user hits OK
+
+    wxString GetName() { return name; }
+    float GetValue() { return value; }
+
+private:
+    wxTextCtrl* namebox;    // text box for entering name
+    wxTextCtrl* valuebox;   // text box for entering value
+    wxString name;          // the given name
+    float value;            // the given value
+
+    #ifdef __WXOSX__
+        wxTimer* onetimer;  // one shot timer (see OnOneTimer)
+        DECLARE_EVENT_TABLE()
+    #endif
+};
+
 // -----------------------------------------------------------------------------
 
-wxString InfoPanel::FormatFloat(const float& f)
+#ifdef __WXOSX__
+
+BEGIN_EVENT_TABLE(ParameterDialog, wxDialog)
+    EVT_TIMER (wxID_ANY, ParameterDialog::OnOneTimer)
+END_EVENT_TABLE()
+
+void ParameterDialog::OnOneTimer(wxTimerEvent& WXUNUSED(event))
 {
-    wxString result = wxString::Format(wxT("%f"),f);
-    // strip any trailing zeros
-    while (result.GetChar(result.Length()-1) == wxChar('0')) {
-        result.Truncate(result.Length()-1);
+    if (namebox) {
+        namebox->SetFocus();
+        valuebox->SetFocus();
+        valuebox->SetSelection(-1,-1);
     }
-    // strip any trailing '.'
-    if (result.GetChar(result.Length()-1) == wxChar('.')) {
-        result.Truncate(result.Length()-1);
+}
+
+#endif
+
+// -----------------------------------------------------------------------------
+
+// need platform-specific gap after OK/Cancel buttons
+#ifdef __WXMAC__
+    const int STDHGAP = 0;
+#elif defined(__WXMSW__)
+    const int STDHGAP = 6;
+#else
+    const int STDHGAP = 10;
+#endif
+
+// -----------------------------------------------------------------------------
+
+ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
+                                 const wxString& inname, float inval,
+                                 const wxPoint& pos, const wxSize& size)
+{
+    Create(parent, wxID_ANY, _("Change parameter"), pos, size);
+    
+    // create the controls
+    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    SetSizer(vbox);
+    
+    wxString prompt = can_edit_name ? _("Enter a new name and/or a new value:")
+                                    : _("Enter a new value:");
+    wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
+
+    wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+
+    if (can_edit_name) {
+        namebox = new wxTextCtrl(this, wxID_ANY, inname);
+        hbox->Add(namebox, 0, wxGROW | wxLEFT | wxRIGHT, 10);
+    } else {
+        namebox = NULL;
+        hbox->Add(new wxStaticText(this, wxID_STATIC, inname),
+                                   0, wxGROW | wxLEFT | wxRIGHT, 10);
     }
-    return result;
+
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("=")), 0, wxLEFT | wxRIGHT, 0);
+    
+    valuebox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inval));
+    hbox->Add(valuebox, 0, wxGROW | wxLEFT | wxRIGHT, 10);
+    hbox->AddStretchSpacer(1);
+    
+    wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
+    
+    // position the controls
+    wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
+    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    wxSize minsize = buttbox->GetMinSize();
+    if (minsize.GetWidth() < 250) {
+        minsize.SetWidth(250);
+        buttbox->SetMinSize(minsize);
+    }
+
+    vbox->AddSpacer(12);
+    vbox->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
+    vbox->AddSpacer(10);
+    vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
+    vbox->AddSpacer(12);
+    vbox->Add(buttbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
+
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
+    
+    if (pos == wxDefaultPosition) Centre();
+    if (size != wxDefaultSize) SetSize(size);
+
+    #ifdef __WXOSX__
+        // due to wxOSX bug we have to set focus after dialog creation (see OnOneTimer)
+        onetimer = new wxTimer(this, wxID_ANY);
+        if (onetimer) onetimer->Start(10, wxTIMER_ONE_SHOT);
+    #else
+        // select value (must do this last on Windows)
+        valuebox->SetFocus();
+        valuebox->SetSelection(-1,-1);
+    #endif
+
+    // install event handler to detect illegal chars when entering value
+    valuebox->Connect(wxEVT_CHAR, wxKeyEventHandler(ParameterDialog::OnChar), NULL, this);
 }
 
 // -----------------------------------------------------------------------------
+
+void ParameterDialog::OnChar(wxKeyEvent& event)
+{
+    int key = event.GetKeyCode();
+    if ( key >= ' ' && key <= '~' ) {
+        if ( (key >= '0' && key <= '9') || key == '.' ) {
+            // allow digits and decimal pt
+            event.Skip();
+        } else {
+            // disallow any other displayable ascii char
+            wxBell();
+        }
+    } else {
+        event.Skip();
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+bool ParameterDialog::TransferDataFromWindow()
+{
+    if (namebox) name = namebox->GetValue();
+    wxString valstr = valuebox->GetValue();
+    double dbl;
+    if (valstr.ToDouble(&dbl) && dbl >= 0.0 && dbl <= 1.0) {
+        value = (float)dbl;
+        return true;
+    } else {
+        Warning(_("The value must be a number from 0.0 to 1.0."));
+        return false;
+    }
+}
+
+// =============================================================================
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
@@ -449,11 +619,24 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
         Warning(_("Bug in ChangeParameter! Unknown parameter: ") + parameter);
         return;
     }
+    
+    wxString newname;
+    float newval;
+    float oldval = sys->GetParameterValue(iParam);
+    bool can_edit_name = sys->HasEditableFormula();
 
-    // TODO!!! create a dialog for editing parameter name and/or value, but
-    // only allow name editing if frame->GetCurrentRDSystem()->HasEditableFormula()
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    int dlgwd = 300;
+    pos.x -= dlgwd + 20;
 
-    Warning(_("TODO!!! change this parameter: ") + parameter);
+    ParameterDialog dialog(frame, can_edit_name, parameter, oldval, pos, wxSize(dlgwd,-1));
+    if ( dialog.ShowModal() == wxID_OK ) {
+        newname = can_edit_name ? dialog.GetName() : parameter;
+        newval = dialog.GetValue();
+        if (newname != parameter) frame->SetParameterName(iParam, string(newname.mb_str()));
+        if (newval != oldval) frame->SetParameter(iParam, newval);
+    }
 }
 
 // -----------------------------------------------------------------------------

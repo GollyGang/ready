@@ -69,11 +69,10 @@ class InfoPanel : public wxPanel
    
         wxStaticText* status;   // for link info
         
-        // helper routines for building HTML info
+        // for building HTML table
         wxString AppendRow(const wxString& label, const wxString& value, bool is_parameter = false);
-        wxString FormatFloat(const float& f);
 
-        // routines for making changes
+        // for making changes
         void ChangeParameter(const wxString& parameter);
         void ChangeRuleName();
         void ChangeDescription();
