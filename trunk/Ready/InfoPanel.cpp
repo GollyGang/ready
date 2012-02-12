@@ -127,7 +127,7 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
     #endif
 
     } else if ( url.StartsWith(change_prefix) ) {
-        // AKT TODO!!! fix bug (in wxMac?): linkrect can be empty if click was in outer edge of link
+        // AKT TODO!!! fix bug: linkrect can be empty if click was in outer edge of link
         panel->ChangeInfo( url.AfterFirst(' ') );
         // safer to reset focus after dialog closes
         SetFocus();
@@ -450,8 +450,9 @@ public:
     #ifdef __WXOSX__
         ~ParameterDialog() { delete onetimer; }
         void OnOneTimer(wxTimerEvent& event);
-        void OnChar(wxKeyEvent& event);
     #endif
+
+    void OnChar(wxKeyEvent& event);
 
     virtual bool TransferDataFromWindow();  // called when user hits OK
 
@@ -517,6 +518,7 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
 
     wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+    hbox->AddStretchSpacer(1);
 
     if (can_edit_name) {
         namebox = new wxTextCtrl(this, wxID_ANY, inname);
