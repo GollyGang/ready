@@ -224,11 +224,11 @@ void OpenCL_RD::WriteToOpenCLBuffers()
 {
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
 
-    const int io = 0;
+    this->iCurrentBuffer = 0;
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
         float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
-        cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[io][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
+        cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCL_RD::WriteToBuffers : buffer writing failed: ");
     }
 }
