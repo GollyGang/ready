@@ -154,7 +154,8 @@ MyFrame::MyFrame(const wxString& title)
        timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
-       fullscreen(false)
+       fullscreen(false),
+       render_settings("render_settings")
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__

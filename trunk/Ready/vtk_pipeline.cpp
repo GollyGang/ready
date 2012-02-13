@@ -61,15 +61,67 @@
 #include <stdexcept>
 using namespace std;
 
-Properties::Properties(const vtkXMLDataElement *node) : XML_Object(node)
-{
-    // TODO!!!
+Properties::Properties(vtkXMLDataElement *node) : XML_Object(node)
+{    
+    for(int i=0;i<node->GetNumberOfNestedElements();i++)
+    {
+        vtkXMLDataElement *prop = node->GetNestedElement(i);
+        string prop_name,prop_type;
+        read_required_attribute(prop,"name",prop_name);
+        read_required_attribute(prop,"type",prop_type);
+        if(prop_type=="float")
+        {
+            float f;
+            read_required_attribute(prop,"value",f);
+            this->float_properties[prop_name] = f;
+        }
+        else if(prop_type=="int")
+        {
+            int i;
+            read_required_attribute(prop,"value",i);
+            this->int_properties[prop_name] = i;
+        }
+        else if(prop_type=="bool")
+        {
+            int i;
+            read_required_attribute(prop,"value",i);
+            this->bool_properties[prop_name] = (i==1);
+        }
+        else throw runtime_error("Properties : unrecognised type: "+prop_type);
+    }
 }
 
 vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
 {
-    // TODO!!!
     vtkSmartPointer<vtkXMLDataElement> root = vtkSmartPointer<vtkXMLDataElement>::New();
+    root->SetName(this->name.c_str());
+    for(map<string,float>::const_iterator it=this->float_properties.begin();it!=this->float_properties.end();it++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
+        node->SetName("property");
+        node->SetAttribute("name",it->first.c_str());
+        node->SetAttribute("type","float");
+        node->SetFloatAttribute("value",it->second);
+        root->AddNestedElement(node);
+    }
+    for(map<string,int>::const_iterator it=this->int_properties.begin();it!=this->int_properties.end();it++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
+        node->SetName("property");
+        node->SetAttribute("name",it->first.c_str());
+        node->SetAttribute("type","int");
+        node->SetIntAttribute("value",it->second);
+        root->AddNestedElement(node);
+    }
+    for(map<string,bool>::const_iterator it=this->bool_properties.begin();it!=this->bool_properties.end();it++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
+        node->SetName("property");
+        node->SetAttribute("name",it->first.c_str());
+        node->SetAttribute("type","bool");
+        node->SetIntAttribute("value",it->second?1:0);
+        root->AddNestedElement(node);
+    }
     return root;
 }
 
