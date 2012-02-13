@@ -87,6 +87,7 @@ class HtmlInfo : public wxHtmlWindow
         void OnMouseMotion(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseDown(wxMouseEvent& event);
+        void OnHtmlCellClicked(wxHtmlCellEvent& event);
         
         MyFrame* frame;
         InfoPanel* panel;
@@ -103,6 +104,7 @@ BEGIN_EVENT_TABLE(HtmlInfo, wxHtmlWindow)
     EVT_LEAVE_WINDOW  (HtmlInfo::OnMouseLeave)
     EVT_LEFT_DOWN     (HtmlInfo::OnMouseDown)
     EVT_RIGHT_DOWN    (HtmlInfo::OnMouseDown)
+    EVT_HTML_CELL_CLICKED (wxID_ANY, HtmlInfo::OnHtmlCellClicked)
 END_EVENT_TABLE()
 
 // -----------------------------------------------------------------------------
@@ -127,9 +129,8 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
     #endif
 
     } else if ( url.StartsWith(change_prefix) ) {
-        // AKT TODO!!! fix bug: linkrect can be empty if click was in outer edge of link
         panel->ChangeInfo( url.AfterFirst(' ') );
-        // safer to reset focus after dialog closes
+        // best to reset focus after dialog closes
         SetFocus();
 
     } else if ( url.StartsWith(wxT("prefs:")) ) {
@@ -166,6 +167,26 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
         // assume it's a link to a local target
         LoadPage(url);
     }
+}
+
+// -----------------------------------------------------------------------------
+
+void HtmlInfo::OnHtmlCellClicked(wxHtmlCellEvent& event)
+{
+    wxHtmlCell* cell = event.GetCell();
+    int x = event.GetPoint().x;
+    int y = event.GetPoint().y;
+    
+    wxHtmlLinkInfo* link = cell->GetLink(x,y);
+    if (link) {
+        // set linkrect to avoid bug in wxHTML if click was in outer edge of link
+        // (bug is in htmlwin.cpp in wxHtmlWindowMouseHelper::HandleIdle;
+        // OnCellMouseHover needs to be called if cell != m_tmpLastCell)
+        wxPoint pt = ScreenToClient( wxGetMousePosition() );
+        linkrect = wxRect(pt.x-x, pt.y-y, cell->GetWidth(), cell->GetHeight());
+    }
+
+    event.Skip();   // call OnLinkClicked
 }
 
 // -----------------------------------------------------------------------------
@@ -675,7 +696,7 @@ void InfoPanel::ChangeDescription()
     
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - 520, pos.y, 500, 300);
+    dialog.SetSize(pos.x - 720, pos.y, 700, 500);
 
     if (dialog.ShowModal() == wxID_OK)
     {
@@ -706,7 +727,7 @@ void InfoPanel::ChangeFormula()
     
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - 520, pos.y, 500, 300);
+    dialog.SetSize(pos.x - 720, pos.y, 700, 500);
 
     if (dialog.ShowModal() == wxID_OK)
     {
