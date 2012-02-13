@@ -13,9 +13,10 @@
       <param name="D_b">  0.03125  </param>
       <param name="k_a">  0.0125   </param>
       
-      <formula number_of_chemicals="2">
+      <formula number_of_chemicals="3">
 		  delta_a = k_a * (16.0f - a * b) + D_a * laplacian_a;
-		  delta_b = k_a * (a * b - b - 12.0f) + D_b * laplacian_b;
+		  delta_b = k_a * (a * b - b - c) + D_b * laplacian_b;
+          delta_c = 0.0f;
       </formula>
       
     </rule>
@@ -23,13 +24,18 @@
     <initial_pattern_generator apply_when_loading="1">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="3.995" high="4.005" />
+        <constant value="4.0" />
         <everywhere />
       </overlay>
       <overlay chemical="b">
         <overwrite />
-        <white_noise low="3.995" high="4.005" />
-		<everywhere />
+        <constant value="4.0" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <white_noise low="11.9" high="12.1" />
+        <everywhere />
       </overlay>
     </initial_pattern_generator>
     
