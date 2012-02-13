@@ -51,7 +51,6 @@ class BaseRD
         // inbuilt implementations cannot have their number_of_chemicals edited
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
-        void SetNumberOfChemicals(int n) { this->n_chemicals = n; this->is_modified = true; }
 
         // advance the RD system by n timesteps
         virtual void Update(int n_steps)=0;
@@ -79,6 +78,7 @@ class BaseRD
         virtual void SetBlockSizeY(int n) {}
         virtual void SetBlockSizeZ(int n) {}
 
+        // use to change the dimensions or the number of chemicals
         virtual void Allocate(int x,int y,int z,int nc);
 
         std::string GetRuleName() const;
@@ -117,7 +117,7 @@ class BaseRD
 
         std::string rule_name, description;
 
-        int n_chemicals;
+        int n_chemicals; // (could use images.size() but TestFormula can be called before Allocate)
 
         std::vector<vtkImageData*> images; // one for each chemical
 

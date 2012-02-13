@@ -130,8 +130,8 @@ int BaseRD::GetTimestepsTaken() const
 
 void BaseRD::Allocate(int x,int y,int z,int nc)
 {
-    if(nc!=this->n_chemicals) throw runtime_error("BaseRD::Allocate : chemical count mismatch");
     this->Deallocate();
+    this->n_chemicals = nc;
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);

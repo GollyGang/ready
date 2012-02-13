@@ -125,8 +125,6 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
 
 void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
-    int i;
-
     OpenCL_RD::InitializeFromXML(rd,warn_to_update);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
@@ -137,8 +135,7 @@ void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_upda
     if(!xml_formula) throw runtime_error("formula node not found in file");
 
     // number_of_chemicals:
-    read_required_attribute(xml_formula,"number_of_chemicals",i);
-    this->SetNumberOfChemicals(i);
+    read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
 
     string formula = trim_multiline_string(xml_formula->GetCharacterData());
     this->TestFormula(formula); // will throw on error
