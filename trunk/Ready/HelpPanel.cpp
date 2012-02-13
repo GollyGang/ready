@@ -253,7 +253,13 @@ void HtmlView::ChangeFontSizes(int size)
     GetViewStart(&x, &y);
     SetFontSizes(size);
     Scroll(x, y);
-    // AKT TODO!!! fix display bug (Mac only?) when size increases so that scroll bar appears
+    
+    // this hack fixes display bug when size increases so that scroll bar appears
+    // (curiously, we don't see any such bug in InfoPanel)
+    wxRect r = GetRect();
+    SetSize(r.x, r.y, r.width-1, r.height);
+    SetSize(r);
+    
     panel->UpdateHelpButtons();
 }
 
