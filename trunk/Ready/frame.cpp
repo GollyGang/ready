@@ -18,7 +18,6 @@
 // local:
 #include "frame.hpp"
 #include "app.hpp"              // for wxGetApp
-#include "vtk_pipeline.hpp"
 #include "wxutils.hpp"
 #include "prefs.hpp"            // for GetPrefs, SavePrefs, etc
 #include "PatternsPanel.hpp"
@@ -152,11 +151,9 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(false),
-       is_wireframe(false),
        timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
-       iActiveChemical(1),
        fullscreen(false)
 {
     this->SetIcon(wxICON(appicon16));
@@ -169,6 +166,20 @@ MyFrame::MyFrame(const wxString& title)
     #endif
     this->aui_mgr.SetManagedWindow(this);
     
+    // TODO: put this somewhere else
+    {
+        this->render_settings.Set("low",0.0f);
+        this->render_settings.Set("high",1.0f);
+        this->render_settings.Set("vertical_scale_1D",25.0f);
+        this->render_settings.Set("vertical_scale_2D",5.0f);
+        this->render_settings.Set("hue_low",0.6f);
+        this->render_settings.Set("hue_high",0.0f);
+        this->render_settings.Set("iActiveChemical",0);
+        this->render_settings.Set("use_image_interpolation",false);
+        this->render_settings.Set("contour_level",0.25f);
+        this->render_settings.Set("use_wireframe",false);
+    }
+
     GetPrefs();     // must be called before InitializeMenus
 
     this->InitializeMenus();
@@ -600,13 +611,15 @@ void MyFrame::OnFitPattern(wxCommandEvent& event)
 
 void MyFrame::OnWireframe(wxCommandEvent& event)
 {
-    this->pVTKWindow->DoCharEvent(this->is_wireframe ? 's' : 'w');
-    this->is_wireframe = !this->is_wireframe;
+    bool wireframe = this->render_settings.GetBool("use_wireframe");
+    this->pVTKWindow->DoCharEvent(wireframe ? 's' : 'w');
+    wireframe = !wireframe;
+    this->render_settings.Set("use_wireframe",wireframe);
 }
 
 void MyFrame::OnUpdateWireframe(wxUpdateUIEvent& event)
 {
-    event.Check(this->is_wireframe);
+    event.Check(this->render_settings.GetBool("use_wireframe"));
 }
 
 void MyFrame::OnToggleViewPane(wxCommandEvent& event)
@@ -723,8 +736,8 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
     this->system = sys;
-    this->iActiveChemical = min(this->iActiveChemical,this->system->GetNumberOfChemicals()-1);
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
+    this->render_settings.Set("iActiveChemical",min(this->render_settings.GetInt("iActiveChemical"),this->system->GetNumberOfChemicals()-1));
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->is_running = false;
     this->UpdateWindows();
 }
@@ -1096,6 +1109,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     
     this->system->BlankImage();
 
+    // DEBUG!!!
+    this->system->Allocate(64,64,64,3);
+
     this->is_running = false;
     this->system->SetFilename("untitled");
     this->system->SetModified(false);
@@ -1399,10 +1415,10 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
         choices.Add(GetChemicalName(i));
     wxSingleChoiceDialog dlg(this,_("Select the chemical to render:"),_("Select active chemical"),
         choices);
-    dlg.SetSelection(this->iActiveChemical);
+    dlg.SetSelection(this->render_settings.GetInt("iActiveChemical"));
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->iActiveChemical = dlg.GetSelection();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->iActiveChemical);
+    this->render_settings.Set("iActiveChemical",dlg.GetSelection());
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->UpdateWindows();
     // TODO: might have some visualization based on more than one chemical
 }

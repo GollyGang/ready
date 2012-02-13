@@ -23,17 +23,10 @@
 #include <vtkXMLDataElement.h>
 
 // local:
+#include "utils.hpp"
 class BaseRD;
 
-// XML object interface
-class XML_Object
-{
-    public:
-
-        XML_Object(const vtkXMLDataElement* node) {}
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
-};
-
+// internal:
 class BaseOperation;
 class BaseFill;
 class BaseShape;
