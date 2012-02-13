@@ -135,6 +135,7 @@ void BaseRD::Allocate(int x,int y,int z,int nc)
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);
+    this->is_modified = true;
 }
 
 void BaseRD::SetFormula(string s)
