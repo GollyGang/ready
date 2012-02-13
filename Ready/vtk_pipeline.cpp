@@ -61,32 +61,73 @@
 #include <stdexcept>
 using namespace std;
 
+Properties::Properties(const vtkXMLDataElement *node) : XML_Object(node)
+{
+    // TODO!!!
+}
+
+vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
+{
+    // TODO!!!
+    vtkSmartPointer<vtkXMLDataElement> root = vtkSmartPointer<vtkXMLDataElement>::New();
+    return root;
+}
+
+float Properties::GetFloat(const std::string &name) const
+{
+    if(this->float_properties.count(name)) 
+        return this->float_properties.find(name)->second;
+    throw runtime_error("Properties::GetFloat: unknown property: "+name);
+}
+
+int Properties::GetInt(const std::string &name) const
+{
+    if(this->int_properties.count(name)) 
+        return this->int_properties.find(name)->second;
+    throw runtime_error("Properties::GetInt: unknown property: "+name);
+}
+
+bool Properties::GetBool(const std::string &name) const
+{
+    if(this->bool_properties.count(name)) 
+        return this->bool_properties.find(name)->second;
+    throw runtime_error("Properties::GetBool: unknown property: "+name);
+}
+
 // TODO: allow visualizations that use more than one chemical
 
-void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
-void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
-void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical);
+void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
     assert(pVTKWindow);
     assert(system);
 
     switch(system->GetDimensionality())
     {
-        case 1: InitializeVTKPipeline_1D(pVTKWindow,system,iActiveChemical); break;
-        case 2: InitializeVTKPipeline_2D(pVTKWindow,system,iActiveChemical); break;
-        case 3: InitializeVTKPipeline_3D(pVTKWindow,system,iActiveChemical); break;
+        // TODO: merge the dimensionalities (often want one/more slices from lower dimensionalities)
+        case 1: InitializeVTKPipeline_1D(pVTKWindow,system,render_settings); break;
+        case 2: InitializeVTKPipeline_2D(pVTKWindow,system,render_settings); break;
+        case 3: InitializeVTKPipeline_3D(pVTKWindow,system,render_settings); break;
         default:
             throw runtime_error("InitializeVTKPipeline : Unsupported dimensionality");
     }
     pVTKWindow->Refresh(false);
 }
 
-void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
+void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
-    float low=0.0f,high=1.0f; // TODO: will be render properties
-    float scale=25.0f; // vertical scale of the graph (TODO: will be a render property)
+    float low = render_settings.GetFloat("low");
+    float high = render_settings.GetFloat("high");
+    float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
+    float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
+    float hue_low = render_settings.GetFloat("hue_low");
+    float hue_high = render_settings.GetFloat("hue_high");
+    bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
+    int iActiveChemical = render_settings.GetInt("iActiveChemical");
+    float contour_level = render_settings.GetFloat("contour_level");
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -98,7 +139,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     lut->SetRampToLinear();
     lut->SetScaleToLinear();
     lut->SetTableRange(low,high);
-    lut->SetHueRange(0.6, 0.0);
+    lut->SetHueRange(hue_low,hue_high);
 
     // pad the image a little so we can actually see it as a 2D strip rather than being invisible
     vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
@@ -113,8 +154,9 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // an actor determines how a scene object is displayed
     vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
     actor->SetInput(image_mapper->GetOutput());
-    actor->SetPosition(0,-5,0);
-    //actor->InterpolateOff();
+    actor->SetPosition(0,-5.0,0);
+    if(!use_image_interpolation)
+        actor->InterpolateOff();
 
     // add the actor to the renderer's scene
     pRenderer->AddActor(actor);
@@ -131,7 +173,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-scale);
+        warp->SetScaleFactor(-vertical_scale_1D);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();
@@ -151,7 +193,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(0,0,low*scale,high*scale,0,0);
+    axis->SetBounds(0,0,low*vertical_scale_1D,high*vertical_scale_1D,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -162,19 +204,29 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     axis->SetCornerOffset(0);
     axis->SetNumberOfLabels(5);
     pRenderer->AddActor(axis);
-    
+
     // set the background color
     pRenderer->SetBackground(0,0,0);
     
     // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     pVTKWindow->SetInteractorStyle(is);
-    
+
     pRenderer->ResetCamera();
 }
 
-void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
+void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
+    float low = render_settings.GetFloat("low");
+    float high = render_settings.GetFloat("high");
+    float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
+    float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
+    float hue_low = render_settings.GetFloat("hue_low");
+    float hue_high = render_settings.GetFloat("hue_high");
+    bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
+    int iActiveChemical = render_settings.GetInt("iActiveChemical");
+    float contour_level = render_settings.GetFloat("contour_level");
+    
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
@@ -186,8 +238,8 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
         lut->SetRampToLinear();
         lut->SetScaleToLinear();
-        lut->SetTableRange(0.0, 0.5);
-        lut->SetHueRange(0.6, 0.0);
+        lut->SetTableRange(low,high);
+        lut->SetHueRange(hue_low,hue_high);
 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -198,6 +250,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
         actor->SetInput(image_mapper->GetOutput());
         //actor->InterpolateOff();
+        actor->SetPosition(0,0,5);
 
         // add the actor to the renderer's scene
         pRenderer->AddActor(actor);
@@ -216,7 +269,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iActiveChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-5.0);
+        warp->SetScaleFactor(-vertical_scale_2D);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();
@@ -225,8 +278,22 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->SetPosition(0,0,-5.1);
         pRenderer->AddActor(actor);
+
+        // add an axis
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(0,0,0,0,low*vertical_scale_2D,high*vertical_scale_2D);
+        axis->SetRanges(0,0,0,0,low,high);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->YAxisVisibilityOff();
+        axis->SetZLabel("");
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        pRenderer->AddActor(axis);
     }
 
     // set the background color
@@ -235,10 +302,22 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     pVTKWindow->SetInteractorStyle(is);
+
+    pRenderer->ResetCamera();
 }
 
-void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,int iActiveChemical)
+void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
+    float low = render_settings.GetFloat("low");
+    float high = render_settings.GetFloat("high");
+    float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
+    float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
+    float hue_low = render_settings.GetFloat("hue_low");
+    float hue_high = render_settings.GetFloat("hue_high");
+    bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
+    int iActiveChemical = render_settings.GetInt("iActiveChemical");
+    float contour_level = render_settings.GetFloat("contour_level");
+    
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
@@ -315,7 +394,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // by making a surface that contours the volume at a specified level
         vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
         surface->SetInput(system->GetImage(iActiveChemical));
-        surface->SetValue(0, 0.25);
+        surface->SetValue(0, contour_level);
         // TODO: allow user to control the contour level
 
         // a mapper converts scene objects to graphics primitives
@@ -366,8 +445,8 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
         lut->SetRampToLinear();
         lut->SetScaleToLinear();
-        lut->SetTableRange(0.0, 0.5);
-        lut->SetHueRange(0.6, 0.0);
+        lut->SetTableRange(low,high);
+        lut->SetHueRange(hue_low,hue_high);
 
         // extract a slice
         vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
@@ -404,4 +483,6 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     pVTKWindow->SetInteractorStyle(is);
+
+    pRenderer->ResetCamera();
 }

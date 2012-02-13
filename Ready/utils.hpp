@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef __UTILS_HPP__
+#define __UTILS_HPP__
+
 // STL:
 #include <string>
 #include <sstream>
@@ -22,6 +25,7 @@
 
 // VTK:
 #include <vtkXMLDataElement.h>
+#include <vtkSmartPointer.h>
 
 double get_time_in_seconds();
 
@@ -66,3 +70,14 @@ int IndexFromChemicalName(const std::string& s);
 
 // read a multiline string, outputting whitespace-trimmed lines
 std::string trim_multiline_string(const char* s);
+
+// XML object interface
+class XML_Object
+{
+    public:
+
+        XML_Object(const vtkXMLDataElement* node) {}
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
+};
+
+#endif
