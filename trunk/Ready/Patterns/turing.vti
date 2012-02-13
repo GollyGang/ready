@@ -8,14 +8,14 @@
       
     <rule type="formula" name="Turing">
         
-      <param name="timestep"> 1.0  </param>
-      <param name="D_a">  0.125    </param>
-      <param name="D_b">  0.03125  </param>
-      <param name="k_a">  0.0125   </param>
+      <param name="timestep"> 1.0      </param>
+      <param name="D_a">      0.125    </param>
+      <param name="D_b">      0.03125  </param>
+      <param name="k_a">      0.0125   </param>
       
       <formula number_of_chemicals="3">
 		  delta_a = k_a * (16.0f - a * b) + D_a * laplacian_a;
-		  delta_b = k_a * (a * b - b - c) + D_b * laplacian_b;
+		  delta_b = max( -b, k_a * (a * b - b - c) + D_b * laplacian_b );
           delta_c = 0.0f;
       </formula>
       
@@ -43,13 +43,13 @@
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">
       <PointData Scalars="Scalars_">
-        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="2" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="3" format="appended" RangeMin="747556731.21" RangeMax="747556731.21" offset="0" />
       </PointData>
       <CellData>
       </CellData>
     </Piece>
   </ImageData>
   <AppendedData encoding="base64">
-   _AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+   _AwAAAACAAAAAAAAANQAAADUAAAA1AAAAeJztwYEAAAAAgCB/uJ0WqQoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGDmMhft4nO3BgQAAAACAIH+4nRapCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYOYyF+3ic7cGBAAAAAIAgf7idFqkKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABg5jIX7
   </AppendedData>
 </VTKFile>
