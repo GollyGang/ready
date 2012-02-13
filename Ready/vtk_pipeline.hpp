@@ -30,8 +30,8 @@ class Properties : public XML_Object
 {
     public: 
 
-        Properties() : XML_Object(NULL) {}
-        Properties(const vtkXMLDataElement* node);
+        Properties(std::string name) : XML_Object(NULL),name(name) {}
+        Properties(vtkXMLDataElement* node);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
         void Set(const std::string& name,float f) { this->float_properties[name] = f; }
@@ -42,6 +42,8 @@ class Properties : public XML_Object
         bool GetBool(const std::string& name) const;
 
     protected:
+    
+        std::string name;
 
         std::map<std::string,float> float_properties;
         std::map<std::string,int> int_properties;
