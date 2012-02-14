@@ -115,7 +115,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // an actor determines how a scene object is displayed
     vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
     actor->SetInput(image_mapper->GetOutput());
-    actor->SetPosition(0,-5.0,0);
+    actor->SetPosition(0,low*vertical_scale_1D - 5.0,0);
     if(!use_image_interpolation)
         actor->InterpolateOff();
 
@@ -213,7 +213,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         actor->SetInput(image_mapper->GetOutput());
         if(!use_image_interpolation)
             actor->InterpolateOff();
-        actor->SetPosition(0,0,5);
+        actor->SetPosition(0,0,low*-vertical_scale_2D + 2);
 
         // add the actor to the renderer's scene
         pRenderer->AddActor(actor);
