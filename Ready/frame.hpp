@@ -135,6 +135,7 @@ class MyFrame : public wxFrame
         void UpdateInfoPane();
         void InitializeHelpPane();
         void InitializeRenderPane();
+        void InitializeDefaultRenderSettings();
         void LoadSettings();
         void SaveSettings();
         void CheckFocus();

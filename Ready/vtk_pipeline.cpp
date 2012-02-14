@@ -50,20 +50,11 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkImageMirrorPad.h>
 #include <vtkCubeAxesActor2D.h>
-// volume rendering
-#include <vtkVolumeRayCastCompositeFunction.h>
-#include <vtkVolumeRayCastMapper.h>
-#include <vtkColorTransferFunction.h>
-#include <vtkPiecewiseFunction.h>
-#include <vtkVolumeProperty.h>
-#include <vtkVolume.h>
 #include <vtkExtractVOI.h>
 
 // STL:
 #include <stdexcept>
 using namespace std;
-
-// TODO: allow visualizations that use more than one chemical
 
 void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
 void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
@@ -257,7 +248,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0,0,0,0,low*vertical_scale_2D,high*vertical_scale_2D);
+        axis->SetBounds(0,0,0,0,low*-vertical_scale_2D,high*-vertical_scale_2D);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
