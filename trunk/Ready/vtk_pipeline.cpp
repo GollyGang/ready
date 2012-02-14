@@ -285,6 +285,8 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     bool use_slice2D = render_settings.GetBool("use_slice2D");
     int slice2D_axis = render_settings.GetInt("slice2D_axis");
     float slice2D_pos = render_settings.GetFloat("slice2D_pos");
+    float surface_r,surface_g,surface_b;
+    render_settings.GetFloat3("surface_color",surface_r,surface_g,surface_b);
 
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -307,7 +309,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // an actor determines how a scene object is displayed
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
-    actor->GetProperty()->SetColor(1,1,1);  
+    actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
     actor->GetProperty()->SetAmbient(0.1);
     actor->GetProperty()->SetDiffuse(0.7);
     actor->GetProperty()->SetSpecular(0.2);

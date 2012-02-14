@@ -1740,5 +1740,6 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.Set("use_slice2D",true);
     this->render_settings.Set("slice2D_axis",2); // 0=x, 1=y, 2=z
     this->render_settings.Set("slice2D_pos",0.5f); // [0,1]
+    this->render_settings.Set("surface_color",1.0f,1.0f,1.0f); // RGB [0,1]
     // TODO: allow user to change defaults
 }
