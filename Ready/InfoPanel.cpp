@@ -437,7 +437,7 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
     result += _("</td>");
 
     if (is_editable) {
-        result += _("<td align=right><a href=\"");
+        result += _("<td valign=top align=right><a href=\"");
         result += change_prefix;
         if (is_parameter) result += parameter_prefix;
         result += label;
@@ -458,33 +458,33 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
 
 class ParameterDialog : public wxDialog
 {
-public:
-    ParameterDialog(wxWindow* parent, bool can_edit_name,
-                    const wxString& inname, float inval,
-                    const wxPoint& pos, const wxSize& size);
-
-    #ifdef __WXOSX__
-        ~ParameterDialog() { delete onetimer; }
-        void OnOneTimer(wxTimerEvent& event);
-    #endif
-
-    void OnChar(wxKeyEvent& event);
-
-    virtual bool TransferDataFromWindow();  // called when user hits OK
-
-    wxString GetName() { return name; }
-    float GetValue() { return value; }
-
-private:
-    wxTextCtrl* namebox;    // text box for entering name
-    wxTextCtrl* valuebox;   // text box for entering value
-    wxString name;          // the given name
-    float value;            // the given value
-
-    #ifdef __WXOSX__
-        wxTimer* onetimer;  // one shot timer (see OnOneTimer)
-        DECLARE_EVENT_TABLE()
-    #endif
+    public:
+        ParameterDialog(wxWindow* parent, bool can_edit_name,
+                        const wxString& inname, float inval,
+                        const wxPoint& pos, const wxSize& size);
+    
+        #ifdef __WXOSX__
+            ~ParameterDialog() { delete onetimer; }
+            void OnOneTimer(wxTimerEvent& event);
+        #endif
+    
+        void OnChar(wxKeyEvent& event);
+    
+        virtual bool TransferDataFromWindow();  // called when user hits OK
+    
+        wxString GetName() { return name; }
+        float GetValue() { return value; }
+    
+    private:
+        wxTextCtrl* namebox;    // text box for entering name
+        wxTextCtrl* valuebox;   // text box for entering value
+        wxString name;          // the given name
+        float value;            // the given value
+    
+        #ifdef __WXOSX__
+            wxTimer* onetimer;  // one shot timer (see OnOneTimer)
+            DECLARE_EVENT_TABLE()
+        #endif
 };
 
 // -----------------------------------------------------------------------------
@@ -649,7 +649,9 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
     pos.x -= dlgwd + 20;
 
     ParameterDialog dialog(frame, can_edit_name, parameter, oldval, pos, wxSize(dlgwd,-1));
-    if ( dialog.ShowModal() == wxID_OK ) {
+    
+    if ( dialog.ShowModal() == wxID_OK )
+    {
         newname = can_edit_name ? dialog.GetName() : parameter;
         newval = dialog.GetValue();
         if (newname != parameter) frame->SetParameterName(iParam, string(newname.mb_str()));
@@ -670,34 +672,107 @@ void InfoPanel::ChangeRuleName()
     pos.x -= dlgwd + 20;
 
     if ( GetString(_("Change rule name"), _("Enter the new rule name:"),
-                   oldname, newname, pos, wxSize(dlgwd,-1)) )
+                   oldname, newname, pos, wxSize(dlgwd,wxDefaultCoord)) )
     {
         if (newname != oldname) frame->SetRuleName(string(newname.mb_str()));
     }
 }
 
+// =============================================================================
+
+// define a modal dialog for editing multi-line text
+// (essentially wxTextEntryDialog but with wxRESIZE_BORDER style)
+
+class MultiLineDialog : public wxDialog
+{
+    public:
+        MultiLineDialog(wxWindow* parent,
+                        const wxString& caption,
+                        const wxString& message,
+                        const wxString& value);
+    
+        wxString GetValue() const { return m_value; }
+        void OnOK(wxCommandEvent& event);
+    
+    private:
+        wxTextCtrl* m_textctrl;
+        wxString m_value;
+    
+        DECLARE_EVENT_TABLE()
+};
+
+BEGIN_EVENT_TABLE(MultiLineDialog, wxDialog)
+    EVT_BUTTON (wxID_OK, MultiLineDialog::OnOK)
+END_EVENT_TABLE()
+
 // -----------------------------------------------------------------------------
+
+MultiLineDialog::MultiLineDialog(wxWindow *parent,
+                                 const wxString& caption,
+                                 const wxString& message,
+                                 const wxString& value)
+     : wxDialog(GetParentForModalDialog(parent, wxOK | wxCANCEL),
+                wxID_ANY, caption, wxDefaultPosition, wxDefaultSize,
+                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+{
+    wxBeginBusyCursor();
+
+    wxBoxSizer* topsizer = new wxBoxSizer( wxVERTICAL );
+
+    wxSizerFlags flagsBorder2;
+    flagsBorder2.DoubleBorder();
+
+    topsizer->Add(CreateTextSizer(message), flagsBorder2);
+
+    m_textctrl = new wxTextCtrl(this, wxID_ANY, value,
+                                wxDefaultPosition, wxSize(100,50), wxTE_MULTILINE);
+
+    topsizer->Add(m_textctrl, wxSizerFlags(1).Expand().TripleBorder(wxLEFT | wxRIGHT));
+
+    wxSizer* buttonSizer = CreateSeparatedButtonSizer(wxOK | wxCANCEL);
+    topsizer->Add(buttonSizer, wxSizerFlags(flagsBorder2).Expand());
+
+    SetAutoLayout(true);
+    SetSizer(topsizer);
+
+    topsizer->SetSizeHints(this);
+    topsizer->Fit(this);
+
+    m_textctrl->SetFocus();
+    m_textctrl->SetSelection(0,0);      // probably nicer not to select all text
+
+    wxEndBusyCursor();
+}
+
+// -----------------------------------------------------------------------------
+
+void MultiLineDialog::OnOK(wxCommandEvent& WXUNUSED(event))
+{
+    m_value = m_textctrl->GetValue();
+    EndModal(wxID_OK);
+}
+
+// =============================================================================
 
 void InfoPanel::ChangeDescription()
 {
     wxString oldtext(frame->GetCurrentRDSystem()->GetDescription().c_str(),wxConvUTF8);
     wxString newtext;
 
-    // AKT TODO!!! adding wxRESIZE_BORDER to style flags didn't work
-    // so we might need to implement our own MultiLineDialog
-    wxTextEntryDialog dialog(frame, _("Enter the new description:"),
-                             _("Change description"), oldtext,
-                             wxOK | wxCANCEL | wxTE_MULTILINE);
+    MultiLineDialog dialog(frame, _("Change description"), _("Enter the new description:"), oldtext);
     
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - 720, pos.y, 700, 500);
+    dialog.SetSize(pos.x - textdlgwd - 20, pos.y, textdlgwd, textdlght);
 
     if (dialog.ShowModal() == wxID_OK)
     {
         newtext = dialog.GetValue();
         if (newtext != oldtext) frame->SetDescription(string(newtext.mb_str()));
     }
+
+    textdlgwd = dialog.GetRect().width;
+    textdlght = dialog.GetRect().height;
 }
 
 // -----------------------------------------------------------------------------
@@ -707,21 +782,20 @@ void InfoPanel::ChangeFormula()
     wxString oldcode(frame->GetCurrentRDSystem()->GetFormula().c_str(),wxConvUTF8);
     wxString newcode;
 
-    // AKT TODO!!! adding wxRESIZE_BORDER to style flags didn't work
-    // so we might need to implement our own MultiLineDialog
-    wxTextEntryDialog dialog(frame, _("Enter the new formula:"),
-                             _("Change formula"), oldcode,
-                             wxOK | wxCANCEL | wxTE_MULTILINE);
+    MultiLineDialog dialog(frame, _("Change formula"), _("Enter the new formula:"), oldcode);
     
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - 720, pos.y, 700, 500);
+    dialog.SetSize(pos.x - textdlgwd - 20, pos.y, textdlgwd, textdlght);
 
     if (dialog.ShowModal() == wxID_OK)
     {
         newcode = dialog.GetValue();
         if (newcode != oldcode) frame->SetFormula(string(newcode.mb_str()));
     }
+
+    textdlgwd = dialog.GetRect().width;
+    textdlght = dialog.GetRect().height;
 }
 
 // -----------------------------------------------------------------------------
