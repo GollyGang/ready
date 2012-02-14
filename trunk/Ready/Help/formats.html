@@ -60,6 +60,7 @@ Specifies the current rule and information about the pattern.
 <li><tt><a href="#description">&lt;description&gt;</a></tt> (optional)
 <li><tt><a href="#rule">&lt;rule&gt;</a></tt> (required)
 <li><tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt> (optional)
+<li><tt><a href="#render_settings">&lt;render_settings&gt;</a></tt> (optional)
 </ul>
 
 <h4><a name="description"></a>The <tt>&lt;description&gt;</tt> element</h4>
@@ -200,6 +201,26 @@ A location in space. Coordinates are in the range from zero to one and are given
 <li><tt>x</tt> (required) : the x-coordinate
 <li><tt>y</tt> (required) : the y-coordinate
 <li><tt>z</tt> (required) : the z-coordinate
+</ul>
+
+<h4><a name="render_settings"></a>The <tt>&lt;render_settings&gt;</tt> element</h4>
+
+The render settings specify how the system should be shown on screen. Contains one or more of the elements listed below.
+<ul>
+<li><tt>&lt;low type="float" value="??" /&gt;</tt> The lowest value that chemicals in this system typically take. Used to determine the colors and the axes.
+<li><tt>&lt;high type="float" value="??" /&gt;</tt> The highest value that chemicals in this system typically take.
+<li><tt>&lt;hue_low type="float" value="??" /&gt;</tt> Values from low to high are mapped onto a hue palette from hue_low to hue_high.
+<li><tt>&lt;hue_high type="float" value="??" /&gt;</tt>
+<li><tt>&lt;iActiveChemical type="int" value="??" /&gt;</tt> The chemical to show (0=a, 1=b, etc.)
+<li><tt>&lt;use_image_interpolation type="bool" value="??" /&gt;</tt> Whether to interpolate the image or show sharp pixels (0=sharp pixels, 1=interpolated)
+<li><tt>&lt;contour_level type="float" value="??" /&gt;</tt> The value to use for the surface contour in 3D systems
+<li><tt>&lt;use_wireframe type="bool" value="??" /&gt;</tt> Whether to show the surface as wireframe or as smooth surface (0=surface, 1=wireframe)
+<li><tt>&lt;surface_color type="float3" a="??" b="??" c="??" /&gt;</tt> The RGB color to use for the surface (range: 0.0-1.0)
+<li><tt>&lt;vertical_scale_1D type="float" value="??" /&gt;</tt> The vertical size of the 1D line graphs
+<li><tt>&lt;vertical_scale_2D type="float" value="??" /&gt;</tt> The vertical size of the 2D surface plots
+<li><tt>&lt;use_slice2D type="bool" value="??" /&gt;</tt> Whether to add a 2D color slice through the 3D volume (0=no, 1=yes)
+<li><tt>&lt;slice2D_axis type="int" value="??" /&gt;</tt> The axis that the slice should be perpendicular to (0=x, 1=y, 2=z)
+<li><tt>&lt;slice2D_pos type="float" value="??" /&gt;</tt> The position along the slice2D_axis to slice at (range: 0.0-1.0, relative to the image size)
 </ul>
 
 </body>
