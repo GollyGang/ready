@@ -16,8 +16,7 @@ Andrew's tasks for 0.2:
 - do any other "AKT TODO" tasks
 
 before 0.3 release:
-- allow user to change the render_settings (both the default ones and the ones specified in the file)
-- more control over render pipeline: slice direction/height, etc.
+- allow user to change the render_settings (both the default ones and the ones specified in the file?)
 - UI for editing the initial-pattern-generator overlay stack
 - add option to convert formula rules into full-kernel rules
 
