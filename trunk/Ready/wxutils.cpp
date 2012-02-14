@@ -85,18 +85,18 @@ void Beep()
 
 class StringDialog : public wxDialog
 {
-public:
-    StringDialog(wxWindow* parent, const wxString& title,
-                 const wxString& prompt, const wxString& instring,
-                 const wxPoint& pos, const wxSize& size);
-
-    virtual bool TransferDataFromWindow();     // called when user hits OK
-
-    wxString GetValue() { return result; }
-
-private:
-    wxTextCtrl* textbox;       // text box for entering the string
-    wxString result;           // the resulting string
+    public:
+        StringDialog(wxWindow* parent, const wxString& title,
+                     const wxString& prompt, const wxString& instring,
+                     const wxPoint& pos, const wxSize& size);
+    
+        virtual bool TransferDataFromWindow();     // called when user hits OK
+    
+        wxString GetValue() { return result; }
+    
+    private:
+        wxTextCtrl* textbox;       // text box for entering the string
+        wxString result;           // the resulting string
 };
 
 // -----------------------------------------------------------------------------
@@ -158,7 +158,8 @@ bool GetString(const wxString& title, const wxString& prompt,
                const wxString& instring, wxString& outstring,
                const wxPoint& pos, const wxSize& size)
 {
-    StringDialog dialog(wxGetApp().GetTopWindow(), title, prompt, instring, pos, size);
+    StringDialog dialog(wxGetApp().GetTopWindow(), title, prompt,
+                        instring, pos, size);
     if ( dialog.ShowModal() == wxID_OK ) {
         outstring = dialog.GetValue();
         return true;
@@ -174,38 +175,39 @@ bool GetString(const wxString& title, const wxString& prompt,
 
 class IntegerDialog : public wxDialog
 {
-public:
-    IntegerDialog(wxWindow* parent,
-                  const wxString& title,
-                  const wxString& prompt,
-                  int inval, int minval, int maxval);
-
-    #ifdef __WXOSX__
-        ~IntegerDialog() { delete onetimer; }
-        void OnOneTimer(wxTimerEvent& event);
-    #endif
+    public:
+        IntegerDialog(wxWindow* parent,
+                      const wxString& title,
+                      const wxString& prompt,
+                      int inval, int minval, int maxval,
+                      const wxPoint& pos, const wxSize& size);
     
-    virtual bool TransferDataFromWindow();     // called when user hits OK
-
-    #ifdef __WXMAC__
-        void OnSpinCtrlChar(wxKeyEvent& event);
-    #endif
-
-    int GetValue() { return result; }
-
-private:
-    enum {
-        ID_SPIN_CTRL = wxID_HIGHEST + 1
-    };
-    wxSpinCtrl* spinctrl;    // for entering the integer
-    int minint;              // minimum value
-    int maxint;              // maximum value
-    int result;              // the resulting integer
-
-    #ifdef __WXOSX__
-        wxTimer* onetimer;   // one shot timer (see OnOneTimer)
-        DECLARE_EVENT_TABLE()
-    #endif
+        #ifdef __WXOSX__
+            ~IntegerDialog() { delete onetimer; }
+            void OnOneTimer(wxTimerEvent& event);
+        #endif
+        
+        virtual bool TransferDataFromWindow();     // called when user hits OK
+    
+        #ifdef __WXMAC__
+            void OnSpinCtrlChar(wxKeyEvent& event);
+        #endif
+    
+        int GetValue() { return result; }
+    
+    private:
+        enum {
+            ID_SPIN_CTRL = wxID_HIGHEST + 1
+        };
+        wxSpinCtrl* spinctrl;    // for entering the integer
+        int minint;              // minimum value
+        int maxint;              // maximum value
+        int result;              // the resulting integer
+    
+        #ifdef __WXOSX__
+            wxTimer* onetimer;   // one shot timer (see OnOneTimer)
+            DECLARE_EVENT_TABLE()
+        #endif
 };
 
 // -----------------------------------------------------------------------------
@@ -237,16 +239,16 @@ void IntegerDialog::OnOneTimer(wxTimerEvent& WXUNUSED(event))
 // override key event handler for wxSpinCtrl to allow key checking
 class MySpinCtrl : public wxSpinCtrl
 {
-public:
-    MySpinCtrl(wxWindow* parent, wxWindowID id) : wxSpinCtrl(parent, id)
-    {
-        // create a dynamic event handler for the underlying wxTextCtrl
-        wxTextCtrl* textctrl = GetText();
-        if (textctrl) {
-            textctrl->Connect(wxID_ANY, wxEVT_CHAR,
-                              wxKeyEventHandler(IntegerDialog::OnSpinCtrlChar));
+    public:
+        MySpinCtrl(wxWindow* parent, wxWindowID id) : wxSpinCtrl(parent, id)
+        {
+            // create a dynamic event handler for the underlying wxTextCtrl
+            wxTextCtrl* textctrl = GetText();
+            if (textctrl) {
+                textctrl->Connect(wxID_ANY, wxEVT_CHAR,
+                                  wxKeyEventHandler(IntegerDialog::OnSpinCtrlChar));
+            }
         }
-    }
 };
 
 void IntegerDialog::OnSpinCtrlChar(wxKeyEvent& event)
@@ -289,9 +291,10 @@ void IntegerDialog::OnSpinCtrlChar(wxKeyEvent& event)
 IntegerDialog::IntegerDialog(wxWindow* parent,
                              const wxString& title,
                              const wxString& prompt,
-                             int inval, int minval, int maxval)
+                             int inval, int minval, int maxval,
+                             const wxPoint& pos, const wxSize& size)
 {
-    Create(parent, wxID_ANY, title, wxDefaultPosition, wxDefaultSize);
+    Create(parent, wxID_ANY, title, pos, size);
 
     minint = minval;
     maxint = maxval;
@@ -333,7 +336,9 @@ IntegerDialog::IntegerDialog(wxWindow* parent,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    Centre();
+
+    if (pos == wxDefaultPosition) Centre();
+    if (size != wxDefaultSize) SetSize(size);
 
     #ifdef __WXOSX__
         // due to wxOSX bug we have to set focus after dialog creation
@@ -375,10 +380,11 @@ bool IntegerDialog::TransferDataFromWindow()
 // -----------------------------------------------------------------------------
 
 bool GetInteger(const wxString& title, const wxString& prompt,
-                int inval, int minval, int maxval, int* outval)
+                int inval, int minval, int maxval, int* outval,
+                const wxPoint& pos, const wxSize& size)
 {
     IntegerDialog dialog(wxGetApp().GetTopWindow(), title, prompt,
-                         inval, minval, maxval);
+                         inval, minval, maxval, pos, size);
     if ( dialog.ShowModal() == wxID_OK ) {
         *outval = dialog.GetValue();
         return true;

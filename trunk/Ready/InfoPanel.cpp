@@ -802,7 +802,23 @@ void InfoPanel::ChangeFormula()
 
 void InfoPanel::ChangeNumChemicals()
 {
-    Warning(_("TODO!!!"));
+    const int MAX_CHEMICALS = 10;   // TODO!!! Tim, is this a sensible limit??? export from BaseRD.hpp???
+
+    int oldnum = frame->GetCurrentRDSystem()->GetNumberOfChemicals();
+    int newnum;
+    
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    int dlgwd = 300;
+    pos.x -= dlgwd + 20;
+
+    if ( GetInteger(_("Change number of chemicals"), _("Enter the new number of chemicals:"),
+                    oldnum, 1, MAX_CHEMICALS, &newnum,
+                    pos, wxSize(dlgwd,wxDefaultCoord)) )
+    {
+        if (newnum != oldnum) //!!! frame->SetNumberOfChemicals(newnum);
+            Warning(_("TODO!!! implement MyFrame::SetNumberOfChemicals(int n)"));
+    }
 }
 
 // -----------------------------------------------------------------------------

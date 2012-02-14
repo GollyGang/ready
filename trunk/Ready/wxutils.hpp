@@ -48,7 +48,9 @@ bool GetString(const wxString& title, const wxString& prompt,
 // Returns false if user hits Cancel button.
 
 bool GetInteger(const wxString& title, const wxString& prompt,
-                int inval, int minval, int maxval, int* outval);
+                int inval, int minval, int maxval, int* outval,
+                const wxPoint& pos = wxDefaultPosition,
+                const wxSize& size = wxDefaultSize);
 // Display a dialog box to get an integer value from the user.
 // Returns false if user hits Cancel button.
 
