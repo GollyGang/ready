@@ -185,7 +185,7 @@ void Properties::GetFloat3(const std::string& name,float &a,float &b,float &c) c
         const vector<float> &f3 = this->float3_properties.find(name)->second;
         a = f3[0]; b = f3[1]; c = f3[2];
     }
-    throw runtime_error("Properties::GetFloat3: unknown property: "+name);
+    else throw runtime_error("Properties::GetFloat3: unknown property: "+name);
 }
 
 void Properties::Set(const std::string& name,float a,float b,float c)
