@@ -24,6 +24,7 @@
 #include "InfoPanel.hpp"
 #include "HelpPanel.hpp"
 #include "IDs.hpp"
+#include "vtk_pipeline.hpp"
 
 // readybase:
 #include "utils.hpp"
@@ -1084,6 +1085,7 @@ void MyFrame::SaveFile(const wxString& path)
 
     vtkSmartPointer<RD_XMLWriter> iw = vtkSmartPointer<RD_XMLWriter>::New();
     iw->SetSystem(this->system);
+    iw->SetRenderSettings(&this->render_settings);
     iw->SetFileName(path.mb_str());
     iw->Write();
 
@@ -1196,6 +1198,11 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         }
         else throw runtime_error("Unsupported rule type: "+type);
         target_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
+
+        // render settings
+        vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
+        if(xml_render_settings) // optional
+            this->render_settings.InitializeFromXML(xml_render_settings);
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
@@ -1421,7 +1428,6 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
     this->render_settings.Set("iActiveChemical",dlg.GetSelection());
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->UpdateWindows();
-    // TODO: might have some visualization based on more than one chemical
 }
 
 void MyFrame::SetRuleName(string s)

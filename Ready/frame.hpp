@@ -32,7 +32,7 @@ class HelpPanel;
 class wxVTKRenderWindowInteractor;
 
 // readybase
-#include "vtk_pipeline.hpp"
+#include "Properties.hpp"
 class BaseRD;
 
 // VTK:
@@ -175,6 +175,7 @@ class MyFrame : public wxFrame
         // settings:
 
         Properties render_settings;
+
         bool is_running;
         int timesteps_per_render;
         double frames_per_second,million_cell_generations_per_second;

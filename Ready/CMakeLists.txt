@@ -43,6 +43,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   OpenCL_FullKernel.hpp OpenCL_FullKernel.cpp
   IO_XML.hpp IO_XML.cpp
   overlays.hpp overlays.cpp
+  Properties.hpp Properties.cpp
   utils.hpp utils.cpp
 )
 if( NOT APPLE )

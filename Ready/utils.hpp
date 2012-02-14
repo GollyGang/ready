@@ -22,6 +22,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <map>
 
 // VTK:
 #include <vtkXMLDataElement.h>
