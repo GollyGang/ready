@@ -214,7 +214,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         actor->SetInput(image_mapper->GetOutput());
         if(!use_image_interpolation)
             actor->InterpolateOff();
-        actor->SetPosition(0,0,low*-scaling + 2);
+        actor->SetPosition(0,-system->GetY()-3,0);
 
         // add the actor to the renderer's scene
         pRenderer->AddActor(actor);
@@ -233,7 +233,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iActiveChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-scaling);
+        warp->SetScaleFactor(scaling);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();
@@ -249,7 +249,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0,0,0,0,low*-scaling,high*-scaling);
+        axis->SetBounds(0,0,0,0,low*scaling,high*scaling);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
