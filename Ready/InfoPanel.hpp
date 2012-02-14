@@ -70,7 +70,8 @@ class InfoPanel : public wxPanel
         wxStaticText* status;   // for link info
         
         // for building HTML table
-        wxString AppendRow(const wxString& label, const wxString& value, bool is_parameter = false);
+        wxString AppendRow(const wxString& label, const wxString& value,
+                           bool is_parameter = false, bool is_editable = true);
 
         // for making changes
         void ChangeParameter(const wxString& parameter);
