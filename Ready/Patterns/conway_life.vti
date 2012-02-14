@@ -59,6 +59,7 @@
 
     <render_settings>
         <use_image_interpolation type="bool" value="0" />
+        <vertical_scale_2D type="float" value="3" />
     </render_settings>
 
     
