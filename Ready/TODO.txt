@@ -16,7 +16,8 @@ Andrew's tasks for 0.2:
 - do any other "AKT TODO" tasks
 
 before 0.3 release:
-- control over render pipeline: contouring level, color map (ranges, palette), slice direction/height etc. in XML and UI
+- allow user to change the render_settings (both the default ones and the ones specified in the file)
+- more control over render pipeline: slice direction/height, etc.
 - UI for editing the initial-pattern-generator overlay stack
 - add option to convert formula rules into full-kernel rules
 
@@ -47,4 +48,4 @@ future ideas:
 - display the evolution of a 1D pattern as a 2D image, with time as the second axis, as here:
   http://www.stephenwolfram.com/publications/recent/specialfunctions/images/Slide028_917x754.gif
 - allow non-OpenCL implementations to load all files, by parsing formula
-- integer systems (including GoL)
+- integer systems
