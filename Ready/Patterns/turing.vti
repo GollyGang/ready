@@ -40,8 +40,8 @@
     </initial_pattern_generator>
     
     <render_settings>
-      <prop name="low" type="float" value="0" />
-      <prop name="high" type="float" value="8" />
+      <low type="float" value="0" />
+      <high type="float" value="8" />
     </render_settings>
 
   </RD>

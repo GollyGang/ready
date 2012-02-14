@@ -58,7 +58,7 @@
     </initial_pattern_generator>
 
     <render_settings>
-        <prop name="use_image_interpolation" type="bool" value="0" />
+        <use_image_interpolation type="bool" value="0" />
     </render_settings>
 
     
