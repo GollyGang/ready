@@ -1729,8 +1729,8 @@ void MyFrame::InitializeDefaultRenderSettings()
 {
     this->render_settings.Set("low",0.0f);
     this->render_settings.Set("high",1.0f);
-    this->render_settings.Set("vertical_scale_1D",25.0f);
-    this->render_settings.Set("vertical_scale_2D",5.0f);
+    this->render_settings.Set("vertical_scale_1D",30.0f);
+    this->render_settings.Set("vertical_scale_2D",15.0f);
     this->render_settings.Set("hue_low",0.6f);
     this->render_settings.Set("hue_high",0.0f);
     this->render_settings.Set("iActiveChemical",0);
