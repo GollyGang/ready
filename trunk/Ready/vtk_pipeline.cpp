@@ -82,13 +82,14 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     float low = render_settings.GetFloat("low");
     float high = render_settings.GetFloat("high");
     float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
-    float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
     float hue_low = render_settings.GetFloat("hue_low");
     float hue_high = render_settings.GetFloat("hue_high");
     bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
     bool use_wireframe = render_settings.GetBool("use_wireframe");
+
+    float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -115,7 +116,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // an actor determines how a scene object is displayed
     vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
     actor->SetInput(image_mapper->GetOutput());
-    actor->SetPosition(0,low*vertical_scale_1D - 5.0,0);
+    actor->SetPosition(0,low*scaling - 5.0,0);
     if(!use_image_interpolation)
         actor->InterpolateOff();
 
@@ -134,7 +135,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-vertical_scale_1D);
+        warp->SetScaleFactor(-scaling);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();
@@ -154,7 +155,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(0,0,low*vertical_scale_1D,high*vertical_scale_1D,0,0);
+    axis->SetBounds(0,0,low*scaling,high*scaling,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -180,7 +181,6 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 {
     float low = render_settings.GetFloat("low");
     float high = render_settings.GetFloat("high");
-    float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
     float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
     float hue_low = render_settings.GetFloat("hue_low");
     float hue_high = render_settings.GetFloat("hue_high");
@@ -188,6 +188,8 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
     bool use_wireframe = render_settings.GetBool("use_wireframe");
+    
+    float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -213,7 +215,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         actor->SetInput(image_mapper->GetOutput());
         if(!use_image_interpolation)
             actor->InterpolateOff();
-        actor->SetPosition(0,0,low*-vertical_scale_2D + 2);
+        actor->SetPosition(0,0,low*-scaling + 2);
 
         // add the actor to the renderer's scene
         pRenderer->AddActor(actor);
@@ -232,7 +234,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         plane->SetInput(system->GetImage(iActiveChemical));
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-vertical_scale_2D);
+        warp->SetScaleFactor(-scaling);
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
         normals->SetInputConnection(warp->GetOutputPort());
         normals->SplittingOff();
@@ -248,7 +250,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0,0,0,0,low*-vertical_scale_2D,high*-vertical_scale_2D);
+        axis->SetBounds(0,0,0,0,low*-scaling,high*-scaling);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
@@ -275,8 +277,6 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 {
     float low = render_settings.GetFloat("low");
     float high = render_settings.GetFloat("high");
-    float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
-    float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
     float hue_low = render_settings.GetFloat("hue_low");
     float hue_high = render_settings.GetFloat("hue_high");
     bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
