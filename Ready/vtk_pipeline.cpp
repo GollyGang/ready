@@ -34,11 +34,9 @@
 #include <vtkSmartPointer.h>
 #include <vtkContourFilter.h>
 #include <vtkProperty.h>
-#include <vtkImageShiftScale.h>
 #include <vtkImageActor.h>
 #include <vtkProperty2D.h>
 #include <vtkRendererCollection.h>
-#include <vtkInteractorStyleImage.h>
 #include <vtkLookupTable.h>
 #include <vtkImageMapToColors.h>
 #include <vtkImageData.h>
@@ -50,7 +48,8 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkImageMirrorPad.h>
 #include <vtkCubeAxesActor2D.h>
-#include <vtkExtractVOI.h>
+#include <vtkImageReslice.h>
+#include <vtkMatrix4x4.h>
 
 // STL:
 #include <stdexcept>
@@ -283,7 +282,10 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
     bool use_wireframe = render_settings.GetBool("use_wireframe");
-    
+    bool use_slice2D = render_settings.GetBool("use_slice2D");
+    int slice2D_axis = render_settings.GetInt("slice2D_axis");
+    float slice2D_pos = render_settings.GetFloat("slice2D_pos");
+
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
@@ -342,6 +344,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     }
 
     // add a 2D slice too
+    if(use_slice2D)
     {
         // create a lookup table for mapping values to colors
         vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
@@ -351,9 +354,44 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         lut->SetHueRange(hue_low,hue_high);
 
         // extract a slice
-        vtkSmartPointer<vtkExtractVOI> voi = vtkSmartPointer<vtkExtractVOI>::New();
-        voi->SetInput(system->GetImage(iActiveChemical));
-        voi->SetVOI(0,system->GetX(),0,system->GetY(),system->GetZ()/2.0,system->GetZ()/2.0);
+        vtkImageData *image = system->GetImage(iActiveChemical);
+        // Matrices for axial, coronal, sagittal, oblique view orientations
+        static double sagittalElements[16] = { // x
+               0, 0,-1, 0,
+               1, 0, 0, 0,
+               0,-1, 0, 0,
+               0, 0, 0, 1 };
+        static double coronalElements[16] = { // y
+                 1, 0, 0, 0,
+                 0, 0, 1, 0,
+                 0,-1, 0, 0,
+                 0, 0, 0, 1 };
+        static double axialElements[16] = { // z
+                 1, 0, 0, 0,
+                 0, 1, 0, 0,
+                 0, 0, 1, 0,
+                 0, 0, 0, 1 };
+        /*static double obliqueElements[16] = { // could get fancy and have slanting slices
+                 1, 0, 0, 0,
+                 0, 0.866025, -0.5, 0,
+                 0, 0.5, 0.866025, 0,
+                 0, 0, 0, 1 };*/
+        // Set the slice orientation
+        vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
+        switch(slice2D_axis)
+        {
+            case 0: resliceAxes->DeepCopy(sagittalElements); break;
+            case 1: resliceAxes->DeepCopy(coronalElements); break;
+            case 2: resliceAxes->DeepCopy(axialElements); break;
+        }
+        resliceAxes->SetElement(0, 3, slice2D_pos * system->GetX());
+        resliceAxes->SetElement(1, 3, slice2D_pos * system->GetY());
+        resliceAxes->SetElement(2, 3, slice2D_pos * system->GetZ());
+
+        vtkSmartPointer<vtkImageReslice> voi = vtkSmartPointer<vtkImageReslice>::New();
+        voi->SetInput(image);
+        voi->SetOutputDimensionality(2);
+        voi->SetResliceAxes(resliceAxes);
 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -363,6 +401,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // an actor determines how a scene object is displayed
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
         actor->SetInput(image_mapper->GetOutput());
+        actor->SetUserMatrix(resliceAxes);
         if(!use_image_interpolation)
             actor->InterpolateOff();
 

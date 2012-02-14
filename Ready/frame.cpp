@@ -1737,5 +1737,8 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.Set("use_image_interpolation",true);
     this->render_settings.Set("contour_level",0.25f);
     this->render_settings.Set("use_wireframe",false);
+    this->render_settings.Set("use_slice2D",true);
+    this->render_settings.Set("slice2D_axis",2); // 0=x, 1=y, 2=z
+    this->render_settings.Set("slice2D_pos",0.5f); // [0,1]
     // TODO: allow user to change defaults
 }
