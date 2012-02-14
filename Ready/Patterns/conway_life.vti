@@ -56,6 +56,11 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
+
+    <render_settings>
+        <prop name="use_image_interpolation" type="bool" value="0" />
+    </render_settings>
+
     
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">

@@ -46,6 +46,11 @@
             </rectangle>
         </overlay>
     </initial_pattern_generator>
+    
+    <render_settings>
+        <prop name="iActiveChemical" type="int" value="1" />
+    </render_settings>
+    
   </RD>
   
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">

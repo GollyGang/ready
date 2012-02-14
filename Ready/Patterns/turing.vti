@@ -39,6 +39,11 @@
       </overlay>
     </initial_pattern_generator>
     
+    <render_settings>
+      <prop name="low" type="float" value="0" />
+      <prop name="high" type="float" value="8" />
+    </render_settings>
+
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">

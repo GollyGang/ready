@@ -168,20 +168,6 @@ MyFrame::MyFrame(const wxString& title)
     #endif
     this->aui_mgr.SetManagedWindow(this);
     
-    // TODO: put this somewhere else
-    {
-        this->render_settings.Set("low",0.0f);
-        this->render_settings.Set("high",1.0f);
-        this->render_settings.Set("vertical_scale_1D",25.0f);
-        this->render_settings.Set("vertical_scale_2D",5.0f);
-        this->render_settings.Set("hue_low",0.6f);
-        this->render_settings.Set("hue_high",0.0f);
-        this->render_settings.Set("iActiveChemical",0);
-        this->render_settings.Set("use_image_interpolation",false);
-        this->render_settings.Set("contour_level",0.25f);
-        this->render_settings.Set("use_wireframe",false);
-    }
-
     GetPrefs();     // must be called before InitializeMenus
 
     this->InitializeMenus();
@@ -1097,6 +1083,21 @@ void MyFrame::SaveFile(const wxString& path)
 
 void MyFrame::OnNewPattern(wxCommandEvent& event)
 {
+    {
+        // default settings (will get overridden when a file is loaded)
+        this->render_settings.Set("low",0.0f);
+        this->render_settings.Set("high",1.0f);
+        this->render_settings.Set("vertical_scale_1D",25.0f);
+        this->render_settings.Set("vertical_scale_2D",5.0f);
+        this->render_settings.Set("hue_low",0.6f);
+        this->render_settings.Set("hue_high",0.0f);
+        this->render_settings.Set("iActiveChemical",0);
+        this->render_settings.Set("use_image_interpolation",true);
+        this->render_settings.Set("contour_level",0.25f);
+        this->render_settings.Set("use_wireframe",false);
+        // TODO: put this in a function
+    }
+
     if(this->system == NULL) {
         // initial call from MyFrame::MyFrame
         GrayScott *s = new GrayScott();
@@ -1111,9 +1112,6 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     
     this->system->BlankImage();
-
-    // DEBUG!!!
-    this->system->Allocate(64,64,64,3);
 
     this->is_running = false;
     this->system->SetFilename("untitled");
@@ -1200,6 +1198,20 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         target_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
 
         // render settings
+        {
+            // default settings (will get overridden)
+            this->render_settings.Set("low",0.0f);
+            this->render_settings.Set("high",1.0f);
+            this->render_settings.Set("vertical_scale_1D",25.0f);
+            this->render_settings.Set("vertical_scale_2D",5.0f);
+            this->render_settings.Set("hue_low",0.6f);
+            this->render_settings.Set("hue_high",0.0f);
+            this->render_settings.Set("iActiveChemical",0);
+            this->render_settings.Set("use_image_interpolation",true);
+            this->render_settings.Set("contour_level",0.25f);
+            this->render_settings.Set("use_wireframe",false);
+            // TODO: put this in a function
+        }
         vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
         if(xml_render_settings) // optional
             this->render_settings.InitializeFromXML(xml_render_settings);
