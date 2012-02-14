@@ -29,7 +29,7 @@ void Properties::InitializeFromXML(vtkXMLDataElement *node)
     {
         vtkXMLDataElement *prop = node->GetNestedElement(i);
         string prop_name,prop_type;
-        read_required_attribute(prop,"name",prop_name);
+        prop_name = prop->GetName();
         read_required_attribute(prop,"type",prop_type);
         if(prop_type=="float")
         {
@@ -68,8 +68,7 @@ vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
     for(map<string,float>::const_iterator it=this->float_properties.begin();it!=this->float_properties.end();it++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("prop");
-        node->SetAttribute("name",it->first.c_str());
+        node->SetName(it->first.c_str());
         node->SetAttribute("type","float");
         node->SetFloatAttribute("value",it->second);
         root->AddNestedElement(node);
@@ -77,8 +76,7 @@ vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
     for(map<string,int>::const_iterator it=this->int_properties.begin();it!=this->int_properties.end();it++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("prop");
-        node->SetAttribute("name",it->first.c_str());
+        node->SetName(it->first.c_str());
         node->SetAttribute("type","int");
         node->SetIntAttribute("value",it->second);
         root->AddNestedElement(node);
@@ -86,8 +84,7 @@ vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
     for(map<string,bool>::const_iterator it=this->bool_properties.begin();it!=this->bool_properties.end();it++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("prop");
-        node->SetAttribute("name",it->first.c_str());
+        node->SetName(it->first.c_str());
         node->SetAttribute("type","bool");
         node->SetIntAttribute("value",it->second?1:0);
         root->AddNestedElement(node);
@@ -95,8 +92,7 @@ vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
     for(map<string,vector<float> >::const_iterator it=this->float3_properties.begin();it!=this->float3_properties.end();it++)
     {
         vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("prop");
-        node->SetAttribute("name",it->first.c_str());
+        node->SetName(it->first.c_str());
         node->SetAttribute("type","float3");
         node->SetFloatAttribute("a",it->second[0]);
         node->SetFloatAttribute("b",it->second[1]);

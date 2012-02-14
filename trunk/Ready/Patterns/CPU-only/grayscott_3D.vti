@@ -43,7 +43,7 @@
     </initial_pattern_generator>
     
     <render_settings>
-        <prop name="iActiveChemical" type="int" value="1" />
+        <iActiveChemical type="int" value="1" />
     </render_settings>
     
   </RD>
