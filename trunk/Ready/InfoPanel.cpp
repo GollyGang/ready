@@ -53,8 +53,6 @@ const wxString block_size_label = wxT("Block size");
 
 // -----------------------------------------------------------------------------
 
-// AKT TODO!!! put HtmlInfo class in separate files so we can use in HelpPanel as well???
-
 // define a child window for displaying HTML info
 class HtmlInfo : public wxHtmlWindow
 {
@@ -291,7 +289,6 @@ void HtmlInfo::ChangeFontSizes(int size)
     GetViewStart(&x, &y);
     SetFontSizes(size);
     Scroll(x, y);
-    // AKT TODO!!! fix display bug (Mac only?) when size increases so that scroll bar appears
     panel->UpdateButtons();
 }
 
@@ -383,11 +380,8 @@ void InfoPanel::Update(const BaseRD* const system)
     s.Replace(wxT("\n"), wxT("<br>"));
     contents += AppendRow(description_label, s);
 
-    if(system->HasEditableNumberOfChemicals())
-    {
-        contents += AppendRow(num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()));
-    }
-    // TODO!!! we might want to show the number of chemicals but not allow editing (e.g. inbuilt rules)
+    contents += AppendRow(num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()),
+                          false, system->HasEditableNumberOfChemicals());
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
@@ -395,35 +389,29 @@ void InfoPanel::Update(const BaseRD* const system)
                               FormatFloat(system->GetParameterValue(iParam)), true);
     }
 
-    if(system->HasEditableFormula())
-    {
-        wxString formula = system->GetFormula();
-        // escape HTML reserved characters
-        formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
-        formula.Replace(wxT("<"), wxT("&lt;"));
-        formula.Replace(wxT(">"), wxT("&gt;"));
-        // deal with line endings
-        formula.Replace(wxT("\r\n"), wxT("<br>"));
-        formula.Replace(wxT("\n\r"), wxT("<br>"));
-        formula.Replace(wxT("\r"), wxT("<br>"));
-        formula.Replace(wxT("\n"), wxT("<br>"));
-        // convert whitespace to &nbsp; so we can use the <code> block
-        formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
-        // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
-        //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
-        formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
-        contents += AppendRow(formula_label, formula);
-    }
-    // TODO!!! we might want to show the formula but not allow editing (e.g. inbuilt rules)
+    wxString formula = system->GetFormula();
+    // escape HTML reserved characters
+    formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
+    formula.Replace(wxT("<"), wxT("&lt;"));
+    formula.Replace(wxT(">"), wxT("&gt;"));
+    // deal with line endings
+    formula.Replace(wxT("\r\n"), wxT("<br>"));
+    formula.Replace(wxT("\n\r"), wxT("<br>"));
+    formula.Replace(wxT("\r"), wxT("<br>"));
+    formula.Replace(wxT("\n"), wxT("<br>"));
+    // convert whitespace to &nbsp; so we can use the <code> block
+    formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
+    // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
+    //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
+    formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
+    contents += AppendRow(formula_label, formula, false, system->HasEditableFormula());
 
     contents += AppendRow(dimensions_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
                                             system->GetX(),system->GetY(),system->GetZ()));
 
-    if(system->HasEditableBlockSize())
-    {
-        contents += AppendRow(block_size_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
-                                                system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()));
-    }
+    contents += AppendRow(block_size_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
+                                            system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
+                                            false, system->HasEditableBlockSize());
 
     contents += _("</table></body></html>");
     
@@ -432,7 +420,8 @@ void InfoPanel::Update(const BaseRD* const system)
 
 // -----------------------------------------------------------------------------
 
-wxString InfoPanel::AppendRow(const wxString& label, const wxString& value, bool is_parameter)
+wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
+                              bool is_parameter, bool is_editable)
 {
     wxString result;
     if (rownum & 1)
@@ -447,11 +436,17 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value, bool
     result += value;
     result += _("</td>");
 
-    result += _("<td align=right><a href=\"");
-    result += change_prefix;
-    if (is_parameter) result += parameter_prefix;
-    result += label;
-    result += _("\">edit</a></td><td width=3></td>");
+    if (is_editable) {
+        result += _("<td align=right><a href=\"");
+        result += change_prefix;
+        if (is_parameter) result += parameter_prefix;
+        result += label;
+        result += _("\">edit</a></td>");
+    } else {
+        result += _("<td></td>");
+    }
+    result += _("<td width=3></td>");
+    
     
     result += _("</tr>");
     return result;
@@ -689,7 +684,7 @@ void InfoPanel::ChangeDescription()
     wxString newtext;
 
     // AKT TODO!!! adding wxRESIZE_BORDER to style flags didn't work
-    // so we might need to implement our own dialog
+    // so we might need to implement our own MultiLineDialog
     wxTextEntryDialog dialog(frame, _("Enter the new description:"),
                              _("Change description"), oldtext,
                              wxOK | wxCANCEL | wxTE_MULTILINE);
@@ -707,20 +702,13 @@ void InfoPanel::ChangeDescription()
 
 // -----------------------------------------------------------------------------
 
-void InfoPanel::ChangeNumChemicals()
-{
-    Warning(_("TODO!!!"));
-}
-
-// -----------------------------------------------------------------------------
-
 void InfoPanel::ChangeFormula()
 {
     wxString oldcode(frame->GetCurrentRDSystem()->GetFormula().c_str(),wxConvUTF8);
     wxString newcode;
 
     // AKT TODO!!! adding wxRESIZE_BORDER to style flags didn't work
-    // so we might need to implement our own dialog
+    // so we might need to implement our own MultiLineDialog
     wxTextEntryDialog dialog(frame, _("Enter the new formula:"),
                              _("Change formula"), oldcode,
                              wxOK | wxCANCEL | wxTE_MULTILINE);
@@ -734,6 +722,13 @@ void InfoPanel::ChangeFormula()
         newcode = dialog.GetValue();
         if (newcode != oldcode) frame->SetFormula(string(newcode.mb_str()));
     }
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeNumChemicals()
+{
+    Warning(_("TODO!!!"));
 }
 
 // -----------------------------------------------------------------------------
