@@ -57,7 +57,7 @@ void Properties::InitializeFromXML(vtkXMLDataElement *node)
             read_required_attribute(prop,"c",f3[2]);
             this->float3_properties[prop_name] = f3;
         }
-        else throw runtime_error("Properties : unrecognised type: "+prop_type);
+        else throw runtime_error("Properties::InitializeFromXML : unrecognised type: "+prop_type);
     }
 }
 
@@ -167,7 +167,7 @@ std::string Properties::GetPropertyName(int i) const
 
 std::string Properties::GetPropertyType(int i) const
 {
-    if(i<0 || i>=this->GetNumberOfProperties()) throw runtime_error("Properties::GetPropertyName : out of range");
+    if(i<0 || i>=this->GetNumberOfProperties()) throw runtime_error("Properties::GetPropertyType : out of range");
     if(i<(int)this->float_properties.size())
         return "float";
     i -= (int)this->float_properties.size();
@@ -179,7 +179,7 @@ std::string Properties::GetPropertyType(int i) const
     i -= (int)this->bool_properties.size();
     if(i<(int)this->float3_properties.size())
         return "float3";
-    throw runtime_error("Properties::GetPropertyName : internal error");
+    throw runtime_error("Properties::GetPropertyType : internal error");
 }
 
 void Properties::GetFloat3(const std::string& name,float &a,float &b,float &c) const
