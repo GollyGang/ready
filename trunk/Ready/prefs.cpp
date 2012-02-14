@@ -83,6 +83,8 @@ int debuglevel = 0;              // for displaying debug info if > 0
     int infofontsize = 10;       // font size in Win/Linux info pane
     int helpfontsize = 10;       // font size in Win/Linux help pane
 #endif
+int textdlgwd = 500;             // width of multi-line text dialog
+int textdlght = 300;             // height of multi-line text dialog
 bool showtips = true;            // show button tips?
 bool allowbeep = true;           // okay to play beep sound?
 bool askonnew = true;            // ask to save changes before creating new pattern?
@@ -895,6 +897,8 @@ void SavePrefs()
     
     fprintf(f, "info_font_size=%d (%d..%d)\n", infofontsize, minfontsize, maxfontsize);
     fprintf(f, "help_font_size=%d (%d..%d)\n", helpfontsize, minfontsize, maxfontsize);
+    fprintf(f, "text_dlg_wd=%d\n", textdlgwd);
+    fprintf(f, "text_dlg_ht=%d\n", textdlght);
     fprintf(f, "show_tips=%d\n", showtips ? 1 : 0);
     fprintf(f, "allow_beep=%d\n", allowbeep ? 1 : 0);
     fprintf(f, "ask_on_new=%d\n", askonnew ? 1 : 0);
@@ -1193,6 +1197,14 @@ void GetPrefs()
             sscanf(value, "%d", &helpfontsize);
             if (helpfontsize < minfontsize) helpfontsize = minfontsize;
             if (helpfontsize > maxfontsize) helpfontsize = maxfontsize;
+
+        } else if (strcmp(keyword, "text_dlg_wd") == 0) {
+            sscanf(value, "%d", &textdlgwd);
+            if (textdlgwd < 200) textdlgwd = 200;
+
+        } else if (strcmp(keyword, "text_dlg_ht") == 0) {
+            sscanf(value, "%d", &textdlght);
+            if (textdlght < 100) textdlght = 100;
 
         } else if (strcmp(keyword, "show_tips") == 0)   { showtips = value[0] == '1';
         } else if (strcmp(keyword, "allow_beep") == 0)  { allowbeep = value[0] == '1';

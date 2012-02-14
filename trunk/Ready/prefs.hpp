@@ -59,6 +59,8 @@ extern int opencl_device;        // current OpenCL device
 extern int debuglevel;           // for displaying debug info if > 0
 extern int infofontsize;         // font size in info pane
 extern int helpfontsize;         // font size in help pane
+extern int textdlgwd;            // width of multi-line text dialog
+extern int textdlght;            // height of multi-line text dialog
 extern bool showtips;            // show button tips?
 extern bool allowbeep;           // okay to play beep sound?
 extern bool askonnew;            // ask to save changes before creating new pattern?
