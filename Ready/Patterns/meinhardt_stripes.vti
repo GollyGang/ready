@@ -26,6 +26,11 @@
       
     </rule>
     
+    <render_settings>
+        <low type="float" value="0" />
+        <high type="float" value="1.5" />
+    </render_settings>
+    
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">
