@@ -21,6 +21,8 @@
 
 // readybase:
 #include "BaseRD.hpp"
+#include "utils.hpp"
+#include "Properties.hpp"
 
 // VTK:
 #include <vtkInteractorStyleTrackballCamera.h>
@@ -61,91 +63,6 @@
 #include <stdexcept>
 using namespace std;
 
-Properties::Properties(vtkXMLDataElement *node) : XML_Object(node)
-{    
-    for(int i=0;i<node->GetNumberOfNestedElements();i++)
-    {
-        vtkXMLDataElement *prop = node->GetNestedElement(i);
-        string prop_name,prop_type;
-        read_required_attribute(prop,"name",prop_name);
-        read_required_attribute(prop,"type",prop_type);
-        if(prop_type=="float")
-        {
-            float f;
-            read_required_attribute(prop,"value",f);
-            this->float_properties[prop_name] = f;
-        }
-        else if(prop_type=="int")
-        {
-            int i;
-            read_required_attribute(prop,"value",i);
-            this->int_properties[prop_name] = i;
-        }
-        else if(prop_type=="bool")
-        {
-            int i;
-            read_required_attribute(prop,"value",i);
-            this->bool_properties[prop_name] = (i==1);
-        }
-        else throw runtime_error("Properties : unrecognised type: "+prop_type);
-    }
-}
-
-vtkSmartPointer<vtkXMLDataElement> Properties::GetAsXML() const
-{
-    vtkSmartPointer<vtkXMLDataElement> root = vtkSmartPointer<vtkXMLDataElement>::New();
-    root->SetName(this->name.c_str());
-    for(map<string,float>::const_iterator it=this->float_properties.begin();it!=this->float_properties.end();it++)
-    {
-        vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("property");
-        node->SetAttribute("name",it->first.c_str());
-        node->SetAttribute("type","float");
-        node->SetFloatAttribute("value",it->second);
-        root->AddNestedElement(node);
-    }
-    for(map<string,int>::const_iterator it=this->int_properties.begin();it!=this->int_properties.end();it++)
-    {
-        vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("property");
-        node->SetAttribute("name",it->first.c_str());
-        node->SetAttribute("type","int");
-        node->SetIntAttribute("value",it->second);
-        root->AddNestedElement(node);
-    }
-    for(map<string,bool>::const_iterator it=this->bool_properties.begin();it!=this->bool_properties.end();it++)
-    {
-        vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
-        node->SetName("property");
-        node->SetAttribute("name",it->first.c_str());
-        node->SetAttribute("type","bool");
-        node->SetIntAttribute("value",it->second?1:0);
-        root->AddNestedElement(node);
-    }
-    return root;
-}
-
-float Properties::GetFloat(const std::string &name) const
-{
-    if(this->float_properties.count(name)) 
-        return this->float_properties.find(name)->second;
-    throw runtime_error("Properties::GetFloat: unknown property: "+name);
-}
-
-int Properties::GetInt(const std::string &name) const
-{
-    if(this->int_properties.count(name)) 
-        return this->int_properties.find(name)->second;
-    throw runtime_error("Properties::GetInt: unknown property: "+name);
-}
-
-bool Properties::GetBool(const std::string &name) const
-{
-    if(this->bool_properties.count(name)) 
-        return this->bool_properties.find(name)->second;
-    throw runtime_error("Properties::GetBool: unknown property: "+name);
-}
-
 // TODO: allow visualizations that use more than one chemical
 
 void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
@@ -180,6 +97,7 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
+    bool use_wireframe = render_settings.GetBool("use_wireframe");
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -278,6 +196,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
+    bool use_wireframe = render_settings.GetBool("use_wireframe");
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -330,6 +249,8 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
+        if(use_wireframe)
+            actor->GetProperty()->SetRepresentationToWireframe();
         pRenderer->AddActor(actor);
 
         // add an axis
@@ -369,109 +290,46 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
+    bool use_wireframe = render_settings.GetBool("use_wireframe");
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
     pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
 
-    if(0)
-    {
-        // use volume rendering
+    // contour the 3D volume and render as a polygonal surface
 
-        // convert image to unsigned char
-        vtkSmartPointer<vtkImageShiftScale> char_image = vtkSmartPointer<vtkImageShiftScale>::New();
-        char_image->SetInput(system->GetImage(iActiveChemical));
-        char_image->SetScale(255.0);
-        char_image->SetOutputScalarTypeToUnsignedChar();
+    // turns the 3d grid of sampled values into a polygon mesh for rendering,
+    // by making a surface that contours the volume at a specified level
+    vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+    surface->SetInput(system->GetImage(iActiveChemical));
+    surface->SetValue(0, contour_level);
 
-        // The volume will be displayed by ray-cast alpha compositing.
-        // A ray-cast mapper is needed to do the ray-casting, and a
-        // compositing function is needed to do the compositing along the ray. 
-        vtkSmartPointer<vtkVolumeRayCastCompositeFunction> rayCastFunction = vtkSmartPointer<vtkVolumeRayCastCompositeFunction>::New();
+    // a mapper converts scene objects to graphics primitives
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(surface->GetOutputPort());
+    mapper->ScalarVisibilityOff();
 
-        vtkSmartPointer<vtkVolumeRayCastMapper> volumeMapper = vtkSmartPointer<vtkVolumeRayCastMapper>::New();
-        volumeMapper->SetInput(char_image->GetOutput());
-        volumeMapper->SetVolumeRayCastFunction(rayCastFunction);
+    // an actor determines how a scene object is displayed
+    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+    actor->GetProperty()->SetColor(1,1,1);  
+    actor->GetProperty()->SetAmbient(0.1);
+    actor->GetProperty()->SetDiffuse(0.7);
+    actor->GetProperty()->SetSpecular(0.2);
+    actor->GetProperty()->SetSpecularPower(3);
+    if(use_wireframe)
+        actor->GetProperty()->SetRepresentationToWireframe();
+    vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+    actor->SetBackfaceProperty(bfprop);
+    bfprop->SetColor(0.3,0.3,0.3);
+    bfprop->SetAmbient(0.3);
+    bfprop->SetDiffuse(0.6);
+    bfprop->SetSpecular(0.1);
 
-        // The color transfer function maps voxel intensities to colors.
-        vtkSmartPointer<vtkColorTransferFunction>volumeColor = vtkSmartPointer<vtkColorTransferFunction>::New();
-        volumeColor->AddRGBPoint(0,1,1,1);
-        volumeColor->AddRGBPoint(255,1,1,1);
+    // add the actor to the renderer's scene
+    pRenderer->AddActor(actor);
 
-        // The opacity transfer function is used to control the opacity
-        // of different tissue types.
-        vtkSmartPointer<vtkPiecewiseFunction> volumeScalarOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
-        volumeScalarOpacity->AddPoint(0,0.0);
-        volumeScalarOpacity->AddPoint(60,0.0);
-        volumeScalarOpacity->AddPoint(80,0.8);
-        volumeScalarOpacity->AddPoint(255,1.0);
-
-        // The gradient opacity function is used to decrease the opacity
-        // in the "flat" regions of the volume while maintaining the opacity
-        // at the boundaries between tissue types.  The gradient is measured
-        // as the amount by which the intensity changes over unit distance.
-        // For most medical data, the unit distance is 1mm.
-        vtkSmartPointer<vtkPiecewiseFunction> volumeGradientOpacity = vtkSmartPointer<vtkPiecewiseFunction>::New();
-        volumeGradientOpacity->AddPoint(0,0.0);
-        volumeGradientOpacity->AddPoint(10,0.5);
-        volumeGradientOpacity->AddPoint(100,1.0);
- 
-        // The VolumeProperty attaches the color and opacity functions to the
-        // volume, and sets other volume properties.
-        vtkSmartPointer<vtkVolumeProperty> volumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
-        volumeProperty->SetColor(volumeColor);
-        volumeProperty->SetScalarOpacity(volumeScalarOpacity);
-        volumeProperty->SetGradientOpacity(volumeGradientOpacity);
-        volumeProperty->SetInterpolationTypeToLinear();
-        volumeProperty->ShadeOff();
-        volumeProperty->SetAmbient(0.4);
-        volumeProperty->SetDiffuse(0.6);
-        volumeProperty->SetSpecular(0.2);
-
-        // The vtkVolume is a vtkProp3D (like a vtkActor) and controls the position
-        // and orientation of the volume in world coordinates.
-        vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
-        volume->SetMapper(volumeMapper);
-        volume->SetProperty(volumeProperty);
-
-        // Finally, add the volume to the renderer
-        pRenderer->AddViewProp(volume);
-    }
-    else
-    {
-        // contour the 3D volume and render as a polygonal surface
-
-        // turns the 3d grid of sampled values into a polygon mesh for rendering,
-        // by making a surface that contours the volume at a specified level
-        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInput(system->GetImage(iActiveChemical));
-        surface->SetValue(0, contour_level);
-        // TODO: allow user to control the contour level
-
-        // a mapper converts scene objects to graphics primitives
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(surface->GetOutputPort());
-        mapper->ScalarVisibilityOff();
-
-        // an actor determines how a scene object is displayed
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(1,1,1);  
-        actor->GetProperty()->SetAmbient(0.1);
-        actor->GetProperty()->SetDiffuse(0.7);
-        actor->GetProperty()->SetSpecular(0.2);
-        actor->GetProperty()->SetSpecularPower(3);
-        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
-        actor->SetBackfaceProperty(bfprop);
-        bfprop->SetColor(0.3,0.3,0.3);
-        bfprop->SetAmbient(0.3);
-        bfprop->SetDiffuse(0.6);
-        bfprop->SetSpecular(0.1);
-
-        // add the actor to the renderer's scene
-        pRenderer->AddActor(actor);
-    }
     // add the bounding box
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();

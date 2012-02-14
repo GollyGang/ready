@@ -19,35 +19,7 @@
 class wxVTKRenderWindowInteractor;
 
 // readybase:
-#include "utils.hpp"
 class BaseRD;
-
-// STL:
-#include <map>
-#include <string>
-
-class Properties : public XML_Object
-{
-    public: 
-
-        Properties(std::string name) : XML_Object(NULL),name(name) {}
-        Properties(vtkXMLDataElement* node);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
-        void Set(const std::string& name,float f) { this->float_properties[name] = f; }
-        void Set(const std::string& name,int i) { this->int_properties[name] = i; }
-        void Set(const std::string& name,bool b) { this->bool_properties[name] = b; }
-        float GetFloat(const std::string& name) const;
-        int GetInt(const std::string& name) const;
-        bool GetBool(const std::string& name) const;
-
-    protected:
-    
-        std::string name;
-
-        std::map<std::string,float> float_properties;
-        std::map<std::string,int> int_properties;
-        std::map<std::string,bool> bool_properties;
-};
+class Properties;
 
 void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);

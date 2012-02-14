@@ -17,6 +17,7 @@
 
 // local
 class BaseRD;
+class Properties;
 
 // VTK:
 #include <vtkXMLImageDataWriter.h>
@@ -32,6 +33,7 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
         static RD_XMLWriter* New();
 
         void SetSystem(BaseRD* rd_system);
+        void SetRenderSettings(Properties* settings) { this->render_settings = settings; }
 
     protected:  
 
@@ -44,6 +46,7 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
     protected:
 
         BaseRD *system;
+        Properties* render_settings;
 };
 
 class RD_XMLReader : public vtkXMLImageDataReader

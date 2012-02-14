@@ -19,7 +19,7 @@
 #include "IO_XML.hpp"
 #include "BaseRD.hpp"
 #include "utils.hpp"
-#include "overlays.hpp"
+#include "Properties.hpp"
 
 // VTK:
 #include <vtkXMLUtilities.h>
@@ -45,7 +45,9 @@ void RD_XMLWriter::SetSystem(BaseRD* rd_system)
 
 int RD_XMLWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 {
-    this->system->GetAsXML()->PrintXML(os,indent);
+    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
+    xml->AddNestedElement(this->render_settings->GetAsXML());
+    xml->PrintXML(os,indent);
     return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
 }
 
