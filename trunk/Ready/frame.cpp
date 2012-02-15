@@ -1743,3 +1743,43 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.Set("surface_color",1.0f,1.0f,1.0f); // RGB [0,1]
     // TODO: allow user to change defaults
 }
+
+void MyFrame::SetNumberOfChemicals(int n)
+{
+    this->system->Allocate(this->system->GetX(),this->system->GetY(),this->system->GetZ(),n);
+    this->system->GenerateInitialPattern();
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    this->UpdateWindows();
+}
+
+bool MyFrame::SetDimensions(int x,int y,int z)
+{
+    try 
+    {
+        this->system->Allocate(x,y,z,this->system->GetNumberOfChemicals());
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox("Dimensions not permitted: "+wxString(e.what(),wxConvUTF8));
+        return false;
+    }
+    catch(...)
+    {
+        wxMessageBox("Dimensions not permitted");
+        return false;
+    }
+    this->system->GenerateInitialPattern();
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    this->UpdateWindows();
+    return true;
+}
+
+void MyFrame::SetBlockSize(int x,int y,int z)
+{
+    this->system->SetBlockSizeX(x);
+    this->system->SetBlockSizeY(y);
+    this->system->SetBlockSizeZ(z);
+    this->system->GenerateInitialPattern();
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    this->UpdateWindows();
+}
