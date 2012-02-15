@@ -49,6 +49,7 @@
     
     <render_settings>
         <iActiveChemical type="int" value="1" />
+        <show_multiple_chemicals_2D type="bool" value="0" />
     </render_settings>
     
   </RD>

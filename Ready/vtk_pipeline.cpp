@@ -191,69 +191,92 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     bool use_wireframe = render_settings.GetBool("use_wireframe");
     float surface_r,surface_g,surface_b;
     render_settings.GetFloat3("surface_color",surface_r,surface_g,surface_b);
-
-    bool show_displacement_mapped_surface = true;
+    bool show_multiple_chemicals_2D = render_settings.GetBool("show_multiple_chemicals_2D");
+    bool show_displacement_mapped_surface = render_settings.GetBool("show_displacement_mapped_surface");
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+
+    vtkFloatingPointType offset[3] = {0,0,0};
+
+    int iFirstChem=0,iLastChem=system->GetNumberOfChemicals();
+    if(!show_multiple_chemicals_2D) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
     pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
     pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
 
-    // assemble the scene
+    // create a lookup table for mapping values to colors
+    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+    lut->SetRampToLinear();
+    lut->SetScaleToLinear();
+    lut->SetTableRange(low,high);
+    lut->SetHueRange(hue_low,hue_high);
+
+    for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
-        // create a lookup table for mapping values to colors
-        vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-        lut->SetRampToLinear();
-        lut->SetScaleToLinear();
-        lut->SetTableRange(low,high);
-        lut->SetHueRange(hue_low,hue_high);
-
-        // pass the image through the lookup table
-        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
-        image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(system->GetImage(iActiveChemical));
-      
-        // an actor determines how a scene object is displayed
-        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-        actor->SetInput(image_mapper->GetOutput());
-        if(!use_image_interpolation)
-            actor->InterpolateOff();
-        actor->SetPosition(0,-system->GetY()-3,0);
-
-        // add the actor to the renderer's scene
-        pRenderer->AddActor(actor);
-
-        // also add a scalar bar to show how the colors correspond to values
+        // add a hue-mapped image
         {
-            vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalar_bar->SetLookupTable(lut);
-            pRenderer->AddActor2D(scalar_bar);
+            // pass the image through the lookup table
+            vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+            image_mapper->SetLookupTable(lut);
+            image_mapper->SetInput(system->GetImage(iChem));
+
+            vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+            actor->SetInput(image_mapper->GetOutput());
+            if(!use_image_interpolation)
+                actor->InterpolateOff();
+            actor->SetPosition(offset[0],offset[1]-system->GetY()-3,offset[2]);
+
+            pRenderer->AddActor(actor);
         }
+
+        if(show_displacement_mapped_surface)
+        {
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane->SetInput(system->GetImage(iChem));
+            vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+            warp->SetInputConnection(plane->GetOutputPort());
+            warp->SetScaleFactor(scaling);
+            vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+            normals->SetInputConnection(warp->GetOutputPort());
+            normals->SplittingOff();
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(normals->GetOutputPort());
+            mapper->ScalarVisibilityOff();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
+            if(use_wireframe)
+                actor->GetProperty()->SetRepresentationToWireframe();
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
+
+            // add the bounding box
+            {
+                vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
+                box->SetBounds(0,system->GetX(),0,system->GetY(),low*scaling,high*scaling);
+
+                vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+                edges->SetInputConnection(box->GetOutputPort());
+
+                vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+                mapper->SetInputConnection(edges->GetOutputPort());
+
+                vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+                actor->SetMapper(mapper);
+                actor->GetProperty()->SetColor(0,0,0);  
+                actor->GetProperty()->SetAmbient(1);
+                actor->SetPosition(offset);
+
+                pRenderer->AddActor(actor);
+            }
+        }
+        offset[0] += system->GetX()+5; // the next chemical should appear further to the right
     }
 
-    // also add a displacement-mapped surface
     if(show_displacement_mapped_surface)
     {
-        vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInput(system->GetImage(iActiveChemical));
-        vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
-        warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(scaling);
-        vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
-        normals->SetInputConnection(warp->GetOutputPort());
-        normals->SplittingOff();
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(normals->GetOutputPort());
-        mapper->ScalarVisibilityOff();
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
-        if(use_wireframe)
-            actor->GetProperty()->SetRepresentationToWireframe();
-        pRenderer->AddActor(actor);
-
         // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
@@ -270,24 +293,10 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         pRenderer->AddActor(axis);
     }
 
-    // add the bounding box
-    {
-        vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(0,system->GetX(),0,system->GetY(),low*scaling,high*scaling);
-
-        vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
-        edges->SetInputConnection(box->GetOutputPort());
-
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(edges->GetOutputPort());
-
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(0,0,0);  
-        actor->GetProperty()->SetAmbient(1);
-
-        pRenderer->AddActor(actor);
-    }
+    // add a scalar bar to show how the colors correspond to values
+    vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+    scalar_bar->SetLookupTable(lut);
+    pRenderer->AddActor2D(scalar_bar);
 
     // set the background color
     pRenderer->GradientBackgroundOn();
