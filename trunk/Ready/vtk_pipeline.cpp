@@ -167,7 +167,9 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     pRenderer->AddActor(axis);
 
     // set the background color
-    pRenderer->SetBackground(0,0,0);
+    pRenderer->GradientBackgroundOn();
+    pRenderer->SetBackground(0,0.4,0.6);
+    pRenderer->SetBackground2(0,0.2,0.3);
     
     // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
@@ -187,6 +189,8 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
     bool use_wireframe = render_settings.GetBool("use_wireframe");
+
+    bool show_displacement_mapped_surface = true;
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     
@@ -228,6 +232,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     }
 
     // also add a displacement-mapped surface
+    if(show_displacement_mapped_surface)
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
         plane->SetInput(system->GetImage(iActiveChemical));
@@ -249,7 +254,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0,0,0,0,low*scaling,high*scaling);
+        axis->SetBounds(0,0,system->GetY(),system->GetY(),low*scaling,high*scaling);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
@@ -262,8 +267,29 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         pRenderer->AddActor(axis);
     }
 
+    // add the bounding box
+    {
+        vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
+        box->SetBounds(0,system->GetX(),0,system->GetY(),low*scaling,high*scaling);
+
+        vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+        edges->SetInputConnection(box->GetOutputPort());
+
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(edges->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(0,0,0);  
+        actor->GetProperty()->SetAmbient(1);
+
+        pRenderer->AddActor(actor);
+    }
+
     // set the background color
-    pRenderer->SetBackground(0,0,0);
+    pRenderer->GradientBackgroundOn();
+    pRenderer->SetBackground(0,0.4,0.6);
+    pRenderer->SetBackground2(0,0.2,0.3);
     
     // change the interactor style to a trackball
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
