@@ -426,7 +426,7 @@ void InfoPanel::Update(const BaseRD* const system)
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             false, true);
 
-    contents += _("</table></body></html>");
+    contents += _T("</table></body></html>");
     
     html->SetPage(contents);
 }
