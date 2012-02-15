@@ -240,6 +240,7 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_EXIT, _("Quit") + GetAccelerator(DO_QUIT));
         menuBar->Append(menu, _("&File"));
     }
+    if(0) // TODO!!!
     {   // edit menu:
         wxMenu *menu = new wxMenu;
         menu->Append(wxID_CUT, _("Cut") + GetAccelerator(DO_CUT), _("Cut the selection and save it to the clipboard"));
@@ -271,7 +272,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::RunStop, _("&Run") + GetAccelerator(DO_RUNSTOP), _("Start running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
-        menu->Append(ID::GenerateInitialPattern, _("Generate &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
+        menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
