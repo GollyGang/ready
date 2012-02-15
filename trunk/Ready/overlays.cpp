@@ -145,7 +145,7 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
 void Overlay::Apply(BaseRD* system,int x,int y,int z) const
 {
     if(this->iTargetChemical<0 || this->iTargetChemical>=system->GetNumberOfChemicals())
-        throw runtime_error("Overlay: chemical out of range");
+        throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(this->iTargetChemical));
     if(this->shape->IsInside(x/float(system->GetX()),y/float(system->GetY()),z/float(system->GetZ()),system->GetDimensionality()))
         this->op->Apply(*vtk_at(static_cast<float*>(system->GetImage(this->iTargetChemical)->GetScalarPointer()),x,y,z,system->GetX(),system->GetY()),
             this->fill->GetValue(system,x,y,z));
@@ -278,7 +278,7 @@ class OtherChemical : public BaseFill
         virtual float GetValue(BaseRD *system,int x,int y,int z) const
         {
             if(this->iOtherChemical<0 || this->iOtherChemical>=system->GetNumberOfChemicals())
-                throw runtime_error("other_chemical: chemical out of range");
+                throw runtime_error("other_chemical: chemical out of range: "+GetChemicalName(this->iOtherChemical));
             return *vtk_at(static_cast<float*>(system->GetImage(this->iOtherChemical)->GetScalarPointer()),
                 x,y,z,system->GetX(),system->GetY());
         }
