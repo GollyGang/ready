@@ -33,9 +33,9 @@ class OpenCL_FullKernel : public OpenCL_RD
         virtual int GetBlockSizeX() const { return this->block_size[0]; }
         virtual int GetBlockSizeY() const { return this->block_size[1]; }
         virtual int GetBlockSizeZ() const { return this->block_size[2]; }
-        virtual void SetBlockSizeX(int n) { this->block_size[0]=n; }
-        virtual void SetBlockSizeY(int n) { this->block_size[1]=n; }
-        virtual void SetBlockSizeZ(int n) { this->block_size[2]=n; }
+        virtual void SetBlockSizeX(int n) { this->block_size[0]=n; this->need_reload_formula=true; }
+        virtual void SetBlockSizeY(int n) { this->block_size[1]=n; this->need_reload_formula=true; }
+        virtual void SetBlockSizeZ(int n) { this->block_size[2]=n; this->need_reload_formula=true; }
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
         

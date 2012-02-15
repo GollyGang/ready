@@ -799,7 +799,7 @@ void InfoPanel::ChangeFormula()
 
 void InfoPanel::ChangeNumChemicals()
 {
-    const int MAX_CHEMICALS = 10;   // TODO!!! Tim, is this a sensible limit??? export from BaseRD.hpp???
+    const int MAX_CHEMICALS = 100;
 
     int oldnum = frame->GetCurrentRDSystem()->GetNumberOfChemicals();
     int newnum;
@@ -813,8 +813,8 @@ void InfoPanel::ChangeNumChemicals()
                     oldnum, 1, MAX_CHEMICALS, &newnum,
                     pos, wxSize(dlgwd,wxDefaultCoord)) )
     {
-        if (newnum != oldnum) // TODO!!! frame->SetNumberOfChemicals(newnum);
-            Warning(_("TODO!!! implement MyFrame::SetNumberOfChemicals(int n)"));
+        if (newnum != oldnum) 
+            frame->SetNumberOfChemicals(newnum);
     }
 }
 
@@ -993,17 +993,16 @@ void InfoPanel::ChangeDimensions()
     int dlgwd = 300;
     pos.x -= dlgwd + 20;
 
-    XYZDialog dialog(frame, _("Change the dimensions"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
-    
-    if (dialog.ShowModal() == wxID_OK)
+    do // allow the user multiple tries until the change is accepted, they cancel, or they don't change the values but hit OK
     {
+        XYZDialog dialog(frame, _("Change the dimensions"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
+        if (dialog.ShowModal() == wxID_CANCEL) break;
         newx = dialog.GetX();
         newy = dialog.GetY();
         newz = dialog.GetZ();
-        if (newx != oldx || newy != oldy || newz != oldz)
-            // TODO!!! frame->SetDimensions(newx, newy, newz);
-            Warning(_("TODO!!! implement MyFrame::SetDimensions(int x,y,z)"));
-    }
+        if (newx == oldx && newy == oldy && newz == oldz) break;
+        if(frame->SetDimensions(newx, newy, newz)) break;
+    } while(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -1029,8 +1028,7 @@ void InfoPanel::ChangeBlockSize()
         newy = dialog.GetY();
         newz = dialog.GetZ();
         if (newx != oldx || newy != oldy || newz != oldz)
-            // TODO!!! frame->SetBlockSize(newx, newy, newz);
-            Warning(_("TODO!!! implement MyFrame::SetBlockSize(int x,y,z)"));
+            frame->SetBlockSize(newx, newy, newz);
     }
 }
 

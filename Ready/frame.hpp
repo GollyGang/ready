@@ -57,6 +57,9 @@ class MyFrame : public wxFrame
         void SetParameter(int iParam,float val);
         void SetParameterName(int iParam,std::string s);
         void SetFormula(std::string s);
+        void SetNumberOfChemicals(int n);
+        bool SetDimensions(int x,int y,int z);
+        void SetBlockSize(int x,int y,int z);
 
         // interface with Preferences dialog
         void ShowPrefsDialog(const wxString& page = wxEmptyString);

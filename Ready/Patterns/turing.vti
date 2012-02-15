@@ -14,8 +14,8 @@
       <param name="k_a">      0.0125   </param>
       
       <formula number_of_chemicals="3">
-		  delta_a = k_a * (16.0f - a * b) + D_a * laplacian_a;
-		  delta_b = max( -b, k_a * (a * b - b - c) + D_b * laplacian_b );
+          delta_a = k_a * (16.0f - a * b) + D_a * laplacian_a;
+          delta_b = max( -b, k_a * (a * b - b - c) + D_b * laplacian_b );
           delta_c = 0.0f;
       </formula>
       
@@ -42,6 +42,7 @@
     <render_settings>
       <low type="float" value="0" />
       <high type="float" value="8" />
+      <contour_level type="float" value="5" />
     </render_settings>
 
   </RD>
