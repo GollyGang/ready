@@ -189,6 +189,8 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
     bool use_wireframe = render_settings.GetBool("use_wireframe");
+    float surface_r,surface_g,surface_b;
+    render_settings.GetFloat3("surface_color",surface_r,surface_g,surface_b);
 
     bool show_displacement_mapped_surface = true;
     
@@ -247,6 +249,7 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
         if(use_wireframe)
             actor->GetProperty()->SetRepresentationToWireframe();
         pRenderer->AddActor(actor);
