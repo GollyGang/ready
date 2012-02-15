@@ -415,10 +415,10 @@ void InfoPanel::Update(const BaseRD* const system)
     formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
     contents += AppendRow(formula_label, formula, false, system->HasEditableFormula());
 
-    contents += AppendRow(dimensions_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
+    contents += AppendRow(dimensions_label, wxString::Format(wxT("XYZ = %d x %d x %d"),
                                             system->GetX(),system->GetY(),system->GetZ()));
 
-    contents += AppendRow(block_size_label, wxString::Format(wxT("XYZ = %d; %d; %d"),
+    contents += AppendRow(block_size_label, wxString::Format(wxT("XYZ = %d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             false, system->HasEditableBlockSize());
 
@@ -937,19 +937,6 @@ void XYZDialog::OnChar(wxKeyEvent& event)
 
 // -----------------------------------------------------------------------------
 
-static int BitCount(int i)
-{
-    // return a count of the number of bits set in given int
-    int n = 0;
-    while (i) {
-        n++ ;
-        i &= i - 1;
-    }
-    return n;
-}
-
-// -----------------------------------------------------------------------------
-
 bool XYZDialog::ValidNumber(wxTextCtrl* box, int* val)
 {
     // validate given X/Y/Z value
@@ -957,9 +944,6 @@ bool XYZDialog::ValidNumber(wxTextCtrl* box, int* val)
     long i;
     if ( str.ToLong(&i) && i >= 1 && i <= 256 ) {
         *val = (int)i;
-        // TODO!!! probably need to do other sanity checks here???
-        // for example, use above BitCount() routine to ensure block size
-        // number is a power of 2???
         return true;
     } else {
         Warning(_("Number must be from 1 to 256."));

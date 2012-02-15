@@ -776,13 +776,11 @@ void MyFrame::OnStep(wxCommandEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(_("Fatal error: ")+wxString(e.what(),wxConvUTF8));
-        this->Destroy();
+        MonospaceMessageBox(_("An error occurred when running the simulation:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
     }
     catch(...)
     {
-        wxMessageBox(_("Unknown fatal error"));
-        this->Destroy();
+        wxMessageBox(_("An unknown error occurred when running the simulation"));
     }
     this->SetStatusBarText();
     Refresh(false);
@@ -897,13 +895,13 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         }
         catch(const exception& e)
         {
-            wxMessageBox(_("Fatal error: ")+wxString(e.what(),wxConvUTF8));
-            this->Destroy();
+            this->is_running = false;
+            MonospaceMessageBox(_("An error occurred when running the simulation:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
         }
         catch(...)
         {
-            wxMessageBox(_("Unknown fatal error"));
-            this->Destroy();
+            this->is_running = false;
+            wxMessageBox(_("An unknown error occurred when running the simulation"));
         }
    
         double time_after = get_time_in_seconds();
@@ -941,13 +939,21 @@ void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
 
 void MyFrame::OnGenerateInitialPattern(wxCommandEvent& event)
 {
-    if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-    
-    this->system->GenerateInitialPattern();
+    try
+    {
+        this->system->GenerateInitialPattern();
+    }
+    catch(const exception& e)
+    {
+        MonospaceMessageBox(_("Generating an initial pattern caused an error:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Generating an initial pattern caused an unknown error"));
+    }
+    // (we allow the user to proceed because they might now want to change other things to match)
 
     this->is_running = false;
-    this->system->SetFilename("untitled");
-    this->system->SetModified(false);
     this->UpdateWindows();
 }
 
@@ -1747,8 +1753,31 @@ void MyFrame::InitializeDefaultRenderSettings()
 
 void MyFrame::SetNumberOfChemicals(int n)
 {
-    this->system->Allocate(this->system->GetX(),this->system->GetY(),this->system->GetZ(),n);
-    this->system->GenerateInitialPattern();
+    try 
+    {
+        this->system->Allocate(this->system->GetX(),this->system->GetY(),this->system->GetZ(),n);
+    }
+    catch(const exception& e)
+    {
+        MonospaceMessageBox(_("Changing the number of chemicals caused an error:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Changing the number of chemicals caused an unknown error"));
+    }
+    try
+    {
+        this->system->GenerateInitialPattern();
+    }
+    catch(const exception& e)
+    {
+        MonospaceMessageBox(_("Generating an initial pattern caused an error:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Generating an initial pattern caused an unknown error"));
+    }
+    // (we allow the user to proceed because they might now want to change other things to match)
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->UpdateWindows();
 }
@@ -1765,8 +1794,8 @@ bool MyFrame::SetDimensions(int x,int y,int z)
             sort(d,d+3);
             if(d[2]!=x || d[1]!=y || d[0]!=z) {
                 x=d[2]; y=d[1]; z=d[0];
-                wxString msg = "We've rearranged the order of the dimensions for visualization. New dimensions: ";
-                msg << x << ", " << y << ", " << z;
+                wxString msg = _("We've rearranged the order of the dimensions for visualization. New dimensions: ");
+                msg << x << _T(" x ") << y << _T(" x ") << z;
                 wxMessageBox(msg);
             }
         }
@@ -1775,12 +1804,12 @@ bool MyFrame::SetDimensions(int x,int y,int z)
     }
     catch(const exception& e)
     {
-        wxMessageBox("Dimensions not permitted: "+wxString(e.what(),wxConvUTF8));
+        MonospaceMessageBox(_("Dimensions not permitted:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
         return false;
     }
     catch(...)
     {
-        wxMessageBox("Dimensions not permitted");
+        wxMessageBox(_("Dimensions not permitted"));
         return false;
     }
     this->system->GenerateInitialPattern();
