@@ -415,10 +415,10 @@ void InfoPanel::Update(const BaseRD* const system)
     formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
     contents += AppendRow(formula_label, formula, false, system->HasEditableFormula());
 
-    contents += AppendRow(dimensions_label, wxString::Format(wxT("XYZ = %d x %d x %d"),
+    contents += AppendRow(dimensions_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetX(),system->GetY(),system->GetZ()));
 
-    contents += AppendRow(block_size_label, wxString::Format(wxT("XYZ = %d x %d x %d"),
+    contents += AppendRow(block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             false, system->HasEditableBlockSize());
 
