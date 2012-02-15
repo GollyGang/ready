@@ -34,7 +34,7 @@
             <white_noise low="0" high="1" />
             <rectangle>
                 <Point3D x="0.2" y="0.2" z="0.6" />
-                <Point3D x="0.4" y="0.5" z="0.8" />
+                <Point3D x="0.5" y="0.5" z="0.8" />
             </rectangle>
         </overlay>
         <overlay chemical="a">
@@ -42,20 +42,19 @@
             <other_chemical chemical="b" />
             <rectangle>
                 <Point3D x="0.2" y="0.2" z="0.6" />
-                <Point3D x="0.4" y="0.5" z="0.8" />
+                <Point3D x="0.5" y="0.5" z="0.8" />
             </rectangle>
         </overlay>
     </initial_pattern_generator>
     
     <render_settings>
         <iActiveChemical type="int" value="1" />
-        <show_multiple_chemicals_2D type="bool" value="0" />
     </render_settings>
     
   </RD>
   
-  <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
-    <Piece Extent="0 127 0 63 0 0">
+  <ImageData WholeExtent="0 63 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 63 0 63 0 0">
       <PointData Scalars="Scalars_">
         <DataArray type="Float32" Name="Scalars_" NumberOfComponents="2" format="appended" RangeMin="0" RangeMax="0" offset="0" />
       </PointData>
@@ -64,6 +63,6 @@
     </Piece>
   </ImageData>
   <AppendedData encoding="base64">
-   _AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+   _AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
   </AppendedData>
 </VTKFile>
