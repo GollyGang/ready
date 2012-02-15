@@ -40,6 +40,15 @@ using namespace std;
     #define ControlDown RawControlDown
 #endif
 
+// need platform-specific gap after OK/Cancel buttons
+#ifdef __WXMAC__
+    const int STDHGAP = 0;
+#elif defined(__WXMSW__)
+    const int STDHGAP = 6;
+#else
+    const int STDHGAP = 10;
+#endif
+
 const wxString change_prefix = wxT("change: ");         // must end with space
 const wxString parameter_prefix = wxT("parameter ");    // ditto
 
@@ -508,17 +517,6 @@ void ParameterDialog::OnOneTimer(wxTimerEvent& WXUNUSED(event))
 
 // -----------------------------------------------------------------------------
 
-// need platform-specific gap after OK/Cancel buttons
-#ifdef __WXMAC__
-    const int STDHGAP = 0;
-#elif defined(__WXMSW__)
-    const int STDHGAP = 6;
-#else
-    const int STDHGAP = 10;
-#endif
-
-// -----------------------------------------------------------------------------
-
 ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
                                  const wxString& inname, float inval,
                                  const wxPoint& pos, const wxSize& size)
@@ -538,17 +536,16 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
 
     if (can_edit_name) {
         namebox = new wxTextCtrl(this, wxID_ANY, inname);
-        hbox->Add(namebox, 0, wxGROW | wxLEFT | wxRIGHT, 10);
+        hbox->Add(namebox, 0, wxALIGN_CENTER_VERTICAL, 0);
     } else {
         namebox = NULL;
-        hbox->Add(new wxStaticText(this, wxID_STATIC, inname),
-                                   0, wxGROW | wxLEFT | wxRIGHT, 10);
+        hbox->Add(new wxStaticText(this, wxID_STATIC, inname), 0, wxALIGN_CENTER_VERTICAL, 0);
     }
 
-    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("=")), 0, wxLEFT | wxRIGHT, 0);
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT(" = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     
     valuebox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inval));
-    hbox->Add(valuebox, 0, wxGROW | wxLEFT | wxRIGHT, 10);
+    hbox->Add(valuebox, 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->AddStretchSpacer(1);
     
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
@@ -650,7 +647,7 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
 
     ParameterDialog dialog(frame, can_edit_name, parameter, oldval, pos, wxSize(dlgwd,-1));
     
-    if ( dialog.ShowModal() == wxID_OK )
+    if (dialog.ShowModal() == wxID_OK)
     {
         newname = can_edit_name ? dialog.GetName() : parameter;
         newval = dialog.GetValue();
@@ -816,23 +813,225 @@ void InfoPanel::ChangeNumChemicals()
                     oldnum, 1, MAX_CHEMICALS, &newnum,
                     pos, wxSize(dlgwd,wxDefaultCoord)) )
     {
-        if (newnum != oldnum) //!!! frame->SetNumberOfChemicals(newnum);
+        if (newnum != oldnum) // TODO!!! frame->SetNumberOfChemicals(newnum);
             Warning(_("TODO!!! implement MyFrame::SetNumberOfChemicals(int n)"));
+    }
+}
+
+// =============================================================================
+
+// define a modal dialog for editing X,Y,Z values
+
+class XYZDialog : public wxDialog
+{
+    public:
+        XYZDialog(wxWindow* parent, const wxString& title,
+                  int inx, int iny, int inz,
+                  const wxPoint& pos, const wxSize& size);
+    
+        void OnChar(wxKeyEvent& event);
+        bool ValidNumber(wxTextCtrl* box, int* val);
+    
+        virtual bool TransferDataFromWindow();  // called when user hits OK
+    
+        int GetX() { return xval; }
+        int GetY() { return yval; }
+        int GetZ() { return zval; }
+    
+    private:
+        wxTextCtrl* xbox;           // for entering X value
+        wxTextCtrl* ybox;           // for entering Y value
+        wxTextCtrl* zbox;           // for entering Z value
+        int xval, yval, zval;       // the given X,Y,Z values
+};
+
+// -----------------------------------------------------------------------------
+
+XYZDialog::XYZDialog(wxWindow* parent, const wxString& title,
+                     int inx, int iny, int inz,
+                     const wxPoint& pos, const wxSize& size)
+{
+    Create(parent, wxID_ANY, title, pos, size);
+    
+    // create the controls
+    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    SetSizer(vbox);
+    
+    wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, _("Enter new X, Y, Z values:"));
+
+    xbox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),inx), wxDefaultPosition, wxSize(50,wxDefaultCoord));
+    ybox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),iny), wxDefaultPosition, wxSize(50,wxDefaultCoord));
+    zbox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),inz), wxDefaultPosition, wxSize(50,wxDefaultCoord));
+
+    wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+
+    hbox->AddStretchSpacer(1);
+    
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("X = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
+    hbox->Add(xbox, 0, wxALIGN_CENTER_VERTICAL, 0);
+    
+    hbox->AddStretchSpacer(1);
+    
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Y = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
+    hbox->Add(ybox, 0, wxALIGN_CENTER_VERTICAL, 0);
+    
+    hbox->AddStretchSpacer(1);
+    
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Z = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
+    hbox->Add(zbox, 0, wxALIGN_CENTER_VERTICAL, 0);
+
+    hbox->AddStretchSpacer(1);
+    
+    wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
+    
+    // position the controls
+    wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
+    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    wxSize minsize = buttbox->GetMinSize();
+    if (minsize.GetWidth() < 250) {
+        minsize.SetWidth(250);
+        buttbox->SetMinSize(minsize);
+    }
+
+    vbox->AddSpacer(12);
+    vbox->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
+    vbox->AddSpacer(10);
+    vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
+    vbox->AddSpacer(12);
+    vbox->Add(buttbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
+
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
+    
+    if (pos == wxDefaultPosition) Centre();
+    if (size != wxDefaultSize) SetSize(size);
+
+    // select X value (must do this last on Windows)
+    xbox->SetFocus();
+    xbox->SetSelection(-1,-1);
+
+    // install event handler to detect illegal chars when entering values
+    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZDialog::OnChar), NULL, this);
+    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZDialog::OnChar), NULL, this);
+    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZDialog::OnChar), NULL, this);
+}
+
+// -----------------------------------------------------------------------------
+
+void XYZDialog::OnChar(wxKeyEvent& event)
+{
+    int key = event.GetKeyCode();
+    if ( key >= ' ' && key <= '~' ) {
+        if ( key >= '0' && key <= '9' ) {
+            // allow digits
+            event.Skip();
+        } else {
+            // disallow any other displayable ascii char
+            wxBell();
+        }
+    } else {
+        // allow tab, del, arrow keys, etc
+        event.Skip();
     }
 }
 
 // -----------------------------------------------------------------------------
 
+static int BitCount(int i)
+{
+    // return a count of the number of bits set in given int
+    int n = 0;
+    while (i) {
+        n++ ;
+        i &= i - 1;
+    }
+    return n;
+}
+
+// -----------------------------------------------------------------------------
+
+bool XYZDialog::ValidNumber(wxTextCtrl* box, int* val)
+{
+    // validate given X/Y/Z value
+    wxString str = box->GetValue();
+    long i;
+    if ( str.ToLong(&i) && i >= 1 && i <= 256 ) {
+        *val = (int)i;
+        // TODO!!! probably need to do other sanity checks here???
+        // for example, use above BitCount() routine to ensure block size
+        // number is a power of 2???
+        return true;
+    } else {
+        Warning(_("Number must be from 1 to 256."));
+        box->SetFocus();
+        box->SetSelection(-1,-1);
+        return false;
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+bool XYZDialog::TransferDataFromWindow()
+{
+    return ValidNumber(xbox, &xval) &&
+           ValidNumber(ybox, &yval) &&
+           ValidNumber(zbox, &zval);
+}
+
+// =============================================================================
+
 void InfoPanel::ChangeDimensions()
 {
-    Warning(_("TODO!!!"));
+    BaseRD* sys = frame->GetCurrentRDSystem();
+    int oldx = sys->GetX();
+    int oldy = sys->GetY();
+    int oldz = sys->GetZ();
+    int newx, newy, newz;
+
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    int dlgwd = 300;
+    pos.x -= dlgwd + 20;
+
+    XYZDialog dialog(frame, _("Change the dimensions"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
+    
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        newx = dialog.GetX();
+        newy = dialog.GetY();
+        newz = dialog.GetZ();
+        if (newx != oldx || newy != oldy || newz != oldz)
+            // TODO!!! frame->SetDimensions(newx, newy, newz);
+            Warning(_("TODO!!! implement MyFrame::SetDimensions(int x,y,z)"));
+    }
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeBlockSize()
 {
-    Warning(_("TODO!!!"));
+    BaseRD* sys = frame->GetCurrentRDSystem();
+    int oldx = sys->GetBlockSizeX();
+    int oldy = sys->GetBlockSizeY();
+    int oldz = sys->GetBlockSizeZ();
+    int newx, newy, newz;
+
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    int dlgwd = 300;
+    pos.x -= dlgwd + 20;
+
+    XYZDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
+    
+    if (dialog.ShowModal() == wxID_OK)
+    {
+        newx = dialog.GetX();
+        newy = dialog.GetY();
+        newz = dialog.GetZ();
+        if (newx != oldx || newy != oldy || newz != oldz)
+            // TODO!!! frame->SetBlockSize(newx, newy, newz);
+            Warning(_("TODO!!! implement MyFrame::SetBlockSize(int x,y,z)"));
+    }
 }
 
 // -----------------------------------------------------------------------------
