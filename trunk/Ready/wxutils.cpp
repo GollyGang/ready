@@ -240,7 +240,9 @@ void IntegerDialog::OnOneTimer(wxTimerEvent& WXUNUSED(event))
 class MySpinCtrl : public wxSpinCtrl
 {
     public:
-        MySpinCtrl(wxWindow* parent, wxWindowID id) : wxSpinCtrl(parent, id)
+        MySpinCtrl(wxWindow* parent, wxWindowID id, const wxString& val = wxEmptyString,
+                   const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize) :
+            wxSpinCtrl(parent, id, val, pos, size)
         {
             // create a dynamic event handler for the underlying wxTextCtrl
             wxTextCtrl* textctrl = GetText();
@@ -303,7 +305,8 @@ IntegerDialog::IntegerDialog(wxWindow* parent,
     wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(topSizer);
 
-    spinctrl = new MySpinCtrl(this, ID_SPIN_CTRL);
+    spinctrl = new MySpinCtrl(this, ID_SPIN_CTRL, wxEmptyString,
+                              wxDefaultPosition, wxSize(100,wxDefaultCoord));
     spinctrl->SetRange(minval, maxval);
     spinctrl->SetValue(inval);
 
@@ -330,7 +333,7 @@ IntegerDialog::IntegerDialog(wxWindow* parent,
     topSizer->AddSpacer(12);
     topSizer->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
     topSizer->AddSpacer(10);
-    topSizer->Add(spinctrl, 0, wxGROW | wxLEFT | wxRIGHT, 10);
+    topSizer->Add(spinctrl, 0, wxALIGN_CENTER, 0);
     topSizer->AddSpacer(12);
     topSizer->Add(stdhbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
 
