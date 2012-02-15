@@ -41,7 +41,8 @@
     
     <render_settings>
       <low type="float" value="0" />
-      <high type="float" value="8" />
+      <high type="float" value="12" />
+	  <vertical_scale_2D type="float" value="30" />
       <contour_level type="float" value="5" />
     </render_settings>
 
