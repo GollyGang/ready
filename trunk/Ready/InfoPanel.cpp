@@ -53,12 +53,12 @@ const wxString change_prefix = wxT("change: ");         // must end with space
 const wxString parameter_prefix = wxT("parameter ");    // ditto
 
 // labels in 1st column
-const wxString rule_name_label = wxT("Rule name");
-const wxString description_label = wxT("Description");
-const wxString num_chemicals_label = wxT("# of chemicals");
-const wxString formula_label = wxT("Formula");
-const wxString dimensions_label = wxT("Dimensions");
-const wxString block_size_label = wxT("Block size");
+const wxString rule_name_label = _("Rule name");
+const wxString description_label = _("Description");
+const wxString num_chemicals_label = _("Number of chemicals");
+const wxString formula_label = _("Formula");
+const wxString dimensions_label = _("Dimensions");
+const wxString block_size_label = _("Block size");
 
 // -----------------------------------------------------------------------------
 
@@ -379,7 +379,7 @@ void InfoPanel::Update(const BaseRD* const system)
     // build HTML string to display current parameters
     wxString contents;
     
-    contents += _("<html><body><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
+    contents += wxT("<html><body><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     rownum = 0;
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
@@ -399,28 +399,32 @@ void InfoPanel::Update(const BaseRD* const system)
     }
 
     wxString formula = system->GetFormula();
-    // escape HTML reserved characters
-    formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
-    formula.Replace(wxT("<"), wxT("&lt;"));
-    formula.Replace(wxT(">"), wxT("&gt;"));
-    // deal with line endings
-    formula.Replace(wxT("\r\n"), wxT("<br>"));
-    formula.Replace(wxT("\n\r"), wxT("<br>"));
-    formula.Replace(wxT("\r"), wxT("<br>"));
-    formula.Replace(wxT("\n"), wxT("<br>"));
-    // convert whitespace to &nbsp; so we can use the <code> block
-    formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
-    // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
-    //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
-    formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
-    contents += AppendRow(formula_label, formula, false, system->HasEditableFormula());
+    if(system->HasEditableFormula() || formula.size()>0)
+    {
+        // escape HTML reserved characters
+        formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
+        formula.Replace(wxT("<"), wxT("&lt;"));
+        formula.Replace(wxT(">"), wxT("&gt;"));
+        // deal with line endings
+        formula.Replace(wxT("\r\n"), wxT("<br>"));
+        formula.Replace(wxT("\n\r"), wxT("<br>"));
+        formula.Replace(wxT("\r"), wxT("<br>"));
+        formula.Replace(wxT("\n"), wxT("<br>"));
+        // convert whitespace to &nbsp; so we can use the <code> block
+        formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
+        // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
+        //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
+        formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
+        contents += AppendRow(formula_label, formula, false, system->HasEditableFormula());
+    }
 
     contents += AppendRow(dimensions_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetX(),system->GetY(),system->GetZ()));
 
-    contents += AppendRow(block_size_label, wxString::Format(wxT("%d x %d x %d"),
+    if(system->HasEditableBlockSize())
+        contents += AppendRow(block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
-                                            false, system->HasEditableBlockSize());
+                                            false, true);
 
     contents += _("</table></body></html>");
     
@@ -434,30 +438,32 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
 {
     wxString result;
     if (rownum & 1)
-        result += _("<tr bgcolor=\"#F0F0F0\">");
+        result += _T("<tr bgcolor=\"#F0F0F0\">");
     else
-        result += _("<tr>");
+        result += _T("<tr>");
     rownum++;
 
-    result += _("<td width=3></td><td valign=top width=\"22%\"><b>");
+    result += _T("<td width=3></td><td valign=top width=\"22%\"><b>");
     result += label;
-    result += _("</b></td><td valign=top>");
+    result += _T("</b></td><td valign=top>");
     result += value;
-    result += _("</td>");
+    result += _T("</td>");
 
     if (is_editable) {
-        result += _("<td valign=top align=right><a href=\"");
+        result += _T("<td valign=top align=right><a href=\"");
         result += change_prefix;
         if (is_parameter) result += parameter_prefix;
         result += label;
-        result += _("\">edit</a></td>");
+        result += _T("\">");
+        result += _("edit");
+        result += _T("</a></td>");
     } else {
-        result += _("<td></td>");
+        result += _T("<td></td>");
     }
-    result += _("<td width=3></td>");
+    result += _T("<td width=3></td>");
     
     
-    result += _("</tr>");
+    result += _T("</tr>");
     return result;
 }
 
