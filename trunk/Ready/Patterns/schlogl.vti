@@ -27,6 +27,7 @@
     <render_settings>
         <low type="float" value="-1.0" />
         <high type="float" value="1.0" />
+		<contour_level type="float" value="0" />
     </render_settings>
     
   </RD>
