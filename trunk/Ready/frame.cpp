@@ -55,6 +55,7 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 using namespace std;
 
 // VTK:
@@ -1756,6 +1757,20 @@ bool MyFrame::SetDimensions(int x,int y,int z)
 {
     try 
     {
+        if(x<1 || y<1 || z<1) throw runtime_error("Dimensions must be at least 1");
+        // rearrange the dimensions (for visualization we need the z to be 1 for 2D images, and both y and z to be 1 for 1D images)
+        if( (x==1 && (y>1 || z>1)) || (y==1 && z>1) )
+        {
+            float d[3]={x,y,z};
+            sort(d,d+3);
+            if(d[2]!=x || d[1]!=y || d[0]!=z) {
+                x=d[2]; y=d[1]; z=d[0];
+                wxString msg = "We've rearranged the order of the dimensions for visualization. New dimensions: ";
+                msg << x << ", " << y << ", " << z;
+                wxMessageBox(msg);
+            }
+        }
+        // attempt the size change
         this->system->Allocate(x,y,z,this->system->GetNumberOfChemicals());
     }
     catch(const exception& e)
