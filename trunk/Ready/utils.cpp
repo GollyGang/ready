@@ -127,9 +127,9 @@ string trim_multiline_string(const char* s)
     ostringstream oss;
     for(int i=0;i<(int)vs.size()-tailtrim;i++)
     {
-        if(minLeadingWhitespace<vs[i].size())
+        if(minLeadingWhitespace < (int)vs[i].size())
             oss << vs[i].substr(minLeadingWhitespace);
-        if(i<(int)vs.size()-tailtrim-1)
+        if(i < (int)vs.size()-tailtrim-1)
             oss << "\n";
     }
     return oss.str();
