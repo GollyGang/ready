@@ -17,7 +17,7 @@ The timeline below gives some idea of the development of the key ideas.
 <p>
 Open <a href="open:Patterns/heat_equation.vti">heat_equation.vti</a> (click on this link) and set it running. Scroll down in the Info Pane to see the formula: <tt>delta_a = laplacian_a;</tt> This says that the rate of change of chemical a is equal to the <a href="http://en.wikipedia.org/wiki/Laplace_operator">Laplacian</a> of chemical a. This means that any location that is lower than its neighbors will increase, and any location that is higher than its neighbors will decrease. This equation describes how heat will spread out in a solid or how ink would diffuse through a liquid.
 <p>
-We compute the Laplacian of each chemical by <a href="http://en.wikipedia.org/wiki/Finite_difference">finite differencing</a> with a <i>stencil</i> of radius 1. In 1D this means that for a string of values:
+We compute the Laplacian of each chemical at each location by <a href="http://en.wikipedia.org/wiki/Finite_difference">finite differencing</a> with a <i>stencil</i> of radius 1. In 1D this means that for a string of values:
 <p>
 <center><table border="1" cellpadding="4">
 <tr><td>...</td><td>A</sub></td><td>B</td><td>C</td><td>...</td></tr>
@@ -33,9 +33,9 @@ Having computed the rate of change of the chemical at each location, we then app
 new_A&nbsp;&nbsp;&nbsp;=&nbsp;&nbsp;&nbsp;A + timestep * A'
 </center>
 <p>
-Other methods of integration are possible and give more accurate results (e.g. <a href="http://en.wikipedia.org/wiki/Runge-Kutta_method">Runge-Kutta</a>) but aren't currently implemented.
-<p>
 Here, <i>timestep</i> is a value that determines how accurate the resulting simulation will be - smaller values will give more accurate solutions but take longer to compute because more steps are needed to get to the same place. You can change the timestep in our heat equation by scrolling down in the Info Pane to 'timestep' and editing the value. If you set it to much larger than 0.2 then the values quickly diverge, due to numerical instabilities. In general it is important to check that any witnessed behaviour is genuine and not an artefact of a timestep that is too large.
+<p>
+There are alternatives to the Euler method that allow for larger timesteps (e.g. <a href="http://en.wikipedia.org/wiki/Runge-Kutta_method">Runge-Kutta</a>) but we haven't implemented them yet.
 
 <p>
 <h4>Turing</h4>
