@@ -1150,6 +1150,12 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         return;
     }
 
+    if(!wxFileExists(path))
+    {
+        wxMessageBox(_("File doesn't exist: ")+path);
+        return;
+    }
+
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     if (remember) AddRecentPattern(path);
