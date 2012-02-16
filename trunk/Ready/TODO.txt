@@ -32,6 +32,7 @@ before 1.0 release:
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
+- some way to add noise to the system on each frame, or periodically
 
 future ideas:
 - parameter map(s) in a separate window, to allow user to explore parameters 
