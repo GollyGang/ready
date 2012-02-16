@@ -5,24 +5,25 @@
 <p>
 <h3>What is reaction-diffusion?</h3>
 
-<a href="http://en.wikipedia.org/wiki/Alan_Turing">Alan Turing</a>, after inventing the computer<font size="-2"><sup>*</sup></font> and single-handedly winning the war<font size="-2"><sup>*</sup></font>, published a paper called <a href="http://en.wikipedia.org/wiki/The_chemical_basis_of_morphogenesis">The Chemical Basis of Morphogenesis</a> in 1952. This showed how chemical morphogens could diffuse through living tissue and drive development in embryos and plants. The key result is that <i>instabilities</i> can arise and form static patterns.
+<a href="http://en.wikipedia.org/wiki/Alan_Turing">Alan Turing</a> (after inventing the computer<font size="-1">*</font> and single-handedly winning the war<font size="-1">*</font>) published a paper in 1952 called <a href="http://en.wikipedia.org/wiki/The_chemical_basis_of_morphogenesis">The Chemical Basis of Morphogenesis</a>. This showed how chemical morphogens could diffuse through living tissue and drive development in embryos and plants. The key result is that <i>instabilities</i> can arise and form static patterns.
 <p>
 The timeline below gives some idea of the development of the key ideas.
 <p>
-&nbsp;&nbsp;&nbsp;&nbsp;<font size="-2">* This is an exaggeration but not completely false.</font>
+&nbsp;&nbsp;&nbsp;&nbsp;<font size="-1">* This is an exaggeration but not completely false.</font>
 
 <p>
 <h4>Before Turing</h4>
 
-TODO!!!
 <p>
-Open <a href="open:Patterns/heat_equation.vti">heat_equation.vti</a> and set it running. 
+Open <a href="open:Patterns/heat_equation.vti">heat_equation.vti</a> (click on this link) and set it running. Scroll down in the Info Pane to see the formula: <tt>delta_a = laplacian_a;</tt> This says that the rate of change of chemical a is equal to the <a href="http://en.wikipedia.org/wiki/Laplace_operator">Laplacian</a> of chemical a. This means that any location that is lower than its neighbors will increase, and any location that is higher than its neighbors will decrease. This equation describes how heat will spread out in a solid or how ink would diffuse through a liquid.
+<p>
 
 <p>
 <h4>Turing</h4>
 
 <p>
-Open <a href="open:Patterns/turing.vti">turing.vti</a> and set it running. 
+Now open <a href="open:Patterns/turing.vti">turing.vti</a>. This system has two chemicals (a and b) which are shown side by side. After a while, spots appear. To see the same system in one dimension, scroll down in the Info Pane to "Dimensions" and edit to set it to 64 x 1 x 1. The line graph shows chemical a in a brighter color. Soon a pattern of peaks and troughs appears, in the same way as the 2D system. (Likewise in 3D, try 32 x 32 x 32.)
+<p>
 TODO!!!
 <p>
 <h4>After Turing</h4>

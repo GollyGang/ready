@@ -4,7 +4,7 @@
   <RD format_version="1">
       
     <description>
-        The &lt;a href="http://en.wikipedia.org/wiki/Heat_equation"&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid. Any pattern would do to show the heat equation in action. From any starting point the chemical levels will spread out and equalise.
+        The &lt;a href="http://en.wikipedia.org/wiki/Heat_equation"&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.
     </description>
     
     <rule type="formula" name="Heat equation">
