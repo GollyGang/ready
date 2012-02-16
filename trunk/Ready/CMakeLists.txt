@@ -81,10 +81,11 @@ set( HELP_FILES
   about.gif about.html
   action.html credits.html file.html help.html mouse.html quickstart.html tips.html
   changes.html edit.html formats.html index.html problems.html refs.html view.html
+  introduction.html
 )
 
 set( TEXT_FILES
-  README.txt COPYING.txt TODO.txt
+  README.txt COPYING.txt TODO.txt BUILD.txt
 )
 
 #-------------------------------------------VTK----------------------------------------------
@@ -176,7 +177,7 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
   
-#--------------------------copy pattern and help files to build folder--------------------------
+#---------------------copy various files to build folder (just for testing)-------------------------
 
 foreach( pattern_file ${PATTERN_FILES} )
   add_custom_command( 
@@ -184,9 +185,8 @@ foreach( pattern_file ${PATTERN_FILES} )
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/Patterns/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Patterns/${pattern_file}"
   )
-  list( APPEND pattern_files_dest "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}" )
+  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}" )
 endforeach( pattern_file ) 
-add_custom_target( CopyPatterns ALL DEPENDS ${pattern_files_dest} )
 
 foreach( help_file ${HELP_FILES} )
   add_custom_command( 
@@ -194,9 +194,19 @@ foreach( help_file ${HELP_FILES} )
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}" "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}"
   )
-  list( APPEND help_files_dest "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}" )
+  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}" )
 endforeach( help_file ) 
-add_custom_target( CopyHelp ALL DEPENDS ${help_files_dest} )
+
+foreach( text_file ${TEXT_FILES} )
+  add_custom_command( 
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${text_file}"
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${text_file}" "${CMAKE_CURRENT_BINARY_DIR}/${text_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${text_file}"
+  )
+  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${text_file}" )
+endforeach( text_file ) 
+
+add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
 #-----------------------------------------------------------------------------------------------
 
