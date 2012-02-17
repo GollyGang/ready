@@ -120,6 +120,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::Reset, MyFrame::OnReset)
     EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
     EVT_MENU(ID::GenerateInitialPattern, MyFrame::OnGenerateInitialPattern)
+    EVT_MENU(ID::AddOrDeleteParameters,MyFrame::OnAddOrDeleteParameters)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
@@ -268,6 +269,8 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
         menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
+        menu->AppendSeparator();
+        menu->Append(ID::AddOrDeleteParameters, _("&Add or delete parameters...") + GetAccelerator(DO_PARAMS),_("Add new named parameters or delete existing ones"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
@@ -1836,4 +1839,10 @@ void MyFrame::RenderSettingsChanged()
 {
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->UpdateWindows();
+}
+
+void MyFrame::OnAddOrDeleteParameters(wxCommandEvent& event)
+{
+    AddOrDeleteParametersDialog dlg(this,this->GetCurrentRDSystem());
+    dlg.ShowModal();
 }

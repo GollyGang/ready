@@ -56,6 +56,7 @@ namespace ID { enum {
     RunStop,
     Reset,
     GenerateInitialPattern,
+    AddOrDeleteParameters,
     SelectOpenCLDevice,
     OpenCLDiagnostics,
     
@@ -88,5 +89,9 @@ namespace ID { enum {
     // toolbars:
     FileToolbar,
     ActionToolbar,
+
+    // add/delete parameters dialog:
+    AddParameter,
+    DeleteParameter,
 
 }; };

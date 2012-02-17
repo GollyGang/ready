@@ -104,6 +104,7 @@ typedef enum
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
     DO_OPENCL,                   // show OpenCL diagnostics...
+    DO_PARAMS,                   // add or delete parameters
     DO_PATTERNS,                 // show patterns pane
     DO_INFO,                     // show info pane
     DO_HELP,                     // show help pane

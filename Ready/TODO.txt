@@ -5,7 +5,6 @@ before 0.2 release:
 - allow user to change the running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - allow user to add/remove parameters
-- add a simple introduction-to-RD help page
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
@@ -14,7 +13,7 @@ Andrew's tasks for 0.2:
 - do any other "AKT TODO" tasks
 
 before 0.3 release:
-- allow user to change the render_settings (both the default ones and the ones specified in the file?)
+- allow user to change the default render settings
 - UI for editing the initial-pattern-generator overlay stack
 - add option to convert formula rules into full-kernel rules
 

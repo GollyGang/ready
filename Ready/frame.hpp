@@ -119,6 +119,7 @@ class MyFrame : public wxFrame
         void OnReset(wxCommandEvent& event);
         void OnUpdateReset(wxUpdateUIEvent& event);
         void OnGenerateInitialPattern(wxCommandEvent& event);
+        void OnAddOrDeleteParameters(wxCommandEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);
 
