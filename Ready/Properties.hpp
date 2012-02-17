@@ -35,7 +35,8 @@ class Properties : public XML_Object
         // for accessing properties generically
         int GetNumberOfProperties() const;
         std::string GetPropertyName(int i) const;
-        std::string GetPropertyType(int i) const; // currently: float, int, bool, float3
+        std::string GetPropertyType(const std::string& name) const; // currently: float, int, bool, float3
+        bool IsProperty(const std::string& name);
 
         // retrieve the value of a property
         float GetFloat(const std::string& name) const;

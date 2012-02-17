@@ -75,8 +75,5 @@ bool ClipboardHasText();
 bool CopyTextToClipboard(const wxString& text);
 // Copy given text to the clipboard.
 
-// sometimes useful to display a block of text in a monospace font
-class MonospaceMessageBox: public wxDialog
-{
-    public: MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon);
-};
+// strip trailing zeros
+wxString FormatFloat(float f);

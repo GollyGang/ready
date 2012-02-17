@@ -92,11 +92,12 @@ class BaseRD
         int GetNumberOfParameters() const;
         std::string GetParameterName(int iParam) const;
         float GetParameterValue(int iParam) const;
-        float GetParameterValueByName(std::string name) const;
-        virtual void AddParameter(std::string name,float val);
+        float GetParameterValueByName(const std::string& name) const;
+        bool IsParameter(const std::string& name) const;
+        virtual void AddParameter(const std::string& name,float val);
         virtual void DeleteParameter(int iParam);
         virtual void DeleteAllParameters();
-        virtual void SetParameterName(int iParam,std::string s);
+        virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
 
         // should the user be asked if they want to save?
@@ -104,7 +105,7 @@ class BaseRD
         void SetModified(bool m);
 
         std::string GetFilename() const;
-        void SetFilename(std::string s);
+        void SetFilename(const std::string& s);
 
         void AddInitialPatternGeneratorOverlay(Overlay* overlay);
         virtual void GenerateInitialPattern();

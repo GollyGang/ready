@@ -54,6 +54,7 @@ endif()
 set( GUI_SOURCES      # high-level GUI code used only in Ready
   IDs.hpp
   wxutils.hpp wxutils.cpp
+  dialogs.hpp dialogs.cpp
   prefs.hpp prefs.cpp
   app.hpp app.cpp 
   frame.hpp frame.cpp 
