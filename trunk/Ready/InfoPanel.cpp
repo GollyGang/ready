@@ -35,21 +35,6 @@
 #include <string>
 using namespace std;
 
-#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-    // wxMOD_CONTROL has been changed to mean Command key down
-    #define wxMOD_CONTROL wxMOD_RAW_CONTROL
-    #define ControlDown RawControlDown
-#endif
-
-// need platform-specific gap after OK/Cancel buttons
-#ifdef __WXMAC__
-    const int STDHGAP = 0;
-#elif defined(__WXMSW__)
-    const int STDHGAP = 6;
-#else
-    const int STDHGAP = 10;
-#endif
-
 const wxString change_prefix = _("change: ");
 
 // labels in 1st column

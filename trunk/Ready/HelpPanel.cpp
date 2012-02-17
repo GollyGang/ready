@@ -27,12 +27,6 @@
 #include <wx/filename.h>        // for wxFileName
 #include <wx/html/htmlwin.h>    // for wxHtmlWindow
 
-#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-    // wxMOD_CONTROL has been changed to mean Command key down
-    #define wxMOD_CONTROL wxMOD_RAW_CONTROL
-    #define ControlDown RawControlDown
-#endif
-
 const wxString helphome = _("Help/index.html");    // contents page
 
 // -----------------------------------------------------------------------------

@@ -162,12 +162,6 @@ action_info keyaction[MAX_KEYCODES][MAX_MODS] = { { nullaction } };
 // strings for setting menu item accelerators
 wxString accelerator[MAX_ACTIONS];
 
-#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-    // wxMOD_CONTROL has been changed to mean Command key down
-    #define wxMOD_CONTROL wxMOD_RAW_CONTROL
-    #define ControlDown RawControlDown
-#endif
-
 // -----------------------------------------------------------------------------
 
 bool ConvertKeyAndModifiers(int wxkey, int wxmods, int* newkey, int* newmods)

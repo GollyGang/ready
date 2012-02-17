@@ -26,6 +26,12 @@
 #include <wx/artprov.h>
 #include <wx/string.h>
 
+#if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
+    // wxMOD_CONTROL has been changed to mean Command key down
+    #define wxMOD_CONTROL wxMOD_RAW_CONTROL
+    #define ControlDown RawControlDown
+#endif
+
 // Various utility routines:
 
 void Note(const wxString& msg);
