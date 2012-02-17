@@ -50,7 +50,7 @@ MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString
     this->ShowModal();
 }
 
-// -----------------------------------------------------------------------------
+// =============================================================================
 
 XYZIntDialog::XYZIntDialog(wxWindow* parent, const wxString& title,
                      int inx, int iny, int inz,
@@ -165,6 +165,108 @@ bool XYZIntDialog::TransferDataFromWindow()
     return ValidNumber(xbox, &xval) &&
            ValidNumber(ybox, &yval) &&
            ValidNumber(zbox, &zval);
+}
+
+// =============================================================================
+
+XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
+                     float inx, float iny, float inz,
+                     const wxPoint& pos, const wxSize& size)
+{
+    Create(parent, wxID_ANY, title, pos, size);
+    
+    // create the controls
+    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    SetSizer(vbox);
+    
+    wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, _("Enter new X, Y, Z values:"));
+
+    xbox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inx), wxDefaultPosition, wxSize(50,wxDefaultCoord));
+    ybox = new wxTextCtrl(this, wxID_ANY, FormatFloat(iny), wxDefaultPosition, wxSize(50,wxDefaultCoord));
+    zbox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inz), wxDefaultPosition, wxSize(50,wxDefaultCoord));
+
+    wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
+
+    hbox->AddStretchSpacer(1);
+    
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("X = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
+    hbox->Add(xbox, 0, wxALIGN_CENTER_VERTICAL, 0);
+    
+    hbox->AddStretchSpacer(1);
+    
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Y = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
+    hbox->Add(ybox, 0, wxALIGN_CENTER_VERTICAL, 0);
+    
+    hbox->AddStretchSpacer(1);
+    
+    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Z = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
+    hbox->Add(zbox, 0, wxALIGN_CENTER_VERTICAL, 0);
+
+    hbox->AddStretchSpacer(1);
+    
+    wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
+    
+    // position the controls
+    wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
+    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    wxSize minsize = buttbox->GetMinSize();
+    if (minsize.GetWidth() < 250) {
+        minsize.SetWidth(250);
+        buttbox->SetMinSize(minsize);
+    }
+
+    vbox->AddSpacer(12);
+    vbox->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
+    vbox->AddSpacer(10);
+    vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
+    vbox->AddSpacer(12);
+    vbox->Add(buttbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
+
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
+    
+    if (pos == wxDefaultPosition) Centre();
+    if (size != wxDefaultSize) SetSize(size);
+
+    // select X value (must do this last on Windows)
+    xbox->SetFocus();
+    xbox->SetSelection(-1,-1);
+
+    // install event handler to detect illegal chars when entering values
+    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
+    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
+    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
+}
+
+// -----------------------------------------------------------------------------
+
+void XYZFloatDialog::OnChar(wxKeyEvent& event)
+{
+    int key = event.GetKeyCode();
+    if ( key >= ' ' && key <= '~' ) {
+        if ( (key >= '0' && key <= '9') || key=='.' || key=='e' || key=='E' || key=='+' || key=='-') {
+            // allow digits and other float characters
+            event.Skip();
+        } else {
+            // disallow any other displayable ascii char
+            wxBell();
+        }
+    } else {
+        // allow tab, del, arrow keys, etc
+        event.Skip();
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+bool XYZFloatDialog::TransferDataFromWindow()
+{
+    double x,y,z;
+    bool ok = this->xbox->GetValue().ToDouble(&x) && this->ybox->GetValue().ToDouble(&y) && this->zbox->GetValue().ToDouble(&z);
+    this->xval = x;
+    this->yval = y;
+    this->zval = z;
+    return ok;
 }
 
 // =============================================================================

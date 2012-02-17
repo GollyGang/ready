@@ -64,6 +64,31 @@ class XYZIntDialog : public wxDialog
 
 //----------------------------------------------------------------------------------
 
+// a modal dialog for editing float X,Y,Z values
+class XYZFloatDialog : public wxDialog
+{
+    public:
+        XYZFloatDialog(wxWindow* parent, const wxString& title,
+                  float inx, float iny, float inz,
+                  const wxPoint& pos, const wxSize& size);
+    
+        void OnChar(wxKeyEvent& event);
+
+        virtual bool TransferDataFromWindow();  // called when user hits OK
+    
+        float GetX() { return xval; }
+        float GetY() { return yval; }
+        float GetZ() { return zval; }
+    
+    private:
+        wxTextCtrl* xbox;             // for entering X value
+        wxTextCtrl* ybox;            // for entering Y value
+        wxTextCtrl* zbox;           // for entering Z value
+        float xval, yval, zval;    // the given X,Y,Z values
+};
+
+//----------------------------------------------------------------------------------
+
 // a modal dialog for editing multi-line text
 // (essentially wxTextEntryDialog but with wxRESIZE_BORDER style)
 class MultiLineDialog : public wxDialog

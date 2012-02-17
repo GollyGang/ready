@@ -537,19 +537,25 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
             }
         }
     }
-    /*else if(type=="float3")
+    else if(type=="float3")
     {
         float oldx,oldy,oldz;
         float newx,newy,newz;
         render_settings.GetFloat3(name,oldx,oldy,oldz);
 
-        // position dialog box to left of linkrect
-        wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-        int dlgwd = 300;
-        pos.x -= dlgwd + 20;
-
-        // TODO: need a XYZFloatDialog
-    }*/
+        XYZFloatDialog dialog(frame, setting, oldx, oldy, oldz,wxDefaultPosition,wxDefaultSize);
+        if (dialog.ShowModal() == wxID_OK)
+        {
+            newx = dialog.GetX();
+            newy = dialog.GetY();
+            newz = dialog.GetZ();
+            if (newx != oldx || newy != oldy || newz != oldz)
+            {
+                render_settings.Set(name,newx,newy,newz);
+                frame->RenderSettingsChanged();
+            }
+        }
+    }
     else {
         wxMessageBox("TODO!!! Edit "+setting);
     }
