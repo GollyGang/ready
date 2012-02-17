@@ -60,6 +60,8 @@ class MyFrame : public wxFrame
         void SetNumberOfChemicals(int n);
         bool SetDimensions(int x,int y,int z);
         void SetBlockSize(int x,int y,int z);
+        Properties& GetRenderSettings() { return this->render_settings; }
+        void RenderSettingsChanged();
 
         // interface with Preferences dialog
         void ShowPrefsDialog(const wxString& page = wxEmptyString);

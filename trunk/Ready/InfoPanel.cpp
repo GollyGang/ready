@@ -22,6 +22,7 @@
 #include "IDs.hpp"
 #include "prefs.hpp"            // for readydir, etc
 #include "wxutils.hpp"          // for Warning, CopyTextToClipboard
+#include "dialogs.hpp"
 
 // readybase:
 #include "BaseRD.hpp"
@@ -49,8 +50,7 @@ using namespace std;
     const int STDHGAP = 10;
 #endif
 
-const wxString change_prefix = wxT("change: ");         // must end with space
-const wxString parameter_prefix = wxT("parameter ");    // ditto
+const wxString change_prefix = _("change: ");
 
 // labels in 1st column
 const wxString rule_name_label = _("Rule name");
@@ -136,7 +136,7 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
     #endif
 
     } else if ( url.StartsWith(change_prefix) ) {
-        panel->ChangeInfo( url.AfterFirst(' ') );
+        panel->ChangeInfo( url.Mid(change_prefix.size()) );
         // best to reset focus after dialog closes
         SetFocus();
 
@@ -358,22 +358,6 @@ static int rownum;  // for alternating row background colors
 
 // -----------------------------------------------------------------------------
 
-static wxString FormatFloat(float f)
-{
-    wxString result = wxString::Format(wxT("%f"),f);
-    // strip any trailing zeros
-    while (result.GetChar(result.Length()-1) == wxChar('0')) {
-        result.Truncate(result.Length()-1);
-    }
-    // strip any trailing '.'
-    if (result.GetChar(result.Length()-1) == wxChar('.')) {
-        result.Truncate(result.Length()-1);
-    }
-    return result;
-}
-
-// -----------------------------------------------------------------------------
-
 void InfoPanel::Update(const BaseRD* const system)
 {
     // build HTML string to display current parameters
@@ -384,13 +368,13 @@ void InfoPanel::Update(const BaseRD* const system)
     rownum = 0;
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(rule_name_label, s);
+    contents += AppendRow(rule_name_label, s,true);
     s = wxString(system->GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(description_label, s);
+    contents += AppendRow(description_label, s,true);
 
     contents += AppendRow(num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()),
-                          false, system->HasEditableNumberOfChemicals());
+                          system->HasEditableNumberOfChemicals());
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
@@ -414,17 +398,37 @@ void InfoPanel::Update(const BaseRD* const system)
         formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
         // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
-        formula = _("<code>") + formula + _("</code>"); // (would prefer the <pre> block here but it adds a leading newline, and also prevents wrapping)
-        contents += AppendRow(formula_label, formula, false, system->HasEditableFormula());
+        formula = _("<code>") + formula + _("</code>");
+        // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
+        contents += AppendRow(formula_label, formula, system->HasEditableFormula());
     }
 
     contents += AppendRow(dimensions_label, wxString::Format(wxT("%d x %d x %d"),
-                                            system->GetX(),system->GetY(),system->GetZ()));
+                                            system->GetX(),system->GetY(),system->GetZ()), true);
 
     if(system->HasEditableBlockSize())
         contents += AppendRow(block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
-                                            false, true);
+                                            true);
+
+    const Properties& render_settings = frame->GetRenderSettings();
+    for(int i=0;i<render_settings.GetNumberOfProperties();i++)
+    {
+        string name = render_settings.GetPropertyName(i);
+        string type = render_settings.GetPropertyType(name);
+        if(type=="float")
+            contents += AppendRow(name,FormatFloat(render_settings.GetFloat(name)),true);
+        else if(type=="bool")
+            contents += AppendRow(name,render_settings.GetBool(name)?_("true"):_("false"),true);
+        else if(type=="int")
+            contents += AppendRow(name,FormatFloat(render_settings.GetInt(name)),true);
+        else if(type=="float3")
+        {
+            float a,b,c;
+            render_settings.GetFloat3(name,a,b,c);
+            contents += AppendRow(name,FormatFloat(a)+_T(", ")+FormatFloat(b)+_T(", ")+FormatFloat(c),true);
+        }
+    }
 
     contents += _T("</table></body></html>");
     
@@ -434,7 +438,7 @@ void InfoPanel::Update(const BaseRD* const system)
 // -----------------------------------------------------------------------------
 
 wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
-                              bool is_parameter, bool is_editable)
+                              bool is_editable)
 {
     wxString result;
     if (rownum & 1)
@@ -452,7 +456,6 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
     if (is_editable) {
         result += _T("<td valign=top align=right><a href=\"");
         result += change_prefix;
-        if (is_parameter) result += parameter_prefix;
         result += label;
         result += _T("\">");
         result += _("edit");
@@ -469,164 +472,90 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
 
 // =============================================================================
 
-// define a modal dialog for editing a parameter name and/or value
-
-class ParameterDialog : public wxDialog
+void InfoPanel::ChangeRenderSetting(const wxString& setting)
 {
-    public:
-        ParameterDialog(wxWindow* parent, bool can_edit_name,
-                        const wxString& inname, float inval,
-                        const wxPoint& pos, const wxSize& size);
-    
-        #ifdef __WXOSX__
-            ~ParameterDialog() { delete onetimer; }
-            void OnOneTimer(wxTimerEvent& event);
-        #endif
-    
-        void OnChar(wxKeyEvent& event);
-    
-        virtual bool TransferDataFromWindow();  // called when user hits OK
-    
-        wxString GetName() { return name; }
-        float GetValue() { return value; }
-    
-    private:
-        wxTextCtrl* namebox;    // text box for entering name
-        wxTextCtrl* valuebox;   // text box for entering value
-        wxString name;          // the given name
-        float value;            // the given value
-    
-        #ifdef __WXOSX__
-            wxTimer* onetimer;  // one shot timer (see OnOneTimer)
-            DECLARE_EVENT_TABLE()
-        #endif
-};
+    Properties& render_settings = frame->GetRenderSettings();
+    string name(setting.mb_str());
+    string type = render_settings.GetPropertyType(name);
+    if(type=="float")
+    {
+        float newval;
+        float oldval = render_settings.GetFloat(name);
 
-// -----------------------------------------------------------------------------
+        // position dialog box to left of linkrect
+        wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+        int dlgwd = 300;
+        pos.x -= dlgwd + 20;
 
-#ifdef __WXOSX__
-
-BEGIN_EVENT_TABLE(ParameterDialog, wxDialog)
-    EVT_TIMER (wxID_ANY, ParameterDialog::OnOneTimer)
-END_EVENT_TABLE()
-
-void ParameterDialog::OnOneTimer(wxTimerEvent& WXUNUSED(event))
-{
-    if (namebox) {
-        namebox->SetFocus();
-        valuebox->SetFocus();
-        valuebox->SetSelection(-1,-1);
-    }
-}
-
-#endif
-
-// -----------------------------------------------------------------------------
-
-ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
-                                 const wxString& inname, float inval,
-                                 const wxPoint& pos, const wxSize& size)
-{
-    Create(parent, wxID_ANY, _("Change parameter"), pos, size);
-    
-    // create the controls
-    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-    SetSizer(vbox);
-    
-    wxString prompt = can_edit_name ? _("Enter a new name and/or a new value:")
-                                    : _("Enter a new value:");
-    wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
-
-    wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-    hbox->AddStretchSpacer(1);
-
-    if (can_edit_name) {
-        namebox = new wxTextCtrl(this, wxID_ANY, inname);
-        hbox->Add(namebox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    } else {
-        namebox = NULL;
-        hbox->Add(new wxStaticText(this, wxID_STATIC, inname), 0, wxALIGN_CENTER_VERTICAL, 0);
-    }
-
-    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT(" = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
-    
-    valuebox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inval));
-    hbox->Add(valuebox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    hbox->AddStretchSpacer(1);
-    
-    wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
-    // position the controls
-    wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
-    wxSize minsize = buttbox->GetMinSize();
-    if (minsize.GetWidth() < 250) {
-        minsize.SetWidth(250);
-        buttbox->SetMinSize(minsize);
-    }
-
-    vbox->AddSpacer(12);
-    vbox->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
-    vbox->AddSpacer(10);
-    vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
-    vbox->AddSpacer(12);
-    vbox->Add(buttbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
-
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
-    
-    if (pos == wxDefaultPosition) Centre();
-    if (size != wxDefaultSize) SetSize(size);
-
-    #ifdef __WXOSX__
-        // due to wxOSX bug we have to set focus after dialog creation (see OnOneTimer)
-        onetimer = new wxTimer(this, wxID_ANY);
-        if (onetimer) onetimer->Start(10, wxTIMER_ONE_SHOT);
-    #else
-        // select value (must do this last on Windows)
-        valuebox->SetFocus();
-        valuebox->SetSelection(-1,-1);
-    #endif
-
-    // install event handler to detect illegal chars when entering value
-    valuebox->Connect(wxEVT_CHAR, wxKeyEventHandler(ParameterDialog::OnChar), NULL, this);
-}
-
-// -----------------------------------------------------------------------------
-
-void ParameterDialog::OnChar(wxKeyEvent& event)
-{
-    int key = event.GetKeyCode();
-    if ( key >= ' ' && key <= '~' ) {
-        if ( (key >= '0' && key <= '9') || key == '.' ) {
-            // allow digits and decimal pt
-            event.Skip();
-        } else {
-            // disallow any other displayable ascii char
-            wxBell();
+        ParameterDialog dialog(frame, false, setting, oldval, pos, wxSize(dlgwd,-1));
+        
+        if (dialog.ShowModal() == wxID_OK)
+        {
+            newval = dialog.GetValue();
+            if (newval != oldval) {
+                render_settings.Set(name, newval);
+                frame->RenderSettingsChanged();
+            }
         }
-    } else {
-        event.Skip();
+    }
+    else if(type=="int")
+    {
+        float newval;
+        float oldval = render_settings.GetInt(name);
+
+        // position dialog box to left of linkrect
+        wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+        int dlgwd = 300;
+        pos.x -= dlgwd + 20;
+
+        ParameterDialog dialog(frame, false, setting, oldval, pos, wxSize(dlgwd,-1));
+        
+        if (dialog.ShowModal() == wxID_OK)
+        {
+            newval = dialog.GetValue();
+            if (newval != oldval) {
+                render_settings.Set(name, (int)newval);
+                frame->RenderSettingsChanged();
+            }
+        }
+    }
+    else if(type=="bool")
+    {
+        wxArrayString choices;
+        choices.Add(_("true"));
+        choices.Add(_("false"));
+        wxSingleChoiceDialog dlg(this,_("Edit render setting"),setting,choices);
+        bool oldval = render_settings.GetBool(name);
+        dlg.SetSelection(oldval?0:1);
+        if(dlg.ShowModal()==wxID_OK)
+        {
+            bool newval = (dlg.GetSelection()==0);
+            if( (newval && !oldval) || (!newval && oldval) )
+            {
+                render_settings.Set(name,newval);
+                frame->RenderSettingsChanged();
+            }
+        }
+    }
+    /*else if(type=="float3")
+    {
+        float oldx,oldy,oldz;
+        float newx,newy,newz;
+        render_settings.GetFloat3(name,oldx,oldy,oldz);
+
+        // position dialog box to left of linkrect
+        wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+        int dlgwd = 300;
+        pos.x -= dlgwd + 20;
+
+        // TODO: need a XYZFloatDialog
+    }*/
+    else {
+        wxMessageBox("TODO!!! Edit "+setting);
     }
 }
 
 // -----------------------------------------------------------------------------
-
-bool ParameterDialog::TransferDataFromWindow()
-{
-    if (namebox) name = namebox->GetValue();
-    wxString valstr = valuebox->GetValue();
-    double dbl;
-    if (valstr.ToDouble(&dbl) && dbl >= 0.0 && dbl <= 1.0) {
-        value = (float)dbl;
-        return true;
-    } else {
-        Warning(_("The value must be a number from 0.0 to 1.0."));
-        return false;
-    }
-}
-
-// =============================================================================
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
@@ -679,80 +608,6 @@ void InfoPanel::ChangeRuleName()
     {
         if (newname != oldname) frame->SetRuleName(string(newname.mb_str()));
     }
-}
-
-// =============================================================================
-
-// define a modal dialog for editing multi-line text
-// (essentially wxTextEntryDialog but with wxRESIZE_BORDER style)
-
-class MultiLineDialog : public wxDialog
-{
-    public:
-        MultiLineDialog(wxWindow* parent,
-                        const wxString& caption,
-                        const wxString& message,
-                        const wxString& value);
-    
-        wxString GetValue() const { return m_value; }
-        void OnOK(wxCommandEvent& event);
-    
-    private:
-        wxTextCtrl* m_textctrl;
-        wxString m_value;
-    
-        DECLARE_EVENT_TABLE()
-};
-
-BEGIN_EVENT_TABLE(MultiLineDialog, wxDialog)
-    EVT_BUTTON (wxID_OK, MultiLineDialog::OnOK)
-END_EVENT_TABLE()
-
-// -----------------------------------------------------------------------------
-
-MultiLineDialog::MultiLineDialog(wxWindow *parent,
-                                 const wxString& caption,
-                                 const wxString& message,
-                                 const wxString& value)
-     : wxDialog(GetParentForModalDialog(parent, wxOK | wxCANCEL),
-                wxID_ANY, caption, wxDefaultPosition, wxDefaultSize,
-                wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
-{
-    wxBeginBusyCursor();
-
-    wxBoxSizer* topsizer = new wxBoxSizer( wxVERTICAL );
-
-    wxSizerFlags flagsBorder2;
-    flagsBorder2.DoubleBorder();
-
-    topsizer->Add(CreateTextSizer(message), flagsBorder2);
-
-    m_textctrl = new wxTextCtrl(this, wxID_ANY, value,
-                                wxDefaultPosition, wxSize(100,50), wxTE_MULTILINE);
-
-    topsizer->Add(m_textctrl, wxSizerFlags(1).Expand().TripleBorder(wxLEFT | wxRIGHT));
-
-    wxSizer* buttonSizer = CreateSeparatedButtonSizer(wxOK | wxCANCEL);
-    topsizer->Add(buttonSizer, wxSizerFlags(flagsBorder2).Expand());
-
-    SetAutoLayout(true);
-    SetSizer(topsizer);
-
-    topsizer->SetSizeHints(this);
-    topsizer->Fit(this);
-
-    m_textctrl->SetFocus();
-    m_textctrl->SetSelection(0,0);      // probably nicer not to select all text
-
-    wxEndBusyCursor();
-}
-
-// -----------------------------------------------------------------------------
-
-void MultiLineDialog::OnOK(wxCommandEvent& WXUNUSED(event))
-{
-    m_value = m_textctrl->GetValue();
-    EndModal(wxID_OK);
 }
 
 // =============================================================================
@@ -826,150 +681,6 @@ void InfoPanel::ChangeNumChemicals()
 
 // =============================================================================
 
-// define a modal dialog for editing X,Y,Z values
-
-class XYZDialog : public wxDialog
-{
-    public:
-        XYZDialog(wxWindow* parent, const wxString& title,
-                  int inx, int iny, int inz,
-                  const wxPoint& pos, const wxSize& size);
-    
-        void OnChar(wxKeyEvent& event);
-        bool ValidNumber(wxTextCtrl* box, int* val);
-    
-        virtual bool TransferDataFromWindow();  // called when user hits OK
-    
-        int GetX() { return xval; }
-        int GetY() { return yval; }
-        int GetZ() { return zval; }
-    
-    private:
-        wxTextCtrl* xbox;           // for entering X value
-        wxTextCtrl* ybox;           // for entering Y value
-        wxTextCtrl* zbox;           // for entering Z value
-        int xval, yval, zval;       // the given X,Y,Z values
-};
-
-// -----------------------------------------------------------------------------
-
-XYZDialog::XYZDialog(wxWindow* parent, const wxString& title,
-                     int inx, int iny, int inz,
-                     const wxPoint& pos, const wxSize& size)
-{
-    Create(parent, wxID_ANY, title, pos, size);
-    
-    // create the controls
-    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
-    SetSizer(vbox);
-    
-    wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, _("Enter new X, Y, Z values:"));
-
-    xbox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),inx), wxDefaultPosition, wxSize(50,wxDefaultCoord));
-    ybox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),iny), wxDefaultPosition, wxSize(50,wxDefaultCoord));
-    zbox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),inz), wxDefaultPosition, wxSize(50,wxDefaultCoord));
-
-    wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-
-    hbox->AddStretchSpacer(1);
-    
-    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("X = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
-    hbox->Add(xbox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    
-    hbox->AddStretchSpacer(1);
-    
-    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Y = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
-    hbox->Add(ybox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    
-    hbox->AddStretchSpacer(1);
-    
-    hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Z = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
-    hbox->Add(zbox, 0, wxALIGN_CENTER_VERTICAL, 0);
-
-    hbox->AddStretchSpacer(1);
-    
-    wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
-    // position the controls
-    wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
-    wxSize minsize = buttbox->GetMinSize();
-    if (minsize.GetWidth() < 250) {
-        minsize.SetWidth(250);
-        buttbox->SetMinSize(minsize);
-    }
-
-    vbox->AddSpacer(12);
-    vbox->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
-    vbox->AddSpacer(10);
-    vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
-    vbox->AddSpacer(12);
-    vbox->Add(buttbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
-
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
-    
-    if (pos == wxDefaultPosition) Centre();
-    if (size != wxDefaultSize) SetSize(size);
-
-    // select X value (must do this last on Windows)
-    xbox->SetFocus();
-    xbox->SetSelection(-1,-1);
-
-    // install event handler to detect illegal chars when entering values
-    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZDialog::OnChar), NULL, this);
-    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZDialog::OnChar), NULL, this);
-    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZDialog::OnChar), NULL, this);
-}
-
-// -----------------------------------------------------------------------------
-
-void XYZDialog::OnChar(wxKeyEvent& event)
-{
-    int key = event.GetKeyCode();
-    if ( key >= ' ' && key <= '~' ) {
-        if ( key >= '0' && key <= '9' ) {
-            // allow digits
-            event.Skip();
-        } else {
-            // disallow any other displayable ascii char
-            wxBell();
-        }
-    } else {
-        // allow tab, del, arrow keys, etc
-        event.Skip();
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-bool XYZDialog::ValidNumber(wxTextCtrl* box, int* val)
-{
-    // validate given X/Y/Z value
-    wxString str = box->GetValue();
-    long i;
-    if ( str.ToLong(&i) && i >= 1 && i <= 256 ) {
-        *val = (int)i;
-        return true;
-    } else {
-        Warning(_("Number must be from 1 to 256."));
-        box->SetFocus();
-        box->SetSelection(-1,-1);
-        return false;
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-bool XYZDialog::TransferDataFromWindow()
-{
-    return ValidNumber(xbox, &xval) &&
-           ValidNumber(ybox, &yval) &&
-           ValidNumber(zbox, &zval);
-}
-
-// =============================================================================
-
 void InfoPanel::ChangeDimensions()
 {
     BaseRD* sys = frame->GetCurrentRDSystem();
@@ -985,7 +696,7 @@ void InfoPanel::ChangeDimensions()
 
     do // allow the user multiple tries until the change is accepted, they cancel, or they don't change the values but hit OK
     {
-        XYZDialog dialog(frame, _("Change the dimensions"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
+        XYZIntDialog dialog(frame, _("Change the dimensions"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
         if (dialog.ShowModal() == wxID_CANCEL) break;
         newx = dialog.GetX();
         newy = dialog.GetY();
@@ -1010,7 +721,7 @@ void InfoPanel::ChangeBlockSize()
     int dlgwd = 300;
     pos.x -= dlgwd + 20;
 
-    XYZDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
+    XYZIntDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
     
     if (dialog.ShowModal() == wxID_OK)
     {
@@ -1026,10 +737,7 @@ void InfoPanel::ChangeBlockSize()
 
 void InfoPanel::ChangeInfo(const wxString& label)
 {
-    if ( label.StartsWith(parameter_prefix) ) {
-        ChangeParameter(label.AfterFirst(' '));
-
-    } else if ( label == rule_name_label ) {
+    if ( label == rule_name_label ) {
         ChangeRuleName();
 
     } else if ( label == description_label ) {
@@ -1047,6 +755,11 @@ void InfoPanel::ChangeInfo(const wxString& label)
     } else if ( label == block_size_label ) {
         ChangeBlockSize();
 
+    } else if ( frame->GetRenderSettings().IsProperty(string(label.mb_str())) ) {
+        ChangeRenderSetting(label);
+
+    } else if ( frame->GetCurrentRDSystem()->IsParameter(string(label.mb_str())) ) {
+        ChangeParameter(label);
     } else {
         Warning(_("Bug in ChangeInfo! Unexpected label: ") + label);
     }

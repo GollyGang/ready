@@ -188,7 +188,7 @@ float BaseRD::GetParameterValue(int iParam) const
     return this->parameters[iParam].second;
 }
 
-float BaseRD::GetParameterValueByName(std::string name) const
+float BaseRD::GetParameterValueByName(const std::string& name) const
 {
     for(int iParam=0;iParam<(int)this->parameters.size();iParam++)
         if(this->parameters[iParam].first == name)
@@ -196,7 +196,7 @@ float BaseRD::GetParameterValueByName(std::string name) const
     throw runtime_error("BaseRD::GetParameterValueByName : parameter name not found: "+name);
 }
 
-void BaseRD::AddParameter(std::string name,float val)
+void BaseRD::AddParameter(const std::string& name,float val)
 {
     this->parameters.push_back(make_pair(name,val));
     this->is_modified = true;
@@ -214,7 +214,7 @@ void BaseRD::DeleteAllParameters()
     this->is_modified = true;
 }
 
-void BaseRD::SetParameterName(int iParam,string s)
+void BaseRD::SetParameterName(int iParam,const string& s)
 {
     this->parameters[iParam].first = s;
     this->is_modified = true;
@@ -224,6 +224,14 @@ void BaseRD::SetParameterValue(int iParam,float val)
 {
     this->parameters[iParam].second = val;
     this->is_modified = true;
+}
+
+bool BaseRD::IsParameter(const string& name) const
+{
+    for(int i=0;i<(int)this->parameters.size();i++)
+        if(this->parameters[i].first == name)
+            return true;
+    return false;
 }
 
 /* static */ vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z)
@@ -254,7 +262,7 @@ std::string BaseRD::GetFilename() const
     return this->filename;
 }
 
-void BaseRD::SetFilename(std::string s)
+void BaseRD::SetFilename(const string& s)
 {
     this->filename = s;
 }

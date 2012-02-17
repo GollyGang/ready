@@ -161,21 +161,17 @@ std::string Properties::GetPropertyName(int i) const
     throw runtime_error("Properties::GetPropertyName : internal error");
 }
 
-std::string Properties::GetPropertyType(int i) const
+std::string Properties::GetPropertyType(const string& name) const
 {
-    if(i<0 || i>=this->GetNumberOfProperties()) throw runtime_error("Properties::GetPropertyType : out of range");
-    if(i<(int)this->float_properties.size())
+    if(this->float_properties.count(name))
         return "float";
-    i -= (int)this->float_properties.size();
-    if(i<(int)this->int_properties.size())
-        return "int";
-    i -= (int)this->int_properties.size();
-    if(i<(int)this->bool_properties.size())
+    if(this->bool_properties.count(name))
         return "bool";
-    i -= (int)this->bool_properties.size();
-    if(i<(int)this->float3_properties.size())
+    if(this->int_properties.count(name))
+        return "int";
+    if(this->float3_properties.count(name))
         return "float3";
-    throw runtime_error("Properties::GetPropertyType : internal error");
+    throw runtime_error("Properties::GetPropertyType : unknown property: "+name);
 }
 
 void Properties::GetFloat3(const std::string& name,float &a,float &b,float &c) const
@@ -193,4 +189,9 @@ void Properties::Set(const std::string& name,float a,float b,float c)
     vector<float> f3(3);
     f3[0]=a; f3[1]=b; f3[2]=c;
     this->float3_properties[name] = f3;
+}
+
+bool Properties::IsProperty(const std::string& name)
+{
+    return this->float_properties.count(name) || this->int_properties.count(name) || this->bool_properties.count(name) || this->float3_properties.count(name);
 }

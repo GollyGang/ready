@@ -25,6 +25,7 @@
 #include "HelpPanel.hpp"
 #include "IDs.hpp"
 #include "vtk_pipeline.hpp"
+#include "dialogs.hpp"
 
 // readybase:
 #include "utils.hpp"
@@ -1833,6 +1834,12 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->system->SetBlockSizeY(y);
     this->system->SetBlockSizeZ(z);
     this->system->GenerateInitialPattern();
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    this->UpdateWindows();
+}
+
+void MyFrame::RenderSettingsChanged()
+{
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->UpdateWindows();
 }
