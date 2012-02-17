@@ -27,6 +27,9 @@
 #include <wx/string.h>
 #include <wx/spinctrl.h>    // for wxSpinCtrl
 
+// readybase:
+class BaseRD;
+
 //----------------------------------------------------------------------------------
 
 // sometimes useful to display a block of text in a monospace font
@@ -200,4 +203,17 @@ class IntegerDialog : public wxDialog
             wxTimer* onetimer;   // one shot timer (see OnOneTimer)
             DECLARE_EVENT_TABLE()
         #endif
+};
+
+//----------------------------------------------------------------------------------
+
+// a dialog to allow the user to add or delete parameters
+class AddOrDeleteParametersDialog : public wxDialog
+{
+    public:
+        AddOrDeleteParametersDialog(wxWindow* parent,BaseRD* system);
+    protected:
+        void OnAddParameter(wxCommandEvent& event);
+        void OnDeleteParameter(wxCommandEvent& event);
+        DECLARE_EVENT_TABLE()
 };
