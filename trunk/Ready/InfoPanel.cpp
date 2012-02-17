@@ -642,9 +642,7 @@ void InfoPanel::ChangeFormula()
 
     MultiLineDialog dialog(frame, _("Change formula"), _("Enter the new formula:"), oldcode);
     
-    // position dialog box to left of linkrect
-    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - textdlgwd - 20, pos.y, textdlgwd, textdlght);
+    dialog.SetSize(textdlgwd, textdlght);
 
     if (dialog.ShowModal() == wxID_OK)
     {
