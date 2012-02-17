@@ -147,11 +147,11 @@ bool XYZIntDialog::ValidNumber(wxTextCtrl* box, int* val)
     // validate given X/Y/Z value
     wxString str = box->GetValue();
     long i;
-    if ( str.ToLong(&i) && i >= 1 && i <= 256 ) {
+    if ( str.ToLong(&i) ) {
         *val = (int)i;
         return true;
     } else {
-        Warning(_("Number must be from 1 to 256."));
+        Warning(_("Error converting number "));
         box->SetFocus();
         box->SetSelection(-1,-1);
         return false;
@@ -233,9 +233,9 @@ XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
     xbox->SetSelection(-1,-1);
 
     // install event handler to detect illegal chars when entering values
-    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
-    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
-    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
+    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZFloatDialog::OnChar), NULL, this);
+    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZFloatDialog::OnChar), NULL, this);
+    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZFloatDialog::OnChar), NULL, this);
 }
 
 // -----------------------------------------------------------------------------
