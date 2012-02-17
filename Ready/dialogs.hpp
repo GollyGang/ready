@@ -25,6 +25,7 @@
 #endif
 #include <wx/artprov.h>
 #include <wx/string.h>
+#include <wx/spinctrl.h>    // for wxSpinCtrl
 
 //----------------------------------------------------------------------------------
 

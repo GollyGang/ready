@@ -19,9 +19,6 @@
 #include "dialogs.hpp"
 #include "wxutils.hpp"
 
-// wxWidgets:
-#include <wx/spinctrl.h>    // for wxSpinCtrl
-
 // -----------------------------------------------------------------------------
 
 // need platform-specific gap after OK/Cancel buttons
