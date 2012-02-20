@@ -7,7 +7,7 @@
     </description>
   
     <rule name="Fitzhugh-Nagumo" type="formula">
-      <param name="timestep">  0.05   </param>
+      <param name="timestep">  0.02   </param>
       <param name="a0">        -0.1   </param>
       <param name="a1">        2      </param>
       <param name="epsilon">   0.05   </param>
