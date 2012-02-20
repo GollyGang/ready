@@ -120,7 +120,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::Reset, MyFrame::OnReset)
     EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
     EVT_MENU(ID::GenerateInitialPattern, MyFrame::OnGenerateInitialPattern)
-    EVT_MENU(ID::AddOrDeleteParameters,MyFrame::OnAddOrDeleteParameters)
+    EVT_MENU(ID::AddParameter,MyFrame::OnAddParameter)
+    EVT_UPDATE_UI(ID::AddParameter, MyFrame::OnUpdateAddParameter)
+    EVT_MENU(ID::DeleteParameter,MyFrame::OnDeleteParameter)
+    EVT_UPDATE_UI(ID::DeleteParameter, MyFrame::OnUpdateDeleteParameter)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
@@ -270,9 +273,10 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
         menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
-        menu->Append(ID::AddOrDeleteParameters, _("&Add or delete parameters...") + GetAccelerator(DO_PARAMS),_("Add new named parameters or delete existing ones"));
+        menu->Append(ID::AddParameter, _("&Add a parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
+        menu->Append(ID::DeleteParameter, _("&Delete a parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
         menu->AppendSeparator();
-        menu->Append(ID::SelectOpenCLDevice, _("Select OpenCL &Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
+        menu->Append(ID::SelectOpenCLDevice, _("Select &OpenCL Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu, _("&Action"));
     }
@@ -1841,8 +1845,31 @@ void MyFrame::RenderSettingsChanged()
     this->UpdateWindows();
 }
 
-void MyFrame::OnAddOrDeleteParameters(wxCommandEvent& event)
+void MyFrame::OnAddParameter(wxCommandEvent& event)
 {
-    AddOrDeleteParametersDialog dlg(this,this->GetCurrentRDSystem());
-    dlg.ShowModal();
+    StringDialog dlg(this,_("Add a parameter"),_("Name:"),wxEmptyString,wxDefaultPosition,wxDefaultSize);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    this->GetCurrentRDSystem()->AddParameter(string(dlg.GetValue().mb_str()),0.0f);
+    this->UpdateWindows();
+}
+
+void MyFrame::OnDeleteParameter(wxCommandEvent& event)
+{
+    wxArrayString as;
+    for(int i=0;i<this->GetCurrentRDSystem()->GetNumberOfParameters();i++)
+        as.Add(wxString(this->GetCurrentRDSystem()->GetParameterName(i).c_str(),wxConvUTF8));
+    wxSingleChoiceDialog dlg(this,_("Select a parameter to delete:"),_("Delete a parameter"),as);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    this->GetCurrentRDSystem()->DeleteParameter(dlg.GetSelection());
+    this->UpdateWindows();
+}
+
+void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
+{
+    event.Enable(this->GetCurrentRDSystem()->HasEditableFormula());
+}
+
+void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
+{
+    event.Enable(this->GetCurrentRDSystem()->HasEditableFormula() && this->GetCurrentRDSystem()->GetNumberOfParameters()>0);
 }

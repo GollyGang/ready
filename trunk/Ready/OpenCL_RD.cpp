@@ -485,9 +485,27 @@ void OpenCL_RD::SetParameterValue(int iParam,float val)
     this->need_reload_formula = true;
 }
 
-void OpenCL_RD::SetParameterName(int iParam,string s)
+void OpenCL_RD::SetParameterName(int iParam,const string& s)
 {
     BaseRD::SetParameterName(iParam,s);
+    this->need_reload_formula = true;
+}
+
+void OpenCL_RD::AddParameter(const std::string& name,float val)
+{
+    BaseRD::AddParameter(name,val);
+    this->need_reload_formula = true;
+}
+
+void OpenCL_RD::DeleteParameter(int iParam)
+{
+    BaseRD::DeleteParameter(iParam);
+    this->need_reload_formula = true;
+}
+
+void OpenCL_RD::DeleteAllParameters()
+{
+    BaseRD::DeleteAllParameters();
     this->need_reload_formula = true;
 }
 
