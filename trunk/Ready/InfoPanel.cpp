@@ -397,9 +397,9 @@ void InfoPanel::Update(const BaseRD* const system)
                                             true);
     contents += _T("</table>");
 
-    contents += wxT("<h4>");
+    contents += wxT("<hr><h5><center>");
     contents += _("Render settings:");
-    contents += wxT("</h4>");
+    contents += wxT("</h5></center>");
     contents += wxT("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     const Properties& render_settings = frame->GetRenderSettings();

@@ -4,6 +4,8 @@ before 0.2 release:
   heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - document: OpenCL formula, kernel
+- bug: InfoPane shouldn't scroll to the top every time we change a parameter
+- relax power of 2 size requirement(only a speed benefit)
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
