@@ -204,16 +204,3 @@ class IntegerDialog : public wxDialog
             DECLARE_EVENT_TABLE()
         #endif
 };
-
-//----------------------------------------------------------------------------------
-
-// a dialog to allow the user to add or delete parameters
-class AddOrDeleteParametersDialog : public wxDialog
-{
-    public:
-        AddOrDeleteParametersDialog(wxWindow* parent,BaseRD* system);
-    protected:
-        void OnAddParameter(wxCommandEvent& event);
-        void OnDeleteParameter(wxCommandEvent& event);
-        DECLARE_EVENT_TABLE()
-};

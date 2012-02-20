@@ -320,7 +320,8 @@ const char* GetActionName(action_id action)
         case DO_STEP:           return "Step";
         case DO_RESET:          return "Reset";
         case DO_GENPATT:        return "Generate Pattern";
-        case DO_PARAMS:         return "Add or delete parameters...";
+        case DO_ADDPARAM:       return "Add a parameter...";
+        case DO_DELPARAM:       return "Delete a parameter...";
         case DO_DEVICE:         return "Select OpenCL Device...";
         case DO_OPENCL:         return "Show OpenCL Diagnostics...";
         // Help menu

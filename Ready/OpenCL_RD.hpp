@@ -50,8 +50,11 @@ class OpenCL_RD : public BaseRD
         static std::string GetPlatformDescription(int iPlatform);
         static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
+        virtual void AddParameter(const std::string& name,float val);
+        virtual void DeleteParameter(int iParam);
+        virtual void DeleteAllParameters();
+        virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
-        virtual void SetParameterName(int iParam,std::string s);
 
         virtual void TestFormula(std::string s);
 
