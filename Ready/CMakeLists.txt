@@ -290,9 +290,7 @@ if( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
 endif()
 
 # install some text files
-foreach( text_file ${TEXT_FILES} )
-  install( FILES ${text_file} DESTINATION "." )
-endforeach()
+install( FILES ${TEXT_FILES} DESTINATION "." )
 
 # install our pattern files
 foreach( pattern_file ${PATTERN_FILES} )
