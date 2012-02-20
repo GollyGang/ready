@@ -3,7 +3,7 @@
   <RD format_version="1">
   
     <description>
-        Tip-splitting
+        Tip-splitting. For 'spiral turbulence' use epsilon = 0.014, delta = 2.8.
     </description>
   
     <rule name="Fitzhugh-Nagumo" type="formula">
