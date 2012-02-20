@@ -87,7 +87,7 @@ class BaseShape : public XML_Object
         // construct when we don't know the derived type
         static BaseShape* New(vtkXMLDataElement* node);
 
-        virtual bool IsInside(float x,float y,float z,int dimensionality) const =0;
+        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const =0;
 
     protected:
 
@@ -146,7 +146,7 @@ void Overlay::Apply(BaseRD* system,int x,int y,int z) const
 {
     if(this->iTargetChemical<0 || this->iTargetChemical>=system->GetNumberOfChemicals())
         throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(this->iTargetChemical));
-    if(this->shape->IsInside(x/float(system->GetX()),y/float(system->GetY()),z/float(system->GetZ()),system->GetDimensionality()))
+    if(this->shape->IsInside(x,y,z,system->GetX(),system->GetY(),system->GetZ()))
         this->op->Apply(*vtk_at(static_cast<float*>(system->GetImage(this->iTargetChemical)->GetScalarPointer()),x,y,z,system->GetX(),system->GetY()),
             this->fill->GetValue(system,x,y,z));
 }
@@ -363,7 +363,7 @@ class Everywhere : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,int dimensionality) const { return true; }
+        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const { return true; }
 };
 
 class Rectangle : public BaseShape
@@ -373,7 +373,7 @@ class Rectangle : public BaseShape
         Rectangle(vtkXMLDataElement* node) : BaseShape(node)
         {
             if(node->GetNumberOfNestedElements()!=2)
-                throw runtime_error("rectangle: expected two nested elements (point3d,point3d)");
+                throw runtime_error("rectangle: expected two nested elements (Point3D,Point3D)");
             this->a = new Point3D(node->GetNestedElement(0));
             this->b = new Point3D(node->GetNestedElement(1));
         }
@@ -390,20 +390,71 @@ class Rectangle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,int dimensionality) const
+        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const
         {
+            int dimensionality = (X>1?1:0) + (Y>1?1:0) + (Z>1?1:0);
+            float rel_x = x/float(X);
+            float rel_y = y/float(Y);
+            float rel_z = z/float(Z);
             switch(dimensionality)
             {
-                case 1: return x>=this->a->x && x<=this->b->x;
-                case 2: return x>=this->a->x && x<=this->b->x && y>=this->a->y && y<=this->b->y;
-                case 3: return x>=this->a->x && x<=this->b->x && y>=this->a->y && y<=this->b->y && z>=this->a->z && z<=this->b->z;
-                default: throw runtime_error("Rectangle::IsInside : unsupported dimensionality");
+                default:
+                case 1: return rel_x>=this->a->x && rel_x<=this->b->x;
+                case 2: return rel_x>=this->a->x && rel_x<=this->b->x && rel_y>=this->a->y && rel_y<=this->b->y;
+                case 3: return rel_x>=this->a->x && rel_x<=this->b->x && rel_y>=this->a->y && rel_y<=this->b->y && rel_z>=this->a->z && rel_z<=this->b->z;
             }
         }
 
     protected:
 
         Point3D *a,*b;
+};
+
+class Circle : public BaseShape
+{
+    public:
+
+        Circle(vtkXMLDataElement* node) : BaseShape(node)
+        {
+            read_required_attribute(node,"radius",this->radius);
+            if(node->GetNumberOfNestedElements()!=1)
+                throw runtime_error("circle: expected one nested element (Point3D)");
+            this->c = new Point3D(node->GetNestedElement(0));
+        }
+        virtual ~Circle() { delete this->c; }
+
+        static const char* GetTypeName() { return "circle"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(Circle::GetTypeName());
+            xml->SetFloatAttribute("radius",this->radius);
+            xml->AddNestedElement(this->c->GetAsXML());
+            return xml;
+        }
+
+        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const
+        {
+            // convert the center and radius to absolute coordinates
+            float cx = this->c->x * X;
+            float cy = this->c->y * Y;
+            float cz = this->c->z * Z;
+            float abs_radius = this->radius * max(X,max(Y,Z)); // (radius is proportional to the largest dimension)
+            int dimensionality = (X>1?1:0) + (Y>1?1:0) + (Z>1?1:0);
+            switch(dimensionality)
+            {
+                default:
+                case 1: return sqrt(pow(x-cx,2.0f)) < abs_radius;
+                case 2: return sqrt(pow(x-cx,2.0f)+pow(y-cy,2.0f)) < abs_radius;
+                case 3: return sqrt(pow(x-cx,2.0f)+pow(y-cy,2.0f)+pow(z-cz,2.0f)) < abs_radius;
+            }
+        }
+
+    protected:
+
+        Point3D *c;
+        float radius;
 };
 
 // -------------------------------------------------------------------------------
@@ -435,5 +486,6 @@ class Rectangle : public BaseShape
     string name(node->GetName());
     if(name==Everywhere::GetTypeName())        return new Everywhere(node);
     else if(name==Rectangle::GetTypeName())    return new Rectangle(node);
+    else if(name==Circle::GetTypeName())       return new Circle(node);
     else throw runtime_error("Unsupported shape: "+name);
 }
