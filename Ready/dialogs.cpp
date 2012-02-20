@@ -423,8 +423,8 @@ void ParameterDialog::OnChar(wxKeyEvent& event)
 {
     int key = event.GetKeyCode();
     if ( key >= ' ' && key <= '~' ) {
-        if ( (key >= '0' && key <= '9') || key == '.' ) {
-            // allow digits and decimal pt
+        if ( (key >= '0' && key <= '9') || key == '.' || key=='-' ) {
+            // allow digits and decimal point and minus sign
             event.Skip();
         } else {
             // disallow any other displayable ascii char
