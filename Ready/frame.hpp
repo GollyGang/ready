@@ -118,6 +118,9 @@ class MyFrame : public wxFrame
         void OnUpdateRunStop(wxUpdateUIEvent& event);
         void OnReset(wxCommandEvent& event);
         void OnUpdateReset(wxUpdateUIEvent& event);
+        void OnRunFaster(wxCommandEvent& event);
+        void OnRunSlower(wxCommandEvent& event);
+        void OnChangeRunningSpeed(wxCommandEvent& event);
         void OnGenerateInitialPattern(wxCommandEvent& event);
         void OnAddParameter(wxCommandEvent& event);
         void OnUpdateAddParameter(wxUpdateUIEvent& event);

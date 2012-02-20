@@ -119,6 +119,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::RunStop, MyFrame::OnUpdateRunStop)
     EVT_MENU(ID::Reset, MyFrame::OnReset)
     EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
+    EVT_MENU(ID::Faster, MyFrame::OnRunFaster)
+    EVT_MENU(ID::Slower, MyFrame::OnRunSlower)
+    EVT_MENU(ID::ChangeRunningSpeed, MyFrame::OnChangeRunningSpeed)
     EVT_MENU(ID::GenerateInitialPattern, MyFrame::OnGenerateInitialPattern)
     EVT_MENU(ID::AddParameter,MyFrame::OnAddParameter)
     EVT_UPDATE_UI(ID::AddParameter, MyFrame::OnUpdateAddParameter)
@@ -272,6 +275,10 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
         menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
+        menu->AppendSeparator();
+        menu->Append(ID::Faster, _("Run &faster") + GetAccelerator(DO_FASTER),_("Run with more timesteps between each render"));
+        menu->Append(ID::Slower, _("Run slo&wer") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
+        menu->Append(ID::ChangeRunningSpeed, _("Change the running speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
         menu->AppendSeparator();
         menu->Append(ID::AddParameter, _("&Add a parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
         menu->Append(ID::DeleteParameter, _("&Delete a parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
@@ -1872,4 +1879,21 @@ void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
 void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 {
     event.Enable(this->GetCurrentRDSystem()->HasEditableFormula() && this->GetCurrentRDSystem()->GetNumberOfParameters()>0);
+}
+
+void MyFrame::OnRunFaster(wxCommandEvent& event)
+{
+    this->timesteps_per_render *= 2;
+}
+
+void MyFrame::OnRunSlower(wxCommandEvent& event)
+{
+    this->timesteps_per_render /= 2;
+}
+
+void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
+{
+    IntegerDialog dlg(this,_("Running speed"),_("New value (timesteps per render):"),this->timesteps_per_render,1,1e6,wxDefaultPosition,wxDefaultSize);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    this->timesteps_per_render = dlg.GetValue();
 }
