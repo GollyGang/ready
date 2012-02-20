@@ -319,6 +319,9 @@ const char* GetActionName(action_id action)
         case DO_RUNSTOP:        return "Run/Stop";
         case DO_STEP:           return "Step";
         case DO_RESET:          return "Reset";
+        case DO_FASTER:         return "Faster";
+        case DO_SLOWER:         return "Slower";
+        case DO_CHANGESPEED:    return "Change the running speed";
         case DO_GENPATT:        return "Generate Pattern";
         case DO_ADDPARAM:       return "Add a parameter...";
         case DO_DELPARAM:       return "Delete a parameter...";

@@ -2,7 +2,6 @@ before 0.2 release:
 - populate a pattern library with some basics, including descriptions and initial-pattern-generators: 
   Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, 
   heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
-- allow user to change the running speed (timesteps_per_render)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - document: OpenCL formula, kernel
 
@@ -16,6 +15,7 @@ before 0.3 release:
 - allow user to change the default render settings
 - UI for editing the initial-pattern-generator overlay stack
 - add option to convert formula rules into full-kernel rules
+- different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
 
 before 0.x release:
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
@@ -36,7 +36,6 @@ before 1.0 release:
 future ideas:
 - parameter map(s) in a separate window, to allow user to explore parameters 
 - full control over scene graph, e.g. nodes+connections interface
-- different topologies: e.g. arbitrary 2d mesh embedded in 3d: zebra, etc.
 - parameters driven by an input scene (for writhing logos, etc.)
 - multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
 - radiosity rendering for better visualization of tangled structures (embed a raytracer)
