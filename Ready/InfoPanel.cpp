@@ -395,6 +395,12 @@ void InfoPanel::Update(const BaseRD* const system)
         contents += AppendRow(block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             true);
+    contents += _T("</table>");
+
+    contents += wxT("<h4>");
+    contents += _("Render settings:");
+    contents += wxT("</h4>");
+    contents += wxT("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     const Properties& render_settings = frame->GetRenderSettings();
     for(int i=0;i<render_settings.GetNumberOfProperties();i++)
