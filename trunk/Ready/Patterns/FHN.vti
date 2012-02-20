@@ -39,8 +39,8 @@
         <overwrite/>
         <white_noise low="0.6" high="1" />
         <rectangle>
-            <Point3D x="0.5" y="0.5" z="0.4" />
-            <Point3D x="0.8" y="0.65" z="0.6" />
+            <Point3D x="0.5" y="0.5" z="0.6" />
+            <Point3D x="0.8" y="0.65" z="0.8" />
         </rectangle>
       </overlay>
     </initial_pattern_generator>
