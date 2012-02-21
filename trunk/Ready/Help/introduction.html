@@ -47,11 +47,11 @@ There are alternatives to the Euler method that allow for larger timesteps (e.g.
 Now open <a href="open:Patterns/turing.vti">turing.vti</a>. This system has two chemicals (a and b) which are shown side by side. The formula is more complicated:
 <p>
 <tt>
-&nbsp;&nbsp;&nbsp;&nbsp;delta_a = k * (16.0f - a * b) + D_a * laplacian_a;
+&nbsp;&nbsp;&nbsp;&nbsp;delta_a = k * (16.0f - a * b) + D_a * laplacian_a;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;delta_b = max( -b, k * (a * b - b - 12.0f) + D_b * laplacian_b );
 </tt>
 <p>
-Here <tt>h</tt>, <tt>D_a</tt> and <tt>D_b</tt> are <i>parameters</i>, and can be edited in the Info Pane to give different behavior. 
+Here <tt>k</tt>, <tt>D_a</tt> and <tt>D_b</tt> are <i>parameters</i>, and can be edited in the Info Pane to give different behavior. 
 <p>
 Set the system running. After a while, spots appear.
 <p>
