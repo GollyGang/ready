@@ -430,8 +430,10 @@ void InfoPanel::Update(const BaseRD* const system)
 
     contents += _T("</table></body></html>");
     
+    html->Freeze(); // (prevent flicker)
     html->SetPage(contents);
     html->RestoreScrollPos();
+    html->Thaw();
 }
 
 // -----------------------------------------------------------------------------
