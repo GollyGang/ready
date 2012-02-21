@@ -11,10 +11,11 @@
       <param name="timestep"> 0.1     </param>
       <param name="D_a">      0.25    </param> <!-- 1/4  -->
       <param name="D_b">      0.0625  </param> <!-- 1/16 -->
+      <param name="k">        0.0625  </param> <!-- 1/16 -->
       
       <formula number_of_chemicals="2">
-          delta_a = (16.0f - a * b) / 16.0f + D_a * laplacian_a;
-          delta_b = max( -b, (a * b - b - 12.0f) / 16.0f + D_b * laplacian_b );
+          delta_a = k * (16.0f - a * b) + D_a * laplacian_a;
+          delta_b = max( -b, k * (a * b - b - 12.0f) + D_b * laplacian_b );
       </formula>
       
     </rule>
