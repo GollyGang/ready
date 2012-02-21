@@ -4,7 +4,6 @@ before 0.2 release:
   heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - document: OpenCL formula, kernel
-- relax power of 2 size requirement(only a speed benefit)
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
@@ -17,6 +16,7 @@ before 0.3 release:
 - UI for editing the initial-pattern-generator overlay stack
 - add option to convert formula rules into full-kernel rules
 - different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
+- relax power of 2 size requirement (only a speed benefit)
 
 before 0.x release:
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
