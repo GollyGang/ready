@@ -250,13 +250,17 @@ void HtmlInfo::OnSize(wxSizeEvent& event)
 {
     SaveScrollPos();
 
+    Freeze(); // prevent flicker
+
     wxHtmlWindow::OnSize(event);
 
     wxString currpage = GetOpenedPage();
     if ( !currpage.IsEmpty() ) {
         LoadPage(currpage);         // reload page
-        RestoreScrollPos();
     }
+
+    RestoreScrollPos();
+    Thaw();
     
     // prevent wxHtmlWindow::OnSize being called again
     event.Skip(false);
