@@ -364,17 +364,17 @@ void InfoPanel::Update(const BaseRD* const system)
     rownum = 0;
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(rule_name_label, s,true);
+    contents += AppendRow(rule_name_label,rule_name_label, s,true);
     s = wxString(system->GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(description_label, s,true);
+    contents += AppendRow(description_label,description_label, s,true);
 
-    contents += AppendRow(num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()),
+    contents += AppendRow(num_chemicals_label,num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()),
                           system->HasEditableNumberOfChemicals());
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
-        contents += AppendRow(system->GetParameterName(iParam),
+        contents += AppendRow(system->GetParameterName(iParam),system->GetParameterName(iParam),
                               FormatFloat(system->GetParameterValue(iParam)), true);
     }
 
@@ -396,14 +396,14 @@ void InfoPanel::Update(const BaseRD* const system)
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        contents += AppendRow(formula_label, formula, system->HasEditableFormula());
+        contents += AppendRow(formula_label,formula_label, formula, system->HasEditableFormula());
     }
 
-    contents += AppendRow(dimensions_label, wxString::Format(wxT("%d x %d x %d"),
+    contents += AppendRow(dimensions_label,dimensions_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetX(),system->GetY(),system->GetZ()), true);
 
     if(system->HasEditableBlockSize())
-        contents += AppendRow(block_size_label, wxString::Format(wxT("%d x %d x %d"),
+        contents += AppendRow(block_size_label,block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             true);
     contents += _T("</table>");
@@ -417,18 +417,20 @@ void InfoPanel::Update(const BaseRD* const system)
     for(int i=0;i<render_settings.GetNumberOfProperties();i++)
     {
         string name = render_settings.GetPropertyName(i);
+        wxString print_label(name);
+        print_label.Replace(_T("_"),_T(" "));
         string type = render_settings.GetPropertyType(name);
         if(type=="float")
-            contents += AppendRow(name,FormatFloat(render_settings.GetFloat(name)),true);
+            contents += AppendRow(print_label,name,FormatFloat(render_settings.GetFloat(name)),true);
         else if(type=="bool")
-            contents += AppendRow(name,render_settings.GetBool(name)?_("true"):_("false"),true);
+            contents += AppendRow(print_label,name,render_settings.GetBool(name)?_("true"):_("false"),true);
         else if(type=="int")
-            contents += AppendRow(name,FormatFloat(render_settings.GetInt(name)),true);
+            contents += AppendRow(print_label,name,FormatFloat(render_settings.GetInt(name)),true);
         else if(type=="float3")
         {
             float a,b,c;
             render_settings.GetFloat3(name,a,b,c);
-            contents += AppendRow(name,FormatFloat(a)+_T(", ")+FormatFloat(b)+_T(", ")+FormatFloat(c),true);
+            contents += AppendRow(print_label,name,FormatFloat(a)+_T(", ")+FormatFloat(b)+_T(", ")+FormatFloat(c),true);
         }
     }
 
@@ -442,7 +444,7 @@ void InfoPanel::Update(const BaseRD* const system)
 
 // -----------------------------------------------------------------------------
 
-wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
+wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label, const wxString& value,
                               bool is_editable)
 {
     wxString result;
@@ -453,7 +455,7 @@ wxString InfoPanel::AppendRow(const wxString& label, const wxString& value,
     rownum++;
 
     result += _T("<td width=3></td><td valign=top width=\"22%\"><b>");
-    result += label;
+    result += print_label;
     result += _T("</b></td><td valign=top>");
     result += value;
     result += _T("</td>");
