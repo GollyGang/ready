@@ -61,6 +61,7 @@ class HtmlInfo : public wxHtmlWindow
             panel = (InfoPanel*)parent;
             editlink = false;
             linkrect = wxRect(0,0,0,0);
+            scroll_x = scroll_y = 0;
         }
 
         virtual void OnLinkClicked(const wxHtmlLinkInfo& link);
@@ -73,6 +74,9 @@ class HtmlInfo : public wxHtmlWindow
 
         wxRect linkrect;     // rect for cell containing link
 
+        void SaveScrollPos() { GetViewStart(&scroll_x, &scroll_y); }
+        void RestoreScrollPos() { Scroll(scroll_x, scroll_y); }
+
     private:
 
         void OnSize(wxSizeEvent& event);
@@ -80,11 +84,14 @@ class HtmlInfo : public wxHtmlWindow
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseDown(wxMouseEvent& event);
         void OnHtmlCellClicked(wxHtmlCellEvent& event);
+
+    private:
         
         MyFrame* frame;
         InfoPanel* panel;
         
-        bool editlink;       // open clicked file in editor?
+        bool editlink;          // open clicked file in editor?
+        int scroll_x,scroll_y;  // remember the scroll position
 
         DECLARE_EVENT_TABLE()
 };
@@ -103,6 +110,8 @@ END_EVENT_TABLE()
 
 void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
 {
+    SaveScrollPos();
+
     wxString url = link.GetHref();
     if ( url.StartsWith(wxT("http:")) || url.StartsWith(wxT("mailto:")) ) {
     // pass http/mailto URL to user's preferred browser/emailer
@@ -239,15 +248,14 @@ void HtmlInfo::OnMouseDown(wxMouseEvent& event)
 // avoid scroll position being reset to top when wxHtmlWindow is resized
 void HtmlInfo::OnSize(wxSizeEvent& event)
 {
-    int x, y;
-    GetViewStart(&x, &y);            // save current position
+    SaveScrollPos();
 
     wxHtmlWindow::OnSize(event);
 
     wxString currpage = GetOpenedPage();
     if ( !currpage.IsEmpty() ) {
         LoadPage(currpage);         // reload page
-        Scroll(x, y);               // scroll to old position
+        RestoreScrollPos();
     }
     
     // prevent wxHtmlWindow::OnSize being called again
@@ -279,10 +287,9 @@ void HtmlInfo::SetFontSizes(int size)
 void HtmlInfo::ChangeFontSizes(int size)
 {
     // changing font sizes resets pos to top, so save and restore pos
-    int x, y;
-    GetViewStart(&x, &y);
+    SaveScrollPos();
     SetFontSizes(size);
-    Scroll(x, y);
+    RestoreScrollPos();
     panel->UpdateButtons();
 }
 
@@ -424,6 +431,7 @@ void InfoPanel::Update(const BaseRD* const system)
     contents += _T("</table></body></html>");
     
     html->SetPage(contents);
+    html->RestoreScrollPos();
 }
 
 // -----------------------------------------------------------------------------

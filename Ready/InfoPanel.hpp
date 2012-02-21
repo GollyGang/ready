@@ -68,6 +68,8 @@ class InfoPanel : public wxPanel
         wxButton* biggerbutt;   // bigger text
    
         wxStaticText* status;   // for link info
+
+    private:
         
         // for building HTML table
         wxString AppendRow(const wxString& label, const wxString& value,
