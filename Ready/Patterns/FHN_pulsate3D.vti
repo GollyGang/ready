@@ -51,7 +51,7 @@
     <render_settings>
         <low type="float" value="-1" />
         <high type="float" value="1" />
-        <use_slice2D type="bool" value="0" />
+        <slice_3D type="bool" value="0" />
     </render_settings>
     
   </RD>

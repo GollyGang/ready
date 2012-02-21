@@ -44,7 +44,7 @@
     
     <render_settings>
         <iActiveChemical type="int" value="1" />
-        <slice2D_pos type="float" value="0.4" />
+        <slice_3D_position type="float" value="0.4" />
     </render_settings>
     
   </RD>
