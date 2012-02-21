@@ -72,7 +72,7 @@ class InfoPanel : public wxPanel
     private:
         
         // for building HTML table
-        wxString AppendRow(const wxString& label, const wxString& value,
+        wxString AppendRow(const wxString& print_label, const wxString& label, const wxString& value,
                            bool is_editable);
 
         // for making changes
