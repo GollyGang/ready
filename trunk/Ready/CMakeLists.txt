@@ -74,7 +74,7 @@ set( RESOURCES
 
 set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti turing.vti
-  kernel_test.vti conway_life.vti FHN.vti
+  kernel_test.vti conway_life.vti FHN.vti FHN_pulsate3D.vti
   CPU-only/grayscott_1D.vti CPU-only/grayscott_2D.vti CPU-only/grayscott_3D.vti
 )
 
