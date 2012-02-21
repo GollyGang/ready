@@ -320,9 +320,9 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     int iActiveChemical = render_settings.GetInt("iActiveChemical");
     float contour_level = render_settings.GetFloat("contour_level");
     bool use_wireframe = render_settings.GetBool("use_wireframe");
-    bool use_slice2D = render_settings.GetBool("use_slice2D");
-    int slice2D_axis = render_settings.GetInt("slice2D_axis");
-    float slice2D_pos = render_settings.GetFloat("slice2D_pos");
+    bool slice_3D = render_settings.GetBool("slice_3D");
+    int slice_3D_axis = render_settings.GetInt("slice_3D_axis");
+    float slice_3D_position = render_settings.GetFloat("slice_3D_position");
     float surface_r,surface_g,surface_b;
     render_settings.GetFloat3("surface_color",surface_r,surface_g,surface_b);
 
@@ -384,7 +384,7 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     }
 
     // add a 2D slice too
-    if(use_slice2D)
+    if(slice_3D)
     {
         // create a lookup table for mapping values to colors
         vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
@@ -418,15 +418,15 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
                  0, 0, 0, 1 };*/
         // Set the slice orientation
         vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
-        switch(slice2D_axis)
+        switch(slice_3D_axis)
         {
             case 0: resliceAxes->DeepCopy(sagittalElements); break;
             case 1: resliceAxes->DeepCopy(coronalElements); break;
             case 2: resliceAxes->DeepCopy(axialElements); break;
         }
-        resliceAxes->SetElement(0, 3, slice2D_pos * system->GetX());
-        resliceAxes->SetElement(1, 3, slice2D_pos * system->GetY());
-        resliceAxes->SetElement(2, 3, slice2D_pos * system->GetZ());
+        resliceAxes->SetElement(0, 3, slice_3D_position * system->GetX());
+        resliceAxes->SetElement(1, 3, slice_3D_position * system->GetY());
+        resliceAxes->SetElement(2, 3, slice_3D_position * system->GetZ());
 
         vtkSmartPointer<vtkImageReslice> voi = vtkSmartPointer<vtkImageReslice>::New();
         voi->SetInput(image);
