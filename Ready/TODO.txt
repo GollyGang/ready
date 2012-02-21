@@ -12,33 +12,36 @@ Andrew's tasks for 0.2:
 - do any other "AKT TODO" tasks
 
 before 0.3 release:
+- add toolbar icons for: faster, slower, change running speed - need artwork :(
+- friendlier names for render settings in Info Pane, not the internal names
+- add initial_pattern_generator to Info Pane for editing
 - allow user to change the default render settings
-- UI for editing the initial-pattern-generator overlay stack
 - add option to convert formula rules into full-kernel rules
 - different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
 - relax power of 2 size requirement (only a speed benefit)
+- image import (user can specify how colors map onto chemicals), import Robert's patterns
+- parameter map(s) in a separate window, to allow user to explore parameters 
+- some way to add noise to the system on each frame, or periodically
 
 before 0.x release:
-- image import (user can specify how colors map onto chemicals), import Robert's patterns
-- image export (likewise)
+- image export (user can specify how chemicals map onto colors)
+- parameters driven by an input scene (for writhing logos, etc.)
+- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
+- graphical UI for editing the initial-pattern-generator overlay stack
 
 before 1.0 release:
 - create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
 - save out scene (e.g. OBJ) for external render (although paraview can load vti's)
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
-- bug: allow user to change OpenCL platform and device while a pattern is running
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
-- some way to add noise to the system on each frame, or periodically
 
 future ideas:
-- parameter map(s) in a separate window, to allow user to explore parameters 
+- bug: allow user to change OpenCL platform and device while a pattern is running
 - full control over scene graph, e.g. nodes+connections interface
-- parameters driven by an input scene (for writhing logos, etc.)
-- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
 - radiosity rendering for better visualization of tangled structures (embed a raytracer)
 - STL output, email file to shapeways for printing
 - discrete RD (simulation of individual chemicals, to compare with differential equations)
@@ -46,3 +49,4 @@ future ideas:
   http://www.stephenwolfram.com/publications/recent/specialfunctions/images/Slide028_917x754.gif
 - allow non-OpenCL implementations to load all files, by parsing formula
 - integer systems
+- read Golly rule tables
