@@ -22,53 +22,53 @@
 
 //This is needed for vtk 3.1 :
 #ifndef VTK_MAJOR_VERSION
-#  include "vtkVersion.h"
+  #include "vtkVersion.h"
 #endif
 
 #if VTK_MAJOR_VERSION > 4 || (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0)
-#  include "vtkCommand.h"
+  #include "vtkCommand.h"
 #else
-#  include "vtkInteractorStyle.h"
+  #include "vtkInteractorStyle.h"
 #endif
 #include "vtkDebugLeaks.h"
 
 // AKT: wxOSX 2.9.x defines __WXOSX_COCOA__ rather than __WXCOCOA__
 #ifdef __WXOSX_COCOA__
-#define __WXCOCOA__
+  #define __WXCOCOA__
 #endif
 
 #if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-    // AKT: ControlDown has been changed to mean Command key down
-    #define ControlDown RawControlDown
+  // AKT: ControlDown has been changed to mean Command key down
+  #define ControlDown RawControlDown
 #endif
 
 #ifdef __WXMAC__
-#ifdef __WXCOCOA__
-#include "vtkCocoaRenderWindow.h"
-#else
-#include "vtkCarbonRenderWindow.h"
-#endif
+  #ifdef __WXCOCOA__
+    #include "vtkCocoaRenderWindow.h"
+  #else
+    #include "vtkCarbonRenderWindow.h"
+  #endif
 #endif
 
 //Keep this for compatibilty reason, this was introduced in wxGTK 2.4.0
 #if (!wxCHECK_VERSION(2, 4, 0))
-wxWindow* wxGetTopLevelParent(wxWindow *win)
-{
-    while ( win && !win->IsTopLevel() )
-         win = win->GetParent();
-    return win;
-}
+  wxWindow* wxGetTopLevelParent(wxWindow *win)
+  {
+      while ( win && !win->IsTopLevel() )
+           win = win->GetParent();
+      return win;
+  }
 #endif
 
 // To access objc calls on cocoa
 #ifdef __WXCOCOA__
-#ifdef VTK_USE_COCOA
-#import <Cocoa/Cocoa.h>
-// This trick is no longer need in VTK CVS, should get rid of that:
-#define id Id
-#else
-#error Build mismatch you need both wxWidgets and VTK to be configure against Cocoa to work
-#endif //VTK_USE_COCOA
+  #ifdef VTK_USE_COCOA
+    #import <Cocoa/Cocoa.h>
+    // This trick is no longer need in VTK CVS, should get rid of that:
+    #define id Id
+  #else
+    #error Build mismatch you need both wxWidgets and VTK to be configure against Cocoa to work
+  #endif //VTK_USE_COCOA
 #endif //__WXCOCOA__
 
 #ifdef __WXGTK__
@@ -100,8 +100,8 @@ wxWindow* wxGetTopLevelParent(wxWindow *win)
 #endif
 
 #ifdef __WXX11__
-#include "wx/x11/privx.h"
-#define GetXWindow(wxwin)   ((Window)(wxwin)->GetHandle())
+  #include "wx/x11/privx.h"
+  #define GetXWindow(wxwin)   ((Window)(wxwin)->GetHandle())
 #endif
 
 
@@ -109,24 +109,24 @@ wxWindow* wxGetTopLevelParent(wxWindow *win)
 //http://wxvtk.sf.net
 //This hack is for some buggy wxGTK version:
 #if wxCHECK_VERSION(2, 3, 2) && !wxCHECK_VERSION(2, 4, 1) && defined(__WXGTK__)
-#  define WX_USE_X_CAPTURE 0
+  #define WX_USE_X_CAPTURE 0
 #else
-#  define WX_USE_X_CAPTURE 1
+  #define WX_USE_X_CAPTURE 1
 #endif
 
 #define ID_wxVTKRenderWindowInteractor_TIMER 1001
 
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
-IMPLEMENT_DYNAMIC_CLASS(wxVTKRenderWindowInteractor, wxGLCanvas)
+  IMPLEMENT_DYNAMIC_CLASS(wxVTKRenderWindowInteractor, wxGLCanvas)
 #else
-IMPLEMENT_DYNAMIC_CLASS(wxVTKRenderWindowInteractor, wxWindow)
+  IMPLEMENT_DYNAMIC_CLASS(wxVTKRenderWindowInteractor, wxWindow)
 #endif  //__WXGTK__
 
 //---------------------------------------------------------------------------
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
-BEGIN_EVENT_TABLE(wxVTKRenderWindowInteractor, wxGLCanvas)
+  BEGIN_EVENT_TABLE(wxVTKRenderWindowInteractor, wxGLCanvas)
 #else
-BEGIN_EVENT_TABLE(wxVTKRenderWindowInteractor, wxWindow)
+  BEGIN_EVENT_TABLE(wxVTKRenderWindowInteractor, wxWindow)
 #endif //__WXGTK__
   //refresh window by doing a Render
   EVT_PAINT       (wxVTKRenderWindowInteractor::OnPaint)
@@ -193,6 +193,9 @@ wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor()
 #ifdef VTK_DEBUG_LEAKS
   vtkDebugLeaks::ConstructClass("wxVTKRenderWindowInteractor");
 #endif
+#if defined(__WXGTK__) && defined(wxUSE_GLCANVAS) && wxCHECK_VERSION(2, 9, 0)
+  this->GLContext = new wxGLContext (this);
+#endif
   this->RenderWindow = NULL;
   this->SetRenderWindow(vtkRenderWindow::New());
   this->RenderWindow->Delete();
@@ -225,6 +228,9 @@ wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor(wxWindow *parent,
 #ifdef VTK_DEBUG_LEAKS
   vtkDebugLeaks::ConstructClass("wxVTKRenderWindowInteractor");
 #endif
+#if defined(__WXGTK__) && defined(wxUSE_GLCANVAS) && wxCHECK_VERSION(2, 9, 0)
+  this->GLContext = new wxGLContext (this);
+#endif
   this->RenderWindow = NULL;
   this->SetRenderWindow(vtkRenderWindow::New());
   this->RenderWindow->Delete();
@@ -237,6 +243,9 @@ wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor(wxWindow *parent,
 //---------------------------------------------------------------------------
 wxVTKRenderWindowInteractor::~wxVTKRenderWindowInteractor()
 {
+#if defined(__WXGTK__) && defined(wxUSE_GLCANVAS) && wxCHECK_VERSION(2, 9, 0)
+  delete this->GLContext;
+#endif
   SetRenderWindow(NULL);
   SetInteractorStyle(NULL);
 }
@@ -270,8 +279,13 @@ void wxVTKRenderWindowInteractor::Enable()
 
   // that's it
   Enabled = 1;
-#if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
-  SetCurrent(); // (deprecated in wx2.9 but I'm not sure how to fix this)
+  
+#if defined(__WXGTK__) && defined(wxUSE_GLCANVAS)
+ #if wxCHECK_VERSION(2, 9, 0)
+  SetCurrent( *GLContext );
+ #else
+  SetCurrent();
+ #endif
 #endif
   Modified();
 }
