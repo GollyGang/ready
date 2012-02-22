@@ -141,7 +141,7 @@ elseif(UNIX)
 endif()
 
 # wxWidgets is required to build the project
-FIND_PACKAGE( wxWidgets COMPONENTS propgrid html aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
 
 IF( wxWidgets_FOUND )
   INCLUDE( ${wxWidgets_USE_FILE} )
@@ -153,18 +153,6 @@ if( WIN32 )
   # prevent link errors with wx 2.9.x
   add_definitions( -DwxDEBUG_LEVEL=0 -DNDEBUG )
 endif()
-
-#-------------------------------------------zLib----------------------------------------------
-
-if( WIN32 )
-  # use zlib library included in wxWidgets
-  set( ZLIB_INCLUDE_DIR ${wxWidgets_ROOT_DIR}/src/zlib )
-  set( ZLIB_LIBRARY ${wxWidgets_LIB_DIR}/wxzlib.lib )
-endif()
-
-find_package( ZLIB REQUIRED )
-include_directories( ${ZLIB_INCLUDE_DIR} )
-# add_definitions( -DZLIB ) # (conflicts with part of VTK, do we need this for anything?)
 
 #-------------------------------------------OpenCL----------------------------------------------
 
@@ -209,7 +197,7 @@ endforeach( text_file )
 
 add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
-#-----------------------------------------------------------------------------------------------
+#-------------------------------- build ------------------------------------------------------
 
 if( APPLE )
   # support Mac OS 10.5 or later
@@ -237,17 +225,7 @@ target_link_libraries( ${APP_NAME}
   vtkIO 
   vtkRendering
   vtkHybrid
-  vtkVolumeRendering
 )
-
-if( APPLE OR WIN32 )
-  target_link_libraries( ${APP_NAME} ${ZLIB_LIBRARIES} )
-else()
-  # on Linux we statically link zlib because some systems (eg. Ubuntu) have a non-standard zlib that contains gzopen64
-  add_library( static_zlib STATIC IMPORTED )
-  set_property( TARGET static_zlib PROPERTY IMPORTED_LOCATION /usr/lib/libz.a )
-  target_link_libraries( ${APP_NAME} static_zlib )
-endif()
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
@@ -269,6 +247,10 @@ endif()
 # http://stackoverflow.com/questions/543203/cmake-runtime-output-directory-on-windows
 if( MSVC_IDE )
   set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )  # strip release binary, for smaller file size
 endif()
 
 #----------------------------------------install------------------------------------------------
