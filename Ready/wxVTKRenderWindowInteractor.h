@@ -58,11 +58,11 @@
 #define USE_WXGLCANVAS
 
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
-#  if wxUSE_GLCANVAS
-#    include <wx/glcanvas.h>
-#  else
-#    error "problem of wxGLCanvas, you need to build wxWidgets with opengl"
-#  endif //wxUSE_GLCANVAS
+ #if wxUSE_GLCANVAS
+  #include <wx/glcanvas.h>
+ #else
+  #error "problem of wxGLCanvas, you need to build wxWidgets with opengl"
+#endif //wxUSE_GLCANVAS
 #endif //__WXGTK__
 
 // Motif version (renamed into wxX11 for wxWindow 2.4 and newer)
@@ -172,6 +172,10 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
     int RenderWhenDisabled;
     int UseCaptureMouse;
 
+#if defined(__WXGTK__) && defined(wxUSE_GLCANVAS) && wxCHECK_VERSION(2, 9, 0)
+    wxGLContext* GLContext;
+#endif
+    
     DECLARE_EVENT_TABLE()
 };
 
