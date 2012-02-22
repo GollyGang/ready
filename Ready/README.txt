@@ -2,8 +2,6 @@
                                     About
 ---------------------------------------------------------------------------------
 
-On Linux you might need to install: libvtk5.4, libwxgtk2.9+
-
 For help, visit: http://code.google.com/p/reaction-diffusion/
 Or email: reaction-diffusion@googlegroups.com
 
