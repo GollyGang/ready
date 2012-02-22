@@ -531,7 +531,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         wxArrayString choices;
         choices.Add(_("true"));
         choices.Add(_("false"));
-        wxSingleChoiceDialog dlg(this,_("Edit render setting"),setting,choices);
+        wxSingleChoiceDialog dlg(this,setting+_T(":"),_("Edit render setting"),choices);
         bool oldval = render_settings.GetBool(name);
         dlg.SetSelection(oldval?0:1);
         if(dlg.ShowModal()==wxID_OK)
