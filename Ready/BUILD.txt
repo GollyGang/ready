@@ -35,7 +35,7 @@ Also edit \wxWidgets\build\msw\config.vc and set
 
 =========================== Linux =================================
 
-Install: libvtk, libwxgtk (2.9+), zlib1g, any OpenCL SDK.
+Install: libvtk, libwxgtk (2.9+), any OpenCL SDK.
 
 mkdir Ready_build
 cd Ready_build
