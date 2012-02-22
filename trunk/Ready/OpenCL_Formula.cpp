@@ -106,8 +106,6 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
     // the parameters (assume all float for now)
     for(int i=0;i<(int)this->parameters.size();i++)
         kernel_source << indent << "float " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
-    // the timestep
-    kernel_source << indent << "float delta_t = " << this->GetParameterValueByName("timestep") << "f;\n";
     // the formula
     istringstream iss(formula);
     string s;
@@ -118,7 +116,7 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
     }
     // the last part of the kernel
     for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << GetChemicalName(iC) << "_out[i_here] = " << GetChemicalName(iC) << " + delta_t * delta_" << GetChemicalName(iC) << ";\n";
+        kernel_source << indent << GetChemicalName(iC) << "_out[i_here] = " << GetChemicalName(iC) << " + timestep * delta_" << GetChemicalName(iC) << ";\n";
     kernel_source << "}\n";
     return kernel_source.str();
 }
