@@ -56,28 +56,59 @@
 #include <stdexcept>
 using namespace std;
 
-void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
-void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
-void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings);
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings,
+    bool reset_camera)
 {
     assert(pVTKWindow);
     assert(system);
 
+    
+    // the VTK renderer is responsible for drawing the scene onto the screen
+    vtkSmartPointer<vtkRenderer> pRenderer;
+    if(pVTKWindow->GetRenderWindow()->GetRenderers()->GetNumberOfItems()>0)
+    {
+        pRenderer = pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+        pRenderer->RemoveAllViewProps();
+    }
+    else
+    {
+        pRenderer = vtkSmartPointer<vtkRenderer>::New();
+        pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
+        
+        // set the background color
+        pRenderer->GradientBackgroundOn();
+        pRenderer->SetBackground(0,0.4,0.6);
+        pRenderer->SetBackground2(0,0.2,0.3);
+        
+        // change the interactor style to a trackball
+        vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+        pVTKWindow->SetInteractorStyle(is);
+    }
+
     switch(system->GetDimensionality())
     {
         // TODO: merge the dimensionalities (often want one/more slices from lower dimensionalities)
-        case 1: InitializeVTKPipeline_1D(pVTKWindow,system,render_settings); break;
-        case 2: InitializeVTKPipeline_2D(pVTKWindow,system,render_settings); break;
-        case 3: InitializeVTKPipeline_3D(pVTKWindow,system,render_settings); break;
+        case 1: InitializeVTKPipeline_1D(pRenderer,system,render_settings); break;
+        case 2: InitializeVTKPipeline_2D(pRenderer,system,render_settings); break;
+        case 3: InitializeVTKPipeline_3D(pRenderer,system,render_settings); break;
         default:
             throw runtime_error("InitializeVTKPipeline : Unsupported dimensionality");
+    }
+
+    if(reset_camera)
+    {
+        vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
+        pRenderer->SetActiveCamera(camera);
+        pRenderer->ResetCamera();
     }
     pVTKWindow->Refresh(false);
 }
 
-void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
@@ -94,11 +125,6 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     
-    // the VTK renderer is responsible for drawing the scene onto the screen
-    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
-    pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
-    pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
-
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetRampToLinear();
@@ -124,8 +150,6 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     actor->SetPosition(0,low*scaling - 5.0,0);
     if(!use_image_interpolation)
         actor->InterpolateOff();
-
-    // add the actor to the renderer's scene
     pRenderer->AddActor(actor);
 
     // also add a scalar bar to show how the colors correspond to values
@@ -171,20 +195,9 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     axis->SetCornerOffset(0);
     axis->SetNumberOfLabels(5);
     pRenderer->AddActor(axis);
-
-    // set the background color
-    pRenderer->GradientBackgroundOn();
-    pRenderer->SetBackground(0,0.4,0.6);
-    pRenderer->SetBackground2(0,0.2,0.3);
-    
-    // change the interactor style to a trackball
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    pVTKWindow->SetInteractorStyle(is);
-
-    pRenderer->ResetCamera();
 }
 
-void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
@@ -210,11 +223,6 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     int iFirstChem=0,iLastChem=system->GetNumberOfChemicals();
     if(!show_multiple_chemicals_2D) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
     
-    // the VTK renderer is responsible for drawing the scene onto the screen
-    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
-    pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
-    pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
-
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetRampToLinear();
@@ -308,20 +316,9 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
     scalar_bar->SetLookupTable(lut);
     pRenderer->AddActor2D(scalar_bar);
-
-    // set the background color
-    pRenderer->GradientBackgroundOn();
-    pRenderer->SetBackground(0,0.4,0.6);
-    pRenderer->SetBackground2(0,0.2,0.3);
-    
-    // change the interactor style to a trackball
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    pVTKWindow->SetInteractorStyle(is);
-
-    pRenderer->ResetCamera();
 }
 
-void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
@@ -339,11 +336,6 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
-
-    // the VTK renderer is responsible for drawing the scene onto the screen
-    vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
-    pVTKWindow->GetRenderWindow()->GetRenderers()->RemoveAllItems();
-    pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
 
     // contour the 3D volume and render as a polygonal surface
 
@@ -472,15 +464,4 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
             pRenderer->AddActor2D(scalar_bar);
         }
     }
-
-    // set the background color
-    pRenderer->GradientBackgroundOn();
-    pRenderer->SetBackground(0,0.4,0.6);
-    pRenderer->SetBackground2(0,0.2,0.3);
-    
-    // change the interactor style to a trackball
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    pVTKWindow->SetInteractorStyle(is);
-
-    pRenderer->ResetCamera();
 }

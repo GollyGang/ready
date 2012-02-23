@@ -22,4 +22,5 @@ class wxVTKRenderWindowInteractor;
 class BaseRD;
 class Properties;
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,
+    const Properties& render_settings,bool reset_camera);
