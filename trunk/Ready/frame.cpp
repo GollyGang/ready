@@ -738,7 +738,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     int iChem = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
     iChem = min(iChem,this->system->GetNumberOfChemicals()-1); // ensure is in valid range
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(iChem));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
     this->is_running = false;
     this->UpdateWindows();
 }
@@ -1436,7 +1436,7 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
     dlg.SetSelection(IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical()));
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(dlg.GetSelection()));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
 
@@ -1799,7 +1799,7 @@ void MyFrame::SetNumberOfChemicals(int n)
         wxMessageBox(_("Generating an initial pattern caused an unknown error"));
     }
     // (we allow the user to proceed because they might now want to change other things to match)
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
 
@@ -1834,7 +1834,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
         return false;
     }
     this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
     this->UpdateWindows();
     return true;
 }
@@ -1845,13 +1845,13 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->system->SetBlockSizeY(y);
     this->system->SetBlockSizeZ(z);
     this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
 
 void MyFrame::RenderSettingsChanged()
 {
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
 
