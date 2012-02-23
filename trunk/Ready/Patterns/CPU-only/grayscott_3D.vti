@@ -43,7 +43,7 @@
     </initial_pattern_generator>
     
     <render_settings>
-        <iActiveChemical type="int" value="1" />
+        <active_chemical type="chemical" value="b" />
         <slice_3D_position type="float" value="0.4" />
     </render_settings>
     

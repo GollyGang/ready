@@ -610,15 +610,15 @@ void MyFrame::OnFitPattern(wxCommandEvent& event)
 
 void MyFrame::OnWireframe(wxCommandEvent& event)
 {
-    bool wireframe = this->render_settings.GetBool("use_wireframe");
+    bool wireframe = this->render_settings.GetProperty("use_wireframe").GetBool();
     this->pVTKWindow->DoCharEvent(wireframe ? 's' : 'w');
     wireframe = !wireframe;
-    this->render_settings.Set("use_wireframe",wireframe);
+    this->render_settings.GetProperty("use_wireframe").SetBool(wireframe);
 }
 
 void MyFrame::OnUpdateWireframe(wxUpdateUIEvent& event)
 {
-    event.Check(this->render_settings.GetBool("use_wireframe"));
+    event.Check(this->render_settings.GetProperty("use_wireframe").GetBool());
 }
 
 void MyFrame::OnToggleViewPane(wxCommandEvent& event)
@@ -735,7 +735,9 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
     this->system = sys;
-    this->render_settings.Set("iActiveChemical",min(this->render_settings.GetInt("iActiveChemical"),this->system->GetNumberOfChemicals()-1));
+    int iChem = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
+    iChem = min(iChem,this->system->GetNumberOfChemicals()-1); // ensure is in valid range
+    this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(iChem));
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->is_running = false;
     this->UpdateWindows();
@@ -1210,7 +1212,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         this->InitializeDefaultRenderSettings();
         vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
         if(xml_render_settings) // optional
-            this->render_settings.InitializeFromXML(xml_render_settings);
+            this->render_settings.OverwriteFromXML(xml_render_settings);
 
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
@@ -1431,9 +1433,9 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
         choices.Add(GetChemicalName(i));
     wxSingleChoiceDialog dlg(this,_("Select the chemical to render:"),_("Select active chemical"),
         choices);
-    dlg.SetSelection(this->render_settings.GetInt("iActiveChemical"));
+    dlg.SetSelection(IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical()));
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->render_settings.Set("iActiveChemical",dlg.GetSelection());
+    this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(dlg.GetSelection()));
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings);
     this->UpdateWindows();
 }
@@ -1750,22 +1752,23 @@ void MyFrame::OnChar(wxKeyEvent& event)
 
 void MyFrame::InitializeDefaultRenderSettings()
 {
-    this->render_settings.Set("low",0.0f);
-    this->render_settings.Set("high",1.0f);
-    this->render_settings.Set("vertical_scale_1D",30.0f);
-    this->render_settings.Set("vertical_scale_2D",15.0f);
-    this->render_settings.Set("hue_low",0.6f);
-    this->render_settings.Set("hue_high",0.0f);
-    this->render_settings.Set("iActiveChemical",0);
-    this->render_settings.Set("use_image_interpolation",true);
-    this->render_settings.Set("contour_level",0.25f);
-    this->render_settings.Set("use_wireframe",false);
-    this->render_settings.Set("slice_3D",true);
-    this->render_settings.Set("slice_3D_axis",2); // 0=x, 1=y, 2=z
-    this->render_settings.Set("slice_3D_position",0.5f); // [0,1]
-    this->render_settings.Set("surface_color",1.0f,1.0f,1.0f); // RGB [0,1]
-    this->render_settings.Set("show_multiple_chemicals_2D",true);
-    this->render_settings.Set("show_displacement_mapped_surface",true);
+    this->render_settings.DeleteAllProperties();
+    this->render_settings.AddProperty(Property("color_low","color",0.0f,0.0f,1.0f));
+    this->render_settings.AddProperty(Property("color_high","color",1.0f,0.0f,0.0f));
+    this->render_settings.AddProperty(Property("active_chemical","chemical","a"));
+    this->render_settings.AddProperty(Property("low",0.0f));
+    this->render_settings.AddProperty(Property("high",1.0f));
+    this->render_settings.AddProperty(Property("vertical_scale_1D",30.0f));
+    this->render_settings.AddProperty(Property("vertical_scale_2D",15.0f));
+    this->render_settings.AddProperty(Property("contour_level",0.25f));
+    this->render_settings.AddProperty(Property("use_wireframe",false));
+    this->render_settings.AddProperty(Property("slice_3D",true));
+    this->render_settings.AddProperty(Property("slice_3D_axis",2)); // 0=x, 1=y, 2=z
+    this->render_settings.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
+    this->render_settings.AddProperty(Property("surface_color","color",1.0f,1.0f,1.0f)); // RGB [0,1]
+    this->render_settings.AddProperty(Property("show_multiple_chemicals_2D",true));
+    this->render_settings.AddProperty(Property("show_displacement_mapped_surface",true));
+    this->render_settings.AddProperty(Property("use_image_interpolation",true));
     // TODO: allow user to change defaults
 }
 

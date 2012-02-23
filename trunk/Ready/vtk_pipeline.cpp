@@ -50,6 +50,7 @@
 #include <vtkCubeAxesActor2D.h>
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
+#include <vtkMath.h>
 
 // STL:
 #include <stdexcept>
@@ -78,15 +79,18 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
 
 void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
-    float low = render_settings.GetFloat("low");
-    float high = render_settings.GetFloat("high");
-    float vertical_scale_1D = render_settings.GetFloat("vertical_scale_1D");
-    float hue_low = render_settings.GetFloat("hue_low");
-    float hue_high = render_settings.GetFloat("hue_high");
-    bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
-    int iActiveChemical = render_settings.GetInt("iActiveChemical");
-    float contour_level = render_settings.GetFloat("contour_level");
-    bool use_wireframe = render_settings.GetBool("use_wireframe");
+    float low = render_settings.GetProperty("low").GetFloat();
+    float high = render_settings.GetProperty("high").GetFloat();
+    float vertical_scale_1D = render_settings.GetProperty("vertical_scale_1D").GetFloat();
+    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
+    render_settings.GetProperty("color_low").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
+    render_settings.GetProperty("color_high").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
+    bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
+    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     
@@ -100,7 +104,9 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     lut->SetRampToLinear();
     lut->SetScaleToLinear();
     lut->SetTableRange(low,high);
-    lut->SetHueRange(hue_low,hue_high);
+    lut->SetSaturationRange(low_sat,high_sat);
+    lut->SetHueRange(low_hue,high_hue);
+    lut->SetValueRange(low_val,high_val);
 
     // pad the image a little so we can actually see it as a 2D strip rather than being invisible
     vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
@@ -180,19 +186,22 @@ void InitializeVTKPipeline_1D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
 void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
-    float low = render_settings.GetFloat("low");
-    float high = render_settings.GetFloat("high");
-    float vertical_scale_2D = render_settings.GetFloat("vertical_scale_2D");
-    float hue_low = render_settings.GetFloat("hue_low");
-    float hue_high = render_settings.GetFloat("hue_high");
-    bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
-    int iActiveChemical = render_settings.GetInt("iActiveChemical");
-    float contour_level = render_settings.GetFloat("contour_level");
-    bool use_wireframe = render_settings.GetBool("use_wireframe");
+    float low = render_settings.GetProperty("low").GetFloat();
+    float high = render_settings.GetProperty("high").GetFloat();
+    float vertical_scale_2D = render_settings.GetProperty("vertical_scale_2D").GetFloat();
+    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
+    render_settings.GetProperty("color_low").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
+    render_settings.GetProperty("color_high").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
+    bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
+    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     float surface_r,surface_g,surface_b;
-    render_settings.GetFloat3("surface_color",surface_r,surface_g,surface_b);
-    bool show_multiple_chemicals_2D = render_settings.GetBool("show_multiple_chemicals_2D");
-    bool show_displacement_mapped_surface = render_settings.GetBool("show_displacement_mapped_surface");
+    render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
+    bool show_multiple_chemicals_2D = render_settings.GetProperty("show_multiple_chemicals_2D").GetBool();
+    bool show_displacement_mapped_surface = render_settings.GetProperty("show_displacement_mapped_surface").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -211,7 +220,9 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
     lut->SetRampToLinear();
     lut->SetScaleToLinear();
     lut->SetTableRange(low,high);
-    lut->SetHueRange(hue_low,hue_high);
+    lut->SetSaturationRange(low_sat,high_sat);
+    lut->SetHueRange(low_hue,high_hue);
+    lut->SetValueRange(low_val,high_val);
 
     for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
@@ -312,19 +323,22 @@ void InitializeVTKPipeline_2D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
 
 void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings)
 {
-    float low = render_settings.GetFloat("low");
-    float high = render_settings.GetFloat("high");
-    float hue_low = render_settings.GetFloat("hue_low");
-    float hue_high = render_settings.GetFloat("hue_high");
-    bool use_image_interpolation = render_settings.GetBool("use_image_interpolation");
-    int iActiveChemical = render_settings.GetInt("iActiveChemical");
-    float contour_level = render_settings.GetFloat("contour_level");
-    bool use_wireframe = render_settings.GetBool("use_wireframe");
-    bool slice_3D = render_settings.GetBool("slice_3D");
-    int slice_3D_axis = render_settings.GetInt("slice_3D_axis");
-    float slice_3D_position = render_settings.GetFloat("slice_3D_position");
+    float low = render_settings.GetProperty("low").GetFloat();
+    float high = render_settings.GetProperty("high").GetFloat();
+    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
+    render_settings.GetProperty("color_low").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
+    render_settings.GetProperty("color_high").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
+    bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
+    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
+    bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
+    int slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetInt();
+    float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
     float surface_r,surface_g,surface_b;
-    render_settings.GetFloat3("surface_color",surface_r,surface_g,surface_b);
+    render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
 
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer = vtkSmartPointer<vtkRenderer>::New();
@@ -391,7 +405,9 @@ void InitializeVTKPipeline_3D(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* sy
         lut->SetRampToLinear();
         lut->SetScaleToLinear();
         lut->SetTableRange(low,high);
-        lut->SetHueRange(hue_low,hue_high);
+        lut->SetSaturationRange(low_sat,high_sat);
+        lut->SetHueRange(low_hue,high_hue);
+        lut->SetValueRange(low_val,high_val);
 
         // extract a slice
         vtkImageData *image = system->GetImage(iActiveChemical);

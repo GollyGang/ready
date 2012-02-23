@@ -1,6 +1,4 @@
 papercuts:
-- render settings: bools should toggle instead of edit, colors should show a color editor, iActiveChemical should offer 'a', 'b', etc. instead of 0,1,2
-- render settings: want a custom order
 - edit formula dialog: want tab key to insert 4 spaces
 - never want dialogs to appear partially off-screen
 
