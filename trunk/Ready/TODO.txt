@@ -1,5 +1,6 @@
 papercuts:
 - render settings: want colors to show their color in the Info Pane, as a filled rectangle or similar
+- 3d camera shouldn't reset every time we change the scene
 - edit formula dialog: want tab key to insert 4 spaces
 - never want dialogs to appear partially off-screen
 
