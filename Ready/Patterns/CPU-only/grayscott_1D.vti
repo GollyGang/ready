@@ -35,7 +35,7 @@
     </initial_pattern_generator>
     
     <render_settings>
-        <iActiveChemical type="int" value="1" />
+        <active_chemical type="chemical" value="b" />
     </render_settings>
     
   </RD>

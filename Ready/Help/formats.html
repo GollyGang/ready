@@ -220,13 +220,13 @@ The render settings specify how the system should be shown on screen. Contains o
 <ul>
 <li><tt>&lt;low type="float" value="??" /&gt;</tt> The lowest value that chemicals in this system typically take. Used to determine the colors and the axes. Default: 0.0
 <li><tt>&lt;high type="float" value="??" /&gt;</tt> The highest value that chemicals in this system typically take. Default: 1.0
-<li><tt>&lt;hue_low type="float" value="??" /&gt;</tt> Values from low to high are mapped onto a hue palette from hue_low to hue_high. Default: 0.6 (blue)
-<li><tt>&lt;hue_high type="float" value="??" /&gt;</tt> Default: 0.0 (red)
-<li><tt>&lt;iActiveChemical type="int" value="??" /&gt;</tt> The chemical to show (0=a, 1=b, etc.). Default: 0
+<li><tt>&lt;color_low type="color" r="??" g="??" b="??" /&gt;</tt> The color for low values. (range: 0.0-1.0). Default: 0,0,1 (blue)
+<li><tt>&lt;color_high type="color" r="??" g="??" b="??" /&gt;</tt> The color for high values. (range: 0.0-1.0). Default: 1,0,0 (red)
+<li><tt>&lt;active_chemical type="chemical" value="??" /&gt;</tt> The chemical to show (a, b, c, etc.). Default: a
 <li><tt>&lt;use_image_interpolation type="bool" value="??" /&gt;</tt> Whether to interpolate the image or show sharp pixels (0=sharp pixels, 1=interpolated). Default: 1
 <li><tt>&lt;contour_level type="float" value="??" /&gt;</tt> The value to use for the surface contour in 3D systems. Default: 0.25
 <li><tt>&lt;use_wireframe type="bool" value="??" /&gt;</tt> Whether to show the surface as wireframe or as smooth surface (0=surface, 1=wireframe). Default: 0
-<li><tt>&lt;surface_color type="float3" a="??" b="??" c="??" /&gt;</tt> The RGB color to use for the surface (range: 0.0-1.0). Default: 1,1,1
+<li><tt>&lt;surface_color type="color" r="??" g="??" b="??" /&gt;</tt> The RGB color to use for the surface (range: 0.0-1.0). Default: 1,1,1 (white)
 <li><tt>&lt;vertical_scale_1D type="float" value="??" /&gt;</tt> The vertical size of the 1D line graphs. Default: 30
 <li><tt>&lt;vertical_scale_2D type="float" value="??" /&gt;</tt> The vertical size of the 2D surface plots. Default: 15
 <li><tt>&lt;use_slice2D type="bool" value="??" /&gt;</tt> Whether to add a 2D color slice through the 3D volume (0=no, 1=yes). Default: 1

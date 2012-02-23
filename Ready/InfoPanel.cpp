@@ -30,6 +30,7 @@
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
 #include <wx/html/htmlwin.h>    // for wxHtmlWindow
+#include <wx/colordlg.h>
 
 // STL:
 #include <string>
@@ -416,22 +417,26 @@ void InfoPanel::Update(const BaseRD* const system)
     const Properties& render_settings = frame->GetRenderSettings();
     for(int i=0;i<render_settings.GetNumberOfProperties();i++)
     {
-        string name = render_settings.GetPropertyName(i);
+        const Property& prop = render_settings.GetProperty(i);
+        string name = prop.GetName();
         wxString print_label(name);
         print_label.Replace(_T("_"),_T(" "));
-        string type = render_settings.GetPropertyType(name);
+        string type = prop.GetType();
         if(type=="float")
-            contents += AppendRow(print_label,name,FormatFloat(render_settings.GetFloat(name)),true);
+            contents += AppendRow(print_label,name,FormatFloat(prop.GetFloat()),true);
         else if(type=="bool")
-            contents += AppendRow(print_label,name,render_settings.GetBool(name)?_("true"):_("false"),true);
+            contents += AppendRow(print_label,name,prop.GetBool()?_("true"):_("false"),true);
         else if(type=="int")
-            contents += AppendRow(print_label,name,FormatFloat(render_settings.GetInt(name)),true);
-        else if(type=="float3")
+            contents += AppendRow(print_label,name,FormatFloat(prop.GetInt()),true);
+        else if(type=="color")
         {
             float a,b,c;
-            render_settings.GetFloat3(name,a,b,c);
+            prop.GetColor(a,b,c);
             contents += AppendRow(print_label,name,FormatFloat(a)+_T(", ")+FormatFloat(b)+_T(", ")+FormatFloat(c),true);
         }
+        else if(type=="chemical")
+            contents += AppendRow(print_label,name,prop.GetChemical(),true);
+        else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
 
     contents += _T("</table></body></html>");
@@ -481,13 +486,12 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
 
 void InfoPanel::ChangeRenderSetting(const wxString& setting)
 {
-    Properties& render_settings = frame->GetRenderSettings();
-    string name(setting.mb_str());
-    string type = render_settings.GetPropertyType(name);
+    Property& prop = frame->GetRenderSettings().GetProperty(string(setting.mb_str()));
+    string type = prop.GetType();
     if(type=="float")
     {
         float newval;
-        float oldval = render_settings.GetFloat(name);
+        float oldval = prop.GetFloat();
 
         // position dialog box to left of linkrect
         wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
@@ -500,7 +504,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         {
             newval = dialog.GetValue();
             if (newval != oldval) {
-                render_settings.Set(name, newval);
+                prop.SetFloat(newval);
                 frame->RenderSettingsChanged();
             }
         }
@@ -508,7 +512,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
     else if(type=="int")
     {
         float newval;
-        float oldval = render_settings.GetInt(name);
+        float oldval = prop.GetInt();
 
         // position dialog box to left of linkrect
         wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
@@ -521,50 +525,44 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         {
             newval = dialog.GetValue();
             if (newval != oldval) {
-                render_settings.Set(name, (int)newval);
+                prop.SetInt((int)newval);
                 frame->RenderSettingsChanged();
             }
         }
     }
     else if(type=="bool")
     {
-        wxArrayString choices;
-        choices.Add(_("true"));
-        choices.Add(_("false"));
-        wxSingleChoiceDialog dlg(this,setting+_T(":"),_("Edit render setting"),choices);
-        bool oldval = render_settings.GetBool(name);
-        dlg.SetSelection(oldval?0:1);
-        if(dlg.ShowModal()==wxID_OK)
+        prop.SetBool(!prop.GetBool());
+        frame->RenderSettingsChanged();
+    }
+    else if(type=="color")
+    {
+        float r,g,b;
+        prop.GetColor(r,g,b);
+        wxColour col = wxGetColourFromUser(this,wxColour(r*255,g*255,b*255));
+        if(col.IsOk()) // (else user cancelled)
         {
-            bool newval = (dlg.GetSelection()==0);
-            if( (newval && !oldval) || (!newval && oldval) )
-            {
-                render_settings.Set(name,newval);
-                frame->RenderSettingsChanged();
-            }
+            r = col.Red()/255.0f;
+            g = col.Green()/255.0f;
+            b = col.Blue()/255.0f;
+            prop.SetColor(r,g,b);
+            frame->RenderSettingsChanged();
         }
     }
-    else if(type=="float3")
+    else if(type=="chemical")
     {
-        float oldx,oldy,oldz;
-        float newx,newy,newz;
-        render_settings.GetFloat3(name,oldx,oldy,oldz);
-
-        XYZFloatDialog dialog(frame, setting, oldx, oldy, oldz,wxDefaultPosition,wxDefaultSize);
-        if (dialog.ShowModal() == wxID_OK)
-        {
-            newx = dialog.GetX();
-            newy = dialog.GetY();
-            newz = dialog.GetZ();
-            if (newx != oldx || newy != oldy || newz != oldz)
-            {
-                render_settings.Set(name,newx,newy,newz);
-                frame->RenderSettingsChanged();
-            }
-        }
+        wxArrayString choices;
+        for(int i=0;i<this->frame->GetCurrentRDSystem()->GetNumberOfChemicals();i++)
+            choices.Add(GetChemicalName(i));
+        wxSingleChoiceDialog dlg(this,_("Chemical:"),_("Select active chemical"),
+            choices);
+        dlg.SetSelection(IndexFromChemicalName(prop.GetChemical()));
+        if(dlg.ShowModal()!=wxID_OK) return;
+        prop.SetChemical(GetChemicalName(dlg.GetSelection()));
+        frame->RenderSettingsChanged();
     }
     else {
-        wxMessageBox("TODO!!! Edit "+setting);
+        wxMessageBox("Editing "+setting+" of type "+wxString(type.c_str(),wxConvUTF8)+" is not currently supported");
     }
 }
 
