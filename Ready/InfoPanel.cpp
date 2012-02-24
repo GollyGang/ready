@@ -480,7 +480,6 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     }
     result += _T("<td width=3></td>");
     
-    
     result += _T("</tr>");
     return result;
 }
