@@ -136,7 +136,7 @@ Each overlay changes the values of a single chemical across the image. Overlays 
 </ul>
 <p><b>Contains:</b>
 <ol>
-<li>operation (required) : one of <tt><a href="#overwrite">overwrite</a></tt>, <tt><a href="#add">add</a></tt>, <tt><a href="#subtract">subtract</a></tt> or <tt><a href="#multiply">multiply</a></tt>.
+<li>operation (required) : one of <tt><a href="#overwrite">overwrite</a></tt>, <tt><a href="#add">add</a></tt>, <tt><a href="#subtract">subtract</a></tt>, <tt><a href="#multiply">multiply</a></tt> or <tt><a href="#divide">divide</a></tt>.
 <li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
 <li>shape (required) : one of <tt><a href="#everywhere">everywhere</a></tt>, <tt><a href="#rectangle">rectangle</a></tt> or <tt><a href="#circle">circle</a></tt>.
 </ol>
@@ -152,6 +152,9 @@ Specifies that this overlay should subtract from the existing values in the imag
 
 <h4><a name="multiply"></a>The <tt>&lt;multiply&gt;</tt> element</h4>
 Specifies that this overlay should multiply the existing values in the image.
+
+<h4><a name="divide"></a>The <tt>&lt;divide&gt;</tt> element</h4>
+Specifies that this overlay should divide the existing values in the image.
 
 <h4><a name="constant"></a>The <tt>&lt;constant&gt;</tt> element</h4>
 Specifies that the values in this overlay are constant.
