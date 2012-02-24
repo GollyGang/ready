@@ -1805,6 +1805,7 @@ void MyFrame::SetNumberOfChemicals(int n)
 
 bool MyFrame::SetDimensions(int x,int y,int z)
 {
+    int dimensionality_before = this->system->GetDimensionality();
     try 
     {
         if(x<1 || y<1 || z<1) throw runtime_error("Dimensions must be at least 1");
@@ -1833,8 +1834,10 @@ bool MyFrame::SetDimensions(int x,int y,int z)
         wxMessageBox(_("Dimensions not permitted"));
         return false;
     }
+    int dimensionality_after = this->system->GetDimensionality();
     this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
+    bool reset_camera = (dimensionality_after != dimensionality_before);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,reset_camera);
     this->UpdateWindows();
     return true;
 }
