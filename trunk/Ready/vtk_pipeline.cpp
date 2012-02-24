@@ -65,7 +65,6 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
 {
     assert(pVTKWindow);
     assert(system);
-
     
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer;
@@ -105,7 +104,6 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
         pRenderer->SetActiveCamera(camera);
         pRenderer->ResetCamera();
     }
-    pVTKWindow->Refresh();
 }
 
 void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
