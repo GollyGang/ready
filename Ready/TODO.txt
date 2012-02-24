@@ -8,6 +8,7 @@ before 0.2 release:
   heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - document: OpenCL formula, kernel
+- bug: 1D line graph: some lines appear black on first render
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
@@ -17,7 +18,6 @@ Andrew's tasks for 0.2:
 
 before 0.3 release:
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
-- friendlier names for render settings in Info Pane, not the internal names
 - add initial_pattern_generator to Info Pane for editing
 - allow user to change the default render settings
 - add option to convert formula rules into full-kernel rules
@@ -25,7 +25,7 @@ before 0.3 release:
 - relax power of 2 size requirement (only a speed benefit)
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
 - parameter map(s) in a separate window, to allow user to explore parameters 
-- some way to add noise to the system on each frame, or periodically
+- some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
 
 before 0.x release:
 - image export (user can specify how chemicals map onto colors)
