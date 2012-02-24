@@ -8,7 +8,6 @@ before 0.2 release:
   heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
 - finish documenting stuff in Help/*.html (search for "!!!")
 - document: OpenCL formula, kernel
-- bug: lines in 1D plot appear black sometimes (only on Windows7?)
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)

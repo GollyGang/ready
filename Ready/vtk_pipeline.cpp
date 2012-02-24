@@ -105,7 +105,7 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
         pRenderer->SetActiveCamera(camera);
         pRenderer->ResetCamera();
     }
-    pVTKWindow->Refresh(false);
+    pRenderer->Render();
 }
 
 void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
@@ -165,18 +165,16 @@ void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Proper
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
         warp->SetScaleFactor(-scaling);
-        vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
-        normals->SetInputConnection(warp->GetOutputPort());
-        normals->SplittingOff();
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(normals->GetOutputPort());
+        mapper->SetInputConnection(warp->GetOutputPort());
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        //if(iChemical==iActiveChemical)
+        actor->GetProperty()->SetAmbient(1);
+        if(iChemical==iActiveChemical)
             actor->GetProperty()->SetColor(1,1,1);
-        //else
-        //    actor->GetProperty()->SetColor(0.5,0.5,0.5);
+        else
+            actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
         pRenderer->AddActor(actor);
     }
