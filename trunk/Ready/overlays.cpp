@@ -225,6 +225,24 @@ class Multiply : public BaseOperation
         virtual void Apply(float& target,float value) const { target *= value; }
 };
 
+class Divide : public BaseOperation
+{
+    public:
+
+        Divide(vtkXMLDataElement* node) : BaseOperation(node) {}
+
+        static const char* GetTypeName() { return "divide"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(Divide::GetTypeName());
+            return xml;
+        }
+
+        virtual void Apply(float& target,float value) const { target /= value; }
+};
+
 class Constant : public BaseFill
 {
     public:
@@ -468,6 +486,7 @@ class Circle : public BaseShape
     else if(name==Add::GetTypeName())          return new Add(node);
     else if(name==Subtract::GetTypeName())     return new Subtract(node);
     else if(name==Multiply::GetTypeName())     return new Multiply(node);
+    else if(name==Divide::GetTypeName())       return new Divide(node);
     else throw runtime_error("Unsupported operation: "+name);
 }
 
