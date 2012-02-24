@@ -297,7 +297,7 @@ MultiLineDialog::MultiLineDialog(wxWindow *parent,
     topsizer->Add(CreateTextSizer(message), flagsBorder2);
 
     m_textctrl = new wxTextCtrl(this, wxID_ANY, value,
-                                wxDefaultPosition, wxSize(100,50), wxTE_MULTILINE);
+                                wxDefaultPosition, wxSize(100,50), wxTE_MULTILINE | wxTE_PROCESS_TAB);
     wxFont font(10,wxTELETYPE,wxFONTSTYLE_NORMAL,wxNORMAL,false,_T("Monospace"),wxFONTENCODING_DEFAULT);
     m_textctrl->SetFont(font);
     m_textctrl->SetMinSize(wxSize(800,500));
