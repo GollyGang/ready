@@ -73,7 +73,7 @@ class InfoPanel : public wxPanel
         
         // for building HTML table
         wxString AppendRow(const wxString& print_label, const wxString& label, const wxString& value,
-                           bool is_editable);
+                           bool is_editable,const wxString& color = wxEmptyString);
 
         // for making changes
         void ChangeParameter(const wxString& parameter);

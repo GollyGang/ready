@@ -430,9 +430,10 @@ void InfoPanel::Update(const BaseRD* const system)
             contents += AppendRow(print_label,name,FormatFloat(prop.GetInt()),true);
         else if(type=="color")
         {
-            float a,b,c;
-            prop.GetColor(a,b,c);
-            contents += AppendRow(print_label,name,FormatFloat(a)+_T(", ")+FormatFloat(b)+_T(", ")+FormatFloat(c),true);
+            float r,g,b;
+            prop.GetColor(r,g,b);
+            wxColor col(r*255,g*255,b*255);
+            contents += AppendRow(print_label,name,_T("RGB = ")+FormatFloat(r,2)+_T(", ")+FormatFloat(g,2)+_T(", ")+FormatFloat(b,2),true,col.GetAsString(wxC2S_HTML_SYNTAX));
         }
         else if(type=="chemical")
             contents += AppendRow(print_label,name,prop.GetChemical(),true);
@@ -450,7 +451,7 @@ void InfoPanel::Update(const BaseRD* const system)
 // -----------------------------------------------------------------------------
 
 wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label, const wxString& value,
-                              bool is_editable)
+                              bool is_editable,const wxString& color)
 {
     wxString result;
     if (rownum & 1)
@@ -463,6 +464,8 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     result += print_label;
     result += _T("</b></td><td valign=top>");
     result += value;
+    if(!color.empty()) // append a color block to illustrate the color
+        result += _T(" :&nbsp;&nbsp;<font color=\"") + color + _T("\">&#x2588;&#x2588;</font>");
     result += _T("</td>");
 
     if (is_editable) {

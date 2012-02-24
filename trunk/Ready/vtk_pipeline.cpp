@@ -173,10 +173,10 @@ void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Proper
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        if(iChemical==iActiveChemical)
+        //if(iChemical==iActiveChemical)
             actor->GetProperty()->SetColor(1,1,1);
-        else
-            actor->GetProperty()->SetColor(0.5,0.5,0.5);
+        //else
+        //    actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
         pRenderer->AddActor(actor);
     }

@@ -82,4 +82,4 @@ bool CopyTextToClipboard(const wxString& text);
 // Copy given text to the clipboard.
 
 // strip trailing zeros
-wxString FormatFloat(float f);
+wxString FormatFloat(float f,int mdp=6);

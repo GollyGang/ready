@@ -192,9 +192,9 @@ bool CopyTextToClipboard(const wxString& text)
 
 // -----------------------------------------------------------------------------
 
-wxString FormatFloat(float f)
+wxString FormatFloat(float f,int mdp)
 {
-    wxString result = wxString::Format(wxT("%f"),f);
+    wxString result = wxString::Format(wxT("%.*f"),mdp,f);
     // strip any trailing zeros
     while (result.GetChar(result.Length()-1) == wxChar('0')) {
         result.Truncate(result.Length()-1);
