@@ -105,7 +105,7 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
         pRenderer->SetActiveCamera(camera);
         pRenderer->ResetCamera();
     }
-    pRenderer->Render();
+    pVTKWindow->Refresh();
 }
 
 void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
