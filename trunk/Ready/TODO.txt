@@ -1,5 +1,5 @@
 papercuts:
-- edit formula dialog: want tab key to insert 4 spaces
+- edit formula dialog: want tab key to indent (doesn't work on Windows), want indent to be smart ideally
 - never want dialogs to appear partially off-screen
 
 before 0.2 release:
