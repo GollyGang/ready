@@ -1171,6 +1171,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     if (remember) AddRecentPattern(path);
     
+    wxBeginBusyCursor();
+    
     // load pattern file
     bool warn_to_update = false;
     BaseRD *target_system = NULL;
@@ -1228,6 +1230,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     }
     catch(const exception& e)
     {
+        wxEndBusyCursor();
         wxString message = warn_to_update ? _("This file is from a more recent version of Ready. You should download a newer version.\n\n") : _("");
         message += _("Failed to open file. Error:\n\n");
         message += wxString(e.what(),wxConvUTF8);
@@ -1237,12 +1240,14 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     }
     catch(...)
     {
+        wxEndBusyCursor();
         wxString message = warn_to_update ? _("This file is from a more recent version of Ready. You should download a newer version.\n\n") : _("");
         message += _("Failed to open file.");
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
         delete target_system;
         return;
     }
+    wxEndBusyCursor();
     if(warn_to_update)
     {
         wxMessageBox("This file is from a more recent version of Ready. For best results you should download a newer version.");
