@@ -413,6 +413,8 @@ void InfoPanel::Update(const BaseRD* const system)
     contents += _("Render settings:");
     contents += wxT("</h5></center>");
     contents += wxT("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
+    
+    rownum = 1;     // nicer if 1st render setting has gray background
 
     const Properties& render_settings = frame->GetRenderSettings();
     for(int i=0;i<render_settings.GetNumberOfProperties();i++)
@@ -463,9 +465,18 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     result += _T("<td width=3></td><td valign=top width=\"22%\"><b>");
     result += print_label;
     result += _T("</b></td><td valign=top>");
-    result += value;
-    if(!color.empty()) // append a color block to illustrate the color
-        result += _T(" :&nbsp;&nbsp;<font color=\"") + color + _T("\">&#x2588;&#x2588;</font>");
+    if (color.empty()) {
+        result += value;
+    } else {
+        // start with a color block to illustrate the color
+        // (we put a border around block in case color matches row background)
+        result += _T("<table border=0 cellspacing=0 cellpadding=0><tr><td>");
+        result += _T("<table border=1 cellspacing=0 cellpadding=6><tr bgcolor=\"");
+        result += color;
+        result += _T("\"><td width=25></td></tr></table></td><td valign=top>&nbsp;&nbsp;&nbsp;");
+        result += value;
+        result += _T("</td></tr></table>");
+    }
     result += _T("</td>");
 
     if (is_editable) {
