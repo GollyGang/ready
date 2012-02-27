@@ -328,7 +328,7 @@ void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
-    int slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetInt();
+    string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
     float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
@@ -422,12 +422,12 @@ void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Proper
                  0, 0, 0, 1 };*/
         // Set the slice orientation
         vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
-        switch(slice_3D_axis)
-        {
-            case 0: resliceAxes->DeepCopy(sagittalElements); break;
-            case 1: resliceAxes->DeepCopy(coronalElements); break;
-            case 2: resliceAxes->DeepCopy(axialElements); break;
-        }
+        if(slice_3D_axis=="x")
+            resliceAxes->DeepCopy(sagittalElements);
+        else if(slice_3D_axis=="y")
+            resliceAxes->DeepCopy(coronalElements);
+        else if(slice_3D_axis=="z")
+            resliceAxes->DeepCopy(axialElements);
         resliceAxes->SetElement(0, 3, slice_3D_position * system->GetX());
         resliceAxes->SetElement(1, 3, slice_3D_position * system->GetY());
         resliceAxes->SetElement(2, 3, slice_3D_position * system->GetZ());
