@@ -439,6 +439,8 @@ void InfoPanel::Update(const BaseRD* const system)
         }
         else if(type=="chemical")
             contents += AppendRow(print_label,name,prop.GetChemical(),true);
+        else if(type=="axis")
+            contents += AppendRow(print_label,name,prop.GetAxis(),true);
         else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
 
@@ -572,6 +574,22 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         dlg.SetSelection(IndexFromChemicalName(prop.GetChemical()));
         if(dlg.ShowModal()!=wxID_OK) return;
         prop.SetChemical(GetChemicalName(dlg.GetSelection()));
+        frame->RenderSettingsChanged();
+    }
+    else if(type=="axis")
+    {
+        wxArrayString choices;
+        choices.Add(_T("x"));
+        choices.Add(_T("y"));
+        choices.Add(_T("z"));
+        wxSingleChoiceDialog dlg(this,_("Axis:"),_("Select axis"),choices);
+        int iAxis=0;
+        if(prop.GetAxis()=="x") iAxis=0; 
+        else if(prop.GetAxis()=="y") iAxis=1; 
+        else if(prop.GetAxis()=="z") iAxis=2;
+        dlg.SetSelection(iAxis);
+        if(dlg.ShowModal()!=wxID_OK) return;
+        prop.SetAxis(string(choices[dlg.GetSelection()].mb_str()));
         frame->RenderSettingsChanged();
     }
     else {

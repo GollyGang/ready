@@ -1769,7 +1769,7 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("contour_level",0.25f));
     this->render_settings.AddProperty(Property("use_wireframe",false));
     this->render_settings.AddProperty(Property("slice_3D",true));
-    this->render_settings.AddProperty(Property("slice_3D_axis",2)); // 0=x, 1=y, 2=z
+    this->render_settings.AddProperty(Property("slice_3D_axis","axis","z"));
     this->render_settings.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
     this->render_settings.AddProperty(Property("show_multiple_chemicals_2D",true));
     this->render_settings.AddProperty(Property("show_displacement_mapped_surface",true));

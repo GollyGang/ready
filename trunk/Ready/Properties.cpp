@@ -31,11 +31,10 @@ void Property::ReadFromXML(vtkXMLDataElement* node)
         read_required_attribute(node,"value",this->i);
     else if(this->type=="bool")
     {
-        string s;
-        read_required_attribute(node,"value",s);
-        if(s=="true") this->b = true;
-        else if(s=="false") this->b = false;
-        else throw runtime_error("Property::ReadFromXML : unrecognised bool value: "+s);
+        read_required_attribute(node,"value",this->s);
+        if(this->s=="true") this->b = true;
+        else if(this->s=="false") this->b = false;
+        else throw runtime_error("Property::ReadFromXML : unrecognised bool value: "+this->s);
     }
     else if(this->type=="color")
     {
@@ -44,7 +43,16 @@ void Property::ReadFromXML(vtkXMLDataElement* node)
         read_required_attribute(node,"b",this->f3);
     }
     else if(this->type=="chemical")
+    {
         read_required_attribute(node,"value",this->s);
+        IndexFromChemicalName(this->s);
+    }
+    else if(this->type=="axis")
+    {
+        read_required_attribute(node,"value",this->s);
+        if(this->s != "x" && this->s != "y" && this->s != "z")
+            throw runtime_error("Property::ReadFromXML : unrecognised axis: "+this->s);
+    }
     else throw runtime_error("Property::ReadFromXML : unrecognised type: "+this->type);
 }
 
@@ -66,6 +74,8 @@ vtkSmartPointer<vtkXMLDataElement> Property::GetAsXML() const
     }
     else if(this->type=="chemical")
         node->SetAttribute("value",this->s.c_str());
+    else if(this->type=="axis")
+        node->SetAttribute("value",this->s.c_str());
     else throw runtime_error("Property::GetAsXML : unrecognised type: "+this->type);
     return node;
 }
@@ -78,15 +88,7 @@ void Properties::OverwriteFromXML(vtkXMLDataElement *node)
     for(int i=0;i<node->GetNumberOfNestedElements();i++)
     {
         vtkXMLDataElement *propnode = node->GetNestedElement(i);
-        // does this property already exist?
-        if(IsProperty(propnode->GetName()))
-        {
-            this->GetProperty(propnode->GetName()).ReadFromXML(propnode);
-        }
-        else
-        {
-            // could give warning that we don't know what this property is - it could be from the future, or a typo
-        }
+        this->GetProperty(propnode->GetName()).ReadFromXML(propnode);
     }
 }
 
