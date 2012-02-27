@@ -58,8 +58,8 @@
     </initial_pattern_generator>
 
     <render_settings>
-        <use_image_interpolation type="bool" value="0" />
-        <vertical_scale_2D type="float" value="3" />
+        <use_image_interpolation value="false" />
+        <vertical_scale_2D value="3" />
     </render_settings>
 
     

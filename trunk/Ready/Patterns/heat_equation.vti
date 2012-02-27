@@ -34,7 +34,7 @@
     </initial_pattern_generator>
     
     <render_settings>
-        <vertical_scale_2D type="float" value="40" />
+        <vertical_scale_2D value="40" />
     </render_settings>
     
   </RD>

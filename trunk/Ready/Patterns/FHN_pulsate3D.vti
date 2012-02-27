@@ -49,9 +49,9 @@
     </initial_pattern_generator>
    
     <render_settings>
-        <low type="float" value="-1" />
-        <high type="float" value="1" />
-        <slice_3D type="bool" value="0" />
+        <low value="-1" />
+        <high value="1" />
+        <slice_3D value="false" />
     </render_settings>
     
   </RD>
