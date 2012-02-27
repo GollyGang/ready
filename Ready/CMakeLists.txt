@@ -149,11 +149,6 @@ ELSE()
   MESSAGE( FATAL_ERROR "Cannot build the executable without wxWidgets. Please set the wxWidgets variables." )
 ENDIF()
 
-if( WIN32 )
-  # prevent link errors with wx 2.9.x
-  add_definitions( -DwxDEBUG_LEVEL=0 -DNDEBUG )
-endif()
-
 #-------------------------------------------OpenCL----------------------------------------------
 
 set( CMAKE_MODULE_PATH ${Ready_SOURCE_DIR} )
