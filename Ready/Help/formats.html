@@ -219,24 +219,24 @@ A location in space. Coordinates are in the range from zero to one and are given
 
 <h4><a name="render_settings"></a>The <tt>&lt;render_settings&gt;</tt> element</h4>
 
-The render settings specify how the system should be shown on screen. Contains one or more of the elements listed below.
+The render settings specify how the system should be shown on screen. Contains one or more of the elements listed below. Each shows the default value as an example of the format.
 <ul>
-<li><tt>&lt;low type="float" value="??" /&gt;</tt> The lowest value that chemicals in this system typically take. Used to determine the colors and the axes. Default: 0.0
-<li><tt>&lt;high type="float" value="??" /&gt;</tt> The highest value that chemicals in this system typically take. Default: 1.0
-<li><tt>&lt;color_low type="color" r="??" g="??" b="??" /&gt;</tt> The color for low values. (range: 0.0-1.0). Default: 0,0,1 (blue)
-<li><tt>&lt;color_high type="color" r="??" g="??" b="??" /&gt;</tt> The color for high values. (range: 0.0-1.0). Default: 1,0,0 (red)
-<li><tt>&lt;active_chemical type="chemical" value="??" /&gt;</tt> The chemical to show (a, b, c, etc.). Default: a
-<li><tt>&lt;use_image_interpolation type="bool" value="??" /&gt;</tt> Whether to interpolate the image or show sharp pixels (0=sharp pixels, 1=interpolated). Default: 1
-<li><tt>&lt;contour_level type="float" value="??" /&gt;</tt> The value to use for the surface contour in 3D systems. Default: 0.25
-<li><tt>&lt;use_wireframe type="bool" value="??" /&gt;</tt> Whether to show the surface as wireframe or as smooth surface (0=surface, 1=wireframe). Default: 0
-<li><tt>&lt;surface_color type="color" r="??" g="??" b="??" /&gt;</tt> The RGB color to use for the surface (range: 0.0-1.0). Default: 1,1,1 (white)
-<li><tt>&lt;vertical_scale_1D type="float" value="??" /&gt;</tt> The vertical size of the 1D line graphs. Default: 30
-<li><tt>&lt;vertical_scale_2D type="float" value="??" /&gt;</tt> The vertical size of the 2D surface plots. Default: 15
-<li><tt>&lt;use_slice2D type="bool" value="??" /&gt;</tt> Whether to add a 2D color slice through the 3D volume (0=no, 1=yes). Default: 1
-<li><tt>&lt;slice2D_axis type="int" value="??" /&gt;</tt> The axis that the slice should be perpendicular to (0=x, 1=y, 2=z). Default: 2
-<li><tt>&lt;slice2D_pos type="float" value="??" /&gt;</tt> The position along the slice2D_axis to slice at (range: 0.0-1.0, relative to the image size). Default: 0.5
-<li><tt>&lt;show_multiple_chemicals_2D type="bool" value="??" /&gt;</tt> Whether to show all the chemicals side by side (0=no, 1=yes). Default: 1
-<li><tt>&lt;show_displacement_mapped_surface type="bool" value="??" /&gt;</tt> Whether to show the height-mapped surface for 2D systems as well as the hue-mapped image (0=no, 1=yes). Default: 1
+<li><tt>&lt;low value="0" /&gt;</tt> The lowest value that chemicals in this system typically take. Used to determine the colors and the axes.
+<li><tt>&lt;high value="1" /&gt;</tt> The highest value that chemicals in this system typically take.
+<li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt> The color for low values. (range: 0.0-1.0).
+<li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt> The color for high values. (range: 0.0-1.0).
+<li><tt>&lt;active_chemical value="a" /&gt;</tt> The chemical to show (a, b, c, etc.).
+<li><tt>&lt;use_image_interpolation value="true" /&gt;</tt> Whether to interpolate the image or show sharp pixels (false=sharp pixels, true=interpolated).
+<li><tt>&lt;contour_level value="0.25" /&gt;</tt> The value to use for the surface contour in 3D systems.
+<li><tt>&lt;use_wireframe value="false" /&gt;</tt> Whether to show the surface as wireframe (or as smooth surface) (false=surface, true=wireframe).
+<li><tt>&lt;surface_color r="1" g="1" b="1" /&gt;</tt> The RGB color to use for the surface (range: 0.0-1.0).
+<li><tt>&lt;vertical_scale_1D value="30" /&gt;</tt> The vertical size of the 1D line graphs.
+<li><tt>&lt;vertical_scale_2D value="15" /&gt;</tt> The vertical size of the 2D surface plots.
+<li><tt>&lt;slice_3D value="true" /&gt;</tt> Whether to add a 2D color slice through the 3D volume.
+<li><tt>&lt;slice_3D_axis value="2" /&gt;</tt> The axis that the slice should be perpendicular to (0=x, 1=y, 2=z).
+<li><tt>&lt;slice_3D_position value="0.5" /&gt;</tt> The position along the slice_3D_axis to slice at (range: 0.0-1.0, relative to the image size).
+<li><tt>&lt;show_multiple_chemicals_2D value="true" /&gt;</tt> Whether to show all the chemicals side by side.
+<li><tt>&lt;show_displacement_mapped_surface value="true" /&gt;</tt> Whether to show the height-mapped surface for 2D systems as well as the hue-mapped image.
 </ul>
 
 </body>

@@ -121,9 +121,9 @@
     </initial_pattern_generator>
     
     <render_settings>
-        <low type="float" value="0" />
-        <high type="float" value="1.5" />
-        <show_multiple_chemicals_2D type="bool" value="0" />
+        <low value="0" />
+        <high value="1.5" />
+        <show_multiple_chemicals_2D value="false" />
     </render_settings>
     
   </RD>

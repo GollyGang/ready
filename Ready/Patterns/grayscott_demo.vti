@@ -45,7 +45,7 @@
     </initial_pattern_generator>
     
     <render_settings>
-        <active_chemical type="chemical" value="b" />
+        <active_chemical value="b" />
     </render_settings>
     
   </RD>

@@ -435,7 +435,7 @@ void InfoPanel::Update(const BaseRD* const system)
             float r,g,b;
             prop.GetColor(r,g,b);
             wxColor col(r*255,g*255,b*255);
-            contents += AppendRow(print_label,name,_T("RGB = ")+FormatFloat(r,2)+_T(", ")+FormatFloat(g,2)+_T(", ")+FormatFloat(b,2),true,col.GetAsString(wxC2S_HTML_SYNTAX));
+            contents += AppendRow(print_label,name,_("RGB = ")+FormatFloat(r,2)+_T(", ")+FormatFloat(g,2)+_T(", ")+FormatFloat(b,2),true,col.GetAsString(wxC2S_HTML_SYNTAX));
         }
         else if(type=="chemical")
             contents += AppendRow(print_label,name,prop.GetChemical(),true);

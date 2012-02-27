@@ -23,18 +23,19 @@
 #include <stdexcept>
 using namespace std;
 
-Property::Property(vtkXMLDataElement* node) : XML_Object(node)
+void Property::ReadFromXML(vtkXMLDataElement* node)
 {    
-    this->name = string(node->GetName());
-    read_required_attribute(node,"type",this->type);
     if(this->type=="float")
         read_required_attribute(node,"value",this->f1);
     else if(this->type=="int")
         read_required_attribute(node,"value",this->i);
     else if(this->type=="bool")
     {
-        read_required_attribute(node,"value",this->i);
-        this->b = (this->i==1);
+        string s;
+        read_required_attribute(node,"value",s);
+        if(s=="true") this->b = true;
+        else if(s=="false") this->b = false;
+        else throw runtime_error("Property::ReadFromXML : unrecognised bool value: "+s);
     }
     else if(this->type=="color")
     {
@@ -44,20 +45,19 @@ Property::Property(vtkXMLDataElement* node) : XML_Object(node)
     }
     else if(this->type=="chemical")
         read_required_attribute(node,"value",this->s);
-    else throw runtime_error("Property::InitializeFromXML : unrecognised type: "+this->type);
+    else throw runtime_error("Property::ReadFromXML : unrecognised type: "+this->type);
 }
 
 vtkSmartPointer<vtkXMLDataElement> Property::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> node = vtkSmartPointer<vtkXMLDataElement>::New();
     node->SetName(this->name.c_str());
-    node->SetAttribute("type",this->type.c_str());
     if(this->type=="float")
         node->SetFloatAttribute("value",this->f1);
     else if(this->type=="int")
         node->SetIntAttribute("value",this->i);
     else if(this->type=="bool")
-        node->SetIntAttribute("value",this->b?1:0);
+        node->SetAttribute("value",this->b?"true":"false");
     else if(this->type=="color")
     {
         node->SetFloatAttribute("r",f1);
@@ -77,15 +77,14 @@ void Properties::OverwriteFromXML(vtkXMLDataElement *node)
     this->set_name = string(node->GetName());
     for(int i=0;i<node->GetNumberOfNestedElements();i++)
     {
-        Property prop(node->GetNestedElement(i));
+        vtkXMLDataElement *propnode = node->GetNestedElement(i);
         // does this property already exist?
-        if(IsProperty(prop.GetName()))
+        if(IsProperty(propnode->GetName()))
         {
-            this->GetProperty(prop.GetName()) = prop;
+            this->GetProperty(propnode->GetName()).ReadFromXML(propnode);
         }
         else
         {
-            this->properties.push_back(prop); 
             // could give warning that we don't know what this property is - it could be from the future, or a typo
         }
     }

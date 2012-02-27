@@ -34,9 +34,9 @@
     </initial_pattern_generator>
     
     <render_settings>
-      <low type="float" value="0" />
-      <high type="float" value="7" />
-      <contour_level type="float" value="5" />
+      <low value="0" />
+      <high value="7" />
+      <contour_level value="5" />
     </render_settings>
 
   </RD>
