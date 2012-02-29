@@ -53,12 +53,12 @@
     <render_settings>
         <low value="-1" />
         <high value="1" />
-		<vertical_scale_1D value="100" />
+		<vertical_scale_1D value="50" />
     </render_settings>
     
   </RD>
-  <ImageData WholeExtent="0 255 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
-    <Piece Extent="0 255 0 0 0 0">
+  <ImageData WholeExtent="0 127 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 0 0 0">
       <PointData Scalars="ImageScalars">
         <DataArray type="Float32" Name="ImageScalars" NumberOfComponents="2" format="appended" RangeMin="0" RangeMax="0" offset="0" />
       </PointData>
@@ -67,6 +67,6 @@
     </Piece>
   </ImageData>
   <AppendedData encoding="base64">
-   _AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+   _AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
   </AppendedData>
 </VTKFile>
