@@ -100,7 +100,7 @@ A parameter of the rule. Most rules require one or more named parameters, such a
 </ul>
 <p><b>Contains:</b>
 <p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc. 
-The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.)
+The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). See the pattern files for examples.
 
 <h4><a name="kernel"></a>The <tt>&lt;kernel&gt;</tt> element</h4>
 
@@ -113,7 +113,7 @@ E.g. for float4 we typically use a block size of 4x1x1. For kernels that process
 <li><tt>block_size_z</tt> (required) : The z component.
 </ul>
 <p><b>Contains:</b>
-<p>A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules.
+<p>A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules. See the pattern files for examples.
 
 <h4><a name="initial_pattern_generator"></a>The <tt>&lt;initial_pattern_generator&gt;</tt> element</h4>
 

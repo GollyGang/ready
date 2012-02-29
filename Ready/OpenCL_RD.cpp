@@ -184,7 +184,6 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     size_t wgs,returned_size;
     ret = clGetKernelWorkGroupInfo(this->kernel,this->device_id,CL_KERNEL_WORK_GROUP_SIZE,sizeof(size_t),&wgs,&returned_size);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : retrieving kernel work group size failed: ");
-    // TODO: allow user override (this value isn't always optimal)
     if(wgs&(wgs-1))
         throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2");
     // spread the work group over the dimensions, preferring x over y and y over z because of memory alignment

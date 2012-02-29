@@ -43,6 +43,7 @@ const wxString rule_name_label = _("Rule name");
 const wxString description_label = _("Description");
 const wxString num_chemicals_label = _("Number of chemicals");
 const wxString formula_label = _("Formula");
+const wxString kernel_label = _("Kernel");
 const wxString dimensions_label = _("Dimensions");
 const wxString block_size_label = _("Block size");
 
@@ -363,9 +364,14 @@ void InfoPanel::Update(const BaseRD* const system)
     contents += wxT("<html><body><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     rownum = 0;
+
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
     contents += AppendRow(rule_name_label,rule_name_label, s,true);
+
+    s = wxString(system->GetRuleType().c_str(),wxConvUTF8);
+    contents += AppendRow("Rule type","Rule type",s,false);
+
     s = wxString(system->GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
     contents += AppendRow(description_label,description_label, s,true);
@@ -397,7 +403,11 @@ void InfoPanel::Update(const BaseRD* const system)
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        contents += AppendRow(formula_label,formula_label, formula, system->HasEditableFormula());
+        wxString print_label = formula_label;
+        if(system->GetRuleType()=="kernel") 
+            contents += AppendRow(kernel_label, kernel_label, formula, system->HasEditableFormula());
+        else
+            contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula());
     }
 
     contents += AppendRow(dimensions_label,dimensions_label, wxString::Format(wxT("%d x %d x %d"),
@@ -682,7 +692,8 @@ void InfoPanel::ChangeFormula()
     wxString oldcode(frame->GetCurrentRDSystem()->GetFormula().c_str(),wxConvUTF8);
     wxString newcode;
 
-    MultiLineDialog dialog(frame, _("Change formula"), _("Enter the new formula:"), oldcode);
+    wxString code_type(frame->GetCurrentRDSystem()->GetRuleType().c_str(),wxConvUTF8);
+    MultiLineDialog dialog(frame, _("Change ")+code_type, _("Enter the new ")+code_type+_T(":"), oldcode);
     
     dialog.SetSize(textdlgwd, textdlght);
 
@@ -786,7 +797,7 @@ void InfoPanel::ChangeInfo(const wxString& label)
     } else if ( label == num_chemicals_label ) {
         ChangeNumChemicals();
 
-    } else if ( label == formula_label ) {
+    } else if ( label == formula_label || label == kernel_label ) {
         ChangeFormula();
 
     } else if ( label == dimensions_label ) {

@@ -147,8 +147,6 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_Formula::GetAsXML() const
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");
 
-    rule->SetAttribute("type","formula");
-
     // formula
     vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
     formula->SetName("formula");

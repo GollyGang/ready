@@ -364,6 +364,7 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
     vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
     rule->SetName("rule");
     rule->SetAttribute("name",this->GetRuleName().c_str());
+    rule->SetAttribute("type",this->GetRuleType().c_str());
 
     // parameters
     for(int i=0;i<this->GetNumberOfParameters();i++)

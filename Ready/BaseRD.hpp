@@ -81,6 +81,9 @@ class BaseRD
         // use to change the dimensions or the number of chemicals
         virtual void Allocate(int x,int y,int z,int nc);
 
+        // returns e.g. "inbuilt", "formula", "kernel", as in the XML
+        virtual std::string GetRuleType() const =0;
+
         std::string GetRuleName() const;
         void SetRuleName(std::string s);
 
