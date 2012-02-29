@@ -3,7 +3,7 @@
   <RD format_version="1">
   
     <description>
-        This is a placeholder rule using OpenCL_FullKernel, where we give the whole OpenCL kernel instead of just a formula. Note that we can use float (or float2) instead of float4.
+        This is an example rule where we give the whole OpenCL kernel instead of just a formula. See also conway_life.vti. Note that we can use float (or float2) instead of float4, as long as the block size matches, e.g. 2x1x1 for float2, 4x1x1 for float4.
     </description>
 
     <rule type="kernel" name="Kernel test">

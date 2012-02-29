@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
-      
+  
+    <description>
+        Self-replicating spots in one dimension.
+    </description>
+          
     <rule type="inbuilt" name="Gray-Scott">
       <param name="timestep">1.0</param>
       <param name="D_a">0.082</param>
