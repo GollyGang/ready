@@ -148,15 +148,3 @@ void GrayScott::Update(int n_steps)
     this->images[0]->Modified();
     this->images[1]->Modified();
 }
-
-vtkSmartPointer<vtkXMLDataElement> BaseInbuilt_RD::GetAsXML() const
-{
-    vtkSmartPointer<vtkXMLDataElement> rd = BaseRD::GetAsXML();
-
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
-    if(!rule) throw runtime_error("rule node not found");
-
-    rule->SetAttribute("type","inbuilt");
-
-    return rd;
-}

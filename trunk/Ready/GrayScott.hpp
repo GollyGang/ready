@@ -23,7 +23,7 @@ class BaseInbuilt_RD : public BaseRD
 {
     public:
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        std::string GetRuleType() const { return "inbuilt"; }
 
         virtual bool HasEditableFormula() const { return false; }
         virtual bool HasEditableNumberOfChemicals() const { return false; }

@@ -29,6 +29,8 @@ class OpenCL_FullKernel : public OpenCL_RD
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
+        std::string GetRuleType() const { return "kernel"; }
+
         virtual bool HasEditableBlockSize() const { return true; }
         virtual int GetBlockSizeX() const { return this->block_size[0]; }
         virtual int GetBlockSizeY() const { return this->block_size[1]; }

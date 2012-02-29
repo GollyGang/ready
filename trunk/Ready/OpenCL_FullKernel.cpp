@@ -70,8 +70,6 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_FullKernel::GetAsXML() const
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");
 
-    rule->SetAttribute("type","kernel");
-
     vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
     kernel->SetName("kernel");
     kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
