@@ -4,11 +4,6 @@ papercuts:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
 
-before 0.2 release:
-- populate a pattern library with some basics, including descriptions and initial-pattern-generators: 
-  Gray-Scott (different possibilities in 1D 2D and 3D), Turing spots, Meinhardt stripes, Schlogl, 
-  heat equation (most as OpenCL, CPU-Only is only there to encourage people to install OpenCL)
-
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - fix bug: tool tips not appearing (Mac app only; bug is in wxOSX-Cocoa and not easy to fix)
