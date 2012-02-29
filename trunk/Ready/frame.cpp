@@ -276,12 +276,12 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
         menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
-        menu->Append(ID::Faster, _("Run &faster") + GetAccelerator(DO_FASTER),_("Run with more timesteps between each render"));
-        menu->Append(ID::Slower, _("Run slo&wer") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
-        menu->Append(ID::ChangeRunningSpeed, _("Change the running speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
+        menu->Append(ID::Faster, _("Run &Faster") + GetAccelerator(DO_FASTER),_("Run with more timesteps between each render"));
+        menu->Append(ID::Slower, _("Run Slo&wer") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
+        menu->Append(ID::ChangeRunningSpeed, _("Change the Running Speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
         menu->AppendSeparator();
-        menu->Append(ID::AddParameter, _("&Add a parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
-        menu->Append(ID::DeleteParameter, _("&Delete a parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
+        menu->Append(ID::AddParameter, _("&Add a Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
+        menu->Append(ID::DeleteParameter, _("&Delete a Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select &OpenCL Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
@@ -1810,7 +1810,6 @@ void MyFrame::SetNumberOfChemicals(int n)
 
 bool MyFrame::SetDimensions(int x,int y,int z)
 {
-    int dimensionality_before = this->system->GetDimensionality();
     try 
     {
         if(x<1 || y<1 || z<1) throw runtime_error("Dimensions must be at least 1");
@@ -1839,10 +1838,8 @@ bool MyFrame::SetDimensions(int x,int y,int z)
         wxMessageBox(_("Dimensions not permitted"));
         return false;
     }
-    int dimensionality_after = this->system->GetDimensionality();
     this->system->GenerateInitialPattern();
-    bool reset_camera = (dimensionality_after != dimensionality_before);
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,reset_camera);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
     this->UpdateWindows();
     return true;
 }
