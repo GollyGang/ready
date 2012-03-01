@@ -104,6 +104,10 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
     // install event handlers to detect keyboard shortcuts when treectrl has focus
     treectrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, frame);
     treectrl->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
+
+    #ifdef __WXMSW__
+        treectrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(PatternsPanel::OnSetFocus),NULL,this);
+    #endif
 }
 
 void PatternsPanel::DoIdleChecks()
@@ -315,4 +319,11 @@ bool PatternsPanel::DoKey(int key, int mods)
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;
+}
+
+void PatternsPanel::OnSetFocus(wxFocusEvent& event)
+{
+    #ifdef __WXMSW__
+        ignore_selection = true;
+    #endif
 }
