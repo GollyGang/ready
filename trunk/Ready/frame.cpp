@@ -242,7 +242,6 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_EXIT, _("Quit") + GetAccelerator(DO_QUIT));
         menuBar->Append(menu, _("&File"));
     }
-    if(0) // TODO!!!
     {   // edit menu:
         wxMenu *menu = new wxMenu;
         menu->Append(wxID_CUT, _("Cut") + GetAccelerator(DO_CUT), _("Cut the selection and save it to the clipboard"));
@@ -280,8 +279,8 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::Slower, _("Run Slo&wer") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
         menu->Append(ID::ChangeRunningSpeed, _("Change the Running Speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
         menu->AppendSeparator();
-        menu->Append(ID::AddParameter, _("&Add a Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
-        menu->Append(ID::DeleteParameter, _("&Delete a Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
+        menu->Append(ID::AddParameter, _("&Add Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
+        menu->Append(ID::DeleteParameter, _("&Delete Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select &OpenCL Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));

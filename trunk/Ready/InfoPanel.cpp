@@ -507,7 +507,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     return result;
 }
 
-// =============================================================================
+// -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeRenderSetting(const wxString& setting)
 {
@@ -662,7 +662,7 @@ void InfoPanel::ChangeRuleName()
     }
 }
 
-// =============================================================================
+// -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeDescription()
 {
@@ -730,7 +730,7 @@ void InfoPanel::ChangeNumChemicals()
     }
 }
 
-// =============================================================================
+// -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeDimensions()
 {
