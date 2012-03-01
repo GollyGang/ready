@@ -78,6 +78,7 @@ class HtmlInfo : public wxHtmlWindow
 
         void SaveScrollPos() { GetViewStart(&scroll_x, &scroll_y); }
         void RestoreScrollPos() { Scroll(scroll_x, scroll_y); }
+        void ResetScrollPos() { Scroll(0,0); }
 
     private:
 
@@ -112,8 +113,6 @@ END_EVENT_TABLE()
 
 void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
 {
-    SaveScrollPos();
-
     wxString url = link.GetHref();
     if ( url.StartsWith(wxT("http:")) || url.StartsWith(wxT("mailto:")) ) {
     // pass http/mailto URL to user's preferred browser/emailer
@@ -352,9 +351,16 @@ InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
     html->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
 }
 
-static int rownum;  // for alternating row background colors
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ResetPosition()
+{
+    html->ResetScrollPos();
+}
 
 // -----------------------------------------------------------------------------
+
+static int rownum;  // for alternating row background colors
 
 void InfoPanel::Update(const BaseRD* const system)
 {
@@ -456,7 +462,8 @@ void InfoPanel::Update(const BaseRD* const system)
 
     contents += _T("</table></body></html>");
     
-    html->Freeze(); // (prevent flicker)
+    html->SaveScrollPos();
+    html->Freeze();             // prevent flicker
     html->SetPage(contents);
     html->RestoreScrollPos();
     html->Thaw();

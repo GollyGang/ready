@@ -740,6 +740,7 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(iChem));
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
     this->is_running = false;
+    this->info_panel->ResetPosition();
     this->UpdateWindows();
 }
 
@@ -1169,10 +1170,10 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
-    if (remember) AddRecentPattern(path);
+    if(remember) AddRecentPattern(path);
     
     wxBeginBusyCursor();
-    
+
     // load pattern file
     bool warn_to_update = false;
     BaseRD *target_system = NULL;

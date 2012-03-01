@@ -45,6 +45,9 @@ class InfoPanel : public wxPanel
         // bring up a suitable dialog for changing the given setting
         void ChangeInfo(const wxString& label);
 
+        // reset scroll position to top
+        void ResetPosition();
+
         // update buttons at top of panel
         void UpdateButtons();
         
