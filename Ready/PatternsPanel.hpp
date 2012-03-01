@@ -53,6 +53,8 @@ class PatternsPanel : public wxPanel
         void OnTreeCollapse(wxTreeEvent& event);
         void OnTreeClick(wxMouseEvent& event);
 
+        void OnSetFocus(wxFocusEvent& event);
+
     private:
 
         MyFrame* frame;   // link to parent frame
