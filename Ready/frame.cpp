@@ -613,6 +613,7 @@ void MyFrame::OnWireframe(wxCommandEvent& event)
     this->pVTKWindow->DoCharEvent(wireframe ? 's' : 'w');
     wireframe = !wireframe;
     this->render_settings.GetProperty("use_wireframe").SetBool(wireframe);
+    this->UpdateInfoPane();
 }
 
 void MyFrame::OnUpdateWireframe(wxUpdateUIEvent& event)
