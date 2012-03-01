@@ -40,6 +40,7 @@ const wxString change_prefix = _("change: ");
 
 // labels in 1st column
 const wxString rule_name_label = _("Rule name");
+const wxString rule_type_label = _("Rule type");
 const wxString description_label = _("Description");
 const wxString num_chemicals_label = _("Number of chemicals");
 const wxString formula_label = _("Formula");
@@ -372,22 +373,22 @@ void InfoPanel::Update(const BaseRD* const system)
     rownum = 0;
 
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
-    s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(rule_name_label,rule_name_label, s,true);
+    s.Replace(wxT("\n"), wxT("<br>"));      // AKT TODO!!! ask Tim if rule name can really have linebreaks
+    contents += AppendRow(rule_name_label, rule_name_label, s, true);
 
     s = wxString(system->GetRuleType().c_str(),wxConvUTF8);
-    contents += AppendRow("Rule type","Rule type",s,false);
+    contents += AppendRow(rule_type_label, rule_type_label, s, false);
 
     s = wxString(system->GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n"), wxT("<br>"));
-    contents += AppendRow(description_label,description_label, s,true);
+    contents += AppendRow(description_label, description_label, s, true, true);
 
-    contents += AppendRow(num_chemicals_label,num_chemicals_label, wxString::Format(wxT("%d"),system->GetNumberOfChemicals()),
+    contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system->GetNumberOfChemicals()),
                           system->HasEditableNumberOfChemicals());
     
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
-        contents += AppendRow(system->GetParameterName(iParam),system->GetParameterName(iParam),
+        contents += AppendRow(system->GetParameterName(iParam), system->GetParameterName(iParam),
                               FormatFloat(system->GetParameterValue(iParam)), true);
     }
 
@@ -409,18 +410,18 @@ void InfoPanel::Update(const BaseRD* const system)
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        wxString print_label = formula_label;
         if(system->GetRuleType()=="kernel") 
-            contents += AppendRow(kernel_label, kernel_label, formula, system->HasEditableFormula());
+            contents += AppendRow(kernel_label, kernel_label, formula, system->HasEditableFormula(), true);
         else
-            contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula());
+            contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
     }
 
-    contents += AppendRow(dimensions_label,dimensions_label, wxString::Format(wxT("%d x %d x %d"),
-                                            system->GetX(),system->GetY(),system->GetZ()), true);
+    contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%d x %d x %d"),
+                                            system->GetX(),system->GetY(),system->GetZ()),
+                                            true);
 
     if(system->HasEditableBlockSize())
-        contents += AppendRow(block_size_label,block_size_label, wxString::Format(wxT("%d x %d x %d"),
+        contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             true);
     contents += _T("</table>");
@@ -441,22 +442,23 @@ void InfoPanel::Update(const BaseRD* const system)
         print_label.Replace(_T("_"),_T(" "));
         string type = prop.GetType();
         if(type=="float")
-            contents += AppendRow(print_label,name,FormatFloat(prop.GetFloat()),true);
+            contents += AppendRow(print_label, name, FormatFloat(prop.GetFloat()), true);
         else if(type=="bool")
-            contents += AppendRow(print_label,name,prop.GetBool()?_("true"):_("false"),true);
+            contents += AppendRow(print_label, name, prop.GetBool()?_("true"):_("false"), true);
         else if(type=="int")
-            contents += AppendRow(print_label,name,FormatFloat(prop.GetInt()),true);
+            contents += AppendRow(print_label, name, FormatFloat(prop.GetInt()), true);
         else if(type=="color")
         {
             float r,g,b;
             prop.GetColor(r,g,b);
             wxColor col(r*255,g*255,b*255);
-            contents += AppendRow(print_label,name,_("RGB = ")+FormatFloat(r,2)+_T(", ")+FormatFloat(g,2)+_T(", ")+FormatFloat(b,2),true,col.GetAsString(wxC2S_HTML_SYNTAX));
+            contents += AppendRow(print_label, name, _("RGB = ")+FormatFloat(r,2)+_T(", ")+FormatFloat(g,2)+_T(", ")+FormatFloat(b,2),
+                                  true, false, col.GetAsString(wxC2S_HTML_SYNTAX));
         }
         else if(type=="chemical")
-            contents += AppendRow(print_label,name,prop.GetChemical(),true);
+            contents += AppendRow(print_label, name, prop.GetChemical(), true);
         else if(type=="axis")
-            contents += AppendRow(print_label,name,prop.GetAxis(),true);
+            contents += AppendRow(print_label, name, prop.GetAxis(), true);
         else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
 
@@ -472,32 +474,35 @@ void InfoPanel::Update(const BaseRD* const system)
 // -----------------------------------------------------------------------------
 
 wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label, const wxString& value,
-                              bool is_editable,const wxString& color)
+                              bool is_editable, bool is_multiline, const wxString& color)
 {
-    wxString result;
-    if (rownum & 1)
-        result += _T("<tr bgcolor=\"#F0F0F0\">");
-    else
-        result += _T("<tr>");
+    wxString result = (rownum & 1) ? _T("<tr bgcolor=\"#F0F0F0\">") : _T("<tr>");
     rownum++;
-
-    result += _T("<td width=3></td><td valign=top width=\"22%\"><b>");
-    result += print_label;
-    result += _T("</b></td><td valign=top>");
-    if (color.empty()) {
-        result += value;
+    
+    if (is_multiline) {
+        result += _T("<td width=3></td><td valign=top width=\"40%\"><b>");
+        result += print_label;
+        result += _T("</b></td><td valign=top></td>");
+        // see below for how value is formatted
     } else {
-        // start with a color block to illustrate the color
-        // (we put a border around block in case color matches row background)
-        result += _T("<table border=0 cellspacing=0 cellpadding=0><tr><td>");
-        result += _T("<table border=1 cellspacing=0 cellpadding=6><tr bgcolor=\"");
-        result += color;
-        result += _T("\"><td width=25></td></tr></table></td><td valign=top>&nbsp;&nbsp;&nbsp;");
-        result += value;
-        result += _T("</td></tr></table>");
+        result += _T("<td width=3></td><td valign=top width=\"40%\"><b>");
+        result += print_label;
+        result += _T("</b></td><td valign=top>");
+        if (color.empty()) {
+            result += value;
+        } else {
+            // start with a color block to illustrate the color
+            // (we put a border around block in case color matches row background)
+            result += _T("<table border=0 cellspacing=0 cellpadding=0><tr><td>");
+            result += _T("<table border=1 cellspacing=0 cellpadding=6><tr bgcolor=\"");
+            result += color;
+            result += _T("\"><td width=25></td></tr></table></td><td valign=top>&nbsp;&nbsp;&nbsp;");
+            result += value;
+            result += _T("</td></tr></table>");
+        }
+        result += _T("</td>");
     }
-    result += _T("</td>");
-
+    
     if (is_editable) {
         result += _T("<td valign=top align=right><a href=\"");
         result += change_prefix;
@@ -508,9 +513,16 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     } else {
         result += _T("<td></td>");
     }
-    result += _T("<td width=3></td>");
+    result += _T("<td width=3></td></tr>");
     
-    result += _T("</tr>");
+    if (is_multiline) {
+        // put text in a new row that spans all columns
+        result += (rownum & 1) ? _T("<tr>") : _T("<tr bgcolor=\"#F0F0F0\">");
+        result += _T("<td width=3></td><td colspan=3>");
+        result += value;
+        result += _T("<br></td><td width=3></td></tr>");
+    }
+    
     return result;
 }
 
