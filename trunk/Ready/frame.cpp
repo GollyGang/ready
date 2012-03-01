@@ -1571,6 +1571,11 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::RunStop,                   DO_RUNSTOP);
         SetAccelerator(mbar, ID::Reset,                     DO_RESET);
         SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_GENPATT);
+        SetAccelerator(mbar, ID::Faster,                    DO_FASTER);
+        SetAccelerator(mbar, ID::Slower,                    DO_SLOWER);
+        SetAccelerator(mbar, ID::ChangeRunningSpeed,        DO_CHANGESPEED);
+        SetAccelerator(mbar, ID::AddParameter,              DO_ADDPARAM);
+        SetAccelerator(mbar, ID::DeleteParameter,           DO_DELPARAM);
         SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
         SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
     }
@@ -1583,50 +1588,55 @@ void MyFrame::ProcessKey(int key, int modifiers)
     
     switch (action.id)
     {
-        case DO_NOTHING:    // any unassigned key (including escape) turns off full screen mode
-                            if (fullscreen) cmdid = ID::FullScreen; break;
+        case DO_NOTHING:        // any unassigned key (including escape) turns off full screen mode
+                                if (fullscreen) cmdid = ID::FullScreen; break;
         
-        case DO_OPENFILE:   OpenFile(action.file);
-                            return;
+        case DO_OPENFILE:       OpenFile(action.file);
+                                return;
         
         // File menu
-        case DO_NEWPATT:    cmdid = wxID_NEW; break;
-        case DO_OPENPATT:   cmdid = wxID_OPEN; break;
-        case DO_SAVE:       cmdid = wxID_SAVE; break;
-        case DO_SCREENSHOT: cmdid = ID::Screenshot; break;
-        case DO_ADDPATTS:   cmdid = ID::AddMyPatterns; break;
-        case DO_PREFS:      cmdid = wxID_PREFERENCES; break;
-        case DO_QUIT:       cmdid = wxID_EXIT; break;
+        case DO_NEWPATT:        cmdid = wxID_NEW; break;
+        case DO_OPENPATT:       cmdid = wxID_OPEN; break;
+        case DO_SAVE:           cmdid = wxID_SAVE; break;
+        case DO_SCREENSHOT:     cmdid = ID::Screenshot; break;
+        case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
+        case DO_PREFS:          cmdid = wxID_PREFERENCES; break;
+        case DO_QUIT:           cmdid = wxID_EXIT; break;
         
         // Edit menu
-        case DO_CUT:        cmdid = wxID_CUT; break;
-        case DO_COPY:       cmdid = wxID_COPY; break;
-        case DO_PASTE:      cmdid = wxID_PASTE; break;
-        case DO_CLEAR:      cmdid = wxID_CLEAR; break;
-        case DO_SELALL:     cmdid = wxID_SELECTALL; break;
+        case DO_CUT:            cmdid = wxID_CUT; break;
+        case DO_COPY:           cmdid = wxID_COPY; break;
+        case DO_PASTE:          cmdid = wxID_PASTE; break;
+        case DO_CLEAR:          cmdid = wxID_CLEAR; break;
+        case DO_SELALL:         cmdid = wxID_SELECTALL; break;
         
         // View menu
-        case DO_FULLSCREEN: cmdid = ID::FullScreen; break;
-        case DO_FIT:        cmdid = ID::FitPattern; break;
-        case DO_WIREFRAME:  cmdid = ID::Wireframe; break;
-        case DO_PATTERNS:   cmdid = ID::PatternsPane; break;
-        case DO_INFO:       cmdid = ID::InfoPane; break;
-        case DO_HELP:       cmdid = ID::HelpPane; break;
-        case DO_RESTORE:    cmdid = ID::RestoreDefaultPerspective; break;
-        case DO_CHEMICAL:   cmdid = ID::ChangeActiveChemical; break;
+        case DO_FULLSCREEN:     cmdid = ID::FullScreen; break;
+        case DO_FIT:            cmdid = ID::FitPattern; break;
+        case DO_WIREFRAME:      cmdid = ID::Wireframe; break;
+        case DO_PATTERNS:       cmdid = ID::PatternsPane; break;
+        case DO_INFO:           cmdid = ID::InfoPane; break;
+        case DO_HELP:           cmdid = ID::HelpPane; break;
+        case DO_RESTORE:        cmdid = ID::RestoreDefaultPerspective; break;
+        case DO_CHEMICAL:       cmdid = ID::ChangeActiveChemical; break;
         
         // Action menu
-        case DO_STEP:       cmdid = ID::Step; break;
-        case DO_RUNSTOP:    cmdid = ID::RunStop; break;
-        case DO_RESET:      cmdid = ID::Reset; break;
-        case DO_GENPATT:    cmdid = ID::GenerateInitialPattern; break;
-        case DO_DEVICE:     cmdid = ID::SelectOpenCLDevice; break;
-        case DO_OPENCL:     cmdid = ID::OpenCLDiagnostics; break;
+        case DO_STEP:           cmdid = ID::Step; break;
+        case DO_RUNSTOP:        cmdid = ID::RunStop; break;
+        case DO_RESET:          cmdid = ID::Reset; break;
+        case DO_GENPATT:        cmdid = ID::GenerateInitialPattern; break;
+        case DO_FASTER:         cmdid = ID::Faster; break;
+        case DO_SLOWER:         cmdid = ID::Slower; break;
+        case DO_CHANGESPEED:    cmdid = ID::ChangeRunningSpeed; break;
+        case DO_ADDPARAM:       cmdid = ID::AddParameter; break;
+        case DO_DELPARAM:       cmdid = ID::DeleteParameter; break;
+        case DO_DEVICE:         cmdid = ID::SelectOpenCLDevice; break;
+        case DO_OPENCL:         cmdid = ID::OpenCLDiagnostics; break;
         
         // Help menu
-        case DO_ABOUT:      cmdid = wxID_ABOUT; break;
+        case DO_ABOUT:          cmdid = wxID_ABOUT; break;
         
-        default:            Warning(_("Bug detected in ProcessKey!"));
+        default:                Warning(_("Bug detected in ProcessKey!"));
     }
    
     if (cmdid != 0) {
