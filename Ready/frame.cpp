@@ -924,6 +924,8 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         this->pVTKWindow->Refresh(false);
         this->SetStatusBarText();
    
+        // AKT TODO!!! do we really want to sleep here???
+        // maybe let user change delay as part of speed control (separate from timesteps_per_render)???
         wxMilliSleep(30);
    
         event.RequestMore(); // trigger another onIdle event
