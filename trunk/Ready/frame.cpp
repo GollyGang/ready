@@ -904,7 +904,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
    
         try 
         {
-            this->system->Update(this->timesteps_per_render); // TODO: user controls speed
+            this->system->Update(this->timesteps_per_render);
         }
         catch(const exception& e)
         {
@@ -1897,22 +1897,28 @@ void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
 
 void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->HasEditableFormula() && this->GetCurrentRDSystem()->GetNumberOfParameters()>0);
+    event.Enable(this->GetCurrentRDSystem()->HasEditableFormula() &&
+                 this->GetCurrentRDSystem()->GetNumberOfParameters() > 0);
 }
 
 void MyFrame::OnRunFaster(wxCommandEvent& event)
 {
     this->timesteps_per_render *= 2;
+    // don't let timesteps_per_render be greater than 1000 otherwise app can become unresponsive
+    if (this->timesteps_per_render > 1e3) this->timesteps_per_render = 1e3;
 }
 
 void MyFrame::OnRunSlower(wxCommandEvent& event)
 {
     this->timesteps_per_render /= 2;
+    // don't let timesteps_per_render be smaller than 1
+    if (this->timesteps_per_render < 1) this->timesteps_per_render = 1;
 }
 
 void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 {
-    IntegerDialog dlg(this,_("Running speed"),_("New value (timesteps per render):"),this->timesteps_per_render,1,1e6,wxDefaultPosition,wxDefaultSize);
+    IntegerDialog dlg(this, _("Running speed"), _("New value (timesteps per render):"),
+                      this->timesteps_per_render, 1, 1e3, wxDefaultPosition, wxDefaultSize);
     if(dlg.ShowModal()!=wxID_OK) return;
     this->timesteps_per_render = dlg.GetValue();
 }
