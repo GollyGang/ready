@@ -31,25 +31,16 @@
 
 BEGIN_EVENT_TABLE(PatternsPanel, wxPanel)
     EVT_TREE_SEL_CHANGED(wxID_TREECTRL, PatternsPanel::OnTreeSelChanged)
-#ifdef __WXMSW__
-    EVT_TREE_ITEM_EXPANDED(wxID_TREECTRL, PatternsPanel::OnTreeExpand)
-    EVT_TREE_ITEM_COLLAPSED(wxID_TREECTRL, PatternsPanel::OnTreeCollapse)
-#endif
 END_EVENT_TABLE()
 
 PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id) 
     : wxPanel(parent,id), frame(parent)
 {
-    #ifdef __WXMSW__
-        call_unselect = false;      // DoIdleChecks needs to call Unselect?
-        editpath = wxEmptyString;   // DoIdleChecks calls EditFile if this isn't empty
-        ignore_selection = false;   // ignore spurious selection?
-    #endif
-    edit_file = false;              // edit the clicked file?
-
+    edit_file = false;
+    
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-    patternctrl = NULL;             // for 1st call of OnTreeSelChanged
+    patternctrl = NULL;    // for 1st call of OnTreeSelChanged
     patternctrl = new wxGenericDirCtrl(this, wxID_ANY, wxEmptyString,
                                        wxDefaultPosition, wxDefaultSize,
                                        #ifdef __WXMSW__
@@ -93,36 +84,14 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
     
     BuildTree();
 
-    // install event handler to detect control/right-click on a file
+    // install event handler to detect clicking on a file
     treectrl->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
     treectrl->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
-    #ifdef __WXMSW__
-        // fix double-click problem
-        treectrl->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
-    #endif
+    treectrl->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(PatternsPanel::OnTreeClick), NULL, this);
 
     // install event handlers to detect keyboard shortcuts when treectrl has focus
     treectrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MyFrame::OnKeyDown), NULL, frame);
     treectrl->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, frame);
-
-    #ifdef __WXMSW__
-        treectrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(PatternsPanel::OnSetFocus),NULL,this);
-    #endif
-}
-
-void PatternsPanel::DoIdleChecks()
-{
-    #ifdef __WXMSW__
-        if (call_unselect) {
-            // deselect file so user can click the same item again
-            patternctrl->GetTreeCtrl()->Unselect();
-            call_unselect = false;
-        }
-        if (!editpath.IsEmpty()) {
-            frame->EditFile(editpath);
-            editpath.Clear();
-        }
-    #endif
 }
 
 void PatternsPanel::AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root)
@@ -172,132 +141,60 @@ void PatternsPanel::BuildTree()
     if (id.IsOk()) treectrl->SelectItem(id);
 }
 
-void PatternsPanel::DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root)
+void PatternsPanel::OnTreeClick(wxMouseEvent& event)
 {
-    // recursively traverse tree and reset each item background to white
-    wxTreeItemIdValue cookie;
-    wxTreeItemId id = treectrl->GetFirstChild(root, cookie);
-    while ( id.IsOk() ) {
-        wxColor currcolor = treectrl->GetItemBackgroundColour(id);
-        if ( currcolor != *wxWHITE ) {
-            // assume item is selected
-            treectrl->SetItemBackgroundColour(id, *wxWHITE);
-        }
-        if ( treectrl->ItemHasChildren(id) ) {
-            DeselectTree(treectrl, id);
-        }
-        id = treectrl->GetNextChild(root, cookie);
+    // determine if an item was clicked
+    wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
+    wxPoint pt = event.GetPosition();
+    int flags;
+    wxTreeItemId id = treectrl->HitTest(pt, flags);
+    if (!id.IsOk()) {
+        // click wasn't in any item
+        event.Skip();
+        return;
     }
-}
+    
+    // check if click was in a folder item
+    wxString filepath = patternctrl->GetFilePath();
+    if (filepath.IsEmpty()) {
+        // click was in a folder item
+        event.Skip();
+        return;
+    }
+    
+    // set global flag for testing in OnTreeSelChanged
+    edit_file = event.ControlDown() || event.RightDown();
 
-void PatternsPanel::OnTreeExpand(wxTreeEvent& WXUNUSED(event))
-{
-    #ifdef __WXMSW__
-        // avoid bug -- expanding/collapsing a folder can cause top visible item
-        // to become selected and thus OnTreeSelChanged gets called
-        ignore_selection = true;
-    #endif
-}
-
-void PatternsPanel::OnTreeCollapse(wxTreeEvent& WXUNUSED(event))
-{
-    #ifdef __WXMSW__
-        // avoid bug -- expanding/collapsing a folder can cause top visible item
-        // to become selected and thus OnTreeSelChanged gets called
-        ignore_selection = true;
-    #endif
+    // check for click in selected item
+    if (id == treectrl->GetSelection()) {
+        // force a selection change so OnTreeSelChanged gets called
+        treectrl->Unselect();
+    }
+    
+    treectrl->SelectItem(id);
+    // OnTreeSelChanged will be called -- don't call event.Skip()
 }
 
 void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
 {
     if (patternctrl == NULL) return;   // ignore 1st call
-    
+        
     wxTreeItemId id = event.GetItem();
     if (!id.IsOk()) return;
 
     wxString filepath = patternctrl->GetFilePath();
-    
-    // deselect file/folder so this handler will be called if user clicks same item
-    wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
-    #ifdef __WXMSW__
-        // calling UnselectAll() or Unselect() here causes a crash
-        if (ignore_selection) {
-            // ignore spurious selection
-            ignore_selection = false;
-            call_unselect = true;
-            return;
-        }
-    #else
-        treectrl->UnselectAll();
-    #endif
 
     if ( filepath.IsEmpty() ) {
         // user clicked on a folder name
-        DeselectTree(treectrl, treectrl->GetRootItem());
-        treectrl->SetItemBackgroundColour(id, *wxLIGHT_GREY);
 
     } else if (edit_file) {
         // open file in text editor
-        #ifdef __WXMSW__
-            // call EditFile in later DoIdleChecks to avoid right-click problem
-            editpath = filepath;
-        #else
-            frame->EditFile(filepath);
-        #endif
+        frame->EditFile(filepath);
     
     } else {
         // user clicked on a pattern/html/txt file
-        
-        // reset background of previously selected file by traversing entire tree;
-        // we can't just remember previously selected id because ids don't persist
-        // after a folder has been collapsed and expanded
-        DeselectTree(treectrl, treectrl->GetRootItem());
-
-        // indicate the selected file
-        treectrl->SetItemBackgroundColour(id, *wxLIGHT_GREY);
-
         frame->OpenFile(filepath);
     }
-
-    #ifdef __WXMSW__
-        // calling Unselect() here causes a crash so do later in DoIdleChecks
-        call_unselect = true;
-    #endif
-}
-
-void PatternsPanel::OnTreeClick(wxMouseEvent& event)
-{
-    // set global flag for testing in OnTreeSelChanged
-    edit_file = event.ControlDown() || event.RightDown();
-   
-    #ifdef __WXMSW__
-        // this handler gets called even if user clicks outside an item,
-        // and in some cases can result in the top visible item becoming
-        // selected, so we need to avoid that
-        ignore_selection = false;
-        if (patternctrl) {
-            wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
-            if (treectrl) {
-                wxPoint pt = event.GetPosition();
-                int flags;
-                wxTreeItemId id = treectrl->HitTest(pt, flags);
-                if (id.IsOk() && (flags & wxTREE_HITTEST_ONITEMLABEL ||
-                                  flags & wxTREE_HITTEST_ONITEMICON)) {
-                    // fix problem with right-click
-                    if (event.RightDown()) {
-                        treectrl->SelectItem(id, true);
-                        // OnTreeSelChanged gets called a few times for some reason
-                    }
-                    // fix problem with double-click
-                    if (event.LeftDClick()) ignore_selection = true;
-                } else {
-                    ignore_selection = true;
-                }
-            }
-        }
-    #endif
-   
-    event.Skip();
 }
 
 bool PatternsPanel::TreeHasFocus()
@@ -319,11 +216,4 @@ bool PatternsPanel::DoKey(int key, int mods)
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;
-}
-
-void PatternsPanel::OnSetFocus(wxFocusEvent& event)
-{
-    #ifdef __WXMSW__
-        ignore_selection = true;
-    #endif
 }

@@ -36,7 +36,6 @@ class PatternsPanel : public wxPanel
 
         PatternsPanel(MyFrame* parent,wxWindowID id);
 
-        void DoIdleChecks();    // called from MyFrame's OnIdle handler
         void BuildTree();       // build tree of pattern files
         bool TreeHasFocus();    // tree ctrl has keyboard focus?
         
@@ -46,14 +45,9 @@ class PatternsPanel : public wxPanel
     private:
 
         void AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root);
-        void DeselectTree(wxTreeCtrl* treectrl, wxTreeItemId root);
 
-        void OnTreeSelChanged(wxTreeEvent& event);
-        void OnTreeExpand(wxTreeEvent& event);
-        void OnTreeCollapse(wxTreeEvent& event);
         void OnTreeClick(wxMouseEvent& event);
-
-        void OnSetFocus(wxFocusEvent& event);
+        void OnTreeSelChanged(wxTreeEvent& event);
 
     private:
 
@@ -61,12 +55,7 @@ class PatternsPanel : public wxPanel
 
         wxGenericDirCtrl* patternctrl;
 
-        #ifdef __WXMSW__
-            bool call_unselect;
-            wxString editpath;
-            bool ignore_selection;
-        #endif
-        bool edit_file;
+        bool edit_file;   // edit clicked file?
 
         DECLARE_EVENT_TABLE()
 };

@@ -885,12 +885,7 @@ void MyFrame::CheckFocus()
 
 void MyFrame::OnIdle(wxIdleEvent& event)
 {
-    this->patterns_panel->DoIdleChecks();
-    
-    // AKT TODO!!! check if this is now safe to call on Windows
-    #ifdef __WXMAC__
-        if (this->IsActive()) this->CheckFocus();
-    #endif
+    if (this->IsActive()) this->CheckFocus();
     
     // we drive our game loop by onIdle events
     if(this->is_running)
