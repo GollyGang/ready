@@ -412,8 +412,7 @@ bool DnDFile::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
     // bring app to front
     #ifdef __WXMAC__
         ProcessSerialNumber process;
-        if ( GetCurrentProcess(&process) == noErr )
-            SetFrontProcess(&process);
+        if ( GetCurrentProcess(&process) == noErr ) SetFrontProcess(&process);
     #endif
     #ifdef __WXMSW__
         SetForegroundWindow( (HWND)frameptr->GetHandle() );
@@ -885,7 +884,10 @@ void MyFrame::CheckFocus()
 
 void MyFrame::OnIdle(wxIdleEvent& event)
 {
-    if (this->IsActive()) this->CheckFocus();
+    #ifdef __WXMAC__
+        // do NOT do this in the Win app (buttons in Info/help pane won't work)
+        if (this->IsActive()) this->CheckFocus();
+    #endif
     
     // we drive our game loop by onIdle events
     if(this->is_running)
