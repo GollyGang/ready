@@ -234,7 +234,7 @@ void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Proper
 
     for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
-        // add a hue-mapped image
+        // add a color-mapped image
         {
             // pass the image through the lookup table
             vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();

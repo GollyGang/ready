@@ -15,7 +15,7 @@
       <param name="F">          0.035  </param>
     </rule>
 
-    <initial_pattern_generator apply_when_loading="1">
+    <initial_pattern_generator apply_when_loading="true">
         <overlay chemical="a">
             <overwrite />
             <constant value="1" />
