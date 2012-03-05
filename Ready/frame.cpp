@@ -1908,6 +1908,9 @@ void MyFrame::OnRunFaster(wxCommandEvent& event)
 void MyFrame::OnRunSlower(wxCommandEvent& event)
 {
     this->render_settings.GetProperty("timesteps_per_render").SetInt(this->render_settings.GetProperty("timesteps_per_render").GetInt() / 2);
+    // don't let timesteps_per_render get to 0 otherwise OnRunFaster can't double it
+    if (this->render_settings.GetProperty("timesteps_per_render").GetInt() < 1)
+        this->render_settings.GetProperty("timesteps_per_render").SetInt(1);
 }
 
 void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
