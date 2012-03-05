@@ -51,6 +51,7 @@
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMath.h>
+#include <vtkTextActor3D.h>
 
 // STL:
 #include <stdexcept>
@@ -291,6 +292,13 @@ void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Proper
                 pRenderer->AddActor(actor);
             }
         }
+
+        // add a text label
+        vtkSmartPointer<vtkTextActor3D> label = vtkSmartPointer<vtkTextActor3D>::New();
+        label->SetInput(GetChemicalName(iChem).c_str());
+        label->SetPosition(offset[0]+system->GetX()/2,offset[1]-system->GetY()-20,offset[2]);
+        pRenderer->AddActor(label);
+
         offset[0] += system->GetX()+5; // the next chemical should appear further to the right
     }
 

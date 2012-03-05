@@ -3,7 +3,6 @@ papercuts:
 - never want dialogs to appear partially off-screen
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
-- should put labels ('a', 'b', ...) below each chemical in the 2D view
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
