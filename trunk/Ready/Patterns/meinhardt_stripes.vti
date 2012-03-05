@@ -123,7 +123,7 @@
     <render_settings>
         <low value="0" />
         <high value="1.5" />
-        <show_multiple_chemicals_2D value="false" />
+        <show_multiple_chemicals value="false" />
     </render_settings>
     
   </RD>

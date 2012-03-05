@@ -4,6 +4,7 @@ papercuts:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
 - should put labels ('a', 'b', ...) below each chemical in the 2D view
+- apply_when_loading should be "true" and "false", not "1" and "0"
 
 Andrew's tasks for 0.2:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
@@ -14,17 +15,19 @@ Andrew's tasks for 0.2:
 before 0.3 release:
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
-- allow user to change the default render settings
 - add option to convert formula rules into full-kernel rules
 - different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
 - relax power of 2 size requirement (only a speed benefit)
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
 - parameter map(s) in a separate window, to allow user to explore parameters 
 - some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
+- new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
+  http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
+- parameters driven by an input scene (for writhing logos, etc.) - can use more chemicals for this
 
 before 0.x release:
+- allow user to change the default render settings
 - image export (user can specify how chemicals map onto colors)
-- parameters driven by an input scene (for writhing logos, etc.)
 - multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
 - graphical UI for editing the initial-pattern-generator overlay stack
 
