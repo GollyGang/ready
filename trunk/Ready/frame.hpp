@@ -190,7 +190,6 @@ class MyFrame : public wxFrame
         Properties render_settings;
 
         bool is_running;
-        int timesteps_per_render;
         double frames_per_second,million_cell_generations_per_second;
 
         wxString default_perspective;

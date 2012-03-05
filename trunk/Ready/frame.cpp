@@ -155,7 +155,6 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(false),
-       timesteps_per_render(100),
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
        fullscreen(false),
@@ -901,7 +900,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
    
         try 
         {
-            this->system->Update(this->timesteps_per_render);
+            this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
         }
         catch(const exception& e)
         {
@@ -915,7 +914,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         }
    
         double time_after = get_time_in_seconds();
-        this->frames_per_second = this->timesteps_per_render / (time_after - time_before);
+        this->frames_per_second = this->render_settings.GetProperty("timesteps_per_render").GetInt() / (time_after - time_before);
         this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
    
         this->pVTKWindow->Refresh(false);
@@ -1784,6 +1783,7 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("show_multiple_chemicals_2D",true));
     this->render_settings.AddProperty(Property("show_displacement_mapped_surface",true));
     this->render_settings.AddProperty(Property("use_image_interpolation",true));
+    this->render_settings.AddProperty(Property("timesteps_per_render",100));
     // TODO: allow user to change defaults
 }
 
@@ -1902,22 +1902,18 @@ void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 
 void MyFrame::OnRunFaster(wxCommandEvent& event)
 {
-    this->timesteps_per_render *= 2;
-    // don't let timesteps_per_render be greater than 1000 otherwise app can become unresponsive
-    if (this->timesteps_per_render > 1e3) this->timesteps_per_render = 1e3;
+    this->render_settings.GetProperty("timesteps_per_render").SetInt(this->render_settings.GetProperty("timesteps_per_render").GetInt() * 2);
 }
 
 void MyFrame::OnRunSlower(wxCommandEvent& event)
 {
-    this->timesteps_per_render /= 2;
-    // don't let timesteps_per_render be smaller than 1
-    if (this->timesteps_per_render < 1) this->timesteps_per_render = 1;
+    this->render_settings.GetProperty("timesteps_per_render").SetInt(this->render_settings.GetProperty("timesteps_per_render").GetInt() / 2);
 }
 
 void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 {
     IntegerDialog dlg(this, _("Running speed"), _("New value (timesteps per render):"),
-                      this->timesteps_per_render, 1, 1e3, wxDefaultPosition, wxDefaultSize);
+                      this->render_settings.GetProperty("timesteps_per_render").GetInt(), 1, 1e8, wxDefaultPosition, wxDefaultSize);
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->timesteps_per_render = dlg.GetValue();
+    this->render_settings.GetProperty("timesteps_per_render").SetInt(dlg.GetValue());
 }
