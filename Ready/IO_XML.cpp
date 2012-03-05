@@ -73,10 +73,9 @@ bool RD_XMLReader::ShouldGenerateInitialPatternWhenLoading()
 {
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
     if(!initial_pattern_generator) return false; // (element is optional, defaults to false)
-    int i;
     const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
-    bool read_ok = s && from_string(s,i);
-    return read_ok && i==1;
+    if(!s) return false;
+    return string(s)=="true";
 }
 
 vtkXMLDataElement* RD_XMLReader::GetRDElement()

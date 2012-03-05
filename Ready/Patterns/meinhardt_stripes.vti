@@ -27,7 +27,7 @@
       
     </rule>
     
-    <initial_pattern_generator apply_when_loading="1">
+    <initial_pattern_generator apply_when_loading="true">
         <!-- a = k_c / (2*k_ab) -->
         <overlay chemical="a">
             <overwrite />
