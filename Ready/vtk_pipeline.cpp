@@ -120,7 +120,11 @@ void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
 
+    int iFirstChem=0,iLastChem=system->GetNumberOfChemicals();
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     
     // create a lookup table for mapping values to colors
@@ -156,7 +160,7 @@ void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     pRenderer->AddActor2D(scalar_bar);
 
     // add a line graph for all the chemicals (active one highlighted)
-    for(int iChemical=0;iChemical<system->GetNumberOfChemicals();iChemical++)
+    for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
         plane->SetInput(system->GetImage(iChemical));
@@ -209,7 +213,7 @@ void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
-    bool show_multiple_chemicals_2D = render_settings.GetProperty("show_multiple_chemicals_2D").GetBool();
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_displacement_mapped_surface = render_settings.GetProperty("show_displacement_mapped_surface").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
@@ -217,7 +221,7 @@ void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     vtkFloatingPointType offset[3] = {0,0,0};
 
     int iFirstChem=0,iLastChem=system->GetNumberOfChemicals();
-    if(!show_multiple_chemicals_2D) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
     
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
