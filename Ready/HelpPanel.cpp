@@ -455,20 +455,6 @@ bool HelpPanel::DoKey(int key, int mods)
     
     // now do keyboard shortcuts specific to help pane
     if ( mods == wxMOD_NONE ) {
-        if ( key == '+' || key == '=' || key == WXK_ADD ) {
-            if ( helpfontsize < maxfontsize ) {
-                helpfontsize++;
-                html->ChangeFontSizes(helpfontsize);
-            }
-            return true;
-        }
-        if ( key == '-' || key == WXK_SUBTRACT ) {
-            if ( helpfontsize > minfontsize ) {
-                helpfontsize--;
-                html->ChangeFontSizes(helpfontsize);
-            }
-            return true;
-        }
         if ( key == '[' ) {
             if ( html->HistoryBack() ) UpdateHelpButtons();
             return true;
