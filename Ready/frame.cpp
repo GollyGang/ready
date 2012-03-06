@@ -802,6 +802,9 @@ void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
     event.Enable(!this->is_running);
 }
 
+static int steps_since_last_render;
+static double time_at_last_render;
+
 void MyFrame::OnRunStop(wxCommandEvent& event)
 {
     if(this->is_running) {
@@ -812,6 +815,10 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
     }
     this->UpdateToolbars();
     Refresh(false);
+    if(this->is_running) {
+        steps_since_last_render = 0;
+        time_at_last_render = get_time_in_seconds();
+    }
 }
 
 void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
@@ -892,15 +899,17 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     if(this->is_running)
     {
         if(this->system->GetTimestepsTaken()==0)
+        {
             this->SaveStartingPattern();
+            steps_since_last_render = 0;
+            time_at_last_render = get_time_in_seconds();
+        }
 
         int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
    
-        double time_before = get_time_in_seconds();
-   
         try 
         {
-            this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
+            this->system->Update(1);
         }
         catch(const exception& e)
         {
@@ -912,17 +921,26 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             this->is_running = false;
             wxMessageBox(_("An unknown error occurred when running the simulation"));
         }
+        
+        steps_since_last_render++;
+        
+        if(steps_since_last_render >= this->render_settings.GetProperty("timesteps_per_render").GetInt())
+        {
+            double time_diff = get_time_in_seconds() - time_at_last_render;
+            if (time_diff == 0.0) time_diff = 0.000001; // avoid division by 0
+            
+            this->frames_per_second = steps_since_last_render / time_diff;
+            this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
+       
+            this->pVTKWindow->Refresh(false);
+            this->SetStatusBarText();
+            
+            steps_since_last_render = 0;
+            time_at_last_render = get_time_in_seconds();
+        }
    
-        double time_after = get_time_in_seconds();
-        this->frames_per_second = this->render_settings.GetProperty("timesteps_per_render").GetInt() / (time_after - time_before);
-        this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
-   
-        this->pVTKWindow->Refresh(false);
-        this->SetStatusBarText();
-   
-        // AKT TODO!!! do we really want to sleep here???
-        // maybe let user change delay as part of speed control (separate from timesteps_per_render)???
-        wxMilliSleep(30);
+        // AKT TODO!!! nice to let user slow refresh rate down by adding a delay (up to 2 secs?)
+        // but not by calling wxMilliSleep -- do this via a slider in toolbar
    
         event.RequestMore(); // trigger another onIdle event
     }
