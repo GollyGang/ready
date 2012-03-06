@@ -905,20 +905,9 @@ bool InfoPanel::DoKey(int key, int mods)
     
     // now do keyboard shortcuts specific to this pane
     if ( mods == wxMOD_NONE ) {
-        if ( key == '+' || key == '=' || key == WXK_ADD ) {
-            if ( infofontsize < maxfontsize ) {
-                infofontsize++;
-                html->ChangeFontSizes(infofontsize);
-            }
-            return true;
-        }
-        if ( key == '-' || key == WXK_SUBTRACT ) {
-            if ( infofontsize > minfontsize ) {
-                infofontsize--;
-                html->ChangeFontSizes(infofontsize);
-            }
-            return true;
-        }
+        // there are none at the moment, and probably safer to keep things that way
+        // otherwise it can get confusing if the user assigns a keyboard shortcut
+        // that conflicts with one hard-wired here
     }
     
     // finally do other keyboard shortcuts
