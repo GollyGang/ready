@@ -40,12 +40,22 @@ MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString
      : wxDialog(NULL,wxID_ANY,title,wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
-    wxFont font(10,wxTELETYPE,wxFONTSTYLE_NORMAL,wxNORMAL,false,_T("Monospace"),wxFONTENCODING_DEFAULT);
+    #ifdef __WXMAC__
+        // need bigger font on Mac, and need to specify facename to get Monaco instead of Courier
+        wxFont font(12, wxMODERN, wxNORMAL, wxNORMAL, false, wxT("Monaco"));
+    #else
+        wxFont font(10, wxTELETYPE, wxFONTSTYLE_NORMAL, wxNORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
+    #endif
     wxTextCtrl *text = new wxTextCtrl(this,wxID_ANY,message,wxDefaultPosition,wxDefaultSize,
         wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
     text->SetFont(font);
     text->SetMinSize(wxSize(800,500));
-    text->SetBackgroundColour(this->GetBackgroundColour());
+    #ifdef __WXMAC__
+        // nicer to use white bg on Mac
+        text->SetBackgroundColour(*wxWHITE);
+    #else
+        text->SetBackgroundColour(this->GetBackgroundColour());
+    #endif
     text->SetForegroundColour(*wxBLACK);
     this->SetIcon(wxArtProvider::GetIcon(icon));
     vbox->Add(text,wxSizerFlags(1).Expand().DoubleBorder());
@@ -298,9 +308,16 @@ MultiLineDialog::MultiLineDialog(wxWindow *parent,
 
     m_textctrl = new wxTextCtrl(this, wxID_ANY, value,
                                 wxDefaultPosition, wxSize(100,50), wxTE_MULTILINE | wxTE_PROCESS_TAB);
-    wxFont font(10,wxTELETYPE,wxFONTSTYLE_NORMAL,wxNORMAL,false,_T("Monospace"),wxFONTENCODING_DEFAULT);
+    #ifdef __WXMAC__
+        // need bigger font on Mac, and need to specify facename to get Monaco instead of Courier
+        wxFont font(12, wxMODERN, wxNORMAL, wxNORMAL, false, wxT("Monaco"));
+    #else
+        wxFont font(10, wxTELETYPE, wxFONTSTYLE_NORMAL, wxNORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
+    #endif
     m_textctrl->SetFont(font);
-    m_textctrl->SetMinSize(wxSize(800,500));
+    
+    // allow people to use small dialog if they wish
+    // m_textctrl->SetMinSize(wxSize(800,500));
 
     topsizer->Add(m_textctrl, wxSizerFlags(1).Expand().TripleBorder(wxLEFT | wxRIGHT));
 
