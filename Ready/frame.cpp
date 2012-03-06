@@ -1860,8 +1860,15 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->UpdateWindows();
 }
 
+const int MAX_TIMESTEPS_PER_RENDER = 1e8;
+
 void MyFrame::RenderSettingsChanged()
 {
+    // first do some range checking (not done in InfoPanel::ChangeRenderSetting)
+    Property& prop = this->render_settings.GetProperty("timesteps_per_render");
+    if (prop.GetInt() < 1) prop.SetInt(1);
+    if (prop.GetInt() > MAX_TIMESTEPS_PER_RENDER) prop.SetInt(MAX_TIMESTEPS_PER_RENDER);
+    
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
@@ -1898,21 +1905,28 @@ void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 
 void MyFrame::OnRunFaster(wxCommandEvent& event)
 {
-    this->render_settings.GetProperty("timesteps_per_render").SetInt(this->render_settings.GetProperty("timesteps_per_render").GetInt() * 2);
+    Property& prop = this->render_settings.GetProperty("timesteps_per_render");
+    prop.SetInt(prop.GetInt() * 2);
+    // check for overflow, or if beyond limit used in OnChangeRunningSpeed
+    if (prop.GetInt() <= 0 || prop.GetInt() > MAX_TIMESTEPS_PER_RENDER) prop.SetInt(MAX_TIMESTEPS_PER_RENDER);
+    this->UpdateInfoPane();
 }
 
 void MyFrame::OnRunSlower(wxCommandEvent& event)
 {
-    this->render_settings.GetProperty("timesteps_per_render").SetInt(this->render_settings.GetProperty("timesteps_per_render").GetInt() / 2);
+    Property& prop = this->render_settings.GetProperty("timesteps_per_render");
+    prop.SetInt(prop.GetInt() / 2);
     // don't let timesteps_per_render get to 0 otherwise OnRunFaster can't double it
-    if (this->render_settings.GetProperty("timesteps_per_render").GetInt() < 1)
-        this->render_settings.GetProperty("timesteps_per_render").SetInt(1);
+    if (prop.GetInt() < 1) prop.SetInt(1);
+    this->UpdateInfoPane();
 }
 
 void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 {
     IntegerDialog dlg(this, _("Running speed"), _("New value (timesteps per render):"),
-                      this->render_settings.GetProperty("timesteps_per_render").GetInt(), 1, 1e8, wxDefaultPosition, wxDefaultSize);
+                      this->render_settings.GetProperty("timesteps_per_render").GetInt(),
+                      1, MAX_TIMESTEPS_PER_RENDER, wxDefaultPosition, wxDefaultSize);
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("timesteps_per_render").SetInt(dlg.GetValue());
+    this->UpdateInfoPane();
 }
