@@ -714,7 +714,9 @@ void InfoPanel::ChangeFormula()
     wxString code_type(frame->GetCurrentRDSystem()->GetRuleType().c_str(),wxConvUTF8);
     MultiLineDialog dialog(frame, _("Change ")+code_type, _("Enter the new ")+code_type+_T(":"), oldcode);
     
-    dialog.SetSize(textdlgwd, textdlght);
+    // position dialog box to left of linkrect
+    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
+    dialog.SetSize(pos.x - textdlgwd - 20, pos.y, textdlgwd, textdlght);
 
     if (dialog.ShowModal() == wxID_OK)
     {

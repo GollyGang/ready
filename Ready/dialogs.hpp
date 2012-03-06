@@ -84,10 +84,10 @@ class XYZFloatDialog : public wxDialog
         float GetZ() { return zval; }
     
     private:
-        wxTextCtrl* xbox;             // for entering X value
-        wxTextCtrl* ybox;            // for entering Y value
+        wxTextCtrl* xbox;           // for entering X value
+        wxTextCtrl* ybox;           // for entering Y value
         wxTextCtrl* zbox;           // for entering Z value
-        float xval, yval, zval;    // the given X,Y,Z values
+        float xval, yval, zval;     // the given X,Y,Z values
 };
 
 //----------------------------------------------------------------------------------
