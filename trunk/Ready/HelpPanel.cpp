@@ -232,7 +232,9 @@ void HtmlView::SetFontSizes(int size)
     f_sizes[5] = int(size * 1.6);
     f_sizes[6] = int(size * 1.8);
     #ifdef __WXOSX_COCOA__
-        SetFonts(wxT("Lucida Grande"), wxT("Monaco"), f_sizes);
+        // use Courier rather than Monaco to avoid baseline bug
+        // (there are still problems with Courier, but not as bad)
+        SetFonts(wxT("Lucida Grande"), wxT("Courier"), f_sizes);
     #else
         SetFonts(wxEmptyString, wxEmptyString, f_sizes);
     #endif
