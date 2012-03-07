@@ -437,7 +437,7 @@ void MyFrame::InitializeRenderPane()
     this->aui_mgr.AddPane(this->pVTKWindow,
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::CanvasPane))
-                  // AKT TODO!!! why don't we see caption??? (I'd like to see when it has focus)
+                  // AKT TODO!!! why don't we see caption??? (it would be nice to see when it has focus)
                   .Caption(_("Render Pane")).CaptionVisible()
                   .CenterPane()
                   .BestSize(400,400)
@@ -501,7 +501,7 @@ void MyFrame::OnCut(wxCommandEvent& event)
 
 void MyFrame::OnCopy(wxCommandEvent& event)
 {
-    // TODO: action depends on which pane has focus
+    // action depends on which pane has focus
     if (this->info_panel->HtmlHasFocus()) {
         this->info_panel->CopySelection();
         return;
