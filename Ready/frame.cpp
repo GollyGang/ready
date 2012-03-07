@@ -113,8 +113,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
     // action menu
-    EVT_MENU(ID::Step, MyFrame::OnStep)
-    EVT_UPDATE_UI(ID::Step, MyFrame::OnUpdateStep)
+    EVT_MENU(ID::Step1, MyFrame::OnStep)
+    EVT_MENU(ID::StepN, MyFrame::OnStep)
+    EVT_UPDATE_UI(ID::Step1, MyFrame::OnUpdateStep)
+    EVT_UPDATE_UI(ID::StepN, MyFrame::OnUpdateStep)
     EVT_MENU(ID::RunStop, MyFrame::OnRunStop)
     EVT_UPDATE_UI(ID::RunStop, MyFrame::OnUpdateRunStop)
     EVT_MENU(ID::Reset, MyFrame::OnReset)
@@ -268,15 +270,16 @@ void MyFrame::InitializeMenus()
     }
     {   // action menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(ID::Step, _("&Step") + GetAccelerator(DO_STEP), _("Advance the simulation by a single timestep"));
-        menu->Append(ID::RunStop, _("&Run") + GetAccelerator(DO_RUNSTOP), _("Start running the simulation"));
+        menu->Append(ID::Step1, _("Step by 1") + GetAccelerator(DO_STEP1), _("Advance the simulation by a single timestep"));
+        menu->Append(ID::StepN, _("Step by N") + GetAccelerator(DO_STEPN), _("Advance the simulation by timesteps per render"));
+        menu->Append(ID::RunStop, _("Run") + GetAccelerator(DO_RUNSTOP), _("Start running the simulation"));
         menu->AppendSeparator();
         menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
         menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
         menu->AppendSeparator();
-        menu->Append(ID::Faster, _("Run &Faster") + GetAccelerator(DO_FASTER),_("Run with more timesteps between each render"));
-        menu->Append(ID::Slower, _("Run Slo&wer") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
-        menu->Append(ID::ChangeRunningSpeed, _("Change the Running Speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
+        menu->Append(ID::Faster, _("Run Faster") + GetAccelerator(DO_FASTER),_("Run with more timesteps between each render"));
+        menu->Append(ID::Slower, _("Run Slower") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
+        menu->Append(ID::ChangeRunningSpeed, _("Change Running Speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
         menu->AppendSeparator();
         menu->Append(ID::AddParameter, _("&Add Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
         menu->Append(ID::DeleteParameter, _("&Delete Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
@@ -332,8 +335,8 @@ void MyFrame::InitializeToolbars()
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
-        this->action_toolbar->AddTool(ID::Step,wxEmptyString,wxArtProvider::GetBitmap(wxART_PLUS,wxART_TOOLBAR),
-            _("Step"));
+        this->action_toolbar->AddTool(ID::Step1,wxEmptyString,wxArtProvider::GetBitmap(wxART_PLUS,wxART_TOOLBAR),
+            _("Step by 1"));
         this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),
             _("Start running the simulation"));
         this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
@@ -779,11 +782,18 @@ void MyFrame::UpdateWindows()
 
 void MyFrame::OnStep(wxCommandEvent& event)
 {
+    if(this->is_running)
+        return;
+    
     if(this->system->GetTimestepsTaken()==0)
         this->SaveStartingPattern();
 
-    try {
-        this->system->Update(1);
+    try
+    {
+        if(event.GetId() == ID::Step1)
+            this->system->Update(1);
+        else
+            this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
     }
     catch(const exception& e)
     {
@@ -793,12 +803,14 @@ void MyFrame::OnStep(wxCommandEvent& event)
     {
         wxMessageBox(_("An unknown error occurred when running the simulation"));
     }
+    
     this->SetStatusBarText();
     Refresh(false);
 }
 
 void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
 {
+    // Step1 or StepN
     event.Enable(!this->is_running);
 }
 
@@ -1563,7 +1575,8 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::RestoreDefaultPerspective, DO_RESTORE);
         SetAccelerator(mbar, ID::ChangeActiveChemical,      DO_CHEMICAL);
         
-        SetAccelerator(mbar, ID::Step,                      DO_STEP);
+        SetAccelerator(mbar, ID::Step1,                     DO_STEP1);
+        SetAccelerator(mbar, ID::StepN,                     DO_STEPN);
         SetAccelerator(mbar, ID::RunStop,                   DO_RUNSTOP);
         SetAccelerator(mbar, ID::Reset,                     DO_RESET);
         SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_GENPATT);
@@ -1617,7 +1630,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_CHEMICAL:       cmdid = ID::ChangeActiveChemical; break;
         
         // Action menu
-        case DO_STEP:           cmdid = ID::Step; break;
+        case DO_STEP1:          cmdid = ID::Step1; break;
+        case DO_STEPN:          cmdid = ID::StepN; break;
         case DO_RUNSTOP:        cmdid = ID::RunStop; break;
         case DO_RESET:          cmdid = ID::Reset; break;
         case DO_GENPATT:        cmdid = ID::GenerateInitialPattern; break;
