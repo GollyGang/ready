@@ -690,9 +690,9 @@ void InfoPanel::ChangeDescription()
 
     MultiLineDialog dialog(frame, _("Change description"), _("Enter the new description:"), oldtext);
     
-    // position dialog box to left of linkrect
-    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - textdlgwd - 20, pos.y, textdlgwd, textdlght);
+    // best to center potentially large dialog box
+    dialog.SetSize(textdlgwd, textdlght);
+    dialog.Centre();
 
     if (dialog.ShowModal() == wxID_OK)
     {
@@ -714,9 +714,9 @@ void InfoPanel::ChangeFormula()
     wxString code_type(frame->GetCurrentRDSystem()->GetRuleType().c_str(),wxConvUTF8);
     MultiLineDialog dialog(frame, _("Change ")+code_type, _("Enter the new ")+code_type+_T(":"), oldcode);
     
-    // position dialog box to left of linkrect
-    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    dialog.SetSize(pos.x - textdlgwd - 20, pos.y, textdlgwd, textdlght);
+    // best to center potentially large dialog box
+    dialog.SetSize(textdlgwd, textdlght);
+    dialog.Centre();
 
     if (dialog.ShowModal() == wxID_OK)
     {
