@@ -52,7 +52,8 @@ namespace ID { enum {
     ChangeActiveChemical,
     
     // action menu
-    Step,
+    Step1,
+    StepN,
     RunStop,
     Reset,
     ChangeRunningSpeed,

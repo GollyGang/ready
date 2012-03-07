@@ -279,8 +279,9 @@ void AddDefaultKeyActions()
 #endif
 
     // Action menu
-    keyaction[IK_F1+4][0].id =          DO_RUNSTOP;
-    keyaction[IK_F1+3][0].id =          DO_STEP;
+    keyaction[(int)' '][0].id =         DO_STEP1;
+    keyaction[IK_TAB][0].id =           DO_STEPN;
+    keyaction[IK_RETURN][0].id =        DO_RUNSTOP;
     keyaction[(int)'r'][mk_CMD].id =    DO_RESET;
 
 }
@@ -316,8 +317,9 @@ const char* GetActionName(action_id action)
         case DO_RESTORE:        return "Restore Default Layout";
         case DO_CHEMICAL:       return "Change Active Chemical...";
         // Action menu
+        case DO_STEP1:          return "Step by 1";
+        case DO_STEPN:          return "Step by N";
         case DO_RUNSTOP:        return "Run/Stop";
-        case DO_STEP:           return "Step";
         case DO_RESET:          return "Reset";
         case DO_FASTER:         return "Run Faster";
         case DO_SLOWER:         return "Run Slower";

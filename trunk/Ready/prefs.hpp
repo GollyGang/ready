@@ -112,7 +112,8 @@ typedef enum
     DO_PATTERNS,                 // show patterns pane
     DO_INFO,                     // show info pane
     DO_HELP,                     // show help pane
-    DO_STEP,                     // step
+    DO_STEP1,                    // step by 1
+    DO_STEPN,                    // step by N
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;
