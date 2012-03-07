@@ -761,13 +761,6 @@ void UpdateAcceleratorStrings()
                     }
                 #endif
                 
-                // menu commands can be processed before a wxTextCtrl gets a keyboard event
-                // (even if the wxTextCtrl is in a modal dialog!), so to ensure normal
-                // characters are passed to a wxTextCtrl we only create menu item
-                // accelerators that contain Ctrl or Alt or a function key
-                if ( !(modset & mk_CMD) && !(modset & mk_ALT) &&
-                     !(key >= IK_F1 && key <= IK_F24) ) validaccel = false;
-                
                 if (validaccel) CreateAccelerator(action, modset, key);
              }
         }
@@ -2293,11 +2286,6 @@ bool ChangePrefs(const wxString& page)
             savekeyaction[key][modset] = keyaction[key][modset];
     
     MyFrame* frameptr = wxGetApp().currframe;
-
-    #ifdef __WXMAC__
-        // disable all menu items to ensure KeyComboCtrl::OnKeyDown sees all key combos
-        frameptr->EnableAllMenus(false);
-    #endif
     
     PrefsDialog dialog(frameptr, page);
 
@@ -2331,11 +2319,6 @@ bool ChangePrefs(const wxString& page)
 
         result = false;
     }
-
-    #ifdef __WXMAC__
-        // restore menus
-        frameptr->EnableAllMenus(true);
-    #endif
     
     frameptr->UpdateMenuAccelerators();
 

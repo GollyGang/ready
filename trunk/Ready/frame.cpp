@@ -81,6 +81,7 @@ wxString PaneName(int id)
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
+    EVT_ACTIVATE(MyFrame::OnActivate)
     EVT_IDLE(MyFrame::OnIdle)
     EVT_SIZE(MyFrame::OnSize)
     EVT_CLOSE(MyFrame::OnClose)
@@ -1535,7 +1536,7 @@ void MyFrame::EnableAllMenus(bool enable)
         }
         #ifdef __WXOSX_COCOA__
             // enable/disable items in app menu
-            //!!! they fail to disable due to wxOSX-Cocoa bug
+            // AKT TODO!!! they fail to disable due to wxOSX-Cocoa bug
             mbar->Enable(wxID_ABOUT, enable);
             mbar->Enable(wxID_PREFERENCES, enable);
             mbar->Enable(wxID_EXIT, enable);
@@ -1543,13 +1544,22 @@ void MyFrame::EnableAllMenus(bool enable)
     }
 }
 
+void MyFrame::OnActivate(wxActivateEvent& event)
+{
+    // we need to disable all menu items when frame becomes inactive
+    // (eg. due to a modal dialog appearing) so that keys bound to menu items
+    // get passed to wxTextCtrls
+    EnableAllMenus(event.GetActive());
+    event.Skip();
+}
+
 void MyFrame::UpdateMenuAccelerators()
 {
     // keyboard shortcuts have changed, so update all menu item accelerators
     wxMenuBar* mbar = GetMenuBar();
     if (mbar) {
-        // wxOSX-Cocoa bug: these app menu items aren't updated (but user isn't likely
-        // to change them so don't bother trying to fix the bug)
+        // AKT TODO!!! wxOSX-Cocoa bug: these app menu items aren't updated
+        // (but user isn't likely to change them so not critical)
         SetAccelerator(mbar, wxID_ABOUT,                    DO_ABOUT);
         SetAccelerator(mbar, wxID_PREFERENCES,              DO_PREFS);
         SetAccelerator(mbar, wxID_EXIT,                     DO_QUIT);

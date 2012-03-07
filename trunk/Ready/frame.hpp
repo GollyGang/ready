@@ -66,7 +66,6 @@ class MyFrame : public wxFrame
         // interface with Preferences dialog
         void ShowPrefsDialog(const wxString& page = wxEmptyString);
         void UpdateMenuAccelerators();
-        void EnableAllMenus(bool enable);
 
         // handle keyboard shortcuts not appearing in menu items
         void OnKeyDown(wxKeyEvent& event);
@@ -134,6 +133,7 @@ class MyFrame : public wxFrame
         void OnHelp(wxCommandEvent& event);
 
         // other event handlers
+        void OnActivate(wxActivateEvent& event);
         void OnIdle(wxIdleEvent& event);
         void OnSize(wxSizeEvent& event);
         void OnClose(wxCloseEvent& event);
@@ -151,6 +151,7 @@ class MyFrame : public wxFrame
         void LoadSettings();
         void SaveSettings();
         void CheckFocus();
+        void EnableAllMenus(bool enable);
        
         void SetCurrentRDSystem(BaseRD* system);
         void UpdateWindows();
