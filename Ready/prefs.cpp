@@ -256,6 +256,7 @@ void AddDefaultKeyActions()
 #else
     keyaction[(int)','][mk_CMD].id =    DO_PREFS;
 #endif
+    keyaction[(int)','][0].id =         DO_PREFS;
     keyaction[(int)'q'][mk_CMD].id =    DO_QUIT;
 
     // Edit menu
@@ -270,9 +271,14 @@ void AddDefaultKeyActions()
     keyaction[(int)'w'][0].id =         DO_WIREFRAME;
     keyaction[(int)'p'][mk_CMD].id =    DO_PATTERNS;
     keyaction[(int)'i'][mk_CMD].id =    DO_INFO;
+    keyaction[(int)'h'][0].id =         DO_HELP;
+    keyaction[(int)'?'][0].id =         DO_HELP;
     keyaction[IK_HELP][0].id =          DO_HELP;
 #ifdef __WXMAC__
-    keyaction[(int)'/'][mk_CMD].id =    DO_HELP;
+    // cmd-? is the usual shortcut in Mac apps
+    keyaction[(int)'?'][mk_CMD].id =    DO_HELP;
+    // we can only detect shift+cmd+/ so we have to assume '?' is above '/' -- yuk
+    keyaction[(int)'/'][mk_SHIFT+mk_CMD].id = DO_HELP;
 #else
     // F1 is the usual shortcut in Win/Linux apps
     keyaction[IK_F1][0].id =            DO_HELP;
@@ -283,7 +289,12 @@ void AddDefaultKeyActions()
     keyaction[IK_TAB][0].id =           DO_STEPN;
     keyaction[IK_RETURN][0].id =        DO_RUNSTOP;
     keyaction[(int)'r'][mk_CMD].id =    DO_RESET;
-
+    keyaction[(int)'+'][0].id =         DO_FASTER;
+    keyaction[(int)'+'][mk_SHIFT].id =  DO_FASTER;
+    keyaction[(int)'='][0].id =         DO_FASTER;
+    keyaction[(int)'_'][0].id =         DO_SLOWER;
+    keyaction[(int)'_'][mk_SHIFT].id =  DO_SLOWER;
+    keyaction[(int)'-'][0].id =         DO_SLOWER;
 }
 
 // -----------------------------------------------------------------------------
