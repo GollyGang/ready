@@ -38,7 +38,7 @@ class HtmlView : public wxHtmlWindow
 
         HtmlView(wxWindow* parent, MyFrame* myframe, wxWindowID id = wxID_ANY,
             const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
-            long style = wxHW_SCROLLBAR_AUTO)
+            long style = wxHW_SCROLLBAR_AUTO | wxWANTS_CHARS)
             : wxHtmlWindow(parent, id, pos, size, style)
         {
             frame = myframe;
