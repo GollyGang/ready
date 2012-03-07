@@ -45,9 +45,9 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
                                        wxDefaultPosition, wxDefaultSize,
                                        #ifdef __WXMSW__
                                            // speed up a bit
-                                           wxDIRCTRL_DIR_ONLY | wxNO_BORDER,
+                                           wxDIRCTRL_DIR_ONLY | wxNO_BORDER | wxWANTS_CHARS,
                                        #else
-                                           wxNO_BORDER,
+                                           wxNO_BORDER | wxWANTS_CHARS,
                                        #endif
                                        wxEmptyString   // see all file types
                                       );
@@ -57,7 +57,7 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
 
     #ifdef __WXMSW__
         // now remove wxDIRCTRL_DIR_ONLY so we'll see files
-        patternctrl->SetWindowStyle(wxNO_BORDER);
+        patternctrl->SetWindowStyle(wxNO_BORDER | wxWANTS_CHARS);
     #endif
 
     wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
