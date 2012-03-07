@@ -4,12 +4,6 @@ papercuts:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
 
-Andrew's tasks for 0.2:
-- improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
-- fix bug: tool tips not appearing (Mac app only; bug is in wxOSX-Cocoa and not easy to fix)
-- use better (big) toolbar icons in Mac app
-- do any other "AKT TODO" tasks
-
 before 0.3 release:
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
@@ -24,6 +18,9 @@ before 0.3 release:
 - parameters driven by an input scene (for writhing logos, etc.) - can use more chemicals for this
 
 before 0.x release:
+- use better (big) toolbar icons in Mac app
+- fix Mac bug: tool tips not appearing (bug is in wxOSX-Cocoa and not easy to fix)
+- improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - allow user to change the default render settings
 - image export (user can specify how chemicals map onto colors)
 - multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
