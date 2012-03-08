@@ -192,11 +192,8 @@ MyFrame::MyFrame(const wxString& title)
 
     // enable/disable tool tips
     #if wxUSE_TOOLTIPS
-        // AKT TODO!!! fix bug: not seeing any tips in Mac app (bug is in wxOSX-Cocoa)
+        // AKT TODO!!! fix bug: can't disable tooltips in Mac app (bug is in wxOSX-Cocoa)
         wxToolTip::Enable(showtips);
-        #ifdef __WXMAC__
-            wxToolTip::SetDelay(1500);  // 1.5 secs is better on Mac
-        #endif
     #endif
 
     // initialize an RD system to get us started

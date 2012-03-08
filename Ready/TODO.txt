@@ -19,7 +19,7 @@ before 0.3 release:
 
 before 0.x release:
 - use better (big) toolbar icons in Mac app
-- fix Mac bug: tool tips not appearing (bug is in wxOSX-Cocoa and not easy to fix)
+- fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - allow user to change the default render settings
 - image export (user can specify how chemicals map onto colors)
