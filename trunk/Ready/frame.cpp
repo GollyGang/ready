@@ -831,6 +831,8 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
     Refresh(false);
     
     if (this->is_running) {
+        if (this->system->GetTimestepsTaken() == 0)
+            this->SaveStartingPattern();
         steps_since_last_render = 0;
         accumulated_time = 0.0;
         do_one_render = false;
@@ -920,14 +922,6 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     // we drive our simulation loop via idle events
     if (this->is_running)
     {
-        if (this->system->GetTimestepsTaken() == 0) {
-            this->SaveStartingPattern();
-            steps_since_last_render = 0;
-            accumulated_time = 0.0;
-        }
-
-        int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
-        
         // ensure num_steps <= timesteps_per_render
         int timesteps_per_render = this->render_settings.GetProperty("timesteps_per_render").GetInt();
         if (num_steps > timesteps_per_render) num_steps = timesteps_per_render;
@@ -978,9 +972,9 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
+            int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
             if (accumulated_time == 0.0)
                 accumulated_time = 0.000001;  // unlikely, but play safe
-            
             this->frames_per_second = steps_since_last_render / accumulated_time;
             this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
        
