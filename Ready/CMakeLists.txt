@@ -74,8 +74,10 @@ set( RESOURCES
 
 set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti turing.vti
-  kernel_test.vti conway_life.vti FHN.vti FHN_pulsate3D.vti FHN_neuron.vti
+  kernel_test.vti conway_life.vti
   CPU-only/grayscott_1D.vti CPU-only/grayscott_2D.vti CPU-only/grayscott_3D.vti
+  FitzHugh-Nagumo/tip-splitting.vti FitzHugh-Nagumo/spiral_turbulence.vti
+  FitzHugh-Nagumo/pulsate.vti FitzHugh-Nagumo/squid_axon.vti
 )
 
 set( HELP_FILES
