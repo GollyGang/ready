@@ -780,18 +780,25 @@ void MyFrame::UpdateWindows()
 
 void MyFrame::OnStep(wxCommandEvent& event)
 {
-    if(this->is_running)
+    if (this->is_running)
         return;
     
-    if(this->system->GetTimestepsTaken()==0)
+    if (this->system->GetTimestepsTaken() == 0)
         this->SaveStartingPattern();
 
     try
     {
-        if(event.GetId() == ID::Step1)
+        if (event.GetId() == ID::Step1) {
             this->system->Update(1);
-        else
-            this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
+        } else {
+            // timesteps_per_render might be huge, so don't do this:
+            // this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
+            // instead we let OnIdle do the stepping, but stop at next render
+            this->is_running = true;
+            steps_since_last_render = 0;
+            accumulated_time = 0.0;
+            do_one_render = true;
+        }
     }
     catch(const exception& e)
     {
@@ -814,7 +821,7 @@ void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
 
 void MyFrame::OnRunStop(wxCommandEvent& event)
 {
-    if(this->is_running) {
+    if (this->is_running) {
         this->is_running = false;
         this->SetStatusBarText();
     } else {
@@ -822,13 +829,19 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
     }
     this->UpdateToolbars();
     Refresh(false);
+    
+    if (this->is_running) {
+        steps_since_last_render = 0;
+        accumulated_time = 0.0;
+        do_one_render = false;
+    }
 }
 
 void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 {
     wxMenuBar* mbar = GetMenuBar();
-    if(mbar) {
-        if(this->is_running) {
+    if (mbar) {
+        if (this->is_running) {
             mbar->SetLabel(ID::RunStop, _("Stop") + GetAccelerator(DO_RUNSTOP));
             mbar->SetHelpString(ID::RunStop,_("Stop running the simulation"));
         } else {
@@ -864,6 +877,12 @@ void MyFrame::OnReset(wxCommandEvent& event)
 void MyFrame::SaveStartingPattern()
 {
     this->starting_pattern->DeepCopy(this->system->GetImage());
+    
+    // this is probably the best place to reset the initial number of steps
+    // used by system->Update in OnIdle
+    num_steps = 50;
+    // 50 is half the initial timesteps_per_render value used in most
+    // pattern files, but really we could choose any small number > 0
 }
 
 void MyFrame::RestoreStartingPattern()
@@ -898,39 +917,88 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         if (this->IsActive()) this->CheckFocus();
     #endif
     
-    // we drive our game loop by onIdle events
-    if(this->is_running)
+    // we drive our simulation loop via idle events
+    if (this->is_running)
     {
-        if(this->system->GetTimestepsTaken()==0)
+        if (this->system->GetTimestepsTaken() == 0) {
             this->SaveStartingPattern();
+            steps_since_last_render = 0;
+            accumulated_time = 0.0;
+        }
 
         int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
-   
+        
+        // ensure num_steps <= timesteps_per_render
+        int timesteps_per_render = this->render_settings.GetProperty("timesteps_per_render").GetInt();
+        if (num_steps > timesteps_per_render) num_steps = timesteps_per_render;
+
+        // use temp_steps for the actual system->Update call because it might be < num_steps
+        int temp_steps = num_steps;
+        if (steps_since_last_render + temp_steps > timesteps_per_render) {
+            // do final steps of this rendering phase
+            temp_steps = timesteps_per_render - steps_since_last_render;
+        }
+        
         double time_before = get_time_in_seconds();
-   
+        
         try 
         {
-            this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
+            this->system->Update(temp_steps);
         }
         catch(const exception& e)
         {
             this->is_running = false;
+            this->UpdateToolbars();
             MonospaceMessageBox(_("An error occurred when running the simulation:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
         }
         catch(...)
         {
             this->is_running = false;
+            this->UpdateToolbars();
             wxMessageBox(_("An unknown error occurred when running the simulation"));
         }
-   
-        double time_after = get_time_in_seconds();
-        this->frames_per_second = this->render_settings.GetProperty("timesteps_per_render").GetInt() / (time_after - time_before);
-        this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
-   
-        this->pVTKWindow->Refresh(false);
-        this->SetStatusBarText();
-   
-        event.RequestMore(); // trigger another onIdle event
+        
+        double time_diff = get_time_in_seconds() - time_before;
+        
+        // note that we don't change num_steps if temp_steps < num_steps
+        if (num_steps == temp_steps) {
+            // if the above system->Update was quick then we'll use more steps in the next call,
+            // otherwise we'll use less steps so that the app remains responsive
+            if (time_diff < 0.1) {
+                num_steps *= 2;
+                if (num_steps > timesteps_per_render) num_steps = timesteps_per_render;
+            } else {
+                num_steps /= 2;
+                if (num_steps < 1) num_steps = 1;
+            }
+        }
+        
+        accumulated_time += time_diff;
+        steps_since_last_render += temp_steps;
+        
+        if (steps_since_last_render >= timesteps_per_render) {
+            // it's time to render what we've computed so far
+            if (accumulated_time == 0.0)
+                accumulated_time = 0.000001;  // unlikely, but play safe
+            
+            this->frames_per_second = steps_since_last_render / accumulated_time;
+            this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
+       
+            this->pVTKWindow->Refresh(false);
+            this->SetStatusBarText();
+            
+            if (do_one_render) {
+                // user selected Step by N so stop now
+                this->is_running = false;
+                this->UpdateToolbars();
+            } else {
+                // keep simulating
+                steps_since_last_render = 0;
+                accumulated_time = 0.0;
+            }
+        }
+        
+        event.RequestMore(); // trigger another idle event
     }
     
     event.Skip();
@@ -942,10 +1010,14 @@ void MyFrame::SetStatusBarText()
     if(this->is_running) txt << _("Running.");
     else txt << _("Stopped.");
     txt << _(" Timesteps: ") << this->system->GetTimestepsTaken();
-    txt << _T("   (") << wxString::Format(_T("%.0f"),this->frames_per_second) 
+    txt << _T("   (") << wxString::Format(_T("%.0f"),this->frames_per_second)
         << _(" computed frames per second, ")
-        << wxString::Format(_T("%.0f"),this->million_cell_generations_per_second) 
+        << wxString::Format(_T("%.0f"),this->million_cell_generations_per_second)
         << _T(" mcgs)");
+    /* DEBUG
+    txt << wxString::Format(_T("  num_steps=%d"), num_steps)
+        << wxString::Format(_T("  tpr=%d"), this->render_settings.GetProperty("timesteps_per_render").GetInt());
+    */
     SetStatusText(txt);
 }
 

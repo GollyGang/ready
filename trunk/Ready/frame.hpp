@@ -169,6 +169,7 @@ class MyFrame : public wxFrame
 
         // using wxAUI for window management
         wxAuiManager aui_mgr;
+        wxString default_perspective;
 
         // VTK does the rendering
         wxVTKRenderWindowInteractor *pVTKWindow;
@@ -180,20 +181,21 @@ class MyFrame : public wxFrame
         vtkImageData *starting_pattern;
 
         // panes and toolbars:
-        
         PatternsPanel *patterns_panel;
         InfoPanel *info_panel;
         HelpPanel *help_panel;
         wxAuiToolBar *action_toolbar;
 
         // settings:
-
         Properties render_settings;
 
+        // following are used when running a simulation:
         bool is_running;
-        double frames_per_second,million_cell_generations_per_second;
-
-        wxString default_perspective;
+        double frames_per_second, million_cell_generations_per_second;
+        int num_steps;
+        int steps_since_last_render;
+        double accumulated_time;
+        bool do_one_render;
 
         DECLARE_EVENT_TABLE()
 };
