@@ -3,15 +3,15 @@
   <RD format_version="1">
   
     <description>
-        Tip-splitting. For 'spiral turbulence' use epsilon = 0.014, delta = 2.8.
+        See the paper: &lt;a href="http://arxiv.org/pdf/patt-sol/9401002"&gt;From Labyrinthine Patterns to Spiral Turbulence&lt;/a&gt;
     </description>
   
     <rule name="Fitzhugh-Nagumo" type="formula">
       <param name="timestep">  0.02   </param>
       <param name="a0">        -0.1   </param>
       <param name="a1">        2      </param>
-      <param name="epsilon">   0.05   </param>
-      <param name="delta">     4      </param>
+      <param name="epsilon">   0.014  </param>
+      <param name="delta">     2.8    </param>
       <param name="k1">        1      </param>
       <param name="k2">        0      </param>
       <param name="k3">        1      </param>
