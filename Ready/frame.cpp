@@ -942,12 +942,14 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         catch(const exception& e)
         {
             this->is_running = false;
+            this->SetStatusBarText();
             this->UpdateToolbars();
             MonospaceMessageBox(_("An error occurred when running the simulation:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
         }
         catch(...)
         {
             this->is_running = false;
+            this->SetStatusBarText();
             this->UpdateToolbars();
             wxMessageBox(_("An unknown error occurred when running the simulation"));
         }
@@ -984,6 +986,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             if (do_one_render) {
                 // user selected Step by N so stop now
                 this->is_running = false;
+                this->SetStatusBarText();
                 this->UpdateToolbars();
             } else {
                 // keep simulating
