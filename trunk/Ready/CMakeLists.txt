@@ -260,19 +260,6 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
-# put the system runtimes in root folder instead of "bin"
-# http://www.cmake.org/pipermail/cmake/2011-January/041718.html
-set( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON )
-include( InstallRequiredSystemLibraries )
-if( CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS )
-  install( 
-    FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-    DESTINATION "."
-    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
-    COMPONENT Runtime
-  )
-endif()
-
 # install some text files
 install( FILES ${TEXT_FILES} DESTINATION "." )
 
