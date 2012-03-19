@@ -9,8 +9,6 @@ CMake documentation first to get the hang of it.
 
 =============== Windows, using the Visual Studio IDE =================
 
-(The IDE build is recommended if you want to debug Ready interactively.)
-
 A) Build VTK:
  - Use CMake (cmake-gui.exe) and make a separate build folder. Use the 
    Visual Studio generator that corresponds to whichever version you
@@ -28,8 +26,12 @@ B) Build wxWidgets:
  - From the Start menu, open a Visual Studio command prompt.
  - cd c:\wxWidgets\build\msw (or equivalent for your installation)
  - Build both the release and debug versions:
+   For 32-bit:
     nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
     nmake -f makefile.vc BUILD=debug RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=1 DEBUG_FLAG=1
+   For 64-bit:
+    nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 TARGET_CPU=AMD64
+    nmake -f makefile.vc BUILD=debug RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=1 DEBUG_FLAG=1 TARGET_CPU=AMD64
  
 C) Build Ready:
  - Run CMake and make a separate build folder for Ready.
@@ -51,6 +53,11 @@ C) Build Ready:
  - Build the PACKAGE target to build the distributable binary zip. The
    source package doesn't seem to be supported by CMake in the IDE yet,
    so use the command-line approach below for this.
+   
+For 64-bit builds:
+- select the 64-bit generators in CMake
+- use the 64-bit version of OpenCL.lib
+- c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
 
 ================ Windows, using the command-line =====================
 
@@ -82,7 +89,10 @@ B) Build wxWidgets:
  - From the Start menu, open a Visual Studio command prompt.
  - cd c:\wxWidgets\build\msw (or equivalent for your installation)
  - Build the release version:   
+   For 32-bit:
     nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+   For 64-bit:
+    nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 TARGET_CPU=AMD64
     
 C) Build Ready:
  - From the Start menu, open a Visual Studio command prompt and type:
@@ -106,6 +116,11 @@ C) Build Ready:
  - Build the binary and source distributables:
     nmake package
     nmake package_source
+
+For 64-bit builds:
+- use the 64-bit Visual Studio command prompt
+- use the 64-bit version of OpenCL.lib
+- c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
 
 =========================== Linux =================================
 
