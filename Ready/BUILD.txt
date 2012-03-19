@@ -141,10 +141,13 @@ doesn't come with a recent enough version) then this is the method
 you'll need:
 
 cd wxWidgets
-./configure --with-gtk --disable-shared --enable-unicode
+mkdir build-gtk
+cd build-gtk
+../configure --with-gtk --disable-shared --enable-unicode
 make
+sudo make install
 
-This produces the wx-config file that CMake needs.
+This creates and installs the wx-config binary that CMake needs.
 
 =========================== MacOS =================================
 
