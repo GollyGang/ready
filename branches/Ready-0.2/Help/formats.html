@@ -1,0 +1,243 @@
+<html>
+<title>Ready Help: File Formats</title>
+<body>
+
+<p>
+<h3>File Formats</h3>
+
+<p><a name="vti"></a>&nbsp;<br>
+<font size=+1><b>Extended VTK image format: *.vti</b></font>
+
+<p>
+The only file format currently supported by Ready is an extended version of <a href="http://vtk.org">VTK</a>'s image format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>. Below is a simple example:
+
+<pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;VTKFile type=&quot;ImageData&quot; version=&quot;0.1&quot; byte_order=&quot;LittleEndian&quot; compressor=&quot;vtkZLibDataCompressor&quot;&gt;
+
+  &lt;<a href="#RD">RD</a> format_version=&quot;1&quot;&gt;
+  
+    &lt;<a href="#rule">rule</a> type=&quot;formula&quot; name=&quot;Schlogl&quot;&gt;
+    
+      &lt;<a href="#param">param</a> name=&quot;timestep&quot;&gt;  0.1  &lt;/param&gt;
+      
+      &lt;<a href="#formula">formula</a> number_of_chemicals=&quot;1&quot;&gt;
+      
+        delta_a = laplacian_a + a - a*a*a;
+        
+      &lt;/formula&gt;
+      
+    &lt;/rule&gt;
+    
+  &lt;/RD&gt;
+  
+  &lt;ImageData WholeExtent=&quot;0 127 0 63 0 0&quot; Origin=&quot;0 0 0&quot; Spacing=&quot;1 1 1&quot;&gt;
+    &lt;Piece Extent=&quot;0 127 0 63 0 0&quot;&gt;
+      &lt;PointData Scalars=&quot;Scalars_&quot;&gt;
+        &lt;DataArray type=&quot;Float32&quot; Name=&quot;Scalars_&quot; format=&quot;appended&quot; RangeMin=&quot;-0.0010000000475&quot; RangeMax=&quot;0.00099975580815&quot; offset=&quot;0&quot; /&gt;
+      &lt;/PointData&gt;
+      &lt;CellData&gt;
+      &lt;/CellData&gt;
+    &lt;/Piece&gt;
+  &lt;/ImageData&gt;
+  &lt;AppendedData encoding=&quot;base64&quot;&gt;
+  _AQAAAACAAAAAAAAAqXAAAA==eJwkXHtcjPn3n6SbS5KQJGmTJBlJPedsMpIUUhQVRRGSJEmSth1t2 ... lots of data ... 3nudNY=
+  &lt;/AppendedData&gt;
+&lt;/VTKFile&gt;
+</tt></pre>
+
+<p>
+This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
+
+<h4><a name="RD"></a>The <tt>&lt;RD&gt;</tt> element</h4>
+<p>
+Specifies the current rule and information about the pattern. 
+<p><b>Attributes:</b>
+<ul>
+<li><tt>format_version</tt> (required) : Integer value that is increased in later versions when the format changes. Used to alert the user that they might need to update their software.
+</ul>
+<b>Contains:</b>
+<ul>
+<li><tt><a href="#description">&lt;description&gt;</a></tt> (optional)
+<li><tt><a href="#rule">&lt;rule&gt;</a></tt> (required)
+<li><tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt> (optional)
+<li><tt><a href="#render_settings">&lt;render_settings&gt;</a></tt> (optional)
+</ul>
+
+<h4><a name="description"></a>The <tt>&lt;description&gt;</tt> element</h4>
+<p>
+A description of the pattern.
+<p><b>Contains:</b>
+<p>Plain text.
+
+<h4><a name="rule"></a>The <tt>&lt;rule&gt;</tt> element</h4>
+<p>
+<b>Attributes:</b>
+<ul><li><tt>type</tt> (required) : "inbuilt" or "formula" or "kernel"
+<li><tt>name</tt> (required) : The name of this rule. If type="inbuilt" then name must match one of the inbuilt rules.
+</ul>
+<b>Contains:</b>
+<ul>
+<li><tt><a href="#param">&lt;param&gt;</a></tt> (multiple, optional)
+<li><tt><a href="#formula">&lt;formula&gt;</a></tt> (required if rule type="inbuilt")
+<li><tt><a href="#kernel">&lt;kernel&gt;</a></tt> (required if rule type="kernel")
+</ul>
+
+<h4><a name="param"></a>The <tt>&lt;param&gt;</tt> element</h4>
+<p>
+A parameter of the rule. Most rules require one or more named parameters, such as <tt>timestep</tt>.
+<p>
+<b>Attributes:</b>
+<ul><li><tt>name</tt> (required) : The name of this parameter.
+</ul>
+<b>Contains:</b>
+<p>The value of this parameter.
+
+<h4><a name="formula"></a>The <tt>&lt;formula&gt;</tt> element</h4>
+
+<p><b>Attributes:</b>
+<ul>
+<li><tt>number_of_chemicals</tt> (required) : The number of chemicals used.
+</ul>
+<p><b>Contains:</b>
+<p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc. 
+The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). See the pattern files for examples.
+
+<h4><a name="kernel"></a>The <tt>&lt;kernel&gt;</tt> element</h4>
+
+<p><b>Attributes:</b>
+<ul>
+<li><tt>number_of_chemicals</tt> (required) : The number of chemicals used.
+<li><tt>block_size_x</tt> (required) : The x component of the dimensions of the spatial unit processed by each kernel call. 
+E.g. for float4 we typically use a block size of 4x1x1. For kernels that process individual floats, the block size will be 1x1x1.
+<li><tt>block_size_y</tt> (required) : The y component.
+<li><tt>block_size_z</tt> (required) : The z component.
+</ul>
+<p><b>Contains:</b>
+<p>A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules. See the pattern files for examples.
+
+<h4><a name="initial_pattern_generator"></a>The <tt>&lt;initial_pattern_generator&gt;</tt> element</h4>
+
+The initial pattern generator is a way to describe typical reaction-diffusion starting conditions. The Schlogl rule, for example, can be initialized with low-amplitude random noise.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>apply_when_loading</tt> (optional) : "true" if the initial pattern generator should overwrite the image when the file is loaded.
+</ul>
+<p><b>Contains:</b>
+<ul>
+<li><tt><a href="#overlay">overlay</a></tt> (multiple)
+</ul>
+
+<h4><a name="overlay"></a>The <tt>&lt;overlay&gt;</tt> element</h4>
+
+Each overlay changes the values of a single chemical across the image. Overlays apply in the order given in the file, from a starting point where every chemical is zero.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>chemical</tt> (required) : the chemical (a, b, c, etc.) that this overlay applies to.
+</ul>
+<p><b>Contains:</b>
+<ol>
+<li>operation (required) : one of <tt><a href="#overwrite">overwrite</a></tt>, <tt><a href="#add">add</a></tt>, <tt><a href="#subtract">subtract</a></tt>, <tt><a href="#multiply">multiply</a></tt> or <tt><a href="#divide">divide</a></tt>.
+<li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
+<li>shape (required) : one of <tt><a href="#everywhere">everywhere</a></tt>, <tt><a href="#rectangle">rectangle</a></tt> or <tt><a href="#circle">circle</a></tt>.
+</ol>
+
+<h4><a name="overwrite"></a>The <tt>&lt;overwrite&gt;</tt> element</h4>
+Specifies that this overlay should overwrite any existing values in the image.
+
+<h4><a name="add"></a>The <tt>&lt;add&gt;</tt> element</h4>
+Specifies that this overlay should add to the existing values in the image.
+
+<h4><a name="subtract"></a>The <tt>&lt;subtract&gt;</tt> element</h4>
+Specifies that this overlay should subtract from the existing values in the image.
+
+<h4><a name="multiply"></a>The <tt>&lt;multiply&gt;</tt> element</h4>
+Specifies that this overlay should multiply the existing values in the image.
+
+<h4><a name="divide"></a>The <tt>&lt;divide&gt;</tt> element</h4>
+Specifies that this overlay should divide the existing values in the image.
+
+<h4><a name="constant"></a>The <tt>&lt;constant&gt;</tt> element</h4>
+Specifies that the values in this overlay are constant.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>value</tt> (required) : the constant value
+</ul>
+
+<h4><a name="white_noise"></a>The <tt>&lt;white_noise&gt;</tt> element</h4>
+Specifies that the values in this overlay are spatially-uncorrelated random values from a flat distribution between low and high.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>low</tt> (required) : the random values will be above this value
+<li><tt>high</tt> (required) : the random values will be below this value
+</ul>
+
+<h4><a name="other_chemical"></a>The <tt>&lt;other_chemical&gt;</tt> element</h4>
+Specifies that the values in this overlay are given by the current value of a different chemical.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>chemical</tt> (required) : the other chemical (a, b, c, etc.) to sample
+</ul>
+
+<h4><a name="parameter"></a>The <tt>&lt;parameter&gt;</tt> element</h4>
+Specifies that the values in this overlay are given by the current value of a named parameter.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>name</tt> (required) : the name of the parameter
+</ul>
+
+<h4><a name="everywhere"></a>The <tt>&lt;everywhere&gt;</tt> element</h4>
+Specifies that the overlay applies everywhere in the image.
+
+<h4><a name="rectangle"></a>The <tt>&lt;rectangle&gt;</tt> element</h4>
+Specifies that the overlay applies to a rectangle in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
+<p><b>Contains:</b>
+<ul>
+<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the first corner of the rectangle
+<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
+</ul>
+
+<h4><a name="circle"></a>The <tt>&lt;circle&gt;</tt> element</h4>
+Specifies that the overlay applies to a circle (sphere) in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
+<p><b>Attributes:</b>
+<ul>
+<li><tt>radius</tt> (required) : the radius of the circle, in the range [0,1] as a proportion of the largest image dimension
+</ul>
+<p><b>Contains:</b>
+<ul>
+<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the center of the circle
+</ul>
+
+<h4><a name="Point3D"></a>The <tt>&lt;Point3D&gt;</tt> element</h4>
+
+A location in space. Coordinates are in the range from zero to one and are given as a proportion of the image size.
+<p><b>Attributes:</b>
+<ul>
+<li><tt>x</tt> (required) : the x-coordinate
+<li><tt>y</tt> (required) : the y-coordinate
+<li><tt>z</tt> (required) : the z-coordinate
+</ul>
+
+<h4><a name="render_settings"></a>The <tt>&lt;render_settings&gt;</tt> element</h4>
+
+The render settings specify how the system should be shown on screen. Contains one or more of the elements listed below. Each shows the default value as an example of the format.
+<ul>
+<li><tt>&lt;low value="0" /&gt;</tt> The lowest value that chemicals in this system typically take. Used to determine the colors and the axes.
+<li><tt>&lt;high value="1" /&gt;</tt> The highest value that chemicals in this system typically take.
+<li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt> The color for low values. (range: 0.0-1.0).
+<li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt> The color for high values. (range: 0.0-1.0).
+<li><tt>&lt;show_multiple_chemicals value="true" /&gt;</tt> Whether to show all the chemicals, or just the active one. Not supported in the 3D view which only shows the active chemical.
+<li><tt>&lt;active_chemical value="a" /&gt;</tt> The chemical to show (a, b, c, etc.).
+<li><tt>&lt;use_image_interpolation value="true" /&gt;</tt> Whether to interpolate the image or show sharp pixels (false=sharp pixels, true=interpolated).
+<li><tt>&lt;contour_level value="0.25" /&gt;</tt> The value to use for the surface contour in 3D systems.
+<li><tt>&lt;use_wireframe value="false" /&gt;</tt> Whether to show the surface as wireframe (or as smooth surface) (false=surface, true=wireframe).
+<li><tt>&lt;surface_color r="1" g="1" b="1" /&gt;</tt> The RGB color to use for the surface (range: 0.0-1.0).
+<li><tt>&lt;vertical_scale_1D value="30" /&gt;</tt> The vertical size of the 1D line graphs.
+<li><tt>&lt;vertical_scale_2D value="15" /&gt;</tt> The vertical size of the 2D surface plots.
+<li><tt>&lt;slice_3D value="true" /&gt;</tt> Whether to add a 2D color slice through the 3D volume.
+<li><tt>&lt;slice_3D_axis value="z" /&gt;</tt> The axis that the slice should be perpendicular to.
+<li><tt>&lt;slice_3D_position value="0.5" /&gt;</tt> The position along the slice_3D_axis to slice at (range: 0.0-1.0, relative to the image size).
+<li><tt>&lt;show_displacement_mapped_surface value="true" /&gt;</tt> Whether to show the height-mapped surface for 2D systems as well as the hue-mapped image.
+</ul>
+
+</body>
+</html>

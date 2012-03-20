@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.google.code.reaction-diffusion</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundleExecutable</key>
+    <string>Ready</string>
+    <key>CFBundleName</key>
+    <string>Ready</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>ReDy</string>
+    <key>CFBundleIconFile</key>
+    <string>app.icns</string>
+    <key>CFBundleVersion</key>
+    <string>VERSION</string>
+    <key>CFBundleShortVersionString</key>
+    <string>VERSION</string>
+    <key>CFBundleGetInfoString</key>
+    <string>Ready version VERSION, Copyright 2011, 2012 The Ready Bunch</string>
+    <key>LSRequiresCarbon</key>
+    <true/>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+		  <dict>
+            <key>CFBundleTypeName</key>
+            <string>Ready Pattern File</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>file-vti.icns</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+            	 <string>vti</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true/>
+		  </dict>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Pattern File</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>****</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+        </dict>
+    </array>
+</dict>
+</plist>

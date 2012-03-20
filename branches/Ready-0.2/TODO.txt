@@ -1,0 +1,50 @@
+papercuts:
+- edit formula dialog: want tab key to indent (doesn't work on Windows), want indent to be smart ideally
+- never want dialogs to appear partially off-screen
+- need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
+- 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
+
+before 0.3 release:
+- implement suggested_running_speed (tu/s) instead of timesteps_per_render
+- add toolbar icons for: faster, slower, change running speed - need artwork :(
+- add initial_pattern_generator to Info Pane for editing
+- add option to convert formula rules into full-kernel rules
+- different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
+- relax power of 2 size requirement (only a speed benefit)
+- image import (user can specify how colors map onto chemicals), import Robert's patterns
+- parameter map(s) in a separate window, to allow user to explore parameters 
+- some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
+- new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
+  http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
+- parameters driven by an input scene (for writhing logos, etc.) - can use more chemicals for this
+
+before 0.x release:
+- use better (big) toolbar icons in Mac app
+- fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
+- improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
+- allow user to change the default render settings
+- image export (user can specify how chemicals map onto colors)
+- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
+- graphical UI for editing the initial-pattern-generator overlay stack
+
+before 1.0 release:
+- create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
+- save out scene (e.g. OBJ) for external render (although paraview can load vti's)
+- lots of patterns in library (primary UI for beginners is a list of examples to click)
+- copy/paste (2d only) (paste modes: add, overwrite)
+- allow user to paint, erase, even while running (2D only)
+- control over boundary conditions: wrap-around or constant value
+- save out videos
+- SSE for non-OpenCL implementations (will assume all target cpus support SSE)
+
+future ideas:
+- bug: allow user to change OpenCL platform and device while a pattern is running
+- full control over scene graph, e.g. nodes+connections interface
+- radiosity rendering for better visualization of tangled structures (embed a raytracer)
+- STL output, email file to shapeways for printing
+- discrete RD (simulation of individual chemicals, to compare with differential equations)
+- display the evolution of a 1D pattern as a 2D image, with time as the second axis, as here:
+  http://www.stephenwolfram.com/publications/recent/specialfunctions/images/Slide028_917x754.gif
+- allow non-OpenCL implementations to load all files, by parsing formula
+- integer systems
+- read Golly rule tables

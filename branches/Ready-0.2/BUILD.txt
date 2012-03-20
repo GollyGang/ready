@@ -1,0 +1,198 @@
+Dependencies: 
+0) CMake: www.cmake.org
+1) VTK: www.vtk.org
+2) wxWidgets (2.9.2+): www.wxwidgets.org
+3) any OpenCL SDK.
+
+Ready uses CMake as a pre-build setup. You might need to read some
+CMake documentation first to get the hang of it.
+
+=============== Windows, using the Visual Studio IDE =================
+
+A) Build VTK:
+ - Use CMake (cmake-gui.exe) and make a separate build folder. Use the 
+   Visual Studio generator that corresponds to whichever version you
+   have installed.
+ - Set BUILD_TESTING to off (we don't need it). 
+ - Ensure BUILD_SHARED_LIBS is off.
+ - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and 
+   similar. Change all occurences of /MD (if any) to /MT, and /MDd to 
+   /MTd. This ensures that the C runtime is statically-linked, so we 
+   don't need to distribute them too.
+ - Generate, then open the resulting VTK.sln and build the Debug and 
+   Release targets.
+ 
+B) Build wxWidgets:
+ - From the Start menu, open a Visual Studio command prompt.
+ - cd c:\wxWidgets\build\msw (or equivalent for your installation)
+ - Build both the release and debug versions:
+   For 32-bit:
+    nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+    nmake -f makefile.vc BUILD=debug RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=1 DEBUG_FLAG=1
+   For 64-bit:
+    nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 TARGET_CPU=AMD64
+    nmake -f makefile.vc BUILD=debug RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=1 DEBUG_FLAG=1 TARGET_CPU=AMD64
+ 
+C) Build Ready:
+ - Run CMake and make a separate build folder for Ready.
+ - Set wxWidgets_ROOT_DIR to your wxWidgets installation folder, if 
+   CMake didn't find the right version automatically.
+ - Set wxWidgets_LIB_DIR to e.g. c:\wxWidgets\lib\vc_lib, if CMake 
+   didn't find the right version automatically.
+ - wxWidgets_USE_REL_AND_DBG should be checked.
+ - Set VTK_DIR to the build folder of VTK, if CMake didn't find the 
+   right version automatically.
+ - Set OPENCL_LIBRARIES to the location of a suitable OpenCL.lib, e.g.
+    E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/lib/Win32/OpenCL.lib
+ - Set OPENCL_INCLUDE_DIRS to e.g.
+    E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/inc
+ - Check the Advanced checkbox. Change all /MD to /MT, and /MDd to /MTd
+ - Generate, then open the resulting Ready.sln and build the Debug and
+   Release targets. Set Ready as the "StartUp Project" to have it run
+   by default.
+ - Build the PACKAGE target to build the distributable binary zip. The
+   source package doesn't seem to be supported by CMake in the IDE yet,
+   so use the command-line approach below for this.
+   
+For 64-bit builds:
+- select the 64-bit generators in CMake
+- use the 64-bit version of OpenCL.lib
+- c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
+
+================ Windows, using the command-line =====================
+
+A) Build VTK:
+ - From the Start menu, open a Visual Studio command prompt and type:
+    cmake-gui
+ - Create a target build folder, and select NMake Makefiles as the 
+   generator.
+ - Set BUILD_TESTING to off (we don't need it). 
+ - Ensure BUILD_SHARED_LIBS is off.
+ - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and 
+   similar. Change all occurences of /MD (if any) to /MT, and /MDd to 
+   /MTd. This ensures that the C runtime is statically-linked, so we 
+   don't need to distribute them too.
+ - Set CMAKE_BUILD_TYPE to Release
+ - Configure, generate, then build with NMake from the build folder:
+    nmake
+    
+ Prior to MSVC 8 (2005) the default (we think) was to link the runtime 
+ statically (/MT), so for older versions of MSVC you can use the simpler 
+ method of:
+    cd c:\vtk
+    mkdir vtk-build
+    cd vtk-build
+    cmake ..
+    nmake
+   
+B) Build wxWidgets:
+ - From the Start menu, open a Visual Studio command prompt.
+ - cd c:\wxWidgets\build\msw (or equivalent for your installation)
+ - Build the release version:   
+   For 32-bit:
+    nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+   For 64-bit:
+    nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 TARGET_CPU=AMD64
+    
+C) Build Ready:
+ - From the Start menu, open a Visual Studio command prompt and type:
+    cmake-gui
+ - Create a target build folder, and select NMake Makefiles as the 
+   generator.
+ - Set CMAKE_BUILD_TYPE to Release
+ - Set wxWidgets_ROOT_DIR to your wxWidgets installation folder, if 
+   CMake didn't find the right version automatically.
+ - Set wxWidgets_LIB_DIR to e.g. c:\wxWidgets\lib\vc_lib, if CMake 
+   didn't find the right version automatically.
+ - Set VTK_DIR to the build folder of VTK.
+ - Set OPENCL_LIBRARIES to the location of a suitable OpenCL.lib, e.g.
+    E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/lib/Win32/OpenCL.lib
+ - Set OPENCL_INCLUDE_DIRS to e.g.
+    E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/inc
+ - Check the Advanced checkbox. Change all /MD to /MT, and /MDd to /MTd
+ - Configure, generate, quit.
+ - Build Ready:
+    nmake
+ - Build the binary and source distributables:
+    nmake package
+    nmake package_source
+
+For 64-bit builds:
+- use the 64-bit Visual Studio command prompt
+- use the 64-bit version of OpenCL.lib
+- c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
+
+=========================== Linux =================================
+
+Install: libvtk, libwxgtk (2.9+), any OpenCL SDK.
+
+mkdir Ready_build
+cd Ready_build
+cmake ../Ready_source_folder
+make
+
+(Alternatively, use ccmake or cmake-gui for configuring.)
+
+make package
+make package_source
+
+If you need to build wxWidgets yourself (if your distribution
+doesn't come with a recent enough version) then this is the method
+you'll need:
+
+cd wxWidgets
+mkdir build-gtk
+cd build-gtk
+../configure --with-gtk --disable-shared --enable-unicode
+make
+sudo make install
+
+This creates and installs the wx-config binary that CMake needs.
+
+=========================== MacOS =================================
+
+1. To avoid the error "-- Could NOT find wxWidgets (missing:  wxWidgets_FOUND)", 
+   manually build and install wxWidgets 2.9 even if you already have an 
+   wxWidgets that works for other projects:
+
+ cd
+ cd devt    # A directory for things I download and build but do not checkout/modify/checkin
+ svn checkout http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wx-trunk
+ cd wx-trunk
+ mkdir build-osx
+ cd build-osx
+ ../configure --enable-unicode --disable-shared --with-osx_cocoa
+ make    # Take a nap, it'll be a while
+ sudo make install
+
+2. If you have not already done do, build VTK 5.8 (no install is needed in this 
+   case because we supply the option "-DVTK_DIR:PATH=$HOME/devt/VTK/build" when 
+   cmake'ing Ready)
+
+ cd
+ cd devt    # A directory for things I download and build but do not checkout/modify/checkin
+ curl 'http://www.vtk.org/files/release/5.8/vtk-5.8.0.tar.gz' > vtk-5.8.0.tar.gz
+ gunzip vtk-5.8.0.tar.gz
+ tar -xvf vtk-5.8.0.tar        # (creates directory ./VTK)
+ cd VTK
+ mkdir build
+ cd build
+ cmake ..
+ make     # This also takes some time
+
+3. Then do this to get, configure and build Ready (assuming VTK was built in 
+   ~/devt/VTK as shown above):
+
+ cd
+ cd proj    # A directory for projects I am "working on"
+ svn checkout https://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion --username $MYEMAIL
+ #
+ # Or if not a project member do:
+ # svn checkout http://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion-read-only
+ # And substitute "reaction-diffusion-read-only" for "reaction-diffusion" in the following
+ #
+ mkdir Ready_gui_build
+ cd Ready_gui_build
+ cmake ../reaction-diffusion/Ready -DVTK_DIR:PATH=$HOME/devt/VTK/build
+ make
+ open Ready.app
