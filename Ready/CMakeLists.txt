@@ -277,6 +277,9 @@ endforeach()
 
 #----------------------------------------package----------------------------------------------
 
+if( APPLE )
+  set( CPACK_SYSTEM_NAME "Mac" )  # nicer than "Darwin"
+endif()
 set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
 set( CPACK_SOURCE_GENERATOR "ZIP" )
