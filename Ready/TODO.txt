@@ -4,10 +4,8 @@ papercuts:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
 
-before 0.2 release:
-- implement suggested_running_speed (tu/s) instead of timesteps_per_render
-
 before 0.3 release:
+- implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
 - add option to convert formula rules into full-kernel rules
