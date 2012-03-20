@@ -633,9 +633,6 @@ void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(event.GetId()));
     if(!pane.IsOk()) return;
     event.Check(pane.IsShown());
-    // following call isn't necessary and can cause unwanted flashing
-    // in help pane (due to HtmlView::OnSize being called)
-    // this->aui_mgr.Update();
 }
 
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
@@ -790,7 +787,7 @@ void MyFrame::OnStep(wxCommandEvent& event)
     {
         if (event.GetId() == ID::Step1) {
             this->system->Update(1);
-        } else {
+        } else if (event.GetId() == ID::StepN) {
             // timesteps_per_render might be huge, so don't do this:
             // this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
             // instead we let OnIdle do the stepping, but stop at next render
