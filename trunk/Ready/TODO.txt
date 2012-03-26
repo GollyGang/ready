@@ -3,6 +3,8 @@ papercuts:
 - never want dialogs to appear partially off-screen
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
+- on some platforms (Windows XP, AMD driver only?) terminal windows appear on pattern load
+- on Windows, Ready application gets pushed into background on first pattern load
 
 before 0.3 release:
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
