@@ -20,6 +20,7 @@
 
 // STL:
 #include <sstream>
+#include <stdexcept>
 using namespace std;
 
 void throwOnError(cl_int ret,const char* message)
