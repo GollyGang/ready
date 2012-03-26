@@ -143,7 +143,7 @@ you'll need:
 cd wxWidgets
 mkdir build-gtk
 cd build-gtk
-../configure --with-gtk --disable-shared --enable-unicode
+../configure --with-gtk --disable-shared --enable-unicode --with-opengl
 make
 sudo make install
 

@@ -39,6 +39,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   BaseRD.hpp BaseRD.cpp
   GrayScott.hpp GrayScott.cpp
   OpenCL_RD.hpp OpenCL_RD.cpp
+  OpenCL_utils.hpp OpenCL_utils.cpp
   OpenCL_Formula.hpp OpenCL_Formula.cpp
   OpenCL_FullKernel.hpp OpenCL_FullKernel.cpp
   IO_XML.hpp IO_XML.cpp

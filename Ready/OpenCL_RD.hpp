@@ -79,7 +79,6 @@ class OpenCL_RD : public BaseRD
 
         static cl_int LinkOpenCL();
         static void throwOnError(cl_int ret,const char* message);
-        static const char* descriptionOfError(cl_int err);
 
     protected:
 
