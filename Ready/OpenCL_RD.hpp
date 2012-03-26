@@ -44,11 +44,6 @@ class OpenCL_RD : public BaseRD
         void SetDevice(int i);
         int GetPlatform() const;
         int GetDevice() const;
-        static std::string GetOpenCLDiagnostics();
-        static int GetNumberOfPlatforms();
-        static int GetNumberOfDevices(int iPlatform);
-        static std::string GetPlatformDescription(int iPlatform);
-        static std::string GetDeviceDescription(int iPlatform,int iDevice);
 
         virtual void AddParameter(const std::string& name,float val);
         virtual void DeleteParameter(int iParam);
@@ -76,9 +71,6 @@ class OpenCL_RD : public BaseRD
 
         void CreateOpenCLBuffers();
         void WriteToOpenCLBuffers();
-
-        static cl_int LinkOpenCL();
-        static void throwOnError(cl_int ret,const char* message);
 
     protected:
 

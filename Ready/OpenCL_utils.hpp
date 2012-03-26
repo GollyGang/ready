@@ -24,7 +24,16 @@
     #include "OpenCL_Dyn_Load.h"
 #endif
 
+// STL:
+#include <string>
+
+std::string GetOpenCLDiagnostics();
+int GetNumberOfPlatforms();
+int GetNumberOfDevices(int iPlatform);
+std::string GetPlatformDescription(int iPlatform);
+std::string GetDeviceDescription(int iPlatform,int iDevice);
 const char* GetDescriptionOfOpenCLError(cl_int err);
 const char* GetPlatformInfoIdAsString(cl_platform_info i);
 const char* GetDeviceInfoIdAsString(cl_device_info i);
-
+cl_int LinkOpenCL();
+void throwOnError(cl_int ret,const char* message);
