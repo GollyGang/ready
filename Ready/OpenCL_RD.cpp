@@ -166,29 +166,10 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     this->kernel = clCreateKernel(program,this->kernel_function_name.c_str(),&ret);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : kernel creation failed: ");
 
-    // decide the size of the work-groups
-    const size_t X = max(1,this->GetX() / this->GetBlockSizeX());
-    const size_t Y = max(1,this->GetY() / this->GetBlockSizeY());
-    const size_t Z = max(1,this->GetZ() / this->GetBlockSizeZ());
-    this->global_range[0] = X;
-    this->global_range[1] = Y;
-    this->global_range[2] = Z;
-    size_t wgs,returned_size;
-    ret = clGetKernelWorkGroupInfo(this->kernel,this->device_id,CL_KERNEL_WORK_GROUP_SIZE,sizeof(size_t),&wgs,&returned_size);
-    throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : retrieving kernel work group size failed: ");
-    if(wgs&(wgs-1))
-        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2");
-    // spread the work group over the dimensions, preferring x over y and y over z because of memory alignment
-    size_t wgx,wgy,wgz;
-    wgx = min(X,wgs);
-    wgy = min(Y,wgs/wgx);
-    wgz = min(Z,wgs/(wgx*wgy));
-    // TODO: give user control over the work group shape?
-    if(X%wgx || Y%wgy || Z%wgz)
-        throw runtime_error("OpenCL_RD::ReloadKernelIfNeeded : work group size doesn't divide into grid dimensions");
-    this->local_range[0] = wgx;
-    this->local_range[1] = wgy;
-    this->local_range[2] = wgz;
+    this->global_range[0] = max(1,this->GetX() / this->GetBlockSizeX());
+    this->global_range[1] = max(1,this->GetY() / this->GetBlockSizeY());
+    this->global_range[2] = max(1,this->GetZ() / this->GetBlockSizeZ());
+    // (we let the local work group size be automatically decided, seems to be faster and more flexible that way)
 
     this->need_reload_formula = false;
 }
@@ -335,7 +316,7 @@ void OpenCL_RD::Update(int n_steps)
                 throwOnError(ret,"OpenCL_RD::Update : clSetKernelArg failed: ");
             }
         }
-        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_range, 0, NULL, NULL);
+        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, NULL, 0, NULL, NULL);
         throwOnError(ret,"OpenCL_RD::Update : clEnqueueNDRangeKernel failed: ");
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
