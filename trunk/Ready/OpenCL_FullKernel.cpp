@@ -76,9 +76,7 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_FullKernel::GetAsXML() const
     kernel->SetIntAttribute("block_size_x",this->block_size[0]);
     kernel->SetIntAttribute("block_size_y",this->block_size[1]);
     kernel->SetIntAttribute("block_size_z",this->block_size[2]);
-    ostringstream oss;
-    vtkXMLUtilities::EncodeString(this->GetFormula().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
-    kernel->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+    kernel->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
     rule->AddNestedElement(kernel);
 
     return rd;
