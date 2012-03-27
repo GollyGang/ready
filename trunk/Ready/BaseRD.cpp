@@ -382,11 +382,7 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
     // description
     vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
     description->SetName("description");
-    {
-        ostringstream oss;
-        vtkXMLUtilities::EncodeString(this->GetDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
-        description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
-    }
+    description->SetCharacterData(this->GetDescription().c_str(),(int)this->GetDescription().length());
     rd->AddNestedElement(description);
 
     // initial pattern generator
