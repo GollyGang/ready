@@ -287,18 +287,18 @@ void BaseRD::GenerateInitialPattern()
         }
     }
     for(int i=0;i<(int)this->images.size();i++)
-	    this->images[i]->Modified();
-	this->timesteps_taken = 0;
+        this->images[i]->Modified();
+    this->timesteps_taken = 0;
 }
 
 void BaseRD::BlankImage()
 {
-	for(int iImage=0;iImage<(int)this->images.size();iImage++)
-	{
-		this->images[iImage]->GetPointData()->GetScalars()->FillComponent(0,0.0);
-		this->images[iImage]->Modified();
-	}
-	this->timesteps_taken = 0;
+    for(int iImage=0;iImage<(int)this->images.size();iImage++)
+    {
+        this->images[iImage]->GetPointData()->GetScalars()->FillComponent(0,0.0);
+        this->images[iImage]->Modified();
+    }
+    this->timesteps_taken = 0;
 }
 
 // load things from the XML that are standard across all implementations
@@ -382,7 +382,13 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
     // description
     vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
     description->SetName("description");
-    description->SetCharacterData(this->GetDescription().c_str(),(int)this->GetDescription().length());
+    ostringstream oss;
+    #if defined(unix) || defined(__unix__) || defined(__unix)
+        vtkXMLUtilities::EncodeString(this->GetDescription().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
+    #else
+        oss << this->GetDescription();
+    #endif
+    description->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
     rd->AddNestedElement(description);
 
     // initial pattern generator
