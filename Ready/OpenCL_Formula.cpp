@@ -150,10 +150,8 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_Formula::GetAsXML() const
     // formula
     vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
     formula->SetName("formula");
-    ostringstream oss;
-    vtkXMLUtilities::EncodeString(this->GetFormula().c_str(),VTK_ENCODING_UNKNOWN,oss,VTK_ENCODING_UNKNOWN,true);
     formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    formula->SetCharacterData(oss.str().c_str(),(int)oss.str().length());
+    formula->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
     rule->AddNestedElement(formula);
 
     return rd;
