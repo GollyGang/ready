@@ -1,6 +1,6 @@
 Dependencies: 
 0) CMake: www.cmake.org
-1) VTK: www.vtk.org
+1) VTK (5.8+): www.vtk.org
 2) wxWidgets (2.9.2+): www.wxwidgets.org
 3) any OpenCL SDK.
 
@@ -124,7 +124,7 @@ For 64-bit builds:
 
 =========================== Linux =================================
 
-Install: libvtk, libwxgtk (2.9+), any OpenCL SDK.
+Install: libvtk, libwxgtk, any OpenCL SDK.
 
 mkdir Ready_build
 cd Ready_build

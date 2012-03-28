@@ -22,7 +22,7 @@ cmake_policy( SET CMP0003 NEW )
 
 project( Ready )
 
-set( READY_VERSION 0.2 )
+set( READY_VERSION 0.2.2 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
