@@ -1,25 +1,31 @@
-    Copyright (C) 1991, 2010, Greg Turk, Tim Hutton
-    
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+---------------------------------------------------------------------------------
+                                    About
+---------------------------------------------------------------------------------
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+For help, visit: http://code.google.com/p/reaction-diffusion/
+Or email: reaction-diffusion@googlegroups.com
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Ready is free software. Help us improve it!
 
-------------------------
+---------------------------------------------------------------------------------
+                             Build from source
+---------------------------------------------------------------------------------
 
-This is a port of part of Greg Turk's reaction-diffusion code, from:
+Build with CMake.
+Dependencies: VTK, wxWidgets, any OpenCL SDK
+Tested on: Windows, Linux, MacOS
+
+For build instructions, see BUILD.txt.
+
+---------------------------------------------------------------------------------
+                              Acknowledgements
+---------------------------------------------------------------------------------
+
+Based on Greg Turk's reaction-diffusion code, from:
 http://www.cc.gatech.edu/~turk/reaction_diffusion/reaction_diffusion.html
 
 The following copyright notice appeared with the original source code. 
-Greg Turk has given permission for the code to be distributed under the GPL.
+Greg Turk has given permission for our derived code to be distributed under the GPL.
 
 ==begin==
 
@@ -48,22 +54,35 @@ Copyright (c) Greg Turk, 1991
 
 ==end==
 
-------------------------
+The code for dynamically-linking OpenCL (OpenCL_Dyn_Load.c and .h) is from the 
+ElectroMag project: http://code.google.com/p/electromag-with-cuda   Thanks!
 
-Build instructions:
+Ready uses wxWidgets for its graphical user interface:
+http://wxwidgets.org
 
-1) install CMake and OpenCV
-2) run CMake to generate the build files for your chosen compiler
-3) build
+Ready uses VTK for its rendering:
+http://vtk.org
 
-Tested on Linux and Windows XP. Should work on all operating systems.
+---------------------------------------------------------------------------------
+                                   License
+---------------------------------------------------------------------------------
 
-There's a SpeedComparisons folder which isn't built by default. If you're interested in OpenMP, OpenCL etc. then you can build it.
+Copyright 2011, 2012 The Ready Bunch
 
-------------------------
+The Ready Bunch is: Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki
 
-Contact:
+This file is part of Ready.
 
-Tim Hutton <tim.hutton@gmail.com>
-Greg Turk <turk.gatech@gmail.com>
+Ready is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Ready is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+See COPYING.txt for the full GNU General Public License.
+Or visit <http://www.gnu.org/licenses/>.
 
