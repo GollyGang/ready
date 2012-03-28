@@ -1,0 +1,68 @@
+<html>
+<title>Ready Help: Changes</title>
+<body>
+
+<p>
+<h3>Changes</h3>
+
+<p>
+<font size=+1><b>Changes in version 0.2.2 (released March 2012)</b></font>
+
+<p>
+<ul>
+<li> Fixed issue that gave 'Invalid work group size' and 'expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2' errors on different graphics cards.
+<li> Fixed XML-escaping issue that caused saved patterns to fail to load.
+</ul>
+
+<p>
+<font size=+1><b>Changes in version 0.2 (released March 2012)</b></font>
+
+<p>
+<ul>
+<li> 1D patterns now supported, as a color strip and a line graph.
+<li> Patterns can be saved and loaded, as VTK image data files (*.vti) extended with
+     an extra XML element called "RD" - see <a href="formats.html">formats.html</a>
+<li> Toolbars added, for common functions.
+<li> Switched to a more flexible scheme for storing user preferences in a file
+     called ReadyPrefs.  See <a href="file.html#prefs">here</a> for more details.
+<li> Added a <a href="prefs:">Preferences</a> dialog for changing various settings,
+     including keyboard shortcuts.
+<li> Added File > New Pattern for setting the pattern to zeros.
+<li> Added File > Open Recent submenu.
+<li> Added View > Full Screen for toggling full screen mode.
+<li> Added View > Fit Pattern to fill the view with the entire pattern.
+<li> Added View > Wireframe for toggling from wireframe to surface view. Many other render settings can be changed in the Info Pane.
+<li> Added Action > Reset to restore a pattern back to its starting point.
+<li> Some menu items have been moved or renamed.
+<li> The Patterns Pane no longer shows inbuilt demos.  It now shows files stored in the supplied
+     Patterns folder.  Ctrl/right-clicking on a file will open it in your preferred text editor
+     (set in <a href="prefs:file">Preferences > File</a>).  You can also add your own pattern
+     folder via File > Add My Patterns.
+<li> The Info Pane allows you to edit a rule's parameters and other properties while it is running.
+<li> The Help Pane displays .html files stored in the Help folder via corresponding items
+     in the Help menu.
+<li> An Initial Pattern Generator is stored in the file and can be run to make new starting patterns.
+     A series of overlays are composed in the different chemical images, and may include randomness.
+<li> A new rule type "kernel" allows full OpenCL kernels to be specified, for maximum flexibility.
+<li> The world size can now be changed. Set x, y or z to 1 for 2D or 1D systems, e.g. 128x1x1
+<li> For 2D systems, all the chemicals are shown side-by-side. This can be turned off in the render settings.
+</ul>
+
+<p>
+<font size=+1><b>Changes in version 0.1 (released January 2012)</b></font>
+
+<p>
+<ul>
+<li> Includes 2D and 3D Gray-Scott demos.
+<li> CPU and OpenCL implementations.
+<li> User can select from available OpenCL devices (GPUs or CPUs).
+<li> OpenCL is loaded at runtime, so we can still do something even if it is not available.
+<li> User can edit OpenCL kernel and apply it to the running system.
+<li> 3D visualisation shows a volume contoured at a fixed value, and a slice from the middle
+     rendered as an image.
+<li> 2D visualisation shows a false-color image and a height-mapped mesh on the back.
+<li> Works on Windows XP+, Linux and MacOS 10.6+.
+</ul>
+
+</body>
+</html>
