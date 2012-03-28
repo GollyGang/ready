@@ -75,7 +75,6 @@ namespace ID { enum {
     HelpView,
     HelpAction,
     HelpHelp,
-    HelpRefs,
     HelpFormats,
     HelpProblems,
     HelpChanges,

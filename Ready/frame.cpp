@@ -144,7 +144,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::HelpView, MyFrame::OnHelp)
     EVT_MENU(ID::HelpAction, MyFrame::OnHelp)
     EVT_MENU(ID::HelpHelp, MyFrame::OnHelp)
-    EVT_MENU(ID::HelpRefs, MyFrame::OnHelp)
     EVT_MENU(ID::HelpFormats, MyFrame::OnHelp)
     EVT_MENU(ID::HelpProblems, MyFrame::OnHelp)
     EVT_MENU(ID::HelpChanges, MyFrame::OnHelp)
@@ -301,7 +300,6 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::HelpAction,   _("Action Menu"));
         menu->Append(ID::HelpHelp,     _("Help Menu"));
         menu->AppendSeparator();
-        menu->Append(ID::HelpRefs,     _("References"));
         menu->Append(ID::HelpFormats,  _("File Formats"));
         menu->Append(ID::HelpProblems, _("Known Problems"));
         menu->Append(ID::HelpChanges,  _("Changes"));
@@ -1111,7 +1109,6 @@ void MyFrame::OnHelp(wxCommandEvent& event)
         case ID::HelpView:      this->help_panel->ShowHelp(_("Help/view.html")); break;
         case ID::HelpAction:    this->help_panel->ShowHelp(_("Help/action.html")); break;
         case ID::HelpHelp:      this->help_panel->ShowHelp(_("Help/help.html")); break;
-        case ID::HelpRefs:      this->help_panel->ShowHelp(_("Help/refs.html")); break;
         case ID::HelpFormats:   this->help_panel->ShowHelp(_("Help/formats.html")); break;
         case ID::HelpProblems:  this->help_panel->ShowHelp(_("Help/problems.html")); break;
         case ID::HelpChanges:   this->help_panel->ShowHelp(_("Help/changes.html")); break;
