@@ -7,6 +7,7 @@ papercuts:
 - on Windows, Ready application gets pushed into background on first pattern load
 
 before 0.3 release:
+- use_image_interpolation=false should give cubes rendering in 3D, and city blocks in the displacement-mapped surface (this especially for e.g. 3D life rules)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
