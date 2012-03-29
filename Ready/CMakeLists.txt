@@ -36,42 +36,49 @@ endif()
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
-  BaseRD.hpp BaseRD.cpp
-  GrayScott.hpp GrayScott.cpp
-  OpenCL_RD.hpp OpenCL_RD.cpp
-  OpenCL_utils.hpp OpenCL_utils.cpp
-  OpenCL_Formula.hpp OpenCL_Formula.cpp
-  OpenCL_FullKernel.hpp OpenCL_FullKernel.cpp
-  IO_XML.hpp IO_XML.cpp
-  overlays.hpp overlays.cpp
-  Properties.hpp Properties.cpp
-  utils.hpp utils.cpp
+  src/readybase/BaseRD.hpp               src/readybase/BaseRD.cpp
+  src/readybase/GrayScott.hpp            src/readybase/GrayScott.cpp
+  src/readybase/OpenCL_RD.hpp            src/readybase/OpenCL_RD.cpp
+  src/readybase/OpenCL_utils.hpp         src/readybase/OpenCL_utils.cpp
+  src/readybase/OpenCL_Formula.hpp       src/readybase/OpenCL_Formula.cpp
+  src/readybase/OpenCL_FullKernel.hpp    src/readybase/OpenCL_FullKernel.cpp
+  src/readybase/IO_XML.hpp               src/readybase/IO_XML.cpp
+  src/readybase/overlays.hpp             src/readybase/overlays.cpp
+  src/readybase/Properties.hpp           src/readybase/Properties.cpp
+  src/readybase/utils.hpp                src/readybase/utils.cpp
 )
 if( NOT APPLE )
   # dynamic loading of OpenCL is only done on Windows and Linux
-  set( BASE_SOURCES ${BASE_SOURCES} OpenCL_Dyn_Load.h OpenCL_Dyn_Load.c )
+  set( BASE_SOURCES ${BASE_SOURCES} src/readybase/OpenCL_Dyn_Load.h src/readybase/OpenCL_Dyn_Load.c )
 endif()
+include_directories( src/readybase )
 
 set( GUI_SOURCES      # high-level GUI code used only in Ready
-  IDs.hpp
-  wxutils.hpp wxutils.cpp
-  dialogs.hpp dialogs.cpp
-  prefs.hpp prefs.cpp
-  app.hpp app.cpp 
-  frame.hpp frame.cpp 
-  HelpPanel.hpp HelpPanel.cpp
-  InfoPanel.hpp InfoPanel.cpp
-  PatternsPanel.hpp PatternsPanel.cpp
-  vtk_pipeline.hpp vtk_pipeline.cpp
-  wxVTKRenderWindowInteractor.h wxVTKRenderWindowInteractor.cxx
+  src/gui/IDs.hpp
+  src/gui/wxutils.hpp                    src/gui/wxutils.cpp
+  src/gui/dialogs.hpp                    src/gui/dialogs.cpp
+  src/gui/prefs.hpp                      src/gui/prefs.cpp
+  src/gui/app.hpp                        src/gui/app.cpp 
+  src/gui/frame.hpp                      src/gui/frame.cpp 
+  src/gui/HelpPanel.hpp                  src/gui/HelpPanel.cpp
+  src/gui/InfoPanel.hpp                  src/gui/InfoPanel.cpp
+  src/gui/PatternsPanel.hpp              src/gui/PatternsPanel.cpp
+  src/gui/vtk_pipeline.hpp               src/gui/vtk_pipeline.cpp
+  src/gui/wxVTKRenderWindowInteractor.h  src/gui/wxVTKRenderWindowInteractor.cxx
 )
+include_directories( src/gui )
 
 set( RESOURCES
-  ready.rc
-  appicon.ico appicon16.ico appicon32.ico appicon48.ico appicon.xpm
-  Info.plist.in
-  app.icns file-vti.icns
+  resources/ready.rc
+  resources/appicon.ico 
+  resources/appicon16.ico 
+  resources/appicon32.ico 
+  resources/appicon48.ico 
+  resources/appicon.xpm
+  resources/Info.plist.in
+  resources/app.icns resources/file-vti.icns
 )
+include_directories( resources )
 
 set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti turing.vti
@@ -111,7 +118,7 @@ ELSE(WIN32)
     SET(GUI_EXECUTABLE MACOSX_BUNDLE)
     IF(VTK_USE_COCOA)
       SET_SOURCE_FILES_PROPERTIES(
-        wxVTKRenderWindowInteractor.cxx
+        src/gui/wxVTKRenderWindowInteractor.cxx
         PROPERTIES COMPILE_FLAGS "-ObjC++")
     ENDIF(VTK_USE_COCOA)
   ELSE(APPLE)
@@ -159,7 +166,7 @@ endif()
 
 #-------------------------------------------OpenCL----------------------------------------------
 
-set( CMAKE_MODULE_PATH ${Ready_SOURCE_DIR} )
+set( CMAKE_MODULE_PATH ${Ready_SOURCE_DIR}/src )
 # (we include our own FindOpenCL.cmake until the time that CMake comes with its own)
 
 # we need to build against OpenCL
@@ -223,24 +230,20 @@ add_executable( ${APP_NAME}
 target_link_libraries( ${APP_NAME}
   readybase
   ${wxWidgets_LIBRARIES} 
-  vtkCommon 
-  vtkGraphics 
-  vtkIO 
-  vtkRendering
-  vtkHybrid
+  vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid
 )
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
   add_custom_target( app_bundle
-    COMMAND sed -e "s/VERSION/${READY_VERSION}/" ${CMAKE_SOURCE_DIR}/Info.plist.in >Ready.app/Contents/Info.plist
+    COMMAND sed -e "s/VERSION/${READY_VERSION}/" ${CMAKE_SOURCE_DIR}/resources/Info.plist.in >Ready.app/Contents/Info.plist
     COMMAND echo -n "APPLReDy" >Ready.app/Contents/PkgInfo
   )
   add_dependencies( ${APP_NAME} app_bundle )
    
   # copy *.icns files into Resources directory inside .app bundle
-  set_source_files_properties( ${CMAKE_SOURCE_DIR}/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-  set_source_files_properties( ${CMAKE_SOURCE_DIR}/file-vti.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+  set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+  set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/file-vti.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
    
   # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
