@@ -53,7 +53,7 @@ class BaseRD
         int GetNumberOfChemicals() const { return this->n_chemicals; }
 
         // advance the RD system by n timesteps
-        virtual void Update(int n_steps)=0;
+        void Update(int n_steps);
 
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
@@ -138,6 +138,9 @@ class BaseRD
         bool is_modified;
 
     protected:
+
+        // advance the RD system by n timesteps
+        virtual void InternalUpdate(int n_steps)=0;
 
         void Deallocate();
 

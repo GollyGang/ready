@@ -60,9 +60,9 @@ class OpenCL_RD : public BaseRD
 		
         virtual void Allocate(int x,int y,int z,int nc);
 
-        virtual void Update(int n_steps);
-
     protected:
+
+        virtual void InternalUpdate(int n_steps);
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
 
