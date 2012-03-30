@@ -38,13 +38,14 @@ class GrayScott : public BaseInbuilt_RD
         ~GrayScott();
 
         virtual void Allocate(int x,int y,int z,int nc);
-        virtual void Update(int n_steps);
 
     protected:
 
         std::vector<vtkImageData*> buffer_images; // one for each chemical
 
     protected:
+
+        virtual void InternalUpdate(int n_steps);
 
         void DeleteBuffers();
 };

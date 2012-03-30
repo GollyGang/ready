@@ -295,7 +295,7 @@ void OpenCL_RD::Allocate(int x,int y,int z,int nc)
     this->CreateOpenCLBuffers();
 }
 
-void OpenCL_RD::Update(int n_steps)
+void OpenCL_RD::InternalUpdate(int n_steps)
 {
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
@@ -320,7 +320,6 @@ void OpenCL_RD::Update(int n_steps)
         throwOnError(ret,"OpenCL_RD::Update : clEnqueueNDRangeKernel failed: ");
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
-    this->timesteps_taken += n_steps;
 
     // read from opencl buffers into our image
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
@@ -329,6 +328,5 @@ void OpenCL_RD::Update(int n_steps)
         float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCL_RD::Update : buffer reading failed: ");
-        this->images[ic]->Modified();
     }
 }

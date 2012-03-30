@@ -67,7 +67,7 @@ void GrayScott::DeleteBuffers()
     }
 }
 
-void GrayScott::Update(int n_steps)
+void GrayScott::InternalUpdate(int n_steps)
 {
     const int X = this->GetX();
     const int Y = this->GetY();
@@ -144,7 +144,4 @@ void GrayScott::Update(int n_steps)
         this->images[0]->DeepCopy(this->buffer_images[0]);
         this->images[1]->DeepCopy(this->buffer_images[1]);
     }
-    this->timesteps_taken += n_steps;
-    this->images[0]->Modified();
-    this->images[1]->Modified();
 }

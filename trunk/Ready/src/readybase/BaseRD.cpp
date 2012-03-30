@@ -394,3 +394,13 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
 
     return rd;
 }
+
+void BaseRD::Update(int n_steps)
+{
+    this->InternalUpdate(n_steps);
+
+    this->timesteps_taken += n_steps;
+
+    for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
+        this->images[ic]->Modified();
+}
