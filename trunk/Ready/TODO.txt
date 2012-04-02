@@ -5,6 +5,7 @@ UI annoyances:
 - 1D line graph: some lines appear black on first render (but only on Tim's Win7/Debian PC!?)
 - on some platforms (Windows XP, AMD driver only?) terminal windows appear on pattern load
 - on Windows, Ready application gets pushed into background on first pattern load
+- can't tab between edit controls in XYZ dialogs on Xubuntu
 
 code annoyances:
 - BaseRD::UpdateImageWrapPad() shouldn't be necessary
