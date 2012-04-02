@@ -29,6 +29,7 @@ class Overlay;
 #include <vtkSmartPointer.h>
 class vtkImageData;
 class vtkXMLDataElement;
+class vtkImageWrapPad;
 
 // abstract base classes for all reaction-diffusion systems
 class BaseRD 
@@ -117,6 +118,9 @@ class BaseRD
         int GetNumberOfInitialPatternGeneratorOverlays() const { return (int)this->initial_pattern_generator.size(); }
         Overlay* GetInitialPatternGeneratorOverlay(int i) const { return this->initial_pattern_generator[i]; }
 
+        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
+        void SetImageWrapPadFilter(vtkImageWrapPad *p) { this->image_wrap_pad_filter = p; }
+
     protected:
 
         std::string rule_name, description;
@@ -145,6 +149,12 @@ class BaseRD
         void Deallocate();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
+
+    private:
+
+        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
+        vtkImageWrapPad *image_wrap_pad_filter;
+        void UpdateImageWrapPadFilter();
 
     private: // deliberately not implemented, to prevent use
 
