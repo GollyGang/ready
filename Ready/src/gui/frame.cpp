@@ -76,10 +76,14 @@ using namespace std;
     #define SetText SetItemLabel
 #endif
 
+// ---------------------------------------------------------------------
+
 wxString PaneName(int id)
 {
     return wxString::Format(_T("%d"),id);
 }
+
+// ---------------------------------------------------------------------
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_ACTIVATE(MyFrame::OnActivate)
@@ -153,6 +157,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ANY, MyFrame::OnOpenRecent)
 END_EVENT_TABLE()
 
+// ---------------------------------------------------------------------
+
 // frame constructor
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
@@ -214,6 +220,8 @@ MyFrame::MyFrame(const wxString& title)
 
     this->starting_pattern = vtkImageData::New();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::InitializeMenus()
 {
@@ -311,6 +319,8 @@ void MyFrame::InitializeMenus()
     SetMenuBar(menuBar);
 }
 
+// ---------------------------------------------------------------------
+
 #ifdef __WXMAC__
     // smaller toolbar bitmaps look much nicer on Mac
     #undef wxART_TOOLBAR
@@ -348,6 +358,8 @@ void MyFrame::InitializeToolbars()
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::InitializePatternsPane()
 {
     this->patterns_panel = new PatternsPanel(this,wxID_ANY);
@@ -360,6 +372,8 @@ void MyFrame::InitializePatternsPane()
                   .Position(0)
                   );
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::InitializeInfoPane()
 {
@@ -374,10 +388,14 @@ void MyFrame::InitializeInfoPane()
                   );
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::UpdateInfoPane()
 {
     this->info_panel->Update(this->system);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::InitializeHelpPane()
 {
@@ -392,7 +410,7 @@ void MyFrame::InitializeHelpPane()
                   );
 }
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------
 
 #if wxUSE_DRAG_AND_DROP
 
@@ -427,7 +445,7 @@ bool DnDFile::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
 
 #endif // wxUSE_DRAG_AND_DROP
 
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------
 
 void MyFrame::InitializeRenderPane()
 {
@@ -453,6 +471,8 @@ void MyFrame::InitializeRenderPane()
     this->pVTKWindow->Connect(wxEVT_CHAR, wxKeyEventHandler(MyFrame::OnChar), NULL, this);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::LoadSettings()
 {
     // use global info set by GetPrefs()
@@ -460,6 +480,8 @@ void MyFrame::LoadSettings()
     this->SetSize(mainwd,mainht);
     if (auilayout.length() > 0) this->aui_mgr.LoadPerspective(auilayout);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::SaveSettings()
 {
@@ -471,6 +493,8 @@ void MyFrame::SaveSettings()
     SavePrefs();
 }
 
+// ---------------------------------------------------------------------
+
 MyFrame::~MyFrame()
 {
     this->SaveSettings(); // save the current settings so it starts up the same next time
@@ -480,16 +504,22 @@ MyFrame::~MyFrame()
     this->starting_pattern->Delete();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     Close(true);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     ShowAboutBox();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnCut(wxCommandEvent& event)
 {
@@ -498,6 +528,8 @@ void MyFrame::OnCut(wxCommandEvent& event)
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnCopy(wxCommandEvent& event)
 {
@@ -513,6 +545,8 @@ void MyFrame::OnCopy(wxCommandEvent& event)
     event.Skip();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnPaste(wxCommandEvent& event)
 {
     // action depends on which pane has focus
@@ -521,10 +555,14 @@ void MyFrame::OnPaste(wxCommandEvent& event)
     event.Skip();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdatePaste(wxUpdateUIEvent& event)
 {
     event.Enable(ClipboardHasText());
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnClear(wxCommandEvent& event)
 {
@@ -533,6 +571,8 @@ void MyFrame::OnClear(wxCommandEvent& event)
     if (this->help_panel->HtmlHasFocus()) return;
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnSelectAll(wxCommandEvent& event)
 {
@@ -547,6 +587,8 @@ void MyFrame::OnSelectAll(wxCommandEvent& event)
     }
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnFullScreen(wxCommandEvent& event)
 {
@@ -600,10 +642,14 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
     this->aui_mgr.Update();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnFitPattern(wxCommandEvent& event)
 {
     this->pVTKWindow->DoCharEvent('r');
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnWireframe(wxCommandEvent& event)
 {
@@ -614,10 +660,14 @@ void MyFrame::OnWireframe(wxCommandEvent& event)
     this->UpdateInfoPane();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdateWireframe(wxUpdateUIEvent& event)
 {
     event.Check(this->render_settings.GetProperty("use_wireframe").GetBool());
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnToggleViewPane(wxCommandEvent& event)
 {
@@ -627,12 +677,16 @@ void MyFrame::OnToggleViewPane(wxCommandEvent& event)
     this->aui_mgr.Update();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdateViewPane(wxUpdateUIEvent& event)
 {
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(event.GetId()));
     if(!pane.IsOk()) return;
     event.Check(pane.IsShown());
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
 {
@@ -644,6 +698,8 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
     }
     MonospaceMessageBox(txt,_("OpenCL diagnostics"),wxART_INFORMATION);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnSize(wxSizeEvent& event)
 {
@@ -665,6 +721,8 @@ void MyFrame::OnSize(wxSizeEvent& event)
     // need this to move and resize status bar in Mac app
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnScreenshot(wxCommandEvent& event)
 {
@@ -710,6 +768,8 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     writer->Write();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 {
     // first make sure the patterns pane is visible
@@ -726,6 +786,8 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SetCurrentRDSystem(BaseRD* sys)
 {
     delete this->system;
@@ -738,6 +800,8 @@ void MyFrame::SetCurrentRDSystem(BaseRD* sys)
     this->info_panel->ResetPosition();
     this->UpdateWindows();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::UpdateWindowTitle()
 {
@@ -765,6 +829,8 @@ void MyFrame::UpdateWindowTitle()
     #endif
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::UpdateWindows()
 {
     this->SetStatusBarText();
@@ -773,6 +839,8 @@ void MyFrame::UpdateWindows()
     this->UpdateToolbars();
     this->Refresh(false);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnStep(wxCommandEvent& event)
 {
@@ -809,11 +877,15 @@ void MyFrame::OnStep(wxCommandEvent& event)
     Refresh(false);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdateStep(wxUpdateUIEvent& event)
 {
     // Step1 or StepN
     event.Enable(!this->is_running);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnRunStop(wxCommandEvent& event)
 {
@@ -835,6 +907,8 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 {
     wxMenuBar* mbar = GetMenuBar();
@@ -849,6 +923,8 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::UpdateToolbars()
 {
     this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
@@ -859,6 +935,8 @@ void MyFrame::UpdateToolbars()
         this->is_running ? _("Stop running the simulation")
                          : _("Start running the simulation") );
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnReset(wxCommandEvent& event)
 {
@@ -872,6 +950,8 @@ void MyFrame::OnReset(wxCommandEvent& event)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SaveStartingPattern()
 {
     this->starting_pattern->DeepCopy(this->system->GetImage());
@@ -883,16 +963,22 @@ void MyFrame::SaveStartingPattern()
     // pattern files, but really we could choose any small number > 0
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::RestoreStartingPattern()
 {
     this->system->CopyFromImage(this->starting_pattern);
     this->system->SetTimestepsTaken(0);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdateReset(wxUpdateUIEvent& event)
 {
     event.Enable(this->system->GetTimestepsTaken() > 0);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::CheckFocus()
 {
@@ -907,6 +993,8 @@ void MyFrame::CheckFocus()
         this->pVTKWindow->SetFocus();
     }
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnIdle(wxIdleEvent& event)
 {
@@ -997,6 +1085,8 @@ void MyFrame::OnIdle(wxIdleEvent& event)
     event.Skip();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SetStatusBarText()
 {
     wxString txt;
@@ -1014,10 +1104,14 @@ void MyFrame::SetStatusBarText()
     SetStatusText(txt);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnRestoreDefaultPerspective(wxCommandEvent& event)
 {
     this->aui_mgr.LoadPerspective(this->default_perspective);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnGenerateInitialPattern(wxCommandEvent& event)
 {
@@ -1038,6 +1132,8 @@ void MyFrame::OnGenerateInitialPattern(wxCommandEvent& event)
     this->is_running = false;
     this->UpdateWindows();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
 {
@@ -1094,6 +1190,8 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     // TODO: hot-change the current RD system
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnHelp(wxCommandEvent& event)
 {
     int id = event.GetId();
@@ -1125,6 +1223,8 @@ void MyFrame::OnHelp(wxCommandEvent& event)
     }
 }
 
+// ---------------------------------------------------------------------
+
 wxString MyFrame::SavePatternDialog()
 {
     wxString filename = wxEmptyString;
@@ -1147,11 +1247,15 @@ wxString MyFrame::SavePatternDialog()
     return filename;
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnSavePattern(wxCommandEvent& event)
 {
     wxString filename = SavePatternDialog();
     if(!filename.empty()) SaveFile(filename);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::SaveFile(const wxString& path)
 {
@@ -1168,6 +1272,8 @@ void MyFrame::SaveFile(const wxString& path)
     this->system->SetModified(false);
     this->UpdateWindowTitle();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnNewPattern(wxCommandEvent& event)
 {
@@ -1193,6 +1299,8 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     this->UpdateWindows();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
     wxFileDialog opendlg(this, _("Choose a pattern file"), opensavedir, wxEmptyString,
@@ -1208,6 +1316,8 @@ void MyFrame::OnOpenPattern(wxCommandEvent& event)
         OpenFile( opendlg.GetPath() );
     }
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OpenFile(const wxString& path, bool remember)
 {
@@ -1324,6 +1434,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnOpenRecent(wxCommandEvent& event)
 {
     int id = event.GetId();
@@ -1337,6 +1449,8 @@ void MyFrame::OnOpenRecent(wxCommandEvent& event)
         event.Skip();
     }
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::AddRecentPattern(const wxString& inpath)
 {
@@ -1405,6 +1519,8 @@ void MyFrame::AddRecentPattern(const wxString& inpath)
     if (mbar) mbar->Enable(ID::OpenRecent, numpatterns > 0);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OpenRecentPattern(int id)
 {
     wxMenuItem* item = patternSubMenu->FindItem(id);
@@ -1424,6 +1540,8 @@ void MyFrame::OpenRecentPattern(int id)
         OpenFile(path);
     }
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::ClearMissingPatterns()
 {
@@ -1471,6 +1589,8 @@ void MyFrame::ClearMissingPatterns()
     if (mbar) mbar->Enable(ID::OpenRecent, numpatterns > 0);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::ClearAllPatterns()
 {
     while (numpatterns > 0) {
@@ -1480,6 +1600,8 @@ void MyFrame::ClearAllPatterns()
     wxMenuBar* mbar = GetMenuBar();
     if (mbar) mbar->Enable(ID::OpenRecent, false);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::EditFile(const wxString& path)
 {
@@ -1500,6 +1622,8 @@ void MyFrame::EditFile(const wxString& path)
     wxExecute(cmd, wxEXEC_ASYNC);
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
 {
     wxArrayString choices;
@@ -1514,12 +1638,16 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
     this->UpdateWindows();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SetRuleName(string s)
 {
     this->system->SetRuleName(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::SetDescription(string s)
 {
@@ -1528,12 +1656,16 @@ void MyFrame::SetDescription(string s)
     this->UpdateInfoPane();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SetParameter(int iParam,float val)
 {
     this->system->SetParameterValue(iParam,val);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::SetParameterName(int iParam,std::string s)
 {
@@ -1542,12 +1674,16 @@ void MyFrame::SetParameterName(int iParam,std::string s)
     this->UpdateInfoPane();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SetFormula(std::string s)
 {
     this->system->SetFormula(s);
     this->UpdateWindowTitle();
     this->UpdateInfoPane();
 }
+
+// ---------------------------------------------------------------------
 
 bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
 {
@@ -1565,11 +1701,15 @@ bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
     return false;
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnClose(wxCloseEvent& event)
 {
     if(event.CanVeto() && this->UserWantsToCancelWhenAskedIfWantsToSave()) return;
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::ShowPrefsDialog(const wxString& page)
 {
@@ -1581,10 +1721,14 @@ void MyFrame::ShowPrefsDialog(const wxString& page)
     this->UpdateWindows();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnPreferences(wxCommandEvent& event)
 {
     ShowPrefsDialog();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::EnableAllMenus(bool enable)
 {
@@ -1605,6 +1749,8 @@ void MyFrame::EnableAllMenus(bool enable)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnActivate(wxActivateEvent& event)
 {
     // we need to disable all menu items when frame becomes inactive
@@ -1613,6 +1759,8 @@ void MyFrame::OnActivate(wxActivateEvent& event)
     EnableAllMenus(event.GetActive());
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::UpdateMenuAccelerators()
 {
@@ -1660,6 +1808,8 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
     }
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::ProcessKey(int key, int modifiers)
 {
@@ -1727,6 +1877,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
     }
 }
 
+// ---------------------------------------------------------------------
+
 // this global is used to pass info from OnKeyDown to OnChar
 static int realkey;
 
@@ -1774,6 +1926,8 @@ void MyFrame::OnKeyDown(wxKeyEvent& event)
 
     event.Skip();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnChar(wxKeyEvent& event)
 {
@@ -1845,6 +1999,8 @@ void MyFrame::OnChar(wxKeyEvent& event)
     }
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::InitializeDefaultRenderSettings()
 {
     this->render_settings.DeleteAllProperties();
@@ -1867,6 +2023,8 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("timesteps_per_render",100));
     // TODO: allow user to change defaults
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::SetNumberOfChemicals(int n)
 {
@@ -1898,6 +2056,8 @@ void MyFrame::SetNumberOfChemicals(int n)
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
+
+// ---------------------------------------------------------------------
 
 bool MyFrame::SetDimensions(int x,int y,int z)
 {
@@ -1935,6 +2095,8 @@ bool MyFrame::SetDimensions(int x,int y,int z)
     return true;
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::SetBlockSize(int x,int y,int z)
 {
     this->system->SetBlockSizeX(x);
@@ -1944,6 +2106,8 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
+
+// ---------------------------------------------------------------------
 
 const int MAX_TIMESTEPS_PER_RENDER = 1e8;
 
@@ -1958,6 +2122,8 @@ void MyFrame::RenderSettingsChanged()
     this->UpdateWindows();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnAddParameter(wxCommandEvent& event)
 {
     StringDialog dlg(this,_("Add a parameter"),_("Name:"),wxEmptyString,wxDefaultPosition,wxDefaultSize);
@@ -1965,6 +2131,8 @@ void MyFrame::OnAddParameter(wxCommandEvent& event)
     this->GetCurrentRDSystem()->AddParameter(string(dlg.GetValue().mb_str()),0.0f);
     this->UpdateWindows();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnDeleteParameter(wxCommandEvent& event)
 {
@@ -1977,16 +2145,22 @@ void MyFrame::OnDeleteParameter(wxCommandEvent& event)
     this->UpdateWindows();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
 {
     event.Enable(this->GetCurrentRDSystem()->HasEditableFormula());
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 {
     event.Enable(this->GetCurrentRDSystem()->HasEditableFormula() &&
                  this->GetCurrentRDSystem()->GetNumberOfParameters() > 0);
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnRunFaster(wxCommandEvent& event)
 {
@@ -1997,6 +2171,8 @@ void MyFrame::OnRunFaster(wxCommandEvent& event)
     this->UpdateInfoPane();
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnRunSlower(wxCommandEvent& event)
 {
     Property& prop = this->render_settings.GetProperty("timesteps_per_render");
@@ -2005,6 +2181,8 @@ void MyFrame::OnRunSlower(wxCommandEvent& event)
     if (prop.GetInt() < 1) prop.SetInt(1);
     this->UpdateInfoPane();
 }
+
+// ---------------------------------------------------------------------
 
 void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 {
@@ -2015,3 +2193,5 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
     this->render_settings.GetProperty("timesteps_per_render").SetInt(dlg.GetValue());
     this->UpdateInfoPane();
 }
+
+// ---------------------------------------------------------------------

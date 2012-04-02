@@ -31,6 +31,7 @@ before 0.x release:
 - image export (user can specify how chemicals map onto colors)
 - multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
 - graphical UI for editing the initial-pattern-generator overlay stack
+- export rule to the WebGL playground template
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
