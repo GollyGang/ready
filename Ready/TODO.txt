@@ -1,4 +1,4 @@
-papercuts:
+UI annoyances:
 - edit formula dialog: want tab key to indent (doesn't work on Windows), want indent to be smart ideally
 - never want dialogs to appear partially off-screen
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
@@ -6,8 +6,10 @@ papercuts:
 - on some platforms (Windows XP, AMD driver only?) terminal windows appear on pattern load
 - on Windows, Ready application gets pushed into background on first pattern load
 
+code annoyances:
+- BaseRD::UpdateImageWrapPad() shouldn't be necessary
+
 before 0.3 release:
-- use_image_interpolation=false should give cubes rendering in 3D, and city blocks in the displacement-mapped surface (this especially for e.g. 3D life rules)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
@@ -31,6 +33,7 @@ before 0.x release:
 - graphical UI for editing the initial-pattern-generator overlay stack
 
 before 1.0 release:
+- use_image_interpolation=false should give city blocks in the displacement-mapped surface?
 - create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
 - save out scene (e.g. OBJ) for external render (although paraview can load vti's)
 - lots of patterns in library (primary UI for beginners is a list of examples to click)

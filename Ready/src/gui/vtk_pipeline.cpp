@@ -52,6 +52,13 @@
 #include <vtkMatrix4x4.h>
 #include <vtkMath.h>
 #include <vtkTextActor3D.h>
+#include <vtkThreshold.h>
+#include <vtkGeometryFilter.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
+#include <vtkImageWrapPad.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
 
 // STL:
 #include <stdexcept>
@@ -88,6 +95,8 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
         vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
         pVTKWindow->SetInteractorStyle(is);
     }
+
+    system->SetImageWrapPadFilter(NULL); // workaround for the GenerateCubesFromLabels approach not being fully pipelined
 
     switch(system->GetDimensionality())
     {
@@ -350,15 +359,49 @@ void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Proper
 
     // contour the 3D volume and render as a polygonal surface
 
-    // turns the 3d grid of sampled values into a polygon mesh for rendering,
-    // by making a surface that contours the volume at a specified level
-    vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-    surface->SetInput(system->GetImage(iActiveChemical));
-    surface->SetValue(0, contour_level);
-
-    // a mapper converts scene objects to graphics primitives
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(surface->GetOutputPort());
+    if(use_image_interpolation)
+    {
+        // turns the 3d grid of sampled values into a polygon mesh for rendering,
+        // by making a surface that contours the volume at a specified level    
+        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+        surface->SetInput(system->GetImage(iActiveChemical));
+        surface->SetValue(0, contour_level);
+
+        // a mapper converts scene objects to graphics primitives
+        mapper->SetInputConnection(surface->GetOutputPort());
+    }
+    else
+    {
+        // render as cubes, Minecraft-style
+        vtkImageData *image = system->GetImage(iActiveChemical);
+        int *extent = image->GetExtent();
+
+        vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
+        pad->SetInput(image);
+        pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
+        pad->Update();
+        pad->GetOutput()->GetCellData()->SetScalars(image->GetPointData()->GetScalars()); // a non-pipelined operation
+
+        system->SetImageWrapPadFilter(pad); // workaround for the GenerateCubesFromLabels approach not being fully pipelined
+
+        vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
+        threshold->SetInputConnection(pad->GetOutputPort());
+        threshold->SetInputArrayToProcess(0, 0, 0,
+            vtkDataObject::FIELD_ASSOCIATION_CELLS,
+            vtkDataSetAttributes::SCALARS);
+        threshold->ThresholdByUpper(contour_level);
+
+        vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+        transform->Translate (-.5, -.5, -.5);
+        vtkSmartPointer<vtkTransformFilter> transformModel = vtkSmartPointer<vtkTransformFilter>::New();
+        transformModel->SetTransform(transform);
+        transformModel->SetInputConnection(threshold->GetOutputPort());
+
+        vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
+        geometry->SetInputConnection(transformModel->GetOutputPort());
+        mapper->SetInputConnection(geometry->GetOutputPort());
+    }
     mapper->ScalarVisibilityOff();
 
     // an actor determines how a scene object is displayed

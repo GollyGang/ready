@@ -35,12 +35,15 @@ using namespace std;
 #include <vtkImageExtractComponents.h>
 #include <vtkPointData.h>
 #include <vtkXMLUtilities.h>
+#include <vtkCellData.h>
+#include <vtkImageWrapPad.h>
 
 BaseRD::BaseRD()
 {
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
     this->is_modified = false;
+    this->image_wrap_pad_filter = NULL;
 }
 
 BaseRD::~BaseRD()
@@ -121,6 +124,7 @@ void BaseRD::CopyFromImage(vtkImageData* im)
         iec->Update();
         this->images[i]->DeepCopy(iec->GetOutput());
     }
+    UpdateImageWrapPadFilter();
 }
 
 int BaseRD::GetTimestepsTaken() const
@@ -288,6 +292,7 @@ void BaseRD::GenerateInitialPattern()
     }
     for(int i=0;i<(int)this->images.size();i++)
         this->images[i]->Modified();
+    UpdateImageWrapPadFilter();
     this->timesteps_taken = 0;
 }
 
@@ -403,4 +408,17 @@ void BaseRD::Update(int n_steps)
 
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
         this->images[ic]->Modified();
+
+    UpdateImageWrapPadFilter();
+}
+
+void BaseRD::UpdateImageWrapPadFilter()
+{
+    // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
+    if(this->image_wrap_pad_filter)
+    {
+        this->image_wrap_pad_filter->Update();
+        this->image_wrap_pad_filter->GetOutput()->GetCellData()->SetScalars(
+            dynamic_cast<vtkImageData*>(this->image_wrap_pad_filter->GetInput())->GetPointData()->GetScalars());
+    }
 }
