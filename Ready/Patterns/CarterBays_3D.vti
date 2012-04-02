@@ -87,56 +87,56 @@ __kernel void rd_compute(__global float* a_in, __global float* a_out)
       </overlay>
 
       <!-- create glider in corner -->
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.032" y="0.032" z="0.032" />
-          <Point3D x="0.048" y="0.048" z="0.048" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.048" y="0.032" z="0.032" />
-          <Point3D x="0.064" y="0.048" z="0.048" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.016" y="0.048" z="0.032" />
-          <Point3D x="0.032" y="0.064" z="0.048" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.064" y="0.048" z="0.032" />
-          <Point3D x="0.080" y="0.064" z="0.048" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.032" y="0.064" z="0.032" />
-          <Point3D x="0.048" y="0.080" z="0.048" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.048" y="0.064" z="0.032" />
-          <Point3D x="0.064" y="0.080" z="0.048" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.032" y="0.032" z="0.016" />
-          <Point3D x="0.048" y="0.048" z="0.032" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.048" y="0.032" z="0.016" />
-          <Point3D x="0.064" y="0.048" z="0.032" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.016" y="0.048" z="0.016" />
-          <Point3D x="0.032" y="0.064" z="0.032" />
-        </rectangle> </overlay>
-      <overlay chemical="a"> <overwrite /> <constant value="1" />
-        <rectangle>
-          <Point3D x="0.064" y="0.048" z="0.016" />
-          <Point3D x="0.080" y="0.064" z="0.032" />
-        </rectangle> </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="2" y="2" z="2" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="3" y="2" z="2" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="1" y="3" z="2" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="4" y="3" z="2" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="2" y="4" z="2" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="3" y="4" z="2" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="2" y="2" z="1" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="3" y="2" z="1" />
+      </overlay>
+      <overlay chemical="a"> 
+        <overwrite />
+        <constant value="1" />
+        <pixel x="1" y="3" z="1" />
+       </overlay>
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="4" y="3" z="1" />
+      </overlay>
     </initial_pattern_generator>
     
     <render_settings>

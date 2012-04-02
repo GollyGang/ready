@@ -153,6 +153,9 @@ void Overlay::Apply(BaseRD* system,int x,int y,int z) const
 
 // -------------------------- the derived types ----------------------------------
 
+
+// -------- operations: -----------
+
 class Add : public BaseOperation
 {
     public:
@@ -242,6 +245,8 @@ class Divide : public BaseOperation
 
         virtual void Apply(float& target,float value) const { target /= value; }
 };
+
+// -------- fill methods: -----------
 
 class Constant : public BaseFill
 {
@@ -366,6 +371,8 @@ class WhiteNoise : public BaseFill
         float low,high;
 };
 
+// -------- shapes: -----------
+
 class Everywhere : public BaseShape
 {
     public:
@@ -475,6 +482,46 @@ class Circle : public BaseShape
         float radius;
 };
 
+class Pixel : public BaseShape
+{
+    public:
+
+        Pixel(vtkXMLDataElement* node) : BaseShape(node)
+        {
+            read_required_attribute(node,"x",this->px);
+            read_required_attribute(node,"y",this->py);
+            read_required_attribute(node,"z",this->pz);
+        }
+
+        static const char* GetTypeName() { return "pixel"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(Pixel::GetTypeName());
+            xml->SetIntAttribute("x",this->px);
+            xml->SetIntAttribute("y",this->py);
+            xml->SetIntAttribute("z",this->pz);
+            return xml;
+        }
+
+        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const
+        {
+            int dimensionality = (X>1?1:0) + (Y>1?1:0) + (Z>1?1:0);
+            switch(dimensionality)
+            {
+                default:
+                case 1: return x==this->px;
+                case 2: return x==this->px && y==this->py;
+                case 3: return x==this->px && y==this->py && z==this->pz;
+            }
+        }
+
+    protected:
+
+        int px,py,pz;
+};
+
 // -------------------------------------------------------------------------------
 
 // when you create a new derived class, add it to the appropriate factory method here:
@@ -506,5 +553,6 @@ class Circle : public BaseShape
     if(name==Everywhere::GetTypeName())        return new Everywhere(node);
     else if(name==Rectangle::GetTypeName())    return new Rectangle(node);
     else if(name==Circle::GetTypeName())       return new Circle(node);
+    else if(name==Pixel::GetTypeName())        return new Pixel(node);
     else throw runtime_error("Unsupported shape: "+name);
 }
