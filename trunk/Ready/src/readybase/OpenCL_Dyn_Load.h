@@ -17,15 +17,11 @@
  */
 // Source: http://code.google.com/p/electromag-with-cuda/source/browse/trunk/GPGPU_Segment/src/OpenCL_Dyn_Load.h
 
-#ifndef _OPENCL_DYN_LOAD_H
+#if !defined(_OPENCL_DYN_LOAD_H) && !defined(__APPLE__)
+// (dynamic loading of OpenCL is not necessary with Mac OS 10.6+)
 #define _OPENCL_DYN_LOAD_H
 
-#ifdef __APPLE__
-    // #include <OpenCL/cl_platform.h>
-    #error Dynamic loading of OpenCL is not necessary with Mac OS 10.6+.
-#else
-    #include <CL/cl_platform.h>
-#endif
+#include <CL/cl_platform.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -1065,13 +1061,8 @@ extern "C" {
     //extern cl_int clLibLoad();
     extern cl_int CL_API_CALL clLibLoad(); // TJH inserted CL_API_CALL because of compile errors
 
-
 #ifdef __cplusplus
 }
 #endif
 
-
-
-#endif  /* _OPENCL_DYN_LOAD_H */
-
-
+#endif

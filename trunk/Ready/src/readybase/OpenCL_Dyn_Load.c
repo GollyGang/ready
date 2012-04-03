@@ -17,6 +17,9 @@
  */
 // Source: http://code.google.com/p/electromag-with-cuda/source/browse/trunk/GPGPU_Segment/src/OpenCL_Dyn_Load.c
 
+#if !defined(__APPLE__)
+// (dynamic loading of OpenCL is not necessary with Mac OS 10.6+)
+
 #include "OpenCL_Dyn_Load.h"
 
 __clGetPlatformIDs                   *clGetPlatformIDs;
@@ -240,3 +243,5 @@ cl_int CL_API_CALL clLibLoad()
 
     return CL_SUCCESS;
 }
+
+#endif

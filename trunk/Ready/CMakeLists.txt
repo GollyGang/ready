@@ -22,7 +22,7 @@ cmake_policy( SET CMP0003 NEW )
 
 project( Ready )
 
-set( READY_VERSION 0.2.2 )   # check matches Help/about.html
+set( READY_VERSION 0.3 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
@@ -47,11 +47,8 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/overlays.hpp             src/readybase/overlays.cpp
   src/readybase/Properties.hpp           src/readybase/Properties.cpp
   src/readybase/utils.hpp                src/readybase/utils.cpp
+  src/readybase/OpenCL_Dyn_Load.h        src/readybase/OpenCL_Dyn_Load.c 
 )
-if( NOT APPLE )
-  # dynamic loading of OpenCL is only done on Windows and Linux
-  set( BASE_SOURCES ${BASE_SOURCES} src/readybase/OpenCL_Dyn_Load.h src/readybase/OpenCL_Dyn_Load.c )
-endif()
 include_directories( src/readybase )
 
 set( GUI_SOURCES      # high-level GUI code used only in Ready
@@ -108,7 +105,7 @@ set( HELP_FILES
 )
 
 set( TEXT_FILES
-  README.txt COPYING.txt TODO.txt BUILD.txt
+  README.txt COPYING.txt TODO.txt BUILD.txt CMakeLists.txt
 )
 
 #-------------------------------------------VTK----------------------------------------------
@@ -276,8 +273,14 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
-# install some text files
+# install the text files
 install( FILES ${TEXT_FILES} DESTINATION "." )
+
+# install our source files
+foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} )
+  get_filename_component( path_name "${source_file}" PATH )
+  install( FILES "${source_file}" DESTINATION ${path_name} )
+endforeach()
 
 # install our pattern files
 foreach( pattern_file ${PATTERN_FILES} )
