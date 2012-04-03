@@ -17,7 +17,7 @@
 
 // local:
 #include "overlays.hpp"
-#include "BaseRD.hpp"
+#include "ImageRD.hpp"
 #include "utils.hpp"
 
 // VTK:
@@ -57,7 +57,7 @@ class BaseFill : public XML_Object
         static BaseFill* New(vtkXMLDataElement* node);
 
         // what value would this fill type be at the given location, given the existing image as in system
-        virtual float GetValue(BaseRD *system,int x,int y,int z) const =0;
+        virtual float GetValue(ImageRD *system,int x,int y,int z) const =0;
 
     protected:
 
@@ -134,7 +134,7 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
     return xml;
 }
 
-void Overlay::Apply(BaseRD* system,int x,int y,int z) const
+void Overlay::Apply(ImageRD* system,int x,int y,int z) const
 {
     if(this->iTargetChemical<0 || this->iTargetChemical>=system->GetNumberOfChemicals())
         throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(this->iTargetChemical));
@@ -297,7 +297,7 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(BaseRD *system,int x,int y,int z) const
+        virtual float GetValue(ImageRD *system,int x,int y,int z) const
         {
             return this->value;
         }
@@ -328,7 +328,7 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(BaseRD *system,int x,int y,int z) const
+        virtual float GetValue(ImageRD *system,int x,int y,int z) const
         {
             if(this->iOtherChemical<0 || this->iOtherChemical>=system->GetNumberOfChemicals())
                 throw runtime_error("other_chemical: chemical out of range: "+GetChemicalName(this->iOtherChemical));
@@ -360,7 +360,7 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(BaseRD *system,int x,int y,int z) const
+        virtual float GetValue(ImageRD *system,int x,int y,int z) const
         {
             return system->GetParameterValueByName(this->parameter_name.c_str());
         }
@@ -391,7 +391,7 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(BaseRD *system,int x,int y,int z) const
+        virtual float GetValue(ImageRD *system,int x,int y,int z) const
         {
             return frand(this->low,this->high);
         }

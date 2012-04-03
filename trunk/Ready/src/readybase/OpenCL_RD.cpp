@@ -238,57 +238,57 @@ void OpenCL_RD::TestFormula(std::string formula)
 
 void OpenCL_RD::CopyFromImage(vtkImageData* im)
 {
-    BaseRD::CopyFromImage(im);
+    ImageRD::CopyFromImage(im);
     this->WriteToOpenCLBuffers();
 }
 
 void OpenCL_RD::SetParameterValue(int iParam,float val)
 {
-    BaseRD::SetParameterValue(iParam,val);
+    ImageRD::SetParameterValue(iParam,val);
     this->need_reload_formula = true;
 }
 
 void OpenCL_RD::SetParameterName(int iParam,const string& s)
 {
-    BaseRD::SetParameterName(iParam,s);
+    ImageRD::SetParameterName(iParam,s);
     this->need_reload_formula = true;
 }
 
 void OpenCL_RD::AddParameter(const std::string& name,float val)
 {
-    BaseRD::AddParameter(name,val);
+    ImageRD::AddParameter(name,val);
     this->need_reload_formula = true;
 }
 
 void OpenCL_RD::DeleteParameter(int iParam)
 {
-    BaseRD::DeleteParameter(iParam);
+    ImageRD::DeleteParameter(iParam);
     this->need_reload_formula = true;
 }
 
 void OpenCL_RD::DeleteAllParameters()
 {
-    BaseRD::DeleteAllParameters();
+    ImageRD::DeleteAllParameters();
     this->need_reload_formula = true;
 }
 
 void OpenCL_RD::GenerateInitialPattern()
 {
-	BaseRD::GenerateInitialPattern();
+	ImageRD::GenerateInitialPattern();
     this->WriteToOpenCLBuffers();
 }
 
 void OpenCL_RD::BlankImage()
 {
-	BaseRD::BlankImage();
+	ImageRD::BlankImage();
     this->WriteToOpenCLBuffers();
 }
 
-void OpenCL_RD::Allocate(int x,int y,int z,int nc)
+void OpenCL_RD::AllocateImages(int x,int y,int z,int nc)
 {
     if(x&(x-1) || y&(y-1) || z&(z-1))
         throw runtime_error("OpenCL_RD::Allocate : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
-    BaseRD::Allocate(x,y,z,nc);
+    ImageRD::AllocateImages(x,y,z,nc);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();

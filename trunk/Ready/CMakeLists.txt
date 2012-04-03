@@ -36,7 +36,8 @@ endif()
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
-  src/readybase/BaseRD.hpp               src/readybase/BaseRD.cpp
+  src/readybase/AbstractRD.hpp           src/readybase/AbstractRD.cpp
+  src/readybase/ImageRD.hpp              src/readybase/ImageRD.cpp
   src/readybase/GrayScott.hpp            src/readybase/GrayScott.cpp
   src/readybase/OpenCL_RD.hpp            src/readybase/OpenCL_RD.cpp
   src/readybase/OpenCL_utils.hpp         src/readybase/OpenCL_utils.cpp
@@ -76,16 +77,27 @@ set( RESOURCES
   resources/appicon48.ico 
   resources/appicon.xpm
   resources/Info.plist.in
-  resources/app.icns resources/file-vti.icns
+  resources/app.icns 
+  resources/file-vti.icns
 )
 include_directories( resources )
 
 set( PATTERN_FILES
-  grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti turing.vti
-  kernel_test.vti conway_life.vti bays_3D.vti
-  CPU-only/grayscott_1D.vti CPU-only/grayscott_2D.vti CPU-only/grayscott_3D.vti
-  FitzHugh-Nagumo/tip-splitting.vti FitzHugh-Nagumo/spiral_turbulence.vti
-  FitzHugh-Nagumo/pulsate.vti FitzHugh-Nagumo/squid_axon.vti
+  grayscott_demo.vti 
+  meinhardt_stripes.vti 
+  schlogl.vti 
+  heat_equation.vti 
+  turing.vti
+  kernel_test.vti 
+  conway_life.vti 
+  bays_3D.vti
+  CPU-only/grayscott_1D.vti 
+  CPU-only/grayscott_2D.vti 
+  CPU-only/grayscott_3D.vti
+  FitzHugh-Nagumo/tip-splitting.vti 
+  FitzHugh-Nagumo/spiral_turbulence.vti
+  FitzHugh-Nagumo/pulsate.vti 
+  FitzHugh-Nagumo/squid_axon.vti
 )
 
 set( HELP_FILES

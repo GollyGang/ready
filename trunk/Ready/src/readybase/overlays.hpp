@@ -25,7 +25,7 @@
 
 // local:
 #include "utils.hpp"
-class BaseRD;
+class ImageRD;
 
 // internal:
 class BaseOperation;
@@ -42,7 +42,7 @@ class Overlay : public XML_Object
         ~Overlay();
             
         // apply the overlay
-        void Apply(BaseRD *system,int x,int y,int z) const;
+        void Apply(ImageRD *system,int x,int y,int z) const;
 
         // for saving to file, get the overlay as an XML element
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;

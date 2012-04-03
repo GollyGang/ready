@@ -42,10 +42,10 @@ GrayScott::GrayScott()
     this->AddParameter("F",0.035f);
 }
 
-void GrayScott::Allocate(int x,int y,int z,int nc)
+void GrayScott::AllocateImages(int x,int y,int z,int nc)
 {
     if(nc!=2) throw runtime_error("GrayScott::Allocate : this implementation is for 2 chemicals only"); 
-    BaseRD::Allocate(x,y,z,2);
+    ImageRD::AllocateImages(x,y,z,2);
     // also allocate our buffer images
     this->DeleteBuffers();
     this->buffer_images.resize(2);

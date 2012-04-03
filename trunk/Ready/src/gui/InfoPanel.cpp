@@ -25,7 +25,7 @@
 #include "dialogs.hpp"
 
 // readybase:
-#include "BaseRD.hpp"
+#include "ImageRD.hpp"
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
@@ -363,7 +363,7 @@ void InfoPanel::ResetPosition()
 
 static int rownum;  // for alternating row background colors
 
-void InfoPanel::Update(const BaseRD* const system)
+void InfoPanel::Update(const ImageRD* const system)
 {
     // build HTML string to display current parameters
     wxString contents;
@@ -630,7 +630,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
-    BaseRD* sys = frame->GetCurrentRDSystem();
+    ImageRD* sys = frame->GetCurrentRDSystem();
     int iParam = 0;
     while (iParam < (int)sys->GetNumberOfParameters()) {
         if (parameter == sys->GetParameterName(iParam)) break;
@@ -755,7 +755,7 @@ void InfoPanel::ChangeNumChemicals()
 
 void InfoPanel::ChangeDimensions()
 {
-    BaseRD* sys = frame->GetCurrentRDSystem();
+    ImageRD* sys = frame->GetCurrentRDSystem();
     int oldx = sys->GetX();
     int oldy = sys->GetY();
     int oldz = sys->GetZ();
@@ -782,7 +782,7 @@ void InfoPanel::ChangeDimensions()
 
 void InfoPanel::ChangeBlockSize()
 {
-    BaseRD* sys = frame->GetCurrentRDSystem();
+    ImageRD* sys = frame->GetCurrentRDSystem();
     int oldx = sys->GetBlockSizeX();
     int oldy = sys->GetBlockSizeY();
     int oldz = sys->GetBlockSizeZ();

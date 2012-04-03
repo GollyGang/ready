@@ -19,7 +19,7 @@
 #define __OPENCL_RD__
 
 // local:
-#include "BaseRD.hpp"
+#include "ImageRD.hpp"
 
 // OpenCL:
 #ifdef __APPLE__
@@ -31,7 +31,7 @@
 #endif
 
 // base class for those RD implementations that use OpenCL
-class OpenCL_RD : public BaseRD
+class OpenCL_RD : public ImageRD
 {
     public:
 
@@ -58,7 +58,7 @@ class OpenCL_RD : public BaseRD
 		virtual void GenerateInitialPattern();
 		virtual void BlankImage();
 		
-        virtual void Allocate(int x,int y,int z,int nc);
+        virtual void AllocateImages(int x,int y,int z,int nc);
 
     protected:
 

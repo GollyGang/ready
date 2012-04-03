@@ -788,7 +788,7 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::SetCurrentRDSystem(BaseRD* sys)
+void MyFrame::SetCurrentRDSystem(ImageRD* sys)
 {
     delete this->system;
     this->system = sys;
@@ -1281,7 +1281,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(this->system == NULL) {
         // initial call from MyFrame::MyFrame
         GrayScott *s = new GrayScott();
-        s->Allocate(30,25,20,2);
+        s->AllocateImages(30,25,20,2);
         s->SetModified(false);
         s->SetFilename("untitled");
         s->GenerateInitialPattern();
@@ -1354,7 +1354,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     // load pattern file
     bool warn_to_update = false;
-    BaseRD *target_system = NULL;
+    ImageRD *target_system = NULL;
     try
     {
         vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
@@ -1398,7 +1398,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
         int nc = iw->GetOutput()->GetNumberOfScalarComponents();
-        target_system->Allocate(dim[0],dim[1],dim[2],nc);
+        target_system->AllocateImages(dim[0],dim[1],dim[2],nc);
         if(iw->ShouldGenerateInitialPatternWhenLoading())
             target_system->GenerateInitialPattern();
         else
@@ -2030,7 +2030,7 @@ void MyFrame::SetNumberOfChemicals(int n)
 {
     try 
     {
-        this->system->Allocate(this->system->GetX(),this->system->GetY(),this->system->GetZ(),n);
+        this->system->AllocateImages(this->system->GetX(),this->system->GetY(),this->system->GetZ(),n);
     }
     catch(const exception& e)
     {
@@ -2077,7 +2077,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
             }
         }
         // attempt the size change
-        this->system->Allocate(x,y,z,this->system->GetNumberOfChemicals());
+        this->system->AllocateImages(x,y,z,this->system->GetNumberOfChemicals());
     }
     catch(const exception& e)
     {
