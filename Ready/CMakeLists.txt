@@ -105,7 +105,9 @@ set( HELP_FILES
 )
 
 set( TEXT_FILES
-  README.txt COPYING.txt TODO.txt BUILD.txt CMakeLists.txt
+  ./README.txt ./COPYING.txt ./TODO.txt ./BUILD.txt 
+  ./CMakeLists.txt 
+  src/FindOpenCL.cmake
 )
 
 #-------------------------------------------VTK----------------------------------------------
@@ -273,11 +275,8 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
-# install the text files
-install( FILES ${TEXT_FILES} DESTINATION "." )
-
 # install our source files
-foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} )
+foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${TEXT_FILES} )
   get_filename_component( path_name "${source_file}" PATH )
   install( FILES "${source_file}" DESTINATION ${path_name} )
 endforeach()
