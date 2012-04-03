@@ -17,6 +17,7 @@
 
 // STL:
 #include <string>
+#include <vector>
 
 // VTK:
 #include <vtkSmartPointer.h>
@@ -53,7 +54,7 @@ class Overlay : public XML_Object
         int iTargetChemical;
         BaseOperation *op;   // e.g. overwrite, add, multiply, etc.
         BaseFill *fill;     // e.g. constant value, white noise, named parameter, other chemical, etc.
-        BaseShape *shape;  // e.g. rectangle, sphere, scattered shapes, etc.
+        std::vector<BaseShape*> shapes;  // e.g. rectangle, sphere, scattered shapes, etc.
 
     private:
 
