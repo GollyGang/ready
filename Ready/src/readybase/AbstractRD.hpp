@@ -29,7 +29,7 @@ class vtkXMLDataElement;
 #include <string>
 #include <vector>
 
-// abstract base class for all reaction-diffusion systems
+/// abstract base class for all reaction-diffusion systems
 class AbstractRD
 {
     public:

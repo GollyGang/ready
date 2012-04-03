@@ -18,9 +18,10 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals, specified as
-// a short formula involving delta_a, laplacian_a, etc. implemented with Euler integration,
-// a basic finite difference stencil and float4 blocks for speed
+/// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
+/** specified as a short formula involving delta_a, laplacian_a, etc. 
+ *  implemented with Euler integration, a basic finite difference stencil 
+ * and float4 blocks for speed */
 class OpenCL_Formula : public OpenCL_RD
 {
     public:
