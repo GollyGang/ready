@@ -366,13 +366,18 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
     rd->SetAttribute("format_version","1");
     // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
 
+    // description
+    vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
+    description->SetName("description");
+    description->SetCharacterData(this->GetDescription().c_str(),(int)this->GetDescription().length());
+    rd->AddNestedElement(description);
+
+    // rule
     vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
     rule->SetName("rule");
     rule->SetAttribute("name",this->GetRuleName().c_str());
     rule->SetAttribute("type",this->GetRuleType().c_str());
-
-    // parameters
-    for(int i=0;i<this->GetNumberOfParameters();i++)
+    for(int i=0;i<this->GetNumberOfParameters();i++)    // parameters
     {
         vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();
         param->SetName("param");
@@ -381,14 +386,7 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
         param->SetCharacterData(s.c_str(),(int)s.length());
         rule->AddNestedElement(param);
     }
-
     rd->AddNestedElement(rule);
-
-    // description
-    vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
-    description->SetName("description");
-    description->SetCharacterData(this->GetDescription().c_str(),(int)this->GetDescription().length());
-    rd->AddNestedElement(description);
 
     // initial pattern generator
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
