@@ -15,72 +15,45 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#ifndef __BASERD__
-#define __BASERD__
+#ifndef __ABSTRACTRD__
+#define __ABSTRACTRD__
 
 // local:
 class Overlay;
+
+// VTK:
+#include <vtkSmartPointer.h>
+class vtkXMLDataElement;
 
 // STL:
 #include <string>
 #include <vector>
 
-// VTK:
-#include <vtkSmartPointer.h>
-class vtkImageData;
-class vtkXMLDataElement;
-class vtkImageWrapPad;
-
-// abstract base classes for all reaction-diffusion systems
-class BaseRD 
+// abstract base class for all reaction-diffusion systems
+class AbstractRD
 {
     public:
 
-        BaseRD();
-        virtual ~BaseRD();
+        virtual ~AbstractRD() {}
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update) =0;
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
 
-        // e.g. 2 for 2D systems, 3 for 3D
-        int GetDimensionality() const;
-
-        int GetX() const;
-        int GetY() const;
-        int GetZ() const;
+        virtual void Update(int n_steps) =0;
 
         // inbuilt implementations cannot have their number_of_chemicals edited
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
 
-        // advance the RD system by n timesteps
-        void Update(int n_steps);
-
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
         void SetTimestepsTaken(int t) { this->timesteps_taken=t; }
-
-        vtkSmartPointer<vtkImageData> GetImage() const;
-        vtkImageData* GetImage(int iChemical) const;
-        virtual void CopyFromImage(vtkImageData* im);
 
         // inbuilt implementations cannot have their formula edited
         virtual bool HasEditableFormula() const =0;
         std::string GetFormula() const;
         virtual void TestFormula(std::string program_string) {}
         virtual void SetFormula(std::string s);
-
-        // only some implementations (OpenCL_FullKernel) can have their block size edited
-        virtual bool HasEditableBlockSize() const { return false; }
-        virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
-        virtual int GetBlockSizeY() const { return 1; }
-        virtual int GetBlockSizeZ() const { return 1; }
-        virtual void SetBlockSizeX(int n) {}
-        virtual void SetBlockSizeY(int n) {}
-        virtual void SetBlockSizeZ(int n) {}
-
-        // use to change the dimensions or the number of chemicals
-        virtual void Allocate(int x,int y,int z,int nc);
 
         // returns e.g. "inbuilt", "formula", "kernel", as in the XML
         virtual std::string GetRuleType() const =0;
@@ -112,22 +85,22 @@ class BaseRD
         void SetFilename(const std::string& s);
 
         void AddInitialPatternGeneratorOverlay(Overlay* overlay);
-        virtual void GenerateInitialPattern();
-        virtual void BlankImage();
+        virtual void GenerateInitialPattern() =0;
+        virtual void BlankImage() =0;
         void ClearInitialPatternGenerator();
         int GetNumberOfInitialPatternGeneratorOverlays() const { return (int)this->initial_pattern_generator.size(); }
         Overlay* GetInitialPatternGeneratorOverlay(int i) const { return this->initial_pattern_generator[i]; }
 
-        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
-        void SetImageWrapPadFilter(vtkImageWrapPad *p) { this->image_wrap_pad_filter = p; }
+    protected:
+
+        // advance the RD system by n timesteps
+        virtual void InternalUpdate(int n_steps)=0;
 
     protected:
 
         std::string rule_name, description;
 
-        int n_chemicals; // (could use images.size() but TestFormula can be called before Allocate)
-
-        std::vector<vtkImageData*> images; // one for each chemical
+        int n_chemicals;
 
         std::vector<Overlay*> initial_pattern_generator;
 
@@ -140,26 +113,7 @@ class BaseRD
 
         std::string filename;
         bool is_modified;
-
-    protected:
-
-        // advance the RD system by n timesteps
-        virtual void InternalUpdate(int n_steps)=0;
-
-        void Deallocate();
-
-        static vtkImageData* AllocateVTKImage(int x,int y,int z);
-
-    private:
-
-        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
-        vtkImageWrapPad *image_wrap_pad_filter;
-        void UpdateImageWrapPadFilter();
-
-    private: // deliberately not implemented, to prevent use
-
-        BaseRD(BaseRD&);
-        BaseRD& operator=(BaseRD&);
 };
 
-#endif
+#endif 
+

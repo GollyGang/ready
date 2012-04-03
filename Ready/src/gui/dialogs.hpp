@@ -28,7 +28,7 @@
 #include <wx/spinctrl.h>    // for wxSpinCtrl
 
 // readybase:
-class BaseRD;
+class ImageRD;
 
 //----------------------------------------------------------------------------------
 

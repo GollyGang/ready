@@ -17,7 +17,7 @@
 
 // local:
 #include "IO_XML.hpp"
-#include "BaseRD.hpp"
+#include "ImageRD.hpp"
 #include "utils.hpp"
 #include "Properties.hpp"
 
@@ -37,7 +37,7 @@ using namespace std;
 vtkStandardNewMacro(RD_XMLWriter);
 vtkStandardNewMacro(RD_XMLReader);
 
-void RD_XMLWriter::SetSystem(BaseRD* rd_system) 
+void RD_XMLWriter::SetSystem(ImageRD* rd_system) 
 { 
     this->system = rd_system; 
     this->SetInput(rd_system->GetImage());

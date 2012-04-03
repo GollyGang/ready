@@ -16,9 +16,9 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "BaseRD.hpp"
-#include "overlays.hpp"
+#include "ImageRD.hpp"
 #include "utils.hpp"
+#include "overlays.hpp"
 
 // stdlib:
 #include <stdlib.h>
@@ -38,7 +38,7 @@ using namespace std;
 #include <vtkCellData.h>
 #include <vtkImageWrapPad.h>
 
-BaseRD::BaseRD()
+ImageRD::ImageRD()
 {
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
@@ -46,13 +46,13 @@ BaseRD::BaseRD()
     this->image_wrap_pad_filter = NULL;
 }
 
-BaseRD::~BaseRD()
+ImageRD::~ImageRD()
 {
-    this->Deallocate();
+    this->DeallocateImages();
     this->ClearInitialPatternGenerator();
 }
 
-void BaseRD::Deallocate()
+void ImageRD::DeallocateImages()
 {
     for(int iChem=0;iChem<(int)this->images.size();iChem++)
     {
@@ -61,19 +61,7 @@ void BaseRD::Deallocate()
     }
 }
 
-void BaseRD::ClearInitialPatternGenerator()
-{
-    for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
-        delete this->initial_pattern_generator[iOverlay];
-    this->initial_pattern_generator.clear();
-}
-
-void BaseRD::AddInitialPatternGeneratorOverlay(Overlay* overlay)
-{
-    this->initial_pattern_generator.push_back(overlay);
-}
-
-int BaseRD::GetDimensionality() const
+int ImageRD::GetDimensionality() const
 {
     assert(this->images.front());
     int dimensionality=0;
@@ -83,27 +71,27 @@ int BaseRD::GetDimensionality() const
     return dimensionality;
 }
 
-int BaseRD::GetX() const
+int ImageRD::GetX() const
 {
     return this->images.front()->GetDimensions()[0];
 }
 
-int BaseRD::GetY() const
+int ImageRD::GetY() const
 {
     return this->images.front()->GetDimensions()[1];
 }
 
-int BaseRD::GetZ() const
+int ImageRD::GetZ() const
 {
     return this->images.front()->GetDimensions()[2];
 }
 
-vtkImageData* BaseRD::GetImage(int iChemical) const
+vtkImageData* ImageRD::GetImage(int iChemical) const
 { 
     return this->images[iChemical];
 }
 
-vtkSmartPointer<vtkImageData> BaseRD::GetImage() const
+vtkSmartPointer<vtkImageData> ImageRD::GetImage() const
 { 
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
     for(int i=0;i<this->GetNumberOfChemicals();i++)
@@ -113,9 +101,9 @@ vtkSmartPointer<vtkImageData> BaseRD::GetImage() const
 }
 
 
-void BaseRD::CopyFromImage(vtkImageData* im)
+void ImageRD::CopyFromImage(vtkImageData* im)
 {
-    if(im->GetNumberOfScalarComponents()!=this->GetNumberOfChemicals()) throw runtime_error("BaseRD::CopyFromImage : chemical count mismatch");
+    if(im->GetNumberOfScalarComponents()!=this->GetNumberOfChemicals()) throw runtime_error("ImageRD::CopyFromImage : chemical count mismatch");
     vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
     iec->SetInput(im);
     for(int i=0;i<this->GetNumberOfChemicals();i++)
@@ -127,14 +115,9 @@ void BaseRD::CopyFromImage(vtkImageData* im)
     UpdateImageWrapPadFilter();
 }
 
-int BaseRD::GetTimestepsTaken() const
+void ImageRD::AllocateImages(int x,int y,int z,int nc)
 {
-    return this->timesteps_taken;
-}
-
-void BaseRD::Allocate(int x,int y,int z,int nc)
-{
-    this->Deallocate();
+    this->DeallocateImages();
     this->n_chemicals = nc;
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
@@ -142,103 +125,7 @@ void BaseRD::Allocate(int x,int y,int z,int nc)
     this->is_modified = true;
 }
 
-void BaseRD::SetFormula(string s)
-{
-    if(s != this->formula)
-        this->need_reload_formula = true;
-    this->formula = s;
-    this->is_modified = true;
-}
-
-string BaseRD::GetFormula() const
-{
-    return this->formula;
-}
-
-std::string BaseRD::GetRuleName() const
-{
-    return this->rule_name;
-}
-
-std::string BaseRD::GetDescription() const
-{
-    return this->description;
-}
-
-void BaseRD::SetRuleName(std::string s)
-{
-    this->rule_name = s;
-    this->is_modified = true;
-}
-
-void BaseRD::SetDescription(std::string s)
-{
-    this->description = s;
-    this->is_modified = true;
-}
-
-int BaseRD::GetNumberOfParameters() const
-{
-    return (int)this->parameters.size();
-}
-
-std::string BaseRD::GetParameterName(int iParam) const
-{
-    return this->parameters[iParam].first;
-}
-
-float BaseRD::GetParameterValue(int iParam) const
-{
-    return this->parameters[iParam].second;
-}
-
-float BaseRD::GetParameterValueByName(const std::string& name) const
-{
-    for(int iParam=0;iParam<(int)this->parameters.size();iParam++)
-        if(this->parameters[iParam].first == name)
-            return this->parameters[iParam].second;
-    throw runtime_error("BaseRD::GetParameterValueByName : parameter name not found: "+name);
-}
-
-void BaseRD::AddParameter(const std::string& name,float val)
-{
-    this->parameters.push_back(make_pair(name,val));
-    this->is_modified = true;
-}
-
-void BaseRD::DeleteParameter(int iParam)
-{
-    this->parameters.erase(this->parameters.begin()+iParam);
-    this->is_modified = true;
-}
-
-void BaseRD::DeleteAllParameters()
-{
-    this->parameters.clear();
-    this->is_modified = true;
-}
-
-void BaseRD::SetParameterName(int iParam,const string& s)
-{
-    this->parameters[iParam].first = s;
-    this->is_modified = true;
-}
-
-void BaseRD::SetParameterValue(int iParam,float val)
-{
-    this->parameters[iParam].second = val;
-    this->is_modified = true;
-}
-
-bool BaseRD::IsParameter(const string& name) const
-{
-    for(int i=0;i<(int)this->parameters.size();i++)
-        if(this->parameters[i].first == name)
-            return true;
-    return false;
-}
-
-/* static */ vtkImageData* BaseRD::AllocateVTKImage(int x,int y,int z)
+/* static */ vtkImageData* ImageRD::AllocateVTKImage(int x,int y,int z)
 {
     vtkImageData *im = vtkImageData::New();
     assert(im);
@@ -247,31 +134,11 @@ bool BaseRD::IsParameter(const string& name) const
     im->SetDimensions(x,y,z);
     im->AllocateScalars();
     if(im->GetDimensions()[0]!=x || im->GetDimensions()[1]!=y || im->GetDimensions()[2]!=z)
-        throw runtime_error("BaseRD::AllocateVTKImage : Failed to allocate image data - dimensions too big?");
+        throw runtime_error("ImageRD::AllocateVTKImage : Failed to allocate image data - dimensions too big?");
     return im;
 }
 
-bool BaseRD::IsModified() const
-{
-    return this->is_modified;
-}
-
-void BaseRD::SetModified(bool m)
-{
-    this->is_modified = m;
-}
-
-std::string BaseRD::GetFilename() const
-{
-    return this->filename;
-}
-
-void BaseRD::SetFilename(const string& s)
-{
-    this->filename = s;
-}
-
-void BaseRD::GenerateInitialPattern()
+void ImageRD::GenerateInitialPattern()
 {
     this->BlankImage();
 
@@ -296,7 +163,7 @@ void BaseRD::GenerateInitialPattern()
     this->timesteps_taken = 0;
 }
 
-void BaseRD::BlankImage()
+void ImageRD::BlankImage()
 {
     for(int iImage=0;iImage<(int)this->images.size();iImage++)
     {
@@ -307,7 +174,7 @@ void BaseRD::BlankImage()
 }
 
 // load things from the XML that are standard across all implementations
-void BaseRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+void ImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
     string str;
     const char *s;
@@ -358,8 +225,8 @@ void BaseRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
     }
 }
 
-// TODO: BaseRD could inherit from XML_Object (but as VTKFile element, not RD element!)
-vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
+// TODO: ImageRD could inherit from XML_Object (but as VTKFile element, not RD element!)
+vtkSmartPointer<vtkXMLDataElement> ImageRD::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
@@ -398,7 +265,7 @@ vtkSmartPointer<vtkXMLDataElement> BaseRD::GetAsXML() const
     return rd;
 }
 
-void BaseRD::Update(int n_steps)
+void ImageRD::Update(int n_steps)
 {
     this->InternalUpdate(n_steps);
 
@@ -410,7 +277,7 @@ void BaseRD::Update(int n_steps)
     UpdateImageWrapPadFilter();
 }
 
-void BaseRD::UpdateImageWrapPadFilter()
+void ImageRD::UpdateImageWrapPadFilter()
 {
     // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
     if(this->image_wrap_pad_filter)

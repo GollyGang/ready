@@ -20,7 +20,7 @@
 #include "wxVTKRenderWindowInteractor.h"
 
 // readybase:
-#include "BaseRD.hpp"
+#include "ImageRD.hpp"
 #include "utils.hpp"
 #include "Properties.hpp"
 
@@ -64,11 +64,11 @@
 #include <stdexcept>
 using namespace std;
 
-void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings);
-void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings);
-void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,ImageRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,ImageRD* system,const Properties& render_settings);
+void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,ImageRD* system,const Properties& render_settings);
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* system,const Properties& render_settings,
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,ImageRD* system,const Properties& render_settings,
     bool reset_camera)
 {
     assert(pVTKWindow);
@@ -116,7 +116,7 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,BaseRD* syste
     }
 }
 
-void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,ImageRD* system,const Properties& render_settings)
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
@@ -207,7 +207,7 @@ void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     pRenderer->AddActor(axis);
 }
 
-void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,ImageRD* system,const Properties& render_settings)
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
@@ -338,7 +338,7 @@ void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,BaseRD* system,const Proper
     pRenderer->AddActor2D(scalar_bar);
 }
 
-void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,BaseRD* system,const Properties& render_settings)
+void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,ImageRD* system,const Properties& render_settings)
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();

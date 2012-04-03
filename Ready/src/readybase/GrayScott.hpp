@@ -16,10 +16,10 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "BaseRD.hpp"
+#include "ImageRD.hpp"
 
 // a base class for all the inbuilt implementations (TODO: put in separate files when we have more than one derived class)
-class BaseInbuilt_RD : public BaseRD
+class InbuiltRD : public ImageRD
 {
     public:
 
@@ -30,14 +30,14 @@ class BaseInbuilt_RD : public BaseRD
 };
 
 // inbuilt implementation: n-dimensional Gray-Scott
-class GrayScott : public BaseInbuilt_RD
+class GrayScott : public InbuiltRD
 {
     public:
 
         GrayScott();
         ~GrayScott();
 
-        virtual void Allocate(int x,int y,int z,int nc);
+        virtual void AllocateImages(int x,int y,int z,int nc);
 
     protected:
 

@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local
-class BaseRD;
+class ImageRD;
 class Properties;
 
 // VTK:
@@ -32,20 +32,20 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
         vtkTypeMacro(RD_XMLWriter, vtkXMLImageDataWriter);
         static RD_XMLWriter* New();
 
-        void SetSystem(BaseRD* rd_system);
+        void SetSystem(ImageRD* rd_system);
         void SetRenderSettings(Properties* settings) { this->render_settings = settings; }
 
     protected:  
 
         RD_XMLWriter() : system(NULL) {} 
 
-        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(BaseRD* system);
+        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
 
         virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
 
     protected:
 
-        BaseRD *system;
+        ImageRD *system;
         Properties* render_settings;
 };
 
