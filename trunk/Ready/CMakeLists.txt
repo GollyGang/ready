@@ -76,6 +76,7 @@ set( RESOURCES
   resources/Info.plist.in
   resources/app.icns 
   resources/file-vti.icns
+  resources/logo.png
 )
 include_directories( resources )
 
@@ -104,10 +105,10 @@ set( HELP_FILES
   introduction.html
 )
 
-set( TEXT_FILES
+set( OTHER_FILES
   ./README.txt ./COPYING.txt ./TODO.txt ./BUILD.txt 
   ./CMakeLists.txt 
-  src/FindOpenCL.cmake
+  src/FindOpenCL.cmake src/Doxyfile.in
 )
 
 #-------------------------------------------VTK----------------------------------------------
@@ -196,7 +197,7 @@ foreach( pattern_file ${PATTERN_FILES} )
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Patterns/${pattern_file}"
   )
   list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}" )
-endforeach( pattern_file ) 
+endforeach() 
 
 foreach( help_file ${HELP_FILES} )
   add_custom_command( 
@@ -205,16 +206,16 @@ foreach( help_file ${HELP_FILES} )
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}"
   )
   list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}" )
-endforeach( help_file ) 
+endforeach() 
 
-foreach( text_file ${TEXT_FILES} )
+foreach( other_file ${OTHER_FILES} )
   add_custom_command( 
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${text_file}"
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${text_file}" "${CMAKE_CURRENT_BINARY_DIR}/${text_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${text_file}"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${other_file}"
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${other_file}" "${CMAKE_CURRENT_BINARY_DIR}/${other_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${other_file}"
   )
-  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${text_file}" )
-endforeach( text_file ) 
+  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${other_file}" )
+endforeach() 
 
 add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
@@ -270,13 +271,25 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )  # strip release binary, for smaller file size
 endif()
 
+#----------------------------------------doxygen------------------------------------------------
+
+find_package( Doxygen )
+if(DOXYGEN_FOUND)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  )
+endif()
+# (if doxygen is found then 'make doc' should produce html documentation of the source code)
+
 #----------------------------------------install------------------------------------------------
 
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
 # install our source files
-foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${TEXT_FILES} )
+foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${OTHER_FILES} )
   get_filename_component( path_name "${source_file}" PATH )
   install( FILES "${source_file}" DESTINATION ${path_name} )
 endforeach()
