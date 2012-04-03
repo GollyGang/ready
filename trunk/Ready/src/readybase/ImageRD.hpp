@@ -25,7 +25,7 @@
 class vtkImageData;
 class vtkImageWrapPad;
 
-// abstract base class for image-based reaction-diffusion systems
+/// abstract base class for image-based reaction-diffusion systems
 class ImageRD : public AbstractRD
 {
     public:

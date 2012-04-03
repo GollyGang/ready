@@ -18,7 +18,8 @@
 // local:
 #include "ImageRD.hpp"
 
-// a base class for all the inbuilt implementations (TODO: put in separate files when we have more than one derived class)
+/// a base class for all the inbuilt implementations 
+// (TODO: put in separate files when we have more than one derived class)
 class InbuiltRD : public ImageRD
 {
     public:
@@ -29,7 +30,7 @@ class InbuiltRD : public ImageRD
         virtual bool HasEditableNumberOfChemicals() const { return false; }
 };
 
-// inbuilt implementation: n-dimensional Gray-Scott
+/// inbuilt implementation: n-dimensional Gray-Scott
 class GrayScott : public InbuiltRD
 {
     public:
