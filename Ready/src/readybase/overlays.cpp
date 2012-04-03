@@ -28,20 +28,7 @@
 #include <stdexcept>
 using namespace std;
 
-class Point3D : public XML_Object
-{
-    public:
-    
-        Point3D(vtkXMLDataElement *node);
-        
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
-        static const char* GetTypeName() { return "Point3D"; }
-
-    public:
-    
-        float x,y,z;
-};
+// ------------------------------------------------------------------------------------------------
 
 class BaseOperation : public XML_Object
 {
@@ -95,6 +82,87 @@ class BaseShape : public XML_Object
         BaseShape(vtkXMLDataElement* node) : XML_Object(node) {}
 };
 
+// ------------------------------------------------------------------------------------------------
+
+Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
+{
+    string s;
+    read_required_attribute(node,"chemical",s);
+    this->iTargetChemical = IndexFromChemicalName(s);
+    const int n_nested = node->GetNumberOfNestedElements();
+    if(n_nested<3)
+        throw runtime_error("overlay : expected at least 3 nested elements (operation, fill, shape)");
+    bool parsedOK;
+    for(int i_nested=0;i_nested<n_nested;i_nested++)
+    {
+        vtkXMLDataElement *subnode = node->GetNestedElement(i_nested);
+        // is this an operation element?
+        try { this->op = BaseOperation::New(subnode); parsedOK = true; }
+        catch(runtime_error&) { parsedOK = false; }
+        if(parsedOK) continue;
+        // is this a fill element?
+        try { this->fill = BaseFill::New(subnode); parsedOK = true; }
+        catch(runtime_error&) { parsedOK = false; }
+        if(parsedOK) continue;
+        // must be a shape element
+        this->shapes.push_back(BaseShape::New(subnode));
+    }
+    // (The usual advice is to not use exceptions for things that are expected to happen but arguably this
+    //  is an example of where the alternative (return values) is less desirable.)
+}
+
+Overlay::~Overlay()
+{
+    delete this->op;
+    delete this->fill;
+    for(int i=0;i<(int)this->shapes.size();i++)
+        delete this->shapes[i];
+}
+
+vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+    xml->SetName(Overlay::GetTypeName());
+    xml->SetAttribute("chemical",GetChemicalName(this->iTargetChemical).c_str());
+    xml->AddNestedElement(this->op->GetAsXML());
+    xml->AddNestedElement(this->fill->GetAsXML());
+    for(int i=0;i<(int)this->shapes.size();i++)
+        xml->AddNestedElement(this->shapes[i]->GetAsXML());
+    return xml;
+}
+
+void Overlay::Apply(BaseRD* system,int x,int y,int z) const
+{
+    if(this->iTargetChemical<0 || this->iTargetChemical>=system->GetNumberOfChemicals())
+        throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(this->iTargetChemical));
+
+    for(int iShape=0;iShape<(int)this->shapes.size();iShape++)
+    {
+        if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ() ) )
+        {
+            this->op->Apply( *vtk_at(static_cast<float*>( system->GetImage(this->iTargetChemical)->GetScalarPointer() ),
+                x, y, z, system->GetX(), system->GetY()), this->fill->GetValue(system,x,y,z) );
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------------------------
+
+class Point3D : public XML_Object
+{
+    public:
+    
+        Point3D(vtkXMLDataElement *node);
+        
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+
+        static const char* GetTypeName() { return "Point3D"; }
+
+    public:
+    
+        float x,y,z;
+};
+
 Point3D::Point3D(vtkXMLDataElement *node) : XML_Object(node)
 {
     read_required_attribute(node,"x",this->x);
@@ -111,48 +179,7 @@ vtkSmartPointer<vtkXMLDataElement> Point3D::GetAsXML() const
     xml->SetFloatAttribute("z",this->z);
     return xml;
 }
-
-Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
-{
-    string s;
-    read_required_attribute(node,"chemical",s);
-    this->iTargetChemical = IndexFromChemicalName(s);
-    if(node->GetNumberOfNestedElements()!=3)
-        throw runtime_error("overlay : expected 3 nested elements (operation, fill, shape)");
-    this->op = BaseOperation::New(node->GetNestedElement(0));
-    this->fill = BaseFill::New(node->GetNestedElement(1));
-    this->shape = BaseShape::New(node->GetNestedElement(2));
-}
-
-Overlay::~Overlay()
-{
-    delete this->op;
-    delete this->fill;
-    delete this->shape;
-}
-
-vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
-{
-    vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
-    xml->SetName(Overlay::GetTypeName());
-    xml->SetAttribute("chemical",GetChemicalName(this->iTargetChemical).c_str());
-    xml->AddNestedElement(this->op->GetAsXML());
-    xml->AddNestedElement(this->fill->GetAsXML());
-    xml->AddNestedElement(this->shape->GetAsXML());
-    return xml;
-}
-
-void Overlay::Apply(BaseRD* system,int x,int y,int z) const
-{
-    if(this->iTargetChemical<0 || this->iTargetChemical>=system->GetNumberOfChemicals())
-        throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(this->iTargetChemical));
-    if(this->shape->IsInside(x,y,z,system->GetX(),system->GetY(),system->GetZ()))
-        this->op->Apply(*vtk_at(static_cast<float*>(system->GetImage(this->iTargetChemical)->GetScalarPointer()),x,y,z,system->GetX(),system->GetY()),
-            this->fill->GetValue(system,x,y,z));
-}
-
 // -------------------------- the derived types ----------------------------------
-
 
 // -------- operations: -----------
 

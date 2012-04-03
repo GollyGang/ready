@@ -91,50 +91,14 @@ __kernel void rd_compute(__global float* a_in, __global float* a_out)
         <overwrite /> 
         <constant value="1" />
         <pixel x="2" y="2" z="2" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="3" y="2" z="2" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="1" y="3" z="2" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="4" y="3" z="2" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="2" y="4" z="2" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="3" y="4" z="2" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="2" y="2" z="1" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="3" y="2" z="1" />
-      </overlay>
-      <overlay chemical="a"> 
-        <overwrite />
-        <constant value="1" />
         <pixel x="1" y="3" z="1" />
-       </overlay>
-      <overlay chemical="a"> 
-        <overwrite /> 
-        <constant value="1" />
         <pixel x="4" y="3" z="1" />
       </overlay>
     </initial_pattern_generator>
