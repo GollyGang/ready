@@ -82,7 +82,7 @@ include_directories( resources )
 
 set( PATTERN_FILES
   grayscott_demo.vti meinhardt_stripes.vti schlogl.vti heat_equation.vti turing.vti
-  kernel_test.vti conway_life.vti CarterBays_3D.vti
+  kernel_test.vti conway_life.vti bays_3D.vti
   CPU-only/grayscott_1D.vti CPU-only/grayscott_2D.vti CPU-only/grayscott_3D.vti
   FitzHugh-Nagumo/tip-splitting.vti FitzHugh-Nagumo/spiral_turbulence.vti
   FitzHugh-Nagumo/pulsate.vti FitzHugh-Nagumo/squid_axon.vti
