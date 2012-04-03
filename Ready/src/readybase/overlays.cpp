@@ -84,7 +84,7 @@ class BaseShape : public XML_Object
 
 // ------------------------------------------------------------------------------------------------
 
-Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
+Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node), op(NULL), fill(NULL)
 {
     string s;
     read_required_attribute(node,"chemical",s);
@@ -106,9 +106,12 @@ Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
         if(parsedOK) continue;
         // must be a shape element
         this->shapes.push_back(BaseShape::New(subnode));
+        // (The usual advice is to not use exceptions for things that are expected to happen but arguably this
+        //  is an example of where the alternative (return values) is less desirable.)
     }
-    // (The usual advice is to not use exceptions for things that are expected to happen but arguably this
-    //  is an example of where the alternative (return values) is less desirable.)
+    if(this->op == NULL) throw runtime_error("overlay: missing operation element");
+    if(this->fill == NULL) throw runtime_error("overlay: missing fill element");
+    if(this->shapes.empty()) throw runtime_error("overlay: missing shape element");
 }
 
 Overlay::~Overlay()
