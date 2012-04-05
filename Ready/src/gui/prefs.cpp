@@ -878,11 +878,11 @@ void SavePrefs()
     // save main window's location and size
     MyFrame* frameptr = wxGetApp().currframe;
     #ifdef __WXMSW__
-    if (frameptr->fullscreen || frameptr->IsIconized()) {
+    if (frameptr->IsFullScreen() || frameptr->IsIconized()) {
         // use mainx, mainy, mainwd, mainht set by frameptr->OnFullScreen()
         // or by frameptr->OnSize
     #else
-    if (frameptr->fullscreen) {
+    if (frameptr->IsFullScreen()) {
         // use mainx, mainy, mainwd, mainht set by frameptr->OnFullScreen()
     #endif
     } else {
@@ -921,7 +921,7 @@ void SavePrefs()
     fputs("\n", f);
 
     fprintf(f, "text_editor=%s\n", (const char*)texteditor.mb_str(wxConvLocal));
-    fprintf(f, "max_patterns=%d (1..%d)\n", maxpatterns, MAX_RECENT);
+    fprintf(f, "max_patterns=%d (1..%d)\n", maxpatterns, ID::MAX_RECENT);
 
     if (numpatterns > 0) {
         fputs("\n", f);
@@ -1229,7 +1229,7 @@ void GetPrefs()
         } else if (strcmp(keyword, "max_patterns") == 0) {
             sscanf(value, "%d", &maxpatterns);
             if (maxpatterns < 1) maxpatterns = 1;
-            if (maxpatterns > MAX_RECENT) maxpatterns = MAX_RECENT;
+            if (maxpatterns > ID::MAX_RECENT) maxpatterns = ID::MAX_RECENT;
 
         } else if (strcmp(keyword, "recent_pattern") == 0) {
             // append path to Open Recent submenu
@@ -1784,7 +1784,7 @@ wxPanel* PrefsDialog::CreateFilePrefs(wxWindow* parent)
     vbox->AddSpacer(5);
 
     // init control values
-    spin1->SetRange(1, MAX_RECENT); spin1->SetValue(maxpatterns);
+    spin1->SetRange(1, ID::MAX_RECENT); spin1->SetValue(maxpatterns);
     spin1->SetFocus();
     spin1->SetSelection(ALL_TEXT);
 
@@ -2188,7 +2188,7 @@ bool PrefsDialog::ValidatePage()
 {
     // validate all spin control values on current page
     if (currpage == FILE_PAGE) {
-        if ( BadSpinVal(PREF_MAX_PATTERNS, 1, MAX_RECENT, _("Maximum number of recent patterns")) )
+        if ( BadSpinVal(PREF_MAX_PATTERNS, 1, ID::MAX_RECENT, _("Maximum number of recent patterns")) )
             return false;
     
     } else if (currpage == EDIT_PAGE) {

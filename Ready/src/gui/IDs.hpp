@@ -24,74 +24,76 @@
     #include <wx/wx.h>
 #endif
 
-const int MAX_RECENT = 100;     // maximum files in Open Recent submenu
-
 // IDs for the controls and the menu commands
-namespace ID { enum {
-    
-    // we can use IDs higher than this for our own purposes
-    Dummy = wxID_HIGHEST+1,
-    
-    // file menu
-    OpenRecent,
-    // next 2 are the last items in the Open Recent submenu
-    ClearMissingPatterns = OpenRecent + MAX_RECENT + 1,
-    ClearAllPatterns,
-    Screenshot,
-    AddMyPatterns,
-    
-    // view menu
-    FullScreen,
-    FitPattern,
-    Wireframe,
-    CanvasPane,
-    PatternsPane,
-    InfoPane,
-    HelpPane,
-    RestoreDefaultPerspective,
-    ChangeActiveChemical,
-    
-    // action menu
-    Step1,
-    StepN,
-    RunStop,
-    Reset,
-    ChangeRunningSpeed,
-    Faster,
-    Slower,
-    GenerateInitialPattern,
-    AddParameter,
-    DeleteParameter,
-    SelectOpenCLDevice,
-    OpenCLDiagnostics,
-    
-    // help menu
-    HelpQuick,
-    HelpTips,
-    HelpKeyboard,
-    HelpMouse,
-    HelpFile,
-    HelpEdit,
-    HelpView,
-    HelpAction,
-    HelpHelp,
-    HelpFormats,
-    HelpProblems,
-    HelpChanges,
-    HelpCredits,
-    
-    // PatternsPanel:
-    PatternsTree,
-    
-    // HelpPanel:
-    BackButton,
-    ForwardButton,
-    ContentsButton,
-    SmallerButton,
-    BiggerButton,
+namespace ID 
+{ 
+    const int MAX_RECENT = 100;     // maximum files in Open Recent submenu
 
-    // toolbars:
-    FileToolbar,
-    ActionToolbar,
+    enum {
+    
+        // we can use IDs higher than this for our own purposes
+        Dummy = wxID_HIGHEST+1,
+        
+        // file menu
+        OpenRecent,
+        // next 2 are the last items in the Open Recent submenu
+        ClearMissingPatterns = OpenRecent + MAX_RECENT + 1,
+        ClearAllPatterns,
+        Screenshot,
+        AddMyPatterns,
+        
+        // view menu
+        FullScreen,
+        FitPattern,
+        Wireframe,
+        CanvasPane,
+        PatternsPane,
+        InfoPane,
+        HelpPane,
+        RestoreDefaultPerspective,
+        ChangeActiveChemical,
+        
+        // action menu
+        Step1,
+        StepN,
+        RunStop,
+        Reset,
+        ChangeRunningSpeed,
+        Faster,
+        Slower,
+        GenerateInitialPattern,
+        AddParameter,
+        DeleteParameter,
+        SelectOpenCLDevice,
+        OpenCLDiagnostics,
+        
+        // help menu
+        HelpQuick,
+        HelpTips,
+        HelpKeyboard,
+        HelpMouse,
+        HelpFile,
+        HelpEdit,
+        HelpView,
+        HelpAction,
+        HelpHelp,
+        HelpFormats,
+        HelpProblems,
+        HelpChanges,
+        HelpCredits,
+        
+        // PatternsPanel:
+        PatternsTree,
+        
+        // HelpPanel:
+        BackButton,
+        ForwardButton,
+        ContentsButton,
+        SmallerButton,
+        BiggerButton,
 
-}; };
+        // toolbars:
+        FileToolbar,
+        ActionToolbar,
+    }; 
+};

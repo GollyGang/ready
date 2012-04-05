@@ -72,7 +72,7 @@ class MyFrame : public wxFrame
         void OnChar(wxKeyEvent& event);
         void ProcessKey(int key, int modifiers);
 
-        bool fullscreen;    // in full screen mode?
+        bool IsFullScreen() { return this->fullscreen; }
 
     private:
 
@@ -196,6 +196,12 @@ class MyFrame : public wxFrame
         int steps_since_last_render;
         double accumulated_time;
         bool do_one_render;
+
+        static const int MAX_TIMESTEPS_PER_RENDER = 1e8;
+
+        int realkey;  // used to pass info from OnKeyDown to OnChar
+
+        bool fullscreen;    // in full screen mode?
 
         DECLARE_EVENT_TABLE()
 };
