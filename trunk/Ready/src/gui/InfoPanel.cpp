@@ -361,9 +361,7 @@ void InfoPanel::ResetPosition()
 
 // -----------------------------------------------------------------------------
 
-static int rownum;  // for alternating row background colors
-
-void InfoPanel::Update(const ImageRD* const system)
+void InfoPanel::Update(const AbstractRD* const system)
 {
     // build HTML string to display current parameters
     wxString contents;
@@ -416,7 +414,8 @@ void InfoPanel::Update(const ImageRD* const system)
             contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
     }
 
-    contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%d x %d x %d"),
+    if(system->HasEditableDimensions())
+        contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetX(),system->GetY(),system->GetZ()),
                                             true);
 
@@ -630,7 +629,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
-    ImageRD* sys = frame->GetCurrentRDSystem();
+    AbstractRD* sys = frame->GetCurrentRDSystem();
     int iParam = 0;
     while (iParam < (int)sys->GetNumberOfParameters()) {
         if (parameter == sys->GetParameterName(iParam)) break;
@@ -755,7 +754,7 @@ void InfoPanel::ChangeNumChemicals()
 
 void InfoPanel::ChangeDimensions()
 {
-    ImageRD* sys = frame->GetCurrentRDSystem();
+    AbstractRD* sys = frame->GetCurrentRDSystem();
     int oldx = sys->GetX();
     int oldy = sys->GetY();
     int oldz = sys->GetZ();
@@ -782,7 +781,7 @@ void InfoPanel::ChangeDimensions()
 
 void InfoPanel::ChangeBlockSize()
 {
-    ImageRD* sys = frame->GetCurrentRDSystem();
+    AbstractRD* sys = frame->GetCurrentRDSystem();
     int oldx = sys->GetBlockSizeX();
     int oldy = sys->GetBlockSizeY();
     int oldz = sys->GetBlockSizeZ();
@@ -916,3 +915,5 @@ bool InfoPanel::DoKey(int key, int mods)
     frame->ProcessKey(key, mods);
     return true;
 }
+
+// -----------------------------------------------------------------------------

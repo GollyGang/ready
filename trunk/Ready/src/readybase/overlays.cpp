@@ -57,7 +57,7 @@ class BaseFill : public XML_Object
         static BaseFill* New(vtkXMLDataElement* node);
 
         // what value would this fill type be at the given location, given the existing image as in system
-        virtual float GetValue(ImageRD *system,int x,int y,int z) const =0;
+        virtual float GetValue(AbstractRD *system,int x,int y,int z) const =0;
 
     protected:
 
@@ -134,17 +134,13 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
     return xml;
 }
 
-void Overlay::Apply(ImageRD* system,int x,int y,int z) const
+void Overlay::Apply(float& val,AbstractRD* system,int x,int y,int z) const
 {
-    if(this->iTargetChemical<0 || this->iTargetChemical>=system->GetNumberOfChemicals())
-        throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(this->iTargetChemical));
-
     for(int iShape=0;iShape<(int)this->shapes.size();iShape++)
     {
         if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ() ) )
         {
-            this->op->Apply( *vtk_at(static_cast<float*>( system->GetImage(this->iTargetChemical)->GetScalarPointer() ),
-                x, y, z, system->GetX(), system->GetY()), this->fill->GetValue(system,x,y,z) );
+            this->op->Apply( val, this->fill->GetValue(system,x,y,z) );
         }
     }
 }
@@ -297,7 +293,7 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(ImageRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
         {
             return this->value;
         }
@@ -328,12 +324,9 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(ImageRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
         {
-            if(this->iOtherChemical<0 || this->iOtherChemical>=system->GetNumberOfChemicals())
-                throw runtime_error("other_chemical: chemical out of range: "+GetChemicalName(this->iOtherChemical));
-            return *vtk_at(static_cast<float*>(system->GetImage(this->iOtherChemical)->GetScalarPointer()),
-                x,y,z,system->GetX(),system->GetY());
+            return system->SampleAt(x,y,z,this->iOtherChemical);
         }
 
     protected:
@@ -360,7 +353,7 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(ImageRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
         {
             return system->GetParameterValueByName(this->parameter_name.c_str());
         }
@@ -391,7 +384,7 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(ImageRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
         {
             return frand(this->low,this->high);
         }

@@ -29,11 +29,11 @@
 
 // readybase:
 #include "utils.hpp"
-#include "IO_XML.hpp"
 #include "GrayScott.hpp"
 #include "OpenCL_Formula.hpp"
 #include "OpenCL_FullKernel.hpp"
 #include "OpenCL_utils.hpp"
+#include "IO_XML.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -217,8 +217,6 @@ MyFrame::MyFrame(const wxString& title)
         wxCommandEvent cmdevent(wxID_NEW);
         OnNewPattern(cmdevent);
     }
-
-    this->starting_pattern = vtkImageData::New();
 }
 
 // ---------------------------------------------------------------------
@@ -501,7 +499,6 @@ MyFrame::~MyFrame()
     this->aui_mgr.UnInit();
     this->pVTKWindow->Delete();
     delete this->system;
-    this->starting_pattern->Delete();
 }
 
 // ---------------------------------------------------------------------
@@ -788,7 +785,7 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::SetCurrentRDSystem(ImageRD* sys)
+void MyFrame::SetCurrentRDSystem(AbstractRD* sys)
 {
     delete this->system;
     this->system = sys;
@@ -848,7 +845,14 @@ void MyFrame::OnStep(wxCommandEvent& event)
         return;
     
     if (this->system->GetTimestepsTaken() == 0)
-        this->SaveStartingPattern();
+    {
+        this->system->SaveStartingPattern();
+    
+        // reset the initial number of steps used by system->Update in OnIdle
+        num_steps = 50;
+        // 50 is half the initial timesteps_per_render value used in most
+        // pattern files, but really we could choose any small number > 0
+    }
 
     try
     {
@@ -900,7 +904,14 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
     
     if (this->is_running) {
         if (this->system->GetTimestepsTaken() == 0)
-            this->SaveStartingPattern();
+        {
+            this->system->SaveStartingPattern();
+    
+            // reset the initial number of steps used by system->Update in OnIdle
+            num_steps = 50;
+            // 50 is half the initial timesteps_per_render value used in most
+            // pattern files, but really we could choose any small number > 0
+        }
         steps_since_last_render = 0;
         accumulated_time = 0.0;
         do_one_render = false;
@@ -944,31 +955,10 @@ void MyFrame::OnReset(wxCommandEvent& event)
     {
         // restore pattern and other info saved by SaveStartingPattern() which
         // was called in OnStep/OnRunStop when GetTimestepsTaken() was 0
-        this->RestoreStartingPattern();
+        this->system->RestoreStartingPattern();
         this->is_running = false;
         this->UpdateWindows();
     }
-}
-
-// ---------------------------------------------------------------------
-
-void MyFrame::SaveStartingPattern()
-{
-    this->starting_pattern->DeepCopy(this->system->GetImage());
-    
-    // this is probably the best place to reset the initial number of steps
-    // used by system->Update in OnIdle
-    num_steps = 50;
-    // 50 is half the initial timesteps_per_render value used in most
-    // pattern files, but really we could choose any small number > 0
-}
-
-// ---------------------------------------------------------------------
-
-void MyFrame::RestoreStartingPattern()
-{
-    this->system->CopyFromImage(this->starting_pattern);
-    this->system->SetTimestepsTaken(0);
 }
 
 // ---------------------------------------------------------------------
@@ -1261,11 +1251,7 @@ void MyFrame::SaveFile(const wxString& path)
 {
     wxBusyCursor busy;
 
-    vtkSmartPointer<RD_XMLWriter> iw = vtkSmartPointer<RD_XMLWriter>::New();
-    iw->SetSystem(this->system);
-    iw->SetRenderSettings(&this->render_settings);
-    iw->SetFileName(path.mb_str());
-    iw->Write();
+    this->system->SaveFile(path.mb_str(),this->render_settings);
 
     AddRecentPattern(path);
     this->system->SetFilename(string(path.mb_str()));
@@ -1281,7 +1267,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(this->system == NULL) {
         // initial call from MyFrame::MyFrame
         GrayScott *s = new GrayScott();
-        s->AllocateImages(30,25,20,2);
+        s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
         s->SetFilename("untitled");
         s->GenerateInitialPattern();
@@ -1354,7 +1340,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     // load pattern file
     bool warn_to_update = false;
-    ImageRD *target_system = NULL;
+    ImageRD *target_system = NULL; // TODO: allow loading of non-image patterns
     try
     {
         vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
@@ -1398,7 +1384,8 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         int dim[3];
         iw->GetOutput()->GetDimensions(dim);
         int nc = iw->GetOutput()->GetNumberOfScalarComponents();
-        target_system->AllocateImages(dim[0],dim[1],dim[2],nc);
+        target_system->SetDimensions(dim[0],dim[1],dim[2]);
+        target_system->SetNumberOfChemicals(nc);
         if(iw->ShouldGenerateInitialPatternWhenLoading())
             target_system->GenerateInitialPattern();
         else
@@ -2027,7 +2014,7 @@ void MyFrame::SetNumberOfChemicals(int n)
 {
     try 
     {
-        this->system->AllocateImages(this->system->GetX(),this->system->GetY(),this->system->GetZ(),n);
+        this->system->SetNumberOfChemicals(n);
     }
     catch(const exception& e)
     {
@@ -2074,7 +2061,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
             }
         }
         // attempt the size change
-        this->system->AllocateImages(x,y,z,this->system->GetNumberOfChemicals());
+        this->system->SetDimensions(x,y,z);
     }
     catch(const exception& e)
     {

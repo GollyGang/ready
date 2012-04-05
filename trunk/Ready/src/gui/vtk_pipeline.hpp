@@ -19,8 +19,8 @@
 class wxVTKRenderWindowInteractor;
 
 // readybase:
-class ImageRD;
+class AbstractRD;
 class Properties;
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,ImageRD* system,
+void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* system,
     const Properties& render_settings,bool reset_camera);
