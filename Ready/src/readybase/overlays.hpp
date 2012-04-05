@@ -25,7 +25,7 @@
 
 // local:
 #include "utils.hpp"
-class ImageRD;
+class AbstractRD;
 
 // internal:
 class BaseOperation;
@@ -41,19 +41,20 @@ class Overlay : public XML_Object
         Overlay(vtkXMLDataElement* node);
         ~Overlay();
             
-        // apply the overlay
-        void Apply(ImageRD *system,int x,int y,int z) const;
-
         // for saving to file, get the overlay as an XML element
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
         static const char* GetTypeName() { return "overlay"; }
 
+        int GetTargetChemical() const { return this->iTargetChemical; }
+
+        void Apply(float& val,AbstractRD* system,int x,int y,int z) const;
+
     protected:
     
         int iTargetChemical;
-        BaseOperation *op;   // e.g. overwrite, add, multiply, etc.
-        BaseFill *fill;     // e.g. constant value, white noise, named parameter, other chemical, etc.
+        BaseOperation *op;                 // e.g. overwrite, add, multiply, etc.
+        BaseFill *fill;                   // e.g. constant value, white noise, named parameter, other chemical, etc.
         std::vector<BaseShape*> shapes;  // e.g. rectangle, sphere, scattered shapes, etc.
 
     private:

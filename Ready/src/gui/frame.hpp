@@ -33,7 +33,7 @@ class wxVTKRenderWindowInteractor;
 
 // readybase
 #include "Properties.hpp"
-class ImageRD;
+class AbstractRD;
 
 // VTK:
 class vtkImageData;
@@ -51,7 +51,7 @@ class MyFrame : public wxFrame
         bool UserWantsToCancelWhenAskedIfWantsToSave();
 
         // interface with InfoPanel
-        ImageRD* GetCurrentRDSystem() { return system; }
+        AbstractRD* GetCurrentRDSystem() { return system; }
         void SetRuleName(std::string s);
         void SetDescription(std::string s);
         void SetParameter(int iParam,float val);
@@ -153,14 +153,11 @@ class MyFrame : public wxFrame
         void CheckFocus();
         void EnableAllMenus(bool enable);
        
-        void SetCurrentRDSystem(ImageRD* system);
+        void SetCurrentRDSystem(AbstractRD* system);
         void UpdateWindows();
         void UpdateWindowTitle();
         void UpdateToolbars();
         void SetStatusBarText();
-
-        void SaveStartingPattern();
-        void RestoreStartingPattern();
 
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
@@ -175,10 +172,7 @@ class MyFrame : public wxFrame
         wxVTKRenderWindowInteractor *pVTKWindow;
 
         // current system being simulated (in future we might want more than one)
-        ImageRD *system;
-
-        // we save the starting pattern, to allow the user to reset
-        vtkImageData *starting_pattern;
+        AbstractRD *system;
 
         // panes and toolbars:
         PatternsPanel *patterns_panel;

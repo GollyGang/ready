@@ -32,8 +32,8 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
         vtkTypeMacro(RD_XMLWriter, vtkXMLImageDataWriter);
         static RD_XMLWriter* New();
 
-        void SetSystem(ImageRD* rd_system);
-        void SetRenderSettings(Properties* settings) { this->render_settings = settings; }
+        void SetSystem(const ImageRD* rd_system);
+        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
 
     protected:  
 
@@ -45,8 +45,8 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
 
     protected:
 
-        ImageRD *system;
-        Properties* render_settings;
+        const ImageRD* system;
+        const Properties* render_settings;
 };
 
 class RD_XMLReader : public vtkXMLImageDataReader

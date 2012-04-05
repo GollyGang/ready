@@ -53,14 +53,14 @@ class OpenCL_RD : public ImageRD
 
         virtual void TestFormula(std::string s);
 
-        virtual void CopyFromImage(vtkImageData* im);
-
 		virtual void GenerateInitialPattern();
 		virtual void BlankImage();
 		
-        virtual void AllocateImages(int x,int y,int z,int nc);
-
     protected:
+
+        virtual void CopyFromImage(vtkImageData* im);
+
+        virtual void AllocateImages(int x,int y,int z,int nc);
 
         virtual void InternalUpdate(int n_steps);
 

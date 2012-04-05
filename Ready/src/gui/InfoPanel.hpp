@@ -29,7 +29,7 @@ class MyFrame;
 class HtmlInfo;
 
 // readybase:
-class ImageRD;
+class AbstractRD;
 
 // this panel allows the user to change the parameters of an RD system
 // (it doesn't change the ImageRD itself though, MyFrame does that)
@@ -40,7 +40,7 @@ class InfoPanel : public wxPanel
         InfoPanel(MyFrame* parent, wxWindowID id);
 
         // update the displayed info to reflect the state of the RD system
-        void Update(const ImageRD* const system);
+        void Update(const AbstractRD* const system);
         
         // bring up a suitable dialog for changing the given setting
         void ChangeInfo(const wxString& label);
@@ -71,6 +71,8 @@ class InfoPanel : public wxPanel
         wxButton* biggerbutt;   // bigger text
    
         wxStaticText* status;   // for link info
+
+        int rownum;             // for alternating row background colors
 
     private:
         

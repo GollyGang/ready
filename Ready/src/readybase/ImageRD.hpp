@@ -37,41 +37,43 @@ class ImageRD : public AbstractRD
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        virtual void SaveFile(const char* filename,const Properties& render_settings) const;
 
         // e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality() const;
+        virtual bool HasEditableDimensions() const { return true; }
+        virtual int GetX() const;
+        virtual int GetY() const;
+        virtual int GetZ() const;
+        virtual void SetDimensions(int x,int y,int z);
+        virtual void SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc);
 
-        int GetX() const;
-        int GetY() const;
-        int GetZ() const;
-
-        vtkSmartPointer<vtkImageData> GetImage() const;
-        vtkImageData* GetImage(int iChemical) const;
-        virtual void CopyFromImage(vtkImageData* im);
-
-        // only some implementations (OpenCL_FullKernel) can have their block size edited
-        virtual bool HasEditableBlockSize() const { return false; }
-        virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
-        virtual int GetBlockSizeY() const { return 1; }
-        virtual int GetBlockSizeZ() const { return 1; }
-        virtual void SetBlockSizeX(int n) {}
-        virtual void SetBlockSizeY(int n) {}
-        virtual void SetBlockSizeZ(int n) {}
+        virtual void SetNumberOfChemicals(int n);
 
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
+        virtual void CopyFromImage(vtkImageData* im);
 
-        // use to change the dimensions or the number of chemicals
-        virtual void AllocateImages(int x,int y,int z,int nc);
+        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
+        virtual void SaveStartingPattern();
+        virtual void RestoreStartingPattern();
 
-        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
-        void SetImageWrapPadFilter(vtkImageWrapPad *p) { this->image_wrap_pad_filter = p; }
+        virtual float SampleAt(int x,int y,int z,int ic);
 
     protected:
 
         std::vector<vtkImageData*> images; // one for each chemical
 
+        // we save the starting pattern, to allow the user to reset
+        vtkImageData *starting_pattern;
+
     protected:
+
+        vtkSmartPointer<vtkImageData> GetImage() const;
+        vtkImageData* GetImage(int iChemical) const;
+
+        // use to change the dimensions or the number of chemicals
+        virtual void AllocateImages(int x,int y,int z,int nc);
 
         void DeallocateImages();
 
@@ -79,8 +81,13 @@ class ImageRD : public AbstractRD
 
     private:
 
-        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined (see vtk_pipeline.cpp)
+        void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& render_settings);
+        void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& render_settings);
+        void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& render_settings);
+
+        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined
         vtkImageWrapPad *image_wrap_pad_filter;
+        void SetImageWrapPadFilter(vtkImageWrapPad *p) { this->image_wrap_pad_filter = p; }
         void UpdateImageWrapPadFilter();
 
     private: // deliberately not implemented, to prevent use

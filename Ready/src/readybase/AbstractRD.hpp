@@ -20,10 +20,12 @@
 
 // local:
 class Overlay;
+class Properties;
 
 // VTK:
 #include <vtkSmartPointer.h>
 class vtkXMLDataElement;
+class vtkRenderer;
 
 // STL:
 #include <string>
@@ -44,6 +46,7 @@ class AbstractRD
         // inbuilt implementations cannot have their number_of_chemicals edited
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
+        virtual void SetNumberOfChemicals(int n) =0;
 
         // how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
@@ -81,6 +84,7 @@ class AbstractRD
         bool IsModified() const;
         void SetModified(bool m);
 
+        virtual void SaveFile(const char* filename,const Properties& render_settings) const =0;
         std::string GetFilename() const;
         void SetFilename(const std::string& s);
 
@@ -90,6 +94,27 @@ class AbstractRD
         void ClearInitialPatternGenerator();
         int GetNumberOfInitialPatternGeneratorOverlays() const { return (int)this->initial_pattern_generator.size(); }
         Overlay* GetInitialPatternGeneratorOverlay(int i) const { return this->initial_pattern_generator[i]; }
+
+        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings) =0;
+        virtual void SaveStartingPattern() =0;
+        virtual void RestoreStartingPattern() =0;
+
+        virtual bool HasEditableDimensions() const { return false; }
+        virtual int GetX() const =0;
+        virtual int GetY() const =0;
+        virtual int GetZ() const =0;
+        virtual void SetDimensions(int x,int y,int z) =0;
+
+        // only some implementations (OpenCL_FullKernel) can have their block size edited
+        virtual bool HasEditableBlockSize() const { return false; }
+        virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
+        virtual int GetBlockSizeY() const { return 1; }
+        virtual int GetBlockSizeZ() const { return 1; }
+        virtual void SetBlockSizeX(int n) {}
+        virtual void SetBlockSizeY(int n) {}
+        virtual void SetBlockSizeZ(int n) {}
+
+        virtual float SampleAt(int x,int y,int z,int ic) =0;
 
     protected:
 
