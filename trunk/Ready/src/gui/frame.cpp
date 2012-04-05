@@ -1879,9 +1879,6 @@ void MyFrame::ProcessKey(int key, int modifiers)
 
 // ---------------------------------------------------------------------
 
-// this global is used to pass info from OnKeyDown to OnChar
-static int realkey;
-
 void MyFrame::OnKeyDown(wxKeyEvent& event)
 {
     #ifdef __WXMAC__
@@ -2108,8 +2105,6 @@ void MyFrame::SetBlockSize(int x,int y,int z)
 }
 
 // ---------------------------------------------------------------------
-
-const int MAX_TIMESTEPS_PER_RENDER = 1e8;
 
 void MyFrame::RenderSettingsChanged()
 {
