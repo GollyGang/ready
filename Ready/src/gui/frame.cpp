@@ -30,10 +30,11 @@
 // readybase:
 #include "utils.hpp"
 #include "GrayScott.hpp"
-#include "OpenCL_Formula.hpp"
-#include "OpenCL_FullKernel.hpp"
 #include "OpenCL_utils.hpp"
 #include "IO_XML.hpp"
+#include "MeshRd.hpp"
+#include "OpenCL_Formula.hpp"
+#include "OpenCL_FullKernel.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -1220,9 +1221,12 @@ wxString MyFrame::SavePatternDialog()
     wxString filename = wxEmptyString;
     wxString currname = this->system->GetFilename();
     currname = currname.AfterLast(wxFILE_SEP_PATH);
+
+    wxString extension(this->system->GetFileExtension().c_str(),wxConvUTF8);
+    wxString extension_description = _("Extended VTK files (*.")+extension +_T(")|*.")+extension;
     
     wxFileDialog savedlg(this, _("Specify the pattern filename"), opensavedir, currname,
-                         _("VTK image files (*.vti)|*.vti"),
+                         extension_description,
                          wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     #ifdef __WXGTK__
         // opensavedir is ignored above (bug in wxGTK 2.8.0???)
@@ -1290,7 +1294,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
     wxFileDialog opendlg(this, _("Choose a pattern file"), opensavedir, wxEmptyString,
-                         _("VTK image files (*.vti)|*.vti"),
+                         _("Extended VTK image files (*.vti)|*.vti|Extended VTK mesh files (*.vtp)|*.vtp"),
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     #ifdef __WXGTK__
         // opensavedir is ignored above (bug in wxGTK 2.8.x???)
@@ -1340,56 +1344,93 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     // load pattern file
     bool warn_to_update = false;
-    ImageRD *target_system = NULL; // TODO: allow loading of non-image patterns
+    AbstractRD *target_system = NULL; // TODO: allow loading of non-image patterns
     try
     {
-        vtkSmartPointer<RD_XMLReader> iw = vtkSmartPointer<RD_XMLReader>::New();
-        iw->SetFileName(path.mb_str());
-        iw->Update();
-
-        string type = iw->GetType();
-        if(type=="inbuilt")
+        ImageRD* image_system = NULL;
+        if(path.SubString(path.Len()-3,path.Len())=="vti")
         {
-            string name = iw->GetName();
-            if(name=="Gray-Scott")
-                target_system = new GrayScott();
-            else 
-                throw runtime_error("Unsupported inbuilt implementation: "+name);
-        }
-        else if(type=="formula")
-        {
-            // TODO: detect if opencl is available, abort if not
-            OpenCL_Formula *s = new OpenCL_Formula();
-            s->SetPlatform(opencl_platform);
-            s->SetDevice(opencl_device);
-            target_system = s;
-        }
-        else if(type=="kernel")
-        {
-            // TODO: detect if opencl is available, abort if not
-            OpenCL_FullKernel *s = new OpenCL_FullKernel();
-            s->SetPlatform(opencl_platform);
-            s->SetDevice(opencl_device);
-            target_system = s;
-        }
-        else throw runtime_error("Unsupported rule type: "+type);
-        target_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
+            vtkSmartPointer<RD_XMLImageReader> iw = vtkSmartPointer<RD_XMLImageReader>::New();
+            iw->SetFileName(path.mb_str());
+            iw->Update();
 
-        // render settings
-        this->InitializeDefaultRenderSettings();
-        vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
-        if(xml_render_settings) // optional
-            this->render_settings.OverwriteFromXML(xml_render_settings);
+            string type = iw->GetType();
+            if(type=="inbuilt")
+            {
+                string name = iw->GetName();
+                if(name=="Gray-Scott")
+                    image_system = new GrayScott();
+                else 
+                    throw runtime_error("Unsupported inbuilt implementation: "+name);
+            }
+            else if(type=="formula")
+            {
+                // TODO: detect if opencl is available, abort if not
+                OpenCL_Formula *s = new OpenCL_Formula();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                image_system = s;
+            }
+            else if(type=="kernel")
+            {
+                // TODO: detect if opencl is available, abort if not
+                OpenCL_FullKernel *s = new OpenCL_FullKernel();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                image_system = s;
+            }
+            else throw runtime_error("Unsupported rule type: "+type);
+            image_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
 
-        int dim[3];
-        iw->GetOutput()->GetDimensions(dim);
-        int nc = iw->GetOutput()->GetNumberOfScalarComponents();
-        target_system->SetDimensions(dim[0],dim[1],dim[2]);
-        target_system->SetNumberOfChemicals(nc);
-        if(iw->ShouldGenerateInitialPatternWhenLoading())
-            target_system->GenerateInitialPattern();
+            // render settings
+            this->InitializeDefaultRenderSettings();
+            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
+            if(xml_render_settings) // optional
+                this->render_settings.OverwriteFromXML(xml_render_settings);
+
+            int dim[3];
+            iw->GetOutput()->GetDimensions(dim);
+            int nc = iw->GetOutput()->GetNumberOfScalarComponents();
+            image_system->SetDimensions(dim[0],dim[1],dim[2]);
+            image_system->SetNumberOfChemicals(nc);
+            if(iw->ShouldGenerateInitialPatternWhenLoading())
+                image_system->GenerateInitialPattern();
+            else
+                image_system->CopyFromImage(iw->GetOutput());
+            target_system = image_system;
+        }
+        else if(path.SubString(path.Len()-3,path.Len())=="vtp")
+        {
+            MeshRD *mesh_system;
+            vtkSmartPointer<RD_XMLPolyDataReader> iw = vtkSmartPointer<RD_XMLPolyDataReader>::New();
+            iw->SetFileName(path.mb_str());
+            iw->Update();
+
+            string type = iw->GetType();
+            if(type=="formula")
+            {
+                // TODO: detect if opencl is available, abort if not
+                MeshRD *s = new MeshRD();
+                s->CopyFromMesh(iw->GetOutput());
+                mesh_system = s;
+            }
+            else throw runtime_error("Unsupported rule type: "+type);
+            mesh_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
+
+            // render settings
+            this->InitializeDefaultRenderSettings();
+            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
+            if(xml_render_settings) // optional
+                this->render_settings.OverwriteFromXML(xml_render_settings);
+
+            if(iw->ShouldGenerateInitialPatternWhenLoading())
+                mesh_system->GenerateInitialPattern();
+            target_system = mesh_system;
+        }
         else
-            target_system->CopyFromImage(iw->GetOutput());
+        {
+            throw runtime_error("Unknown extension");
+        }
         target_system->SetFilename(string(path.mb_str())); // TODO: display filetitle only (user option?)
         target_system->SetModified(false);
         this->SetCurrentRDSystem(target_system);

@@ -35,9 +35,6 @@ class wxVTKRenderWindowInteractor;
 #include "Properties.hpp"
 class AbstractRD;
 
-// VTK:
-class vtkImageData;
-
 class MyFrame : public wxFrame
 {
     public:

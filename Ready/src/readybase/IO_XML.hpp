@@ -17,27 +17,32 @@
 
 // local
 class ImageRD;
+class MeshRD;
 class Properties;
 
 // VTK:
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkXMLPolyDataReader.h>
 #include <vtkXMLDataElement.h>
 #include <vtkSmartPointer.h>
 
-class RD_XMLWriter : public vtkXMLImageDataWriter
+// -------------------------------------------------------------------
+
+class RD_XMLImageWriter : public vtkXMLImageDataWriter
 {
     public:
 
-        vtkTypeMacro(RD_XMLWriter, vtkXMLImageDataWriter);
-        static RD_XMLWriter* New();
+        vtkTypeMacro(RD_XMLImageWriter, vtkXMLImageDataWriter);
+        static RD_XMLImageWriter* New();
 
         void SetSystem(const ImageRD* rd_system);
         void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
 
     protected:  
 
-        RD_XMLWriter() : system(NULL) {} 
+        RD_XMLImageWriter() : system(NULL) {} 
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
 
@@ -49,12 +54,14 @@ class RD_XMLWriter : public vtkXMLImageDataWriter
         const Properties* render_settings;
 };
 
-class RD_XMLReader : public vtkXMLImageDataReader
+// -------------------------------------------------------------------
+
+class RD_XMLImageReader : public vtkXMLImageDataReader
 {
     public:
 
-        vtkTypeMacro(RD_XMLReader, vtkXMLImageDataReader);
-        static RD_XMLReader* New();
+        vtkTypeMacro(RD_XMLImageReader, vtkXMLImageDataReader);
+        static RD_XMLImageReader* New();
 
         std::string GetType();
         std::string GetName();
@@ -63,6 +70,54 @@ class RD_XMLReader : public vtkXMLImageDataReader
 
     protected:  
 
-        RD_XMLReader() {} 
+        RD_XMLImageReader() {} 
 
 };
+
+// -------------------------------------------------------------------
+
+class RD_XMLPolyDataWriter : public vtkXMLPolyDataWriter
+{
+    public:
+
+        vtkTypeMacro(RD_XMLPolyDataWriter, vtkXMLPolyDataWriter);
+        static RD_XMLPolyDataWriter* New();
+
+        void SetSystem(const MeshRD* rd_system);
+        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
+
+    protected:  
+
+        RD_XMLPolyDataWriter() : system(NULL) {} 
+
+        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
+
+        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
+
+    protected:
+
+        const MeshRD* system;
+        const Properties* render_settings;
+};
+
+// -------------------------------------------------------------------
+
+class RD_XMLPolyDataReader : public vtkXMLPolyDataReader
+{
+    public:
+
+        vtkTypeMacro(RD_XMLPolyDataReader, vtkXMLPolyDataReader);
+        static RD_XMLPolyDataReader* New();
+
+        std::string GetType();
+        std::string GetName();
+        vtkXMLDataElement* GetRDElement();
+        bool ShouldGenerateInitialPatternWhenLoading();
+
+    protected:  
+
+        RD_XMLPolyDataReader() {} 
+
+};
+
+// -------------------------------------------------------------------

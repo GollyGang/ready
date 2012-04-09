@@ -33,11 +33,11 @@ class ImageRD : public AbstractRD
         ImageRD();
         virtual ~ImageRD();
 
-        virtual void Update(int n_steps);
-
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
         virtual void SaveFile(const char* filename,const Properties& render_settings) const;
+
+        virtual void Update(int n_steps);
 
         // e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality() const;
@@ -59,6 +59,8 @@ class ImageRD : public AbstractRD
         virtual void RestoreStartingPattern();
 
         virtual float SampleAt(int x,int y,int z,int ic);
+
+        virtual std::string GetFileExtension() const { return "vti"; }
 
     protected:
 
