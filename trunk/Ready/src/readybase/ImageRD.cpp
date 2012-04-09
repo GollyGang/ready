@@ -74,9 +74,6 @@ using namespace std;
 
 ImageRD::ImageRD()
 {
-    this->timesteps_taken = 0;
-    this->need_reload_formula = true;
-    this->is_modified = false;
     this->image_wrap_pad_filter = NULL;
     this->starting_pattern = vtkImageData::New();
 }
@@ -86,7 +83,6 @@ ImageRD::ImageRD()
 ImageRD::~ImageRD()
 {
     this->DeallocateImages();
-    this->ClearInitialPatternGenerator();
     this->starting_pattern->Delete();
 }
 
@@ -812,7 +808,7 @@ void ImageRD::RestoreStartingPattern()
 
 void ImageRD::SaveFile(const char* filename,const Properties& render_settings) const
 {
-    vtkSmartPointer<RD_XMLWriter> iw = vtkSmartPointer<RD_XMLWriter>::New();
+    vtkSmartPointer<RD_XMLImageWriter> iw = vtkSmartPointer<RD_XMLImageWriter>::New();
     iw->SetSystem(this);
     iw->SetRenderSettings(&render_settings);
     iw->SetFileName(filename);

@@ -18,6 +18,7 @@
 // local:
 #include "IO_XML.hpp"
 #include "ImageRD.hpp"
+#include "MeshRD.hpp"
 #include "utils.hpp"
 #include "Properties.hpp"
 
@@ -34,15 +35,23 @@
 #include <stdexcept>
 using namespace std;
 
-vtkStandardNewMacro(RD_XMLWriter);
-vtkStandardNewMacro(RD_XMLReader);
+// --------------------------------------------------------------------------------
 
-void RD_XMLWriter::SetSystem(const ImageRD* rd_system) 
+vtkStandardNewMacro(RD_XMLImageWriter);
+vtkStandardNewMacro(RD_XMLImageReader);
+vtkStandardNewMacro(RD_XMLPolyDataWriter);
+vtkStandardNewMacro(RD_XMLPolyDataReader);
+
+// --------------------------------------------------------------------------------
+
+void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system) 
 { 
     this->system = rd_system; 
 }
 
-int RD_XMLWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
+// --------------------------------------------------------------------------------
+
+int RD_XMLImageWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 {
     vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
     xml->AddNestedElement(this->render_settings->GetAsXML());
@@ -50,7 +59,9 @@ int RD_XMLWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
     return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
 }
 
-string RD_XMLReader::GetType()
+// ================================================================================
+
+string RD_XMLImageReader::GetType()
 {
     vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -59,7 +70,9 @@ string RD_XMLReader::GetType()
     return s;
 }
 
-string RD_XMLReader::GetName()
+// --------------------------------------------------------------------------------
+
+string RD_XMLImageReader::GetName()
 {
     vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -68,16 +81,21 @@ string RD_XMLReader::GetName()
     return s;
 }
 
-bool RD_XMLReader::ShouldGenerateInitialPatternWhenLoading()
+// --------------------------------------------------------------------------------
+
+bool RD_XMLImageReader::ShouldGenerateInitialPatternWhenLoading()
 {
-    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = 
+        this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
     if(!initial_pattern_generator) return false; // (element is optional, defaults to false)
     const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
     if(!s) return false;
     return string(s)=="true";
 }
 
-vtkXMLDataElement* RD_XMLReader::GetRDElement()
+// --------------------------------------------------------------------------------
+
+vtkXMLDataElement* RD_XMLImageReader::GetRDElement()
 {
     this->Update();
     vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
@@ -86,3 +104,68 @@ vtkXMLDataElement* RD_XMLReader::GetRDElement()
     if(!rd) throw runtime_error("RD node not found in file");
     return rd;
 }
+
+// ================================================================================
+
+void RD_XMLPolyDataWriter::SetSystem(const MeshRD* rd_system) 
+{ 
+    this->system = rd_system; 
+}
+
+// --------------------------------------------------------------------------------
+
+int RD_XMLPolyDataWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
+    xml->AddNestedElement(this->render_settings->GetAsXML());
+    xml->PrintXML(os,indent);
+    return vtkXMLPolyDataWriter::WritePrimaryElement(os,indent);
+}
+
+// ================================================================================
+
+string RD_XMLPolyDataReader::GetType()
+{
+    vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+    string s;
+    read_required_attribute(rule,"type",s);
+    return s;
+}
+
+// --------------------------------------------------------------------------------
+
+string RD_XMLPolyDataReader::GetName()
+{
+    vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+    string s;
+    read_required_attribute(rule,"name",s);
+    return s;
+}
+
+// --------------------------------------------------------------------------------
+
+bool RD_XMLPolyDataReader::ShouldGenerateInitialPatternWhenLoading()
+{
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = 
+        this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
+    if(!initial_pattern_generator) return false; // (element is optional, defaults to false)
+    const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
+    if(!s) return false;
+    return string(s)=="true";
+}
+
+// --------------------------------------------------------------------------------
+
+vtkXMLDataElement* RD_XMLPolyDataReader::GetRDElement()
+{
+    this->Update();
+    vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();
+    if(!root) throw runtime_error("No XML found in file");
+    vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
+    if(!rd) throw runtime_error("RD node not found in file");
+    return rd;
+}
+
+// --------------------------------------------------------------------------------

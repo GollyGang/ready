@@ -43,6 +43,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/OpenCL_utils.hpp         src/readybase/OpenCL_utils.cpp
   src/readybase/OpenCL_Formula.hpp       src/readybase/OpenCL_Formula.cpp
   src/readybase/OpenCL_FullKernel.hpp    src/readybase/OpenCL_FullKernel.cpp
+  src/readybase/MeshRD.hpp               src/readybase/MeshRD.cpp
   src/readybase/IO_XML.hpp               src/readybase/IO_XML.cpp
   src/readybase/overlays.hpp             src/readybase/overlays.cpp
   src/readybase/Properties.hpp           src/readybase/Properties.cpp

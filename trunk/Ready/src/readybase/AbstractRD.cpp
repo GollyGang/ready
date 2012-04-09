@@ -22,6 +22,24 @@
 // STL:
 using namespace std;
 
+// ---------------------------------------------------------------------
+
+AbstractRD::AbstractRD()
+{
+    this->timesteps_taken = 0;
+    this->need_reload_formula = true;
+    this->is_modified = false;
+}
+
+// ---------------------------------------------------------------------
+
+AbstractRD::~AbstractRD()
+{
+    this->ClearInitialPatternGenerator();
+}
+
+// ---------------------------------------------------------------------
+
 void AbstractRD::ClearInitialPatternGenerator()
 {
     for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
@@ -29,15 +47,21 @@ void AbstractRD::ClearInitialPatternGenerator()
     this->initial_pattern_generator.clear();
 }
 
+// ---------------------------------------------------------------------
+
 void AbstractRD::AddInitialPatternGeneratorOverlay(Overlay* overlay)
 {
     this->initial_pattern_generator.push_back(overlay);
 }
 
+// ---------------------------------------------------------------------
+
 int AbstractRD::GetTimestepsTaken() const
 {
     return this->timesteps_taken;
 }
+
+// ---------------------------------------------------------------------
 
 void AbstractRD::SetFormula(string s)
 {
@@ -47,20 +71,28 @@ void AbstractRD::SetFormula(string s)
     this->is_modified = true;
 }
 
+// ---------------------------------------------------------------------
+
 string AbstractRD::GetFormula() const
 {
     return this->formula;
 }
+
+// ---------------------------------------------------------------------
 
 std::string AbstractRD::GetRuleName() const
 {
     return this->rule_name;
 }
 
+// ---------------------------------------------------------------------
+
 std::string AbstractRD::GetDescription() const
 {
     return this->description;
 }
+
+// ---------------------------------------------------------------------
 
 void AbstractRD::SetRuleName(std::string s)
 {
@@ -68,26 +100,36 @@ void AbstractRD::SetRuleName(std::string s)
     this->is_modified = true;
 }
 
+// ---------------------------------------------------------------------
+
 void AbstractRD::SetDescription(std::string s)
 {
     this->description = s;
     this->is_modified = true;
 }
 
+// ---------------------------------------------------------------------
+
 int AbstractRD::GetNumberOfParameters() const
 {
     return (int)this->parameters.size();
 }
+
+// ---------------------------------------------------------------------
 
 std::string AbstractRD::GetParameterName(int iParam) const
 {
     return this->parameters[iParam].first;
 }
 
+// ---------------------------------------------------------------------
+
 float AbstractRD::GetParameterValue(int iParam) const
 {
     return this->parameters[iParam].second;
 }
+
+// ---------------------------------------------------------------------
 
 float AbstractRD::GetParameterValueByName(const std::string& name) const
 {
@@ -97,11 +139,15 @@ float AbstractRD::GetParameterValueByName(const std::string& name) const
     throw runtime_error("ImageRD::GetParameterValueByName : parameter name not found: "+name);
 }
 
+// ---------------------------------------------------------------------
+
 void AbstractRD::AddParameter(const std::string& name,float val)
 {
     this->parameters.push_back(make_pair(name,val));
     this->is_modified = true;
 }
+
+// ---------------------------------------------------------------------
 
 void AbstractRD::DeleteParameter(int iParam)
 {
@@ -109,11 +155,15 @@ void AbstractRD::DeleteParameter(int iParam)
     this->is_modified = true;
 }
 
+// ---------------------------------------------------------------------
+
 void AbstractRD::DeleteAllParameters()
 {
     this->parameters.clear();
     this->is_modified = true;
 }
+
+// ---------------------------------------------------------------------
 
 void AbstractRD::SetParameterName(int iParam,const string& s)
 {
@@ -121,11 +171,15 @@ void AbstractRD::SetParameterName(int iParam,const string& s)
     this->is_modified = true;
 }
 
+// ---------------------------------------------------------------------
+
 void AbstractRD::SetParameterValue(int iParam,float val)
 {
     this->parameters[iParam].second = val;
     this->is_modified = true;
 }
+
+// ---------------------------------------------------------------------
 
 bool AbstractRD::IsParameter(const string& name) const
 {
@@ -135,22 +189,32 @@ bool AbstractRD::IsParameter(const string& name) const
     return false;
 }
 
+// ---------------------------------------------------------------------
+
 bool AbstractRD::IsModified() const
 {
     return this->is_modified;
 }
+
+// ---------------------------------------------------------------------
 
 void AbstractRD::SetModified(bool m)
 {
     this->is_modified = m;
 }
 
+// ---------------------------------------------------------------------
+
 std::string AbstractRD::GetFilename() const
 {
     return this->filename;
 }
 
+// ---------------------------------------------------------------------
+
 void AbstractRD::SetFilename(const string& s)
 {
     this->filename = s;
 }
+
+// ---------------------------------------------------------------------

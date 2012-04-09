@@ -36,7 +36,8 @@ class AbstractRD
 {
     public:
 
-        virtual ~AbstractRD() {}
+        AbstractRD();
+        virtual ~AbstractRD();
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update) =0;
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
@@ -60,6 +61,7 @@ class AbstractRD
 
         // returns e.g. "inbuilt", "formula", "kernel", as in the XML
         virtual std::string GetRuleType() const =0;
+        virtual std::string GetFileExtension() const =0;
 
         std::string GetRuleName() const;
         void SetRuleName(std::string s);
@@ -100,10 +102,10 @@ class AbstractRD
         virtual void RestoreStartingPattern() =0;
 
         virtual bool HasEditableDimensions() const { return false; }
-        virtual int GetX() const =0;
-        virtual int GetY() const =0;
-        virtual int GetZ() const =0;
-        virtual void SetDimensions(int x,int y,int z) =0;
+        virtual int GetX() const { return 0; }
+        virtual int GetY() const { return 0; }
+        virtual int GetZ() const { return 0; }
+        virtual void SetDimensions(int x,int y,int z) {}
 
         // only some implementations (OpenCL_FullKernel) can have their block size edited
         virtual bool HasEditableBlockSize() const { return false; }
