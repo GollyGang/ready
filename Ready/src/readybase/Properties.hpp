@@ -24,7 +24,7 @@
 #include <map>
 #include <cassert>
 
-// a property can have one of several types
+/// A 'Property' has a type, a name and a value.
 class Property : public XML_Object
 {
     public:
@@ -35,9 +35,9 @@ class Property : public XML_Object
         Property(const std::string& name,float f) : XML_Object(NULL), name(name), type("float"), f1(f) {}
         Property(const std::string& name,int i) : XML_Object(NULL), name(name), type("int"), i(i) {}
         Property(const std::string& name,bool b) : XML_Object(NULL), name(name), type("bool"), b(b) {}
-        Property(const std::string& name,const std::string& type,float a,float b,float c) // e.g. "color"
+        Property(const std::string& name,const std::string& type,float a,float b,float c) //< e.g. "color"
             : XML_Object(NULL), name(name), type(type), f1(a), f2(b), f3(c) {}
-        Property(const std::string& name,const std::string& type,const std::string& c) // e.g. "chemical", "axis"
+        Property(const std::string& name,const std::string& type,const std::string& c) //< e.g. "chemical", "axis"
             : XML_Object(NULL), name(name), type(type), s(c) {}
 
         std::string GetName() const { return this->name; }
@@ -67,7 +67,7 @@ class Property : public XML_Object
         std::string s;
 };
 
-// a set of property types that can be saved to XML and loaded from XML
+/// A set of 'Property's that can be saved/loaded to/from XML.
 class Properties : public XML_Object
 {
     public: 
@@ -87,5 +87,5 @@ class Properties : public XML_Object
     protected:
     
         std::vector<Property> properties;
-        std::string set_name; // used for saving to XML
+        std::string set_name; //< used for saving to XML
 };

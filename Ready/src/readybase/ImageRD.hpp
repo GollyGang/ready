@@ -25,7 +25,7 @@
 class vtkImageData;
 class vtkImageWrapPad;
 
-/// abstract base class for image-based reaction-diffusion systems
+/// Base class for image-based systems.
 class ImageRD : public AbstractRD
 {
     public:
@@ -33,13 +33,11 @@ class ImageRD : public AbstractRD
         ImageRD();
         virtual ~ImageRD();
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
         virtual void SaveFile(const char* filename,const Properties& render_settings) const;
 
         virtual void Update(int n_steps);
 
-        // e.g. 2 for 2D systems, 3 for 3D
+        /// e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality() const;
         virtual bool HasEditableDimensions() const { return true; }
         virtual int GetX() const;
@@ -64,7 +62,7 @@ class ImageRD : public AbstractRD
 
     protected:
 
-        std::vector<vtkImageData*> images; // one for each chemical
+        std::vector<vtkImageData*> images; //< one for each chemical
 
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;
@@ -74,7 +72,7 @@ class ImageRD : public AbstractRD
         vtkSmartPointer<vtkImageData> GetImage() const;
         vtkImageData* GetImage(int iChemical) const;
 
-        // use to change the dimensions or the number of chemicals
+        /// use to change the dimensions or the number of chemicals
         virtual void AllocateImages(int x,int y,int z,int nc);
 
         void DeallocateImages();
@@ -87,7 +85,7 @@ class ImageRD : public AbstractRD
         void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& render_settings);
 
-        // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined
+        /// kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined
         vtkImageWrapPad *image_wrap_pad_filter;
         void SetImageWrapPadFilter(vtkImageWrapPad *p) { this->image_wrap_pad_filter = p; }
         void UpdateImageWrapPadFilter();

@@ -31,7 +31,7 @@ class vtkRenderer;
 #include <string>
 #include <vector>
 
-/// abstract base class for all reaction-diffusion systems
+/// Abstract base class for all reaction-diffusion systems.
 class AbstractRD
 {
     public:
@@ -39,27 +39,27 @@ class AbstractRD
         AbstractRD();
         virtual ~AbstractRD();
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update) =0;
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
         virtual void Update(int n_steps) =0;
 
-        // inbuilt implementations cannot have their number_of_chemicals edited
+        /// inbuilt implementations cannot have their number_of_chemicals edited
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
         virtual void SetNumberOfChemicals(int n) =0;
 
-        // how many timesteps have we advanced since being initialized?
+        /// how many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const;
         void SetTimestepsTaken(int t) { this->timesteps_taken=t; }
 
-        // inbuilt implementations cannot have their formula edited
+        /// inbuilt implementations cannot have their formula edited
         virtual bool HasEditableFormula() const =0;
         std::string GetFormula() const;
         virtual void TestFormula(std::string program_string) {}
         virtual void SetFormula(std::string s);
 
-        // returns e.g. "inbuilt", "formula", "kernel", as in the XML
+        /// returns e.g. "inbuilt", "formula", "kernel", as in the XML
         virtual std::string GetRuleType() const =0;
         virtual std::string GetFileExtension() const =0;
 
@@ -82,7 +82,7 @@ class AbstractRD
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
 
-        // should the user be asked if they want to save?
+        /// should the user be asked if they want to save?
         bool IsModified() const;
         void SetModified(bool m);
 
@@ -107,9 +107,9 @@ class AbstractRD
         virtual int GetZ() const { return 0; }
         virtual void SetDimensions(int x,int y,int z) {}
 
-        // only some implementations (OpenCL_FullKernel) can have their block size edited
+        /// only some implementations (OpenCL_FullKernel) can have their block size edited
         virtual bool HasEditableBlockSize() const { return false; }
-        virtual int GetBlockSizeX() const { return 1; } // e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
+        virtual int GetBlockSizeX() const { return 1; } //< e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
         virtual int GetBlockSizeY() const { return 1; }
         virtual int GetBlockSizeZ() const { return 1; }
         virtual void SetBlockSizeX(int n) {}
@@ -120,7 +120,7 @@ class AbstractRD
 
     protected:
 
-        // advance the RD system by n timesteps
+        /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps)=0;
 
     protected:

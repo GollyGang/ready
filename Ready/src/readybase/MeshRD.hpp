@@ -21,6 +21,7 @@
 // VTK:
 class vtkPolyData;
 
+/// Base class for mesh-based systems.
 class MeshRD : public AbstractRD
 {
     public:
@@ -54,15 +55,15 @@ class MeshRD : public AbstractRD
 
     protected:
 
-        // advance the RD system by n timesteps
+        /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps);
 
     protected:
 
         vtkPolyData* mesh;
 
-        // we save the starting pattern, to allow the user to reset
-        //vtkPolyData *starting_pattern;
+        /// we save the starting pattern, to allow the user to reset
+        vtkPolyData *starting_pattern;
 
     private: // deliberately not implemented, to prevent use
 

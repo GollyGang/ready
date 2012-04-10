@@ -18,6 +18,7 @@
 // local:
 #include "MeshRD.hpp"
 #include "IO_XML.hpp"
+#include "utils.hpp"
 
 // VTK:
 #include <vtkPolyData.h>
@@ -25,19 +26,17 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
-#include <vtkSphereSource.h> // DEBUG
+
+// STL:
+#include <stdexcept>
+using namespace std;
 
 // ---------------------------------------------------------------------
 
 MeshRD::MeshRD()
 {
-    //this->starting_pattern = vtkPolyData::New();
-
-    // DEBUG:
-    vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-    sphere->Update();
+    this->starting_pattern = vtkPolyData::New();
     this->mesh = vtkPolyData::New();
-    this->mesh->DeepCopy(sphere->GetOutput());
 }
 
 // ---------------------------------------------------------------------
@@ -45,28 +44,7 @@ MeshRD::MeshRD()
 MeshRD::~MeshRD()
 {
     this->mesh->Delete();
-    //this->starting_pattern->Delete();
-}
-
-// ---------------------------------------------------------------------
-
-void MeshRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
-{
-    // TODO
-}
-
-// ---------------------------------------------------------------------
-
-vtkSmartPointer<vtkXMLDataElement> MeshRD::GetAsXML() const
-{
-    vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
-    rd->SetName("RD");
-    rd->SetAttribute("format_version","1");
-    // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
-
-    return rd;
-
-    // TODO
+    this->starting_pattern->Delete();
 }
 
 // ---------------------------------------------------------------------
@@ -113,7 +91,7 @@ void MeshRD::BlankImage()
 
 void MeshRD::CopyFromMesh(vtkPolyData* pd)
 {
-    // TODO
+    this->mesh->DeepCopy(pd);
 }
 
 // ---------------------------------------------------------------------
@@ -135,14 +113,14 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
 void MeshRD::SaveStartingPattern()
 {
-    // TODO
+    this->starting_pattern->DeepCopy(this->mesh);
 }
 
 // ---------------------------------------------------------------------
 
 void MeshRD::RestoreStartingPattern()
 {
-    // TODO
+    this->mesh->DeepCopy(this->starting_pattern);
 }
 
 // ---------------------------------------------------------------------
@@ -159,6 +137,45 @@ float MeshRD::SampleAt(int x,int y,int z,int ic)
 void MeshRD::InternalUpdate(int n_steps)
 {
     // TODO
+}
+
+// ---------------------------------------------------------------------
+void MeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+{
+    AbstractRD::InitializeFromXML(rd,warn_to_update);
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found in file");
+
+    // formula:
+    vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
+    if(!xml_formula) throw runtime_error("formula node not found in file");
+
+    // number_of_chemicals:
+    read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
+
+    string formula = trim_multiline_string(xml_formula->GetCharacterData());
+    this->TestFormula(formula); // will throw on error
+    this->SetFormula(formula); // (won't throw yet)
+}
+
+// ---------------------------------------------------------------------
+
+vtkSmartPointer<vtkXMLDataElement> MeshRD::GetAsXML() const
+{
+    vtkSmartPointer<vtkXMLDataElement> rd = AbstractRD::GetAsXML();
+
+    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
+    if(!rule) throw runtime_error("rule node not found");
+
+    // formula
+    vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
+    formula->SetName("formula");
+    formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+    formula->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
+    rule->AddNestedElement(formula);
+
+    return rd;
 }
 
 // ---------------------------------------------------------------------
