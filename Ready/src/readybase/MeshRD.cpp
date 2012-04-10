@@ -19,6 +19,7 @@
 #include "MeshRD.hpp"
 #include "IO_XML.hpp"
 #include "utils.hpp"
+#include "Properties.hpp"
 
 // VTK:
 #include <vtkPolyData.h>
@@ -26,6 +27,15 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
+#include <vtkMath.h>
+#include <vtkLookupTable.h>
+#include <vtkScalarBarActor.h>
+#include <vtkCubeSource.h>
+#include <vtkExtractEdges.h>
+#include <vtkProperty.h>
+#include <vtkCellData.h>
+#include <vtkFloatArray.h>
+#include <vtkMinimalStandardRandomSequence.h>
 
 // STL:
 #include <stdexcept>
@@ -98,15 +108,64 @@ void MeshRD::CopyFromMesh(vtkPolyData* pd)
 
 void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings)
 {
-    // TODO
+    float low = render_settings.GetProperty("low").GetFloat();
+    float high = render_settings.GetProperty("high").GetFloat();
+    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
+    render_settings.GetProperty("color_low").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
+    render_settings.GetProperty("color_high").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
+    bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
+    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+
+    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    
+    // create a lookup table for mapping values to colors
+    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+    lut->SetRampToLinear();
+    lut->SetScaleToLinear();
+    lut->SetTableRange(low,high);
+    lut->SetSaturationRange(low_sat,high_sat);
+    lut->SetHueRange(low_hue,high_hue);
+    lut->SetValueRange(low_val,high_val);
+    lut->Build();
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInput(this->mesh);
+    mapper->SetScalarModeToUseCellData();
+    mapper->SetLookupTable(lut);
 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
 
     pRenderer->AddActor(actor);
+
+    // also add a scalar bar to show how the colors correspond to values
+    vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+    scalar_bar->SetLookupTable(lut);
+    pRenderer->AddActor2D(scalar_bar);
+
+    // add the bounding box
+    {
+        vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
+        box->SetBounds(this->mesh->GetBounds());
+
+        vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+        edges->SetInputConnection(box->GetOutputPort());
+
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(edges->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(0,0,0);  
+        actor->GetProperty()->SetAmbient(1);
+
+        pRenderer->AddActor(actor);
+    }
 }
 
 // ---------------------------------------------------------------------
