@@ -32,7 +32,7 @@
 #include "GrayScott.hpp"
 #include "OpenCL_utils.hpp"
 #include "IO_XML.hpp"
-#include "MeshRd.hpp"
+#include "MeshRD.hpp"
 #include "OpenCL_Formula.hpp"
 #include "OpenCL_FullKernel.hpp"
 
