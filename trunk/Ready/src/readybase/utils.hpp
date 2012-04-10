@@ -72,7 +72,8 @@ int IndexFromChemicalName(const std::string& s);
 // read a multiline string, outputting whitespace-trimmed lines
 std::string trim_multiline_string(const char* s);
 
-// XML object interface
+/// Abstract interface for XML objects.
+/** Allows objects to be saved/loaded to/from an XML representation. */
 class XML_Object
 {
     public:

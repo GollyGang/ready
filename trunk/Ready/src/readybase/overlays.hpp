@@ -32,16 +32,16 @@ class BaseOperation;
 class BaseFill;
 class BaseShape;
 
-// an overlay is a filled shape to be drawn on top of an image (think: stacked transparencies)
+/// An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).
 class Overlay : public XML_Object
 {
     public:
     
-        // can construct from an XML node
+        /// can construct from an XML node
         Overlay(vtkXMLDataElement* node);
         ~Overlay();
             
-        // for saving to file, get the overlay as an XML element
+        /// for saving to file, get the overlay as an XML element
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
         static const char* GetTypeName() { return "overlay"; }
@@ -53,12 +53,12 @@ class Overlay : public XML_Object
     protected:
     
         int iTargetChemical;
-        BaseOperation *op;                 // e.g. overwrite, add, multiply, etc.
-        BaseFill *fill;                   // e.g. constant value, white noise, named parameter, other chemical, etc.
-        std::vector<BaseShape*> shapes;  // e.g. rectangle, sphere, scattered shapes, etc.
+        BaseOperation *op;                 //< e.g. overwrite, add, multiply, etc.
+        BaseFill *fill;                   //< e.g. constant value, white noise, named parameter, other chemical, etc.
+        std::vector<BaseShape*> shapes;  //< e.g. rectangle, sphere, scattered shapes, etc.
 
     private:
 
-        Overlay();          // not implemented
-        Overlay(Overlay&); // not implemented
+        Overlay();          //< not implemented
+        Overlay(Overlay&); //< not implemented
 };

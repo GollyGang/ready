@@ -1294,7 +1294,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
     wxFileDialog opendlg(this, _("Choose a pattern file"), opensavedir, wxEmptyString,
-                         _("Extended VTK image files (*.vti)|*.vti|Extended VTK mesh files (*.vtp)|*.vtp"),
+                         _("Extended VTK files (*.vti;*.vtp)|*.vti;*.vtp"),
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     #ifdef __WXGTK__
         // opensavedir is ignored above (bug in wxGTK 2.8.x???)
@@ -1344,7 +1344,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     // load pattern file
     bool warn_to_update = false;
-    AbstractRD *target_system = NULL; // TODO: allow loading of non-image patterns
+    AbstractRD *target_system = NULL;
     try
     {
         ImageRD* image_system = NULL;
@@ -1409,14 +1409,12 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             string type = iw->GetType();
             if(type=="formula")
             {
-                // TODO: detect if opencl is available, abort if not
                 MeshRD *s = new MeshRD();
                 s->CopyFromMesh(iw->GetOutput());
                 mesh_system = s;
             }
             else throw runtime_error("Unsupported rule type: "+type);
             mesh_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
-
             // render settings
             this->InitializeDefaultRenderSettings();
             vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
@@ -1425,6 +1423,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
             if(iw->ShouldGenerateInitialPatternWhenLoading())
                 mesh_system->GenerateInitialPattern();
+
             target_system = mesh_system;
         }
         else

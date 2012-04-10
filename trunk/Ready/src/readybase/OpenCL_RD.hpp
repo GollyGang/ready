@@ -30,7 +30,7 @@
     #include "OpenCL_Dyn_Load.h"
 #endif
 
-/// base class for those RD implementations that use OpenCL
+/// Base class for implementations that use OpenCL.
 class OpenCL_RD : public ImageRD
 {
     public:

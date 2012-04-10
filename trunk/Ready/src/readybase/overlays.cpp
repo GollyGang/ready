@@ -30,55 +30,58 @@ using namespace std;
 
 // ------------------------------------------------------------------------------------------------
 
+/// Base class for a mathematical operation to be carried out at a particular location in the RD system.
 class BaseOperation : public XML_Object
 {
     public:
 
         virtual ~BaseOperation() {}
 
-        // construct when we don't know the derived type
+        /// construct when we don't know the derived type
         static BaseOperation* New(vtkXMLDataElement* node);
 
         virtual void Apply(float& target,float value) const =0;
 
     protected:
         
-        // can construct from an XML node
+        /// can construct from an XML node
         BaseOperation(vtkXMLDataElement* node) : XML_Object(node) {}
 };
 
+/// Base class for different ways of specifying values at a particular location in the RD system.
 class BaseFill : public XML_Object
 {
     public:
 
         virtual ~BaseFill() {}
 
-        // construct when we don't know the derived type
+        /// construct when we don't know the derived type
         static BaseFill* New(vtkXMLDataElement* node);
 
-        // what value would this fill type be at the given location, given the existing image as in system
+        /// what value would this fill type be at the given location, given the existing image as in system
         virtual float GetValue(AbstractRD *system,int x,int y,int z) const =0;
 
     protected:
 
-        // can construct from an XML node
+        /// can construct from an XML node
         BaseFill(vtkXMLDataElement* node) : XML_Object(node) {}
 };
  
+/// Base class for different shapes that we can draw onto the RD system.
 class BaseShape : public XML_Object
 {
     public:
 
         virtual ~BaseShape() {}
 
-        // construct when we don't know the derived type
+        /// construct when we don't know the derived type
         static BaseShape* New(vtkXMLDataElement* node);
 
         virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const =0;
 
     protected:
 
-        // can construct from an XML node
+        /// can construct from an XML node
         BaseShape(vtkXMLDataElement* node) : XML_Object(node) {}
 };
 

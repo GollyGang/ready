@@ -18,8 +18,9 @@
 // local:
 #include "OpenCL_RD.hpp"
 
-/// n-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
-/** specified as a full OpenCL kernel, for maximum flexibility */
+/// An RD system that uses an OpenCL program.
+/** An N-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
+  * specified as a full OpenCL kernel, for maximum flexibility */
 class OpenCL_FullKernel : public OpenCL_RD
 {
     public:
