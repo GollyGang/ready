@@ -94,6 +94,8 @@ void MeshRD::SaveFile(const char* filename,const Properties& render_settings) co
 
 void MeshRD::GenerateInitialPattern()
 {
+    this->mesh->BuildCells();
+
     this->BlankImage();
 
     vtkIdType npts,*pts;
@@ -172,7 +174,6 @@ float MeshRD::GetZ() const
 void MeshRD::CopyFromMesh(vtkPolyData* pd)
 {
     this->mesh->DeepCopy(pd);
-    this->mesh->ComputeBounds();
     this->buffer->DeepCopy(this->mesh);
 
     // DEBUG:
