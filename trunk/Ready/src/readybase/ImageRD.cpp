@@ -745,3 +745,12 @@ void ImageRD::SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc)
 }
 
 // ---------------------------------------------------------------------
+
+int ImageRD::GetNumberOfCells() const
+{
+	return this->images.front()->GetDimensions()[0] * 
+		this->images.front()->GetDimensions()[1] * 
+		this->images.front()->GetDimensions()[2];
+}
+
+// ---------------------------------------------------------------------

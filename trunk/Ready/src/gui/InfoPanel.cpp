@@ -50,6 +50,7 @@ const wxString formula_label = _("Formula");
 const wxString kernel_label = _("Kernel");
 const wxString dimensions_label = _("Dimensions");
 const wxString block_size_label = _("Block size");
+const wxString number_of_cells_label = _("Number of cells");
 
 // -----------------------------------------------------------------------------
 
@@ -425,6 +426,10 @@ void InfoPanel::Update(const AbstractRD* const system)
         contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             true);
+                                            
+    contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
+                                        system->GetNumberOfCells()),false);
+
     contents += _T("</table>");
 
     contents += wxT("<h5><center>");

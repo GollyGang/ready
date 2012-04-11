@@ -385,3 +385,10 @@ void MeshRD::ComputeCellNeighbors()
 }
 
 // ---------------------------------------------------------------------
+
+int MeshRD::GetNumberOfCells() const
+{
+	return this->mesh->GetNumberOfCells();
+}
+
+// ---------------------------------------------------------------------
