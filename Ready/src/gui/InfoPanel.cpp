@@ -32,6 +32,9 @@
 #include <wx/html/htmlwin.h>    // for wxHtmlWindow
 #include <wx/colordlg.h>
 
+// VTK:
+#include <vtkMath.h>
+
 // STL:
 #include <string>
 using namespace std;
@@ -414,10 +417,9 @@ void InfoPanel::Update(const AbstractRD* const system)
             contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
     }
 
-    if(system->HasEditableDimensions())
-        contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%d x %d x %d"),
-                                            system->GetX(),system->GetY(),system->GetZ()),
-                                            true);
+    contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%d x %d x %d"),
+                                        vtkMath::Round(system->GetX()),vtkMath::Round(system->GetY()),vtkMath::Round(system->GetZ())),
+                                        system->HasEditableDimensions());
 
     if(system->HasEditableBlockSize())
         contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),

@@ -111,21 +111,21 @@ int ImageRD::GetDimensionality() const
 
 // ---------------------------------------------------------------------
 
-int ImageRD::GetX() const
+float ImageRD::GetX() const
 {
     return this->images.front()->GetDimensions()[0];
 }
 
 // ---------------------------------------------------------------------
 
-int ImageRD::GetY() const
+float ImageRD::GetY() const
 {
     return this->images.front()->GetDimensions()[1];
 }
 
 // ---------------------------------------------------------------------
 
-int ImageRD::GetZ() const
+float ImageRD::GetZ() const
 {
     return this->images.front()->GetDimensions()[2];
 }
@@ -198,9 +198,9 @@ void ImageRD::GenerateInitialPattern()
 {
     this->BlankImage();
 
-    const int X = this->GetX();
-    const int Y = this->GetY();
-    const int Z = this->GetZ();
+    const int X = this->images.front()->GetDimensions()[0];
+    const int Y = this->images.front()->GetDimensions()[1];
+    const int Z = this->images.front()->GetDimensions()[2];
 
     for(int z=0;z<Z;z++)
     {
@@ -216,8 +216,11 @@ void ImageRD::GenerateInitialPattern()
                     if(iC<0 || iC>=this->GetNumberOfChemicals())
                         throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-                    float *val = vtk_at(static_cast<float*>(this->GetImage(iC)->GetScalarPointer()),x,y,z,this->GetX(),this->GetY());
-                    overlay->Apply(*val,this,x,y,z);
+                    float *val = vtk_at(static_cast<float*>(this->GetImage(iC)->GetScalarPointer()),x,y,z,X,Y);
+                    vector<float> vals(this->GetNumberOfChemicals());
+                    for(int i=0;i<this->GetNumberOfChemicals();i++)
+                        vals[i] = *vtk_at(static_cast<float*>(this->GetImage(i)->GetScalarPointer()),x,y,z,X,Y);
+                    *val = overlay->Apply(vals,this,x,y,z);
                 }
             }
         }
@@ -739,18 +742,6 @@ void ImageRD::SetNumberOfChemicals(int n)
 void ImageRD::SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc)
 {
     this->AllocateImages(x,y,z,nc);
-}
-
-// ---------------------------------------------------------------------
-
-float ImageRD::SampleAt(int x,int y,int z,int ic)
-{
-    if(ic<0 || ic>=this->GetNumberOfChemicals())
-        throw runtime_error("ImageRD::SampleAt: chemical out of range: "+GetChemicalName(ic));
-    if(x<0 || x>=this->GetX() || y<0 || y>=this->GetY() || z<0 || z>=this->GetZ())
-        throw runtime_error("ImageRD::SampleAt: coordinate out of range");
-
-    return *vtk_at(static_cast<float*>(this->GetImage(ic)->GetScalarPointer()),x,y,z,this->GetX(),this->GetY());
 }
 
 // ---------------------------------------------------------------------

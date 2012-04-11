@@ -23,6 +23,7 @@
 // VTK:
 #include <vtkXMLDataElement.h>
 #include <vtkImageData.h>
+#include <vtkMath.h>
 
 // STL:
 #include <stdexcept>
@@ -58,8 +59,8 @@ class BaseFill : public XML_Object
         /// construct when we don't know the derived type
         static BaseFill* New(vtkXMLDataElement* node);
 
-        /// what value would this fill type be at the given location, given the existing image as in system
-        virtual float GetValue(AbstractRD *system,int x,int y,int z) const =0;
+        /// what value would this fill type be at the given location, given the existing data
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const =0;
 
     protected:
 
@@ -77,7 +78,7 @@ class BaseShape : public XML_Object
         /// construct when we don't know the derived type
         static BaseShape* New(vtkXMLDataElement* node);
 
-        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const =0;
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const =0;
 
     protected:
 
@@ -137,15 +138,18 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
     return xml;
 }
 
-void Overlay::Apply(float& val,AbstractRD* system,int x,int y,int z) const
+float Overlay::Apply(vector<float> vals,AbstractRD* system,float x,float y,float z) const
 {
+    float val = vals[this->iTargetChemical];
     for(int iShape=0;iShape<(int)this->shapes.size();iShape++)
     {
         if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ() ) )
         {
-            this->op->Apply( val, this->fill->GetValue(system,x,y,z) );
+            this->op->Apply( val, this->fill->GetValue(system,vals,x,y,z) );
+            vals[this->iTargetChemical] = val; // in case there are multiple shapes at this location in this overlay
         }
     }
+    return val;
 }
 
 // --------------------------------------------------------------------------------------------------
@@ -296,7 +300,7 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
         {
             return this->value;
         }
@@ -327,9 +331,9 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
         {
-            return system->SampleAt(x,y,z,this->iOtherChemical);
+            return vals[this->iOtherChemical];
         }
 
     protected:
@@ -356,7 +360,7 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
         {
             return system->GetParameterValueByName(this->parameter_name.c_str());
         }
@@ -387,7 +391,7 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,int x,int y,int z) const
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
         {
             return frand(this->low,this->high);
         }
@@ -414,7 +418,10 @@ class Everywhere : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const { return true; }
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const 
+        { 
+            return true; 
+        }
 };
 
 class Rectangle : public BaseShape
@@ -441,12 +448,15 @@ class Rectangle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const
         {
-            int dimensionality = (X>1?1:0) + (Y>1?1:0) + (Z>1?1:0);
-            float rel_x = x/float(X);
-            float rel_y = y/float(Y);
-            float rel_z = z/float(Z);
+            int Xi = vtkMath::Round(X);
+            int Yi = vtkMath::Round(Y);
+            int Zi = vtkMath::Round(Z);
+            int dimensionality = (Xi>1?1:0) + (Yi>1?1:0) + (Zi>1?1:0);
+            float rel_x = x/X;
+            float rel_y = y/Y;
+            float rel_z = z/Z;
             switch(dimensionality)
             {
                 default:
@@ -485,14 +495,17 @@ class Circle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const
         {
             // convert the center and radius to absolute coordinates
             float cx = this->c->x * X;
             float cy = this->c->y * Y;
             float cz = this->c->z * Z;
             float abs_radius = this->radius * max(X,max(Y,Z)); // (radius is proportional to the largest dimension)
-            int dimensionality = (X>1?1:0) + (Y>1?1:0) + (Z>1?1:0);
+            int Xi = vtkMath::Round(X);
+            int Yi = vtkMath::Round(Y);
+            int Zi = vtkMath::Round(Z);
+            int dimensionality = (Xi>1?1:0) + (Yi>1?1:0) + (Zi>1?1:0);
             switch(dimensionality)
             {
                 default:
@@ -531,15 +544,18 @@ class Pixel : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(int x,int y,int z,int X,int Y,int Z) const
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const
         {
-            int dimensionality = (X>1?1:0) + (Y>1?1:0) + (Z>1?1:0);
+            int Xi = vtkMath::Round(X);
+            int Yi = vtkMath::Round(Y);
+            int Zi = vtkMath::Round(Z);
+            int dimensionality = (Xi>1?1:0) + (Yi>1?1:0) + (Zi>1?1:0);
             switch(dimensionality)
             {
                 default:
-                case 1: return x==this->px;
-                case 2: return x==this->px && y==this->py;
-                case 3: return x==this->px && y==this->py && z==this->pz;
+                case 1: return vtkMath::Round(x)==this->px;
+                case 2: return vtkMath::Round(x)==this->px && vtkMath::Round(y)==this->py;
+                case 3: return vtkMath::Round(x)==this->px && vtkMath::Round(y)==this->py && vtkMath::Round(z)==this->pz;
             }
         }
 

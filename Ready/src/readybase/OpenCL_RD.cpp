@@ -30,6 +30,7 @@ using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
+#include <vtkMath.h>
 
 OpenCL_RD::OpenCL_RD()
 {
@@ -166,9 +167,9 @@ void OpenCL_RD::ReloadKernelIfNeeded()
     this->kernel = clCreateKernel(program,this->kernel_function_name.c_str(),&ret);
     throwOnError(ret,"OpenCL_RD::ReloadKernelIfNeeded : kernel creation failed: ");
 
-    this->global_range[0] = max(1,this->GetX() / this->GetBlockSizeX());
-    this->global_range[1] = max(1,this->GetY() / this->GetBlockSizeY());
-    this->global_range[2] = max(1,this->GetZ() / this->GetBlockSizeZ());
+    this->global_range[0] = max(1,vtkMath::Round(this->GetX()) / this->GetBlockSizeX());
+    this->global_range[1] = max(1,vtkMath::Round(this->GetY()) / this->GetBlockSizeY());
+    this->global_range[2] = max(1,vtkMath::Round(this->GetZ()) / this->GetBlockSizeZ());
     // (we let the local work group size be automatically decided, seems to be faster and more flexible that way)
 
     this->need_reload_formula = false;

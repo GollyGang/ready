@@ -40,9 +40,9 @@ class ImageRD : public AbstractRD
         /// e.g. 2 for 2D systems, 3 for 3D
         int GetDimensionality() const;
         virtual bool HasEditableDimensions() const { return true; }
-        virtual int GetX() const;
-        virtual int GetY() const;
-        virtual int GetZ() const;
+        virtual float GetX() const;
+        virtual float GetY() const;
+        virtual float GetZ() const;
         virtual void SetDimensions(int x,int y,int z);
         virtual void SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc);
 
@@ -55,8 +55,6 @@ class ImageRD : public AbstractRD
         virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
-
-        virtual float SampleAt(int x,int y,int z,int ic);
 
         virtual std::string GetFileExtension() const { return "vti"; }
 

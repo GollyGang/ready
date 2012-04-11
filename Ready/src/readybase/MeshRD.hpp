@@ -34,6 +34,10 @@ class MeshRD : public AbstractRD
 
         virtual void Update(int n_steps);
 
+        virtual float GetX() const;
+        virtual float GetY() const;
+        virtual float GetZ() const;
+
         virtual void SetNumberOfChemicals(int n);
 
         virtual bool HasEditableFormula() const { return true; }
@@ -51,9 +55,10 @@ class MeshRD : public AbstractRD
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 
-        virtual float SampleAt(int x,int y,int z,int ic);
-
     protected:
+
+        /// work out which cells are neighbors of each other
+        void ComputeCellNeighbors();
 
         /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps);
@@ -61,9 +66,12 @@ class MeshRD : public AbstractRD
     protected:
 
         vtkPolyData* mesh;
+        vtkPolyData* buffer;
 
         /// we save the starting pattern, to allow the user to reset
         vtkPolyData *starting_pattern;
+
+        std::vector<std::vector<vtkIdType> > cell_neighbors;
 
     private: // deliberately not implemented, to prevent use
 
