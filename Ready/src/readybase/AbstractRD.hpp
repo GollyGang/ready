@@ -68,6 +68,8 @@ class AbstractRD
 
         std::string GetDescription() const;
         void SetDescription(std::string s);
+        
+        virtual int GetNumberOfCells() const =0;
 
         // every implementation has parameters that can be edited and changed 
         // (will cause errors if they don't match the inbuilt names, the formula or the kernel)

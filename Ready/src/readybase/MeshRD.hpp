@@ -44,6 +44,8 @@ class MeshRD : public AbstractRD
 
         virtual std::string GetRuleType() const { return "formula"; } // TODO
         virtual std::string GetFileExtension() const { return "vtp"; }
+        
+        virtual int GetNumberOfCells() const;
 
         virtual void SaveFile(const char* filename,const Properties& render_settings) const;
 
