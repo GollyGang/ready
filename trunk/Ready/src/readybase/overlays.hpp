@@ -18,6 +18,7 @@
 // STL:
 #include <string>
 #include <vector>
+using namespace std;
 
 // VTK:
 #include <vtkSmartPointer.h>
@@ -48,17 +49,19 @@ class Overlay : public XML_Object
 
         int GetTargetChemical() const { return this->iTargetChemical; }
 
-        void Apply(float& val,AbstractRD* system,int x,int y,int z) const;
+        /// given a vector of values (one for each chemical) at a location in a system, returns the new value
+        float Apply(vector<float> vals,AbstractRD* system,float x,float y,float z) const;
 
     protected:
     
-        int iTargetChemical;
-        BaseOperation *op;                 //< e.g. overwrite, add, multiply, etc.
-        BaseFill *fill;                   //< e.g. constant value, white noise, named parameter, other chemical, etc.
+        int iTargetChemical;             //< each overlay applies to a single chemical
+
+        BaseOperation *op;               //< e.g. overwrite, add, multiply, etc.
+        BaseFill *fill;                  //< e.g. constant value, white noise, named parameter, other chemical, etc.
         std::vector<BaseShape*> shapes;  //< e.g. rectangle, sphere, scattered shapes, etc.
 
     private:
 
         Overlay();          //< not implemented
-        Overlay(Overlay&); //< not implemented
+        Overlay(Overlay&);  //< not implemented
 };

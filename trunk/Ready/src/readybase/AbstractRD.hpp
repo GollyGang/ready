@@ -102,9 +102,9 @@ class AbstractRD
         virtual void RestoreStartingPattern() =0;
 
         virtual bool HasEditableDimensions() const { return false; }
-        virtual int GetX() const { return 0; }
-        virtual int GetY() const { return 0; }
-        virtual int GetZ() const { return 0; }
+        virtual float GetX() const =0;
+        virtual float GetY() const =0;
+        virtual float GetZ() const =0;
         virtual void SetDimensions(int x,int y,int z) {}
 
         /// only some implementations (OpenCL_FullKernel) can have their block size edited
@@ -115,8 +115,6 @@ class AbstractRD
         virtual void SetBlockSizeX(int n) {}
         virtual void SetBlockSizeY(int n) {}
         virtual void SetBlockSizeZ(int n) {}
-
-        virtual float SampleAt(int x,int y,int z,int ic) =0;
 
     protected:
 
