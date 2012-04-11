@@ -8,9 +8,10 @@ UI annoyances:
 - can't tab between edit controls in XYZ dialogs on Xubuntu
 
 code annoyances:
-- BaseRD::UpdateImageWrapPad() shouldn't be necessary
+- ImageRD::UpdateImageWrapPad() shouldn't be necessary
 
 before 0.3 release:
+- use vtkUnstructuredGrid (*.vtu) instead of vtkPolyData (*.vtp) in MeshRD, to allow for volumetric cells
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
