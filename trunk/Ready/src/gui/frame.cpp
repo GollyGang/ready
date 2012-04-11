@@ -1049,7 +1049,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
-            int n_cells = this->system->GetX() * this->system->GetY() * this->system->GetZ();
+            int n_cells = this->system->GetNumberOfCells();
             if (accumulated_time == 0.0)
                 accumulated_time = 0.000001;  // unlikely, but play safe
             this->frames_per_second = steps_since_last_render / accumulated_time;
