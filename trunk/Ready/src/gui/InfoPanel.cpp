@@ -375,14 +375,13 @@ void InfoPanel::Update(const AbstractRD* const system)
     rownum = 0;
 
     wxString s(system->GetRuleName().c_str(),wxConvUTF8);
-    s.Replace(wxT("\n"), wxT("<br>"));      // AKT TODO!!! ask Tim if rule name can really have linebreaks
     contents += AppendRow(rule_name_label, rule_name_label, s, true);
 
     s = wxString(system->GetRuleType().c_str(),wxConvUTF8);
     contents += AppendRow(rule_type_label, rule_type_label, s, false);
 
     s = wxString(system->GetDescription().c_str(),wxConvUTF8);
-    s.Replace(wxT("\n"), wxT("<br>"));
+    s.Replace(wxT("\n\n"), wxT("<p>"));
     contents += AppendRow(description_label, description_label, s, true, true);
 
     contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system->GetNumberOfChemicals()),
