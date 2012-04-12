@@ -5,8 +5,10 @@
       
     <description>
         Schlögl’s model is the canonical example of a chemical reaction system that exhibits bistability.
-        Schlögl, F. (1972) Chemical reaction models for non-equilibrium phase transition. Z. Physik. 253, 147–161.
-        The initial pattern is simply random values at each pixel, between -0.005 and 0.005. This low-amplitude noise quickly develops into large areas of matching values.
+        &lt;i&gt;Schlögl, F. (1972) Chemical reaction models for non-equilibrium phase transition. Z. Physik. 253, 147–161.&lt;/i&gt;
+        
+        The initial pattern is simply random values at each pixel, between -0.005 and 0.005.
+        This low-amplitude noise quickly develops into large areas of matching values.
     </description>
     
     <rule type="formula" name="Schlogl">
