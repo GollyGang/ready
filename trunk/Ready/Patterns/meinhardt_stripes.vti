@@ -2,9 +2,9 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
       
-    <pattern_description>
+    <description>
         Meinhardt stripes
-    </pattern_description>
+    </description>
     
     <rule type="formula" name="Meinhardt">
         
