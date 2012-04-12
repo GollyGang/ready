@@ -19,7 +19,8 @@
 #include "AbstractRD.hpp"
 
 // VTK:
-class vtkPolyData;
+#include <vtkType.h>
+class vtkUnstructuredGrid;
 
 /// Base class for mesh-based systems.
 class MeshRD : public AbstractRD
@@ -43,7 +44,9 @@ class MeshRD : public AbstractRD
         virtual bool HasEditableFormula() const { return true; }
 
         virtual std::string GetRuleType() const { return "formula"; } // TODO
-        virtual std::string GetFileExtension() const { return "vtp"; }
+
+        virtual std::string GetFileExtension() const { return MeshRD::GetFileExtensionStatic(); }
+        static std::string GetFileExtensionStatic() { return "vtu"; }
         
         virtual int GetNumberOfCells() const;
 
@@ -51,7 +54,7 @@ class MeshRD : public AbstractRD
 
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
-        virtual void CopyFromMesh(vtkPolyData* pd);
+        virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
 
         virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
         virtual void SaveStartingPattern();
@@ -67,11 +70,9 @@ class MeshRD : public AbstractRD
 
     protected:
 
-        vtkPolyData* mesh;
-        vtkPolyData* buffer;
-
-        /// we save the starting pattern, to allow the user to reset
-        vtkPolyData *starting_pattern;
+        vtkUnstructuredGrid* mesh;
+        vtkUnstructuredGrid* buffer;
+        vtkUnstructuredGrid* starting_pattern; //< we save the starting pattern, to allow the user to reset
 
         std::vector<std::vector<vtkIdType> > cell_neighbors;
 

@@ -90,7 +90,7 @@ set( PATTERN_FILES
   kernel_test.vti 
   conway_life.vti 
   bays_3D.vti
-  sphere.vtp
+  sphere.vtu
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti

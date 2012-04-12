@@ -23,8 +23,8 @@ class Properties;
 // VTK:
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>
-#include <vtkXMLPolyDataWriter.h>
-#include <vtkXMLPolyDataReader.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridReader.h>
 #include <vtkXMLDataElement.h>
 #include <vtkSmartPointer.h>
 
@@ -76,19 +76,19 @@ class RD_XMLImageReader : public vtkXMLImageDataReader
 
 // -------------------------------------------------------------------
 
-class RD_XMLPolyDataWriter : public vtkXMLPolyDataWriter
+class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
 {
     public:
 
-        vtkTypeMacro(RD_XMLPolyDataWriter, vtkXMLPolyDataWriter);
-        static RD_XMLPolyDataWriter* New();
+        vtkTypeMacro(RD_XMLUnstructuredGridWriter, vtkXMLUnstructuredGridWriter);
+        static RD_XMLUnstructuredGridWriter* New();
 
         void SetSystem(const MeshRD* rd_system);
         void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
 
     protected:  
 
-        RD_XMLPolyDataWriter() : system(NULL) {} 
+        RD_XMLUnstructuredGridWriter() : system(NULL) {} 
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
 
@@ -102,12 +102,12 @@ class RD_XMLPolyDataWriter : public vtkXMLPolyDataWriter
 
 // -------------------------------------------------------------------
 
-class RD_XMLPolyDataReader : public vtkXMLPolyDataReader
+class RD_XMLUnstructuredGridReader : public vtkXMLUnstructuredGridReader
 {
     public:
 
-        vtkTypeMacro(RD_XMLPolyDataReader, vtkXMLPolyDataReader);
-        static RD_XMLPolyDataReader* New();
+        vtkTypeMacro(RD_XMLUnstructuredGridReader, vtkXMLUnstructuredGridReader);
+        static RD_XMLUnstructuredGridReader* New();
 
         std::string GetType();
         std::string GetName();
@@ -116,7 +116,7 @@ class RD_XMLPolyDataReader : public vtkXMLPolyDataReader
 
     protected:  
 
-        RD_XMLPolyDataReader() {} 
+        RD_XMLUnstructuredGridReader() {} 
 
 };
 

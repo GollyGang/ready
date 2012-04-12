@@ -58,7 +58,8 @@ class ImageRD : public AbstractRD
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 
-        virtual std::string GetFileExtension() const { return "vti"; }
+        virtual std::string GetFileExtension() const { return ImageRD::GetFileExtensionStatic(); }
+        static std::string GetFileExtensionStatic() { return "vti"; }
 
     protected:
 
