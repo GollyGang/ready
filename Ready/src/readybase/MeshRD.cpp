@@ -37,6 +37,10 @@
 #include <vtkCellData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdList.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkDataSetMapper.h>
+#include <vtkTetra.h>
+#include <vtkCellArray.h>
 
 // STL:
 #include <stdexcept>
@@ -46,9 +50,9 @@ using namespace std;
 
 MeshRD::MeshRD()
 {
-    this->starting_pattern = vtkPolyData::New();
-    this->mesh = vtkPolyData::New();
-    this->buffer = vtkPolyData::New();
+    this->starting_pattern = vtkUnstructuredGrid::New();
+    this->mesh = vtkUnstructuredGrid::New();
+    this->buffer = vtkUnstructuredGrid::New();
 }
 
 // ---------------------------------------------------------------------
@@ -82,7 +86,7 @@ void MeshRD::SetNumberOfChemicals(int n)
 
 void MeshRD::SaveFile(const char* filename,const Properties& render_settings) const
 {
-    vtkSmartPointer<RD_XMLPolyDataWriter> iw = vtkSmartPointer<RD_XMLPolyDataWriter>::New();
+    vtkSmartPointer<RD_XMLUnstructuredGridWriter> iw = vtkSmartPointer<RD_XMLUnstructuredGridWriter>::New();
     iw->SetSystem(this);
     iw->SetRenderSettings(&render_settings);
     iw->SetFileName(filename);
@@ -94,8 +98,6 @@ void MeshRD::SaveFile(const char* filename,const Properties& render_settings) co
 
 void MeshRD::GenerateInitialPattern()
 {
-    this->mesh->BuildCells();
-
     this->BlankImage();
 
     vtkIdType npts,*pts;
@@ -166,14 +168,15 @@ float MeshRD::GetZ() const
 
 // ---------------------------------------------------------------------
 
-#include <vtkPlatonicSolidSource.h> // DEBUG
+// DEBUG
+#include <vtkPlatonicSolidSource.h>
 #include <vtkButterflySubdivisionFilter.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkMinimalStandardRandomSequence.h>
 
-void MeshRD::CopyFromMesh(vtkPolyData* pd)
+void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
-    this->mesh->DeepCopy(pd);
+    this->mesh->DeepCopy(mesh2);
     this->buffer->DeepCopy(this->mesh);
 
     // DEBUG:
@@ -186,7 +189,8 @@ void MeshRD::CopyFromMesh(vtkPolyData* pd)
         butterfly->SetInputConnection(icosahedron->GetOutputPort());
         butterfly->SetNumberOfSubdivisions(3);
         butterfly->Update();
-        this->mesh->DeepCopy(butterfly->GetOutput());
+        this->mesh->SetPoints(butterfly->GetOutput()->GetPoints());
+        this->mesh->SetCells(VTK_POLYGON,butterfly->GetOutput()->GetPolys());
 
         // push the vertices out into the shape of a sphere
         vtkFloatingPointType p[3];
@@ -210,6 +214,8 @@ void MeshRD::CopyFromMesh(vtkPolyData* pd)
             if(i==0)
                 scalars->SetValue(i,1.0f);
         }
+
+        this->buffer->DeepCopy(this->mesh);
     }
 
     this->ComputeCellNeighbors();
@@ -246,7 +252,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
     // add the mesh actor
     {
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
         mapper->SetInput(this->mesh);
         mapper->SetScalarModeToUseCellData();
         mapper->SetLookupTable(lut);
@@ -300,13 +306,13 @@ void MeshRD::RestoreStartingPattern()
 
 void MeshRD::InternalUpdate(int n_steps)
 {
-    // for now, a hard-coded heat equation
     vtkFloatArray *source = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetScalars() );
     vtkFloatArray *target = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetScalars() );
     for(int iStep=0;iStep<n_steps;iStep++)
     {
         for(vtkIdType iCell=0;iCell<(int)this->cell_neighbors.size();iCell++)
         {
+            // for now, a hard-coded heat equation
             float val = source->GetValue(iCell);
             for(vtkIdType iNeighbor=0;iNeighbor<(int)this->cell_neighbors[iCell].size();iNeighbor++)
                 val += source->GetValue(this->cell_neighbors[iCell][iNeighbor]);
@@ -362,27 +368,41 @@ vtkSmartPointer<vtkXMLDataElement> MeshRD::GetAsXML() const
 
 void MeshRD::ComputeCellNeighbors()
 {
-    this->mesh->BuildCells();
-    this->mesh->BuildLinks();
     this->cell_neighbors.clear();
+    vtkSmartPointer<vtkIdList> ptIds = vtkSmartPointer<vtkIdList>::New();
+    vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
+    vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
         vector<vtkIdType> neighbors;
-        vtkIdType npts,*pts;
-        this->mesh->GetCellPoints(iCell,npts,pts);
-        for(vtkIdType iPt=0;iPt<npts;iPt++)
+        this->mesh->GetCellPoints(iCell,ptIds);
+        vtkIdType npts = ptIds->GetNumberOfIds();
+        switch(this->mesh->GetCellType(iCell))
         {
-            vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
-            this->mesh->GetCellEdgeNeighbors(iCell,pts[iPt],pts[(iPt+1)%npts],ids);
-            int nNeighbors = ids->GetNumberOfIds();
-            for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
-            {
-                vtkIdType id = ids->GetId(iNeighbor);
-                neighbors.push_back(id);
-            }
+            case VTK_POLYGON: // 2D face, neighbors share an edge
+                {
+                    for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    {
+                        edgeIds->SetNumberOfIds(2);
+                        edgeIds->SetId(0,ptIds->GetId(iPt));
+                        edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
+                        this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
+                        int nNeighbors = cellIds->GetNumberOfIds();
+                        for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                        {
+                            vtkIdType id = cellIds->GetId(iNeighbor);
+                            neighbors.push_back(id);
+                        }
+                    }
+                    this->cell_neighbors.push_back(neighbors);
+                }
+                break;
+            // TODO: allow for 1D (VTK_LINE) and 3D (VTK_HEXAHEDRON?) cells
+            default:
+                throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported cell type");
         }
-        this->cell_neighbors.push_back(neighbors);
     }
+    // N.B. we don't intend to support cells of mixed dimensionality in one mesh
 }
 
 // ---------------------------------------------------------------------

@@ -39,8 +39,8 @@ using namespace std;
 
 vtkStandardNewMacro(RD_XMLImageWriter);
 vtkStandardNewMacro(RD_XMLImageReader);
-vtkStandardNewMacro(RD_XMLPolyDataWriter);
-vtkStandardNewMacro(RD_XMLPolyDataReader);
+vtkStandardNewMacro(RD_XMLUnstructuredGridWriter);
+vtkStandardNewMacro(RD_XMLUnstructuredGridReader);
 
 // --------------------------------------------------------------------------------
 
@@ -107,24 +107,24 @@ vtkXMLDataElement* RD_XMLImageReader::GetRDElement()
 
 // ================================================================================
 
-void RD_XMLPolyDataWriter::SetSystem(const MeshRD* rd_system) 
+void RD_XMLUnstructuredGridWriter::SetSystem(const MeshRD* rd_system) 
 { 
     this->system = rd_system; 
 }
 
 // --------------------------------------------------------------------------------
 
-int RD_XMLPolyDataWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
+int RD_XMLUnstructuredGridWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 {
     vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
     xml->AddNestedElement(this->render_settings->GetAsXML());
     xml->PrintXML(os,indent);
-    return vtkXMLPolyDataWriter::WritePrimaryElement(os,indent);
+    return vtkXMLUnstructuredGridWriter::WritePrimaryElement(os,indent);
 }
 
 // ================================================================================
 
-string RD_XMLPolyDataReader::GetType()
+string RD_XMLUnstructuredGridReader::GetType()
 {
     vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -135,7 +135,7 @@ string RD_XMLPolyDataReader::GetType()
 
 // --------------------------------------------------------------------------------
 
-string RD_XMLPolyDataReader::GetName()
+string RD_XMLUnstructuredGridReader::GetName()
 {
     vtkSmartPointer<vtkXMLDataElement> rule = this->GetRDElement()->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -146,7 +146,7 @@ string RD_XMLPolyDataReader::GetName()
 
 // --------------------------------------------------------------------------------
 
-bool RD_XMLPolyDataReader::ShouldGenerateInitialPatternWhenLoading()
+bool RD_XMLUnstructuredGridReader::ShouldGenerateInitialPatternWhenLoading()
 {
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = 
         this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
@@ -158,7 +158,7 @@ bool RD_XMLPolyDataReader::ShouldGenerateInitialPatternWhenLoading()
 
 // --------------------------------------------------------------------------------
 
-vtkXMLDataElement* RD_XMLPolyDataReader::GetRDElement()
+vtkXMLDataElement* RD_XMLUnstructuredGridReader::GetRDElement()
 {
     this->Update();
     vtkSmartPointer<vtkXMLDataElement> root = this->XMLParser->GetRootElement();

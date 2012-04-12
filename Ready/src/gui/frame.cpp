@@ -1294,7 +1294,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 void MyFrame::OnOpenPattern(wxCommandEvent& event)
 {
     wxFileDialog opendlg(this, _("Choose a pattern file"), opensavedir, wxEmptyString,
-                         _("Extended VTK files (*.vti;*.vtp)|*.vti;*.vtp"),
+                         _("Extended VTK files (*.vti;*.vtu)|*.vti;*.vtu"),
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     #ifdef __WXGTK__
         // opensavedir is ignored above (bug in wxGTK 2.8.x???)
@@ -1348,7 +1348,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     try
     {
         ImageRD* image_system = NULL;
-        if(path.SubString(path.Len()-3,path.Len())=="vti")
+        if(path.SubString(path.Len()-3,path.Len()) == ImageRD::GetFileExtensionStatic())
         {
             vtkSmartPointer<RD_XMLImageReader> iw = vtkSmartPointer<RD_XMLImageReader>::New();
             iw->SetFileName(path.mb_str());
@@ -1399,10 +1399,10 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
                 image_system->CopyFromImage(iw->GetOutput());
             target_system = image_system;
         }
-        else if(path.SubString(path.Len()-3,path.Len())=="vtp")
+        else if(path.SubString(path.Len()-3,path.Len()) == MeshRD::GetFileExtensionStatic())
         {
             MeshRD *mesh_system;
-            vtkSmartPointer<RD_XMLPolyDataReader> iw = vtkSmartPointer<RD_XMLPolyDataReader>::New();
+            vtkSmartPointer<RD_XMLUnstructuredGridReader> iw = vtkSmartPointer<RD_XMLUnstructuredGridReader>::New();
             iw->SetFileName(path.mb_str());
             iw->Update();
 
