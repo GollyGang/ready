@@ -140,8 +140,8 @@ void MeshRD::GenerateInitialPattern()
 void MeshRD::BlankImage()
 {
     vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetScalars() );
-    for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
-        scalars->FillComponent(iCell,0.0);
+    for(int iChem=0;iChem<this->n_chemicals;iChem++)
+        scalars->FillComponent(iChem,0.0);
     this->mesh->Modified();
 }
 
@@ -200,21 +200,15 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
             vtkMath::Normalize(p);
             this->mesh->GetPoints()->SetPoint(i,p);
         }
-        
+    }
+     
+    if(0)
+    {
         // assign some cell data
-        vtkFloatArray *scalars = vtkFloatArray::New();
-        scalars->SetNumberOfComponents(1);
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(2);
         scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
         this->mesh->GetCellData()->SetScalars(scalars);
-        vtkSmartPointer<vtkMinimalStandardRandomSequence> random = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
-        for(int i=0;i<this->mesh->GetNumberOfCells();i++)
-        {
-            random->Next();
-            scalars->SetValue(i,random->GetValue()*0.1f);
-            if(i==0)
-                scalars->SetValue(i,1.0f);
-        }
-
         this->buffer->DeepCopy(this->mesh);
     }
 
@@ -256,9 +250,12 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         mapper->SetInput(this->mesh);
         mapper->SetScalarModeToUseCellData();
         mapper->SetLookupTable(lut);
+        //mapper->SelectColorArray(iActiveChemical);
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
+        if(use_wireframe)
+            actor->GetProperty()->SetRepresentationToWireframe();
 
         pRenderer->AddActor(actor);
     }
