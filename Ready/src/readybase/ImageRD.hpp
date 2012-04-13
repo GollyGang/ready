@@ -61,6 +61,8 @@ class ImageRD : public AbstractRD
         virtual std::string GetFileExtension() const { return ImageRD::GetFileExtensionStatic(); }
         static std::string GetFileExtensionStatic() { return "vti"; }
 
+        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
+
     protected:
 
         std::vector<vtkImageData*> images; //< one for each chemical
