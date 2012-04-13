@@ -29,8 +29,8 @@ namespace ID
 { 
     const int MAX_RECENT = 100;     // maximum files in Open Recent submenu
 
-    enum {
-    
+    enum 
+    {
         // we can use IDs higher than this for our own purposes
         Dummy = wxID_HIGHEST+1,
         
@@ -41,6 +41,8 @@ namespace ID
         ClearAllPatterns,
         Screenshot,
         AddMyPatterns,
+        ImportMesh,
+        ExportMesh,
         
         // view menu
         FullScreen,

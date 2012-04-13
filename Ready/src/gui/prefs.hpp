@@ -91,9 +91,11 @@ typedef enum
     DO_CLEAR,                    // clear selection
     DO_COPY,                     // copy selection
     DO_CUT,                      // cut selection
+    DO_EXPORTMESH,               // export a mesh
     DO_FIT,                      // fit pattern
     DO_FULLSCREEN,               // full screen
     DO_GENPATT,                  // generate pattern
+    DO_IMPORTMESH,               // import a mesh
     DO_NEWPATT,                  // new pattern
     DO_OPENPATT,                 // open pattern...
     DO_PASTE,                    // paste
