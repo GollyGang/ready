@@ -70,6 +70,7 @@ using namespace std;
 #include <vtkXMLPolyDataReader.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkPolyData.h>
+#include <vtkOBJReader.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -2264,10 +2265,38 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         rd->SetNumberOfChemicals(1);
         this->SetCurrentRDSystem(rd);
     }
+    else if(mesh_filename.EndsWith(_T("vtu")))
+    {
+        if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+        this->InitializeDefaultRenderSettings();
+
+        vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+        vtu_reader->SetFileName(mesh_filename.mb_str());
+        vtu_reader->Update();
+        MeshRD *rd = new MeshRD();
+        rd->CopyFromMesh(vtu_reader->GetOutput());
+        rd->SetNumberOfChemicals(1);
+        this->SetCurrentRDSystem(rd);
+    }
+    else if(mesh_filename.EndsWith(_T("obj")))
+    {
+        if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+        this->InitializeDefaultRenderSettings();
+
+        vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
+        obj_reader->SetFileName(mesh_filename.mb_str());
+        obj_reader->Update();
+        MeshRD *rd = new MeshRD();
+        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        ug->SetPoints(obj_reader->GetOutput()->GetPoints());
+        ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
+        rd->CopyFromMesh(ug);
+        rd->SetNumberOfChemicals(1);
+        this->SetCurrentRDSystem(rd);
+    }
     else
     {
-        // TODO
-        wxMessageBox(_("Not yet implemented.")); 
+        wxMessageBox(_("Unsupported file type")); 
         return; 
     }
 }
