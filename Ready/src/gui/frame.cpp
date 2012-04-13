@@ -243,8 +243,8 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_OPEN, _("Open Pattern...") + GetAccelerator(DO_OPENPATT), _("Choose a pattern file to open"));
         menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
         menu->AppendSeparator();
-        menu->Append(ID::ImportMesh, _("Import mesh...") + GetAccelerator(DO_IMPORTMESH), _("Import a mesh"));
-        menu->Append(ID::ExportMesh, _("Export mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export a mesh"));
+        menu->Append(ID::ImportMesh, _("Import Mesh...") + GetAccelerator(DO_IMPORTMESH), _("Import a mesh"));
+        menu->Append(ID::ExportMesh, _("Export Mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export a mesh"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
@@ -1004,7 +1004,7 @@ void MyFrame::CheckFocus()
 void MyFrame::OnIdle(wxIdleEvent& event)
 {
     #ifdef __WXMAC__
-        // do NOT do this in the Win app (buttons in Info/help pane won't work)
+        // do NOT do this in the Win app (buttons in Info/Help pane won't work)
         if (this->IsActive()) this->CheckFocus();
     #endif
     
@@ -1816,6 +1816,8 @@ void MyFrame::UpdateMenuAccelerators()
         
         SetAccelerator(mbar, wxID_NEW,                      DO_NEWPATT);
         SetAccelerator(mbar, wxID_OPEN,                     DO_OPENPATT);
+        SetAccelerator(mbar, ID::ImportMesh,                DO_IMPORTMESH);
+        SetAccelerator(mbar, ID::ExportMesh,                DO_EXPORTMESH);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
@@ -1868,6 +1870,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
         // File menu
         case DO_NEWPATT:        cmdid = wxID_NEW; break;
         case DO_OPENPATT:       cmdid = wxID_OPEN; break;
+        case DO_IMPORTMESH:     cmdid = ID::ImportMesh; break;
+        case DO_EXPORTMESH:     cmdid = ID::ExportMesh; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
         case DO_SCREENSHOT:     cmdid = ID::Screenshot; break;
         case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
