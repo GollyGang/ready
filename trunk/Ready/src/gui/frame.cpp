@@ -71,6 +71,10 @@ using namespace std;
 #include <vtkUnstructuredGrid.h>
 #include <vtkPolyData.h>
 #include <vtkOBJReader.h>
+#include <vtkCellArray.h>
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkTriangleFilter.h>
+#include <vtkPointData.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -2306,10 +2310,63 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 void MyFrame::OnExportMesh(wxCommandEvent& event)
 {
     // possible uses: (context dependent)
-    // 1. output MeshRD surface
+    // 1. output MeshRD surface (although can already use Paraview to convert VTU to OBJ etc.)
     // 2. output ImageRD 3d-image contour for active chemical
     // 3. output ImageRD 2d-image displacement-mapped surface for active chemical
-    wxMessageBox(_("Not yet implemented.")); 
+
+    wxString mesh_filename = wxFileSelector(_("Export a mesh:"),wxEmptyString,wxEmptyString,wxEmptyString,
+        _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    if(mesh_filename.empty()) return; // user cancelled
+
+    vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
+    this->system->GetAsMesh(pd,this->render_settings);
+
+    if(mesh_filename.EndsWith(_T("obj")))
+    {
+        wxBusyCursor busy;
+        ofstream out(mesh_filename.mb_str());
+        out << "# Output from Ready - http://code.google.com/p/reaction-diffusion\n";
+        pd->BuildCells();
+        for(vtkIdType iPt=0;iPt<pd->GetNumberOfPoints();iPt++)
+            out << "v " << pd->GetPoint(iPt)[0] << " " << pd->GetPoint(iPt)[1] << " " << pd->GetPoint(iPt)[2] << "\n";
+        if(pd->GetPointData()->GetNormals())
+        {
+            for(vtkIdType iPt=0;iPt<pd->GetNumberOfPoints();iPt++)
+                out << "vn " << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[0] << " " 
+                    << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[1] << " " 
+                    << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[2] << "\n";
+        }
+        vtkIdType npts,*pts;
+        for(vtkIdType iCell=0;iCell<pd->GetPolys()->GetNumberOfCells();iCell++)
+        {
+            pd->GetCellPoints(iCell,npts,pts);
+            out << "f";
+            if(pd->GetPointData()->GetNormals())
+            {
+                for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    out << " " << pts[iPt]+1 << "//" << pts[iPt]+1; // (OBJ indices are 1-based)
+            }
+            else
+            {
+                for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    out << " " << pts[iPt]+1; // (OBJ indices are 1-based)
+            }
+            out << "\n";
+        }
+    }
+    else if(mesh_filename.EndsWith(_T("vtp")))
+    {
+        wxBusyCursor busy;
+        vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+        writer->SetFileName(mesh_filename.mb_str());
+        writer->SetInput(pd);
+        writer->Write();
+    }
+    else
+    {
+        wxMessageBox(_("Unsupported file type")); 
+        return; 
+    }
 }
 
 // ---------------------------------------------------------------------

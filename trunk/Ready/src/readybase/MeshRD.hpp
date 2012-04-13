@@ -60,6 +60,8 @@ class MeshRD : public AbstractRD
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 
+        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
+
     protected:
 
         /// work out which cells are neighbors of each other

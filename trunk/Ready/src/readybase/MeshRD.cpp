@@ -41,6 +41,7 @@
 #include <vtkDataSetMapper.h>
 #include <vtkTetra.h>
 #include <vtkCellArray.h>
+#include <vtkGeometryFilter.h>
 
 // STL:
 #include <stdexcept>
@@ -442,6 +443,17 @@ void MeshRD::ComputeCellNeighbors()
 int MeshRD::GetNumberOfCells() const
 {
 	return this->mesh->GetNumberOfCells();
+}
+
+// ---------------------------------------------------------------------
+
+void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) const
+{
+    vtkSmartPointer<vtkGeometryFilter> geom = vtkSmartPointer<vtkGeometryFilter>::New();
+    geom->SetInput(this->mesh);
+    geom->Update();
+    out->DeepCopy(geom->GetOutput());
+    // 2D meshes will get returned unchanged, meshes with 3D cells will have their outer surface returned
 }
 
 // ---------------------------------------------------------------------

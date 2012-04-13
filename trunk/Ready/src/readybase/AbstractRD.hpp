@@ -26,6 +26,7 @@ class Properties;
 #include <vtkSmartPointer.h>
 class vtkXMLDataElement;
 class vtkRenderer;
+class vtkPolyData;
 
 // STL:
 #include <string>
@@ -117,6 +118,9 @@ class AbstractRD
         virtual void SetBlockSizeX(int n) {}
         virtual void SetBlockSizeY(int n) {}
         virtual void SetBlockSizeZ(int n) {}
+
+        /// retrieve the current view as a vtkPolyData
+        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const =0;
 
     protected:
 
