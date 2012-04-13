@@ -103,7 +103,6 @@ void MeshRD::GenerateInitialPattern()
     vtkIdType npts,*pts;
     float x,y,z;
     vtkFloatingPointType *p;
-    vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetScalars() );
     vtkFloatingPointType *bounds = this->mesh->GetBounds();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
@@ -124,11 +123,16 @@ void MeshRD::GenerateInitialPattern()
             if(iC<0 || iC>=this->GetNumberOfChemicals())
                 throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-            float val = scalars->GetTuple(iCell)[iC];
+            float val;
             vector<float> vals(this->GetNumberOfChemicals());
             for(int i=0;i<this->GetNumberOfChemicals();i++)
-                vals[i] = scalars->GetTuple(iCell)[i];
-            scalars->SetComponent(iCell,iC,overlay->Apply(vals,this,x,y,z));
+            {
+                vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str()) );
+                vals[i] = scalars->GetValue(iCell);
+                if(i==iC) val = vals[i];
+            }
+            vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str()) );
+            scalars->SetValue(iCell,overlay->Apply(vals,this,x,y,z));
         }
     }
     this->mesh->Modified();
@@ -139,9 +143,11 @@ void MeshRD::GenerateInitialPattern()
 
 void MeshRD::BlankImage()
 {
-    vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetScalars() );
     for(int iChem=0;iChem<this->n_chemicals;iChem++)
-        scalars->FillComponent(iChem,0.0);
+    {
+        vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
+        scalars->FillComponent(0,0.0);
+    }
     this->mesh->Modified();
 }
 
@@ -177,7 +183,6 @@ float MeshRD::GetZ() const
 void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->mesh->DeepCopy(mesh2);
-    this->buffer->DeepCopy(this->mesh);
 
     // DEBUG:
     if(0)
@@ -202,15 +207,23 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
         }
     }
      
+    // DEBUG
     if(0)
     {
         // assign some cell data
-        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
-        scalars->SetNumberOfComponents(2);
-        scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
-        this->mesh->GetCellData()->SetScalars(scalars);
-        this->buffer->DeepCopy(this->mesh);
+        this->n_chemicals = 2;
+        for(int iChem=0;iChem<this->n_chemicals;iChem++)
+        {
+            vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+            scalars->SetNumberOfComponents(1);
+            scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
+            scalars->SetName(GetChemicalName(iChem).c_str());
+            scalars->FillComponent(0,((iChem%2)?0.8:0.2));
+            this->mesh->GetCellData()->AddArray(scalars);
+        }
     }
+
+    this->buffer->DeepCopy(this->mesh);
 
     this->ComputeCellNeighbors();
 }
@@ -227,13 +240,10 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     render_settings.GetProperty("color_high").GetColor(r,g,b);
     vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
-    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    string activeChemical = render_settings.GetProperty("active_chemical").GetChemical();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
-    
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetRampToLinear();
@@ -242,15 +252,14 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     lut->SetSaturationRange(low_sat,high_sat);
     lut->SetHueRange(low_hue,high_hue);
     lut->SetValueRange(low_val,high_val);
-    lut->Build();
 
     // add the mesh actor
     {
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
         mapper->SetInput(this->mesh);
-        mapper->SetScalarModeToUseCellData();
+        mapper->SetScalarModeToUseCellFieldData();
+        mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
-        //mapper->SelectColorArray(iActiveChemical);
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
@@ -303,20 +312,32 @@ void MeshRD::RestoreStartingPattern()
 
 void MeshRD::InternalUpdate(int n_steps)
 {
-    vtkFloatArray *source = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetScalars() );
-    vtkFloatArray *target = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetScalars() );
+    // for now, a hard-coded heat equation
     for(int iStep=0;iStep<n_steps;iStep++)
     {
-        for(vtkIdType iCell=0;iCell<(int)this->cell_neighbors.size();iCell++)
+        for(int iChem=0;iChem<this->n_chemicals;iChem++)
         {
-            // for now, a hard-coded heat equation
-            float val = source->GetValue(iCell);
-            for(vtkIdType iNeighbor=0;iNeighbor<(int)this->cell_neighbors[iCell].size();iNeighbor++)
-                val += source->GetValue(this->cell_neighbors[iCell][iNeighbor]);
-            val /= this->cell_neighbors[iCell].size() + 1;
-            target->SetValue(iCell,val);
+            vtkFloatArray *source;
+            vtkFloatArray *target;
+            if(iStep%2)
+            {
+                source = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
+                target = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
+            }
+            else
+            {
+                source = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
+                target = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
+            }
+            for(vtkIdType iCell=0;iCell<(int)this->cell_neighbors.size();iCell++)
+            {
+                float val = source->GetValue(iCell);
+                for(vtkIdType iNeighbor=0;iNeighbor<(int)this->cell_neighbors[iCell].size();iNeighbor++)
+                    val += source->GetValue(this->cell_neighbors[iCell][iNeighbor]);
+                val /= this->cell_neighbors[iCell].size() + 1;
+                target->SetValue(iCell,val);
+            }
         }
-        std::swap(source,target);
     }
     if(n_steps%2)
         this->mesh->DeepCopy(this->buffer);
