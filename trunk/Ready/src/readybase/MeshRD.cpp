@@ -62,6 +62,7 @@ MeshRD::~MeshRD()
     this->mesh->Delete();
     this->buffer->Delete();
     this->starting_pattern->Delete();
+    this->n_chemicals = 0;
 }
 
 // ---------------------------------------------------------------------
@@ -79,7 +80,20 @@ void MeshRD::Update(int n_steps)
 
 void MeshRD::SetNumberOfChemicals(int n)
 {
-    // TODO
+    for(int iChem=0;iChem<this->n_chemicals;iChem++)
+        this->mesh->GetCellData()->RemoveArray(GetChemicalName(iChem).c_str());
+    this->n_chemicals = n;
+    for(int iChem=0;iChem<this->n_chemicals;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        this->mesh->GetCellData()->AddArray(scalars);
+    }
+
+    this->buffer->DeepCopy(this->mesh);
 }
 
 // ---------------------------------------------------------------------
@@ -313,12 +327,12 @@ void MeshRD::RestoreStartingPattern()
 void MeshRD::InternalUpdate(int n_steps)
 {
     // for now, a hard-coded heat equation
+    vtkFloatArray *source;
+    vtkFloatArray *target;
     for(int iStep=0;iStep<n_steps;iStep++)
     {
         for(int iChem=0;iChem<this->n_chemicals;iChem++)
         {
-            vtkFloatArray *source;
-            vtkFloatArray *target;
             if(iStep%2)
             {
                 source = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );

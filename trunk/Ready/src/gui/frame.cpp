@@ -50,6 +50,7 @@
 #if wxUSE_TOOLTIPS
    #include "wx/tooltip.h"      // for wxToolTip
 #endif
+#include <wx/choicdlg.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -66,6 +67,9 @@ using namespace std;
 #include <vtkPNGWriter.h>
 #include <vtkJPEGWriter.h>
 #include <vtkSmartPointer.h>
+#include <vtkXMLPolyDataReader.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkPolyData.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -95,6 +99,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_NEW, MyFrame::OnNewPattern)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
+    EVT_MENU(ID::ImportMesh, MyFrame::OnImportMesh)
+    EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
     EVT_MENU(ID::AddMyPatterns, MyFrame::OnAddMyPatterns)
     EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
@@ -231,6 +237,9 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_OPEN, _("Open Pattern...") + GetAccelerator(DO_OPENPATT), _("Choose a pattern file to open"));
         menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
+        menu->AppendSeparator();
+        menu->Append(ID::ImportMesh, _("Import mesh...") + GetAccelerator(DO_IMPORTMESH), _("Import a mesh"));
+        menu->Append(ID::ExportMesh, _("Export mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export a mesh"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
@@ -2214,6 +2223,64 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("timesteps_per_render").SetInt(dlg.GetValue());
     this->UpdateInfoPane();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnImportMesh(wxCommandEvent& event)
+{
+    // possible uses:
+    // 1. as MeshRD (to run RD on surface, or internally between 3d cells)
+    //    - will need to ask user for other pattern to duplicate formula etc. from, or whether to define this later
+    // 2. as representation of a binary image for ImageRD (e.g. import a 3D logo, then run tip-splitting from that seed)
+    //    - will need to ask for an existing pattern to load the image into, and whether to clear that image first
+    //    - will need to ask which chemical(s) to affect, and at what level
+
+    wxString mesh_filename = wxFileSelector(_("Import a mesh:"),wxEmptyString,wxEmptyString,wxEmptyString,
+        _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"),wxFD_OPEN);
+    if(mesh_filename.empty()) return; // user cancelled
+
+    wxArrayString choices;
+    choices.Add(_("Run a pattern on the surface of this mesh"));
+    choices.Add(_("Paint this pattern into a 3D volume image"));
+    int ret = wxGetSingleChoiceIndex(_("What would you like to do with the mesh?"),_("Select one of these options:"),choices);
+    if(ret==-1) return; // user cancelled
+
+    if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
+
+    if(mesh_filename.EndsWith(_T("vtp")))
+    {
+        if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+        this->InitializeDefaultRenderSettings();
+
+        vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+        vtp_reader->SetFileName(mesh_filename.mb_str());
+        vtp_reader->Update();
+        MeshRD *rd = new MeshRD();
+        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
+        ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
+        rd->CopyFromMesh(ug);
+        rd->SetNumberOfChemicals(1);
+        this->SetCurrentRDSystem(rd);
+    }
+    else
+    {
+        // TODO
+        wxMessageBox(_("Not yet implemented.")); 
+        return; 
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnExportMesh(wxCommandEvent& event)
+{
+    // possible uses: (context dependent)
+    // 1. output MeshRD surface
+    // 2. output ImageRD 3d-image contour for active chemical
+    // 3. output ImageRD 2d-image displacement-mapped surface for active chemical
+    wxMessageBox(_("Not yet implemented.")); 
 }
 
 // ---------------------------------------------------------------------

@@ -91,6 +91,7 @@ set( PATTERN_FILES
   conway_life.vti 
   bays_3D.vti
   sphere.vtu
+  cow.vtu
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti

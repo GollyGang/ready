@@ -80,6 +80,8 @@ class MyFrame : public wxFrame
         void OnScreenshot(wxCommandEvent& event);
         void OnAddMyPatterns(wxCommandEvent& event);
         void OnPreferences(wxCommandEvent& event);
+        void OnImportMesh(wxCommandEvent& event);
+        void OnExportMesh(wxCommandEvent& event);
         void OnQuit(wxCommandEvent& event);
 
         // Open Recent submenu
