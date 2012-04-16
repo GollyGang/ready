@@ -42,6 +42,8 @@
 #include <vtkTetra.h>
 #include <vtkCellArray.h>
 #include <vtkGeometryFilter.h>
+#include <vtkCutter.h>
+#include <vtkPlane.h>
 
 // STL:
 #include <stdexcept>
@@ -116,20 +118,18 @@ void MeshRD::GenerateInitialPattern()
     this->BlankImage();
 
     vtkIdType npts,*pts;
-    float x,y,z;
-    vtkFloatingPointType *p;
+    float cp[3];
     vtkFloatingPointType *bounds = this->mesh->GetBounds();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
         this->mesh->GetCellPoints(iCell,npts,pts);
         // get a point at the centre of the cell (need a location to sample the overlays)
-        x=y=z=0.0f;
+        cp[0]=cp[1]=cp[2]=0.0f;
         for(vtkIdType iPt=0;iPt<npts;iPt++)
-        {
-            p = this->mesh->GetPoint(pts[iPt]);
-            x+=p[0]-bounds[0]; y+=p[1]-bounds[2]; z+=p[2]-bounds[4];
-        }
-        x/=npts; y/=npts; z/=npts;
+            for(int xyz=0;xyz<3;xyz++)
+                cp[xyz] += this->mesh->GetPoint(pts[iPt])[xyz]-bounds[xyz*2+0];
+        for(int xyz=0;xyz<3;xyz++)
+            cp[xyz] /= npts;
         for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
         {
             Overlay* overlay = this->initial_pattern_generator[iOverlay];
@@ -143,11 +143,15 @@ void MeshRD::GenerateInitialPattern()
             for(int i=0;i<this->GetNumberOfChemicals();i++)
             {
                 vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str()) );
+                if(!scalars)
+                    throw runtime_error("MeshRD::GenerateInitialPattern : failed to cast cell data to vtkFloatArray");
                 vals[i] = scalars->GetValue(iCell);
                 if(i==iC) val = vals[i];
             }
             vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str()) );
-            scalars->SetValue(iCell,overlay->Apply(vals,this,x,y,z));
+            if(!scalars)
+                throw runtime_error("MeshRD::GenerateInitialPattern : failed to cast cell data to vtkFloatArray");
+            scalars->SetValue(iCell,overlay->Apply(vals,this,cp[0],cp[1],cp[2]));
         }
     }
     this->mesh->Modified();
@@ -271,6 +275,10 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
 
+    bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
+    string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
+    float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
+
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetRampToLinear();
@@ -283,7 +291,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     // add the mesh actor
     {
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-        if(use_wireframe)
+        if(use_wireframe && !slice_3D)
         {
             // explicitly extract the edges - the default mapper only shows the outside surface
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
@@ -300,7 +308,36 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
+        if(slice_3D)
+            actor->GetProperty()->SetRepresentationToWireframe();
 
+        pRenderer->AddActor(actor);
+    }
+
+    // add a slice
+    if(slice_3D)
+    {
+        vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+        vtkFloatingPointType *bounds = this->mesh->GetBounds();
+        plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
+                         slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
+                         slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
+        if(slice_3D_axis=="x")
+            plane->SetNormal(1,0,0);
+        else if(slice_3D_axis=="y")
+            plane->SetNormal(0,1,0);
+        else
+            plane->SetNormal(0,0,1);
+        vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+        cutter->SetInput(this->mesh);
+        cutter->SetCutFunction(plane);
+        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+        mapper->SetInputConnection(cutter->GetOutputPort());
+        mapper->SetScalarModeToUseCellFieldData();
+        mapper->SelectColorArray(activeChemical.c_str());
+        mapper->SetLookupTable(lut);
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
         pRenderer->AddActor(actor);
     }
 
@@ -494,6 +531,20 @@ void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) cons
     geom->Update();
     out->DeepCopy(geom->GetOutput());
     // 2D meshes will get returned unchanged, meshes with 3D cells will have their outer surface returned
+}
+
+// ---------------------------------------------------------------------
+
+int MeshRD::GetArenaDimensionality() const
+{
+    vtkFloatingPointType epsilon = 1e-4;
+    vtkFloatingPointType *bounds = this->mesh->GetBounds();
+    int dimensionality = 0;
+    for(int xyz=0;xyz<3;xyz++)
+        if(bounds[xyz*2+1]-bounds[xyz*2+0] > epsilon)
+            dimensionality++;
+    return dimensionality;
+    // TODO: rotate datasets on input such that if dimensionality=2 then all z=constant, and if dimensionality=1 then all y=constant and all z=constant
 }
 
 // ---------------------------------------------------------------------

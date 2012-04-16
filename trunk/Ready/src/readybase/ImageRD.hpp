@@ -68,6 +68,8 @@ class ImageRD : public AbstractRD
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;
 
+        virtual int GetArenaDimensionality() const;
+
     protected:
 
         vtkSmartPointer<vtkImageData> GetImage() const;
@@ -79,9 +81,6 @@ class ImageRD : public AbstractRD
         void DeallocateImages();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
-
-        /// e.g. 2 for 2D systems, 3 for 3D
-        int GetDimensionality() const;
 
     private:
 

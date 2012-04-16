@@ -122,6 +122,9 @@ class AbstractRD
         /// retrieve the current view as a vtkPolyData
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const =0;
 
+        /// retreive the dimensionality of the system volume, irrespective of the cells within it
+        virtual int GetArenaDimensionality() const =0;
+
     protected:
 
         /// advance the RD system by n timesteps

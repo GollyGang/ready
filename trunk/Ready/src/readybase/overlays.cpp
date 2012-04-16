@@ -78,7 +78,7 @@ class BaseShape : public XML_Object
         /// construct when we don't know the derived type
         static BaseShape* New(vtkXMLDataElement* node);
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const =0;
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const =0;
 
     protected:
 
@@ -143,7 +143,7 @@ float Overlay::Apply(vector<float> vals,AbstractRD* system,float x,float y,float
     float val = vals[this->iTargetChemical];
     for(int iShape=0;iShape<(int)this->shapes.size();iShape++)
     {
-        if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ() ) )
+        if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ(), system->GetArenaDimensionality() ) )
         {
             this->op->Apply( val, this->fill->GetValue(system,vals,x,y,z) );
             vals[this->iTargetChemical] = val; // in case there are multiple shapes at this location in this overlay
@@ -418,7 +418,7 @@ class Everywhere : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const 
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const 
         { 
             return true; 
         }
@@ -448,12 +448,8 @@ class Rectangle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
         {
-            int Xi = vtkMath::Round(X);
-            int Yi = vtkMath::Round(Y);
-            int Zi = vtkMath::Round(Z);
-            int dimensionality = (Xi>1?1:0) + (Yi>1?1:0) + (Zi>1?1:0);
             float rel_x = x/X;
             float rel_y = y/Y;
             float rel_z = z/Z;
@@ -495,17 +491,13 @@ class Circle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
         {
             // convert the center and radius to absolute coordinates
             float cx = this->c->x * X;
             float cy = this->c->y * Y;
             float cz = this->c->z * Z;
             float abs_radius = this->radius * max(X,max(Y,Z)); // (radius is proportional to the largest dimension)
-            int Xi = vtkMath::Round(X);
-            int Yi = vtkMath::Round(Y);
-            int Zi = vtkMath::Round(Z);
-            int dimensionality = (Xi>1?1:0) + (Yi>1?1:0) + (Zi>1?1:0);
             switch(dimensionality)
             {
                 default:
@@ -544,12 +536,8 @@ class Pixel : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z) const
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
         {
-            int Xi = vtkMath::Round(X);
-            int Yi = vtkMath::Round(Y);
-            int Zi = vtkMath::Round(Z);
-            int dimensionality = (Xi>1?1:0) + (Yi>1?1:0) + (Zi>1?1:0);
             switch(dimensionality)
             {
                 default:
