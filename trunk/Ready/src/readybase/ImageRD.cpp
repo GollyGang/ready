@@ -761,46 +761,85 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
 
-    if(use_image_interpolation)
+    float low = render_settings.GetProperty("low").GetFloat();
+    float high = render_settings.GetProperty("high").GetFloat();
+    float vertical_scale_1D = render_settings.GetProperty("vertical_scale_1D").GetFloat();
+    float vertical_scale_2D = render_settings.GetProperty("vertical_scale_2D").GetFloat();
+
+    switch(this->GetDimensionality())
     {
-        // turns the 3d grid of sampled values into a polygon mesh for rendering,
-        // by making a surface that contours the volume at a specified level    
-        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInput(this->GetImage(iActiveChemical));
-        surface->SetValue(0, contour_level);
-        surface->Update();
-        out->DeepCopy(surface->GetOutput());
-    }
-    else
-    {
-        // render as cubes, Minecraft-style
-        vtkImageData *image = this->GetImage(iActiveChemical);
-        int *extent = image->GetExtent();
+        case 1:
+            {
+                float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
-        vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
-        pad->SetInput(image);
-        pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
-        pad->Update();
-        pad->GetOutput()->GetCellData()->SetScalars(image->GetPointData()->GetScalars()); // a non-pipelined operation
+                vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+                plane->SetInput(this->GetImage(iActiveChemical));
+                vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+                warp->SetInputConnection(plane->GetOutputPort());
+                warp->SetScaleFactor(-scaling);
+                warp->Update();
+                out->DeepCopy(warp->GetOutput());
+            }
+            break;
+        case 2:
+            {
+                float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
-        vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
-        threshold->SetInputConnection(pad->GetOutputPort());
-        threshold->SetInputArrayToProcess(0, 0, 0,
-            vtkDataObject::FIELD_ASSOCIATION_CELLS,
-            vtkDataSetAttributes::SCALARS);
-        threshold->ThresholdByUpper(contour_level);
+                vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+                plane->SetInput(this->GetImage(iActiveChemical));
+                vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+                warp->SetInputConnection(plane->GetOutputPort());
+                warp->SetScaleFactor(scaling);
+                vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+                normals->SetInputConnection(warp->GetOutputPort());
+                normals->SplittingOff();
+                normals->Update();
+                out->DeepCopy(normals->GetOutput());
+            }
+            break;
+        case 3:
+            if(use_image_interpolation)
+            {
+                // turns the 3d grid of sampled values into a polygon mesh for rendering,
+                // by making a surface that contours the volume at a specified level    
+                vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+                surface->SetInput(this->GetImage(iActiveChemical));
+                surface->SetValue(0, contour_level);
+                surface->Update();
+                out->DeepCopy(surface->GetOutput());
+            }
+            else
+            {
+                // render as cubes, Minecraft-style
+                vtkImageData *image = this->GetImage(iActiveChemical);
+                int *extent = image->GetExtent();
 
-        vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-        transform->Translate (-.5, -.5, -.5);
-        vtkSmartPointer<vtkTransformFilter> transformModel = vtkSmartPointer<vtkTransformFilter>::New();
-        transformModel->SetTransform(transform);
-        transformModel->SetInputConnection(threshold->GetOutputPort());
+                vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
+                pad->SetInput(image);
+                pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
+                pad->Update();
+                pad->GetOutput()->GetCellData()->SetScalars(image->GetPointData()->GetScalars()); // a non-pipelined operation
 
-        vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
-        geometry->SetInputConnection(transformModel->GetOutputPort());
-        geometry->Update();
+                vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
+                threshold->SetInputConnection(pad->GetOutputPort());
+                threshold->SetInputArrayToProcess(0, 0, 0,
+                    vtkDataObject::FIELD_ASSOCIATION_CELLS,
+                    vtkDataSetAttributes::SCALARS);
+                threshold->ThresholdByUpper(contour_level);
 
-        out->DeepCopy(geometry->GetOutput());
+                vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+                transform->Translate (-.5, -.5, -.5);
+                vtkSmartPointer<vtkTransformFilter> transformModel = vtkSmartPointer<vtkTransformFilter>::New();
+                transformModel->SetTransform(transform);
+                transformModel->SetInputConnection(threshold->GetOutputPort());
+
+                vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
+                geometry->SetInputConnection(transformModel->GetOutputPort());
+                geometry->Update();
+
+                out->DeepCopy(geometry->GetOutput());
+            }
+            break;
     }
 }
 

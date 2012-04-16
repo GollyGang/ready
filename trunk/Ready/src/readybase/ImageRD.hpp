@@ -37,8 +37,6 @@ class ImageRD : public AbstractRD
 
         virtual void Update(int n_steps);
 
-        /// e.g. 2 for 2D systems, 3 for 3D
-        int GetDimensionality() const;
         virtual bool HasEditableDimensions() const { return true; }
         virtual float GetX() const;
         virtual float GetY() const;
@@ -81,6 +79,9 @@ class ImageRD : public AbstractRD
         void DeallocateImages();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
+
+        /// e.g. 2 for 2D systems, 3 for 3D
+        int GetDimensionality() const;
 
     private:
 
