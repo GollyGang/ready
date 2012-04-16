@@ -92,6 +92,7 @@ set( PATTERN_FILES
   bays_3D.vti
   sphere.vtu
   cow.vtu
+  tetramesh.vtu
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti

@@ -189,20 +189,32 @@ float MeshRD::GetZ() const
 
 // ---------------------------------------------------------------------
 
-// DEBUG
+// DEBUG: some things used for making datasets, will remove before the next release
 #include <vtkPlatonicSolidSource.h>
 #include <vtkButterflySubdivisionFilter.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkMinimalStandardRandomSequence.h>
+#include <vtkPointSource.h>
+#include <vtkDelaunay3D.h>
 
 void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->mesh->DeepCopy(mesh2);
 
-    // DEBUG:
+    // DEBUG: make a tetrahedral mesh by delaunay tetrahedralization on a random point cloud
     if(0)
     {
-        // make a geodesic sphere by subdividing an icosahedron
+        vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
+        pts->SetNumberOfPoints(200);
+        vtkSmartPointer<vtkDelaunay3D> del = vtkSmartPointer<vtkDelaunay3D>::New();
+        del->SetInputConnection(pts->GetOutputPort());
+        del->Update();
+        this->mesh->DeepCopy(del->GetOutput());
+    }
+
+    // DEBUG: make a geodesic sphere by subdividing an icosahedron
+    if(0)
+    {
         vtkSmartPointer<vtkPlatonicSolidSource> icosahedron = vtkSmartPointer<vtkPlatonicSolidSource>::New();
         icosahedron->SetSolidTypeToIcosahedron();
         vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly = vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
@@ -271,15 +283,23 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     // add the mesh actor
     {
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-        mapper->SetInput(this->mesh);
+        if(use_wireframe)
+        {
+            // explicitly extract the edges - the default mapper only shows the outside surface
+            vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+            edges->SetInput(this->mesh);
+            mapper->SetInputConnection(edges->GetOutputPort());
+        }
+        else
+        {
+            mapper->SetInput(this->mesh);
+        }
         mapper->SetScalarModeToUseCellFieldData();
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        if(use_wireframe)
-            actor->GetProperty()->SetRepresentationToWireframe();
 
         pRenderer->AddActor(actor);
     }
@@ -404,7 +424,6 @@ void MeshRD::ComputeCellNeighbors()
     this->cell_neighbors.clear();
     vtkSmartPointer<vtkIdList> ptIds = vtkSmartPointer<vtkIdList>::New();
     vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
-    vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
         vector<vtkIdType> neighbors;
@@ -416,6 +435,7 @@ void MeshRD::ComputeCellNeighbors()
                 {
                     for(vtkIdType iPt=0;iPt<npts;iPt++)
                     {
+                        vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
                         edgeIds->SetNumberOfIds(2);
                         edgeIds->SetId(0,ptIds->GetId(iPt));
                         edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
@@ -430,7 +450,27 @@ void MeshRD::ComputeCellNeighbors()
                     this->cell_neighbors.push_back(neighbors);
                 }
                 break;
-            // TODO: allow for 1D (VTK_LINE) and 3D (VTK_HEXAHEDRON?) cells
+            case VTK_TETRA: // 3D cell, neighbors share a triangular face
+                {
+                    for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    {
+                        vtkSmartPointer<vtkIdList> faceIds = vtkSmartPointer<vtkIdList>::New();
+                        faceIds->SetNumberOfIds(3);
+                        faceIds->SetId(0,ptIds->GetId(iPt));
+                        faceIds->SetId(1,ptIds->GetId((iPt+1)%npts));
+                        faceIds->SetId(2,ptIds->GetId((iPt+2)%npts));
+                        this->mesh->GetCellNeighbors(iCell,faceIds,cellIds);
+                        int nNeighbors = cellIds->GetNumberOfIds();
+                        for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                        {
+                            vtkIdType id = cellIds->GetId(iNeighbor);
+                            neighbors.push_back(id);
+                        }
+                    }
+                    this->cell_neighbors.push_back(neighbors);
+                }
+                break;
+            // TODO: allow for 1D (VTK_LINE) and other kinds of 3D cells?
             default:
                 throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported cell type");
         }
