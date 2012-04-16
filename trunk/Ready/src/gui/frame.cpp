@@ -666,10 +666,11 @@ void MyFrame::OnFitPattern(wxCommandEvent& event)
 void MyFrame::OnWireframe(wxCommandEvent& event)
 {
     bool wireframe = this->render_settings.GetProperty("use_wireframe").GetBool();
-    this->pVTKWindow->DoCharEvent(wireframe ? 's' : 'w');
     wireframe = !wireframe;
     this->render_settings.GetProperty("use_wireframe").SetBool(wireframe);
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateInfoPane();
+    this->Refresh(false);
 }
 
 // ---------------------------------------------------------------------
