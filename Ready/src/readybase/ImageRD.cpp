@@ -99,7 +99,7 @@ void ImageRD::DeallocateImages()
 
 // ---------------------------------------------------------------------
 
-int ImageRD::GetDimensionality() const
+int ImageRD::GetArenaDimensionality() const
 {
     assert(this->images.front());
     int dimensionality=0;
@@ -275,7 +275,7 @@ void ImageRD::UpdateImageWrapPadFilter()
 void ImageRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings)
 {
     this->SetImageWrapPadFilter(NULL); // workaround for the GenerateCubesFromLabels approach not being fully pipelined
-    switch(this->GetDimensionality())
+    switch(this->GetArenaDimensionality())
     {
         // TODO: merge the dimensionalities (often want one/more slices from lower dimensionalities)
         case 1: this->InitializeVTKPipeline_1D(pRenderer,render_settings); break;
@@ -766,7 +766,7 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
     float vertical_scale_1D = render_settings.GetProperty("vertical_scale_1D").GetFloat();
     float vertical_scale_2D = render_settings.GetProperty("vertical_scale_2D").GetFloat();
 
-    switch(this->GetDimensionality())
+    switch(this->GetArenaDimensionality())
     {
         case 1:
             {

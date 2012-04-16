@@ -37,6 +37,11 @@
       </overlay>
       <overlay chemical="b">
         <overwrite />
+        <white_noise low="0.0" high="0.1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
         <constant value="0.9" />
         <rectangle> 
           <Point3D x="0" y="0" z="0.7" />

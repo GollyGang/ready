@@ -62,6 +62,8 @@ class MeshRD : public AbstractRD
 
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
 
+        virtual int GetArenaDimensionality() const;
+
     protected:
 
         /// work out which cells are neighbors of each other
