@@ -628,15 +628,6 @@ void wxVTKRenderWindowInteractor::OnKeyUp(wxKeyEvent &event)
 #endif //!(VTK_MAJOR_VERSION == 3 && VTK_MINOR_VERSION == 1)
 
 //---------------------------------------------------------------------------
-// AKT: added for Ready (is there a better way???)
-void wxVTKRenderWindowInteractor::DoCharEvent(char key)
-{
-  wxPoint mousePos = ScreenToClient(wxGetMousePosition());
-  SetEventInformationFlipY(mousePos.x, mousePos.y, false, false, key, 0, NULL);
-  InvokeEvent(vtkCommand::CharEvent, NULL);
-}
-
-//---------------------------------------------------------------------------
 void wxVTKRenderWindowInteractor::OnChar(wxKeyEvent &event)
 {
   if (!Enabled) 
@@ -650,8 +641,7 @@ void wxVTKRenderWindowInteractor::OnChar(wxKeyEvent &event)
   char key = '\0';
   if (((unsigned int)keycode) < 256)
     {
-    // TODO: Unicode in non-Unicode mode ??
-    key = (char)keycode;
+    // TODO: Unicode in non-Unicode mode ??key = (char)keycode;
     }
 
   // we don't get a valid mouse position inside the key event on every platform

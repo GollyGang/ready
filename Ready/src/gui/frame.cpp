@@ -75,6 +75,7 @@ using namespace std;
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkPointData.h>
+#include <vtkRendererCollection.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -658,7 +659,13 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
 
 void MyFrame::OnFitPattern(wxCommandEvent& event)
 {
-    this->pVTKWindow->DoCharEvent('r');
+    // reset the active camera in all the renderers in this render window
+    vtkRenderWindow* renWin = this->pVTKWindow->GetRenderWindow();
+    renWin->GetRenderers()->InitTraversal();
+    vtkRenderer *ren;
+    while(ren = renWin->GetRenderers()->GetNextItem())
+        ren->ResetCamera();
+    this->Refresh(false);
 }
 
 // ---------------------------------------------------------------------
