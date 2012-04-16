@@ -641,7 +641,8 @@ void wxVTKRenderWindowInteractor::OnChar(wxKeyEvent &event)
   char key = '\0';
   if (((unsigned int)keycode) < 256)
     {
-    // TODO: Unicode in non-Unicode mode ??key = (char)keycode;
+        // TODO: Unicode in non-Unicode mode ??
+        key = (char)keycode;
     }
 
   // we don't get a valid mouse position inside the key event on every platform
