@@ -50,6 +50,10 @@
       </overlay>
     </initial_pattern_generator>
     
+    <render_settings>
+      <slice_3D value="false" />
+    </render_settings>
+    
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="200"                  NumberOfCells="1063"                >
