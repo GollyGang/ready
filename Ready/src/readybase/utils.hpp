@@ -66,10 +66,10 @@ void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val
         throw std::runtime_error(to_string(e->GetName())+" : failed to read required attribute: "+name);
 } 
 
-std::string GetChemicalName(int i); // a, b, c, ... z, aa, ab, ...
+std::string GetChemicalName(int i); ///< a, b, c, ... z, aa, ab, ...
 int IndexFromChemicalName(const std::string& s);
 
-// read a multiline string, outputting whitespace-trimmed lines
+/// Read a multiline string, outputting whitespace-trimmed lines.
 std::string trim_multiline_string(const char* s);
 
 /// Abstract interface for XML objects.
