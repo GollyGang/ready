@@ -291,14 +291,22 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     // add the mesh actor
     {
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-        if(use_wireframe && !slice_3D)
+        if(use_wireframe && !slice_3D) // full wireframe mode: all internal edges
         {
             // explicitly extract the edges - the default mapper only shows the outside surface
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
             edges->SetInput(this->mesh);
             mapper->SetInputConnection(edges->GetOutputPort());
         }
-        else
+        else if(slice_3D) // partial wireframe mode: only external surface edges
+        {
+            vtkSmartPointer<vtkGeometryFilter> geom = vtkSmartPointer<vtkGeometryFilter>::New();
+            geom->SetInput(this->mesh);
+            vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+            edges->SetInputConnection(geom->GetOutputPort());
+            mapper->SetInputConnection(edges->GetOutputPort());
+        }
+        else // non-wireframe mode: shows filled external surface
         {
             mapper->SetInput(this->mesh);
         }
@@ -308,8 +316,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        if(slice_3D)
-            actor->GetProperty()->SetRepresentationToWireframe();
 
         pRenderer->AddActor(actor);
     }
@@ -338,7 +344,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         mapper->SetLookupTable(lut);
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        //actor->GetProperty()->SetAmbient(1);
+        actor->GetProperty()->LightingOff();
         pRenderer->AddActor(actor);
     }
 
