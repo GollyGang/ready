@@ -19,6 +19,7 @@
 #include "OpenCL_RD.hpp"
 #include "OpenCL_utils.hpp"
 #include "utils.hpp"
+using namespace OpenCL_utils;
 
 // STL:
 #include <vector>

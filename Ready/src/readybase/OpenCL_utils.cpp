@@ -17,13 +17,16 @@
 
 // local:
 #include "OpenCL_utils.hpp"
+using namespace OpenCL_utils;
 
 // STL:
 #include <sstream>
 #include <stdexcept>
 using namespace std;
 
-void throwOnError(cl_int ret,const char* message)
+// ---------------------------------------------------------------------------------------------------------
+
+void OpenCL_utils::throwOnError(cl_int ret,const char* message)
 {
     if(ret == CL_SUCCESS) return;
 
@@ -32,7 +35,9 @@ void throwOnError(cl_int ret,const char* message)
     throw runtime_error(oss.str().c_str());
 }
 
-std::string GetOpenCLDiagnostics() // report on OpenCL without throwing exceptions
+// ---------------------------------------------------------------------------------------------------------
+
+std::string OpenCL_utils::GetOpenCLDiagnostics()
 {
     // TODO: make this report more readable, retrieve numeric data too
     ostringstream report;
@@ -145,7 +150,9 @@ std::string GetOpenCLDiagnostics() // report on OpenCL without throwing exceptio
     return report.str();
 }
 
-int GetNumberOfPlatforms()
+// ---------------------------------------------------------------------------------------------------------
+
+int OpenCL_utils::GetNumberOfPlatforms()
 {
     if(LinkOpenCL() != CL_SUCCESS)
         return 0;
@@ -158,7 +165,9 @@ int GetNumberOfPlatforms()
     return num_platforms;
 }
 
-int GetNumberOfDevices(int iPlatform)
+// ---------------------------------------------------------------------------------------------------------
+
+int OpenCL_utils::GetNumberOfDevices(int iPlatform)
 {
     if(LinkOpenCL() != CL_SUCCESS)
         return 0;
@@ -179,7 +188,9 @@ int GetNumberOfDevices(int iPlatform)
     return num_devices;
 }
 
-string GetPlatformDescription(int iPlatform)
+// ---------------------------------------------------------------------------------------------------------
+
+string OpenCL_utils::GetPlatformDescription(int iPlatform)
 {
     LinkOpenCL();
 
@@ -203,7 +214,9 @@ string GetPlatformDescription(int iPlatform)
     return oss.str();
 }
 
-string GetDeviceDescription(int iPlatform,int iDevice)
+// ---------------------------------------------------------------------------------------------------------
+
+string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
 {
     LinkOpenCL();
 
@@ -234,7 +247,9 @@ string GetDeviceDescription(int iPlatform,int iDevice)
     return oss.str();
 }
 
-cl_int LinkOpenCL()
+// ---------------------------------------------------------------------------------------------------------
+
+cl_int OpenCL_utils::LinkOpenCL()
 {
 #ifdef __APPLE__
     return CL_SUCCESS;
@@ -243,8 +258,10 @@ cl_int LinkOpenCL()
 #endif
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 // http://www.khronos.org/message_boards/viewtopic.php?f=37&t=2107
-const char* GetDescriptionOfOpenCLError(cl_int err)
+const char* OpenCL_utils::GetDescriptionOfOpenCLError(cl_int err)
 {
     switch (err) {
         case CL_SUCCESS:                            return "Success!";
@@ -297,83 +314,89 @@ const char* GetDescriptionOfOpenCLError(cl_int err)
     }
 }
 
-const char* GetPlatformInfoIdAsString(cl_platform_info i)
+// ---------------------------------------------------------------------------------------------------------
+
+const char* OpenCL_utils::GetPlatformInfoIdAsString(cl_platform_info i)
 {
     switch(i)
     {
-        case CL_PLATFORM_PROFILE: return "CL_PLATFORM_PROFILE";
-        case CL_PLATFORM_VERSION: return "CL_PLATFORM_VERSION";
-        case CL_PLATFORM_NAME: return "CL_PLATFORM_NAME";
-        case CL_PLATFORM_VENDOR: return "CL_PLATFORM_VENDOR";
+        case CL_PLATFORM_PROFILE:    return "CL_PLATFORM_PROFILE";
+        case CL_PLATFORM_VERSION:    return "CL_PLATFORM_VERSION";
+        case CL_PLATFORM_NAME:       return "CL_PLATFORM_NAME";
+        case CL_PLATFORM_VENDOR:     return "CL_PLATFORM_VENDOR";
         case CL_PLATFORM_EXTENSIONS: return "CL_PLATFORM_EXTENSIONS";
         default: return "Unknown";
     }
 }
 
-const char* GetDeviceInfoIdAsString(cl_device_info i)
+// ---------------------------------------------------------------------------------------------------------
+
+const char* OpenCL_utils::GetDeviceInfoIdAsString(cl_device_info i)
 {
     switch(i)
     {
-        case CL_DEVICE_TYPE:  return "CL_DEVICE_TYPE";
-        case CL_DEVICE_VENDOR_ID:  return "CL_DEVICE_VENDOR_ID";
-        case CL_DEVICE_MAX_COMPUTE_UNITS:  return "CL_DEVICE_MAX_COMPUTE_UNITS";
-        case CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS:  return "CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS";
-        case CL_DEVICE_MAX_WORK_GROUP_SIZE:  return "CL_DEVICE_MAX_WORK_GROUP_SIZE";
-        case CL_DEVICE_MAX_WORK_ITEM_SIZES:  return "CL_DEVICE_MAX_WORK_ITEM_SIZES";
-        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR";
-        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT";
-        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT";
-        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG";
-        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT";
+        case CL_DEVICE_TYPE:                           return "CL_DEVICE_TYPE";
+        case CL_DEVICE_VENDOR_ID:                      return "CL_DEVICE_VENDOR_ID";
+        case CL_DEVICE_MAX_COMPUTE_UNITS:              return "CL_DEVICE_MAX_COMPUTE_UNITS";
+        case CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS:       return "CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS";
+        case CL_DEVICE_MAX_WORK_GROUP_SIZE:            return "CL_DEVICE_MAX_WORK_GROUP_SIZE";
+        case CL_DEVICE_MAX_WORK_ITEM_SIZES:            return "CL_DEVICE_MAX_WORK_ITEM_SIZES";
+        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR:    return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR";
+        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT:   return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT";
+        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT:     return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT";
+        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG:    return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG";
+        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:   return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT";
         case CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE";
-        case CL_DEVICE_MAX_CLOCK_FREQUENCY:  return "CL_DEVICE_MAX_CLOCK_FREQUENCY";
-        case CL_DEVICE_ADDRESS_BITS:  return "CL_DEVICE_ADDRESS_BITS";
-        case CL_DEVICE_MAX_READ_IMAGE_ARGS:  return "CL_DEVICE_MAX_READ_IMAGE_ARGS";
-        case CL_DEVICE_MAX_WRITE_IMAGE_ARGS:  return "CL_DEVICE_MAX_WRITE_IMAGE_ARGS";
-        case CL_DEVICE_MAX_MEM_ALLOC_SIZE:  return "CL_DEVICE_MAX_MEM_ALLOC_SIZE";
-        case CL_DEVICE_IMAGE2D_MAX_WIDTH:  return "CL_DEVICE_IMAGE2D_MAX_WIDTH";
-        case CL_DEVICE_IMAGE2D_MAX_HEIGHT:  return "CL_DEVICE_IMAGE2D_MAX_HEIGHT";
-        case CL_DEVICE_IMAGE3D_MAX_WIDTH:  return "CL_DEVICE_IMAGE3D_MAX_WIDTH";
-        case CL_DEVICE_IMAGE3D_MAX_HEIGHT:  return "CL_DEVICE_IMAGE3D_MAX_HEIGHT";
-        case CL_DEVICE_IMAGE3D_MAX_DEPTH:  return "CL_DEVICE_IMAGE3D_MAX_DEPTH";
-        case CL_DEVICE_IMAGE_SUPPORT:  return "CL_DEVICE_IMAGE_SUPPORT";
-        case CL_DEVICE_MAX_PARAMETER_SIZE:  return "CL_DEVICE_MAX_PARAMETER_SIZE";
-        case CL_DEVICE_MAX_SAMPLERS:  return "CL_DEVICE_MAX_SAMPLERS";
-        case CL_DEVICE_MEM_BASE_ADDR_ALIGN:  return "CL_DEVICE_MEM_BASE_ADDR_ALIGN";
-        case CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE:  return "CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE";
-        case CL_DEVICE_SINGLE_FP_CONFIG:  return "CL_DEVICE_SINGLE_FP_CONFIG";
-        case CL_DEVICE_GLOBAL_MEM_CACHE_TYPE:  return "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE";
-        case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:  return "CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE";
-        case CL_DEVICE_GLOBAL_MEM_CACHE_SIZE:  return "CL_DEVICE_GLOBAL_MEM_CACHE_SIZE";
-        case CL_DEVICE_GLOBAL_MEM_SIZE:  return "CL_DEVICE_GLOBAL_MEM_SIZE";
-        case CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:  return "CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE";
-        case CL_DEVICE_MAX_CONSTANT_ARGS:  return "CL_DEVICE_MAX_CONSTANT_ARGS";
-        case CL_DEVICE_LOCAL_MEM_TYPE:  return "CL_DEVICE_LOCAL_MEM_TYPE";
-        case CL_DEVICE_LOCAL_MEM_SIZE:  return "CL_DEVICE_LOCAL_MEM_SIZE";
-        case CL_DEVICE_ERROR_CORRECTION_SUPPORT:  return "CL_DEVICE_ERROR_CORRECTION_SUPPORT";
-        case CL_DEVICE_PROFILING_TIMER_RESOLUTION:  return "CL_DEVICE_PROFILING_TIMER_RESOLUTION";
-        case CL_DEVICE_ENDIAN_LITTLE:  return "CL_DEVICE_ENDIAN_LITTLE";
-        case CL_DEVICE_AVAILABLE:  return "CL_DEVICE_AVAILABLE";
-        case CL_DEVICE_COMPILER_AVAILABLE:  return "CL_DEVICE_COMPILER_AVAILABLE";
-        case CL_DEVICE_EXECUTION_CAPABILITIES:  return "CL_DEVICE_EXECUTION_CAPABILITIES";
-        case CL_DEVICE_QUEUE_PROPERTIES:  return "CL_DEVICE_QUEUE_PROPERTIES";
-        case CL_DEVICE_NAME:  return "CL_DEVICE_NAME";
-        case CL_DEVICE_VENDOR:  return "CL_DEVICE_VENDOR";
-        case CL_DRIVER_VERSION:  return "CL_DRIVER_VERSION";
-        case CL_DEVICE_PROFILE:  return "CL_DEVICE_PROFILE";
-        case CL_DEVICE_VERSION:  return "CL_DEVICE_VERSION";
-        case CL_DEVICE_EXTENSIONS:  return "CL_DEVICE_EXTENSIONS";
-        case CL_DEVICE_PLATFORM:  return "CL_DEVICE_PLATFORM";
-        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF:  return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF";
-        case CL_DEVICE_HOST_UNIFIED_MEMORY:  return "CL_DEVICE_HOST_UNIFIED_MEMORY";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_INT:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_INT";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE";
-        case CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF:  return "CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF";
-        case CL_DEVICE_OPENCL_C_VERSION:  return "CL_DEVICE_OPENCL_C_VERSION";
+        case CL_DEVICE_MAX_CLOCK_FREQUENCY:            return "CL_DEVICE_MAX_CLOCK_FREQUENCY";
+        case CL_DEVICE_ADDRESS_BITS:                   return "CL_DEVICE_ADDRESS_BITS";
+        case CL_DEVICE_MAX_READ_IMAGE_ARGS:            return "CL_DEVICE_MAX_READ_IMAGE_ARGS";
+        case CL_DEVICE_MAX_WRITE_IMAGE_ARGS:           return "CL_DEVICE_MAX_WRITE_IMAGE_ARGS";
+        case CL_DEVICE_MAX_MEM_ALLOC_SIZE:             return "CL_DEVICE_MAX_MEM_ALLOC_SIZE";
+        case CL_DEVICE_IMAGE2D_MAX_WIDTH:              return "CL_DEVICE_IMAGE2D_MAX_WIDTH";
+        case CL_DEVICE_IMAGE2D_MAX_HEIGHT:             return "CL_DEVICE_IMAGE2D_MAX_HEIGHT";
+        case CL_DEVICE_IMAGE3D_MAX_WIDTH:              return "CL_DEVICE_IMAGE3D_MAX_WIDTH";
+        case CL_DEVICE_IMAGE3D_MAX_HEIGHT:             return "CL_DEVICE_IMAGE3D_MAX_HEIGHT";
+        case CL_DEVICE_IMAGE3D_MAX_DEPTH:              return "CL_DEVICE_IMAGE3D_MAX_DEPTH";
+        case CL_DEVICE_IMAGE_SUPPORT:                  return "CL_DEVICE_IMAGE_SUPPORT";
+        case CL_DEVICE_MAX_PARAMETER_SIZE:             return "CL_DEVICE_MAX_PARAMETER_SIZE";
+        case CL_DEVICE_MAX_SAMPLERS:                   return "CL_DEVICE_MAX_SAMPLERS";
+        case CL_DEVICE_MEM_BASE_ADDR_ALIGN:            return "CL_DEVICE_MEM_BASE_ADDR_ALIGN";
+        case CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE:       return "CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE";
+        case CL_DEVICE_SINGLE_FP_CONFIG:               return "CL_DEVICE_SINGLE_FP_CONFIG";
+        case CL_DEVICE_GLOBAL_MEM_CACHE_TYPE:          return "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE";
+        case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:      return "CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE";
+        case CL_DEVICE_GLOBAL_MEM_CACHE_SIZE:          return "CL_DEVICE_GLOBAL_MEM_CACHE_SIZE";
+        case CL_DEVICE_GLOBAL_MEM_SIZE:                return "CL_DEVICE_GLOBAL_MEM_SIZE";
+        case CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:       return "CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE";
+        case CL_DEVICE_MAX_CONSTANT_ARGS:              return "CL_DEVICE_MAX_CONSTANT_ARGS";
+        case CL_DEVICE_LOCAL_MEM_TYPE:                 return "CL_DEVICE_LOCAL_MEM_TYPE";
+        case CL_DEVICE_LOCAL_MEM_SIZE:                 return "CL_DEVICE_LOCAL_MEM_SIZE";
+        case CL_DEVICE_ERROR_CORRECTION_SUPPORT:       return "CL_DEVICE_ERROR_CORRECTION_SUPPORT";
+        case CL_DEVICE_PROFILING_TIMER_RESOLUTION:     return "CL_DEVICE_PROFILING_TIMER_RESOLUTION";
+        case CL_DEVICE_ENDIAN_LITTLE:                  return "CL_DEVICE_ENDIAN_LITTLE";
+        case CL_DEVICE_AVAILABLE:                      return "CL_DEVICE_AVAILABLE";
+        case CL_DEVICE_COMPILER_AVAILABLE:             return "CL_DEVICE_COMPILER_AVAILABLE";
+        case CL_DEVICE_EXECUTION_CAPABILITIES:         return "CL_DEVICE_EXECUTION_CAPABILITIES";
+        case CL_DEVICE_QUEUE_PROPERTIES:               return "CL_DEVICE_QUEUE_PROPERTIES";
+        case CL_DEVICE_NAME:                           return "CL_DEVICE_NAME";
+        case CL_DEVICE_VENDOR:                         return "CL_DEVICE_VENDOR";
+        case CL_DRIVER_VERSION:                        return "CL_DRIVER_VERSION";
+        case CL_DEVICE_PROFILE:                        return "CL_DEVICE_PROFILE";
+        case CL_DEVICE_VERSION:                        return "CL_DEVICE_VERSION";
+        case CL_DEVICE_EXTENSIONS:                     return "CL_DEVICE_EXTENSIONS";
+        case CL_DEVICE_PLATFORM:                       return "CL_DEVICE_PLATFORM";
+        case CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF:    return "CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF";
+        case CL_DEVICE_HOST_UNIFIED_MEMORY:            return "CL_DEVICE_HOST_UNIFIED_MEMORY";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR:       return "CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT:      return "CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_INT:        return "CL_DEVICE_NATIVE_VECTOR_WIDTH_INT";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG:       return "CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT:      return "CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE:     return "CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE";
+        case CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF:       return "CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF";
+        case CL_DEVICE_OPENCL_C_VERSION:               return "CL_DEVICE_OPENCL_C_VERSION";
         default: return "Unknown";
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------

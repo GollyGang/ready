@@ -54,14 +54,14 @@ class Overlay : public XML_Object
 
     protected:
     
-        int iTargetChemical;             //< each overlay applies to a single chemical
+        int iTargetChemical;             ///< each overlay applies to a single chemical
 
-        BaseOperation *op;               //< e.g. overwrite, add, multiply, etc.
-        BaseFill *fill;                  //< e.g. constant value, white noise, named parameter, other chemical, etc.
-        std::vector<BaseShape*> shapes;  //< e.g. rectangle, sphere, scattered shapes, etc.
+        BaseOperation *op;               ///< e.g. overwrite, add, multiply, etc.
+        BaseFill *fill;                  ///< e.g. constant value, white noise, named parameter, other chemical, etc.
+        std::vector<BaseShape*> shapes;  ///< e.g. rectangle, sphere, scattered shapes, etc.
 
     private:
 
-        Overlay();          //< not implemented
-        Overlay(Overlay&);  //< not implemented
+        Overlay();          ///< not implemented
+        Overlay(Overlay&);  ///< not implemented
 };
