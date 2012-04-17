@@ -35,6 +35,7 @@
 #include "MeshRD.hpp"
 #include "OpenCL_Formula.hpp"
 #include "OpenCL_FullKernel.hpp"
+using namespace OpenCL_utils;
 
 // local resources:
 #include "appicon16.xpm"

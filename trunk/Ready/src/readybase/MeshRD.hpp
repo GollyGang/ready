@@ -76,7 +76,7 @@ class MeshRD : public AbstractRD
 
         vtkUnstructuredGrid* mesh;
         vtkUnstructuredGrid* buffer;
-        vtkUnstructuredGrid* starting_pattern; //< we save the starting pattern, to allow the user to reset
+        vtkUnstructuredGrid* starting_pattern; ///< we save the starting pattern, to allow the user to reset
 
         std::vector<std::vector<vtkIdType> > cell_neighbors;
 

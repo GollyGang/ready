@@ -26,6 +26,7 @@
 
 class MyFrame;
 
+/// The wxApp-derived application class for the Ready GUI.
 class MyApp : public wxApp
 {
 public:

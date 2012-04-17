@@ -63,7 +63,7 @@ class ImageRD : public AbstractRD
 
     protected:
 
-        std::vector<vtkImageData*> images; //< one for each chemical
+        std::vector<vtkImageData*> images; ///< one for each chemical
 
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;

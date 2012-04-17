@@ -331,13 +331,14 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
         cutter->SetInput(this->mesh);
         cutter->SetCutFunction(plane);
-        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(cutter->GetOutputPort());
         mapper->SetScalarModeToUseCellFieldData();
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
+        //actor->GetProperty()->SetAmbient(1);
         pRenderer->AddActor(actor);
     }
 

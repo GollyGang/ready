@@ -35,6 +35,7 @@ class wxVTKRenderWindowInteractor;
 #include "Properties.hpp"
 class AbstractRD;
 
+/// The wxFrame-derived top-level window for the Ready GUI.
 class MyFrame : public wxFrame
 {
     public:
