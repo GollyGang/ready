@@ -32,12 +32,21 @@ class Property : public XML_Object
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
         void ReadFromXML(vtkXMLDataElement* node);
 
+        /// Construct as a float.
         Property(const std::string& name,float f) : XML_Object(NULL), name(name), type("float"), f1(f) {}
+
+        /// Construct as an int.
         Property(const std::string& name,int i) : XML_Object(NULL), name(name), type("int"), i(i) {}
+
+        /// Construct as a bool.
         Property(const std::string& name,bool b) : XML_Object(NULL), name(name), type("bool"), b(b) {}
-        Property(const std::string& name,const std::string& type,float a,float b,float c) ///< e.g. "color"
+
+        /// Construct as a float3. e.g. "color" = { 0.1, 0.4, 0.2 }
+        Property(const std::string& name,const std::string& type,float a,float b,float c)
             : XML_Object(NULL), name(name), type(type), f1(a), f2(b), f3(c) {}
-        Property(const std::string& name,const std::string& type,const std::string& c) ///< e.g. "chemical", "axis"
+
+        /// Construct as a string. e.g. "chemical" = "a", "axis" = "x"
+        Property(const std::string& name,const std::string& type,const std::string& c)
             : XML_Object(NULL), name(name), type(type), s(c) {}
 
         std::string GetName() const { return this->name; }
