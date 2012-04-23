@@ -15,44 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local
-class ImageRD;
-class MeshRD;
-class Properties;
-
 // VTK:
-#include <vtkXMLImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>
-#include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkXMLDataElement.h>
 #include <vtkSmartPointer.h>
-
-// -------------------------------------------------------------------
-
-class RD_XMLImageWriter : public vtkXMLImageDataWriter
-{
-    public:
-
-        vtkTypeMacro(RD_XMLImageWriter, vtkXMLImageDataWriter);
-        static RD_XMLImageWriter* New();
-
-        void SetSystem(const ImageRD* rd_system);
-        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
-
-    protected:  
-
-        RD_XMLImageWriter() : system(NULL) {} 
-
-        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
-
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
-
-    protected:
-
-        const ImageRD* system;
-        const Properties* render_settings;
-};
 
 // -------------------------------------------------------------------
 
@@ -72,32 +39,6 @@ class RD_XMLImageReader : public vtkXMLImageDataReader
 
         RD_XMLImageReader() {} 
 
-};
-
-// -------------------------------------------------------------------
-
-class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
-{
-    public:
-
-        vtkTypeMacro(RD_XMLUnstructuredGridWriter, vtkXMLUnstructuredGridWriter);
-        static RD_XMLUnstructuredGridWriter* New();
-
-        void SetSystem(const MeshRD* rd_system);
-        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
-
-    protected:  
-
-        RD_XMLUnstructuredGridWriter() : system(NULL) {} 
-
-        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
-
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
-
-    protected:
-
-        const MeshRD* system;
-        const Properties* render_settings;
 };
 
 // -------------------------------------------------------------------

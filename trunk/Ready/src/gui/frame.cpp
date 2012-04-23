@@ -1413,7 +1413,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
             int dim[3];
             iw->GetOutput()->GetDimensions(dim);
-            int nc = iw->GetOutput()->GetNumberOfScalarComponents();
+            int nc = iw->GetOutput()->GetNumberOfScalarComponents() * iw->GetOutput()->GetPointData()->GetNumberOfArrays();
             image_system->SetDimensions(dim[0],dim[1],dim[2]);
             image_system->SetNumberOfChemicals(nc);
             if(iw->ShouldGenerateInitialPatternWhenLoading())

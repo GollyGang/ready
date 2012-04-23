@@ -12,9 +12,6 @@ code annoyances:
 
 before 0.3 release:
 
-- switch ImageRD (and all vti files) to use single-component named scalar arrays (as in MeshRD) 
-   - enables paraview to contour them and volume render them
-   - easier to deal with in code (only need a single vtkImageData to get contiguous memory for each chemical)
 - different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
 - relax power of 2 size requirement (only a speed benefit)
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
