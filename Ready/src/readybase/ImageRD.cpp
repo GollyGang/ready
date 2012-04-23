@@ -69,6 +69,35 @@ using namespace std;
 #include <vtkGeometryFilter.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkXMLImageDataWriter.h>
+#include <vtkObjectFactory.h>
+#include <vtkFloatArray.h>
+
+// -------------------------------------------------------------------
+
+class RD_XMLImageWriter : public vtkXMLImageDataWriter
+{
+    public:
+
+        vtkTypeMacro(RD_XMLImageWriter, vtkXMLImageDataWriter);
+        static RD_XMLImageWriter* New();
+
+        void SetSystem(const ImageRD* rd_system);
+        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
+
+    protected:  
+
+        RD_XMLImageWriter() : system(NULL) {} 
+
+        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
+
+        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
+
+    protected:
+
+        const ImageRD* system;
+        const Properties* render_settings;
+};
 
 // ---------------------------------------------------------------------
 
@@ -153,15 +182,32 @@ vtkSmartPointer<vtkImageData> ImageRD::GetImage() const
 
 void ImageRD::CopyFromImage(vtkImageData* im)
 {
-    if(im->GetNumberOfScalarComponents()!=this->GetNumberOfChemicals()) throw runtime_error("ImageRD::CopyFromImage : chemical count mismatch");
-    vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
-    iec->SetInput(im);
-    for(int i=0;i<this->GetNumberOfChemicals();i++)
+    int n_arrays = im->GetPointData()->GetNumberOfArrays();
+    int n_components = im->GetNumberOfScalarComponents();
+
+    if(n_components==1 && n_arrays==this->GetNumberOfChemicals())
     {
-        iec->SetComponents(i);
-        iec->Update();
-        this->images[i]->DeepCopy(iec->GetOutput());
+        // convert named array data to single-component data in multiple images
+        for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
+        {
+            this->images[iChem]->SetExtent(im->GetExtent());
+            this->images[iChem]->GetPointData()->SetScalars(im->GetPointData()->GetArray(GetChemicalName(iChem).c_str()));
+        }
     }
+    else if(n_arrays==1 && n_components==this->GetNumberOfChemicals()) 
+    {
+        // convert multi-component data to single-component data in multiple images
+        vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
+        iec->SetInput(im);
+        for(int i=0;i<this->GetNumberOfChemicals();i++)
+        {
+            iec->SetComponents(i);
+            iec->Update();
+            this->images[i]->DeepCopy(iec->GetOutput());
+        }
+    }
+    else   
+        throw runtime_error("ImageRD::CopyFromImage : chemical count mismatch");
     UpdateImageWrapPadFilter();
 }
 
@@ -713,18 +759,6 @@ void ImageRD::RestoreStartingPattern()
 
 // ---------------------------------------------------------------------
 
-void ImageRD::SaveFile(const char* filename,const Properties& render_settings) const
-{
-    vtkSmartPointer<RD_XMLImageWriter> iw = vtkSmartPointer<RD_XMLImageWriter>::New();
-    iw->SetSystem(this);
-    iw->SetRenderSettings(&render_settings);
-    iw->SetFileName(filename);
-    iw->SetInput(this->GetImage());
-    iw->Write();
-}
-
-// ---------------------------------------------------------------------
-
 void ImageRD::SetDimensions(int x, int y, int z)
 {
     this->AllocateImages(x,y,z,this->GetNumberOfChemicals());
@@ -844,3 +878,48 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
 }
 
 // ---------------------------------------------------------------------
+
+void ImageRD::SaveFile(const char* filename,const Properties& render_settings) const
+{
+    // convert the image to named arrays
+    vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
+    im->DeepCopy(this->images.front());
+    im->GetPointData()->SetScalars(NULL);
+    for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> fa = vtkSmartPointer<vtkFloatArray>::New();
+        fa->DeepCopy(this->images[iChem]->GetPointData()->GetScalars());
+        fa->SetName(GetChemicalName(iChem).c_str());
+        im->GetPointData()->AddArray(fa);
+    }
+
+    vtkSmartPointer<RD_XMLImageWriter> iw = vtkSmartPointer<RD_XMLImageWriter>::New();
+    iw->SetSystem(this);
+    iw->SetRenderSettings(&render_settings);
+    iw->SetFileName(filename);
+    iw->SetInput(im);
+    iw->Write();
+}
+
+// --------------------------------------------------------------------------------
+
+vtkStandardNewMacro(RD_XMLImageWriter);
+
+// --------------------------------------------------------------------------------
+
+void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system) 
+{ 
+    this->system = rd_system; 
+}
+
+// --------------------------------------------------------------------------------
+
+int RD_XMLImageWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
+    xml->AddNestedElement(this->render_settings->GetAsXML());
+    xml->PrintXML(os,indent);
+    return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
+}
+
+// --------------------------------------------------------------------------------

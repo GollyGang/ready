@@ -37,27 +37,8 @@ using namespace std;
 
 // --------------------------------------------------------------------------------
 
-vtkStandardNewMacro(RD_XMLImageWriter);
 vtkStandardNewMacro(RD_XMLImageReader);
-vtkStandardNewMacro(RD_XMLUnstructuredGridWriter);
 vtkStandardNewMacro(RD_XMLUnstructuredGridReader);
-
-// --------------------------------------------------------------------------------
-
-void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system) 
-{ 
-    this->system = rd_system; 
-}
-
-// --------------------------------------------------------------------------------
-
-int RD_XMLImageWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
-{
-    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
-    xml->AddNestedElement(this->render_settings->GetAsXML());
-    xml->PrintXML(os,indent);
-    return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
-}
 
 // ================================================================================
 
@@ -103,23 +84,6 @@ vtkXMLDataElement* RD_XMLImageReader::GetRDElement()
     vtkSmartPointer<vtkXMLDataElement> rd = root->FindNestedElementWithName("RD");
     if(!rd) throw runtime_error("RD node not found in file");
     return rd;
-}
-
-// ================================================================================
-
-void RD_XMLUnstructuredGridWriter::SetSystem(const MeshRD* rd_system) 
-{ 
-    this->system = rd_system; 
-}
-
-// --------------------------------------------------------------------------------
-
-int RD_XMLUnstructuredGridWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
-{
-    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
-    xml->AddNestedElement(this->render_settings->GetAsXML());
-    xml->PrintXML(os,indent);
-    return vtkXMLUnstructuredGridWriter::WritePrimaryElement(os,indent);
 }
 
 // ================================================================================

@@ -44,10 +44,38 @@
 #include <vtkGeometryFilter.h>
 #include <vtkCutter.h>
 #include <vtkPlane.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkObjectFactory.h>
 
 // STL:
 #include <stdexcept>
 using namespace std;
+
+// -------------------------------------------------------------------
+
+class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
+{
+    public:
+
+        vtkTypeMacro(RD_XMLUnstructuredGridWriter, vtkXMLUnstructuredGridWriter);
+        static RD_XMLUnstructuredGridWriter* New();
+
+        void SetSystem(const MeshRD* rd_system);
+        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
+
+    protected:  
+
+        RD_XMLUnstructuredGridWriter() : system(NULL) {} 
+
+        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
+
+        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
+
+    protected:
+
+        const MeshRD* system;
+        const Properties* render_settings;
+};
 
 // ---------------------------------------------------------------------
 
@@ -552,6 +580,27 @@ int MeshRD::GetArenaDimensionality() const
             dimensionality++;
     return dimensionality;
     // TODO: rotate datasets on input such that if dimensionality=2 then all z=constant, and if dimensionality=1 then all y=constant and all z=constant
+}
+
+// ---------------------------------------------------------------------
+
+vtkStandardNewMacro(RD_XMLUnstructuredGridWriter);
+
+// ---------------------------------------------------------------------
+
+void RD_XMLUnstructuredGridWriter::SetSystem(const MeshRD* rd_system) 
+{ 
+    this->system = rd_system; 
+}
+
+// ---------------------------------------------------------------------
+
+int RD_XMLUnstructuredGridWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
+{
+    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
+    xml->AddNestedElement(this->render_settings->GetAsXML());
+    xml->PrintXML(os,indent);
+    return vtkXMLUnstructuredGridWriter::WritePrimaryElement(os,indent);
 }
 
 // ---------------------------------------------------------------------
