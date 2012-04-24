@@ -51,20 +51,20 @@
     
   </RD>
   <UnstructuredGrid>
-    <Piece NumberOfPoints="2903"                 NumberOfCells="3263"                >
+    <Piece NumberOfPoints="2903" NumberOfCells="3263" >
       <PointData>
       </PointData>
       <CellData>
-        <DataArray type="Float32" Name="a" format="appended" RangeMin="0"                    RangeMax="0"                    offset="0"                   />
-        <DataArray type="Float32" Name="b" format="appended" RangeMin="0"                    RangeMax="0"                    offset="72"                  />
+        <DataArray type="Float32" Name="a" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+        <DataArray type="Float32" Name="b" format="appended" RangeMin="0" RangeMax="0" offset="72" />
       </CellData>
       <Points>
-        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="appended" RangeMin="1.3772239036"         RangeMax="6.1258021248"         offset="144"                 />
+        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="appended" RangeMin="1.3772239036" RangeMax="6.1258021248" offset="144" />
       </Points>
       <Cells>
-        <DataArray type="Int32" Name="connectivity" format="appended" RangeMin=""                     RangeMax=""                     offset="29664"               />
-        <DataArray type="Int32" Name="offsets" format="appended" RangeMin=""                     RangeMax=""                     offset="52152"               />
-        <DataArray type="UInt8" Name="types" format="appended" RangeMin=""                     RangeMax=""                     offset="58352"               />
+        <DataArray type="Int32" Name="connectivity" format="appended" RangeMin="" RangeMax="" offset="29664" />
+        <DataArray type="Int32" Name="offsets" format="appended" RangeMin="" RangeMax="" offset="52152" />
+        <DataArray type="UInt8" Name="types" format="appended" RangeMin="" RangeMax="" offset="58352" />
       </Cells>
     </Piece>
   </UnstructuredGrid>
