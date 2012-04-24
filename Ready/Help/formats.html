@@ -11,39 +11,41 @@
 <p>
 The only file format currently supported by Ready is an extended version of <a href="http://vtk.org">VTK</a>'s image format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>. Below is a simple example:
 
-<pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
+<p><table bgcolor="#FFFFF0"><tr><td><pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
 &lt;VTKFile type=&quot;ImageData&quot; version=&quot;0.1&quot; byte_order=&quot;LittleEndian&quot; compressor=&quot;vtkZLibDataCompressor&quot;&gt;
 
-  &lt;<a href="#RD">RD</a> format_version=&quot;1&quot;&gt;
+  &lt;<a href="#RD">RD</a> format_version=&quot;2&quot;&gt;
   
     &lt;<a href="#rule">rule</a> type=&quot;formula&quot; name=&quot;Schlogl&quot;&gt;
-    
-      &lt;<a href="#param">param</a> name=&quot;timestep&quot;&gt;  0.1  &lt;/param&gt;
-      
+      &lt;<a href="#param">param</a> name=&quot;timestep&quot;&gt;  0.1  &lt;/<a href="#param">param</a>&gt;
       &lt;<a href="#formula">formula</a> number_of_chemicals=&quot;1&quot;&gt;
-      
         delta_a = laplacian_a + a - a*a*a;
-        
-      &lt;/formula&gt;
-      
-    &lt;/rule&gt;
+      &lt;/<a href="#formula">formula</a>&gt;
+    &lt;/<a href="#rule">rule</a>&gt;
     
-  &lt;/RD&gt;
+    &lt;<a href="#initial_pattern_generator">initial_pattern_generator</a> apply_when_loading=&quot;true&quot;&gt;
+      &lt;<a href="#overlay">overlay</a> chemical=&quot;a&quot;&gt;
+        &lt;<a href="#overwrite">overwrite</a> /&gt;
+        &lt;<a href="#white_noise">white_noise</a> low=&quot;-0.1&quot; high=&quot;0.1&quot; /&gt;
+        &lt;<a href="#everywhere">everywhere</a> /&gt;
+      &lt;/<a href="#overlay">overlay</a>&gt;
+    &lt;/<a href="#initial_pattern_generator">initial_pattern_generator</a>&gt;
+    
+  &lt;/<a href="#RD">RD</a>&gt;
   
   &lt;ImageData WholeExtent=&quot;0 127 0 63 0 0&quot; Origin=&quot;0 0 0&quot; Spacing=&quot;1 1 1&quot;&gt;
     &lt;Piece Extent=&quot;0 127 0 63 0 0&quot;&gt;
-      &lt;PointData Scalars=&quot;Scalars_&quot;&gt;
-        &lt;DataArray type=&quot;Float32&quot; Name=&quot;Scalars_&quot; format=&quot;appended&quot; RangeMin=&quot;-0.0010000000475&quot; RangeMax=&quot;0.00099975580815&quot; offset=&quot;0&quot; /&gt;
+      &lt;PointData&gt;
+        &lt;DataArray type=&quot;Float32&quot; Name=&quot;a&quot; format=&quot;appended&quot; RangeMin=&quot;0&quot; RangeMax=&quot;0&quot; offset=&quot;0&quot; /&gt;
       &lt;/PointData&gt;
       &lt;CellData&gt;
       &lt;/CellData&gt;
     &lt;/Piece&gt;
   &lt;/ImageData&gt;
   &lt;AppendedData encoding=&quot;base64&quot;&gt;
-  _AQAAAACAAAAAAAAAqXAAAA==eJwkXHtcjPn3n6SbS5KQJGmTJBlJPedsMpIUUhQVRRGSJEmSth1t2 ... lots of data ... 3nudNY=
+    _AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
   &lt;/AppendedData&gt;
-&lt;/VTKFile&gt;
-</tt></pre>
+&lt;/VTKFile&gt;</tt></pre></td></tr></table>
 
 <p>
 This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
