@@ -175,11 +175,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00074"></a>00074 
 <a name="l00075"></a>00075     <span class="keyword">protected</span>:
 <a name="l00076"></a>00076 
-<a name="l00077"></a><a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644">00077</a>         vtkUnstructuredGrid* <a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644">mesh</a>;
-<a name="l00078"></a><a class="code" href="classMeshRD.html#a3e371590e647939854d46257743ec1bc">00078</a>         vtkUnstructuredGrid* <a class="code" href="classMeshRD.html#a3e371590e647939854d46257743ec1bc">buffer</a>;
+<a name="l00077"></a><a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644">00077</a>         vtkUnstructuredGrid* <a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>;             
+<a name="l00078"></a><a class="code" href="classMeshRD.html#a3e371590e647939854d46257743ec1bc">00078</a>         vtkUnstructuredGrid* <a class="code" href="classMeshRD.html#a3e371590e647939854d46257743ec1bc" title="temporary storage used during computation">buffer</a>;           
 <a name="l00079"></a><a class="code" href="classMeshRD.html#a72da64fb3411931d74a0829a812865a7">00079</a>         vtkUnstructuredGrid* <a class="code" href="classMeshRD.html#a72da64fb3411931d74a0829a812865a7" title="we save the starting pattern, to allow the user to reset">starting_pattern</a>; 
 <a name="l00080"></a>00080 
-<a name="l00081"></a><a class="code" href="classMeshRD.html#a35f9615358390380166abaec3c0eb5d4">00081</a>         std::vector&lt;std::vector&lt;vtkIdType&gt; &gt; <a class="code" href="classMeshRD.html#a35f9615358390380166abaec3c0eb5d4">cell_neighbors</a>;
+<a name="l00081"></a><a class="code" href="classMeshRD.html#a35f9615358390380166abaec3c0eb5d4">00081</a>         std::vector&lt;std::vector&lt;vtkIdType&gt; &gt; <a class="code" href="classMeshRD.html#a35f9615358390380166abaec3c0eb5d4" title="the connectivity between cells; for each cell, what cells are its neighbors?">cell_neighbors</a>; 
 <a name="l00082"></a>00082 
 <a name="l00083"></a>00083     <span class="keyword">private</span>: <span class="comment">// deliberately not implemented, to prevent use</span>
 <a name="l00084"></a>00084 
@@ -190,7 +190,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 18 2012 11:19:36 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 24 2012 11:02:34 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

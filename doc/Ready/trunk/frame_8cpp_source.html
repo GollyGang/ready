@@ -1517,7 +1517,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l01413"></a>01413 
 <a name="l01414"></a>01414             <span class="keywordtype">int</span> dim[3];
 <a name="l01415"></a>01415             iw-&gt;GetOutput()-&gt;GetDimensions(dim);
-<a name="l01416"></a>01416             <span class="keywordtype">int</span> nc = iw-&gt;GetOutput()-&gt;GetNumberOfScalarComponents();
+<a name="l01416"></a>01416             <span class="keywordtype">int</span> nc = iw-&gt;GetOutput()-&gt;GetNumberOfScalarComponents() * iw-&gt;GetOutput()-&gt;GetPointData()-&gt;GetNumberOfArrays();
 <a name="l01417"></a>01417             image_system-&gt;<a class="code" href="classImageRD.html#a73be8ca9a7b6659fc2f085f08b3375ca">SetDimensions</a>(dim[0],dim[1],dim[2]);
 <a name="l01418"></a>01418             image_system-&gt;<a class="code" href="classImageRD.html#af933532d2ba634c8887bd31f3b8f95f1">SetNumberOfChemicals</a>(nc);
 <a name="l01419"></a>01419             <span class="keywordflow">if</span>(iw-&gt;ShouldGenerateInitialPatternWhenLoading())
@@ -2491,7 +2491,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 18 2012 11:19:36 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 24 2012 11:02:34 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>
