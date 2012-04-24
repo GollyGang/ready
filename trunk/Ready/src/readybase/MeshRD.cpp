@@ -53,6 +53,7 @@ using namespace std;
 
 // -------------------------------------------------------------------
 
+/// Used to write vtkUnstructuredGrid to XML, with an added RD section containing rule information.
 class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
 {
     public:

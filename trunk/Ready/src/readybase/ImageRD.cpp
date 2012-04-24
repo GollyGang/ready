@@ -75,6 +75,7 @@ using namespace std;
 
 // -------------------------------------------------------------------
 
+/// Used to write vtkImageData to XML, with an added RD section containing rule information.
 class RD_XMLImageWriter : public vtkXMLImageDataWriter
 {
     public:
