@@ -7,9 +7,6 @@ UI annoyances:
 - on Windows, Ready application gets pushed into background on first pattern load
 - can't tab between edit controls in XYZ dialogs on Xubuntu
 
-code annoyances:
-- ImageRD::UpdateImageWrapPad() shouldn't be necessary
-
 before 0.3 release:
 
 - different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
@@ -58,3 +55,7 @@ future ideas:
 - allow non-OpenCL implementations to load all files, by parsing formula
 - integer systems
 - read Golly rule tables
+
+code annoyances:
+- ImageRD::UpdateImageWrapPad() shouldn't be necessary
+- would prefer ImageRD to use named arrays, as in MeshRD
