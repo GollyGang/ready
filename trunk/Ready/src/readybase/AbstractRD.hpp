@@ -110,9 +110,9 @@ class AbstractRD
         virtual float GetZ() const =0;
         virtual void SetDimensions(int x,int y,int z) {}
 
-        /// only some implementations (OpenCL_FullKernel) can have their block size edited
+        /// only some implementations (FullKernelOpenCLImageRD) can have their block size edited
         virtual bool HasEditableBlockSize() const { return false; }
-        virtual int GetBlockSizeX() const { return 1; } ///< e.g. block size may be 4x1x1 for kernels that use float4 (like OpenCL_Formula)
+        virtual int GetBlockSizeX() const { return 1; } ///< e.g. block size may be 4x1x1 for kernels that use float4 (like FormulaOpenCLImageRD)
         virtual int GetBlockSizeY() const { return 1; }
         virtual int GetBlockSizeZ() const { return 1; }
         virtual void SetBlockSizeX(int n) {}
@@ -150,4 +150,3 @@ class AbstractRD
 };
 
 #endif 
-

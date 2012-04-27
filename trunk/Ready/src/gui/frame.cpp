@@ -29,12 +29,12 @@
 
 // readybase:
 #include "utils.hpp"
-#include "GrayScott.hpp"
+#include "GrayScottImageRD.hpp"
 #include "OpenCL_utils.hpp"
 #include "IO_XML.hpp"
-#include "MeshRD.hpp"
-#include "OpenCL_Formula.hpp"
-#include "OpenCL_FullKernel.hpp"
+#include "HeatEquationMeshRD.hpp"
+#include "FormulaOpenCLImageRD.hpp"
+#include "FullKernelOpenCLImageRD.hpp"
 using namespace OpenCL_utils;
 
 // local resources:
@@ -77,6 +77,7 @@ using namespace std;
 #include <vtkTriangleFilter.h>
 #include <vtkPointData.h>
 #include <vtkRendererCollection.h>
+#include <vtkXMLGenericDataObjectReader.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -1293,7 +1294,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     this->InitializeDefaultRenderSettings();
     if(this->system == NULL) {
         // initial call from MyFrame::MyFrame
-        GrayScott *s = new GrayScott();
+        GrayScottImageRD *s = new GrayScottImageRD();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
         s->SetFilename("untitled");
@@ -1370,26 +1371,33 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     AbstractRD *target_system = NULL;
     try
     {
-        ImageRD* image_system = NULL;
-        if(path.SubString(path.Len()-3,path.Len()) == ImageRD::GetFileExtensionStatic())
-        {
-            vtkSmartPointer<RD_XMLImageReader> iw = vtkSmartPointer<RD_XMLImageReader>::New();
-            iw->SetFileName(path.mb_str());
-            iw->Update();
+        // get the VTK data type from the file
+        vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
+        bool parallel;
+        int data_type = generic_reader->ReadOutputType(path.mb_str(),parallel);
 
-            string type = iw->GetType();
+        if( data_type == VTK_IMAGE_DATA )
+        {
+            vtkSmartPointer<RD_XMLImageReader> reader = vtkSmartPointer<RD_XMLImageReader>::New();
+            reader->SetFileName(path.mb_str());
+            reader->Update();
+            vtkImageData *image = reader->GetOutput();
+
+            string type = reader->GetType();
+            string name = reader->GetName();
+
+            ImageRD* image_system;
             if(type=="inbuilt")
             {
-                string name = iw->GetName();
                 if(name=="Gray-Scott")
-                    image_system = new GrayScott();
+                    image_system = new GrayScottImageRD();
                 else 
                     throw runtime_error("Unsupported inbuilt implementation: "+name);
             }
             else if(type=="formula")
             {
                 // TODO: detect if opencl is available, abort if not
-                OpenCL_Formula *s = new OpenCL_Formula();
+                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
                 s->SetPlatform(opencl_platform);
                 s->SetDevice(opencl_device);
                 image_system = s;
@@ -1397,61 +1405,67 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             else if(type=="kernel")
             {
                 // TODO: detect if opencl is available, abort if not
-                OpenCL_FullKernel *s = new OpenCL_FullKernel();
+                FullKernelOpenCLImageRD *s = new FullKernelOpenCLImageRD();
                 s->SetPlatform(opencl_platform);
                 s->SetDevice(opencl_device);
                 image_system = s;
             }
             else throw runtime_error("Unsupported rule type: "+type);
-            image_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
+            image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
 
             // render settings
             this->InitializeDefaultRenderSettings();
-            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
+            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");
             if(xml_render_settings) // optional
                 this->render_settings.OverwriteFromXML(xml_render_settings);
 
             int dim[3];
-            iw->GetOutput()->GetDimensions(dim);
-            int nc = iw->GetOutput()->GetNumberOfScalarComponents() * iw->GetOutput()->GetPointData()->GetNumberOfArrays();
+            image->GetDimensions(dim);
+            int nc = image->GetNumberOfScalarComponents() * image->GetPointData()->GetNumberOfArrays();
             image_system->SetDimensions(dim[0],dim[1],dim[2]);
             image_system->SetNumberOfChemicals(nc);
-            if(iw->ShouldGenerateInitialPatternWhenLoading())
+            if(reader->ShouldGenerateInitialPatternWhenLoading())
                 image_system->GenerateInitialPattern();
             else
-                image_system->CopyFromImage(iw->GetOutput());
+                image_system->CopyFromImage(image);
             target_system = image_system;
         }
-        else if(path.SubString(path.Len()-3,path.Len()) == MeshRD::GetFileExtensionStatic())
+        else if( data_type == VTK_UNSTRUCTURED_GRID )
         {
-            MeshRD *mesh_system;
-            vtkSmartPointer<RD_XMLUnstructuredGridReader> iw = vtkSmartPointer<RD_XMLUnstructuredGridReader>::New();
-            iw->SetFileName(path.mb_str());
-            iw->Update();
+            vtkSmartPointer<RD_XMLUnstructuredGridReader> reader = vtkSmartPointer<RD_XMLUnstructuredGridReader>::New();
+            reader->SetFileName(path.mb_str());
+            reader->Update();
+            vtkUnstructuredGrid *ugrid = reader->GetOutput();
 
-            string type = iw->GetType();
+            string type = reader->GetType();
+            string name = reader->GetName();
+
+            MeshRD* mesh_system;
             if(type=="formula")
             {
-                MeshRD *s = new MeshRD();
-                s->CopyFromMesh(iw->GetOutput());
-                mesh_system = s;
+                // TODO
+                mesh_system = new HeatEquationMeshRD();
             }
             else throw runtime_error("Unsupported rule type: "+type);
-            mesh_system->InitializeFromXML(iw->GetRDElement(),warn_to_update);
+
+            mesh_system->CopyFromMesh(ugrid);
+            mesh_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
             // render settings
             this->InitializeDefaultRenderSettings();
-            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = iw->GetRDElement()->FindNestedElementWithName("render_settings");
+            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");
             if(xml_render_settings) // optional
                 this->render_settings.OverwriteFromXML(xml_render_settings);
 
-            if(iw->ShouldGenerateInitialPatternWhenLoading())
+            if(reader->ShouldGenerateInitialPatternWhenLoading())
                 mesh_system->GenerateInitialPattern();
 
             target_system = mesh_system;
         }
         else
         {
-            throw runtime_error("Unknown extension");
+            ostringstream oss;
+            oss << "Unsupported data type: " << data_type;
+            throw runtime_error(oss.str());
         }
         target_system->SetFilename(string(path.mb_str())); // TODO: display filetitle only (user option?)
         target_system->SetModified(false);
@@ -2252,7 +2266,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     //    - will need to ask user for other pattern to duplicate formula etc. from, or whether to define this later
     // 2. as representation of a binary image for ImageRD (e.g. import a 3D logo, then run tip-splitting from that seed)
     //    - will need to ask for an existing pattern to load the image into, and whether to clear that image first
-    //    - will need to ask which chemical(s) to affect, and at what level
+    //    - will need to ask which chemical(s) to affect, and at what level (overlays engine)
 
     wxString mesh_filename = wxFileSelector(_("Import a mesh:"),wxEmptyString,wxEmptyString,wxEmptyString,
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"),wxFD_OPEN);
@@ -2266,6 +2280,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
 
+    // for now we give the mesh an inbuilt rule (heat equation) but this should be different
+
     if(mesh_filename.EndsWith(_T("vtp")))
     {
         if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
@@ -2274,7 +2290,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
         vtp_reader->SetFileName(mesh_filename.mb_str());
         vtp_reader->Update();
-        MeshRD *rd = new MeshRD();
+        MeshRD *rd = new HeatEquationMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
@@ -2290,7 +2306,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
         vtu_reader->SetFileName(mesh_filename.mb_str());
         vtu_reader->Update();
-        MeshRD *rd = new MeshRD();
+        MeshRD *rd = new HeatEquationMeshRD();
         rd->CopyFromMesh(vtu_reader->GetOutput());
         rd->SetNumberOfChemicals(1);
         this->SetCurrentRDSystem(rd);
@@ -2303,7 +2319,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
         obj_reader->SetFileName(mesh_filename.mb_str());
         obj_reader->Update();
-        MeshRD *rd = new MeshRD();
+        MeshRD *rd = new HeatEquationMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());

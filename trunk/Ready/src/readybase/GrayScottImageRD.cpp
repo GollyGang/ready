@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "GrayScott.hpp"
+#include "GrayScottImageRD.hpp"
 #include "utils.hpp"
 
 // stdlib:
@@ -30,7 +30,7 @@ using namespace std;
 // VTK:
 #include <vtkImageData.h>
 
-GrayScott::GrayScott()
+GrayScottImageRD::GrayScottImageRD()
 {
     this->rule_name = "Gray-Scott";
     this->n_chemicals = 2;
@@ -42,9 +42,9 @@ GrayScott::GrayScott()
     this->AddParameter("F",0.035f);
 }
 
-void GrayScott::AllocateImages(int x,int y,int z,int nc)
+void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc)
 {
-    if(nc!=2) throw runtime_error("GrayScott::Allocate : this implementation is for 2 chemicals only"); 
+    if(nc!=2) throw runtime_error("GrayScottImageRD::Allocate : this implementation is for 2 chemicals only"); 
     ImageRD::AllocateImages(x,y,z,2);
     // also allocate our buffer images
     this->DeleteBuffers();
@@ -53,12 +53,12 @@ void GrayScott::AllocateImages(int x,int y,int z,int nc)
         this->buffer_images[i] = AllocateVTKImage(x,y,z);
 }
 
-GrayScott::~GrayScott()
+GrayScottImageRD::~GrayScottImageRD()
 {
     this->DeleteBuffers();
 }
 
-void GrayScott::DeleteBuffers()
+void GrayScottImageRD::DeleteBuffers()
 {
     for(int i=0;i<(int)this->buffer_images.size();i++)
     {
@@ -67,7 +67,7 @@ void GrayScott::DeleteBuffers()
     }
 }
 
-void GrayScott::InternalUpdate(int n_steps)
+void GrayScottImageRD::InternalUpdate(int n_steps)
 {
     const int X = this->GetX();
     const int Y = this->GetY();

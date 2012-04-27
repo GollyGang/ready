@@ -31,12 +31,12 @@ class InbuiltRD : public ImageRD
 };
 
 /// An inbuilt implementation: n-dimensional Gray-Scott.
-class GrayScott : public InbuiltRD
+class GrayScottImageRD : public InbuiltRD
 {
     public:
 
-        GrayScott();
-        ~GrayScott();
+        GrayScottImageRD();
+        ~GrayScottImageRD();
 
     protected:
 

@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "OpenCL_FullKernel.hpp"
+#include "FullKernelOpenCLImageRD.hpp"
 #include "utils.hpp"
 
 // STL:
@@ -26,7 +26,7 @@ using namespace std;
 // VTK:
 #include <vtkXMLUtilities.h>
 
-OpenCL_FullKernel::OpenCL_FullKernel()
+FullKernelOpenCLImageRD::FullKernelOpenCLImageRD()
 {
     this->SetRuleName("Full kernel example");
     this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");
@@ -35,14 +35,14 @@ OpenCL_FullKernel::OpenCL_FullKernel()
     this->block_size[2]=1;
 }
 
-string OpenCL_FullKernel::AssembleKernelSourceFromFormula(std::string formula) const
+string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }
 
-void OpenCL_FullKernel::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+void FullKernelOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
-    OpenCL_RD::InitializeFromXML(rd,warn_to_update);
+    OpenCLImageRD::InitializeFromXML(rd,warn_to_update);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -63,9 +63,9 @@ void OpenCL_FullKernel::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_u
     this->SetFormula(formula); // will set but won't throw
 }
 
-vtkSmartPointer<vtkXMLDataElement> OpenCL_FullKernel::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML() const
 {
-    vtkSmartPointer<vtkXMLDataElement> rd = OpenCL_RD::GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML();
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");

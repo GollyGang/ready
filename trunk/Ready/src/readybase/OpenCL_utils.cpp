@@ -161,7 +161,7 @@ int OpenCL_utils::GetNumberOfPlatforms()
     cl_platform_id platforms_available[MAX_PLATFORMS];
     cl_uint num_platforms;
     cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
-    throwOnError(ret,"OpenCL_RD::GetNumberOfPlatforms : clGetPlatformIDs failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetNumberOfPlatforms : clGetPlatformIDs failed: ");
     return num_platforms;
 }
 
@@ -177,13 +177,13 @@ int OpenCL_utils::GetNumberOfDevices(int iPlatform)
     cl_platform_id platforms_available[MAX_PLATFORMS];
     cl_uint num_platforms;
     cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
-    throwOnError(ret,"OpenCL_RD::GetNumberOfDevices : clGetPlatformIDs failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetNumberOfDevices : clGetPlatformIDs failed: ");
 
     const size_t MAX_DEVICES = 10;
     cl_device_id devices_available[MAX_DEVICES];
     cl_uint num_devices;
     ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
-    throwOnError(ret,"OpenCL_RD::GetNumberOfDevices : clGetDeviceIDs failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetNumberOfDevices : clGetDeviceIDs failed: ");
 
     return num_devices;
 }
@@ -199,7 +199,7 @@ string OpenCL_utils::GetPlatformDescription(int iPlatform)
     cl_platform_id platforms_available[MAX_PLATFORMS];
     cl_uint num_platforms;
     cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
-    throwOnError(ret,"OpenCL_RD::GetPlatformDescription : clGetPlatformIDs failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetPlatformDescription : clGetPlatformIDs failed: ");
 
     ostringstream oss;
     const size_t MAX_INFO_LENGTH = 1000;
@@ -207,7 +207,7 @@ string OpenCL_utils::GetPlatformDescription(int iPlatform)
     size_t info_length;
     ret = clGetPlatformInfo(platforms_available[iPlatform],CL_PLATFORM_NAME,
         MAX_INFO_LENGTH,info,&info_length);
-    throwOnError(ret,"OpenCL_RD::GetPlatformDescription : clGetPlatformInfo failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetPlatformDescription : clGetPlatformInfo failed: ");
     string platform_name = info;
     platform_name = platform_name.substr(platform_name.find_first_not_of(" \n\r\t"));
     oss << platform_name;
@@ -225,7 +225,7 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
     cl_platform_id platforms_available[MAX_PLATFORMS];
     cl_uint num_platforms;
     cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
-    throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetPlatformIDs failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetDeviceDescription : clGetPlatformIDs failed: ");
 
     const size_t MAX_INFO_LENGTH = 1000;
     char info[MAX_INFO_LENGTH];
@@ -237,10 +237,10 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
     cl_uint num_devices;
     ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,
         MAX_DEVICES,devices_available,&num_devices);
-    throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetDeviceIDs failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetDeviceDescription : clGetDeviceIDs failed: ");
     ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_NAME,
         MAX_INFO_LENGTH,info,&info_length);
-    throwOnError(ret,"OpenCL_RD::GetDeviceDescription : clGetDeviceInfo failed: ");
+    throwOnError(ret,"OpenCLImageRD::GetDeviceDescription : clGetDeviceInfo failed: ");
     string device_name = info;
     device_name = device_name.substr(device_name.find_first_not_of(" \n\r\t"));
     oss << device_name;
