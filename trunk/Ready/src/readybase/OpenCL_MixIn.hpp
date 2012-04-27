@@ -26,6 +26,7 @@
 
 // STL:
 #include <vector>
+#include <string>
 
 /// OpenCL functionality, for adding to those implementations that use it.
 class OpenCL_MixIn
