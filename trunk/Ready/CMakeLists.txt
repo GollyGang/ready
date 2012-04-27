@@ -43,8 +43,10 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/FormulaOpenCLImageRD.hpp      src/readybase/FormulaOpenCLImageRD.cpp
   src/readybase/FullKernelOpenCLImageRD.hpp   src/readybase/FullKernelOpenCLImageRD.cpp
   src/readybase/MeshRD.hpp                    src/readybase/MeshRD.cpp
-  src/readybase/HeatEquationMeshRD.hpp        src/readybase/HeatEquationMeshRD.cpp
+  src/readybase/GrayScottMeshRD.hpp           src/readybase/GrayScottMeshRD.cpp
   src/readybase/OpenCLMeshRD.hpp              src/readybase/OpenCLMeshRD.cpp
+  src/readybase/FormulaOpenCLMeshRD.hpp       src/readybase/FormulaOpenCLMeshRD.cpp
+  src/readybase/FullKernelOpenCLMeshRD.hpp    src/readybase/FullKernelOpenCLMeshRD.cpp
   src/readybase/OpenCL_MixIn.hpp              src/readybase/OpenCL_MixIn.cpp
   src/readybase/OpenCL_utils.hpp              src/readybase/OpenCL_utils.cpp
   src/readybase/IO_XML.hpp                    src/readybase/IO_XML.cpp
