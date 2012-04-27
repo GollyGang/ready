@@ -32,7 +32,7 @@
 #include "GrayScottImageRD.hpp"
 #include "OpenCL_utils.hpp"
 #include "IO_XML.hpp"
-#include "HeatEquationMeshRD.hpp"
+#include "GrayScottMeshRD.hpp"
 #include "FormulaOpenCLImageRD.hpp"
 #include "FullKernelOpenCLImageRD.hpp"
 using namespace OpenCL_utils;
@@ -1441,10 +1441,12 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             string name = reader->GetName();
 
             MeshRD* mesh_system;
-            if(type=="formula")
+            if(type=="inbuilt")
             {
-                // TODO
-                mesh_system = new HeatEquationMeshRD();
+                if(name=="Gray-Scott")
+                    mesh_system = new GrayScottMeshRD();
+                else 
+                    throw runtime_error("Unsupported inbuilt implementation: "+name);
             }
             else throw runtime_error("Unsupported rule type: "+type);
 
@@ -2280,7 +2282,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
 
-    // for now we give the mesh an inbuilt rule (heat equation) but this should be different
+    // for now we give the mesh an inbuilt rule (Gray-Scott) but this should be different
 
     if(mesh_filename.EndsWith(_T("vtp")))
     {
@@ -2290,7 +2292,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
         vtp_reader->SetFileName(mesh_filename.mb_str());
         vtp_reader->Update();
-        MeshRD *rd = new HeatEquationMeshRD();
+        MeshRD *rd = new GrayScottMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
@@ -2306,7 +2308,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
         vtu_reader->SetFileName(mesh_filename.mb_str());
         vtu_reader->Update();
-        MeshRD *rd = new HeatEquationMeshRD();
+        MeshRD *rd = new GrayScottMeshRD();
         rd->CopyFromMesh(vtu_reader->GetOutput());
         rd->SetNumberOfChemicals(1);
         this->SetCurrentRDSystem(rd);
@@ -2319,7 +2321,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
         obj_reader->SetFileName(mesh_filename.mb_str());
         obj_reader->Update();
-        MeshRD *rd = new HeatEquationMeshRD();
+        MeshRD *rd = new GrayScottMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());

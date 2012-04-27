@@ -31,11 +31,11 @@ class InbuiltMeshRD : public MeshRD
 };
 
 /// A non-OpenCL mesh implementation, just as an example.
-class HeatEquationMeshRD : public InbuiltMeshRD
+class GrayScottMeshRD : public InbuiltMeshRD
 {
     public:
 
-        HeatEquationMeshRD();
+        GrayScottMeshRD();
 
     protected:
 
