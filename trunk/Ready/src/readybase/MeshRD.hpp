@@ -30,9 +30,6 @@ class MeshRD : public AbstractRD
         MeshRD();
         virtual ~MeshRD();
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
         virtual void Update(int n_steps);
 
         virtual float GetX() const;

@@ -418,46 +418,6 @@ void MeshRD::RestoreStartingPattern()
 
 // ---------------------------------------------------------------------
 
-void MeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
-{
-    AbstractRD::InitializeFromXML(rd,warn_to_update);
-
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
-    if(!rule) throw runtime_error("rule node not found in file");
-
-    // formula:
-    vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
-    if(!xml_formula) throw runtime_error("formula node not found in file");
-
-    // number_of_chemicals:
-    read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
-
-    string formula = trim_multiline_string(xml_formula->GetCharacterData());
-    this->TestFormula(formula); // will throw on error
-    this->SetFormula(formula); // (won't throw yet)
-}
-
-// ---------------------------------------------------------------------
-
-vtkSmartPointer<vtkXMLDataElement> MeshRD::GetAsXML() const
-{
-    vtkSmartPointer<vtkXMLDataElement> rd = AbstractRD::GetAsXML();
-
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
-    if(!rule) throw runtime_error("rule node not found");
-
-    // formula
-    vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
-    formula->SetName("formula");
-    formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    formula->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
-    rule->AddNestedElement(formula);
-
-    return rd;
-}
-
-// ---------------------------------------------------------------------
-
 void MeshRD::ComputeCellNeighbors()
 {
     this->cell_neighbors.clear();

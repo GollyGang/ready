@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "HeatEquationMeshRD.hpp"
+#include "GrayScottMeshRD.hpp"
 #include "utils.hpp"
 
 // VTK:
@@ -26,17 +26,17 @@
 
 // ---------------------------------------------------------------------
 
-HeatEquationMeshRD::HeatEquationMeshRD()
+GrayScottMeshRD::GrayScottMeshRD()
 {
-    this->rule_name = "Heat equation";
+    this->rule_name = "Gray-Scott";
     this->n_chemicals = 2;
 }
 
 // ---------------------------------------------------------------------
 
-void HeatEquationMeshRD::InternalUpdate(int n_steps)
+void GrayScottMeshRD::InternalUpdate(int n_steps)
 {
-    // for now, a hard-coded heat equation
+    // TODO for now, a hard-coded heat equation
     vtkFloatArray *source;
     vtkFloatArray *target;
     for(int iStep=0;iStep<n_steps;iStep++)
