@@ -20,7 +20,7 @@
 
 /// Base class for all the inbuilt implementations.
 // (TODO: put in separate files when we have more than one derived class)
-class InbuiltRD : public ImageRD
+class InbuiltImageRD : public ImageRD
 {
     public:
 
@@ -31,7 +31,7 @@ class InbuiltRD : public ImageRD
 };
 
 /// An inbuilt implementation: n-dimensional Gray-Scott.
-class GrayScottImageRD : public InbuiltRD
+class GrayScottImageRD : public InbuiltImageRD
 {
     public:
 
