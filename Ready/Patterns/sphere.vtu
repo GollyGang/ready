@@ -6,7 +6,7 @@
         Self-replicating spots.
     </description>
 
-    <rule type="formula" name="Gray-Scott">
+    <rule type="inbuilt" name="Gray-Scott">
         
       <param name="timestep"> 1.0    </param>
       <param name="D_a">      0.082  </param>
@@ -14,11 +14,6 @@
       <param name="k">        0.064  </param>
       <param name="F">        0.035  </param>
 
-      <formula number_of_chemicals="2">
-        delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
-        delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
-      </formula>
-      
     </rule>
     
     <initial_pattern_generator apply_when_loading="true">
