@@ -100,6 +100,7 @@ set( PATTERN_FILES
   FitzHugh-Nagumo/spiral_turbulence.vti
   FitzHugh-Nagumo/pulsate.vti 
   FitzHugh-Nagumo/squid_axon.vti
+  FitzHugh-Nagumo/Ising_regime.vti
 )
 
 set( HELP_FILES
