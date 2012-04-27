@@ -16,7 +16,7 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "OpenCL_Formula.hpp"
+#include "FormulaOpenCLImageRD.hpp"
 #include "utils.hpp"
 
 // STL:
@@ -27,7 +27,9 @@ using namespace std;
 // VTK:
 #include <vtkXMLUtilities.h>
 
-OpenCL_Formula::OpenCL_Formula()
+// -------------------------------------------------------------------------
+
+FormulaOpenCLImageRD::FormulaOpenCLImageRD()
 {
     this->SetRuleName("Gray-Scott");
     this->AddParameter("timestep",1.0f);
@@ -40,7 +42,9 @@ OpenCL_Formula::OpenCL_Formula()
     delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;\n");
 }
 
-std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula) const
+// -------------------------------------------------------------------------
+
+std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     const string indent = "    ";
     const int NC = this->GetNumberOfChemicals();
@@ -93,10 +97,16 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
             kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
     for(int iC=0;iC<NC;iC++)
     {
-        kernel_source << indent << "float4 laplacian_" << GetChemicalName(iC) << " = (float4)(" << GetChemicalName(iC) << "_up.x + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_down.x + " << GetChemicalName(iC) << "_left.w + " << GetChemicalName(iC) << "_fore.x + " << GetChemicalName(iC) << "_back.x,\n";
-        kernel_source << indent << GetChemicalName(iC) << "_up.y + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_down.y + " << GetChemicalName(iC) << ".x + " << GetChemicalName(iC) << "_fore.y + " << GetChemicalName(iC) << "_back.y,\n";
-        kernel_source << indent << GetChemicalName(iC) << "_up.z + " << GetChemicalName(iC) << ".w + " << GetChemicalName(iC) << "_down.z + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_fore.z + " << GetChemicalName(iC) << "_back.z,\n";
-        kernel_source << indent << GetChemicalName(iC) << "_up.w + " << GetChemicalName(iC) << "_right.x + " << GetChemicalName(iC) << "_down.w + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_fore.w + " << GetChemicalName(iC) << "_back.w) - 6.0f*" << GetChemicalName(iC) << "\n";
+        kernel_source << indent << "float4 laplacian_" << GetChemicalName(iC) << " = (float4)(" << GetChemicalName(iC) << "_up.x + " 
+            << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_down.x + " << GetChemicalName(iC) << "_left.w + " 
+            << GetChemicalName(iC) << "_fore.x + " << GetChemicalName(iC) << "_back.x,\n";
+        kernel_source << indent << GetChemicalName(iC) << "_up.y + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) 
+            << "_down.y + " << GetChemicalName(iC) << ".x + " << GetChemicalName(iC) << "_fore.y + " << GetChemicalName(iC) << "_back.y,\n";
+        kernel_source << indent << GetChemicalName(iC) << "_up.z + " << GetChemicalName(iC) << ".w + " << GetChemicalName(iC) 
+            << "_down.z + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_fore.z + " << GetChemicalName(iC) << "_back.z,\n";
+        kernel_source << indent << GetChemicalName(iC) << "_up.w + " << GetChemicalName(iC) << "_right.x + " << GetChemicalName(iC) 
+            << "_down.w + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_fore.w + " << GetChemicalName(iC) 
+            << "_back.w) - 6.0f*" << GetChemicalName(iC) << "\n";
         kernel_source << indent << "+ (float4)(1e-6f,1e-6f,1e-6f,1e-6f); // (kill denormals)\n";
     }
     kernel_source << "\n";
@@ -121,9 +131,11 @@ std::string OpenCL_Formula::AssembleKernelSourceFromFormula(std::string formula)
     return kernel_source.str();
 }
 
-void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
-    OpenCL_RD::InitializeFromXML(rd,warn_to_update);
+    OpenCLImageRD::InitializeFromXML(rd,warn_to_update);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found in file");
@@ -140,9 +152,11 @@ void OpenCL_Formula::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_upda
     this->SetFormula(formula); // (won't throw yet)
 }
 
-vtkSmartPointer<vtkXMLDataElement> OpenCL_Formula::GetAsXML() const
+// -------------------------------------------------------------------------
+
+vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML() const
 {
-    vtkSmartPointer<vtkXMLDataElement> rd = OpenCL_RD::GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML();
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");
@@ -156,3 +170,45 @@ vtkSmartPointer<vtkXMLDataElement> OpenCL_Formula::GetAsXML() const
 
     return rd;
 }
+
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::SetParameterValue(int iParam,float val)
+{
+    AbstractRD::SetParameterValue(iParam,val);
+    this->need_reload_formula = true;
+}
+
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::SetParameterName(int iParam,const string& s)
+{
+    AbstractRD::SetParameterName(iParam,s);
+    this->need_reload_formula = true;
+}
+
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::AddParameter(const std::string& name,float val)
+{
+    AbstractRD::AddParameter(name,val);
+    this->need_reload_formula = true;
+}
+
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::DeleteParameter(int iParam)
+{
+    AbstractRD::DeleteParameter(iParam);
+    this->need_reload_formula = true;
+}
+
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::DeleteAllParameters()
+{
+    AbstractRD::DeleteAllParameters();
+    this->need_reload_formula = true;
+}
+
+// -------------------------------------------------------------------------

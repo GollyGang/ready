@@ -16,25 +16,33 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "OpenCL_RD.hpp"
+#include "OpenCLImageRD.hpp"
 
-/// An RD system that uses an OpenCL formula snippet.
+/// An RD system that uses an OpenCL program.
 /** An N-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
- *  specified as a short formula involving delta_a, laplacian_a, etc. 
- *  implemented with Euler integration, a basic finite difference stencil 
- *  and float4 blocks for speed */
-class OpenCL_Formula : public OpenCL_RD
+  * specified as a full OpenCL kernel, for maximum flexibility */
+class FullKernelOpenCLImageRD : public OpenCLImageRD
 {
     public:
 
-        OpenCL_Formula();
+        FullKernelOpenCLImageRD();
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
-        std::string GetRuleType() const { return "formula"; }
+        virtual std::string GetRuleType() const { return "kernel"; }
 
-        virtual int GetBlockSizeX() const { return 4; } // we use float4 in a 4x1x1 block
+        virtual bool HasEditableBlockSize() const { return true; }
+        virtual int GetBlockSizeX() const { return this->block_size[0]; }
+        virtual int GetBlockSizeY() const { return this->block_size[1]; }
+        virtual int GetBlockSizeZ() const { return this->block_size[2]; }
+        virtual void SetBlockSizeX(int n) { this->block_size[0]=n; this->need_reload_formula=true; }
+        virtual void SetBlockSizeY(int n) { this->block_size[1]=n; this->need_reload_formula=true; }
+        virtual void SetBlockSizeZ(int n) { this->block_size[2]=n; this->need_reload_formula=true; }
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
+        
+    protected:
+    
+        int block_size[3];
 };

@@ -70,7 +70,7 @@ class MeshRD : public AbstractRD
         void ComputeCellNeighbors();
 
         /// advance the RD system by n timesteps
-        virtual void InternalUpdate(int n_steps);
+        virtual void InternalUpdate(int n_steps) =0;
 
     protected:
 

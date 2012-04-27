@@ -20,36 +20,17 @@
 
 // local:
 #include "ImageRD.hpp"
-
-// OpenCL:
-#ifdef __APPLE__
-    // OpenCL is linked at start up time on Mac OS 10.6+
-    #include <OpenCL/opencl.h>
-#else
-    // OpenCL is loaded dynamically on Windows and Linux
-    #include "OpenCL_Dyn_Load.h"
-#endif
+#include "OpenCL_MixIn.hpp"
 
 /// Base class for implementations that use OpenCL.
-class OpenCL_RD : public ImageRD
+class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 {
     public:
 
-        OpenCL_RD();
-        virtual ~OpenCL_RD();
+        OpenCLImageRD();
+        virtual ~OpenCLImageRD();
 
         virtual bool HasEditableFormula() const { return true; }
-
-        void SetPlatform(int i);
-        void SetDevice(int i);
-        int GetPlatform() const;
-        int GetDevice() const;
-
-        virtual void AddParameter(const std::string& name,float val);
-        virtual void DeleteParameter(int iParam);
-        virtual void DeleteAllParameters();
-        virtual void SetParameterName(int iParam,const std::string& s);
-        virtual void SetParameterValue(int iParam,float val);
 
         virtual void TestFormula(std::string s);
 
@@ -66,7 +47,6 @@ class OpenCL_RD : public ImageRD
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
 
-        void ReloadContextIfNeeded();
         void ReloadKernelIfNeeded();
 
         void CreateOpenCLBuffers();
@@ -76,21 +56,7 @@ class OpenCL_RD : public ImageRD
 
         std::string kernel_source;
 
-    private:
-
-        // OpenCL things for re-use
-        cl_device_id device_id;
-        cl_context context;
-        cl_command_queue command_queue;
-        cl_kernel kernel;
         std::vector<cl_mem> buffers[2];
-        size_t global_range[3];
-
-        std::string kernel_function_name;
-
-        int iPlatform,iDevice;
-        bool need_reload_context;
-        
         int iCurrentBuffer;
 };
 

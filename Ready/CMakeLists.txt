@@ -36,19 +36,22 @@ endif()
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
-  src/readybase/AbstractRD.hpp           src/readybase/AbstractRD.cpp
-  src/readybase/ImageRD.hpp              src/readybase/ImageRD.cpp
-  src/readybase/GrayScott.hpp            src/readybase/GrayScott.cpp
-  src/readybase/OpenCL_RD.hpp            src/readybase/OpenCL_RD.cpp
-  src/readybase/OpenCL_utils.hpp         src/readybase/OpenCL_utils.cpp
-  src/readybase/OpenCL_Formula.hpp       src/readybase/OpenCL_Formula.cpp
-  src/readybase/OpenCL_FullKernel.hpp    src/readybase/OpenCL_FullKernel.cpp
-  src/readybase/MeshRD.hpp               src/readybase/MeshRD.cpp
-  src/readybase/IO_XML.hpp               src/readybase/IO_XML.cpp
-  src/readybase/overlays.hpp             src/readybase/overlays.cpp
-  src/readybase/Properties.hpp           src/readybase/Properties.cpp
-  src/readybase/utils.hpp                src/readybase/utils.cpp
-  src/readybase/OpenCL_Dyn_Load.h        src/readybase/OpenCL_Dyn_Load.c 
+  src/readybase/AbstractRD.hpp                src/readybase/AbstractRD.cpp
+  src/readybase/ImageRD.hpp                   src/readybase/ImageRD.cpp
+  src/readybase/GrayScottImageRD.hpp          src/readybase/GrayScottImageRD.cpp
+  src/readybase/OpenCLImageRD.hpp             src/readybase/OpenCLImageRD.cpp
+  src/readybase/FormulaOpenCLImageRD.hpp      src/readybase/FormulaOpenCLImageRD.cpp
+  src/readybase/FullKernelOpenCLImageRD.hpp   src/readybase/FullKernelOpenCLImageRD.cpp
+  src/readybase/MeshRD.hpp                    src/readybase/MeshRD.cpp
+  src/readybase/HeatEquationMeshRD.hpp        src/readybase/HeatEquationMeshRD.cpp
+  src/readybase/OpenCLMeshRD.hpp              src/readybase/OpenCLMeshRD.cpp
+  src/readybase/OpenCL_MixIn.hpp              src/readybase/OpenCL_MixIn.cpp
+  src/readybase/OpenCL_utils.hpp              src/readybase/OpenCL_utils.cpp
+  src/readybase/IO_XML.hpp                    src/readybase/IO_XML.cpp
+  src/readybase/overlays.hpp                  src/readybase/overlays.cpp
+  src/readybase/Properties.hpp                src/readybase/Properties.cpp
+  src/readybase/utils.hpp                     src/readybase/utils.cpp
+  src/readybase/OpenCL_Dyn_Load.h             src/readybase/OpenCL_Dyn_Load.c 
 )
 include_directories( src/readybase )
 
