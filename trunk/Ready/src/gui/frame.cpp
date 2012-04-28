@@ -2274,6 +2274,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"),wxFD_OPEN);
     if(mesh_filename.empty()) return; // user cancelled
 
+    /*
     wxArrayString choices;
     choices.Add(_("Run a pattern on the surface of this mesh"));
     choices.Add(_("Paint this pattern into a 3D volume image"));
@@ -2281,6 +2282,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     if(ret==-1) return; // user cancelled
 
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
+    */
 
     // for now we give the mesh an inbuilt rule (Gray-Scott) but this should be different
 
@@ -2297,7 +2299,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
-        rd->SetNumberOfChemicals(1);
+        rd->SetNumberOfChemicals(2);
+        this->InitializeDefaultRenderSettings();
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("vtu")))
@@ -2310,7 +2313,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtu_reader->Update();
         MeshRD *rd = new GrayScottMeshRD();
         rd->CopyFromMesh(vtu_reader->GetOutput());
-        rd->SetNumberOfChemicals(1);
+        rd->SetNumberOfChemicals(2);
+        this->InitializeDefaultRenderSettings();
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("obj")))
@@ -2326,7 +2330,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
-        rd->SetNumberOfChemicals(1);
+        rd->SetNumberOfChemicals(2);
+        this->InitializeDefaultRenderSettings();
         this->SetCurrentRDSystem(rd);
     }
     else
