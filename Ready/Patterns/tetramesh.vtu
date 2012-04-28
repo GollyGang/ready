@@ -19,27 +19,22 @@
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0.0" high="0.1" />
+        <constant value="1" />
         <everywhere />
       </overlay>
-      <overlay chemical="a">
-        <add />
-        <constant value="0.9" />
-        <rectangle> 
-          <Point3D x="0.5" y="0" z="0" />
+      <overlay chemical="b">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <rectangle>
+          <Point3D x="0.8" y="0" z="0" />
           <Point3D x="1" y="1" z="1" />
         </rectangle>
       </overlay>
-      <overlay chemical="b">
-        <overwrite />
-        <white_noise low="0.0" high="0.1" />
-        <everywhere />
-      </overlay>
-      <overlay chemical="b">
-        <overwrite />
-        <constant value="0.9" />
-        <rectangle> 
-          <Point3D x="0" y="0" z="0.7" />
+      <overlay chemical="a">
+        <subtract />
+        <other_chemical chemical="b" />
+        <rectangle>
+          <Point3D x="0.8" y="0" z="0" />
           <Point3D x="1" y="1" z="1" />
         </rectangle>
       </overlay>
@@ -47,6 +42,7 @@
     
     <render_settings>
       <slice_3D value="false" />
+	  <active_chemical value="b" />
     </render_settings>
     
   </RD>

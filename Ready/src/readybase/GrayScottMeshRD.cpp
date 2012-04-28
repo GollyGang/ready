@@ -36,31 +36,54 @@ GrayScottMeshRD::GrayScottMeshRD()
 
 void GrayScottMeshRD::InternalUpdate(int n_steps)
 {
-    // TODO for now, a hard-coded heat equation
-    vtkFloatArray *source;
-    vtkFloatArray *target;
+    float timestep = this->GetParameterValueByName("timestep");
+    float D_a = this->GetParameterValueByName("D_a");
+    float D_b = this->GetParameterValueByName("D_b");
+    float k = this->GetParameterValueByName("k");
+    float F = this->GetParameterValueByName("F");
+
+    vtkFloatArray *source_a,*source_b;
+    vtkFloatArray *target_a,*target_b;
+    float dda,ddb,aval,bval,da,db;
+    int n_neighbors;
+
     for(int iStep=0;iStep<n_steps;iStep++)
     {
-        for(int iChem=0;iChem<this->n_chemicals;iChem++)
+        if(iStep%2)
         {
-            if(iStep%2)
+            source_a = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(0).c_str()) );
+            source_b = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(1).c_str()) );
+            target_a = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(0).c_str()) );
+            target_b = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(1).c_str()) );
+        }
+        else
+        {
+            source_a = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(0).c_str()) );
+            source_b = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(1).c_str()) );
+            target_a = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(0).c_str()) );
+            target_b = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(1).c_str()) );
+        }
+        for(vtkIdType iCell=0;iCell<(int)this->cell_neighbors.size();iCell++)
+        {
+            // compute the laplacian
+            aval = source_a->GetValue(iCell);
+            bval = source_b->GetValue(iCell);
+            dda = 0.0f;
+            ddb = 0.0f;
+            n_neighbors = this->cell_neighbors[iCell].size();
+            for(vtkIdType iNeighbor=0;iNeighbor<n_neighbors;iNeighbor++)
             {
-                source = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
-                target = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
+                dda += source_a->GetValue(this->cell_neighbors[iCell][iNeighbor]);
+                ddb += source_b->GetValue(this->cell_neighbors[iCell][iNeighbor]);
             }
-            else
-            {
-                source = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
-                target = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(iChem).c_str()) );
-            }
-            for(vtkIdType iCell=0;iCell<(int)this->cell_neighbors.size();iCell++)
-            {
-                float val = source->GetValue(iCell);
-                for(vtkIdType iNeighbor=0;iNeighbor<(int)this->cell_neighbors[iCell].size();iNeighbor++)
-                    val += source->GetValue(this->cell_neighbors[iCell][iNeighbor]);
-                val /= this->cell_neighbors[iCell].size() + 1;
-                target->SetValue(iCell,val);
-            }
+            dda -= n_neighbors * aval; // graph laplacian
+            ddb -= n_neighbors * bval;
+            // Gray-Scott update step:
+            da = D_a * dda - aval*bval*bval + F*(1-aval);
+            db = D_b * ddb + aval*bval*bval - (F+k)*bval;
+            // apply the step:
+            target_a->SetValue(iCell,aval + timestep*da );
+            target_b->SetValue(iCell,bval + timestep*db );
         }
     }
     if(n_steps%2)
