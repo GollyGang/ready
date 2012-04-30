@@ -238,7 +238,7 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
     if(0)
     {
         vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
-        pts->SetNumberOfPoints(200);
+        pts->SetNumberOfPoints(1000);
         vtkSmartPointer<vtkDelaunay3D> del = vtkSmartPointer<vtkDelaunay3D>::New();
         del->SetInputConnection(pts->GetOutputPort());
         del->Update();
@@ -252,7 +252,7 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
         icosahedron->SetSolidTypeToIcosahedron();
         vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly = vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
         butterfly->SetInputConnection(icosahedron->GetOutputPort());
-        butterfly->SetNumberOfSubdivisions(3);
+        butterfly->SetNumberOfSubdivisions(4);
         butterfly->Update();
         this->mesh->SetPoints(butterfly->GetOutput()->GetPoints());
         this->mesh->SetCells(VTK_POLYGON,butterfly->GetOutput()->GetPolys());
@@ -420,59 +420,115 @@ void MeshRD::RestoreStartingPattern()
 
 void MeshRD::ComputeCellNeighbors()
 {
+    enum TNeighborhood { CELL_NEIGHBORS, VERTEX_NEIGHBORS };
+    enum TDiffusionCoefficient { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE };
+    // TODO: when these possibilities have settled down, allow them to be specified as file options
+
+    TNeighborhood neighborhood_type = VERTEX_NEIGHBORS;
+    TDiffusionCoefficient diffusion_type = EQUAL;
+
+    if(diffusion_type==BOUNDARY_SIZE && neighborhood_type!=CELL_NEIGHBORS)
+        throw runtime_error("MeshRD::ComputeCellNeighbors : BOUNDARY_SIZE diffusion only works with CELL_NEIGHBORS neighborhood");
+
     this->cell_neighbors.clear();
     vtkSmartPointer<vtkIdList> ptIds = vtkSmartPointer<vtkIdList>::New();
     vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
+    TNeighbor nbor;
+
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
-        vector<vtkIdType> neighbors;
+        vector<TNeighbor> neighbors;
         this->mesh->GetCellPoints(iCell,ptIds);
         vtkIdType npts = ptIds->GetNumberOfIds();
-        switch(this->mesh->GetCellType(iCell))
+        switch(neighborhood_type)
         {
-            case VTK_POLYGON: // 2D face, neighbors share an edge
+            case VERTEX_NEIGHBORS: // neighbors share a vertex
+            {
+                for(vtkIdType iPt=0;iPt<npts;iPt++)
                 {
-                    for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
+                    edgeIds->SetNumberOfIds(1);
+                    edgeIds->SetId(0,ptIds->GetId(iPt));
+                    this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
+                    int nNeighbors = cellIds->GetNumberOfIds();
+                    for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
                     {
-                        vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
-                        edgeIds->SetNumberOfIds(2);
-                        edgeIds->SetId(0,ptIds->GetId(iPt));
-                        edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
-                        this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
-                        int nNeighbors = cellIds->GetNumberOfIds();
-                        for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                        nbor.iNeighbor = cellIds->GetId(iNeighbor);
+                        switch(diffusion_type)
                         {
-                            vtkIdType id = cellIds->GetId(iNeighbor);
-                            neighbors.push_back(id);
+                            case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
+                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
+                        }
+                        neighbors.push_back(nbor);
+                    }
+                }
+            }
+            break;
+            case CELL_NEIGHBORS: // neighbors share an edge/face
+            {
+                switch(this->mesh->GetCellType(iCell))
+                {
+                    case VTK_POLYGON: // a 2D face, neighbors share an edge
+                    {
+                        for(vtkIdType iPt=0;iPt<npts;iPt++)
+                        {
+                            vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
+                            edgeIds->SetNumberOfIds(2);
+                            edgeIds->SetId(0,ptIds->GetId(iPt));
+                            edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
+                            this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
+                            int nNeighbors = cellIds->GetNumberOfIds();
+                            for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                            {
+                                nbor.iNeighbor = cellIds->GetId(iNeighbor);
+                                switch(diffusion_type)
+                                {
+                                    case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
+                                    default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
+                                }
+                                neighbors.push_back(nbor);
+                            }
                         }
                     }
-                    this->cell_neighbors.push_back(neighbors);
-                }
-                break;
-            case VTK_TETRA: // 3D cell, neighbors share a triangular face
-                {
-                    for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    break;
+                    case VTK_TETRA: // a 3D tetrahedral cell, neighbors share a triangular face
                     {
-                        vtkSmartPointer<vtkIdList> faceIds = vtkSmartPointer<vtkIdList>::New();
-                        faceIds->SetNumberOfIds(3);
-                        faceIds->SetId(0,ptIds->GetId(iPt));
-                        faceIds->SetId(1,ptIds->GetId((iPt+1)%npts));
-                        faceIds->SetId(2,ptIds->GetId((iPt+2)%npts));
-                        this->mesh->GetCellNeighbors(iCell,faceIds,cellIds);
-                        int nNeighbors = cellIds->GetNumberOfIds();
-                        for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                        for(vtkIdType iPt=0;iPt<npts;iPt++)
                         {
-                            vtkIdType id = cellIds->GetId(iNeighbor);
-                            neighbors.push_back(id);
+                            vtkSmartPointer<vtkIdList> faceIds = vtkSmartPointer<vtkIdList>::New();
+                            faceIds->SetNumberOfIds(3);
+                            faceIds->SetId(0,ptIds->GetId(iPt));
+                            faceIds->SetId(1,ptIds->GetId((iPt+1)%npts));
+                            faceIds->SetId(2,ptIds->GetId((iPt+2)%npts));
+                            this->mesh->GetCellNeighbors(iCell,faceIds,cellIds);
+                            int nNeighbors = cellIds->GetNumberOfIds();
+                            for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                            {
+                                nbor.iNeighbor = cellIds->GetId(iNeighbor);
+                                switch(diffusion_type)
+                                {
+                                    case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
+                                    default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
+                                }
+                                neighbors.push_back(nbor);
+                            }
                         }
                     }
-                    this->cell_neighbors.push_back(neighbors);
+                    break;
+                    default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported cell type");
                 }
-                break;
-            // TODO: allow for 1D (VTK_LINE) and other kinds of 3D cells?
-            default:
-                throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported cell type");
+            }        
+            break;
+            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported neighborhood type");
         }
+        // normalize the diffusion coefficients for this cell
+        float coeff_sum=0.0f;
+        for(int iN=0;iN<(int)neighbors.size();iN++)
+            coeff_sum += neighbors[iN].diffusion_coefficient;
+        for(int iN=0;iN<(int)neighbors.size();iN++)
+            neighbors[iN].diffusion_coefficient /= coeff_sum;
+        // store this list of neighbors
+        this->cell_neighbors.push_back(neighbors);
     }
     // N.B. we don't intend to support cells of mixed dimensionality in one mesh
 }
