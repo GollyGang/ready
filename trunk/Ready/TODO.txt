@@ -30,7 +30,7 @@ before 0.x release:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - allow user to change the default render settings
 - image export (user can specify how chemicals map onto colors)
-- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel)
+- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) - read Turk's CASCADE language?
 - graphical UI for editing the initial-pattern-generator overlay stack
 - export rule to the WebGL playground template
 
