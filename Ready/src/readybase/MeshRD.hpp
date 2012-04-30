@@ -75,7 +75,8 @@ class MeshRD : public AbstractRD
         vtkUnstructuredGrid* buffer;           ///< temporary storage used during computation
         vtkUnstructuredGrid* starting_pattern; ///< we save the starting pattern, to allow the user to reset
 
-        std::vector<std::vector<vtkIdType> > cell_neighbors; ///< the connectivity between cells; for each cell, what cells are its neighbors?
+        struct TNeighbor { vtkIdType iNeighbor; float diffusion_coefficient; };
+        std::vector<std::vector<TNeighbor> > cell_neighbors; ///< the connectivity between cells; for each cell, what cells are its neighbors?
 
     private: // deliberately not implemented, to prevent use
 

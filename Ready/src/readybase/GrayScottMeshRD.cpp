@@ -46,6 +46,7 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
     vtkFloatArray *target_a,*target_b;
     float dda,ddb,aval,bval,da,db;
     int n_neighbors;
+    TNeighbor neighbor;
 
     for(int iStep=0;iStep<n_steps;iStep++)
     {
@@ -73,11 +74,14 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
             n_neighbors = this->cell_neighbors[iCell].size();
             for(vtkIdType iNeighbor=0;iNeighbor<n_neighbors;iNeighbor++)
             {
-                dda += source_a->GetValue(this->cell_neighbors[iCell][iNeighbor]);
-                ddb += source_b->GetValue(this->cell_neighbors[iCell][iNeighbor]);
+                neighbor = this->cell_neighbors[iCell][iNeighbor];
+                dda += source_a->GetValue(neighbor.iNeighbor) * neighbor.diffusion_coefficient;
+                ddb += source_b->GetValue(neighbor.iNeighbor) * neighbor.diffusion_coefficient;
             }
-            dda -= n_neighbors * aval; // graph laplacian
-            ddb -= n_neighbors * bval;
+            dda -= aval;
+            ddb -= bval;
+            dda *= 4.0f; // scale the Laplacian to be more similar to the 2D square grid version, so the same parameters work
+            ddb *= 4.0f;
             // Gray-Scott update step:
             da = D_a * dda - aval*bval*bval + F*(1-aval);
             db = D_b * ddb + aval*bval*bval - (F+k)*bval;
