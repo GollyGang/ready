@@ -37,6 +37,8 @@ class GrayScottMeshRD : public InbuiltMeshRD
 
         GrayScottMeshRD();
 
+        void CreateGrayScottStartingConditions();
+
     protected:
 
         virtual void InternalUpdate(int n_steps);
