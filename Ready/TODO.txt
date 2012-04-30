@@ -9,19 +9,22 @@ UI annoyances:
 
 before 0.3 release:
 
-- different topologies: arbitrary connectivity (allows 3d zebra, hex tiling, sphere, etc.)
 - relax power of 2 size requirement (only a speed benefit)
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
-- parameter map(s) in a separate window, to allow user to explore parameters 
+- parameter map(s) in a separate window, to allow user to explore parameters (can use extra chemicals for this)
 - some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
 - new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
   http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
 - parameters driven by an input scene (for writhing logos, etc.) - can use more chemicals for this
 
+- document MeshRD changes, File Import command, new examples
+- mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
+
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
 - add option to convert formula rules into full-kernel rules
+- support boundary_size diffusion option
 
 
 before 0.x release:
@@ -30,7 +33,8 @@ before 0.x release:
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - allow user to change the default render settings
 - image export (user can specify how chemicals map onto colors)
-- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) - read Turk's CASCADE language?
+- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) 
+- read Turk's CASCADE language, for freeze-and-continue schemes (can use extra chemicals for this)
 - graphical UI for editing the initial-pattern-generator overlay stack
 - export rule to the WebGL playground template
 

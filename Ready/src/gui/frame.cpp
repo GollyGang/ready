@@ -2289,49 +2289,64 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     if(mesh_filename.EndsWith(_T("vtp")))
     {
         if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+
+        wxBusyCursor busy;
+
         this->InitializeDefaultRenderSettings();
+        this->render_settings.GetProperty("slice_3D").SetBool(false);
+        this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
         vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
         vtp_reader->SetFileName(mesh_filename.mb_str());
         vtp_reader->Update();
-        MeshRD *rd = new GrayScottMeshRD();
+        GrayScottMeshRD *rd = new GrayScottMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
         rd->SetNumberOfChemicals(2);
-        this->InitializeDefaultRenderSettings();
+        rd->CreateGrayScottStartingConditions();
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("vtu")))
     {
         if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+
+        wxBusyCursor busy;
+
         this->InitializeDefaultRenderSettings();
+        this->render_settings.GetProperty("slice_3D").SetBool(false);
+        this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
         vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
         vtu_reader->SetFileName(mesh_filename.mb_str());
         vtu_reader->Update();
-        MeshRD *rd = new GrayScottMeshRD();
+        GrayScottMeshRD *rd = new GrayScottMeshRD();
         rd->CopyFromMesh(vtu_reader->GetOutput());
         rd->SetNumberOfChemicals(2);
-        this->InitializeDefaultRenderSettings();
+        rd->CreateGrayScottStartingConditions();
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("obj")))
     {
         if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+    
+        wxBusyCursor busy;
+
         this->InitializeDefaultRenderSettings();
+        this->render_settings.GetProperty("slice_3D").SetBool(false);
+        this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
         vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
         obj_reader->SetFileName(mesh_filename.mb_str());
         obj_reader->Update();
-        MeshRD *rd = new GrayScottMeshRD();
+        GrayScottMeshRD *rd = new GrayScottMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
         rd->SetNumberOfChemicals(2);
-        this->InitializeDefaultRenderSettings();
+        rd->CreateGrayScottStartingConditions();
         this->SetCurrentRDSystem(rd);
     }
     else
