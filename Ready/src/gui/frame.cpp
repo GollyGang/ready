@@ -1685,7 +1685,16 @@ void MyFrame::EditFile(const wxString& path)
         // Windows or Unix
         cmd = wxString::Format(wxT("\"%s\" \"%s\""), texteditor.c_str(), path.c_str());
     #endif
-    wxExecute(cmd, wxEXEC_ASYNC);
+    
+    wxArrayString output, errors;
+    wxExecute(cmd, output, errors, wxEXEC_ASYNC);
+    if (errors.GetCount() > 0) {
+        wxString msg = _("Failed to open file in your preferred text editor:\n\n");
+        for (size_t i = 0; i < errors.GetCount(); i++)
+            msg += errors[i];
+        msg += _("\n\nTry choosing a different editor in Preferences > File.");
+        Warning(msg);
+    }
 }
 
 // ---------------------------------------------------------------------
