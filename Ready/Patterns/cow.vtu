@@ -3,7 +3,7 @@
   <RD format_version="1">
     
     <description>
-        Self-replicating spots.
+        Gray-Scott on the surface of a cow.
     </description>
 
     <rule type="inbuilt" name="Gray-Scott">
@@ -11,7 +11,7 @@
       <param name="timestep"> 1.0    </param>
       <param name="D_a">      0.082  </param>
       <param name="D_b">      0.041  </param>
-      <param name="k">        0.064  </param>
+      <param name="k">        0.062  </param>
       <param name="F">        0.035  </param>
 
     </rule>
