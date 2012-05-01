@@ -9,6 +9,7 @@ UI annoyances:
 
 before 0.3 release:
 
+- implement FormulaOpenCLMeshRD and FullKernelOpenCLMeshRD
 - relax power of 2 size requirement (only a speed benefit)
 - image import (user can specify how colors map onto chemicals), import Robert's patterns
 - parameter map(s) in a separate window, to allow user to explore parameters (can use extra chemicals for this)
