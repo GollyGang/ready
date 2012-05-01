@@ -98,6 +98,7 @@ set( PATTERN_FILES
   sphere.vtu
   cow.vtu
   tetramesh.vtu
+  munafo-uskate.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti
