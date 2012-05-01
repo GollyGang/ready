@@ -78,6 +78,10 @@ class MeshRD : public AbstractRD
         struct TNeighbor { vtkIdType iNeighbor; float diffusion_coefficient; };
         std::vector<std::vector<TNeighbor> > cell_neighbors; ///< the connectivity between cells; for each cell, what cells are its neighbors?
 
+    private:
+
+        void add_if_new(std::vector<TNeighbor>& neighbors,TNeighbor neighbor);
+
     private: // deliberately not implemented, to prevent use
 
         MeshRD(MeshRD&);

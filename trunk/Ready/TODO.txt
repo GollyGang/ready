@@ -60,6 +60,7 @@ future ideas:
 - allow non-OpenCL implementations to load all files, by parsing formula
 - integer systems
 - read Golly rule tables
+- new neighborhood type: WITHIN_RADIUS, as per http://groups.csail.mit.edu/mac/projects/amorphous/jsim/sim/GrayScott.html
 
 code annoyances:
 - ImageRD::UpdateImageWrapPad() shouldn't be necessary

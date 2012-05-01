@@ -418,6 +418,16 @@ void MeshRD::RestoreStartingPattern()
 
 // ---------------------------------------------------------------------
 
+void MeshRD::add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
+{
+    for(vector<TNeighbor>::const_iterator it=neighbors.begin();it!=neighbors.end();it++)
+        if(it->iNeighbor==neighbor.iNeighbor)
+            return;
+    neighbors.push_back(neighbor);
+}
+
+// ---------------------------------------------------------------------
+
 void MeshRD::ComputeCellNeighbors()
 {
     enum TNeighborhood { CELL_NEIGHBORS, VERTEX_NEIGHBORS };
@@ -459,7 +469,7 @@ void MeshRD::ComputeCellNeighbors()
                             case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
                             default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
                         }
-                        neighbors.push_back(nbor);
+                        add_if_new(neighbors,nbor);
                     }
                 }
             }
@@ -486,7 +496,7 @@ void MeshRD::ComputeCellNeighbors()
                                     case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
                                     default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
                                 }
-                                neighbors.push_back(nbor);
+                                add_if_new(neighbors,nbor);
                             }
                         }
                     }
@@ -510,7 +520,7 @@ void MeshRD::ComputeCellNeighbors()
                                     case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
                                     default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
                                 }
-                                neighbors.push_back(nbor);
+                                add_if_new(neighbors,nbor);
                             }
                         }
                     }

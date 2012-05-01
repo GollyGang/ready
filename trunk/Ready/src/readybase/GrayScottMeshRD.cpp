@@ -88,6 +88,9 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
             ddb -= bval;
             dda *= 4.0f; // scale the Laplacian to be more similar to the 2D square grid version, so the same parameters work
             ddb *= 4.0f;
+            // avoid denormals
+            dda += 1e-6f;
+            ddb += 1e-6f;
             // Gray-Scott update step:
             da = D_a * dda - aval*bval*bval + F*(1-aval);
             db = D_b * ddb + aval*bval*bval - (F+k)*bval;
