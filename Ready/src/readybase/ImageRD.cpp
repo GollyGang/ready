@@ -72,6 +72,7 @@ using namespace std;
 #include <vtkXMLImageDataWriter.h>
 #include <vtkObjectFactory.h>
 #include <vtkFloatArray.h>
+#include <vtkTextureMapToPlane.h>
 
 // -------------------------------------------------------------------
 
@@ -451,6 +452,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_displacement_mapped_surface = render_settings.GetProperty("show_displacement_mapped_surface").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
+    bool use_image_texture = false; // TODO: could be a render setting if desired
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -470,19 +472,18 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
 
     for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
-        // add a color-mapped image
-        {
-            // pass the image through the lookup table
-            vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
-            image_mapper->SetLookupTable(lut);
-            image_mapper->SetInput(this->GetImage(iChem));
+        // pass the image through the lookup table
+        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+        image_mapper->SetLookupTable(lut);
+        image_mapper->SetInput(this->GetImage(iChem));
 
+        // add a color-mapped image plane
+        {
             vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
             actor->SetInput(image_mapper->GetOutput());
             if(!use_image_interpolation)
                 actor->InterpolateOff();
             actor->SetPosition(offset[0],offset[1]-this->GetY()-3,offset[2]);
-
             pRenderer->AddActor(actor);
         }
 
@@ -497,15 +498,41 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             normals->SetInputConnection(warp->GetOutputPort());
             normals->SplittingOff();
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-            mapper->SetInputConnection(normals->GetOutputPort());
+            if(use_image_texture)
+            {
+                vtkSmartPointer<vtkTextureMapToPlane> tmap = vtkSmartPointer<vtkTextureMapToPlane>::New();
+                tmap->SetOrigin(0,0,0);
+                tmap->SetPoint1(this->GetX(),0,0);
+                tmap->SetPoint2(0,this->GetY(),0);
+                tmap->SetInputConnection(normals->GetOutputPort());
+                mapper->SetInputConnection(tmap->GetOutputPort());
+            }
+            else
+                mapper->SetInputConnection(normals->GetOutputPort());
             mapper->ScalarVisibilityOff();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
             actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
+            actor->GetProperty()->SetAmbient(0.1);
+            actor->GetProperty()->SetDiffuse(0.7);
+            actor->GetProperty()->SetSpecular(0.2);
+            actor->GetProperty()->SetSpecularPower(3);
             if(use_wireframe)
                 actor->GetProperty()->SetRepresentationToWireframe();
             actor->SetPosition(offset);
             pRenderer->AddActor(actor);
+
+            // add the color image as the texture of the displacement-mapped surface
+            if(use_image_texture)
+            {
+                vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+                texture->SetInputConnection(image_mapper->GetOutputPort());
+                if(use_image_interpolation)
+                    texture->InterpolateOn();
+                else
+                    texture->InterpolateOn();
+                actor->SetTexture(texture);
+            }
 
             // add the bounding box
             {
