@@ -84,6 +84,7 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     }
 
     // create the kernel
+    if(this->kernel) clReleaseKernel(this->kernel);
     this->kernel = clCreateKernel(program,this->kernel_function_name.c_str(),&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
 

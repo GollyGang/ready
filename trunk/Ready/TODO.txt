@@ -18,7 +18,9 @@ before 0.3 release:
 - some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
 - new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
   http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
-- bug: get "Failed to allocate context: out of resources" errors after extended usage (not releasing something?)
+- bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
+  extended usage (not releasing something? or bug in driver - get on other platforms?)
+    - to reproduce: repeatedly load vti files
 - add examples that use more chemicals to modulate parameters
 
 - document MeshRD changes, File Import command, new examples

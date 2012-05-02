@@ -105,7 +105,7 @@ void OpenCL_MixIn::ReloadContextIfNeeded()
             // currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn't work
         }
         if(this->iPlatform >= (int)num_platforms)
-            throw runtime_error("OpenCLImageRD::ReloadContextIfNeeded : too few platforms available");
+            throw runtime_error("OpenCL_MixIn::ReloadContextIfNeeded : too few platforms available");
         platform_id = platforms_available[this->iPlatform];
     }
 
@@ -115,20 +115,21 @@ void OpenCL_MixIn::ReloadContextIfNeeded()
         cl_device_id devices_available[MAX_DEVICES];
         cl_uint num_devices;
         ret = clGetDeviceIDs(platform_id,CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
-        throwOnError(ret,"OpenCLImageRD::ReloadContextIfNeeded : Failed to retrieve device IDs: ");
+        throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to retrieve device IDs: ");
         if(this->iDevice >= (int)num_devices)
-            throw runtime_error("OpenCLImageRD::ReloadContextIfNeeded : too few devices available");
+            throw runtime_error("OpenCL_MixIn::ReloadContextIfNeeded : too few devices available");
         this->device_id = devices_available[this->iDevice];
     }
 
     // create the context
+    if(this->context) clReleaseContext(this->context);
     this->context = clCreateContext(NULL,1,&this->device_id,NULL,NULL,&ret);
-    throwOnError(ret,"OpenCLImageRD::ReloadContextIfNeeded : Failed to create context: ");
+    throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to create context: ");
 
     // create the command queue
+    if(this->command_queue) clReleaseCommandQueue(this->command_queue);
     this->command_queue = clCreateCommandQueue(this->context,this->device_id,0,&ret);
-    throwOnError(ret,"OpenCLImageRD::ReloadContextIfNeeded : Failed to create command queue: ");
+    throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to create command queue: ");
 
     this->need_reload_context = false;
 }
-
