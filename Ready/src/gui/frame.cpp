@@ -2095,6 +2095,7 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("slice_3D_axis","axis","z"));
     this->render_settings.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
     this->render_settings.AddProperty(Property("show_displacement_mapped_surface",true));
+    this->render_settings.AddProperty(Property("color_displacement_mapped_surface",true));
     this->render_settings.AddProperty(Property("use_image_interpolation",true));
     this->render_settings.AddProperty(Property("timesteps_per_render",100));
     this->render_settings.AddProperty(Property("show_color_scale",true));

@@ -20,7 +20,11 @@
 <li> Meshes can now be exported as OBJ or VTP files - see File > Export Mesh...
 <li> Can import meshes (*.obj, *.vtp, *.vtu) as surfaces to run RD on.
 <li> <tt>use_image_interpolation=false</tt> now gives voxelised Minecraft-style rendering in 3D.
-<li> New  <a href="formats.html#render_settings">render setting</a>: <tt>show_color_scale</tt> allows the color scale legend to be turned off.
+<li> New <a href="formats.html#render_settings">render settings</a>:
+<ul>
+<li><tt>show_color_scale</tt>: allows the color scale legend to be turned off.
+<li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D images) be colored using the image.
+</ul>
 <li> New overlay type: <a href="formats.html#pixel">pixel</a>, for specifying cells directly.
 <li> The <a href="formats.html#overlay">overlay</a> element can now contain multiple shape specifiers.
 <li> Image files (*.vti) can now be loaded into Paraview, with named chemicals ('a', 'b', etc.) and now can be visualized by volume rendering and contoured.

@@ -452,7 +452,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_displacement_mapped_surface = render_settings.GetProperty("show_displacement_mapped_surface").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
-    bool use_image_texture = false; // TODO: could be a render setting if desired
+    bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -498,7 +498,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             normals->SetInputConnection(warp->GetOutputPort());
             normals->SplittingOff();
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-            if(use_image_texture)
+            if(color_displacement_mapped_surface)
             {
                 vtkSmartPointer<vtkTextureMapToPlane> tmap = vtkSmartPointer<vtkTextureMapToPlane>::New();
                 tmap->SetOrigin(0,0,0);
@@ -523,7 +523,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             pRenderer->AddActor(actor);
 
             // add the color image as the texture of the displacement-mapped surface
-            if(use_image_texture)
+            if(color_displacement_mapped_surface)
             {
                 vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
                 texture->SetInputConnection(image_mapper->GetOutputPort());
