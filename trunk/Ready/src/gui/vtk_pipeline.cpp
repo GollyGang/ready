@@ -67,6 +67,8 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
     if(reset_camera)
     {
         vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
+        if(system->GetArenaDimensionality()>2)
+            camera->SetPosition(-3,3,10); // move off-axis to look more natural
         pRenderer->SetActiveCamera(camera);
         pRenderer->ResetCamera();
     }
