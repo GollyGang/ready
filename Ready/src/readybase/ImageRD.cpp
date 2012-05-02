@@ -350,6 +350,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -384,9 +385,12 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     pRenderer->AddActor(actor);
 
     // also add a scalar bar to show how the colors correspond to values
-    vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-    scalar_bar->SetLookupTable(lut);
-    pRenderer->AddActor2D(scalar_bar);
+    if(show_color_scale)
+    {
+        vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalar_bar->SetLookupTable(lut);
+        pRenderer->AddActor2D(scalar_bar);
+    }
 
     // add a line graph for all the chemicals (active one highlighted)
     for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
@@ -446,6 +450,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_displacement_mapped_surface = render_settings.GetProperty("show_displacement_mapped_surface").GetBool();
+    bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -554,9 +559,12 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     }
 
     // add a scalar bar to show how the colors correspond to values
-    vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-    scalar_bar->SetLookupTable(lut);
-    pRenderer->AddActor2D(scalar_bar);
+    if(show_color_scale)
+    {
+        vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalar_bar->SetLookupTable(lut);
+        pRenderer->AddActor2D(scalar_bar);
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -579,6 +587,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
+    bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
 
     // contour the 3D volume and render as a polygonal surface
 
@@ -734,10 +743,10 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         pRenderer->AddActor(actor);
 
         // also add a scalar bar to show how the colors correspond to values
+        if(show_color_scale)
         {
             vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
             scalar_bar->SetLookupTable(lut);
-
             pRenderer->AddActor2D(scalar_bar);
         }
     }

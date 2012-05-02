@@ -17,6 +17,7 @@ before 0.3 release:
 - new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
   http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
 - parameters driven by an input scene (for writhing logos, etc.) - can use more chemicals for this
+- bug: get "Failed to allocate context: out of resources" errors after extended usage (not releasing something?)
 
 - document MeshRD changes, File Import command, new examples
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)

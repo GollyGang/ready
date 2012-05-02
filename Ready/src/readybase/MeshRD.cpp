@@ -303,6 +303,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     string activeChemical = render_settings.GetProperty("active_chemical").GetChemical();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
 
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
     string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
@@ -378,9 +379,12 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     }
 
     // also add a scalar bar to show how the colors correspond to values
-    vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-    scalar_bar->SetLookupTable(lut);
-    pRenderer->AddActor2D(scalar_bar);
+    if(show_color_scale)
+    {
+        vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalar_bar->SetLookupTable(lut);
+        pRenderer->AddActor2D(scalar_bar);
+    }
 
     // add the bounding box
     {
