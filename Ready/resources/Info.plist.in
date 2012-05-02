@@ -32,10 +32,11 @@
             <key>CFBundleTypeName</key>
             <string>Ready Pattern File</string>
             <key>CFBundleTypeIconFile</key>
-            <string>file-vti.icns</string>
+            <string>file.icns</string>
             <key>CFBundleTypeExtensions</key>
             <array>
             	 <string>vti</string>
+            	 <string>vtu</string>
             </array>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>

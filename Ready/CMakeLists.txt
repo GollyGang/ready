@@ -81,7 +81,7 @@ set( RESOURCES
   resources/appicon.xpm
   resources/Info.plist.in
   resources/app.icns 
-  resources/file-vti.icns
+  resources/file.icns
   resources/logo.png
 )
 include_directories( resources )
@@ -266,7 +266,7 @@ if( APPLE )
    
   # copy *.icns files into Resources directory inside .app bundle
   set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-  set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/file-vti.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
+  set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/file.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
    
   # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
