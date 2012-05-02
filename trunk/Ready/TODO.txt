@@ -11,13 +11,15 @@ before 0.3 release:
 
 - implement FormulaOpenCLMeshRD and FullKernelOpenCLMeshRD
 - relax power of 2 size requirement (only a speed benefit)
-- image import (user can specify how colors map onto chemicals), import Robert's patterns
-- parameter map(s) in a separate window, to allow user to explore parameters (can use extra chemicals for this)
+- image import (user can specify how colors map onto chemicals), import Robert's patterns?
+- image export (take 2D slice)
+- parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
+  chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
 - some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
 - new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
   http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
-- parameters driven by an input scene (for writhing logos, etc.) - can use more chemicals for this
 - bug: get "Failed to allocate context: out of resources" errors after extended usage (not releasing something?)
+- add examples that use more chemicals to modulate parameters
 
 - document MeshRD changes, File Import command, new examples
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
@@ -26,8 +28,7 @@ before 0.3 release:
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
 - add option to convert formula rules into full-kernel rules
-- support boundary_size diffusion option
-
+- support boundary_size diffusion option, to match Turk's implementation
 
 before 0.x release:
 - use better (big) toolbar icons in Mac app
@@ -36,9 +37,10 @@ before 0.x release:
 - allow user to change the default render settings
 - image export (user can specify how chemicals map onto colors)
 - multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) 
-- read Turk's CASCADE language, for freeze-and-continue schemes (can use extra chemicals for this)
+- read Turk's CASCADE language, for freeze-and-continue schemes
 - graphical UI for editing the initial-pattern-generator overlay stack
-- export rule to the WebGL playground template
+- export rule to the WebGL Playground template
+- add orientation indicator, as in Paraview
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
@@ -62,7 +64,8 @@ future ideas:
 - integer systems
 - read Golly rule tables
 - new neighborhood type: WITHIN_RADIUS, as per http://groups.csail.mit.edu/mac/projects/amorphous/jsim/sim/GrayScott.html
+- allow 3D view angle to be specified as a render setting
 
 code annoyances:
 - ImageRD::UpdateImageWrapPad() shouldn't be necessary
-- would prefer ImageRD to use named arrays, as in MeshRD
+- would prefer ImageRD to use named arrays internally, as in MeshRD
