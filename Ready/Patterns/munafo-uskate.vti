@@ -53,9 +53,9 @@
         <active_chemical value="b" />
         <show_multiple_chemicals value="false" />
         <color_low r="1" g="0" b="0" />
-        <color_high r="0" g="0.5" b="1" />
+        <color_high r="1" g="0" b="1" />
         <low value="0" />
-        <high value="0.3" />
+        <high value="0.45" />
     </render_settings>
     
   </RD>
