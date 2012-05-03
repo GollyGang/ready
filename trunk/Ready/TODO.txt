@@ -20,6 +20,7 @@ before 0.3 release:
   extended usage (not releasing something? or bug in driver - get on other platforms?)
     - to reproduce: repeatedly load vti files
 - add examples that use more chemicals to modulate parameters
+- control over boundary conditions: wrap-around or constant value (esp. for parameter map)
 
 - document MeshRD changes, File Import command, add/improve new examples
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
@@ -51,7 +52,6 @@ before 1.0 release:
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
-- control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
 - new overlay shape: scattered rectangles/circles (need some higher-level specifier for this?)
