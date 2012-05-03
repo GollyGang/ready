@@ -27,6 +27,8 @@ before 0.3 release:
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
 
+- 2D slices as slice through 3D volume (if available, else whole image) =>
+  1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
