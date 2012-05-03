@@ -401,6 +401,56 @@ class WhiteNoise : public BaseFill
         float low,high;
 };
 
+class LinearGradient : public BaseFill
+{
+    public:
+
+        LinearGradient(vtkXMLDataElement* node) : BaseFill(node)
+        {
+            read_required_attribute(node,"val1",this->val1);
+            read_required_attribute(node,"x1",this->x1);
+            read_required_attribute(node,"y1",this->y1);
+            read_required_attribute(node,"z1",this->z1);
+            read_required_attribute(node,"val2",this->val2);
+            read_required_attribute(node,"x2",this->x2);
+            read_required_attribute(node,"y2",this->y2);
+            read_required_attribute(node,"z2",this->z2);
+        }
+
+        static const char* GetTypeName() { return "linear_gradient"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(WhiteNoise::GetTypeName());
+            xml->SetFloatAttribute("val1",this->val1);
+            xml->SetFloatAttribute("x1",this->x1);
+            xml->SetFloatAttribute("y1",this->y1);
+            xml->SetFloatAttribute("z1",this->z1);
+            xml->SetFloatAttribute("val2",this->val2);
+            xml->SetFloatAttribute("x2",this->x2);
+            xml->SetFloatAttribute("y2",this->y2);
+            xml->SetFloatAttribute("z2",this->z2);
+            return xml;
+        }
+
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        {
+            float rel_x = x/system->GetX();
+            float rel_y = y/system->GetY();
+            float rel_z = z/system->GetZ();
+            // project this point onto the linear gradient axis
+            return this->val1 
+                + (this->val2-this->val1) 
+                * ( (rel_x-this->x1)*(this->x2-this->x1) + (rel_y-this->y1)*(this->y2-this->y1) + (rel_z-this->z1)*(this->z2-this->z1) )
+                / hypot3(this->x2-this->x1,this->y2-this->y1,this->z2-this->z1) ;
+        }
+
+    protected:
+
+        float val1,x1,y1,z1,val2,x2,y2,z2;
+};
+
 // -------- shapes: -----------
 
 class Everywhere : public BaseShape
@@ -574,6 +624,7 @@ class Pixel : public BaseShape
     else if(name==WhiteNoise::GetTypeName())      return new WhiteNoise(node);
     else if(name==OtherChemical::GetTypeName())   return new OtherChemical(node);
     else if(name==Parameter::GetTypeName())       return new Parameter(node);
+    else if(name==LinearGradient::GetTypeName())  return new LinearGradient(node);
     else throw runtime_error("Unsupported fill type: "+name);
 }
 

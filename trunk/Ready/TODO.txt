@@ -16,8 +16,6 @@ before 0.3 release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
   chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
 - some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
-- new overlay fill type: horizontal/vertical gradient, for spiral seeds, as here:
-  http://mrob.com/pub/comp/xmorphia/misc-images/2d-spiral-seeds.jpg
 - bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
   extended usage (not releasing something? or bug in driver - get on other platforms?)
     - to reproduce: repeatedly load vti files
@@ -56,6 +54,7 @@ before 1.0 release:
 - control over boundary conditions: wrap-around or constant value
 - save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
+- new overlay shape: scattered rectangles/circles (need some higher-level specifier for this?)
 
 future ideas:
 - bug: allow user to change OpenCL platform and device while a pattern is running
