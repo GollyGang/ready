@@ -7,7 +7,7 @@
         controls the 'F' parameter. For more detail, see:
         &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/index.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/index.html&lt;/a&gt;
         
-        Edit the linear_gradient elements in the file to zoom in on a particular area.
+        Edit the &lt;i&gt;linear_gradient&lt;/i&gt; elements in the file to zoom in on a particular area.
     </description>
 
     <rule type="formula" name="Gray-Scott">
@@ -38,11 +38,13 @@
       </overlay>
       <overlay chemical="c">
         <overwrite />
+        <!-- horizontal gradient increasing from left to right: -->
         <linear_gradient val1="0.03" x1="0" y1="0" z1="0" val2="0.07" x2="1" y2="0" z2="0" />
         <everywhere />
       </overlay>
       <overlay chemical="d">
         <overwrite />
+        <!-- vertical gradient increasing from bottom to top: -->
         <linear_gradient val1="0" x1="0" y1="0" z1="0" val2="0.1" x2="0" y2="1" z2="0" />
         <everywhere />
       </overlay>
@@ -52,7 +54,6 @@
         <show_displacement_mapped_surface value="false" />
         <show_multiple_chemicals value="false" />
         <active_chemical value="b" />
-        <timesteps_per_render value="4000" />
     </render_settings>
     
   </RD>
