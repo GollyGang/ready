@@ -46,7 +46,6 @@ before 0.x release:
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
-- create nicer app icon (need at least 128x128 image for Mac, then scale down for smaller icons)
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
