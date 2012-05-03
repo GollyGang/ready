@@ -6,6 +6,8 @@
         right and controls the 'k' parameter, and chemical 'd' increases from bottom to top and 
         controls the 'F' parameter. For more detail, see:
         &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/index.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/index.html&lt;/a&gt;
+        
+        Edit the linear_gradient elements in the file to zoom in on a particular area.
     </description>
 
     <rule type="formula" name="Gray-Scott">
