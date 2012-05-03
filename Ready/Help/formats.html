@@ -61,11 +61,12 @@ This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> elemen
 <tt><a href="#everywhere">&lt;everywhere&gt;</a></tt><br>
 <tt><a href="#formula">&lt;formula&gt;</a></tt><br>
 <tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt><br>
+<tt><a href="#linear_gradient">&lt;linear_gradient&gt;</a></tt><br>
 <tt><a href="#kernel">&lt;kernel&gt;</a></tt><br>
 <tt><a href="#multiply">&lt;multiply</a></tt><br>
 <tt><a href="#other_chemical">&lt;other_chemical&gt;</a></tt><br>
-<tt><a href="#overlay">&lt;overlay&gt;</a></tt><br>
 </td><td width="50%">
+<tt><a href="#overlay">&lt;overlay&gt;</a></tt><br>
 <tt><a href="#overwrite">&lt;overwrite&gt;</a></tt><br>
 <tt><a href="#param">&lt;param&gt;</a></tt><br>
 <tt><a href="#parameter">&lt;parameter&gt;</a></tt><br>
@@ -168,7 +169,7 @@ Each overlay changes the values of a single chemical across the image. Overlays 
 <p><b>Contains:</b>
 <ol>
 <li>operation (required) : one of <tt><a href="#overwrite">overwrite</a></tt>, <tt><a href="#add">add</a></tt>, <tt><a href="#subtract">subtract</a></tt>, <tt><a href="#multiply">multiply</a></tt> or <tt><a href="#divide">divide</a></tt>.
-<li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
+<li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt>, <tt><a href="#linear_gradient">linear_gradient</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
 <li>shape (required) : one or more of <tt><a href="#everywhere">everywhere</a></tt>, <tt><a href="#rectangle">rectangle</a></tt>, <tt><a href="#circle">circle</a></tt> or <tt><a href="#pixel">pixel</a></tt>.
 </ol>
 
@@ -207,6 +208,20 @@ Specifies that the values in this overlay are given by the current value of a di
 <p><b>Attributes:</b>
 <ul>
 <li><tt>chemical</tt> (required) : the other chemical (a, b, c, etc.) to sample
+</ul>
+
+<h4><a name="linear_gradient"></a>The <tt>&lt;linear_gradient&gt;</tt> element</h4>
+Specifies that the values in this overlay vary linearly from val1 at (x1,y1,z1) to val2 at (x2,y2,z2).
+<p><b>Attributes:</b>
+<ul>
+<li><tt>val1</tt> (required) : the value at the start of the gradient
+<li><tt>x1</tt> (required) : the x-coordinate of the start point
+<li><tt>y1</tt> (required) : the y-coordinate of the start point
+<li><tt>z1</tt> (required) : the z-coordinate of the start point
+<li><tt>val2</tt> (required) : the value at the end of the gradient
+<li><tt>x2</tt> (required) : the x-coordinate of the end point
+<li><tt>y2</tt> (required) : the y-coordinate of the end point
+<li><tt>z2</tt> (required) : the z-coordinate of the end point
 </ul>
 
 <h4><a name="parameter"></a>The <tt>&lt;parameter&gt;</tt> element</h4>
