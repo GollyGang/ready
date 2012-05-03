@@ -27,9 +27,6 @@ before 0.3 release:
 - table of links to each XML element at top of formats.html
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
-- bug: "Reset no longer works properly for some files (eg. bays_3D.vti,
-    conway_life.vti, heat_equation.vti).  The saved pattern info is
-    no longer restored correctly."
 
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
