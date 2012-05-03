@@ -187,7 +187,17 @@ void ImageRD::CopyFromImage(vtkImageData* im)
     int n_arrays = im->GetPointData()->GetNumberOfArrays();
     int n_components = im->GetNumberOfScalarComponents();
 
-    if(n_components==1 && n_arrays==this->GetNumberOfChemicals())
+    bool has_named_arrays = true;
+    for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
+    {
+        if(!im->GetPointData()->HasArray(GetChemicalName(iChem).c_str()))
+        {
+            has_named_arrays = false;
+            break;
+        }
+    }
+
+    if(has_named_arrays && n_components==1 && n_arrays==this->GetNumberOfChemicals())
     {
         // convert named array data to single-component data in multiple images
         for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
