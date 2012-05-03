@@ -6,10 +6,10 @@
 <h3>File Formats</h3>
 
 <p><a name="vti"></a>&nbsp;<br>
-<font size=+1><b>Extended VTK image format: *.vti</b></font>
+<font size=+1><b>Extended VTK format: *.vti, *.vtu</b></font>
 
 <p>
-The only file format currently supported by Ready is an extended version of <a href="http://vtk.org">VTK</a>'s image format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>. Below is a simple example:
+The only file format currently supported by Ready is an extended version of <a href="http://vtk.org">VTK</a>'s format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>. Below is a simple example of a *.vti file:
 
 <p><table bgcolor="#FFFFF0"><tr><td><pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
 &lt;VTKFile type=&quot;ImageData&quot; version=&quot;0.1&quot; byte_order=&quot;LittleEndian&quot; compressor=&quot;vtkZLibDataCompressor&quot;&gt;
@@ -48,7 +48,36 @@ The only file format currently supported by Ready is an extended version of <a h
 &lt;/VTKFile&gt;</tt></pre></td></tr></table>
 
 <p>
-This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Such files can still be read as standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. The XML tags  are listed below:
+This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> element (inside the <tt>VTKFile</tt> element) that contains all the Ready-specific data. Ready supports mesh-based systems as well (*.vtu) - these have UnstructuredGrid instead of ImageData sections. Both can be read as the standard VTK image format, for example in <a href="http://www.paraview.org">Paraview</a>. 
+
+<h4>XML elements:</h4>
+
+<table border="0"><tr><td width="50%">
+<tt><a href="#add">&lt;add&gt;</a></tt><br>
+<tt><a href="#circle">&lt;circle&gt;</a></tt><br>
+<tt><a href="#constant">&lt;constant&gt;</a></tt><br>
+<tt><a href="#description">&lt;description&gt;</a></tt><br>
+<tt><a href="#divide">&lt;divide&gt;</a></tt><br>
+<tt><a href="#everywhere">&lt;everywhere&gt;</a></tt><br>
+<tt><a href="#formula">&lt;formula&gt;</a></tt><br>
+<tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt><br>
+<tt><a href="#kernel">&lt;kernel&gt;</a></tt><br>
+<tt><a href="#multiply">&lt;multiply</a></tt><br>
+<tt><a href="#other_chemical">&lt;other_chemical&gt;</a></tt><br>
+<tt><a href="#overlay">&lt;overlay&gt;</a></tt><br>
+</td><td width="50%">
+<tt><a href="#overwrite">&lt;overwrite&gt;</a></tt><br>
+<tt><a href="#param">&lt;param&gt;</a></tt><br>
+<tt><a href="#parameter">&lt;parameter&gt;</a></tt><br>
+<tt><a href="#pixel">&lt;pixel&gt;</a></tt><br>
+<tt><a href="#Point3D">&lt;Point3D&gt;</a></tt><br>
+<tt><a href="#RD">&lt;RD&gt;</a></tt><tt><br>
+<tt><a href="#rectangle">&lt;rectangle&gt;</a></tt><br>
+<tt><a href="#render_settings">&lt;render_settings&gt;</a></tt><br>
+<tt><a href="#rule">&lt;rule&gt;</a></tt><br>
+<tt><a href="#subtract">&lt;subtract&gt;</a></tt><br>
+<tt><a href="#white_noise">&lt;white_noise&gt;</a></tt><br>
+</td></tr></table>
 
 <h4><a name="RD"></a>The <tt>&lt;RD&gt;</tt> element</h4>
 <p>

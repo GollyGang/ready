@@ -23,8 +23,7 @@ before 0.3 release:
     - to reproduce: repeatedly load vti files
 - add examples that use more chemicals to modulate parameters
 
-- document MeshRD changes, File Import command, add/improve new examples, vtu format
-- table of links to each XML element at top of formats.html
+- document MeshRD changes, File Import command, add/improve new examples
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
 
