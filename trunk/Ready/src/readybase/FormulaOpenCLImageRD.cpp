@@ -111,7 +111,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     }
     kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << "float4 delta_" << GetChemicalName(iC) << ";\n";
+        kernel_source << indent << "float4 delta_" << GetChemicalName(iC) << "=(float4)(0.0f,0.0f,0.0f,0.0f);\n";
     kernel_source << "\n";
     // the parameters (assume all float for now)
     for(int i=0;i<(int)this->parameters.size();i++)
