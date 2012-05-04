@@ -106,6 +106,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     // file menu
     EVT_MENU(wxID_NEW, MyFrame::OnNewPattern)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
+    EVT_MENU(ID::ReloadFromDisk, MyFrame::OnReloadFromDisk)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     EVT_MENU(ID::ImportMesh, MyFrame::OnImportMesh)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
@@ -245,6 +246,7 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_OPEN, _("Open Pattern...") + GetAccelerator(DO_OPENPATT), _("Choose a pattern file to open"));
         menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
+        menu->Append(ID::ReloadFromDisk, _("Reload from Disk") + GetAccelerator(DO_RELOAD), _("Reload the pattern file from disk"));
         menu->AppendSeparator();
         menu->Append(ID::ImportMesh, _("Import Mesh...") + GetAccelerator(DO_IMPORTMESH), _("Import a mesh"));
         menu->Append(ID::ExportMesh, _("Export Mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export a mesh"));
@@ -1498,6 +1500,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         wxMessageBox("This file is from a more recent version of Ready. For best results you should download a newer version.");
         // TODO: allow user to stop this message from appearing every time
     }
+    this->system->SetFilename(string(path.mb_str()));
 }
 
 // ---------------------------------------------------------------------
@@ -1850,6 +1853,7 @@ void MyFrame::UpdateMenuAccelerators()
         
         SetAccelerator(mbar, wxID_NEW,                      DO_NEWPATT);
         SetAccelerator(mbar, wxID_OPEN,                     DO_OPENPATT);
+        SetAccelerator(mbar, ID::ReloadFromDisk,            DO_RELOAD);
         SetAccelerator(mbar, ID::ImportMesh,                DO_IMPORTMESH);
         SetAccelerator(mbar, ID::ExportMesh,                DO_EXPORTMESH);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
@@ -1904,6 +1908,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         // File menu
         case DO_NEWPATT:        cmdid = wxID_NEW; break;
         case DO_OPENPATT:       cmdid = wxID_OPEN; break;
+        case DO_RELOAD:         cmdid = ID::ReloadFromDisk; break;
         case DO_IMPORTMESH:     cmdid = ID::ImportMesh; break;
         case DO_EXPORTMESH:     cmdid = ID::ExportMesh; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
@@ -2429,6 +2434,13 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
         wxMessageBox(_("Unsupported file type")); 
         return; 
     }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnReloadFromDisk(wxCommandEvent &event)
+{
+    this->OpenFile(this->system->GetFilename());
 }
 
 // ---------------------------------------------------------------------

@@ -307,6 +307,7 @@ const char* GetActionName(action_id action)
         // File menu
         case DO_NEWPATT:        return "New Pattern";
         case DO_OPENPATT:       return "Open Pattern...";
+        case DO_RELOAD:         return "Reload from Disk";
         case DO_IMPORTMESH:     return "Import Mesh...";
         case DO_EXPORTMESH:     return "Export Mesh...";
         case DO_SAVE:           return "Save Pattern...";

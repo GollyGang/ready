@@ -36,6 +36,7 @@ namespace ID
         
         // file menu
         OpenRecent,
+        ReloadFromDisk,
         // next 2 are the last items in the Open Recent submenu
         ClearMissingPatterns = OpenRecent + MAX_RECENT + 1,
         ClearAllPatterns,

@@ -77,6 +77,7 @@ class MyFrame : public wxFrame
         // File menu
         void OnNewPattern(wxCommandEvent& event);
         void OnOpenPattern(wxCommandEvent& event);
+        void OnReloadFromDisk(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
         void OnScreenshot(wxCommandEvent& event);
         void OnAddMyPatterns(wxCommandEvent& event);

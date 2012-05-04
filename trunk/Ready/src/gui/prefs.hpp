@@ -83,14 +83,14 @@ typedef enum
     DO_OPENFILE,                 // open a chosen pattern/html file
                                  // the rest are in (mostly) alphabetical order:
     DO_ABOUT,                    // about Ready
-    DO_ADDPATTS,                 // add my patterns...
     DO_ADDPARAM,                 // add parameter...
-    DO_DELPARAM,                 // delete parameter...
+    DO_ADDPATTS,                 // add my patterns...
     DO_CHEMICAL,                 // change active chemical...
     DO_CHANGESPEED,              // change running speed...
     DO_CLEAR,                    // clear selection
     DO_COPY,                     // copy selection
     DO_CUT,                      // cut selection
+    DO_DELPARAM,                 // delete parameter...
     DO_EXPORTMESH,               // export a mesh...
     DO_FIT,                      // fit pattern
     DO_FULLSCREEN,               // full screen
@@ -101,24 +101,33 @@ typedef enum
     DO_PASTE,                    // paste
     DO_PREFS,                    // preferences...
     DO_QUIT,                     // quit Ready
+    DO_RELOAD,                   // reload pattern from disk
     DO_RESET,                    // reset
     DO_RESTORE,                  // restore default layout
-    DO_RUNSTOP,                  // run/stop
     DO_FASTER,                   // run faster
     DO_SLOWER,                   // run slower
+    DO_RUNSTOP,                  // run/stop
     DO_SAVE,                     // save pattern...
     DO_SCREENSHOT,               // save screenshot...
+    DO_HELP,                     // show help pane
+    DO_INFO,                     // show info pane
+    DO_PATTERNS,                 // show patterns pane
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
     DO_OPENCL,                   // show OpenCL diagnostics...
-    DO_PATTERNS,                 // show patterns pane
-    DO_INFO,                     // show info pane
-    DO_HELP,                     // show help pane
     DO_STEP1,                    // step by 1
     DO_STEPN,                    // step by N
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;
+
+// N.B. Above list should be alphabetical by the string shown to the user (shown as a comment above), so that
+// they appear in the right order in the Preferences dialog.
+
+// When adding to the above, you must also manually update the following:
+//  - prefs.cpp (throughout)
+//  - MyFrame::ProcessKey()
+//  - MyFrame::UpdateMenuAccelerators();
 
 typedef struct {
     action_id id;                // one of the above
