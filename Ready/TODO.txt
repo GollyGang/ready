@@ -22,7 +22,7 @@ before 0.3 release:
 - add examples that use more chemicals to modulate parameters
 - control over boundary conditions: wrap-around or constant value (esp. for parameter map)
 
-- document MeshRD changes, File Import command, add/improve new examples
+- document MeshRD changes, add/improve new examples
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
 
@@ -34,7 +34,6 @@ before 0.3 release:
 - add option to convert formula rules into full-kernel rules
 - support boundary_size diffusion option, to match Turk's implementation
 - can floating panes go behind main window?
-- need "File > Reload" command
 - bug: crash on rearrange panes on Ubuntu 12.04. May be related to http://trac.wxwidgets.org/ticket/9547,
        so try calling wxGetApp().SetUseBestVisual(false) in #ifdef __WXGTK__ block. Tried on Debian,
        gives the same look.
