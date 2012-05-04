@@ -7,61 +7,9 @@ Or email: reaction-diffusion@googlegroups.com
 
 Ready is free software. Help us improve it!
 
----------------------------------------------------------------------------------
-                             Build from source
----------------------------------------------------------------------------------
-
-Build with CMake.
-Dependencies: VTK, wxWidgets, any OpenCL SDK
-Tested on: Windows, Linux, MacOS
-
 For build instructions, see BUILD.txt.
 
----------------------------------------------------------------------------------
-                              Acknowledgements
----------------------------------------------------------------------------------
-
-Based on Greg Turk's reaction-diffusion code, from:
-http://www.cc.gatech.edu/~turk/reaction_diffusion/reaction_diffusion.html
-
-The following copyright notice appeared with the original source code. 
-Greg Turk has given permission for our derived code to be distributed under the GPL.
-
-==begin==
-
-Make spots and stripes with reaction-diffusion.
-
-The spot-formation system is described in the article:
-
-  "A Model for Generating Aspects of Zebra and Other Mammailian
-   Coat Patterns"
-  Jonathan B. L. Bard
-  Journal of Theoretical Biology, Vol. 93, No. 2, pp. 363-385
-  (November 1981)
-
-The stripe-formation system is described in the book:
-
-  Models of Biological Pattern Formation
-  Hans Meinhardt
-  Academic Press, 1982
-
-
-Permission is granted to modify and/or distribute this program so long
-as the program is distributed free of charge and this header is retained
-as part of the program.
-
-Copyright (c) Greg Turk, 1991
-
-==end==
-
-The code for dynamically-linking OpenCL (OpenCL_Dyn_Load.c and .h) is from the 
-ElectroMag project: http://code.google.com/p/electromag-with-cuda   Thanks!
-
-Ready uses wxWidgets for its graphical user interface:
-http://wxwidgets.org
-
-Ready uses VTK for its rendering:
-http://vtk.org
+See Help/credits.html for a list of credits and acknowledgements.
 
 ---------------------------------------------------------------------------------
                                    License
@@ -85,4 +33,3 @@ GNU General Public License for more details.
 
 See COPYING.txt for the full GNU General Public License.
 Or visit <http://www.gnu.org/licenses/>.
-
