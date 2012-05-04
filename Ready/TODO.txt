@@ -35,6 +35,9 @@ before 0.3 release:
 - support boundary_size diffusion option, to match Turk's implementation
 - can floating panes go behind main window?
 - need "File > Reload" command
+- bug: crash on rearrange panes on Ubuntu 12.04. May be related to http://trac.wxwidgets.org/ticket/9547,
+       so try calling wxGetApp().SetUseBestVisual(false) in #ifdef __WXGTK__ block. Tried on Debian,
+       gives the same look.
 
 before 0.x release:
 - use better (big) toolbar icons in Mac app
