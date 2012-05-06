@@ -2088,6 +2088,7 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("surface_color","color",1.0f,1.0f,1.0f)); // RGB [0,1]
     this->render_settings.AddProperty(Property("color_low","color",0.0f,0.0f,1.0f));
     this->render_settings.AddProperty(Property("color_high","color",1.0f,0.0f,0.0f));
+    this->render_settings.AddProperty(Property("show_color_scale",true));
     this->render_settings.AddProperty(Property("show_multiple_chemicals",true));
     this->render_settings.AddProperty(Property("active_chemical","chemical","a"));
     this->render_settings.AddProperty(Property("low",0.0f));
@@ -2103,7 +2104,6 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("color_displacement_mapped_surface",true));
     this->render_settings.AddProperty(Property("use_image_interpolation",true));
     this->render_settings.AddProperty(Property("timesteps_per_render",100));
-    this->render_settings.AddProperty(Property("show_color_scale",true));
     // TODO: allow user to change defaults
 }
 
