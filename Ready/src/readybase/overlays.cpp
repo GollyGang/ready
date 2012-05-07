@@ -414,7 +414,7 @@ class LinearGradient : public BaseFill
             this->p1 = new Point3D(node->GetNestedElement(0));
             this->p2 = new Point3D(node->GetNestedElement(1));
         }
-        virtual ~LinearGradient() { delete this->p1; delete this->p1; }
+        virtual ~LinearGradient() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "linear_gradient"; }
 
