@@ -32,7 +32,7 @@ These are the Ready-specific XML elements in alphabetical order:
 <tt><a href="#param">&lt;param&gt;</a></tt><br>
 <tt><a href="#parameter">&lt;parameter&gt;</a></tt><br>
 <tt><a href="#pixel">&lt;pixel&gt;</a></tt><br>
-<tt><a href="#Point3D">&lt;Point3D&gt;</a></tt><br>
+<tt><a href="#point3d">&lt;point3d&gt;</a></tt><br>
 <tt><a href="#RD">&lt;RD&gt;</a></tt><tt><br>
 <tt><a href="#rectangle">&lt;rectangle&gt;</a></tt><br>
 <tt><a href="#render_settings">&lt;render_settings&gt;</a></tt><br>
@@ -229,17 +229,16 @@ Specifies that the values in this overlay are given by the current value of a di
 </ul>
 
 <h4><a name="linear_gradient"></a><b>&lt;linear_gradient&gt;</b></h4>
-Specifies that the values in this overlay vary linearly from val1 at (x1,y1,z1) to val2 at (x2,y2,z2).
+Specifies that the values in this overlay vary linearly from val1 at the start to val2 at the end.
 <p>Attributes:
 <ul>
 <li><tt>val1</tt> (required) : the value at the start of the gradient.
-<li><tt>x1</tt> (required) : the x-coordinate of the start point.
-<li><tt>y1</tt> (required) : the y-coordinate of the start point.
-<li><tt>z1</tt> (required) : the z-coordinate of the start point.
 <li><tt>val2</tt> (required) : the value at the end of the gradient.
-<li><tt>x2</tt> (required) : the x-coordinate of the end point.
-<li><tt>y2</tt> (required) : the y-coordinate of the end point.
-<li><tt>z2</tt> (required) : the z-coordinate of the end point.
+</ul>
+<p>Contains:
+<ul>
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the start point for the gradient
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the end point for the gradient
 </ul>
 
 <h4><a name="parameter"></a><b>&lt;parameter&gt;</b></h4>
@@ -256,8 +255,8 @@ Specifies that the overlay applies everywhere in the image.
 Specifies that the overlay applies to a rectangle in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p>Contains:
 <ul>
-<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the first corner of the rectangle
-<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the first corner of the rectangle
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
 </ul>
 
 <h4><a name="circle"></a><b>&lt;circle&gt;</b></h4>
@@ -268,7 +267,7 @@ Specifies that the overlay applies to a circle (sphere) in the image. For a 1D i
 </ul>
 <p>Contains:
 <ul>
-<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the center of the circle.
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the center of the circle.
 </ul>
 
 <h4><a name="pixel"></a><b>&lt;pixel&gt;</b></h4>
@@ -280,7 +279,7 @@ Specifies that the overlay applies to a single pixel in the image. For a 1D imag
 <li><tt>z</tt> (required) : the z-coordinate of the pixel, a 0-based integer.
 </ul>
 
-<h4><a name="Point3D"></a><b>&lt;Point3D&gt;</b></h4>
+<h4><a name="point3d"></a><b>&lt;point3d&gt;</b></h4>
 
 A location in space. Coordinates are in the range from zero to one and are given as a proportion of the image size.
 <p>Attributes:

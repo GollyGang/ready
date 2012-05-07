@@ -162,7 +162,7 @@ class Point3D : public XML_Object
         
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
-        static const char* GetTypeName() { return "Point3D"; }
+        static const char* GetTypeName() { return "point3D"; }
 
     public:
     
@@ -408,29 +408,24 @@ class LinearGradient : public BaseFill
         LinearGradient(vtkXMLDataElement* node) : BaseFill(node)
         {
             read_required_attribute(node,"val1",this->val1);
-            read_required_attribute(node,"x1",this->x1);
-            read_required_attribute(node,"y1",this->y1);
-            read_required_attribute(node,"z1",this->z1);
             read_required_attribute(node,"val2",this->val2);
-            read_required_attribute(node,"x2",this->x2);
-            read_required_attribute(node,"y2",this->y2);
-            read_required_attribute(node,"z2",this->z2);
+            if(node->GetNumberOfNestedElements()!=2)
+                throw runtime_error("linear_gradient: expected two nested elements (point3D,point3D)");
+            this->p1 = new Point3D(node->GetNestedElement(0));
+            this->p2 = new Point3D(node->GetNestedElement(1));
         }
+        virtual ~LinearGradient() { delete this->p1; delete this->p1; }
 
         static const char* GetTypeName() { return "linear_gradient"; }
 
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
-            xml->SetName(WhiteNoise::GetTypeName());
+            xml->SetName(LinearGradient::GetTypeName());
             xml->SetFloatAttribute("val1",this->val1);
-            xml->SetFloatAttribute("x1",this->x1);
-            xml->SetFloatAttribute("y1",this->y1);
-            xml->SetFloatAttribute("z1",this->z1);
             xml->SetFloatAttribute("val2",this->val2);
-            xml->SetFloatAttribute("x2",this->x2);
-            xml->SetFloatAttribute("y2",this->y2);
-            xml->SetFloatAttribute("z2",this->z2);
+            xml->AddNestedElement(this->p1->GetAsXML());
+            xml->AddNestedElement(this->p2->GetAsXML());
             return xml;
         }
 
@@ -440,15 +435,17 @@ class LinearGradient : public BaseFill
             float rel_y = y/system->GetY();
             float rel_z = z/system->GetZ();
             // project this point onto the linear gradient axis
-            return this->val1 
-                + (this->val2-this->val1) 
-                * ( (rel_x-this->x1)*(this->x2-this->x1) + (rel_y-this->y1)*(this->y2-this->y1) + (rel_z-this->z1)*(this->z2-this->z1) )
-                / hypot3(this->x2-this->x1,this->y2-this->y1,this->z2-this->z1) ;
+            return this->val1 + (this->val2-this->val1) 
+                * ( (rel_x-this->p1->x)*(this->p2->x-this->p1->x) 
+                  + (rel_y-this->p1->y)*(this->p2->y-this->p1->y) 
+                  + (rel_z-this->p1->z)*(this->p2->z-this->p1->z) )
+                / hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z) ;
         }
 
     protected:
 
-        float val1,x1,y1,z1,val2,x2,y2,z2;
+        float val1,val2;
+        Point3D *p1,*p2;
 };
 
 // -------- shapes: -----------
@@ -481,7 +478,7 @@ class Rectangle : public BaseShape
         Rectangle(vtkXMLDataElement* node) : BaseShape(node)
         {
             if(node->GetNumberOfNestedElements()!=2)
-                throw runtime_error("rectangle: expected two nested elements (Point3D,Point3D)");
+                throw runtime_error("rectangle: expected two nested elements (point3D,point3D)");
             this->a = new Point3D(node->GetNestedElement(0));
             this->b = new Point3D(node->GetNestedElement(1));
         }
@@ -507,8 +504,11 @@ class Rectangle : public BaseShape
             {
                 default:
                 case 1: return rel_x>=this->a->x && rel_x<=this->b->x;
-                case 2: return rel_x>=this->a->x && rel_x<=this->b->x && rel_y>=this->a->y && rel_y<=this->b->y;
-                case 3: return rel_x>=this->a->x && rel_x<=this->b->x && rel_y>=this->a->y && rel_y<=this->b->y && rel_z>=this->a->z && rel_z<=this->b->z;
+                case 2: return rel_x>=this->a->x && rel_x<=this->b->x && 
+                               rel_y>=this->a->y && rel_y<=this->b->y;
+                case 3: return rel_x>=this->a->x && rel_x<=this->b->x && 
+                               rel_y>=this->a->y && rel_y<=this->b->y && 
+                               rel_z>=this->a->z && rel_z<=this->b->z;
             }
         }
 
@@ -525,7 +525,7 @@ class Circle : public BaseShape
         {
             read_required_attribute(node,"radius",this->radius);
             if(node->GetNumberOfNestedElements()!=1)
-                throw runtime_error("circle: expected one nested element (Point3D)");
+                throw runtime_error("circle: expected one nested element (point3D)");
             this->c = new Point3D(node->GetNestedElement(0));
         }
         virtual ~Circle() { delete this->c; }
