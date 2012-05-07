@@ -100,21 +100,23 @@ The following sections describe the Ready-specific XML elements.
 Specifies the current rule and information about the pattern. 
 <p>Attributes:
 <ul>
-<li><tt>format_version</tt> (required) : Integer value that is increased in later versions when the format changes. Used to alert the user that they might need to update their software.
+<li><tt>format_version</tt> (required) : Integer value that is increased in later versions when the format changes.
+Used to alert the user that they might need to update their software.
 </ul>
-Contains:
+<p>Contains:
 <ul>
-<li><tt><a href="#description">&lt;description&gt;</a></tt> (optional)
-<li><tt><a href="#rule">&lt;rule&gt;</a></tt> (required)
-<li><tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt> (optional)
-<li><tt><a href="#render_settings">&lt;render_settings&gt;</a></tt> (optional)
+<li><tt><a href="#description">&lt;description&gt;</a></tt> (optional).
+<li><tt><a href="#rule">&lt;rule&gt;</a></tt> (required).
+<li><tt><a href="#initial_pattern_generator">&lt;initial_pattern_generator&gt;</a></tt> (optional).
+<li><tt><a href="#render_settings">&lt;render_settings&gt;</a></tt> (optional).
 </ul>
 
 <h4><a name="description"></a><b>&lt;description&gt;</b></h4>
 <p>
 A description of the pattern.
 <p>Contains:
-<p>Plain text.
+<p>Plain text, although simple HTML can also be used with suitable precautions.
+See the description in <a href="edit:Patterns/munafo-uskate.vti">munafo-uskate.vti</a> for an example.
 
 <h4><a name="rule"></a><b>&lt;rule&gt;</b></h4>
 <p>
@@ -123,11 +125,11 @@ Attributes:
 <li><tt>name</tt> (required) : The name of this rule. If type="inbuilt" then name must match one of the inbuilt rules
 (currently just "Gray-Scott").
 </ul>
-Contains:
+<p>Contains:
 <ul>
-<li><tt><a href="#param">&lt;param&gt;</a></tt> (multiple, optional)
-<li><tt><a href="#formula">&lt;formula&gt;</a></tt> (required if rule type="inbuilt")
-<li><tt><a href="#kernel">&lt;kernel&gt;</a></tt> (required if rule type="kernel")
+<li><tt><a href="#param">&lt;param&gt;</a></tt> (multiple, optional).
+<li><tt><a href="#formula">&lt;formula&gt;</a></tt> (required if rule type="inbuilt").
+<li><tt><a href="#kernel">&lt;kernel&gt;</a></tt> (required if rule type="kernel").
 </ul>
 
 <h4><a name="param"></a><b>&lt;param&gt;</b></h4>
@@ -137,7 +139,7 @@ A parameter of the rule. Most rules require one or more named parameters, such a
 Attributes:
 <ul><li><tt>name</tt> (required) : The name of this parameter.
 </ul>
-Contains:
+<p>Contains:
 <p>The value of this parameter.
 
 <h4><a name="formula"></a><b>&lt;formula&gt;</b></h4>
@@ -172,7 +174,7 @@ The initial pattern generator is a way to describe typical reaction-diffusion st
 </ul>
 <p>Contains:
 <ul>
-<li><tt><a href="#overlay">overlay</a></tt> (multiple)
+<li><tt><a href="#overlay">overlay</a></tt> (multiple).
 </ul>
 
 <h4><a name="overlay"></a><b>&lt;overlay&gt;</b></h4>
@@ -215,36 +217,36 @@ Specifies that the values in this overlay are constant.
 Specifies that the values in this overlay are spatially-uncorrelated random values from a flat distribution between low and high.
 <p>Attributes:
 <ul>
-<li><tt>low</tt> (required) : the random values will be above this value
-<li><tt>high</tt> (required) : the random values will be below this value
+<li><tt>low</tt> (required) : the random values will be above this value.
+<li><tt>high</tt> (required) : the random values will be below this value.
 </ul>
 
 <h4><a name="other_chemical"></a><b>&lt;other_chemical&gt;</b></h4>
 Specifies that the values in this overlay are given by the current value of a different chemical.
 <p>Attributes:
 <ul>
-<li><tt>chemical</tt> (required) : the other chemical (a, b, c, etc.) to sample
+<li><tt>chemical</tt> (required) : the other chemical (a, b, c, etc.) to sample.
 </ul>
 
 <h4><a name="linear_gradient"></a><b>&lt;linear_gradient&gt;</b></h4>
 Specifies that the values in this overlay vary linearly from val1 at (x1,y1,z1) to val2 at (x2,y2,z2).
 <p>Attributes:
 <ul>
-<li><tt>val1</tt> (required) : the value at the start of the gradient
-<li><tt>x1</tt> (required) : the x-coordinate of the start point
-<li><tt>y1</tt> (required) : the y-coordinate of the start point
-<li><tt>z1</tt> (required) : the z-coordinate of the start point
-<li><tt>val2</tt> (required) : the value at the end of the gradient
-<li><tt>x2</tt> (required) : the x-coordinate of the end point
-<li><tt>y2</tt> (required) : the y-coordinate of the end point
-<li><tt>z2</tt> (required) : the z-coordinate of the end point
+<li><tt>val1</tt> (required) : the value at the start of the gradient.
+<li><tt>x1</tt> (required) : the x-coordinate of the start point.
+<li><tt>y1</tt> (required) : the y-coordinate of the start point.
+<li><tt>z1</tt> (required) : the z-coordinate of the start point.
+<li><tt>val2</tt> (required) : the value at the end of the gradient.
+<li><tt>x2</tt> (required) : the x-coordinate of the end point.
+<li><tt>y2</tt> (required) : the y-coordinate of the end point.
+<li><tt>z2</tt> (required) : the z-coordinate of the end point.
 </ul>
 
 <h4><a name="parameter"></a><b>&lt;parameter&gt;</b></h4>
 Specifies that the values in this overlay are given by the current value of a named parameter.
 <p>Attributes:
 <ul>
-<li><tt>name</tt> (required) : the name of the parameter
+<li><tt>name</tt> (required) : the name of the parameter.
 </ul>
 
 <h4><a name="everywhere"></a><b>&lt;everywhere&gt;</b></h4>
@@ -266,16 +268,16 @@ Specifies that the overlay applies to a circle (sphere) in the image. For a 1D i
 </ul>
 <p>Contains:
 <ul>
-<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the center of the circle
+<li><tt><a href="#Point3D">Point3D</a></tt> (required) : the center of the circle.
 </ul>
 
 <h4><a name="pixel"></a><b>&lt;pixel&gt;</b></h4>
 Specifies that the overlay applies to a single pixel in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p>Attributes:
 <ul>
-<li><tt>x</tt> (required) : the x-coordinate of the pixel, a 0-based integer
-<li><tt>y</tt> (required) : the y-coordinate of the pixel, a 0-based integer
-<li><tt>z</tt> (required) : the z-coordinate of the pixel, a 0-based integer
+<li><tt>x</tt> (required) : the x-coordinate of the pixel, a 0-based integer.
+<li><tt>y</tt> (required) : the y-coordinate of the pixel, a 0-based integer.
+<li><tt>z</tt> (required) : the z-coordinate of the pixel, a 0-based integer.
 </ul>
 
 <h4><a name="Point3D"></a><b>&lt;Point3D&gt;</b></h4>
@@ -283,9 +285,9 @@ Specifies that the overlay applies to a single pixel in the image. For a 1D imag
 A location in space. Coordinates are in the range from zero to one and are given as a proportion of the image size.
 <p>Attributes:
 <ul>
-<li><tt>x</tt> (required) : the x-coordinate
-<li><tt>y</tt> (required) : the y-coordinate
-<li><tt>z</tt> (required) : the z-coordinate
+<li><tt>x</tt> (required) : the x-coordinate.
+<li><tt>y</tt> (required) : the y-coordinate.
+<li><tt>z</tt> (required) : the z-coordinate.
 </ul>
 
 <h4><a name="render_settings"></a><b>&lt;render_settings&gt;</b></h4>
@@ -306,7 +308,7 @@ Default values are shown to illustrate the format.
 <li><tt>&lt;vertical_scale_1D value="30" /&gt;</tt><br>The vertical size of the 1D line graphs.
 <li><tt>&lt;vertical_scale_2D value="15" /&gt;</tt><br>The vertical size of the 2D surface plots.
 <li><tt>&lt;contour_level value="0.25" /&gt;</tt><br>The value to use for the surface contour in 3D systems.
-<li><tt>&lt;use_wireframe value="false" /&gt;</tt><br>Whether to show the surface as wireframe (or as smooth surface) (false=surface, true=wireframe).
+<li><tt>&lt;use_wireframe value="false" /&gt;</tt><br>Whether to show the surface as wireframe or as smooth surface (false=surface, true=wireframe).
 <li><tt>&lt;slice_3D value="true" /&gt;</tt><br>Whether to add a 2D color slice through the 3D volume.
 <li><tt>&lt;slice_3D_axis value="z" /&gt;</tt><br>The axis that the slice should be perpendicular to.
 <li><tt>&lt;slice_3D_position value="0.5" /&gt;</tt><br>The position along the slice_3D_axis to slice at (range: 0.0-1.0, relative to the image size).
