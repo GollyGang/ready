@@ -11,7 +11,7 @@
 <p>
 The only file format currently supported by Ready is an extended version of
 <a href="http://vtk.org">VTK</a>'s format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>.
-These are the Ready-specific XML elements in alphabetical order:
+These are the Ready-specific XML elements, in alphabetical order:
 
 <p><dd><table border="0"><tr><td width="50%">
 <tt><a href="#add">&lt;add&gt;</a></tt><br>
@@ -210,7 +210,7 @@ Specifies that this overlay should divide the existing values in the image.
 Specifies that the values in this overlay are constant.
 <p>Attributes:
 <ul>
-<li><tt>value</tt> (required) : the constant value
+<li><tt>value</tt> (required) : the constant value.
 </ul>
 
 <h4><a name="white_noise"></a><b>&lt;white_noise&gt;</b></h4>
@@ -237,8 +237,8 @@ Specifies that the values in this overlay vary linearly from val1 at the start t
 </ul>
 <p>Contains:
 <ul>
-<li><tt><a href="#point3d">point3d</a></tt> (required) : the start point for the gradient
-<li><tt><a href="#point3d">point3d</a></tt> (required) : the end point for the gradient
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the start point for the gradient.
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the end point for the gradient.
 </ul>
 
 <h4><a name="parameter"></a><b>&lt;parameter&gt;</b></h4>
@@ -255,7 +255,7 @@ Specifies that the overlay applies everywhere in the image.
 Specifies that the overlay applies to a rectangle in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p>Contains:
 <ul>
-<li><tt><a href="#point3d">point3d</a></tt> (required) : the first corner of the rectangle
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the first corner of the rectangle.
 <li><tt><a href="#point3d">point3d</a></tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
 </ul>
 
@@ -263,7 +263,7 @@ Specifies that the overlay applies to a rectangle in the image. For a 1D image, 
 Specifies that the overlay applies to a circle (sphere) in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p>Attributes:
 <ul>
-<li><tt>radius</tt> (required) : the radius of the circle, in the range [0,1] as a proportion of the largest image dimension
+<li><tt>radius</tt> (required) : the radius of the circle, in the range [0,1] as a proportion of the largest image dimension.
 </ul>
 <p>Contains:
 <ul>
