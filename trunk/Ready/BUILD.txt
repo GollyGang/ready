@@ -4,8 +4,8 @@ Dependencies:
 2) wxWidgets (2.9.2+): www.wxwidgets.org
 3) any OpenCL SDK.
 
-Ready uses CMake as a pre-build setup. You might need to read some
-CMake documentation first to get the hang of it.
+Ready uses CMake fr pre-build setup. You might need to read some CMake
+documentation first to get the hang of it.
 
 =============== Windows, using the Visual Studio IDE =================
 
@@ -124,21 +124,26 @@ For 64-bit builds:
 
 =========================== Linux =================================
 
-Install: libvtk, libwxgtk, any OpenCL SDK.
+Install: libgtk2.0-dev, libvtk (if your repository provides a recent
+enough version), libwxgtk (if your repository provides a recent
+enough version), any OpenCL SDK, ccmake (cmake-curses-gui).
 
-mkdir Ready_build
-cd Ready_build
-cmake ../Ready_source_folder
+A) Build VTK (if your repository doesn't provide a recent enough 
+   version):
+
+cd VTK
+mkdir bin
+cd bin
+ccmake ..
+"c" (configure)
+ - Set BUILD_TESTING to off (we don't need it). 
+ - Set CMAKE_BUILD_TYPE to: Release
+"g" (generate)
 make
+sudo make install
 
-(Alternatively, use ccmake or cmake-gui for configuring.)
-
-make package
-make package_source
-
-If you need to build wxWidgets yourself (if your distribution
-doesn't come with a recent enough version) then this is the method
-you'll need:
+B) Build wxWidgets (if your repository doesn't provide a recent enough 
+   version):
 
 cd wxWidgets
 mkdir build-gtk
@@ -147,7 +152,16 @@ cd build-gtk
 make
 sudo make install
 
-This creates and installs the wx-config binary that CMake needs.
+C) Build Ready:
+
+mkdir Ready_build
+cd Ready_build
+ccmake ../Ready_source_folder
+(configure, generate)
+make
+
+make package
+make package_source
 
 =========================== MacOS =================================
 
