@@ -32,20 +32,26 @@
         <overwrite />
         <white_noise low="0" high="1" />
         <rectangle>
-          <Point3D x="0.2" y="0.2" z="0.6" />
-          <Point3D x="0.4" y="0.5" z="0.8" />
+          <point3D x="0.2" y="0.2" z="0.6" />
+          <point3D x="0.4" y="0.5" z="0.8" />
         </rectangle>
       </overlay>
       <overlay chemical="c">
         <overwrite />
         <!-- horizontal gradient increasing from left to right: -->
-        <linear_gradient val1="0.03" x1="0" y1="0" z1="0" val2="0.07" x2="1" y2="0" z2="0" />
+        <linear_gradient val1="0.03" val2="0.07">
+          <point3d x="0" y="0" z="0" />
+          <point3d x="1" y="0" z="0" />
+        </linear_gradient>
         <everywhere />
       </overlay>
       <overlay chemical="d">
         <overwrite />
         <!-- vertical gradient increasing from bottom to top: -->
-        <linear_gradient val1="0" x1="0" y1="0" z1="0" val2="0.1" x2="0" y2="1" z2="0" />
+        <linear_gradient val1="0" val2="0.1">
+          <point3d x="0" y="0" z="0" />
+          <point3d x="0" y="1" z="0" />
+        </linear_gradient>
         <everywhere />
       </overlay>
     </initial_pattern_generator>
