@@ -90,6 +90,7 @@ class InfoPanel : public wxPanel
         void ChangeFormula();
         void ChangeDimensions();
         void ChangeBlockSize();
+        void ChangeWrapOption();
         
         // event handlers
         void OnSmallerButton(wxCommandEvent& event);

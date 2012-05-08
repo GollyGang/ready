@@ -29,6 +29,7 @@ AbstractRD::AbstractRD()
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
     this->is_modified = false;
+    this->wrap = true;
 }
 
 // ---------------------------------------------------------------------
@@ -240,6 +241,11 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     read_required_attribute(rule,"name",str);
     this->SetRuleName(str);
 
+    // wrap-around
+    s = rule->GetAttribute("wrap");
+    if(!s) this->wrap = true;
+    else this->wrap = (string(s)=="1");
+
     // parameters:
     this->DeleteAllParameters();
     for(int i=0;i<rule->GetNumberOfNestedElements();i++)
@@ -291,6 +297,8 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML() const
     rule->SetName("rule");
     rule->SetAttribute("name",this->GetRuleName().c_str());
     rule->SetAttribute("type",this->GetRuleType().c_str());
+    if(this->HasEditableWrapOption())
+        rule->SetIntAttribute("wrap",this->GetWrap()?1:0);
     for(int i=0;i<this->GetNumberOfParameters();i++)    // parameters
     {
         vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();

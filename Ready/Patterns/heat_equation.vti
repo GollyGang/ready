@@ -7,7 +7,7 @@
         The &lt;a href="http://en.wikipedia.org/wiki/Heat_equation"&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.
     </description>
     
-    <rule type="formula" name="Heat equation">
+    <rule type="formula" name="Heat equation" wrap="0">
       <param name="timestep"> 0.1 </param>
       <formula number_of_chemicals="1">
         delta_a = laplacian_a;

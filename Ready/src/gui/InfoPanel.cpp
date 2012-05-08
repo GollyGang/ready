@@ -51,6 +51,7 @@ const wxString kernel_label = _("Kernel");
 const wxString dimensions_label = _("Dimensions");
 const wxString block_size_label = _("Block size");
 const wxString number_of_cells_label = _("Number of cells");
+const wxString wrap_label = _("Toroidal wrap-around");
 
 // -----------------------------------------------------------------------------
 
@@ -426,6 +427,9 @@ void InfoPanel::Update(const AbstractRD* const system)
                                             system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                             true);
                                             
+    if(system->HasEditableWrapOption())
+        contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
+
     contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
                                         system->GetNumberOfCells()),false);
 
@@ -812,6 +816,15 @@ void InfoPanel::ChangeBlockSize()
 
 // -----------------------------------------------------------------------------
 
+void InfoPanel::ChangeWrapOption()
+{
+    AbstractRD* sys = frame->GetCurrentRDSystem();
+    sys->SetWrap(!sys->GetWrap());
+    this->Update(sys);
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::ChangeInfo(const wxString& label)
 {
     if ( label == rule_name_label ) {
@@ -831,6 +844,9 @@ void InfoPanel::ChangeInfo(const wxString& label)
 
     } else if ( label == block_size_label ) {
         ChangeBlockSize();
+
+    } else if ( label == wrap_label ) {
+        ChangeWrapOption();
 
     } else if ( frame->GetRenderSettings().IsProperty(string(label.mb_str())) ) {
         ChangeRenderSetting(label);

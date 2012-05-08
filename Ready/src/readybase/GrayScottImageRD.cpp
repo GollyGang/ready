@@ -78,6 +78,8 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
     float k = this->GetParameterValueByName("k");
     float F = this->GetParameterValueByName("F");
 
+    int x_prev,x_next,y_prev,y_next,z_prev,z_next;
+
     // take approximately n_steps
     for(int iStep=0;iStep<n_steps;iStep++)
     {
@@ -97,16 +99,40 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
         }
         for(int z=0;z<Z;z++)
         {
-            int z_prev = (z-1+Z)%Z;
-            int z_next = (z+1)%Z;
+            if(this->wrap)
+            {
+                z_prev = (z-1+Z)%Z;
+                z_next = (z+1)%Z;
+            }
+            else
+            {
+                z_prev = max(0,z-1);
+                z_next = min(Z-1,z+1);
+            }
             for(int y=0;y<Y;y++)
             {
-                int y_prev = (y-1+Y)%Y;
-                int y_next = (y+1)%Y;
+                if(this->wrap)
+                {
+                    y_prev = (y-1+Y)%Y;
+                    y_next = (y+1)%Y;
+                }
+                else
+                {
+                    y_prev = max(0,y-1);
+                    y_next = min(Y-1,y+1);
+                }
                 for(int x=0;x<X;x++)
                 {
-                    int x_prev = (x-1+X)%X;
-                    int x_next = (x+1)%X;
+                    if(this->wrap)
+                    {
+                        x_prev = (x-1+X)%X;
+                        x_next = (x+1)%X;
+                    }
+                    else
+                    {
+                        x_prev = max(0,x-1);
+                        x_next = min(X-1,x+1);
+                    }
 
                     float aval = *vtk_at(old_a,x,y,z,X,Y);
                     float bval = *vtk_at(old_b,x,y,z,X,Y);
