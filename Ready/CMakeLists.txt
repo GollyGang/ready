@@ -92,6 +92,7 @@ set( PATTERN_FILES
   schlogl.vti 
   heat_equation.vti 
   turing.vti
+  turing_noisy.vti
   kernel_test.vti 
   conway_life.vti 
   bays_3D.vti
