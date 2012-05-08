@@ -7,15 +7,13 @@ UI annoyances:
 - on Windows, Ready application gets pushed into background on first pattern load
 - can't tab between edit controls in XYZ dialogs on Xubuntu
 - color scale sometimes appears with garbled banded colors on Debian 
+- can floating panes go behind main window?
 
 before 0.3 release:
 
 - implement FormulaOpenCLMeshRD and FullKernelOpenCLMeshRD
-- relax power of 2 size requirement (only a speed benefit)
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
 - image export (take 2D slice)
-- parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
-  chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
 - some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
 - bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
   extended usage (not releasing something? or bug in driver - get on other platforms?)
@@ -23,8 +21,7 @@ before 0.3 release:
 - add examples that use more chemicals to modulate parameters
 
 - document MeshRD changes, add/improve new examples
-- mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
-- simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
+- update code documentation
 
 - 2D slices as slice through 3D volume (if available, else whole image) =>
   1D slice as line through 2D slice (if available, else whole image)
@@ -32,10 +29,11 @@ before 0.3 release:
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
 - add option to convert formula rules into full-kernel rules
-- support boundary_size diffusion option, to match Turk's implementation
-- can floating panes go behind main window?
 
 before 0.x release:
+- parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
+  chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
+- relax power of 2 size requirement (only a speed benefit)
 - use better (big) toolbar icons in Mac app
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
@@ -46,6 +44,8 @@ before 0.x release:
 - graphical UI for editing the initial-pattern-generator overlay stack
 - export rule to the WebGL Playground template
 - add orientation indicator, as in Paraview
+- mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
+- simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
@@ -69,6 +69,7 @@ future ideas:
 - read Golly rule tables
 - new neighborhood type: WITHIN_RADIUS, as per http://groups.csail.mit.edu/mac/projects/amorphous/jsim/sim/GrayScott.html
 - allow 3D view angle to be specified as a render setting
+- support boundary_size diffusion option, to match Turk's implementation
 
 code annoyances:
 - ImageRD::UpdateImageWrapPad() shouldn't be necessary
