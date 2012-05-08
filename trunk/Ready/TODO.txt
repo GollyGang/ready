@@ -21,7 +21,6 @@ before 0.3 release:
   extended usage (not releasing something? or bug in driver - get on other platforms?)
     - to reproduce: repeatedly load vti files
 - add examples that use more chemicals to modulate parameters
-- control over boundary conditions: wrap-around or constant value (esp. for parameter map)
 
 - document MeshRD changes, add/improve new examples
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)

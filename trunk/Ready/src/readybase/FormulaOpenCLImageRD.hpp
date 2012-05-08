@@ -44,4 +44,7 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
         virtual void DeleteAllParameters();
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
+
+        virtual bool HasEditableWrapOption() const { return true; }
+        virtual void SetWrap(bool w);
 };

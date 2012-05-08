@@ -28,6 +28,8 @@ class InbuiltImageRD : public ImageRD
 
         virtual bool HasEditableFormula() const { return false; }
         virtual bool HasEditableNumberOfChemicals() const { return false; }
+
+        virtual bool HasEditableWrapOption() const { return true; }
 };
 
 /// An inbuilt implementation: n-dimensional Gray-Scott.

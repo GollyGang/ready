@@ -6,7 +6,7 @@
         A phenomenon called 'tip-splitting' or 'bifurcating stripes'. Recently observed in the growing palate of mice: &lt;a href="http://www.nature.com/ng/journal/v44/n3/abs/ng.1090.html"&gt;Periodic stripe formation by a Turing mechanism operating at growth zones in the mammalian palate&lt;/a&gt;
     </description>
   
-    <rule name="Fitzhugh-Nagumo" type="formula">
+    <rule name="Fitzhugh-Nagumo" type="formula" wrap="0">
       <param name="timestep">  0.02   </param>
       <param name="a0">        -0.1   </param>
       <param name="a1">        2      </param>

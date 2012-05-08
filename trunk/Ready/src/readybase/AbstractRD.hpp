@@ -119,6 +119,10 @@ class AbstractRD
         virtual void SetBlockSizeY(int n) {}
         virtual void SetBlockSizeZ(int n) {}
 
+        virtual bool HasEditableWrapOption() const { return false; }
+        bool GetWrap() const { return this->wrap; }
+        virtual void SetWrap(bool w) { this->wrap = w; }
+
         /// retrieve the current view as a vtkPolyData
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const =0;
 
@@ -147,6 +151,8 @@ class AbstractRD
 
         std::string filename;
         bool is_modified;
+
+        bool wrap; ///< should the data wrap-around or have a boundary?
 };
 
 #endif 

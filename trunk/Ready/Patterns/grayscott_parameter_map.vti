@@ -10,7 +10,7 @@
         Edit the &lt;i&gt;linear_gradient&lt;/i&gt; elements in the file to zoom in on a particular area.
     </description>
 
-    <rule type="formula" name="Gray-Scott">
+    <rule type="formula" name="Gray-Scott" wrap="0">
         
       <param name="timestep"> 0.2    </param>
       <param name="diff">     0.07  </param>

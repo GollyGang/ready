@@ -79,13 +79,24 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     // output the Laplacian part of the body
     kernel_source << "\
 \n\
-    // compute the Laplacians of each chemical\n\
+    // compute the Laplacians of each chemical\n";
+    if(this->wrap)
+        kernel_source << "\
     const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n\
     const int xp1 = ((x+1) & (X-1));\n\
     const int ym1 = ((y-1+Y) & (Y-1));\n\
     const int yp1 = ((y+1) & (Y-1));\n\
     const int zm1 = ((z-1+Z) & (Z-1));\n\
-    const int zp1 = ((z+1) & (Z-1));\n\
+    const int zp1 = ((z+1) & (Z-1));\n";
+    else
+        kernel_source << "\
+    const int xm1 = max(0,x-1);\n\
+    const int ym1 = max(0,y-1);\n\
+    const int zm1 = max(0,z-1);\n\
+    const int xp1 = min(X-1,x+1);\n\
+    const int yp1 = min(Y-1,y+1);\n\
+    const int zp1 = min(Z-1,z+1);\n";
+    kernel_source << "\
     const int i_left =  X*(Y*z + y) + xm1;\n\
     const int i_right = X*(Y*z + y) + xp1;\n\
     const int i_up =    X*(Y*z + ym1) + x;\n\
@@ -208,6 +219,14 @@ void FormulaOpenCLImageRD::DeleteParameter(int iParam)
 void FormulaOpenCLImageRD::DeleteAllParameters()
 {
     AbstractRD::DeleteAllParameters();
+    this->need_reload_formula = true;
+}
+
+// -------------------------------------------------------------------------
+
+void FormulaOpenCLImageRD::SetWrap(bool w)
+{
+    AbstractRD::SetWrap(w);
     this->need_reload_formula = true;
 }
 
