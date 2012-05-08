@@ -15,27 +15,37 @@
   <ul>
   <li><a href="open:Patterns/bays_3D.vti">bays_3D.vti</a>, implements a 3D cellular automaton.
   <li><a href="open:Patterns/FitzHugh-Nagumo/Ising_regime.vti">Ising_regime.vti</a>
-  <li><a href="open:Patterns/munafo-uskate.vti">munafo-uskate.vti</a>, Robert Munafo's glider in the U-Skate world.
-  <li><a href="open:Patterns/grayscott_parameter_map.vti">grayscott_parameter_map.vti</a>, showing how the parameters affect the Gray-Scott system.
+  <li><a href="open:Patterns/munafo-uskate.vti">munafo-uskate.vti</a>, Robert Munafo's glider in the 
+  U-Skate world.
+  <li><a href="open:Patterns/grayscott_parameter_map.vti">grayscott_parameter_map.vti</a>, showing 
+  how the parameters affect the Gray-Scott system.
   </ul>
 <li> <tt>use_image_interpolation=false</tt> now gives voxelised Minecraft-style rendering in 3D.
 <li> New <a href="formats.html#render_settings">render settings</a>:
 <ul>
 <li><tt>show_color_scale</tt>: allows the color scale legend to be turned off.
-<li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D images) be colored using the image.
+<li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D 
+    images) to be colored using the image.
 </ul>
 <li> New overlay shape: <a href="formats.html#pixel">pixel</a>, for specifying cells directly.
-<li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for spatially-varying values.
-<li> The <a href="formats.html#overlay">overlay</a> element can now contain multiple shape specifiers.
-<li> Image files (*.vti) can now be loaded into Paraview, with named chemicals ('a', 'b', etc.) and now can be visualized by volume rendering and contoured.
+<li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for 
+    spatially-varying values.
+<li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape 
+    specifiers.
+<li> Image files (*.vti) can now be loaded into Paraview, with named chemicals ('a', 'b', etc.). 
+    There they can be visualized by volume rendering, or contoured in various ways.
 <li> Ready has a new (much nicer!) icon.
 <li> New menu commands:
   <ul>
-  <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current pattern file from the saved version on disk.
-  <li><a href="file.html#File_ImportMesh">File > Import Mesh</a> : imports mesh files (*.obj, *.vtp, *.vtu) as surfaces to run RD on.
-  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> : exports mesh files (*.obj, *.vtp) from the current contoured surface or displacement-mapped surface.
+  <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current 
+  pattern file from the saved version on disk.
+  <li><a href="file.html#File_ImportMesh">File > Import Mesh</a> : imports mesh files (*.obj, *.vtp, 
+  *.vtu) as surfaces to run RD on.
+  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> : exports mesh files (*.obj, *.vtp) 
+  from the current contoured surface or displacement-mapped surface.
   </ul>
-<li> New option for image-based systems: <a href="formats.html#rule">wrap</a>, to toggle toroidal wrap-around on/off.
+<li> New option for image-based systems: <a href="formats.html#rule">wrap</a>, to toggle toroidal 
+    wrap-around on/off.
 </ul>
 
 <p>
@@ -43,7 +53,8 @@
 
 <p>
 <ul>
-<li> Fixed issue that gave 'Invalid work group size' and 'expecting CL_KERNEL_WORK_GROUP_SIZE to be a power of 2' errors on different graphics cards.
+<li> Fixed issue that gave 'Invalid work group size' and 'expecting CL_KERNEL_WORK_GROUP_SIZE to be 
+    a power of 2' errors on different graphics cards.
 <li> Fixed XML-escaping issue that caused saved patterns to fail to load.
 </ul>
 
@@ -64,7 +75,8 @@
 <li> Added File > Open Recent submenu.
 <li> Added View > Full Screen for toggling full screen mode.
 <li> Added View > Fit Pattern to fill the view with the entire pattern.
-<li> Added View > Wireframe for toggling from wireframe to surface view. Many other render settings can be changed in the Info Pane.
+<li> Added View > Wireframe for toggling from wireframe to surface view. Many other render settings 
+    can be changed in the Info Pane.
 <li> Added Action > Reset to restore a pattern back to its starting point.
 <li> Some menu items have been moved or renamed.
 <li> The Patterns Pane no longer shows inbuilt demos.  It now shows files stored in the supplied
@@ -78,7 +90,8 @@
      A series of overlays are composed in the different chemical images, and may include randomness.
 <li> A new rule type "kernel" allows full OpenCL kernels to be specified, for maximum flexibility.
 <li> The world size can now be changed. Set x, y or z to 1 for 2D or 1D systems, e.g. 128x1x1
-<li> For 2D systems, all the chemicals are shown side-by-side. This can be turned off in the render settings.
+<li> For 2D systems, all the chemicals are shown side-by-side. This can be turned off in the render 
+    settings.
 </ul>
 
 <p>
