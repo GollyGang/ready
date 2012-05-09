@@ -2,6 +2,11 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
       
+    <description>
+        Self-replicating spots in three dimensions, using the
+        Gray-Scott rule built into Ready (currently the only such rule).
+    </description>
+      
     <rule type="inbuilt" name="Gray-Scott">
       <param name="timestep">1.0</param>
       <param name="D_a">
