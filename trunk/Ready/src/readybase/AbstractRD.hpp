@@ -27,6 +27,7 @@ class Properties;
 class vtkXMLDataElement;
 class vtkRenderer;
 class vtkPolyData;
+class vtkImageData;
 
 // STL:
 #include <string>
@@ -123,10 +124,13 @@ class AbstractRD
         bool GetWrap() const { return this->wrap; }
         virtual void SetWrap(bool w) { this->wrap = w; }
 
-        /// retrieve the current view as a vtkPolyData
+        /// Retrieve the current 3D object as a vtkPolyData.
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const =0;
 
-        /// retreive the dimensionality of the system volume, irrespective of the cells within it
+        /// Retrieve the current 2D plane as a vtkImageData.
+        virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const =0;
+
+        /// Retreive the dimensionality of the system volume, irrespective of the cells within it.
         virtual int GetArenaDimensionality() const =0;
 
     protected:

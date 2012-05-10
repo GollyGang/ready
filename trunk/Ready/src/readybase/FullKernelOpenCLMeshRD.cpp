@@ -30,9 +30,6 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD()
 {
     this->SetRuleName("Full kernel example");
     this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");
-    this->block_size[0]=1;
-    this->block_size[1]=1;
-    this->block_size[2]=1;
 }
 
 string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string formula) const
@@ -51,9 +48,6 @@ void FullKernelOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn
     vtkSmartPointer<vtkXMLDataElement> xml_kernel = rule->FindNestedElementWithName("kernel");
     if(!xml_kernel) throw runtime_error("kernel node not found in file");
     string formula = trim_multiline_string(xml_kernel->GetCharacterData());
-    read_required_attribute(xml_kernel,"block_size_x",this->block_size[0]);
-    read_required_attribute(xml_kernel,"block_size_y",this->block_size[1]);
-    read_required_attribute(xml_kernel,"block_size_z",this->block_size[2]);
 
     // number_of_chemicals:
     read_required_attribute(xml_kernel,"number_of_chemicals",this->n_chemicals);
@@ -73,9 +67,9 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML() const
     vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
     kernel->SetName("kernel");
     kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    kernel->SetIntAttribute("block_size_x",this->block_size[0]);
-    kernel->SetIntAttribute("block_size_y",this->block_size[1]);
-    kernel->SetIntAttribute("block_size_z",this->block_size[2]);
+    kernel->SetIntAttribute("block_size_x",1);
+    kernel->SetIntAttribute("block_size_y",1);
+    kernel->SetIntAttribute("block_size_z",1);
     kernel->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
     rule->AddNestedElement(kernel);
 

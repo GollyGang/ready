@@ -61,6 +61,8 @@ class ImageRD : public AbstractRD
 
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
 
+        virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
+
     protected:
 
         std::vector<vtkImageData*> images; ///< one for each chemical
