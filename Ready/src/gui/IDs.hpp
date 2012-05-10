@@ -44,6 +44,7 @@ namespace ID
         AddMyPatterns,
         ImportMesh,
         ExportMesh,
+        ExportImage,
         
         // view menu
         FullScreen,

@@ -581,6 +581,13 @@ int MeshRD::GetArenaDimensionality() const
 
 // ---------------------------------------------------------------------
 
+void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) const
+{
+    // TODO
+}
+
+// ---------------------------------------------------------------------
+
 vtkStandardNewMacro(RD_XMLUnstructuredGridWriter);
 
 // ---------------------------------------------------------------------

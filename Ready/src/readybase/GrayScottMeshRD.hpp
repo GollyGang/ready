@@ -37,6 +37,7 @@ class GrayScottMeshRD : public InbuiltMeshRD
 
         GrayScottMeshRD();
 
+        /// For imported meshes we need a way to get something going on the surface so the user can get started.
         void CreateGrayScottStartingConditions();
 
     protected:

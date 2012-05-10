@@ -950,6 +950,87 @@ void ImageRD::SaveFile(const char* filename,const Properties& render_settings) c
 
 // --------------------------------------------------------------------------------
 
+void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) const
+{
+    float low = render_settings.GetProperty("low").GetFloat();
+    float high = render_settings.GetProperty("high").GetFloat();
+    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
+    render_settings.GetProperty("color_low").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
+    render_settings.GetProperty("color_high").GetColor(r,g,b);
+    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
+    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    
+    // create a lookup table for mapping values to colors
+    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+    lut->SetRampToLinear();
+    lut->SetScaleToLinear();
+    lut->SetTableRange(low,high);
+    lut->SetSaturationRange(low_sat,high_sat);
+    lut->SetHueRange(low_hue,high_hue);
+    lut->SetValueRange(low_val,high_val);
+
+    // pass the image through the lookup table
+    vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+    image_mapper->SetLookupTable(lut);
+    switch(this->GetArenaDimensionality())
+    {
+        case 1: 
+        case 2:
+            image_mapper->SetInput(this->GetImage(iActiveChemical));
+            break;
+        case 3:
+            {
+                string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
+                float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
+
+                // Matrices for axial, coronal, sagittal, oblique view orientations
+                static double sagittalElements[16] = { // x
+                       0, 0,-1, 0,
+                       1, 0, 0, 0,
+                       0,-1, 0, 0,
+                       0, 0, 0, 1 };
+                static double coronalElements[16] = { // y
+                         1, 0, 0, 0,
+                         0, 0, 1, 0,
+                         0,-1, 0, 0,
+                         0, 0, 0, 1 };
+                static double axialElements[16] = { // z
+                         1, 0, 0, 0,
+                         0, 1, 0, 0,
+                         0, 0, 1, 0,
+                         0, 0, 0, 1 };
+                /*static double obliqueElements[16] = { // could get fancy and have slanting slices
+                         1, 0, 0, 0,
+                         0, 0.866025, -0.5, 0,
+                         0, 0.5, 0.866025, 0,
+                         0, 0, 0, 1 };*/
+                // Set the slice orientation
+                vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
+                if(slice_3D_axis=="x")
+                    resliceAxes->DeepCopy(sagittalElements);
+                else if(slice_3D_axis=="y")
+                    resliceAxes->DeepCopy(coronalElements);
+                else if(slice_3D_axis=="z")
+                    resliceAxes->DeepCopy(axialElements);
+                resliceAxes->SetElement(0, 3, slice_3D_position * this->GetX());
+                resliceAxes->SetElement(1, 3, slice_3D_position * this->GetY());
+                resliceAxes->SetElement(2, 3, slice_3D_position * this->GetZ());
+
+                vtkSmartPointer<vtkImageReslice> voi = vtkSmartPointer<vtkImageReslice>::New();
+                voi->SetInput(this->GetImage(iActiveChemical));
+                voi->SetOutputDimensionality(2);
+                voi->SetResliceAxes(resliceAxes);
+                image_mapper->SetInputConnection(voi->GetOutputPort());
+            };
+    }
+    image_mapper->Update();
+
+    out->DeepCopy(image_mapper->GetOutput());
+}
+
+// --------------------------------------------------------------------------------
+
 vtkStandardNewMacro(RD_XMLImageWriter);
 
 // --------------------------------------------------------------------------------

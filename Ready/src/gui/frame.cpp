@@ -110,6 +110,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
     EVT_MENU(ID::ImportMesh, MyFrame::OnImportMesh)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
+    EVT_MENU(ID::ExportImage, MyFrame::OnExportImage)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
     EVT_MENU(ID::AddMyPatterns, MyFrame::OnAddMyPatterns)
     EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
@@ -249,7 +250,8 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::ReloadFromDisk, _("Reload from Disk") + GetAccelerator(DO_RELOAD), _("Reload the pattern file from disk"));
         menu->AppendSeparator();
         menu->Append(ID::ImportMesh, _("Import Mesh...") + GetAccelerator(DO_IMPORTMESH), _("Import a mesh"));
-        menu->Append(ID::ExportMesh, _("Export Mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export a mesh"));
+        menu->Append(ID::ExportMesh, _("Export Mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export the mesh"));
+        menu->Append(ID::ExportImage, _("Export Image...") + GetAccelerator(DO_EXPORTIMAGE), _("Export the image"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
@@ -1856,6 +1858,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::ReloadFromDisk,            DO_RELOAD);
         SetAccelerator(mbar, ID::ImportMesh,                DO_IMPORTMESH);
         SetAccelerator(mbar, ID::ExportMesh,                DO_EXPORTMESH);
+        SetAccelerator(mbar, ID::ExportImage,               DO_EXPORTIMAGE);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
@@ -1911,6 +1914,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_RELOAD:         cmdid = ID::ReloadFromDisk; break;
         case DO_IMPORTMESH:     cmdid = ID::ImportMesh; break;
         case DO_EXPORTMESH:     cmdid = ID::ExportMesh; break;
+        case DO_EXPORTIMAGE:    cmdid = ID::ExportImage; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
         case DO_SCREENSHOT:     cmdid = ID::Screenshot; break;
         case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
@@ -2321,7 +2325,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
         rd->SetNumberOfChemicals(2);
-        rd->CreateGrayScottStartingConditions();
+        rd->CreateGrayScottStartingConditions(); // get something going as an example
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("vtu")))
@@ -2340,7 +2344,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         GrayScottMeshRD *rd = new GrayScottMeshRD();
         rd->CopyFromMesh(vtu_reader->GetOutput());
         rd->SetNumberOfChemicals(2);
-        rd->CreateGrayScottStartingConditions();
+        rd->CreateGrayScottStartingConditions(); // get something going as an example
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("obj")))
@@ -2362,7 +2366,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
         rd->SetNumberOfChemicals(2);
-        rd->CreateGrayScottStartingConditions();
+        rd->CreateGrayScottStartingConditions(); // get something going as an example
         this->SetCurrentRDSystem(rd);
     }
     else
@@ -2441,6 +2445,53 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
 void MyFrame::OnReloadFromDisk(wxCommandEvent &event)
 {
     this->OpenFile(this->system->GetFilename());
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnExportImage(wxCommandEvent &event)
+{
+    // find an unused filename
+    const wxString default_filename_root = _("Ready_image_");
+    const wxString default_filename_ext = _T("png");
+    int unused_value = 0;
+    wxString filename;
+    wxString extension,folder;
+    folder = screenshotdir;
+    do {
+        filename = default_filename_root;
+        filename << wxString::Format(_("%04d."),unused_value) << default_filename_ext;
+        unused_value++;
+    } while(::wxFileExists(folder+_T("/")+filename));
+
+    // ask the user for confirmation
+    bool accepted = true;
+    do {
+        filename = wxFileSelector(_("Specify the image filename"),folder,filename,default_filename_ext,
+            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
+            wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+        if(filename.empty()) return; // user cancelled
+        // validate
+        wxFileName::SplitPath(filename,&folder,NULL,&extension);
+        if(extension!=_T("png") && extension!=_T("jpg"))
+        {
+            wxMessageBox(_("Unsupported format"));
+            accepted = false;
+        }
+    } while(!accepted);
+
+    screenshotdir = folder;
+
+    vtkSmartPointer<vtkImageWriter> writer;
+    if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+    else if(extension==_T("jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+    writer->SetFileName(filename.mb_str());
+    vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+    system->GetAs2DImage(image,this->render_settings);
+    writer->SetInput(image);
+    writer->Write();
+
+    // TODO: merge with OnSaveScreenshot
 }
 
 // ---------------------------------------------------------------------

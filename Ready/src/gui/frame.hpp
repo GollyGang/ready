@@ -84,6 +84,7 @@ class MyFrame : public wxFrame
         void OnPreferences(wxCommandEvent& event);
         void OnImportMesh(wxCommandEvent& event);
         void OnExportMesh(wxCommandEvent& event);
+        void OnExportImage(wxCommandEvent& event);
         void OnQuit(wxCommandEvent& event);
 
         // Open Recent submenu
