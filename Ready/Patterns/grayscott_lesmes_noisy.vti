@@ -3,14 +3,14 @@
   <RD format_version="2">
       
     <description>
-		Lesmes F, et al. (2003) Noise-controlled self-replicating patterns 
-		&lt;a href=&quot;http://bbm1.ucm.es/fmoran/publications/78-Lesmes-Noise controlled self-replicating patterns-phys.Rev.Lett.91(23)238301-1-4(2003).pdf&quot;&gt;(PDF)&lt;/a&gt;.
-		
-		The noise parameter controls the amount of noise added to the system. With zero noise the
-		system evolves long worms. With noise=0.2, self-replicating dots are seen instead.
-		
-		(Note that their formula is written slightly differently; the (F+k) term appears as a single
-		parameter.)
+        Lesmes F, et al. (2003) Noise-controlled self-replicating patterns 
+        &lt;a href=&quot;http://bbm1.ucm.es/fmoran/publications/78-Lesmes-Noise%20controlled%20self-replicating%20patterns-phys.Rev.Lett.91(23)238301-1-4(2003).pdf&quot;&gt;(PDF)&lt;/a&gt;.
+        
+        The noise parameter controls the amount of noise added to the system. With zero noise the
+        system evolves long worms. With noise=0.2, self-replicating dots are seen instead.
+        
+        (Note that their formula is written slightly differently; the (F+k) term appears as a single
+        parameter.)
     </description>
       
     <rule type="formula" name="Gray-Scott">
@@ -20,11 +20,11 @@
       <param name="D_b">      0.05    </param>
       <param name="k">        0.065   </param>
       <param name="F">        0.05    </param>
-	  <param name="noise">    0.2     </param>
-	  
+      <param name="noise">    0.2     </param>
+      
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a) + c*noise;
-		delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
+        delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
         delta_c = (fmod(c+laplacian_c,1)-c)/timestep; // randomness [-1,1]
       </formula>
       
@@ -40,13 +40,13 @@
         <overwrite />
         <white_noise low="0" high="1" />
         <circle radius="0.02">
-		  <point3d x="0.5" y="0.5" z="0.5" />
+          <point3d x="0.5" y="0.5" z="0.5" />
         </circle>
         <circle radius="0.02">
-		  <point3d x="0.8" y="0.7" z="0.5" />
+          <point3d x="0.8" y="0.7" z="0.5" />
         </circle>
         <circle radius="0.02">
-		  <point3d x="0.2" y="0.45" z="0.5" />
+          <point3d x="0.2" y="0.45" z="0.5" />
         </circle>
       </overlay>
       <overlay chemical="c">
@@ -59,7 +59,7 @@
     <render_settings>
       <low value="0" />
       <high value="1" />
-	  <show_displacement_mapped_surface value="false" />
+      <show_displacement_mapped_surface value="false" />
     </render_settings>
 
   </RD>
