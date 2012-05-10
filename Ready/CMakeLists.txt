@@ -102,6 +102,7 @@ set( PATTERN_FILES
   munafo-uskate.vti
   grayscott_parameter_map.vti
   grayscott_lesmes_noisy.vti
+  mutually-catalytic_spots.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti
