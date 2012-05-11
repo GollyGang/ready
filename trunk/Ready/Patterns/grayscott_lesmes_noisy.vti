@@ -7,7 +7,7 @@
         &lt;a href=&quot;http://bbm1.ucm.es/fmoran/publications/78-Lesmes-Noise%20controlled%20self-replicating%20patterns-phys.Rev.Lett.91(23)238301-1-4(2003).pdf&quot;&gt;(PDF)&lt;/a&gt;.
         
         The noise parameter controls the amount of noise added to the system. With zero noise the
-        system evolves long worms. With noise=0.2, self-replicating dots are seen instead.
+        system evolves long worms. With noise=0.3, self-replicating dots are seen instead.
         
         (Note that their formula is written slightly differently; the (F+k) term appears as a single
         parameter.)
@@ -15,12 +15,12 @@
       
     <rule type="formula" name="Gray-Scott">
         
-      <param name="timestep"> 0.025    </param>
+      <param name="timestep"> 0.2    </param>
       <param name="D_a">      0.4     </param>
       <param name="D_b">      0.2     </param>
       <param name="k">        0.0655  </param>
       <param name="F">        0.05    </param>
-      <param name="noise">    0.5     </param>
+      <param name="noise">    0.3     </param>
       
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a) + c*noise;
