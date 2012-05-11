@@ -15,12 +15,12 @@
       
     <rule type="formula" name="Gray-Scott">
         
-      <param name="timestep"> 0.5     </param>
-      <param name="D_a">      0.1     </param>
-      <param name="D_b">      0.05    </param>
-      <param name="k">        0.065   </param>
+      <param name="timestep"> 0.025    </param>
+      <param name="D_a">      0.4     </param>
+      <param name="D_b">      0.2     </param>
+      <param name="k">        0.0655  </param>
       <param name="F">        0.05    </param>
-      <param name="noise">    0.2     </param>
+      <param name="noise">    0.5     </param>
       
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a) + c*noise;
@@ -63,18 +63,18 @@
     </render_settings>
 
   </RD>
-  <ImageData WholeExtent="0 63 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
-    <Piece Extent="0 63 0 63 0 0">
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 127 0 0">
       <PointData>
         <DataArray type="Float32" Name="a" format="appended" RangeMin="0" RangeMax="0" offset="0" />
-        <DataArray type="Float32" Name="b" format="appended" RangeMin="0" RangeMax="0" offset="76" />
-        <DataArray type="Float32" Name="c" format="appended" RangeMin="0" RangeMax="0" offset="152" />
+        <DataArray type="Float32" Name="b" format="appended" RangeMin="0" RangeMax="0" offset="168" />
+        <DataArray type="Float32" Name="c" format="appended" RangeMin="0" RangeMax="0" offset="336" />
       </PointData>
       <CellData>
       </CellData>
     </Piece>
   </ImageData>
   <AppendedData encoding="base64">
-   _AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAABAQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAABAQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+   _AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
   </AppendedData>
 </VTKFile>
