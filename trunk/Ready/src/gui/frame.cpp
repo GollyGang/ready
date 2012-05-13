@@ -1682,22 +1682,24 @@ void MyFrame::EditFile(const wxString& path)
         if (texteditor.IsEmpty()) return;
     }
     
-    // open given file in user's preferred text editor
-    wxString cmd;
-    #ifdef __WXMAC__
-        cmd = wxString::Format(wxT("open -a \"%s\" \"%s\""), texteditor.c_str(), path.c_str());
-    #else
-        // Windows or Unix
-        cmd = wxString::Format(wxT("\"%s\" \"%s\""), texteditor.c_str(), path.c_str());
-    #endif
+    // execute a command to open given file in user's preferred text editor
+    wxString cmd = wxString::Format(wxT("\"%s\" \"%s\""), texteditor.c_str(), path.c_str());
+    long result = wxExecute(cmd, wxEXEC_ASYNC);
     
-    wxArrayString output, errors;
-    wxExecute(cmd, output, errors, wxEXEC_ASYNC);
-    if (errors.GetCount() > 0) {
-        wxString msg = _("Failed to open file in your preferred text editor:\n\n");
-        for (size_t i = 0; i < errors.GetCount(); i++)
-            msg += errors[i];
-        msg += _("\n\nTry choosing a different editor in Preferences > File.");
+#if defined(__WXMSW__)
+    // on Windows, wxExecute returns 0 if cmd fails
+    if (result == 0)
+#elif defined(__WXMAC__)
+    // on Mac, wxExecute returns -1 if cmd succeeds (bug, or wx docs are wrong)
+    if (result != -1)
+#elif defined(__WXGTK__)
+    // on Linux, wxExecute always returns a +ve number (pid?) if cmd fails OR succeeds (sheesh!)
+    // but if it fails an error message appears in shell window
+    if (result <= 0)
+#endif
+    {
+        wxString msg = _("Failed to open file in your preferred text editor.\n");
+        msg += _("Try choosing a different editor in Preferences > File.");
         Warning(msg);
     }
 }
