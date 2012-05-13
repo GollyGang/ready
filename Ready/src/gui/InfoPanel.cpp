@@ -121,20 +121,9 @@ void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
 {
     wxString url = link.GetHref();
     if ( url.StartsWith(wxT("http:")) || url.StartsWith(wxT("mailto:")) ) {
-    // pass http/mailto URL to user's preferred browser/emailer
-    #if defined(__WXMAC__)
-        // wxLaunchDefaultBrowser doesn't work on Mac with IE (get msg in console.log)
-        // but it's easier just to use the Mac OS X open command
-        if ( wxExecute(wxT("open ") + url, wxEXEC_ASYNC) == -1 )
-            Warning(_("Could not open URL!"));
-    #elif defined(__WXGTK__)
-        // wxLaunchDefaultBrowser is not reliable on Linux/GTK so we call gnome-open
-        if ( wxExecute(wxT("gnome-open ") + url, wxEXEC_ASYNC) == -1 )
-            Warning(_("Could not open URL!"));
-    #else
+        // pass http/mailto URL to user's preferred browser/emailer
         if ( !wxLaunchDefaultBrowser(url) )
-            Warning(_("Could not launch browser!"));
-    #endif
+            Warning(_("Could not open URL in browser!"));
 
     } else if ( url.StartsWith(change_prefix) ) {
         panel->ChangeInfo( url.Mid(change_prefix.size()) );
