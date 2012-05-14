@@ -2486,8 +2486,7 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     bool accepted = true;
     do {
         filename = wxFileSelector(_("Specify the image filename"),folder,filename,default_filename_ext,
-            //_("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
-            _("PNG files (*.png)|*.png"), // TODO: fix black thumbnail issue with JPEG output
+            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
             wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
         if(filename.empty()) return; // user cancelled
         // validate
