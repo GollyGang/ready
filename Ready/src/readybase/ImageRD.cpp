@@ -973,6 +973,7 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
     // pass the image through the lookup table
     vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
     image_mapper->SetLookupTable(lut);
+    image_mapper->SetOutputFormatToRGB(); // without this, vtkJPEGWriter writes JPEGs that some software struggles with
     switch(this->GetArenaDimensionality())
     {
         case 1: 

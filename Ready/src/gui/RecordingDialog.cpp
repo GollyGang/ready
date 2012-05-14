@@ -59,7 +59,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent)
         hbox2->Add(new wxStaticText(this, wxID_STATIC, _("000000")),0, wxRIGHT | wxALIGN_BOTTOM,10);
         this->extension_combo = new wxComboBox(this,wxID_ANY);
         this->extension_combo->AppendString(_(".png"));
-        //this->extension_combo->AppendString(_(".jpg")); // TODO: fix issue with black JPEG thumbnail
+        this->extension_combo->AppendString(_(".jpg"));
         this->extension_combo->SetSelection(0);
         hbox2->Add(this->extension_combo,0,wxLEFT | wxRIGHT,0);
     }
