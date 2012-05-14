@@ -778,8 +778,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     bool accepted = true;
     do {
         filename = wxFileSelector(_("Specify the screenshot filename"),folder,filename,default_filename_ext,
-            //_("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
-            _("PNG files (*.png)|*.png"), // TODO: fix issue with black JPEG thumbnails
+            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
             wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
         if(filename.empty()) return; // user cancelled
         // validate
