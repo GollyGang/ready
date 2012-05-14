@@ -13,6 +13,7 @@ rendering window if the app is already running.
 <li>For maximum speed, use "Change Running Speed..." in the Action menu to increase the number of timesteps between each render. Fewer frames will be drawn, and the overall speed will be faster.
 <li>The patterns in the "CPU-only" folder typically run much slower than the others, if your graphics card is reasonable. So for better performance you shouldn't use them. (If you don't have OpenCL installed or you're in a virtual machine then only the CPU-only patterns will work.)
 <li>Any reaction-diffusion pattern can be changed in size using the dimensions control in the Info Pane. If you double the size then remember that the diffusion speed parameters (e.g. D_a and D_b for Gray-Scott) must be <i>quadrupled</i> to get the same outcome from the initial pattern.
+<li>To make a video, use the commands on the File menu: <a href="file.html#File_StartRecording">Start Recording...</a> and <a href="file.html#File_StopRecording">Stop Recording</a> to produce a sequence of images. Then use you favorite utility to make a video file. For example in <a href="http://ffmpeg.org/">FFmpeg</a> the following command makes an <a href="http://en.wikipedia.org/wiki/MPEG-4">MPEG-4</a> video at 50 frames per second: <br><tt>ffmpeg -r 50 -i frame_%06d.png -sameq video.mp4</tt>
 </ul>
 
 </body>
