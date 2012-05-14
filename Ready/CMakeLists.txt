@@ -59,16 +59,17 @@ include_directories( src/readybase )
 
 set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/IDs.hpp
-  src/gui/wxutils.hpp                    src/gui/wxutils.cpp
-  src/gui/dialogs.hpp                    src/gui/dialogs.cpp
-  src/gui/prefs.hpp                      src/gui/prefs.cpp
-  src/gui/app.hpp                        src/gui/app.cpp 
-  src/gui/frame.hpp                      src/gui/frame.cpp 
-  src/gui/HelpPanel.hpp                  src/gui/HelpPanel.cpp
-  src/gui/InfoPanel.hpp                  src/gui/InfoPanel.cpp
-  src/gui/PatternsPanel.hpp              src/gui/PatternsPanel.cpp
-  src/gui/vtk_pipeline.hpp               src/gui/vtk_pipeline.cpp
-  src/gui/wxVTKRenderWindowInteractor.h  src/gui/wxVTKRenderWindowInteractor.cxx
+  src/gui/wxutils.hpp                      src/gui/wxutils.cpp
+  src/gui/dialogs.hpp                      src/gui/dialogs.cpp
+  src/gui/prefs.hpp                        src/gui/prefs.cpp
+  src/gui/app.hpp                          src/gui/app.cpp 
+  src/gui/frame.hpp                        src/gui/frame.cpp 
+  src/gui/HelpPanel.hpp                    src/gui/HelpPanel.cpp
+  src/gui/InfoPanel.hpp                    src/gui/InfoPanel.cpp
+  src/gui/PatternsPanel.hpp                src/gui/PatternsPanel.cpp
+  src/gui/vtk_pipeline.hpp                 src/gui/vtk_pipeline.cpp
+  src/gui/wxVTKRenderWindowInteractor.h    src/gui/wxVTKRenderWindowInteractor.cxx
+  src/gui/RecordingDialog.hpp              src/gui/RecordingDialog.cpp
 )
 include_directories( src/gui )
 
@@ -104,6 +105,7 @@ set( PATTERN_FILES
   grayscott_lesmes_noisy.vti
   grayscott_noisy_solitons_mitosis.vti
   mutually-catalytic_spots.vti
+  parameter_modulation_demo.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti

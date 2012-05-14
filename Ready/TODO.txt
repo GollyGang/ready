@@ -13,11 +13,9 @@ before 0.3 release:
 
 - implement FormulaOpenCLMeshRD and FullKernelOpenCLMeshRD
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
-- some way to add noise to the system on each frame, or periodically (for Turing and Meinhardt, especially)
 - bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
   extended usage (not releasing something? or bug in driver - get on other platforms?)
     - to reproduce: repeatedly load vti files
-- add examples that use more chemicals to modulate parameters
 
 - document MeshRD changes, add/improve new examples
 - update code documentation
@@ -50,7 +48,6 @@ before 1.0 release:
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
 - copy/paste (2d only) (paste modes: add, overwrite)
 - allow user to paint, erase, even while running (2D only)
-- save out videos
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
 - new overlay shape: scattered rectangles/circles (need some higher-level specifier for this?)
 

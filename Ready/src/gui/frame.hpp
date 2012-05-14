@@ -80,6 +80,10 @@ class MyFrame : public wxFrame
         void OnReloadFromDisk(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
         void OnScreenshot(wxCommandEvent& event);
+        void OnStartRecording(wxCommandEvent& event);
+        void OnUpdateStartRecording(wxUpdateUIEvent& event);
+        void OnStopRecording(wxCommandEvent& event);
+        void OnUpdateStopRecording(wxUpdateUIEvent& event);
         void OnAddMyPatterns(wxCommandEvent& event);
         void OnPreferences(wxCommandEvent& event);
         void OnImportMesh(wxCommandEvent& event);
@@ -160,6 +164,7 @@ class MyFrame : public wxFrame
         void UpdateWindowTitle();
         void UpdateToolbars();
         void SetStatusBarText();
+        void RecordFrame();
 
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
@@ -192,6 +197,11 @@ class MyFrame : public wxFrame
         int steps_since_last_render;
         double accumulated_time;
         bool do_one_render;
+
+        // used when recording frames to disk
+        bool is_recording,record_data_image;
+        std::string recording_prefix,recording_extension;
+        int iRecordingFrame;
 
         static const int MAX_TIMESTEPS_PER_RENDER = 1e8;
 

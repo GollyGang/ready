@@ -25,17 +25,6 @@
 
 // -----------------------------------------------------------------------------
 
-// need platform-specific gap after OK/Cancel buttons
-#ifdef __WXMAC__
-    const int STDHGAP = 0;
-#elif defined(__WXMSW__)
-    const int STDHGAP = 6;
-#else
-    const int STDHGAP = 10;
-#endif
-
-// -----------------------------------------------------------------------------
-
 MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon) 
      : wxDialog(NULL,wxID_ANY,title,wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {

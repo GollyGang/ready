@@ -64,6 +64,7 @@ wxString readydir;               // directory containing app
 wxString datadir;                // directory for user-specific data
 wxString tempdir;                // directory for temporary data
 wxString patterndir;             // directory for supplied patterns
+wxString recordingdir;           // directory for recording images
 
 // initialize exported preferences:
 
@@ -313,6 +314,8 @@ const char* GetActionName(action_id action)
         case DO_EXPORTIMAGE:    return "Export Image...";
         case DO_SAVE:           return "Save Pattern...";
         case DO_SCREENSHOT:     return "Save Screenshot...";
+        case DO_STARTRECORDING: return "Start Recording...";
+        case DO_STOPRECORDING:  return "Stop Recording";
         case DO_ADDPATTS:       return "Add My Patterns...";
         case DO_PREFS:          return "Preferences...";
         case DO_QUIT:           return "Quit Ready";
@@ -907,6 +910,7 @@ void SavePrefs()
     SaveRelPath(f, "screenshot_dir", screenshotdir);
     SaveRelPath(f, "choose_dir", choosedir);
     SaveRelPath(f, "user_dir", userdir);
+    SaveRelPath(f, "recording_dir", recordingdir);
 
     fputs("\n", f);
 
@@ -1098,6 +1102,8 @@ void InitPaths()
     }
     
     patterndir = readydir + PATT_DIR;
+
+    recordingdir = _T(".");
 }
 
 // -----------------------------------------------------------------------------
@@ -1212,6 +1218,7 @@ void GetPrefs()
         } else if (strcmp(keyword, "screenshot_dir") == 0) { GetRelPath(value, screenshotdir, PATT_DIR);
         } else if (strcmp(keyword, "choose_dir") == 0)     { GetRelPath(value, choosedir);
         } else if (strcmp(keyword, "user_dir") == 0)       { GetRelPath(value, userdir);
+        } else if (strcmp(keyword, "recording_dir") == 0)  { GetRelPath(value, recordingdir);
         
         } else if (strcmp(keyword, "text_editor") == 0) {
             texteditor = wxString(value,wxConvLocal);

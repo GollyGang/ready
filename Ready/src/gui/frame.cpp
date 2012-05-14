@@ -26,6 +26,7 @@
 #include "IDs.hpp"
 #include "vtk_pipeline.hpp"
 #include "dialogs.hpp"
+#include "RecordingDialog.hpp"
 
 // readybase:
 #include "utils.hpp"
@@ -112,6 +113,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
     EVT_MENU(ID::ExportImage, MyFrame::OnExportImage)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
+    EVT_MENU(ID::StartRecording, MyFrame::OnStartRecording)
+    EVT_UPDATE_UI(ID::StartRecording, MyFrame::OnUpdateStartRecording)
+    EVT_MENU(ID::StopRecording, MyFrame::OnStopRecording)
+    EVT_UPDATE_UI(ID::StopRecording, MyFrame::OnUpdateStopRecording)
     EVT_MENU(ID::AddMyPatterns, MyFrame::OnAddMyPatterns)
     EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
@@ -184,7 +189,8 @@ MyFrame::MyFrame(const wxString& title)
        frames_per_second(0.0),
        million_cell_generations_per_second(0.0),
        fullscreen(false),
-       render_settings("render_settings")
+       render_settings("render_settings"),
+       is_recording(false)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -255,6 +261,9 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
+        menu->AppendSeparator();
+        menu->Append(ID::StartRecording, _("Start Recording...") + GetAccelerator(DO_STARTRECORDING), _("Start recording frames as images to disk"));
+        menu->Append(ID::StopRecording, _("Stop Recording") + GetAccelerator(DO_STOPRECORDING), _("Stop recording frames"));
         menu->AppendSeparator();
         menu->Append(ID::AddMyPatterns, _("Add My Patterns...") + GetAccelerator(DO_ADDPATTS), _("Add chosen folder to patterns pane"));
         #if !defined(__WXOSX_COCOA__)
@@ -1082,6 +1091,9 @@ void MyFrame::OnIdle(wxIdleEvent& event)
                 accumulated_time = 0.000001;  // unlikely, but play safe
             this->frames_per_second = steps_since_last_render / accumulated_time;
             this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
+
+            if(this->is_recording)
+                this->RecordFrame();
        
             this->pVTKWindow->Refresh(false);
             this->SetStatusBarText();
@@ -1863,6 +1875,8 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::ExportImage,               DO_EXPORTIMAGE);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
+        SetAccelerator(mbar, ID::StartRecording,            DO_STARTRECORDING);
+        SetAccelerator(mbar, ID::StopRecording,             DO_STOPRECORDING);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
         
         SetAccelerator(mbar, wxID_CUT,                      DO_CUT);
@@ -1919,6 +1933,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_EXPORTIMAGE:    cmdid = ID::ExportImage; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
         case DO_SCREENSHOT:     cmdid = ID::Screenshot; break;
+        case DO_STARTRECORDING: cmdid = ID::StartRecording; break;
+        case DO_STOPRECORDING:  cmdid = ID::StopRecording; break;
         case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
         case DO_PREFS:          cmdid = wxID_PREFERENCES; break;
         case DO_QUIT:           cmdid = wxID_EXIT; break;
@@ -2494,6 +2510,66 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     writer->Write();
 
     // TODO: merge with OnSaveScreenshot
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::RecordFrame()
+{
+    ostringstream oss; 
+    oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+    vtkSmartPointer<vtkImageWriter> writer;
+    if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+    else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+    if(this->record_data_image) // take the 2D data (2D system or 2D slice)
+    {
+        vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+        this->system->GetAs2DImage(image,this->render_settings);
+        writer->SetInput(image);
+    }
+    else // take a screenshot of the current view
+    {
+        vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
+        screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
+        writer->SetInputConnection(screenshot->GetOutputPort());
+    }
+    writer->SetFileName(oss.str().c_str());
+    writer->Write();
+    this->iRecordingFrame++;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnStartRecording(wxCommandEvent &event)
+{
+    RecordingDialog dlg(this);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    this->recording_prefix = dlg.recording_prefix;
+    this->recording_extension = dlg.recording_extension;
+    this->record_data_image = dlg.record_data_image;
+    this->iRecordingFrame = 0;
+    this->is_recording = true;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateStartRecording(wxUpdateUIEvent &event)
+{
+    event.Enable(!this->is_recording);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnStopRecording(wxCommandEvent &event)
+{
+    this->is_recording = false;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateStopRecording(wxUpdateUIEvent &event)
+{
+    event.Enable(this->is_recording);
 }
 
 // ---------------------------------------------------------------------
