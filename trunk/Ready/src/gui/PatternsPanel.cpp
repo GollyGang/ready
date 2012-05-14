@@ -153,18 +153,18 @@ void PatternsPanel::OnTreeClick(wxMouseEvent& event)
         event.Skip();
         return;
     }
+
+    // set global flag for testing in OnTreeSelChanged
+    // (must do this BEFORE checking for click on folder)
+    edit_file = event.ControlDown() || event.RightDown();
     
-    // check if click was in a folder item
     wxString filepath = patternctrl->GetFilePath();
     if (filepath.IsEmpty()) {
-        // click was in a folder item
+        // user clicked on a folder name
         event.Skip();
         return;
     }
     
-    // set global flag for testing in OnTreeSelChanged
-    edit_file = event.ControlDown() || event.RightDown();
-
     // check for click in selected item
     if (id == treectrl->GetSelection()) {
         // force a selection change so OnTreeSelChanged gets called
@@ -184,7 +184,7 @@ void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
 
     wxString filepath = patternctrl->GetFilePath();
 
-    if ( filepath.IsEmpty() ) {
+    if (filepath.IsEmpty()) {
         // user clicked on a folder name
 
     } else if (edit_file) {
