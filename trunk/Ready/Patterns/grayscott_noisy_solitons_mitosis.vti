@@ -19,7 +19,7 @@
       <param name="D_b">      0.1     </param>
       <param name="k">        0.0648  </param>
       <param name="F">        0.03    </param>
-      <param name="noise">    0.0     </param>
+      <param name="noise">    0.2     </param>
       
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a) + c*noise;
