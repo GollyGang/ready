@@ -14,7 +14,8 @@
 <li> New patterns: 
   <ul>
   <li><a href="open:Patterns/bays_3D.vti">bays_3D.vti</a>, implements a 3D cellular automaton.
-  <li><a href="open:Patterns/FitzHugh-Nagumo/Ising_regime.vti">Ising_regime.vti</a>
+  <li><a href="open:Patterns/FitzHugh-Nagumo/Ising_regime.vti">Ising_regime.vti</a>, showing how tiny
+  variation can grow into large meanders in the FitzHugh-Nagumo system.
   <li><a href="open:Patterns/munafo-uskate.vti">munafo-uskate.vti</a>, Robert Munafo's glider in the 
   U-Skate world.
   <li><a href="open:Patterns/grayscott_parameter_map.vti">grayscott_parameter_map.vti</a>, showing 
@@ -27,6 +28,8 @@
   how noise can trigger solitons to replicate.
   <li><a href="open:Patterns/mutually-catalytic_spots.vti">mutually-catalytic_spots.vti</a>, where 
   big spots can only replicate if full of small spots.
+  <li><a href="open:Patterns/parameter_modulation_demo.vti">parameter_modulation_demo.vti</a>, showing how
+  values in an extra chemical can be used to modulate the parameters of a system.
   </ul>
 <li> <tt>use_image_interpolation=false</tt> now gives voxelised Minecraft-style rendering in 3D.
 <li> New <a href="formats.html#render_settings">render settings</a>:
@@ -40,8 +43,8 @@
     spatially-varying values.
 <li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape 
     specifiers.
-<li> Image files (*.vti) can now be loaded into Paraview, with named chemicals ('a', 'b', etc.). 
-    There they can be visualized by volume rendering, or contoured in various ways.
+<li> Pattern files (*.vti, *.vtu) can now be loaded into Paraview correctly, with named chemicals 
+    ('a', 'b', etc.). There they can be visualized by volume rendering, or contoured in various ways.
 <li> Ready has a new (much nicer!) icon.
 <li> New menu commands:
   <ul>
@@ -53,6 +56,9 @@
   from the current contoured surface or displacement-mapped surface.
   <li><a href="file.html#File_ExportImage">File > Export Image</a> : exports an image file (*.png, *.jpg) 
   from the current slice or 2D system.
+  <li><a href="file.html#File_StartRecording">File > Start Recording...</a> : saves an image out every 
+  frame, for making videos.
+  <li><a href="file.html#File_StopRecording">File > Stop Recording</a> : stops saving out images.
   </ul>
 <li> New option for image-based systems: <a href="formats.html#rule">wrap</a>, to toggle toroidal 
     wrap-around on/off.

@@ -45,6 +45,7 @@ extern wxString readydir;        // directory containing app
 extern wxString datadir;         // directory for user-specific data
 extern wxString tempdir;         // directory for temporary data
 extern wxString patterndir;      // directory for supplied patterns
+extern wxString recordingdir;    // directory for recording images
 
 // Global preference data:
 
@@ -116,8 +117,10 @@ typedef enum
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
     DO_OPENCL,                   // show OpenCL diagnostics...
+    DO_STARTRECORDING,           // start recording
     DO_STEP1,                    // step by 1
     DO_STEPN,                    // step by N
+    DO_STOPRECORDING,            // stop recording
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;

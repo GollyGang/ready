@@ -41,6 +41,8 @@ namespace ID
         ClearAllPatterns,
         ReloadFromDisk,
         Screenshot,
+        StartRecording,
+        StopRecording,
         AddMyPatterns,
         ImportMesh,
         ExportMesh,
