@@ -23,6 +23,7 @@
 
 // -------------------------------------------------------------------
 
+/// Reads *.vti files, our extended version of VTK's XML format for vtkImageData.
 class RD_XMLImageReader : public vtkXMLImageDataReader
 {
     public:
@@ -43,6 +44,7 @@ class RD_XMLImageReader : public vtkXMLImageDataReader
 
 // -------------------------------------------------------------------
 
+/// Reads *.vtu files, our extended version of VTK's XML format for vtkUnstructuredGrid.
 class RD_XMLUnstructuredGridReader : public vtkXMLUnstructuredGridReader
 {
     public:

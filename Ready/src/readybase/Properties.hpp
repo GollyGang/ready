@@ -24,7 +24,7 @@
 #include <map>
 #include <cassert>
 
-/// A 'Property' has a type, a name and a value.
+/// A Property has a type, a name and a value.
 class Property : public XML_Object
 {
     public:
@@ -76,7 +76,7 @@ class Property : public XML_Object
         std::string s;
 };
 
-/// A set of 'Property's that can be saved/loaded to/from XML.
+/// A set of Property instances that can be saved/loaded to/from XML.
 class Properties : public XML_Object
 {
     public: 

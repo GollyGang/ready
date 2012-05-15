@@ -28,7 +28,7 @@
 class MyFrame;
 class HtmlView;
 
-// the help panel displays .html files (stored in the Help folder or elsewhere)
+/// The help panel displays .html files (stored in the Help folder or elsewhere).
 class HelpPanel : public wxPanel
 {
     public:

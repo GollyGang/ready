@@ -32,7 +32,7 @@ class ImageRD;
 
 //----------------------------------------------------------------------------------
 
-// sometimes useful to display a block of text in a monospace font
+/// Displays a block of text in a monospace font.
 class MonospaceMessageBox: public wxDialog
 {
     public: 
@@ -41,7 +41,7 @@ class MonospaceMessageBox: public wxDialog
 
 //----------------------------------------------------------------------------------
 
-// a modal dialog for editing integer X,Y,Z values
+/// A modal dialog for editing integer X,Y,Z values.
 class XYZIntDialog : public wxDialog
 {
     public:
@@ -67,7 +67,7 @@ class XYZIntDialog : public wxDialog
 
 //----------------------------------------------------------------------------------
 
-// a modal dialog for editing float X,Y,Z values
+/// A modal dialog for editing float X,Y,Z values.
 class XYZFloatDialog : public wxDialog
 {
     public:
@@ -92,7 +92,7 @@ class XYZFloatDialog : public wxDialog
 
 //----------------------------------------------------------------------------------
 
-// a modal dialog for editing multi-line text
+/// A modal dialog for editing multi-line text.
 // (essentially wxTextEntryDialog but with wxRESIZE_BORDER style)
 class MultiLineDialog : public wxDialog
 {
@@ -114,7 +114,7 @@ class MultiLineDialog : public wxDialog
 
 //----------------------------------------------------------------------------------
 
-// a modal dialog for editing a parameter name and/or value
+/// A modal dialog for editing a parameter name and/or value.
 class ParameterDialog : public wxDialog
 {
     public:
@@ -148,7 +148,7 @@ class ParameterDialog : public wxDialog
 
 //----------------------------------------------------------------------------------
 
-// a modal dialog for getting a string
+/// A modal dialog for getting a string.
 class StringDialog : public wxDialog
 {
     public:
@@ -167,7 +167,7 @@ class StringDialog : public wxDialog
 
 //----------------------------------------------------------------------------------
 
-// a modal dialog for getting an integer
+/// A modal dialog for getting an integer.
 class IntegerDialog : public wxDialog
 {
     public:

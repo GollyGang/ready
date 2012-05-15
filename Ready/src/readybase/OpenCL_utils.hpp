@@ -39,37 +39,36 @@
 // STL:
 #include <string>
 
+/// Utilities for working with OpenCL.
 namespace OpenCL_utils
 {
+    /// Returns a full report on the available OpenCL devices.
+    std::string GetOpenCLDiagnostics();
 
-/// Returns a full report on the available OpenCL devices.
-std::string GetOpenCLDiagnostics();
+    /// Returns the number of OpenCL platforms (from vendors) that are available.
+    int GetNumberOfPlatforms();
 
-/// Returns the number of OpenCL platforms (from vendors) that are available.
-int GetNumberOfPlatforms();
+    /// Returns the number of OpenCL devices available on this platform.
+    int GetNumberOfDevices(int iPlatform);
 
-/// Returns the number of OpenCL devices available on this platform.
-int GetNumberOfDevices(int iPlatform);
+    /// Returns a description of this platform.
+    std::string GetPlatformDescription(int iPlatform);
 
-/// Returns a description of this platform.
-std::string GetPlatformDescription(int iPlatform);
+    /// Returns a description of this device.
+    std::string GetDeviceDescription(int iPlatform,int iDevice);
 
-/// Returns a description of this device.
-std::string GetDeviceDescription(int iPlatform,int iDevice);
+    /// Returns a description of the OpenCL error code.
+    const char* GetDescriptionOfOpenCLError(cl_int err);
 
-/// Returns a description of the OpenCL error code.
-const char* GetDescriptionOfOpenCLError(cl_int err);
+    /// Converts cl_platform_info to a string.
+    const char* GetPlatformInfoIdAsString(cl_platform_info i);
 
-/// Converts cl_platform_info to a string.
-const char* GetPlatformInfoIdAsString(cl_platform_info i);
+    /// Converts cl_device_info to a string.
+    const char* GetDeviceInfoIdAsString(cl_device_info i);
 
-/// Converts cl_device_info to a string.
-const char* GetDeviceInfoIdAsString(cl_device_info i);
+    /// Links OpenCL dynamically (if appropriate for this OS).
+    cl_int LinkOpenCL();
 
-/// Links OpenCL dynamically (if appropriate for this OS).
-cl_int LinkOpenCL();
-
-/// Throws a std::runtime_error with a descriptive message of the OpenCL error code.
-void throwOnError(cl_int ret,const char* message);
-
+    /// Throws a std::runtime_error with a descriptive message of the OpenCL error code.
+    void throwOnError(cl_int ret,const char* message);
 }

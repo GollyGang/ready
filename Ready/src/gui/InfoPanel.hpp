@@ -31,7 +31,7 @@ class HtmlInfo;
 // readybase:
 class AbstractRD;
 
-// this panel allows the user to change the parameters of an RD system
+/// This panel allows the user to change the parameters of an RD system.
 // (it doesn't change the ImageRD itself though, MyFrame does that)
 class InfoPanel : public wxPanel
 {

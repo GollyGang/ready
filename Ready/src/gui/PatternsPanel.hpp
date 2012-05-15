@@ -29,7 +29,7 @@
 // local:
 class MyFrame;
 
-// our patterns panel lets users click on pattern files
+/// The patterns panel lets users click on pattern files.
 class PatternsPanel : public wxPanel
 {
     public:

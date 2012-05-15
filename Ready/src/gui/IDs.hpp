@@ -24,7 +24,7 @@
     #include <wx/wx.h>
 #endif
 
-// IDs for the controls and the menu commands
+/// IDs for the controls and the menu commands.
 namespace ID 
 { 
     const int MAX_RECENT = 100;     // maximum files in Open Recent submenu
