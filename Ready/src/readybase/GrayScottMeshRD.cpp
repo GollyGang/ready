@@ -77,7 +77,7 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
             bval = source_b->GetValue(iCell);
             dda = 0.0f;
             ddb = 0.0f;
-            n_neighbors = this->cell_neighbors[iCell].size();
+            n_neighbors = (int)this->cell_neighbors[iCell].size();
             for(vtkIdType iNeighbor=0;iNeighbor<n_neighbors;iNeighbor++)
             {
                 neighbor = this->cell_neighbors[iCell][iNeighbor];
