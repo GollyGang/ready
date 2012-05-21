@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef __MESHRD__
+#define __MESHRD__
+
 // local:
 #include "AbstractRD.hpp"
 
@@ -52,13 +55,12 @@ class MeshRD : public AbstractRD
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
         virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
-
-        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 
-        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
+        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
 
+        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
 
         virtual int GetArenaDimensionality() const;
@@ -77,15 +79,14 @@ class MeshRD : public AbstractRD
         vtkUnstructuredGrid* buffer;           ///< temporary storage used during computation
         vtkUnstructuredGrid* starting_pattern; ///< we save the starting pattern, to allow the user to reset
 
-        struct TNeighbor { vtkIdType iNeighbor; float diffusion_coefficient; };
-        std::vector<std::vector<TNeighbor> > cell_neighbors; ///< the connectivity between cells; for each cell, what cells are its neighbors?
-
-    private:
-
-        void add_if_new(std::vector<TNeighbor>& neighbors,TNeighbor neighbor);
+        int max_neighbors;
+        int *cell_neighbor_indices;   ///< index of each neighbor of a cell
+        float *cell_neighbor_weights; ///< diffusion coefficient between each cell and a neighbor
 
     private: // deliberately not implemented, to prevent use
 
         MeshRD(MeshRD&);
         MeshRD& operator=(MeshRD&);
 };
+
+#endif

@@ -36,6 +36,8 @@
 #include "GrayScottMeshRD.hpp"
 #include "FormulaOpenCLImageRD.hpp"
 #include "FullKernelOpenCLImageRD.hpp"
+#include "FormulaOpenCLMeshRD.hpp"
+#include "FullKernelOpenCLMeshRD.hpp"
 using namespace OpenCL_utils;
 
 // local resources:
@@ -1464,10 +1466,26 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
                 else 
                     throw runtime_error("Unsupported inbuilt implementation: "+name);
             }
+            else if(type=="formula")
+            {
+                // TODO: detect if opencl is available, abort if not
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                mesh_system = s;
+            }
+            else if(type=="kernel")
+            {
+                // TODO: detect if opencl is available, abort if not
+                FullKernelOpenCLMeshRD *s = new FullKernelOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                mesh_system = s;
+            }
             else throw runtime_error("Unsupported rule type: "+type);
 
-            mesh_system->CopyFromMesh(ugrid);
             mesh_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
+            mesh_system->CopyFromMesh(ugrid);
             // render settings
             this->InitializeDefaultRenderSettings();
             vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");

@@ -15,8 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#ifndef __UTILS_HPP__
-#define __UTILS_HPP__
+#ifndef __UTILS__
+#define __UTILS__
 
 // STL:
 #include <string>

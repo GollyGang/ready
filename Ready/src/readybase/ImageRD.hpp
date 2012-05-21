@@ -51,16 +51,15 @@ class ImageRD : public AbstractRD
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
         virtual void CopyFromImage(vtkImageData* im);
-
-        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
+
+        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
 
         virtual std::string GetFileExtension() const { return ImageRD::GetFileExtensionStatic(); }
         static std::string GetFileExtensionStatic() { return "vti"; }
 
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
-
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
 
     protected:

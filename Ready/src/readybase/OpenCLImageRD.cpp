@@ -35,22 +35,6 @@ using namespace std;
 
 // ----------------------------------------------------------------------------------------------------------------
 
-OpenCLImageRD::OpenCLImageRD()
-{
-    this->iCurrentBuffer = 0;
-}
-
-// ----------------------------------------------------------------------------------------------------------------
-
-OpenCLImageRD::~OpenCLImageRD()
-{
-    for(int io=0;io<2;io++)
-        for(int i=0;i<(int)this->buffers[io].size();i++)
-            clReleaseMemObject(this->buffers[io][i]);
-}
-
-// ----------------------------------------------------------------------------------------------------------------
-
 void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
@@ -111,7 +95,7 @@ void OpenCLImageRD::CreateOpenCLBuffers()
         for(int ic=0;ic<NC;ic++)
         {
             this->buffers[io][ic] = clCreateBuffer(this->context, CL_MEM_READ_WRITE, MEM_SIZE, NULL, &ret);
-            throwOnError(ret,"OpenCLImageRD::CreateBuffers : buffer creation failed: ");
+            throwOnError(ret,"OpenCLImageRD::CreateOpenCLBuffers : buffer creation failed: ");
         }
     }
 }
@@ -127,40 +111,7 @@ void OpenCLImageRD::WriteToOpenCLBuffers()
     {
         float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
         cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLImageRD::WriteToBuffers : buffer writing failed: ");
-    }
-}
-
-// ----------------------------------------------------------------------------------------------------------------
-
-void OpenCLImageRD::TestFormula(std::string formula)
-{
-    this->need_reload_context = true;
-    this->ReloadContextIfNeeded();
-
-    string kernel_source = this->AssembleKernelSourceFromFormula(formula);
-
-    cl_int ret;
-
-    // create the program
-    const char *source = kernel_source.c_str();
-    size_t source_size = kernel_source.length();
-    cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
-    throwOnError(ret,"OpenCLImageRD::TestProgram : Failed to create program with source: ");
-
-    // build the program
-    ret = clBuildProgram(program,1,&this->device_id,NULL,NULL,NULL);
-    if(ret != CL_SUCCESS)
-    {
-        const int MAX_BUILD_LOG = 10000;
-        char build_log[MAX_BUILD_LOG];
-        size_t build_log_length;
-        cl_int ret2 = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
-        throwOnError(ret2,"OpenCLImageRD::TestProgram : retrieving program build log failed: ");
-        { ofstream out("kernel.txt"); out << kernel_source; }
-        ostringstream oss;
-        oss << "OpenCLImageRD::TestProgram : build failed: (kernel saved as kernel.txt)\n\n" << build_log;
-        throwOnError(ret,oss.str().c_str());
+        throwOnError(ret,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
     }
 }
 
@@ -193,7 +144,7 @@ void OpenCLImageRD::BlankImage()
 void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc)
 {
     if(x&(x-1) || y&(y-1) || z&(z-1))
-        throw runtime_error("OpenCLImageRD::Allocate : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
+        throw runtime_error("OpenCLImageRD::AllocateImages : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
     ImageRD::AllocateImages(x,y,z,nc);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
@@ -221,22 +172,36 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
             {
                 // a_in, b_in, ... a_out, b_out ...
                 ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[iBuffer][ic]);
-                throwOnError(ret,"OpenCLImageRD::Update : clSetKernelArg failed: ");
+                throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
             }
         }
         ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, NULL, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLImageRD::Update : clEnqueueNDRangeKernel failed: ");
+        throwOnError(ret,"OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed: ");
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
 
+    this->ReadFromOpenCLBuffers();
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::ReadFromOpenCLBuffers()
+{
     // read from opencl buffers into our image
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
         float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLImageRD::Update : buffer reading failed: ");
+        throwOnError(ret,"OpenCLImageRD::ReadFromOpenCLBuffers : buffer reading failed: ");
     }
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::TestFormula(std::string program_string)
+{
+    this->TestKernel(this->AssembleKernelSourceFromFormula(program_string));
 }
 
 // ----------------------------------------------------------------------------------------------------------------

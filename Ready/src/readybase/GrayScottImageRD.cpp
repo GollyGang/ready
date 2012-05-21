@@ -43,7 +43,7 @@ GrayScottImageRD::GrayScottImageRD()
 
 void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc)
 {
-    if(nc!=2) throw runtime_error("GrayScottImageRD::Allocate : this implementation is for 2 chemicals only"); 
+    if(nc!=2) throw runtime_error("GrayScottImageRD::AllocateImages : this implementation is for 2 chemicals only"); 
     ImageRD::AllocateImages(x,y,z,2);
     // also allocate our buffer images
     this->DeleteBuffers();

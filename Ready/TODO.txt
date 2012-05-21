@@ -11,11 +11,11 @@ UI annoyances:
 
 before 0.3 release:
 
-- implement FormulaOpenCLMeshRD and FullKernelOpenCLMeshRD
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
+  (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
   extended usage (not releasing something? or bug in driver - get on other platforms?)
-    - to reproduce: repeatedly load vti files
+    - to reproduce: repeatedly load OpenCL vti files
 
 - document MeshRD changes, add/improve new examples
 - update code documentation

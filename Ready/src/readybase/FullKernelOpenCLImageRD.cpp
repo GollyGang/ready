@@ -26,6 +26,8 @@ using namespace std;
 // VTK:
 #include <vtkXMLUtilities.h>
 
+// ---------------------------------------------------------------------------------------------------------
+
 FullKernelOpenCLImageRD::FullKernelOpenCLImageRD()
 {
     this->SetRuleName("Full kernel example");
@@ -35,10 +37,14 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD()
     this->block_size[2]=1;
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }
+
+// ---------------------------------------------------------------------------------------------------------
 
 void FullKernelOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
@@ -63,6 +69,8 @@ void FullKernelOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &war
     this->SetFormula(formula); // will set but won't throw
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML();
@@ -81,3 +89,5 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML() const
 
     return rd;
 }
+
+// ---------------------------------------------------------------------------------------------------------

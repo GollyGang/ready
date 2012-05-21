@@ -22,6 +22,8 @@ using namespace OpenCL_utils;
 
 // STL:
 #include <stdexcept>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 // ---------------------------------------------------------------------------
@@ -41,12 +43,18 @@ OpenCL_MixIn::OpenCL_MixIn()
 
     if(LinkOpenCL()!= CL_SUCCESS)
         throw runtime_error("Failed to load dynamic library for OpenCL");
+
+    this->iCurrentBuffer = 0;
 }
 
 // ---------------------------------------------------------------------------
 
 OpenCL_MixIn::~OpenCL_MixIn()
 {
+    for(int io=0;io<2;io++)
+        for(int i=0;i<(int)this->buffers[io].size();i++)
+            clReleaseMemObject(this->buffers[io][i]);
+
     clReleaseContext(this->context);
     clReleaseCommandQueue(this->command_queue);
     clReleaseKernel(this->kernel);
@@ -133,3 +141,36 @@ void OpenCL_MixIn::ReloadContextIfNeeded()
 
     this->need_reload_context = false;
 }
+
+// -------------------------------------------------------------------------
+
+void OpenCL_MixIn::TestKernel(std::string kernel_source)
+{
+    this->need_reload_context = true;
+    this->ReloadContextIfNeeded();
+
+    cl_int ret;
+
+    // create the program
+    const char *source = kernel_source.c_str();
+    size_t source_size = kernel_source.length();
+    cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
+    throwOnError(ret,"OpenCL_MixIn::TestKernel : Failed to create program with source: ");
+
+    // build the program
+    ret = clBuildProgram(program,1,&this->device_id,NULL,NULL,NULL);
+    if(ret != CL_SUCCESS)
+    {
+        const int MAX_BUILD_LOG = 10000;
+        char build_log[MAX_BUILD_LOG];
+        size_t build_log_length;
+        cl_int ret2 = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
+        throwOnError(ret2,"OpenCL_MixIn::TestKernel : retrieving program build log failed: ");
+        { ofstream out("kernel.txt"); out << kernel_source; }
+        ostringstream oss;
+        oss << "OpenCL_MixIn::TestKernel : build failed: (kernel saved as kernel.txt)\n\n" << build_log;
+        throwOnError(ret,oss.str().c_str());
+    }
+}
+
+// -----------------------------------------------------------------------

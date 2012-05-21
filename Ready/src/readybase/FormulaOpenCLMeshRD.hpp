@@ -30,8 +30,6 @@ class FormulaOpenCLMeshRD : public OpenCLMeshRD
 
         virtual std::string GetRuleType() const { return "formula"; }
 
-        virtual int GetBlockSizeX() const { return 4; } // we use float4 in a 4x1x1 block
-
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel

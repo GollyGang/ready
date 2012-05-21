@@ -15,8 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-#ifndef __OPENCL_RD__
-#define __OPENCL_RD__
+#ifndef __OPENCLIMAGERD__
+#define __OPENCLIMAGERD__
 
 // local:
 #include "ImageRD.hpp"
@@ -27,15 +27,12 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 {
     public:
 
-        OpenCLImageRD();
-        virtual ~OpenCLImageRD();
-
         virtual bool HasEditableFormula() const { return true; }
-
-        virtual void TestFormula(std::string s);
 
 		virtual void GenerateInitialPattern();
 		virtual void BlankImage();
+
+        virtual void TestFormula(std::string program_string);
 		
     protected:
 
@@ -45,19 +42,11 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual void InternalUpdate(int n_steps);
 
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
+        virtual void ReloadKernelIfNeeded();
 
-        void ReloadKernelIfNeeded();
-
-        void CreateOpenCLBuffers();
-        void WriteToOpenCLBuffers();
-
-    protected:
-
-        std::string kernel_source;
-
-        std::vector<cl_mem> buffers[2];
-        int iCurrentBuffer;
+        virtual void CreateOpenCLBuffers();
+        virtual void WriteToOpenCLBuffers();
+        virtual void ReadFromOpenCLBuffers();
 };
 
 #endif

@@ -18,7 +18,6 @@
 // STL:
 #include <string>
 #include <vector>
-using namespace std;
 
 // VTK:
 #include <vtkSmartPointer.h>
@@ -50,7 +49,7 @@ class Overlay : public XML_Object
         int GetTargetChemical() const { return this->iTargetChemical; }
 
         /// given a vector of values (one for each chemical) at a location in a system, returns the new value
-        float Apply(vector<float> vals,AbstractRD* system,float x,float y,float z) const;
+        float Apply(std::vector<float> vals,AbstractRD* system,float x,float y,float z) const;
 
     protected:
     
