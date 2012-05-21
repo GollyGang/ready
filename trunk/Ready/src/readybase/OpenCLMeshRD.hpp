@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef __OPENCLMESHRD__
+#define __OPENCLMESHRD__
+
 // local:
 #include "MeshRD.hpp"
 #include "OpenCL_MixIn.hpp"
@@ -24,11 +27,9 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
 {
     public:
 
-        virtual std::string GetRuleType() const { return "formula"; }
-
         virtual bool HasEditableFormula() const { return true; }
 
-        virtual void TestFormula(std::string s);
+        virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel
         virtual void AddParameter(const std::string& name,float val);
@@ -36,4 +37,26 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         virtual void DeleteAllParameters();
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
+
+		virtual void GenerateInitialPattern();
+		virtual void BlankImage();
+
+        virtual void TestFormula(std::string program_string);
+
+    protected:
+
+        virtual void InternalUpdate(int n_steps);
+
+        virtual void ReloadKernelIfNeeded();
+
+        virtual void CreateOpenCLBuffers();
+        virtual void WriteToOpenCLBuffers();
+        virtual void ReadFromOpenCLBuffers();
+
+    private:
+
+        cl_mem clBuffer_cell_neighbor_indices;
+        cl_mem clBuffer_cell_neighbor_weights;
 };
+
+#endif

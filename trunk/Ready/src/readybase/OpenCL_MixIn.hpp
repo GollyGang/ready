@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef __OPENCLMIXIN__
+#define __OPENCLMIXIN__
+
 // OpenCL:
 #ifdef __APPLE__
     // OpenCL is linked at start up time on Mac OS 10.6+
@@ -43,7 +46,17 @@ class OpenCL_MixIn
 
     protected:
 
+        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
+
         void ReloadContextIfNeeded();
+        virtual void ReloadKernelIfNeeded() =0;
+
+        virtual void CreateOpenCLBuffers() =0;
+        virtual void WriteToOpenCLBuffers() =0;
+        virtual void ReadFromOpenCLBuffers() =0;
+
+        /// Test a kernel string for errors on the current device.
+        void TestKernel(std::string s);
 
     protected:
 
@@ -57,7 +70,14 @@ class OpenCL_MixIn
 
         bool need_reload_context;
 
+        std::vector<cl_mem> buffers[2];
+        int iCurrentBuffer;
+
+        std::string kernel_source;
+
     private:
 
         int iPlatform,iDevice;
 };
+
+#endif

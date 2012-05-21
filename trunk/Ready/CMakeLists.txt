@@ -98,6 +98,8 @@ set( PATTERN_FILES
   conway_life.vti 
   bays_3D.vti
   sphere.vtu
+  sphere_formula.vtu
+  sphere_kernel.vtu
   cow.vtu
   tetramesh.vtu
   munafo-uskate.vti

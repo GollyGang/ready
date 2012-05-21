@@ -85,12 +85,17 @@ MeshRD::MeshRD()
     this->starting_pattern = vtkUnstructuredGrid::New();
     this->mesh = vtkUnstructuredGrid::New();
     this->buffer = vtkUnstructuredGrid::New();
+    this->cell_neighbor_indices = NULL;
+    this->cell_neighbor_weights = NULL;
 }
 
 // ---------------------------------------------------------------------
 
 MeshRD::~MeshRD()
 {
+    delete []this->cell_neighbor_indices;
+    delete []this->cell_neighbor_weights;
+
     this->mesh->Delete();
     this->buffer->Delete();
     this->starting_pattern->Delete();
@@ -233,6 +238,7 @@ float MeshRD::GetZ() const
 void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->mesh->DeepCopy(mesh2);
+    this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
 
     // DEBUG: make a tetrahedral mesh by delaunay tetrahedralization on a random point cloud
     if(0)
@@ -422,7 +428,9 @@ void MeshRD::RestoreStartingPattern()
 
 // ---------------------------------------------------------------------
 
-void MeshRD::add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
+struct TNeighbor { vtkIdType iNeighbor; float diffusion_coefficient; };
+
+void add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
 {
     for(vector<TNeighbor>::const_iterator it=neighbors.begin();it!=neighbors.end();it++)
         if(it->iNeighbor==neighbor.iNeighbor)
@@ -444,11 +452,12 @@ void MeshRD::ComputeCellNeighbors()
     if(diffusion_type==BOUNDARY_SIZE && neighborhood_type!=CELL_NEIGHBORS)
         throw runtime_error("MeshRD::ComputeCellNeighbors : BOUNDARY_SIZE diffusion only works with CELL_NEIGHBORS neighborhood");
 
-    this->cell_neighbors.clear();
     vtkSmartPointer<vtkIdList> ptIds = vtkSmartPointer<vtkIdList>::New();
     vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
     TNeighbor nbor;
 
+    vector<vector<TNeighbor> > cell_neighbors; // the connectivity between cells; for each cell, what cells are its neighbors?
+    this->max_neighbors = 0;
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
         vector<TNeighbor> neighbors;
@@ -542,9 +551,31 @@ void MeshRD::ComputeCellNeighbors()
         for(int iN=0;iN<(int)neighbors.size();iN++)
             neighbors[iN].diffusion_coefficient /= coeff_sum;
         // store this list of neighbors
-        this->cell_neighbors.push_back(neighbors);
+        cell_neighbors.push_back(neighbors);
+        if(neighbors.size()>this->max_neighbors)
+            this->max_neighbors = (int)neighbors.size();
     }
     // N.B. we don't intend to support cells of mixed dimensionality in one mesh
+
+    // copy data to plain arrays
+    this->cell_neighbor_indices = new int[this->mesh->GetNumberOfCells()*this->max_neighbors];
+    this->cell_neighbor_weights = new float[this->mesh->GetNumberOfCells()*this->max_neighbors];
+    for(int i=0;i<this->mesh->GetNumberOfCells();i++)
+    {
+        for(int j=0;j<(int)cell_neighbors[i].size();j++)
+        {
+            int k = i*this->max_neighbors + j;
+            this->cell_neighbor_indices[k] = cell_neighbors[i][j].iNeighbor;
+            this->cell_neighbor_weights[k] = cell_neighbors[i][j].diffusion_coefficient;
+        }
+        // fill any remaining slots with iCell,0.0
+        for(int j=(int)cell_neighbors[i].size();j<max_neighbors;j++)
+        {
+            int k = i*this->max_neighbors + j;
+            this->cell_neighbor_indices[k] = i;
+            this->cell_neighbor_weights[k] = 0.0f;
+        }
+    }
 }
 
 // ---------------------------------------------------------------------

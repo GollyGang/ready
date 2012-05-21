@@ -3,10 +3,10 @@
   <RD format_version="1">
     
     <description>
-        Gray-Scott on the surface of a sphere.
+        Gray-Scott on the surface of a sphere. This version uses our full-kernel OpenCL implementation.
     </description>
 
-    <rule type="inbuilt" name="Gray-Scott">
+    <rule type="kernel" name="Test">
         
       <param name="timestep"> 1.0    </param>
       <param name="D_a">      0.082  </param>
@@ -14,6 +14,49 @@
       <param name="k">        0.0625 </param>
       <param name="F">        0.035  </param>
 
+      <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float* a_in,__global float* b_in,
+                                 __global float* a_out,__global float* b_out,
+                                 __global int* neighbor_indices,
+                                 __global float* neighbor_weights,
+                                 const int max_neighbors) 
+        {
+            // parameters:
+            const float timestep = 1.0f;
+            const float D_a = 0.082f;
+            const float D_b = 0.041f;
+            const float k = 0.0625f;
+            const float F = 0.035f;
+            
+            const int x = get_global_id(0);
+            float aval = a_in[x];
+            float bval = b_in[x];
+            // compute the laplacians
+            float laplacian_a = 0.0f;
+            float laplacian_b = 0.0f;
+            int offset = x * max_neighbors;
+            for(int i=0;i &lt; max_neighbors;i++)
+            {
+                laplacian_a += a_in[neighbor_indices[offset+i]] * neighbor_weights[offset+i];
+                laplacian_b += b_in[neighbor_indices[offset+i]] * neighbor_weights[offset+i];
+            }
+            laplacian_a -= aval;
+            laplacian_b -= bval;
+            // scale the Laplacian to be more similar to the 2D square grid version, so the same parameters work
+            laplacian_a *= 4.0f;
+            laplacian_b *= 4.0f;
+            // avoid denormals
+            laplacian_a += 1e-6f;
+            laplacian_b += 1e-6f;
+            // Gray-Scott update step:
+            float delta_a = D_a * laplacian_a - aval*bval*bval + F*(1-aval);
+            float delta_b = D_b * laplacian_b + aval*bval*bval - (F+k)*bval;
+            // apply the step:
+            a_out[x] = aval + timestep * delta_a;
+            b_out[x] = bval + timestep * delta_b;
+        }
+      </kernel>
+      
     </rule>
     
     <initial_pattern_generator apply_when_loading="true">

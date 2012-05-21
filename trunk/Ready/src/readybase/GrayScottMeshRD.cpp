@@ -51,8 +51,8 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
     vtkFloatArray *source_a,*source_b;
     vtkFloatArray *target_a,*target_b;
     float dda,ddb,aval,bval,da,db;
-    int n_neighbors;
-    TNeighbor neighbor;
+    int neighbor_index;
+    float diffusion_coefficient;
 
     for(int iStep=0;iStep<n_steps;iStep++)
     {
@@ -70,19 +70,20 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
             target_a = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(0).c_str()) );
             target_b = vtkFloatArray::SafeDownCast( this->buffer->GetCellData()->GetArray(GetChemicalName(1).c_str()) );
         }
-        for(vtkIdType iCell=0;iCell<(int)this->cell_neighbors.size();iCell++)
+        for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
         {
             // compute the laplacian
             aval = source_a->GetValue(iCell);
             bval = source_b->GetValue(iCell);
             dda = 0.0f;
             ddb = 0.0f;
-            n_neighbors = (int)this->cell_neighbors[iCell].size();
-            for(vtkIdType iNeighbor=0;iNeighbor<n_neighbors;iNeighbor++)
+            for(int iNeighbor=0;iNeighbor<this->max_neighbors;iNeighbor++)
             {
-                neighbor = this->cell_neighbors[iCell][iNeighbor];
-                dda += source_a->GetValue(neighbor.iNeighbor) * neighbor.diffusion_coefficient;
-                ddb += source_b->GetValue(neighbor.iNeighbor) * neighbor.diffusion_coefficient;
+                int k = iCell*this->max_neighbors + iNeighbor;
+                neighbor_index = this->cell_neighbor_indices[k];
+                diffusion_coefficient = this->cell_neighbor_weights[k];
+                dda += source_a->GetValue(neighbor_index) * diffusion_coefficient;
+                ddb += source_b->GetValue(neighbor_index) * diffusion_coefficient;
             }
             dda -= aval;
             ddb -= bval;

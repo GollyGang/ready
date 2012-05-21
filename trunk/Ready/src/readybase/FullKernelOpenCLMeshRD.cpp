@@ -26,16 +26,22 @@ using namespace std;
 // VTK:
 #include <vtkXMLUtilities.h>
 
+// ---------------------------------------------------------------------------------------------------------
+
 FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD()
 {
     this->SetRuleName("Full kernel example");
-    this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");
+    this->SetFormula("__kernel void rd_compute() {}");
 }
+
+// ---------------------------------------------------------------------------------------------------------
 
 string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }
+
+// ---------------------------------------------------------------------------------------------------------
 
 void FullKernelOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
 {
@@ -57,6 +63,8 @@ void FullKernelOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn
     this->SetFormula(formula); // will set but won't throw
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> rd = OpenCLMeshRD::GetAsXML();
@@ -75,3 +83,5 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML() const
 
     return rd;
 }
+
+// ---------------------------------------------------------------------------------------------------------
