@@ -119,56 +119,77 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00015"></a>00015 <span class="comment">    You should have received a copy of the GNU General Public License</span>
 <a name="l00016"></a>00016 <span class="comment">    along with Ready. If not, see &lt;http://www.gnu.org/licenses/&gt;.         */</span>
 <a name="l00017"></a>00017 
-<a name="l00018"></a>00018 <span class="comment">// OpenCL:</span>
-<a name="l00019"></a>00019 <span class="preprocessor">#ifdef __APPLE__</span>
-<a name="l00020"></a>00020 <span class="preprocessor"></span>    <span class="comment">// OpenCL is linked at start up time on Mac OS 10.6+</span>
-<a name="l00021"></a>00021 <span class="preprocessor">    #include &lt;OpenCL/opencl.h&gt;</span>
-<a name="l00022"></a>00022 <span class="preprocessor">#else</span>
-<a name="l00023"></a>00023 <span class="preprocessor"></span>    <span class="comment">// OpenCL is loaded dynamically on Windows and Linux</span>
-<a name="l00024"></a>00024 <span class="preprocessor">    #include &quot;<a class="code" href="OpenCL__Dyn__Load_8h.html">OpenCL_Dyn_Load.h</a>&quot;</span>
-<a name="l00025"></a>00025 <span class="preprocessor">#endif</span>
-<a name="l00026"></a>00026 <span class="preprocessor"></span>
-<a name="l00027"></a>00027 <span class="comment">// STL:</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00029"></a>00029 <span class="preprocessor">#include &lt;string&gt;</span>
-<a name="l00030"></a>00030 
-<a name="l00032"></a><a class="code" href="classOpenCL__MixIn.html">00032</a> <span class="keyword">class </span><a class="code" href="classOpenCL__MixIn.html" title="OpenCL functionality, for adding to those implementations that use it.">OpenCL_MixIn</a>
-<a name="l00033"></a>00033 {
-<a name="l00034"></a>00034     <span class="keyword">public</span>:
-<a name="l00035"></a>00035 
-<a name="l00036"></a>00036         <a class="code" href="classOpenCL__MixIn.html#aafa2fbab3e4863eafe5bc028405b2041">OpenCL_MixIn</a>();
-<a name="l00037"></a>00037         <span class="keyword">virtual</span> <a class="code" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">~OpenCL_MixIn</a>();
-<a name="l00038"></a>00038     
-<a name="l00039"></a>00039         <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">SetPlatform</a>(<span class="keywordtype">int</span> i);
-<a name="l00040"></a>00040         <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">SetDevice</a>(<span class="keywordtype">int</span> i);
-<a name="l00041"></a>00041         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a4d05c1a685daf20e6e7d65b5e5f8aa5c">GetPlatform</a>() <span class="keyword">const</span>;
-<a name="l00042"></a>00042         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#ab3835f8b807cf6ef62093010d2f25374">GetDevice</a>() <span class="keyword">const</span>;
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044     <span class="keyword">protected</span>:
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046         <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">ReloadContextIfNeeded</a>();
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048     <span class="keyword">protected</span>:
-<a name="l00049"></a>00049 
-<a name="l00050"></a><a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">00050</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#a96a7d9b65e8319e2f8c751455ae92ec8">cl_context</a> <a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a>;
-<a name="l00051"></a><a class="code" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">00051</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> <a class="code" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">device_id</a>;
-<a name="l00052"></a><a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">00052</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#ad555869572d7067f86762cd9e032cf2b">cl_kernel</a> <a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>;
-<a name="l00053"></a><a class="code" href="classOpenCL__MixIn.html#a88fd7f9a2535f8435a5dbc01e44d48cd">00053</a>         std::string <a class="code" href="classOpenCL__MixIn.html#a88fd7f9a2535f8435a5dbc01e44d48cd">kernel_function_name</a>;
-<a name="l00054"></a><a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">00054</a>         <span class="keywordtype">size_t</span> <a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a>[3];
-<a name="l00055"></a>00055 
-<a name="l00056"></a><a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">00056</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#ac0eceefed5ddf03f817f9c9a20fdc616">cl_command_queue</a> <a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>;
-<a name="l00057"></a>00057 
-<a name="l00058"></a><a class="code" href="classOpenCL__MixIn.html#ad8b0dffce6141a1315487371557752d6">00058</a>         <span class="keywordtype">bool</span> <a class="code" href="classOpenCL__MixIn.html#ad8b0dffce6141a1315487371557752d6">need_reload_context</a>;
-<a name="l00059"></a>00059 
-<a name="l00060"></a>00060     <span class="keyword">private</span>:
-<a name="l00061"></a>00061 
-<a name="l00062"></a><a class="code" href="classOpenCL__MixIn.html#a8536c05ae194417bb816744e1a042b30">00062</a>         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a8536c05ae194417bb816744e1a042b30">iPlatform</a>,<a class="code" href="classOpenCL__MixIn.html#a48fd5974448a51dc6787e722669307af">iDevice</a>;
-<a name="l00063"></a>00063 };
+<a name="l00018"></a>00018 <span class="preprocessor">#ifndef __OPENCLMIXIN__</span>
+<a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define __OPENCLMIXIN__</span>
+<a name="l00020"></a>00020 <span class="preprocessor"></span>
+<a name="l00021"></a>00021 <span class="comment">// OpenCL:</span>
+<a name="l00022"></a>00022 <span class="preprocessor">#ifdef __APPLE__</span>
+<a name="l00023"></a>00023 <span class="preprocessor"></span>    <span class="comment">// OpenCL is linked at start up time on Mac OS 10.6+</span>
+<a name="l00024"></a>00024 <span class="preprocessor">    #include &lt;OpenCL/opencl.h&gt;</span>
+<a name="l00025"></a>00025 <span class="preprocessor">#else</span>
+<a name="l00026"></a>00026 <span class="preprocessor"></span>    <span class="comment">// OpenCL is loaded dynamically on Windows and Linux</span>
+<a name="l00027"></a>00027 <span class="preprocessor">    #include &quot;<a class="code" href="OpenCL__Dyn__Load_8h.html">OpenCL_Dyn_Load.h</a>&quot;</span>
+<a name="l00028"></a>00028 <span class="preprocessor">#endif</span>
+<a name="l00029"></a>00029 <span class="preprocessor"></span>
+<a name="l00030"></a>00030 <span class="comment">// STL:</span>
+<a name="l00031"></a>00031 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00032"></a>00032 <span class="preprocessor">#include &lt;string&gt;</span>
+<a name="l00033"></a>00033 <span class="comment"></span>
+<a name="l00034"></a>00034 <span class="comment">/// OpenCL functionality, for adding to those implementations that use it.</span>
+<a name="l00035"></a><a class="code" href="classOpenCL__MixIn.html">00035</a> <span class="comment"></span><span class="keyword">class </span><a class="code" href="classOpenCL__MixIn.html" title="OpenCL functionality, for adding to those implementations that use it.">OpenCL_MixIn</a>
+<a name="l00036"></a>00036 {
+<a name="l00037"></a>00037     <span class="keyword">public</span>:
+<a name="l00038"></a>00038 
+<a name="l00039"></a>00039         <a class="code" href="classOpenCL__MixIn.html#aafa2fbab3e4863eafe5bc028405b2041">OpenCL_MixIn</a>();
+<a name="l00040"></a>00040         <span class="keyword">virtual</span> <a class="code" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">~OpenCL_MixIn</a>();
+<a name="l00041"></a>00041     
+<a name="l00042"></a>00042         <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">SetPlatform</a>(<span class="keywordtype">int</span> i);
+<a name="l00043"></a>00043         <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">SetDevice</a>(<span class="keywordtype">int</span> i);
+<a name="l00044"></a>00044         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a4d05c1a685daf20e6e7d65b5e5f8aa5c">GetPlatform</a>() <span class="keyword">const</span>;
+<a name="l00045"></a>00045         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#ab3835f8b807cf6ef62093010d2f25374">GetDevice</a>() <span class="keyword">const</span>;
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047     <span class="keyword">protected</span>:
+<a name="l00048"></a>00048 
+<a name="l00049"></a>00049         <span class="keyword">virtual</span> std::string <a class="code" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">AssembleKernelSourceFromFormula</a>(std::string formula) <span class="keyword">const</span> =0;
+<a name="l00050"></a>00050 
+<a name="l00051"></a>00051         <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">ReloadContextIfNeeded</a>();
+<a name="l00052"></a>00052         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011">ReloadKernelIfNeeded</a>() =0;
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76">CreateOpenCLBuffers</a>() =0;
+<a name="l00055"></a>00055         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0">WriteToOpenCLBuffers</a>() =0;
+<a name="l00056"></a>00056         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0">ReadFromOpenCLBuffers</a>() =0;
+<a name="l00057"></a>00057 <span class="comment"></span>
+<a name="l00058"></a>00058 <span class="comment">        /// Test a kernel string for errors on the current device.</span>
+<a name="l00059"></a>00059 <span class="comment"></span>        <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870" title="Test a kernel string for errors on the current device.">TestKernel</a>(std::string s);
+<a name="l00060"></a>00060 
+<a name="l00061"></a>00061     <span class="keyword">protected</span>:
+<a name="l00062"></a>00062 
+<a name="l00063"></a><a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">00063</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#a96a7d9b65e8319e2f8c751455ae92ec8">cl_context</a> <a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a>;
+<a name="l00064"></a><a class="code" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">00064</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> <a class="code" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">device_id</a>;
+<a name="l00065"></a><a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">00065</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#ad555869572d7067f86762cd9e032cf2b">cl_kernel</a> <a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>;
+<a name="l00066"></a><a class="code" href="classOpenCL__MixIn.html#a88fd7f9a2535f8435a5dbc01e44d48cd">00066</a>         std::string <a class="code" href="classOpenCL__MixIn.html#a88fd7f9a2535f8435a5dbc01e44d48cd">kernel_function_name</a>;
+<a name="l00067"></a><a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">00067</a>         <span class="keywordtype">size_t</span> <a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a>[3];
+<a name="l00068"></a>00068 
+<a name="l00069"></a><a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">00069</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#ac0eceefed5ddf03f817f9c9a20fdc616">cl_command_queue</a> <a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>;
+<a name="l00070"></a>00070 
+<a name="l00071"></a><a class="code" href="classOpenCL__MixIn.html#ad8b0dffce6141a1315487371557752d6">00071</a>         <span class="keywordtype">bool</span> <a class="code" href="classOpenCL__MixIn.html#ad8b0dffce6141a1315487371557752d6">need_reload_context</a>;
+<a name="l00072"></a>00072 
+<a name="l00073"></a><a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">00073</a>         std::vector&lt;cl_mem&gt; <a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[2];
+<a name="l00074"></a><a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">00074</a>         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a>;
+<a name="l00075"></a>00075 
+<a name="l00076"></a><a class="code" href="classOpenCL__MixIn.html#a5f6cd25b2189785ac71885d8745ad4ce">00076</a>         std::string <a class="code" href="classOpenCL__MixIn.html#a5f6cd25b2189785ac71885d8745ad4ce">kernel_source</a>;
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078     <span class="keyword">private</span>:
+<a name="l00079"></a>00079 
+<a name="l00080"></a><a class="code" href="classOpenCL__MixIn.html#a8536c05ae194417bb816744e1a042b30">00080</a>         <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a8536c05ae194417bb816744e1a042b30">iPlatform</a>,<a class="code" href="classOpenCL__MixIn.html#a48fd5974448a51dc6787e722669307af">iDevice</a>;
+<a name="l00081"></a>00081 };
+<a name="l00082"></a>00082 
+<a name="l00083"></a>00083 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:02 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

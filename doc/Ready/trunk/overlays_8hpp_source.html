@@ -122,54 +122,57 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00018"></a>00018 <span class="comment">// STL:</span>
 <a name="l00019"></a>00019 <span class="preprocessor">#include &lt;string&gt;</span>
 <a name="l00020"></a>00020 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00021"></a>00021 <span class="keyword">using namespace </span>std;
-<a name="l00022"></a>00022 
-<a name="l00023"></a>00023 <span class="comment">// VTK:</span>
-<a name="l00024"></a>00024 <span class="preprocessor">#include &lt;vtkSmartPointer.h&gt;</span>
-<a name="l00025"></a>00025 <span class="preprocessor">#include &lt;vtkXMLDataElement.h&gt;</span>
-<a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="comment">// local:</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &quot;<a class="code" href="utils_8hpp.html">utils.hpp</a>&quot;</span>
-<a name="l00029"></a>00029 <span class="keyword">class </span><a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>;
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="comment">// internal:</span>
-<a name="l00032"></a>00032 <span class="keyword">class </span><a class="code" href="classBaseOperation.html" title="Base class for a mathematical operation to be carried out at a particular location in the RD system...">BaseOperation</a>;
-<a name="l00033"></a>00033 <span class="keyword">class </span><a class="code" href="classBaseFill.html" title="Base class for different ways of specifying values at a particular location in the RD system...">BaseFill</a>;
-<a name="l00034"></a>00034 <span class="keyword">class </span><a class="code" href="classBaseShape.html" title="Base class for different shapes that we can draw onto the RD system.">BaseShape</a>;
-<a name="l00035"></a>00035 
-<a name="l00037"></a><a class="code" href="classOverlay.html">00037</a> <span class="keyword">class </span><a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a> : <span class="keyword">public</span> <a class="code" href="classXML__Object.html" title="Abstract interface for XML objects.">XML_Object</a>
-<a name="l00038"></a>00038 {
-<a name="l00039"></a>00039     <span class="keyword">public</span>:
-<a name="l00040"></a>00040     
-<a name="l00042"></a>00042         <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(vtkXMLDataElement* node);
-<a name="l00043"></a>00043         ~<a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>();
-<a name="l00044"></a>00044             
-<a name="l00046"></a>00046         <span class="keyword">virtual</span> vtkSmartPointer&lt;vtkXMLDataElement&gt; GetAsXML() <span class="keyword">const</span>;
-<a name="l00047"></a>00047 
-<a name="l00048"></a><a class="code" href="classOverlay.html#a73f07e70aeca85d19ebd4f46cf29eaaa">00048</a>         <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classOverlay.html#a73f07e70aeca85d19ebd4f46cf29eaaa">GetTypeName</a>() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;overlay&quot;</span>; }
-<a name="l00049"></a>00049 
-<a name="l00050"></a><a class="code" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">00050</a>         <span class="keywordtype">int</span> <a class="code" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">GetTargetChemical</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> this-&gt;iTargetChemical; }
-<a name="l00051"></a>00051 
-<a name="l00053"></a>00053         <span class="keywordtype">float</span> Apply(vector&lt;float&gt; vals,<a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>* system,<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z) <span class="keyword">const</span>;
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055     <span class="keyword">protected</span>:
-<a name="l00056"></a>00056     
-<a name="l00057"></a><a class="code" href="classOverlay.html#af61ec051e76500404d5a0d04c69b373f">00057</a>         <span class="keywordtype">int</span> <a class="code" href="classOverlay.html#af61ec051e76500404d5a0d04c69b373f" title="each overlay applies to a single chemical">iTargetChemical</a>;             
-<a name="l00058"></a>00058 
-<a name="l00059"></a><a class="code" href="classOverlay.html#a89a910a1e19d5302cd01b27ed61027fc">00059</a>         <a class="code" href="classBaseOperation.html" title="Base class for a mathematical operation to be carried out at a particular location in the RD system...">BaseOperation</a> *<a class="code" href="classOverlay.html#a89a910a1e19d5302cd01b27ed61027fc" title="e.g. overwrite, add, multiply, etc.">op</a>;               
-<a name="l00060"></a><a class="code" href="classOverlay.html#aba664ec65ed5707d56949c72f92a27bb">00060</a>         <a class="code" href="classBaseFill.html" title="Base class for different ways of specifying values at a particular location in the RD system...">BaseFill</a> *<a class="code" href="classOverlay.html#aba664ec65ed5707d56949c72f92a27bb" title="e.g. constant value, white noise, named parameter, other chemical, etc.">fill</a>;                  
-<a name="l00061"></a><a class="code" href="classOverlay.html#a2e6b5163c0c5e36aa5142997566ade7d">00061</a>         std::vector&lt;BaseShape*&gt; <a class="code" href="classOverlay.html#a2e6b5163c0c5e36aa5142997566ade7d" title="e.g. rectangle, sphere, scattered shapes, etc.">shapes</a>;  
-<a name="l00062"></a>00062 
-<a name="l00063"></a>00063     <span class="keyword">private</span>:
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065         <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>();          
-<a name="l00066"></a>00066         <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(<a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>&amp;);  
-<a name="l00067"></a>00067 };
+<a name="l00021"></a>00021 
+<a name="l00022"></a>00022 <span class="comment">// VTK:</span>
+<a name="l00023"></a>00023 <span class="preprocessor">#include &lt;vtkSmartPointer.h&gt;</span>
+<a name="l00024"></a>00024 <span class="preprocessor">#include &lt;vtkXMLDataElement.h&gt;</span>
+<a name="l00025"></a>00025 
+<a name="l00026"></a>00026 <span class="comment">// local:</span>
+<a name="l00027"></a>00027 <span class="preprocessor">#include &quot;<a class="code" href="utils_8hpp.html">utils.hpp</a>&quot;</span>
+<a name="l00028"></a>00028 <span class="keyword">class </span><a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>;
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="comment">// internal:</span>
+<a name="l00031"></a>00031 <span class="keyword">class </span><a class="code" href="classBaseOperation.html" title="Base class for a mathematical operation to be carried out at a particular location in the RD system...">BaseOperation</a>;
+<a name="l00032"></a>00032 <span class="keyword">class </span><a class="code" href="classBaseFill.html" title="Base class for different ways of specifying values at a particular location in the RD system...">BaseFill</a>;
+<a name="l00033"></a>00033 <span class="keyword">class </span><a class="code" href="classBaseShape.html" title="Base class for different shapes that we can draw onto the RD system.">BaseShape</a>;
+<a name="l00034"></a>00034 <span class="comment"></span>
+<a name="l00035"></a>00035 <span class="comment">/// An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).</span>
+<a name="l00036"></a><a class="code" href="classOverlay.html">00036</a> <span class="comment"></span><span class="keyword">class </span><a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a> : <span class="keyword">public</span> <a class="code" href="classXML__Object.html" title="Abstract interface for XML objects.">XML_Object</a>
+<a name="l00037"></a>00037 {
+<a name="l00038"></a>00038     <span class="keyword">public</span>:
+<a name="l00039"></a>00039     <span class="comment"></span>
+<a name="l00040"></a>00040 <span class="comment">        /// can construct from an XML node</span>
+<a name="l00041"></a>00041 <span class="comment"></span>        <a class="code" href="classOverlay.html#ab4f509d502931bcaad03418470993d70" title="not implemented">Overlay</a>(vtkXMLDataElement* node);
+<a name="l00042"></a>00042         <a class="code" href="classOverlay.html#ad40a5e109ee4acbdec9f21d5496b7fa9">~Overlay</a>();
+<a name="l00043"></a>00043             <span class="comment"></span>
+<a name="l00044"></a>00044 <span class="comment">        /// for saving to file, get the overlay as an XML element</span>
+<a name="l00045"></a>00045 <span class="comment"></span>        <span class="keyword">virtual</span> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classOverlay.html#a724a6e655bc32c8592415a0d72899a59" title="for saving to file, get the overlay as an XML element">GetAsXML</a>() <span class="keyword">const</span>;
+<a name="l00046"></a>00046 
+<a name="l00047"></a><a class="code" href="classOverlay.html#a73f07e70aeca85d19ebd4f46cf29eaaa">00047</a>         <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classOverlay.html#a73f07e70aeca85d19ebd4f46cf29eaaa">GetTypeName</a>() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;overlay&quot;</span>; }
+<a name="l00048"></a>00048 
+<a name="l00049"></a><a class="code" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">00049</a>         <span class="keywordtype">int</span> <a class="code" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">GetTargetChemical</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> this-&gt;<a class="code" href="classOverlay.html#af61ec051e76500404d5a0d04c69b373f" title="each overlay applies to a single chemical">iTargetChemical</a>; }
+<a name="l00050"></a>00050 <span class="comment"></span>
+<a name="l00051"></a>00051 <span class="comment">        /// given a vector of values (one for each chemical) at a location in a system, returns the new value</span>
+<a name="l00052"></a>00052 <span class="comment"></span>        <span class="keywordtype">float</span> <a class="code" href="classOverlay.html#a1acb8b82e5f7b6496cc27a2f21f19803" title="given a vector of values (one for each chemical) at a location in a system, returns the new value...">Apply</a>(std::vector&lt;float&gt; vals,<a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>* system,<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z) <span class="keyword">const</span>;
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054     <span class="keyword">protected</span>:
+<a name="l00055"></a>00055     
+<a name="l00056"></a><a class="code" href="classOverlay.html#af61ec051e76500404d5a0d04c69b373f">00056</a>         <span class="keywordtype">int</span> <a class="code" href="classOverlay.html#af61ec051e76500404d5a0d04c69b373f" title="each overlay applies to a single chemical">iTargetChemical</a>;             <span class="comment">///&lt; each overlay applies to a single chemical</span>
+<a name="l00057"></a>00057 <span class="comment"></span>
+<a name="l00058"></a><a class="code" href="classOverlay.html#a89a910a1e19d5302cd01b27ed61027fc">00058</a>         <a class="code" href="classBaseOperation.html" title="Base class for a mathematical operation to be carried out at a particular location in the RD system...">BaseOperation</a> *<a class="code" href="classOverlay.html#a89a910a1e19d5302cd01b27ed61027fc" title="e.g. overwrite, add, multiply, etc.">op</a>;               <span class="comment">///&lt; e.g. overwrite, add, multiply, etc.</span>
+<a name="l00059"></a><a class="code" href="classOverlay.html#aba664ec65ed5707d56949c72f92a27bb">00059</a> <span class="comment"></span>        <a class="code" href="classBaseFill.html" title="Base class for different ways of specifying values at a particular location in the RD system...">BaseFill</a> *<a class="code" href="classOverlay.html#aba664ec65ed5707d56949c72f92a27bb" title="e.g. constant value, white noise, named parameter, other chemical, etc.">fill</a>;                  <span class="comment">///&lt; e.g. constant value, white noise, named parameter, other chemical, etc.</span>
+<a name="l00060"></a><a class="code" href="classOverlay.html#a2e6b5163c0c5e36aa5142997566ade7d">00060</a> <span class="comment"></span>        std::vector&lt;BaseShape*&gt; <a class="code" href="classOverlay.html#a2e6b5163c0c5e36aa5142997566ade7d" title="e.g. rectangle, sphere, scattered shapes, etc.">shapes</a>;  <span class="comment">///&lt; e.g. rectangle, sphere, scattered shapes, etc.</span>
+<a name="l00061"></a>00061 <span class="comment"></span>
+<a name="l00062"></a>00062     <span class="keyword">private</span>:
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064         <a class="code" href="classOverlay.html#ab4f509d502931bcaad03418470993d70" title="not implemented">Overlay</a>();          <span class="comment">///&lt; not implemented</span>
+<a name="l00065"></a>00065 <span class="comment"></span>        <a class="code" href="classOverlay.html#ab4f509d502931bcaad03418470993d70" title="not implemented">Overlay</a>(<a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>&amp;);  <span class="comment">///&lt; not implemented</span>
+<a name="l00066"></a>00066 <span class="comment"></span>};
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:02 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

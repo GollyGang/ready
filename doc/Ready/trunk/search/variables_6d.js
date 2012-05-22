@@ -8,6 +8,7 @@ var searchData=
   ['mainy',['mainy',['../prefs_8cpp.html#a8b015efaa4cb16287077ac74b60ad67a',1,'mainy():&#160;prefs.cpp'],['../prefs_8hpp.html#a8b015efaa4cb16287077ac74b60ad67a',1,'mainy():&#160;prefs.cpp']]],
   ['max_5fkeycodes',['MAX_KEYCODES',['../prefs_8cpp.html#a85c7a27ef78976422a68cf49a99bd589',1,'prefs.cpp']]],
   ['max_5fmods',['MAX_MODS',['../prefs_8cpp.html#a91ac701426603f585619c7a4be1b3f6d',1,'prefs.cpp']]],
+  ['max_5fneighbors',['max_neighbors',['../classMeshRD.html#aeefb408bac4a13de1327c578d1f7bd86',1,'MeshRD']]],
   ['max_5frecent',['MAX_RECENT',['../namespaceID.html#add26a31edd435929e305eca022a899d0',1,'ID']]],
   ['max_5ftimesteps_5fper_5frender',['MAX_TIMESTEPS_PER_RENDER',['../classMyFrame.html#a168fe8215b1cd99fad646460d601afac',1,'MyFrame']]],
   ['maxfontsize',['maxfontsize',['../prefs_8hpp.html#aac2c9b284ec614d2ba278a3ad5522840',1,'prefs.hpp']]],

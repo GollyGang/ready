@@ -2,9 +2,12 @@ var searchData=
 [
   ['c',['c',['../classCircle.html#abaac03542a55d0112b0fa670dd30338d',1,'Circle']]],
   ['canreload',['canreload',['../classHtmlView.html#a12450519cd8dce10b29e1d0e66b56f84',1,'HtmlView']]],
-  ['cell_5fneighbors',['cell_neighbors',['../classMeshRD.html#a35f9615358390380166abaec3c0eb5d4',1,'MeshRD']]],
+  ['cell_5fneighbor_5findices',['cell_neighbor_indices',['../classMeshRD.html#a3e7eed75884e6c8bcb237df5f25a1275',1,'MeshRD']]],
+  ['cell_5fneighbor_5fweights',['cell_neighbor_weights',['../classMeshRD.html#ae18bc016b672b125b350e241efd9d283',1,'MeshRD']]],
   ['change_5fprefix',['change_prefix',['../InfoPanel_8cpp.html#a28d380cadc0862ccd87175cd446fc93c',1,'InfoPanel.cpp']]],
   ['choosedir',['choosedir',['../prefs_8cpp.html#a8bf37d7016c72a6f4df10b194849371a',1,'prefs.cpp']]],
+  ['clbuffer_5fcell_5fneighbor_5findices',['clBuffer_cell_neighbor_indices',['../classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79',1,'OpenCLMeshRD']]],
+  ['clbuffer_5fcell_5fneighbor_5fweights',['clBuffer_cell_neighbor_weights',['../classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5',1,'OpenCLMeshRD']]],
   ['clbuildprogram',['clBuildProgram',['../OpenCL__Dyn__Load_8c.html#affc3163962636065253cd39f2a1b41e8',1,'clBuildProgram():&#160;OpenCL_Dyn_Load.c'],['../OpenCL__Dyn__Load_8h.html#affc3163962636065253cd39f2a1b41e8',1,'clBuildProgram():&#160;OpenCL_Dyn_Load.c']]],
   ['clcreatebuffer',['clCreateBuffer',['../OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da',1,'clCreateBuffer():&#160;OpenCL_Dyn_Load.c'],['../OpenCL__Dyn__Load_8h.html#a1c7ff86a3c27f18a1234273412c783da',1,'clCreateBuffer():&#160;OpenCL_Dyn_Load.c']]],
   ['clcreatecommandqueue',['clCreateCommandQueue',['../OpenCL__Dyn__Load_8c.html#af1cf33961a134ecf53e20a200dae9bfe',1,'clCreateCommandQueue():&#160;OpenCL_Dyn_Load.c'],['../OpenCL__Dyn__Load_8h.html#af1cf33961a134ecf53e20a200dae9bfe',1,'clCreateCommandQueue():&#160;OpenCL_Dyn_Load.c']]],

@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['p1',['p1',['../classLinearGradient.html#a52061b8a5eedbc925d02fca6a45cc531',1,'LinearGradient']]],
+  ['p2',['p2',['../classLinearGradient.html#adf1a370f8c9ba5904a163d5b66aa7b7d',1,'LinearGradient']]],
   ['panel',['panel',['../classHtmlView.html#a17159a122f613e34d245a54a7923c738',1,'HtmlView::panel()'],['../classHtmlInfo.html#a537802be5db2f91a49dd0d5ef630e66f',1,'HtmlInfo::panel()']]],
   ['panename',['PaneName',['../frame_8cpp.html#adb2d02d23949d250b57d1b3e00210c70',1,'frame.cpp']]],
   ['parameter',['Parameter',['../classParameter.html',1,'Parameter'],['../classParameter.html#ac4bebcb6f564c3b250a584a9d80e4b19',1,'Parameter::Parameter()']]],
@@ -36,7 +38,7 @@ var searchData=
   ['prefspath',['prefspath',['../prefs_8cpp.html#ab9caae868f071ef53f59a17b995b45ec',1,'prefs.cpp']]],
   ['printself',['PrintSelf',['../classwxVTKRenderWindowInteractor.html#a79fca453ebf097cedf62a78deed768c6',1,'wxVTKRenderWindowInteractor']]],
   ['processkey',['ProcessKey',['../classMyFrame.html#a47a959eefdac32d85b8d3fe6b675329a',1,'MyFrame']]],
-  ['properties',['Properties',['../classProperties.html',1,'Properties'],['../classProperties.html#a142291b2488b5298a7834ad523b768f6',1,'Properties::properties()'],['../classProperties.html#ae4f2f65968a832feebb599684e104100',1,'Properties::Properties(std::string set_name)']]],
+  ['properties',['Properties',['../classProperties.html',1,'Properties'],['../classProperties.html#ae4f2f65968a832feebb599684e104100',1,'Properties::Properties(std::string set_name)'],['../classProperties.html#a142291b2488b5298a7834ad523b768f6',1,'Properties::properties()']]],
   ['properties_2ecpp',['Properties.cpp',['../Properties_8cpp.html',1,'']]],
   ['properties_2ehpp',['Properties.hpp',['../Properties_8hpp.html',1,'']]],
   ['property',['Property',['../classProperty.html',1,'Property'],['../classProperty.html#ae1e5fea7c1c8038d8a1b5dcd9a785559',1,'Property::Property(const std::string &amp;name, float f)'],['../classProperty.html#a957213889b434a769c444e880f5f8525',1,'Property::Property(const std::string &amp;name, int i)'],['../classProperty.html#ae08eb1c8a6d51985dbd7e3b270865b7d',1,'Property::Property(const std::string &amp;name, bool b)'],['../classProperty.html#a178f956bebcb7d33124a3dbd1b00b5c0',1,'Property::Property(const std::string &amp;name, const std::string &amp;type, float a, float b, float c)'],['../classProperty.html#af3f904a284b0d0696d62f95d46b0a0be',1,'Property::Property(const std::string &amp;name, const std::string &amp;type, const std::string &amp;c)']]],

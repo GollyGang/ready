@@ -10,12 +10,12 @@ var searchData=
   ['beep',['Beep',['../wxutils_8cpp.html#a26f50e4eb3544de269fffd2cf13ced86',1,'Beep():&#160;wxutils.cpp'],['../wxutils_8hpp.html#a26f50e4eb3544de269fffd2cf13ced86',1,'Beep():&#160;wxutils.cpp']]],
   ['biggerbutt',['biggerbutt',['../classHelpPanel.html#a75a9fa64121b70e929598c31d2a02179',1,'HelpPanel::biggerbutt()'],['../classInfoPanel.html#aa2316e4112dae724575f2fa7d17c9d1f',1,'InfoPanel::biggerbutt()']]],
   ['biggerbutton',['BiggerButton',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a8c8cafc34ab525214c1b8182284e6c10',1,'ID']]],
-  ['blankimage',['BlankImage',['../classAbstractRD.html#a15ee19303ed2801df202ac29c6ea3534',1,'AbstractRD::BlankImage()'],['../classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0',1,'ImageRD::BlankImage()'],['../classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91',1,'MeshRD::BlankImage()'],['../classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34',1,'OpenCLImageRD::BlankImage()']]],
+  ['blankimage',['BlankImage',['../classAbstractRD.html#a15ee19303ed2801df202ac29c6ea3534',1,'AbstractRD::BlankImage()'],['../classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0',1,'ImageRD::BlankImage()'],['../classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91',1,'MeshRD::BlankImage()'],['../classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34',1,'OpenCLImageRD::BlankImage()'],['../classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e',1,'OpenCLMeshRD::BlankImage()']]],
   ['block_5fsize',['block_size',['../classFullKernelOpenCLImageRD.html#ad49c0662612b8a198860d212afb75ab1',1,'FullKernelOpenCLImageRD']]],
   ['block_5fsize_5flabel',['block_size_label',['../InfoPanel_8cpp.html#a35021f1f9df3867cb007729783d3c987',1,'InfoPanel.cpp']]],
   ['buffer',['buffer',['../classMeshRD.html#a3e371590e647939854d46257743ec1bc',1,'MeshRD']]],
   ['buffer_5fimages',['buffer_images',['../classGrayScottImageRD.html#a56c534592723311d74e2b4563fef4a76',1,'GrayScottImageRD']]],
-  ['buffers',['buffers',['../classOpenCLImageRD.html#aac75bd1a6dc77cc45a5fa1d161553241',1,'OpenCLImageRD']]],
+  ['buffers',['buffers',['../classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508',1,'OpenCL_MixIn']]],
   ['buildrdsystemxml',['BuildRDSystemXML',['../classRD__XMLImageWriter.html#ae4c22ce9e1e34259668fe41d85204566',1,'RD_XMLImageWriter::BuildRDSystemXML()'],['../classRD__XMLUnstructuredGridWriter.html#a8b8d5f760dc240a3aa6573483cca0538',1,'RD_XMLUnstructuredGridWriter::BuildRDSystemXML()']]],
   ['buildtree',['BuildTree',['../classPatternsPanel.html#a77334ca07f14ac2cde43f244a3361686',1,'PatternsPanel']]]
 ];

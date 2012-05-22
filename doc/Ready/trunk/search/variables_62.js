@@ -7,5 +7,5 @@ var searchData=
   ['block_5fsize_5flabel',['block_size_label',['../InfoPanel_8cpp.html#a35021f1f9df3867cb007729783d3c987',1,'InfoPanel.cpp']]],
   ['buffer',['buffer',['../classMeshRD.html#a3e371590e647939854d46257743ec1bc',1,'MeshRD']]],
   ['buffer_5fimages',['buffer_images',['../classGrayScottImageRD.html#a56c534592723311d74e2b4563fef4a76',1,'GrayScottImageRD']]],
-  ['buffers',['buffers',['../classOpenCLImageRD.html#aac75bd1a6dc77cc45a5fa1d161553241',1,'OpenCLImageRD']]]
+  ['buffers',['buffers',['../classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508',1,'OpenCL_MixIn']]]
 ];

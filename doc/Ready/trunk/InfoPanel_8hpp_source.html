@@ -134,10 +134,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00030"></a>00030 
 <a name="l00031"></a>00031 <span class="comment">// readybase:</span>
 <a name="l00032"></a>00032 <span class="keyword">class </span><a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>;
-<a name="l00033"></a>00033 
-<a name="l00034"></a>00034 <span class="comment">// this panel allows the user to change the parameters of an RD system</span>
-<a name="l00035"></a>00035 <span class="comment">// (it doesn&#39;t change the ImageRD itself though, MyFrame does that)</span>
-<a name="l00036"></a><a class="code" href="classInfoPanel.html">00036</a> <span class="keyword">class </span><a class="code" href="classInfoPanel.html">InfoPanel</a> : <span class="keyword">public</span> wxPanel
+<a name="l00033"></a>00033 <span class="comment"></span>
+<a name="l00034"></a>00034 <span class="comment">/// This panel allows the user to change the parameters of an RD system.</span>
+<a name="l00035"></a>00035 <span class="comment"></span><span class="comment">// (it doesn&#39;t change the ImageRD itself though, MyFrame does that)</span>
+<a name="l00036"></a><a class="code" href="classInfoPanel.html">00036</a> <span class="keyword">class </span><a class="code" href="classInfoPanel.html" title="This panel allows the user to change the parameters of an RD system.">InfoPanel</a> : <span class="keyword">public</span> wxPanel
 <a name="l00037"></a>00037 {
 <a name="l00038"></a>00038     <span class="keyword">public</span>:
 <a name="l00039"></a>00039 
@@ -194,18 +194,19 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00090"></a>00090         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#a7b900772b8a6f4935f83c856e18e9194">ChangeFormula</a>();
 <a name="l00091"></a>00091         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#aaaf715fba80eee2f4fdd95b89946091f">ChangeDimensions</a>();
 <a name="l00092"></a>00092         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#ae7cc75469642c207eae550ea03b6af99">ChangeBlockSize</a>();
-<a name="l00093"></a>00093         
-<a name="l00094"></a>00094         <span class="comment">// event handlers</span>
-<a name="l00095"></a>00095         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#a9974cf6e1f32b7ea4732b6581c1aea1b">OnSmallerButton</a>(wxCommandEvent&amp; event);
-<a name="l00096"></a>00096         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#a014ca442e46c9e91783aab7c897078b0">OnBiggerButton</a>(wxCommandEvent&amp; event);
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098         DECLARE_EVENT_TABLE()
-<a name="l00099"></a>00099 };
+<a name="l00093"></a>00093         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#a964f1104957f2b83ce51196f31a87c0b">ChangeWrapOption</a>();
+<a name="l00094"></a>00094         
+<a name="l00095"></a>00095         <span class="comment">// event handlers</span>
+<a name="l00096"></a>00096         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#a9974cf6e1f32b7ea4732b6581c1aea1b">OnSmallerButton</a>(wxCommandEvent&amp; event);
+<a name="l00097"></a>00097         <span class="keywordtype">void</span> <a class="code" href="classInfoPanel.html#a014ca442e46c9e91783aab7c897078b0">OnBiggerButton</a>(wxCommandEvent&amp; event);
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099         DECLARE_EVENT_TABLE()
+<a name="l00100"></a>00100 };
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:02 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -146,19 +146,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad1315e99af6900fbb7fd620e4827fda3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#ad1315e99af6900fbb7fd620e4827fda3">GenerateInitialPattern</a> ()</td></tr>
 <tr class="memitem:a0e392b4ad19a659dd8f2fcc0f54c1de0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0">BlankImage</a> ()</td></tr>
 <tr class="memitem:a7f4d538f7c74d6f6ec6e70c4cc4236f4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a7f4d538f7c74d6f6ec6e70c4cc4236f4">CopyFromImage</a> (vtkImageData *im)</td></tr>
-<tr class="memitem:a39ebf217c641b7cc7afaba6887a97c9c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a39ebf217c641b7cc7afaba6887a97c9c">InitializeRenderPipeline</a> (vtkRenderer *pRenderer, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
 <tr class="memitem:aac38099aac975408531306f466b700f5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#aac38099aac975408531306f466b700f5">SaveStartingPattern</a> ()</td></tr>
 <tr class="memitem:a87da400e21de530cd83ba9aff345a57d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a87da400e21de530cd83ba9aff345a57d">RestoreStartingPattern</a> ()</td></tr>
+<tr class="memitem:a39ebf217c641b7cc7afaba6887a97c9c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a39ebf217c641b7cc7afaba6887a97c9c">InitializeRenderPipeline</a> (vtkRenderer *pRenderer, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
 <tr class="memitem:a548e75a2021513a95f307f5c6ba9b771"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a548e75a2021513a95f307f5c6ba9b771">GetFileExtension</a> () const </td></tr>
 <tr class="memitem:a5cd7d20c52b71cce60dc71c9ee488b53"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a5cd7d20c52b71cce60dc71c9ee488b53">GetAsMesh</a> (vtkPolyData *out, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings) const </td></tr>
-<tr class="memdesc:a5cd7d20c52b71cce60dc71c9ee488b53"><td class="mdescLeft">&#160;</td><td class="mdescRight">retrieve the current view as a vtkPolyData  <a href="#a5cd7d20c52b71cce60dc71c9ee488b53"></a><br/></td></tr>
+<tr class="memdesc:a5cd7d20c52b71cce60dc71c9ee488b53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 3D object as a vtkPolyData.  <a href="#a5cd7d20c52b71cce60dc71c9ee488b53"></a><br/></td></tr>
+<tr class="memitem:a1083d6cbb93bd6fc16c488bf7db2f568"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a1083d6cbb93bd6fc16c488bf7db2f568">GetAs2DImage</a> (vtkImageData *out, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings) const </td></tr>
+<tr class="memdesc:a1083d6cbb93bd6fc16c488bf7db2f568"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 2D plane as a vtkImageData.  <a href="#a1083d6cbb93bd6fc16c488bf7db2f568"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a25f0c8e1b88575fc14308b7c392757ef"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a25f0c8e1b88575fc14308b7c392757ef">GetFileExtensionStatic</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a5cbe2215bc54992c5c91b965ef376dcc"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a5cbe2215bc54992c5c91b965ef376dcc">GetArenaDimensionality</a> () const </td></tr>
-<tr class="memdesc:a5cbe2215bc54992c5c91b965ef376dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">retreive the dimensionality of the system volume, irrespective of the cells within it  <a href="#a5cbe2215bc54992c5c91b965ef376dcc"></a><br/></td></tr>
+<tr class="memdesc:a5cbe2215bc54992c5c91b965ef376dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retreive the dimensionality of the system volume, irrespective of the cells within it.  <a href="#a5cbe2215bc54992c5c91b965ef376dcc"></a><br/></td></tr>
 <tr class="memitem:a6244057215a86492e80df2039e859e7b"><td class="memItemLeft" align="right" valign="top">vtkSmartPointer&lt; vtkImageData &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a6244057215a86492e80df2039e859e7b">GetImage</a> () const </td></tr>
 <tr class="memitem:a4deec153ec3cbc34f6936c9a45688122"><td class="memItemLeft" align="right" valign="top">vtkImageData *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a4deec153ec3cbc34f6936c9a45688122">GetImage</a> (int iChemical) const </td></tr>
 <tr class="memitem:ac496af879f4ae78d25403be495de8c45"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#ac496af879f4ae78d25403be495de8c45">AllocateImages</a> (int x, int y, int z, int nc)</td></tr>
@@ -205,7 +207,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00105">105</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00106">106</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -223,7 +225,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00113">113</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00114">114</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -286,7 +288,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGrayScottImageRD.html#ac0ece4290035af9c4b04f60aaca4be0b">GrayScottImageRD</a>, and <a class="el" href="classOpenCLImageRD.html#a2b45e9256c9412d3b57b49fb87df4cf6">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00217">217</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00228">228</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -321,7 +323,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00229">229</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00240">240</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -343,7 +345,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00283">283</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00294">294</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +366,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#aa84aaabe35569bcfafd50ea8c0f36352">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00184">184</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00185">185</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +384,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00121">121</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00122">122</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -404,7 +406,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#a5236712e492efc30a0870a912a53676e">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00244">244</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00255">255</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -422,11 +424,44 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>retreive the dimensionality of the system volume, irrespective of the cells within it </p>
+<p>Retreive the dimensionality of the system volume, irrespective of the cells within it. </p>
 
 <p>Implements <a class="el" href="classAbstractRD.html#ad06725e8898ba2e16772cda74368a0ed">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00132">132</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00133">133</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1083d6cbb93bd6fc16c488bf7db2f568"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classImageRD.html#a1083d6cbb93bd6fc16c488bf7db2f568">ImageRD::GetAs2DImage</a> </td>
+          <td>(</td>
+          <td class="paramtype">vtkImageData *&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const<code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Retrieve the current 2D plane as a vtkImageData. </p>
+
+<p>Implements <a class="el" href="classAbstractRD.html#ab2a503fcd628baf0fb763ce626ecfe31">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00953">953</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -455,11 +490,11 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>retrieve the current view as a vtkPolyData </p>
+<p>Retrieve the current 3D object as a vtkPolyData. </p>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a7a5c43082919d90e393bdfd9cf2948e5">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00793">793</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00839">839</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -515,7 +550,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00172">172</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00173">173</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,7 +569,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00165">165</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00166">166</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -554,7 +589,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a89bff1670ebf193394493a4f81ec49c1">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00784">784</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00830">830</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -574,7 +609,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa569d2908a67a0946652e0b518abad52">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00144">144</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00145">145</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +629,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#abdbeb388c5d50fe586edb59266b9b3eb">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00151">151</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00152">152</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -614,7 +649,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a3e207e17ccdf980501c20b4f3153877d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00158">158</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00159">159</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -665,7 +700,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a9fba6f8368f4317934ccdbdfa185c44b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00322">322</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00333">333</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -694,7 +729,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00338">338</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00349">349</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -723,7 +758,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00431">431</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00446">446</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -752,7 +787,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00564">564</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00609">609</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -789,7 +824,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa3b511ef22685dc79c26380b6c454f8f">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00755">755</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00801">801</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -820,7 +855,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a77c2f176da53d7c5b3dbb322a8910d68">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00883">883</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00929">929</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -840,7 +875,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aec9f3320b27e8f79891ca02da04bcf7f">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00748">748</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00794">794</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -877,7 +912,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#af51917604735dca12ed3f57d51116fb5">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00763">763</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00809">809</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -918,7 +953,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00777">777</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00823">823</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -937,7 +972,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00093">93</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00094">94</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -958,7 +993,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a2e9794397c5b55bc2220392bd6b8cd57">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00770">770</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00816">816</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -979,7 +1014,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa365a78f2c1773ee94d70503d2068c87">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00295">295</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00306">306</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -997,7 +1032,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00309">309</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00320">320</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1015,7 +1050,7 @@ Private Attributes</h2></td></tr>
 
 <p>kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined </p>
 
-<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00092">92</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00093">93</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1032,7 +1067,7 @@ Private Attributes</h2></td></tr>
 
 <p>one for each chemical </p>
 
-<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00066">66</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00067">67</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1047,7 +1082,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00069">69</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00070">70</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1059,7 +1094,7 @@ Private Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:03 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

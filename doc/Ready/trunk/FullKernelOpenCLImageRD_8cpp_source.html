@@ -130,66 +130,76 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00026"></a>00026 <span class="comment">// VTK:</span>
 <a name="l00027"></a>00027 <span class="preprocessor">#include &lt;vtkXMLUtilities.h&gt;</span>
 <a name="l00028"></a>00028 
-<a name="l00029"></a><a class="code" href="classFullKernelOpenCLImageRD.html#afbbecb3df490bc998e2271c382ff3860">00029</a> <a class="code" href="classFullKernelOpenCLImageRD.html#afbbecb3df490bc998e2271c382ff3860">FullKernelOpenCLImageRD::FullKernelOpenCLImageRD</a>()
-<a name="l00030"></a>00030 {
-<a name="l00031"></a>00031     this-&gt;SetRuleName(<span class="stringliteral">&quot;Full kernel example&quot;</span>);
-<a name="l00032"></a>00032     this-&gt;SetFormula(<span class="stringliteral">&quot;__kernel void rd_compute(__global float* a_in,__global float* a_out) {}&quot;</span>);
-<a name="l00033"></a>00033     this-&gt;block_size[0]=1;
-<a name="l00034"></a>00034     this-&gt;block_size[1]=1;
-<a name="l00035"></a>00035     this-&gt;block_size[2]=1;
-<a name="l00036"></a>00036 }
-<a name="l00037"></a>00037 
-<a name="l00038"></a><a class="code" href="classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832">00038</a> <span class="keywordtype">string</span> <a class="code" href="classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832">FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula</a>(std::string formula)<span class="keyword"> const</span>
-<a name="l00039"></a>00039 <span class="keyword"></span>{
-<a name="l00040"></a>00040     <span class="keywordflow">return</span> formula; <span class="comment">// here the formula is a full OpenCL kernel</span>
-<a name="l00041"></a>00041 }
-<a name="l00042"></a>00042 
-<a name="l00043"></a><a class="code" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">00043</a> <span class="keywordtype">void</span> <a class="code" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">FullKernelOpenCLImageRD::InitializeFromXML</a>(vtkXMLDataElement *rd, <span class="keywordtype">bool</span> &amp;warn_to_update)
-<a name="l00044"></a>00044 {
-<a name="l00045"></a>00045     <a class="code" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">OpenCLImageRD::InitializeFromXML</a>(rd,warn_to_update);
+<a name="l00029"></a>00029 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00030"></a>00030 
+<a name="l00031"></a><a class="code" href="classFullKernelOpenCLImageRD.html#afbbecb3df490bc998e2271c382ff3860">00031</a> <a class="code" href="classFullKernelOpenCLImageRD.html#afbbecb3df490bc998e2271c382ff3860">FullKernelOpenCLImageRD::FullKernelOpenCLImageRD</a>()
+<a name="l00032"></a>00032 {
+<a name="l00033"></a>00033     this-&gt;SetRuleName(<span class="stringliteral">&quot;Full kernel example&quot;</span>);
+<a name="l00034"></a>00034     this-&gt;SetFormula(<span class="stringliteral">&quot;__kernel void rd_compute(__global float* a_in,__global float* a_out) {}&quot;</span>);
+<a name="l00035"></a>00035     this-&gt;block_size[0]=1;
+<a name="l00036"></a>00036     this-&gt;block_size[1]=1;
+<a name="l00037"></a>00037     this-&gt;block_size[2]=1;
+<a name="l00038"></a>00038 }
+<a name="l00039"></a>00039 
+<a name="l00040"></a>00040 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00041"></a>00041 
+<a name="l00042"></a><a class="code" href="classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832">00042</a> <span class="keywordtype">string</span> <a class="code" href="classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832">FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula</a>(std::string formula)<span class="keyword"> const</span>
+<a name="l00043"></a>00043 <span class="keyword"></span>{
+<a name="l00044"></a>00044     <span class="keywordflow">return</span> formula; <span class="comment">// here the formula is a full OpenCL kernel</span>
+<a name="l00045"></a>00045 }
 <a name="l00046"></a>00046 
-<a name="l00047"></a>00047     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
-<a name="l00048"></a>00048     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found in file&quot;</span>);
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050     <span class="comment">// kernel:</span>
-<a name="l00051"></a>00051     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_kernel = rule-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;kernel&quot;</span>);
-<a name="l00052"></a>00052     <span class="keywordflow">if</span>(!xml_kernel) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;kernel node not found in file&quot;</span>);
-<a name="l00053"></a>00053     <span class="keywordtype">string</span> formula = <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(xml_kernel-&gt;GetCharacterData());
-<a name="l00054"></a>00054     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;block_size_x&quot;</span>,this-&gt;block_size[0]);
-<a name="l00055"></a>00055     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;block_size_y&quot;</span>,this-&gt;block_size[1]);
-<a name="l00056"></a>00056     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;block_size_z&quot;</span>,this-&gt;block_size[2]);
-<a name="l00057"></a>00057 
-<a name="l00058"></a>00058     <span class="comment">// number_of_chemicals:</span>
-<a name="l00059"></a>00059     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;n_chemicals);
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061     <span class="comment">// do this last, because it requires everything else to be set up first</span>
-<a name="l00062"></a>00062     this-&gt;TestFormula(formula); <span class="comment">// will throw on error but won&#39;t set</span>
-<a name="l00063"></a>00063     this-&gt;SetFormula(formula); <span class="comment">// will set but won&#39;t throw</span>
-<a name="l00064"></a>00064 }
-<a name="l00065"></a>00065 
-<a name="l00066"></a><a class="code" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">00066</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">FullKernelOpenCLImageRD::GetAsXML</a>()<span class="keyword"> const</span>
-<a name="l00067"></a>00067 <span class="keyword"></span>{
-<a name="l00068"></a>00068     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = <a class="code" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">OpenCLImageRD::GetAsXML</a>();
-<a name="l00069"></a>00069 
-<a name="l00070"></a>00070     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
-<a name="l00071"></a>00071     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found&quot;</span>);
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073     vtkSmartPointer&lt;vtkXMLDataElement&gt; kernel = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00074"></a>00074     kernel-&gt;SetName(<span class="stringliteral">&quot;kernel&quot;</span>);
-<a name="l00075"></a>00075     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;GetNumberOfChemicals());
-<a name="l00076"></a>00076     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_x&quot;</span>,this-&gt;block_size[0]);
-<a name="l00077"></a>00077     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_y&quot;</span>,this-&gt;block_size[1]);
-<a name="l00078"></a>00078     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_z&quot;</span>,this-&gt;block_size[2]);
-<a name="l00079"></a>00079     kernel-&gt;SetCharacterData(this-&gt;GetFormula().c_str(),(<span class="keywordtype">int</span>)this-&gt;GetFormula().length());
-<a name="l00080"></a>00080     rule-&gt;AddNestedElement(kernel);
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082     <span class="keywordflow">return</span> rd;
-<a name="l00083"></a>00083 }
+<a name="l00047"></a>00047 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00048"></a>00048 
+<a name="l00049"></a><a class="code" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">00049</a> <span class="keywordtype">void</span> <a class="code" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">FullKernelOpenCLImageRD::InitializeFromXML</a>(vtkXMLDataElement *rd, <span class="keywordtype">bool</span> &amp;warn_to_update)
+<a name="l00050"></a>00050 {
+<a name="l00051"></a>00051     <a class="code" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">OpenCLImageRD::InitializeFromXML</a>(rd,warn_to_update);
+<a name="l00052"></a>00052 
+<a name="l00053"></a>00053     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
+<a name="l00054"></a>00054     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found in file&quot;</span>);
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056     <span class="comment">// kernel:</span>
+<a name="l00057"></a>00057     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_kernel = rule-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;kernel&quot;</span>);
+<a name="l00058"></a>00058     <span class="keywordflow">if</span>(!xml_kernel) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;kernel node not found in file&quot;</span>);
+<a name="l00059"></a>00059     <span class="keywordtype">string</span> formula = <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(xml_kernel-&gt;GetCharacterData());
+<a name="l00060"></a>00060     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;block_size_x&quot;</span>,this-&gt;block_size[0]);
+<a name="l00061"></a>00061     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;block_size_y&quot;</span>,this-&gt;block_size[1]);
+<a name="l00062"></a>00062     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;block_size_z&quot;</span>,this-&gt;block_size[2]);
+<a name="l00063"></a>00063 
+<a name="l00064"></a>00064     <span class="comment">// number_of_chemicals:</span>
+<a name="l00065"></a>00065     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_kernel,<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;n_chemicals);
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067     <span class="comment">// do this last, because it requires everything else to be set up first</span>
+<a name="l00068"></a>00068     this-&gt;TestFormula(formula); <span class="comment">// will throw on error but won&#39;t set</span>
+<a name="l00069"></a>00069     this-&gt;SetFormula(formula); <span class="comment">// will set but won&#39;t throw</span>
+<a name="l00070"></a>00070 }
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00073"></a>00073 
+<a name="l00074"></a><a class="code" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">00074</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">FullKernelOpenCLImageRD::GetAsXML</a>()<span class="keyword"> const</span>
+<a name="l00075"></a>00075 <span class="keyword"></span>{
+<a name="l00076"></a>00076     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = <a class="code" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">OpenCLImageRD::GetAsXML</a>();
+<a name="l00077"></a>00077 
+<a name="l00078"></a>00078     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
+<a name="l00079"></a>00079     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found&quot;</span>);
+<a name="l00080"></a>00080 
+<a name="l00081"></a>00081     vtkSmartPointer&lt;vtkXMLDataElement&gt; kernel = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00082"></a>00082     kernel-&gt;SetName(<span class="stringliteral">&quot;kernel&quot;</span>);
+<a name="l00083"></a>00083     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;GetNumberOfChemicals());
+<a name="l00084"></a>00084     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_x&quot;</span>,this-&gt;block_size[0]);
+<a name="l00085"></a>00085     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_y&quot;</span>,this-&gt;block_size[1]);
+<a name="l00086"></a>00086     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_z&quot;</span>,this-&gt;block_size[2]);
+<a name="l00087"></a>00087     kernel-&gt;SetCharacterData(this-&gt;GetFormula().c_str(),(<span class="keywordtype">int</span>)this-&gt;GetFormula().length());
+<a name="l00088"></a>00088     rule-&gt;AddNestedElement(kernel);
+<a name="l00089"></a>00089 
+<a name="l00090"></a>00090     <span class="keywordflow">return</span> rd;
+<a name="l00091"></a>00091 }
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:02 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

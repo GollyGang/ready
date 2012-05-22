@@ -1155,8 +1155,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l01051"></a>01051     extern <a class="code" href="OpenCL__Dyn__Load_8h.html#a0c717a5b41b07b795d7289d6262bb7f4">__clEnqueueWaitForEvents</a>             *<a class="code" href="OpenCL__Dyn__Load_8c.html#a134b193087aaea987eda4f4c11c3d0c0">clEnqueueWaitForEvents</a>;
 <a name="l01052"></a>01052     extern <a class="code" href="OpenCL__Dyn__Load_8h.html#af61601a69540af2628712579353cde41">__clEnqueueBarrier</a>                   *<a class="code" href="OpenCL__Dyn__Load_8c.html#a844a3b8b5736665113a77dd46b008000">clEnqueueBarrier</a>;
 <a name="l01053"></a>01053     extern <a class="code" href="OpenCL__Dyn__Load_8h.html#a3cff800c47e05b9b3f085335143b843c">__clGetExtensionFunctionAddress</a>      *<a class="code" href="OpenCL__Dyn__Load_8c.html#a49f2ec1d9a1e3554aaf8edaa5538bc67">clGetExtensionFunctionAddress</a>;
-<a name="l01054"></a>01054 
-<a name="l01061"></a>01061     <span class="comment">//extern cl_int clLibLoad();</span>
+<a name="l01054"></a>01054 <span class="comment"></span>
+<a name="l01055"></a>01055 <span class="comment">/// Loads the OpenCL library if available</span>
+<a name="l01056"></a>01056 <span class="comment">///</span>
+<a name="l01057"></a>01057 <span class="comment">/// This function must be called prior to calling anu other cl*() function</span>
+<a name="l01058"></a>01058 <span class="comment">/// @return Returns CL_DEVICE_NOT_AVAILABLE if the OpenCL Library is not found</span>
+<a name="l01059"></a>01059 <span class="comment">/// @return CL_DEVICE_NOT_AVAILABLE  if a library function is not found.</span>
+<a name="l01060"></a>01060 <span class="comment">/// @return and CL_SUCCESS if all modules are loaded succesfully.</span>
+<a name="l01061"></a>01061 <span class="comment"></span>    <span class="comment">//extern cl_int clLibLoad();</span>
 <a name="l01062"></a>01062     extern cl_int CL_API_CALL <a class="code" href="OpenCL__Dyn__Load_8c.html#ada1028462629c0bc598ad91f5996af04">clLibLoad</a>(); <span class="comment">// TJH inserted CL_API_CALL because of compile errors</span>
 <a name="l01063"></a>01063 
 <a name="l01064"></a>01064 <span class="preprocessor">#ifdef __cplusplus</span>
@@ -1168,7 +1174,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:02 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

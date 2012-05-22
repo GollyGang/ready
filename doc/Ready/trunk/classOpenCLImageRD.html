@@ -97,8 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">OpenCLImageRD Class Reference</div>  </div>
 </div><!--header-->
@@ -126,13 +125,11 @@ Inheritance diagram for OpenCLImageRD:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af0de388bd204e71bff4abbb9fad172bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#af0de388bd204e71bff4abbb9fad172bd">OpenCLImageRD</a> ()</td></tr>
-<tr class="memitem:a2fef019a1f9ca1ab1525f1edf37f2339"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a2fef019a1f9ca1ab1525f1edf37f2339">~OpenCLImageRD</a> ()</td></tr>
 <tr class="memitem:a43f497ccbec90f3f01a58b5a1de80d4d"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a43f497ccbec90f3f01a58b5a1de80d4d">HasEditableFormula</a> () const </td></tr>
 <tr class="memdesc:a43f497ccbec90f3f01a58b5a1de80d4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">inbuilt implementations cannot have their formula edited  <a href="#a43f497ccbec90f3f01a58b5a1de80d4d"></a><br/></td></tr>
-<tr class="memitem:aa53d644f68a68b3188eae94d3e309119"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#aa53d644f68a68b3188eae94d3e309119">TestFormula</a> (std::string s)</td></tr>
 <tr class="memitem:a5236712e492efc30a0870a912a53676e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a5236712e492efc30a0870a912a53676e">GenerateInitialPattern</a> ()</td></tr>
 <tr class="memitem:aaae51563604b6a0dfd32c170cdad5c34"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34">BlankImage</a> ()</td></tr>
+<tr class="memitem:a5e16eb5ca7640418eca7339634cdfb2b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a5e16eb5ca7640418eca7339634cdfb2b">TestFormula</a> (std::string program_string)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:aa84aaabe35569bcfafd50ea8c0f36352"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#aa84aaabe35569bcfafd50ea8c0f36352">CopyFromImage</a> (vtkImageData *im)</td></tr>
@@ -140,58 +137,16 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:a2b45e9256c9412d3b57b49fb87df4cf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">use to change the dimensions or the number of chemicals  <a href="#a2b45e9256c9412d3b57b49fb87df4cf6"></a><br/></td></tr>
 <tr class="memitem:a4740537884f5b8d7e544d9a0689c11a5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a4740537884f5b8d7e544d9a0689c11a5">InternalUpdate</a> (int n_steps)</td></tr>
 <tr class="memdesc:a4740537884f5b8d7e544d9a0689c11a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#a4740537884f5b8d7e544d9a0689c11a5"></a><br/></td></tr>
-<tr class="memitem:aadd648d23e482831a24f52730db8df60"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#aadd648d23e482831a24f52730db8df60">AssembleKernelSourceFromFormula</a> (std::string <a class="el" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a>) const =0</td></tr>
-<tr class="memitem:a8af8f615bc238a4493d86368d47f621a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a">ReloadKernelIfNeeded</a> ()</td></tr>
-<tr class="memitem:a4548ce92403d8765c6bd42e584df9ce2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a4548ce92403d8765c6bd42e584df9ce2">CreateOpenCLBuffers</a> ()</td></tr>
-<tr class="memitem:abcd5e979e5af088561f1601ef91669e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#abcd5e979e5af088561f1601ef91669e8">WriteToOpenCLBuffers</a> ()</td></tr>
-<tr><td colspan="2"><h2><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a8e2696fd6f1e0510f4d9206ee2286f86"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a8e2696fd6f1e0510f4d9206ee2286f86">kernel_source</a></td></tr>
-<tr class="memitem:aac75bd1a6dc77cc45a5fa1d161553241"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#aac75bd1a6dc77cc45a5fa1d161553241">buffers</a> [2]</td></tr>
-<tr class="memitem:a8cdf2c1562f281e1f7aba2f73bc204d6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a8cdf2c1562f281e1f7aba2f73bc204d6">iCurrentBuffer</a></td></tr>
+<tr class="memitem:a8af8f615bc238a4493d86368d47f621a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a">ReloadKernelIfNeeded</a> ()</td></tr>
+<tr class="memitem:a4548ce92403d8765c6bd42e584df9ce2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a4548ce92403d8765c6bd42e584df9ce2">CreateOpenCLBuffers</a> ()</td></tr>
+<tr class="memitem:abcd5e979e5af088561f1601ef91669e8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#abcd5e979e5af088561f1601ef91669e8">WriteToOpenCLBuffers</a> ()</td></tr>
+<tr class="memitem:ab0e9644914548bce785cf766e0aa0f40"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#ab0e9644914548bce785cf766e0aa0f40">ReadFromOpenCLBuffers</a> ()</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Base class for implementations that use OpenCL. </p>
 
 <p>Definition at line <a class="el" href="OpenCLImageRD_8hpp_source.html#l00026">26</a> of file <a class="el" href="OpenCLImageRD_8hpp_source.html">OpenCLImageRD.hpp</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="af0de388bd204e71bff4abbb9fad172bd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classOpenCLImageRD.html#af0de388bd204e71bff4abbb9fad172bd">OpenCLImageRD::OpenCLImageRD</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00038">38</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a2fef019a1f9ca1ab1525f1edf37f2339"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classOpenCLImageRD.html#a2fef019a1f9ca1ab1525f1edf37f2339">OpenCLImageRD::~OpenCLImageRD</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00045">45</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a2b45e9256c9412d3b57b49fb87df4cf6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -233,26 +188,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classImageRD.html#ac496af879f4ae78d25403be495de8c45">ImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00192">192</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aadd648d23e482831a24f52730db8df60"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::string <a class="el" href="classOpenCLImageRD.html#aadd648d23e482831a24f52730db8df60">OpenCLImageRD::AssembleKernelSourceFromFormula</a> </td>
-          <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>formula</em></td><td>)</td>
-          <td> const<code> [protected, pure virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Implemented in <a class="el" href="classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832">FullKernelOpenCLImageRD</a>, and <a class="el" href="classFormulaOpenCLImageRD.html#a06166b3d9360045c9dd1d23113ec368b">FormulaOpenCLImageRD</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00144">144</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +208,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0">ImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00184">184</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00136">136</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,7 +229,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classImageRD.html#a7f4d538f7c74d6f6ec6e70c4cc4236f4">ImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00168">168</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00120">120</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -305,13 +241,15 @@ Protected Attributes</h2></td></tr>
           <td class="memname">void <a class="el" href="classOpenCLImageRD.html#a4548ce92403d8765c6bd42e584df9ce2">OpenCLImageRD::CreateOpenCLBuffers</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
+          <td><code> [protected, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00100">100</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Implements <a class="el" href="classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76">OpenCL_MixIn</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00085">85</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -331,7 +269,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classImageRD.html#ad1315e99af6900fbb7fd620e4827fda3">ImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00176">176</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00128">128</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -353,7 +291,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a8d2907ae4dd4a0cec5c97f7ee67edaec">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8hpp_source.html#l00033">33</a> of file <a class="el" href="OpenCLImageRD_8hpp_source.html">OpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8hpp_source.html#l00030">30</a> of file <a class="el" href="OpenCLImageRD_8hpp_source.html">OpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +314,27 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a6353d2e211e79a2d0d883cbe8719801b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00205">205</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00157">157</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab0e9644914548bce785cf766e0aa0f40"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#ab0e9644914548bce785cf766e0aa0f40">OpenCLImageRD::ReadFromOpenCLBuffers</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0">OpenCL_MixIn</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00188">188</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -388,25 +346,27 @@ Protected Attributes</h2></td></tr>
           <td class="memname">void <a class="el" href="classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a">OpenCLImageRD::ReloadKernelIfNeeded</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
+          <td><code> [protected, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00054">54</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Implements <a class="el" href="classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011">OpenCL_MixIn</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00038">38</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa53d644f68a68b3188eae94d3e309119"></a>
+<a class="anchor" id="a5e16eb5ca7640418eca7339634cdfb2b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#aa53d644f68a68b3188eae94d3e309119">OpenCLImageRD::TestFormula</a> </td>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#a5e16eb5ca7640418eca7339634cdfb2b">OpenCLImageRD::TestFormula</a> </td>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>s</em></td><td>)</td>
+          <td class="paramname"><em>program_string</em></td><td>)</td>
           <td><code> [virtual]</code></td>
         </tr>
       </table>
@@ -415,7 +375,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a1f8ac307cb768147fcef9ebfffe0a637">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00135">135</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00202">202</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -427,59 +387,15 @@ Protected Attributes</h2></td></tr>
           <td class="memname">void <a class="el" href="classOpenCLImageRD.html#abcd5e979e5af088561f1601ef91669e8">OpenCLImageRD::WriteToOpenCLBuffers</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
+          <td><code> [protected, virtual]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00120">120</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Implements <a class="el" href="classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0">OpenCL_MixIn</a>.</p>
 
-</div>
-</div>
-<hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="aac75bd1a6dc77cc45a5fa1d161553241"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>&gt; <a class="el" href="classOpenCLImageRD.html#aac75bd1a6dc77cc45a5fa1d161553241">OpenCLImageRD::buffers</a>[2]<code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="OpenCLImageRD_8hpp_source.html#l00059">59</a> of file <a class="el" href="OpenCLImageRD_8hpp_source.html">OpenCLImageRD.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a8cdf2c1562f281e1f7aba2f73bc204d6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classOpenCLImageRD.html#a8cdf2c1562f281e1f7aba2f73bc204d6">OpenCLImageRD::iCurrentBuffer</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="OpenCLImageRD_8hpp_source.html#l00060">60</a> of file <a class="el" href="OpenCLImageRD_8hpp_source.html">OpenCLImageRD.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a8e2696fd6f1e0510f4d9206ee2286f86"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string <a class="el" href="classOpenCLImageRD.html#a8e2696fd6f1e0510f4d9206ee2286f86">OpenCLImageRD::kernel_source</a><code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="OpenCLImageRD_8hpp_source.html#l00057">57</a> of file <a class="el" href="OpenCLImageRD_8hpp_source.html">OpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00105">105</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +407,7 @@ Protected Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:03 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

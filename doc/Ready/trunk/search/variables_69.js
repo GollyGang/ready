@@ -1,7 +1,7 @@
 var searchData=
 [
   ['i',['i',['../classProperty.html#a8f9da0113de384c3d40eedfc61a8ee50',1,'Property']]],
-  ['icurrentbuffer',['iCurrentBuffer',['../classOpenCLImageRD.html#a8cdf2c1562f281e1f7aba2f73bc204d6',1,'OpenCLImageRD']]],
+  ['icurrentbuffer',['iCurrentBuffer',['../classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0',1,'OpenCL_MixIn']]],
   ['id',['id',['../structaction__info.html#aa8aa631cd84cd7672b7870e1af6e6863',1,'action_info']]],
   ['idevice',['iDevice',['../classOpenCL__MixIn.html#a48fd5974448a51dc6787e722669307af',1,'OpenCL_MixIn']]],
   ['ignore_5fpage_5fevent',['ignore_page_event',['../classPrefsDialog.html#acf48c0cdb1d05cc17d1ef3ff9dd10d94',1,'PrefsDialog']]],
@@ -26,12 +26,15 @@ var searchData=
   ['image_5fwrap_5fpad_5ffilter',['image_wrap_pad_filter',['../classImageRD.html#a182631158f77bcbde06da5013bf37bfc',1,'ImageRD']]],
   ['images',['images',['../classImageRD.html#adba4679bca0840937c0837bf2e7d787d',1,'ImageRD']]],
   ['inabout',['inAbout',['../classHtmlView.html#a279253185a7a24d90f91e8a44c4259b8',1,'HtmlView']]],
+  ['ineighbor',['iNeighbor',['../structTNeighbor.html#a799107451fc00a468659663d44e309ed',1,'TNeighbor']]],
   ['info_5fpanel',['info_panel',['../classMyFrame.html#a2f1705495767375a3a81b28b90f7749c',1,'MyFrame']]],
   ['infofontsize',['infofontsize',['../prefs_8cpp.html#a7af6ffef487690c55989fafb52cad837',1,'infofontsize():&#160;prefs.cpp'],['../prefs_8hpp.html#a7af6ffef487690c55989fafb52cad837',1,'infofontsize():&#160;prefs.cpp']]],
   ['initial_5fpattern_5fgenerator',['initial_pattern_generator',['../classAbstractRD.html#aaa86e0b52d83c999ff6c0ed29780cb22',1,'AbstractRD']]],
   ['iotherchemical',['iOtherChemical',['../classOtherChemical.html#abab7fdb1df6707adc0a2c26c62579af8',1,'OtherChemical']]],
   ['iplatform',['iPlatform',['../classOpenCL__MixIn.html#a8536c05ae194417bb816744e1a042b30',1,'OpenCL_MixIn']]],
+  ['irecordingframe',['iRecordingFrame',['../classMyFrame.html#ac8872d8cdb198385e55e7bea0dad8c17',1,'MyFrame']]],
   ['is_5fmodified',['is_modified',['../classAbstractRD.html#abbf06675d6f5342317203a85cdff0fec',1,'AbstractRD']]],
+  ['is_5frecording',['is_recording',['../classMyFrame.html#ab5981f19f643c26ef5a0b2eacae4d276',1,'MyFrame']]],
   ['is_5frunning',['is_running',['../classMyFrame.html#ac16a2ad94c97411d14cfca97647b9710',1,'MyFrame']]],
   ['itargetchemical',['iTargetChemical',['../classOverlay.html#af61ec051e76500404d5a0d04c69b373f',1,'Overlay']]]
 ];

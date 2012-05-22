@@ -2,6 +2,7 @@ var searchData=
 [
   ['lastchar',['lastchar',['../classlinereader.html#ad9f0f6be5a6cc6f3a335fe992cdcad14',1,'linereader']]],
   ['lf',['LF',['../prefs_8cpp.html#a9efa21d4c812c5c9f085a638b1bb0268',1,'prefs.cpp']]],
+  ['lineargradient',['LinearGradient',['../classLinearGradient.html',1,'LinearGradient'],['../classLinearGradient.html#a8fe6cdcdaecd995c49b7c318c77da0a0',1,'LinearGradient::LinearGradient()']]],
   ['linereader',['linereader',['../classlinereader.html',1,'linereader'],['../classlinereader.html#a48e9cef2da2c0c3f5b08de994ad47b49',1,'linereader::linereader()']]],
   ['linkopencl',['LinkOpenCL',['../namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b',1,'OpenCL_utils']]],
   ['linkrect',['linkrect',['../classHtmlView.html#a6b3e324d1b822275ae260e2bdf8016bc',1,'HtmlView::linkrect()'],['../classHtmlInfo.html#a6731edd430ed22f4712663b7540c7dbe',1,'HtmlInfo::linkrect()']]],

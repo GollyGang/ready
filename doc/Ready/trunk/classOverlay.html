@@ -130,8 +130,8 @@ Public Member Functions</h2></td></tr>
 &lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlay.html#a724a6e655bc32c8592415a0d72899a59">GetAsXML</a> () const </td></tr>
 <tr class="memdesc:a724a6e655bc32c8592415a0d72899a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">for saving to file, get the overlay as an XML element  <a href="#a724a6e655bc32c8592415a0d72899a59"></a><br/></td></tr>
 <tr class="memitem:adfc33fddea74def34977f986f5a1aeee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">GetTargetChemical</a> () const </td></tr>
-<tr class="memitem:aa68ab155a56147c6a6d1b37fe198c63c"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlay.html#aa68ab155a56147c6a6d1b37fe198c63c">Apply</a> (vector&lt; float &gt; vals, <a class="el" href="classAbstractRD.html">AbstractRD</a> *system, float x, float y, float z) const </td></tr>
-<tr class="memdesc:aa68ab155a56147c6a6d1b37fe198c63c"><td class="mdescLeft">&#160;</td><td class="mdescRight">given a vector of values (one for each chemical) at a location in a system, returns the new value  <a href="#aa68ab155a56147c6a6d1b37fe198c63c"></a><br/></td></tr>
+<tr class="memitem:a1acb8b82e5f7b6496cc27a2f21f19803"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlay.html#a1acb8b82e5f7b6496cc27a2f21f19803">Apply</a> (std::vector&lt; float &gt; vals, <a class="el" href="classAbstractRD.html">AbstractRD</a> *system, float x, float y, float z) const </td></tr>
+<tr class="memdesc:a1acb8b82e5f7b6496cc27a2f21f19803"><td class="mdescLeft">&#160;</td><td class="mdescRight">given a vector of values (one for each chemical) at a location in a system, returns the new value  <a href="#a1acb8b82e5f7b6496cc27a2f21f19803"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a73f07e70aeca85d19ebd4f46cf29eaaa"><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOverlay.html#a73f07e70aeca85d19ebd4f46cf29eaaa">GetTypeName</a> ()</td></tr>
@@ -155,7 +155,7 @@ Private Member Functions</h2></td></tr>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies). </p>
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00037">37</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00036">36</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a829bfaf1bf842a816c90e6bae0777ee6"></a>
 <div class="memitem">
@@ -234,14 +234,14 @@ Private Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="aa68ab155a56147c6a6d1b37fe198c63c"></a>
+<a class="anchor" id="a1acb8b82e5f7b6496cc27a2f21f19803"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float <a class="el" href="classOverlay.html#aa68ab155a56147c6a6d1b37fe198c63c">Overlay::Apply</a> </td>
+          <td class="memname">float <a class="el" href="classOverlay.html#a1acb8b82e5f7b6496cc27a2f21f19803">Overlay::Apply</a> </td>
           <td>(</td>
-          <td class="paramtype">vector&lt; float &gt;&#160;</td>
+          <td class="paramtype">std::vector&lt; float &gt;&#160;</td>
           <td class="paramname"><em>vals</em>, </td>
         </tr>
         <tr>
@@ -319,7 +319,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00050">50</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00049">49</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 
 </div>
 </div>
@@ -337,7 +337,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00048">48</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00047">47</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 
 </div>
 </div>
@@ -355,7 +355,7 @@ Private Member Functions</h2></td></tr>
 
 <p>e.g. constant value, white noise, named parameter, other chemical, etc. </p>
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00060">60</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00059">59</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 
 </div>
 </div>
@@ -372,7 +372,7 @@ Private Member Functions</h2></td></tr>
 
 <p>each overlay applies to a single chemical </p>
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00057">57</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00056">56</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +389,7 @@ Private Member Functions</h2></td></tr>
 
 <p>e.g. overwrite, add, multiply, etc. </p>
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00059">59</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00058">58</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +406,7 @@ Private Member Functions</h2></td></tr>
 
 <p>e.g. rectangle, sphere, scattered shapes, etc. </p>
 
-<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00061">61</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8hpp_source.html#l00060">60</a> of file <a class="el" href="overlays_8hpp_source.html">overlays.hpp</a>.</p>
 
 </div>
 </div>
@@ -418,7 +418,7 @@ Private Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:03 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

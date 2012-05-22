@@ -128,15 +128,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00024"></a>00024 <span class="comment">// VTK:</span>
 <a name="l00025"></a>00025 <span class="keyword">class </span>vtkImageData;
 <a name="l00026"></a>00026 <span class="keyword">class </span>vtkImageWrapPad;
-<a name="l00027"></a>00027 
-<a name="l00029"></a><a class="code" href="classImageRD.html">00029</a> <span class="keyword">class </span><a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a> : <span class="keyword">public</span> <a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>
+<a name="l00027"></a>00027 <span class="comment"></span>
+<a name="l00028"></a>00028 <span class="comment">/// Base class for image-based systems.</span>
+<a name="l00029"></a><a class="code" href="classImageRD.html">00029</a> <span class="comment"></span><span class="keyword">class </span><a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a> : <span class="keyword">public</span> <a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>
 <a name="l00030"></a>00030 {
 <a name="l00031"></a>00031     <span class="keyword">public</span>:
 <a name="l00032"></a>00032 
 <a name="l00033"></a>00033         <a class="code" href="classImageRD.html#aea257c163ec0468ebdcdee0c332e1156">ImageRD</a>();
 <a name="l00034"></a>00034         <span class="keyword">virtual</span> <a class="code" href="classImageRD.html#a388870afb32f96a69d9780dec3d54f02">~ImageRD</a>();
 <a name="l00035"></a>00035 
-<a name="l00036"></a>00036         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a028dcdf21770403484968c23e0ac4bc6">SaveFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classAbstractRD.html#acb8e6b64b80df97fb751ac5c70598225">filename</a>,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of &#39;Property&#39;s that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings) <span class="keyword">const</span>;
+<a name="l00036"></a>00036         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a028dcdf21770403484968c23e0ac4bc6">SaveFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="classAbstractRD.html#acb8e6b64b80df97fb751ac5c70598225">filename</a>,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings) <span class="keyword">const</span>;
 <a name="l00037"></a>00037 
 <a name="l00038"></a>00038         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a6ca70515b0210ce9311b340076e4ed5d">Update</a>(<span class="keywordtype">int</span> n_steps);
 <a name="l00039"></a>00039 
@@ -154,58 +155,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00051"></a>00051         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#ad1315e99af6900fbb7fd620e4827fda3">GenerateInitialPattern</a>();
 <a name="l00052"></a>00052         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0">BlankImage</a>();
 <a name="l00053"></a>00053         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a7f4d538f7c74d6f6ec6e70c4cc4236f4">CopyFromImage</a>(vtkImageData* im);
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a39ebf217c641b7cc7afaba6887a97c9c">InitializeRenderPipeline</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of &#39;Property&#39;s that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
-<a name="l00056"></a>00056         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#aac38099aac975408531306f466b700f5">SaveStartingPattern</a>();
-<a name="l00057"></a>00057         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a87da400e21de530cd83ba9aff345a57d">RestoreStartingPattern</a>();
+<a name="l00054"></a>00054         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#aac38099aac975408531306f466b700f5">SaveStartingPattern</a>();
+<a name="l00055"></a>00055         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a87da400e21de530cd83ba9aff345a57d">RestoreStartingPattern</a>();
+<a name="l00056"></a>00056 
+<a name="l00057"></a>00057         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a39ebf217c641b7cc7afaba6887a97c9c">InitializeRenderPipeline</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
 <a name="l00058"></a>00058 
 <a name="l00059"></a><a class="code" href="classImageRD.html#a548e75a2021513a95f307f5c6ba9b771">00059</a>         <span class="keyword">virtual</span> std::string <a class="code" href="classImageRD.html#a548e75a2021513a95f307f5c6ba9b771">GetFileExtension</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="classImageRD.html#a25f0c8e1b88575fc14308b7c392757ef">ImageRD::GetFileExtensionStatic</a>(); }
 <a name="l00060"></a><a class="code" href="classImageRD.html#a25f0c8e1b88575fc14308b7c392757ef">00060</a>         <span class="keyword">static</span> std::string <a class="code" href="classImageRD.html#a25f0c8e1b88575fc14308b7c392757ef">GetFileExtensionStatic</a>() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;vti&quot;</span>; }
 <a name="l00061"></a>00061 
-<a name="l00062"></a>00062         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a5cd7d20c52b71cce60dc71c9ee488b53" title="retrieve the current view as a vtkPolyData">GetAsMesh</a>(vtkPolyData *out,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of &#39;Property&#39;s that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings) <span class="keyword">const</span>;
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064     <span class="keyword">protected</span>:
-<a name="l00065"></a>00065 
-<a name="l00066"></a><a class="code" href="classImageRD.html#adba4679bca0840937c0837bf2e7d787d">00066</a>         std::vector&lt;vtkImageData*&gt; <a class="code" href="classImageRD.html#adba4679bca0840937c0837bf2e7d787d" title="one for each chemical">images</a>; 
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068         <span class="comment">// we save the starting pattern, to allow the user to reset</span>
-<a name="l00069"></a><a class="code" href="classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97">00069</a>         vtkImageData *<a class="code" href="classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97">starting_pattern</a>;
-<a name="l00070"></a>00070 
-<a name="l00071"></a>00071         <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classImageRD.html#a5cbe2215bc54992c5c91b965ef376dcc" title="retreive the dimensionality of the system volume, irrespective of the cells within it...">GetArenaDimensionality</a>() <span class="keyword">const</span>;
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073     <span class="keyword">protected</span>:
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075         vtkSmartPointer&lt;vtkImageData&gt; <a class="code" href="classImageRD.html#a6244057215a86492e80df2039e859e7b">GetImage</a>() <span class="keyword">const</span>;
-<a name="l00076"></a>00076         vtkImageData* <a class="code" href="classImageRD.html#a6244057215a86492e80df2039e859e7b">GetImage</a>(<span class="keywordtype">int</span> iChemical) <span class="keyword">const</span>;
-<a name="l00077"></a>00077 
-<a name="l00079"></a>00079         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#ac496af879f4ae78d25403be495de8c45" title="use to change the dimensions or the number of chemicals">AllocateImages</a>(<span class="keywordtype">int</span> x,<span class="keywordtype">int</span> y,<span class="keywordtype">int</span> z,<span class="keywordtype">int</span> nc);
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a5787d806e02714685277a1cca21f77e1">DeallocateImages</a>();
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083         <span class="keyword">static</span> vtkImageData* <a class="code" href="classImageRD.html#aff86f7467e47e211e54f4d1783c90a60">AllocateVTKImage</a>(<span class="keywordtype">int</span> x,<span class="keywordtype">int</span> y,<span class="keywordtype">int</span> z);
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085     <span class="keyword">private</span>:
-<a name="l00086"></a>00086 
-<a name="l00087"></a>00087         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#ad11e59b6578af83c6fd2cc81a6412bf6">InitializeVTKPipeline_1D</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of &#39;Property&#39;s that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
-<a name="l00088"></a>00088         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a46439572790aedbb04c21581024a78c9">InitializeVTKPipeline_2D</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of &#39;Property&#39;s that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
-<a name="l00089"></a>00089         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#aff2d08be6334fe8de83b3d828555e731">InitializeVTKPipeline_3D</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of &#39;Property&#39;s that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
-<a name="l00090"></a>00090 
-<a name="l00092"></a><a class="code" href="classImageRD.html#a182631158f77bcbde06da5013bf37bfc">00092</a>         vtkImageWrapPad *<a class="code" href="classImageRD.html#a182631158f77bcbde06da5013bf37bfc" title="kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined">image_wrap_pad_filter</a>;
-<a name="l00093"></a><a class="code" href="classImageRD.html#a977210c644a9b4fee2f02352fd27a7c8">00093</a>         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a977210c644a9b4fee2f02352fd27a7c8">SetImageWrapPadFilter</a>(vtkImageWrapPad *p) { this-&gt;<a class="code" href="classImageRD.html#a182631158f77bcbde06da5013bf37bfc" title="kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined">image_wrap_pad_filter</a> = p; }
-<a name="l00094"></a>00094         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a78425460aa57de9f46a74ce3e4a0ea08">UpdateImageWrapPadFilter</a>();
-<a name="l00095"></a>00095 
-<a name="l00096"></a>00096     <span class="keyword">private</span>: <span class="comment">// deliberately not implemented, to prevent use</span>
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098         <a class="code" href="classImageRD.html#aea257c163ec0468ebdcdee0c332e1156">ImageRD</a>(<a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a>&amp;);
-<a name="l00099"></a>00099         <a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a>&amp; <a class="code" href="classImageRD.html#a1e4be1feaeb23fdf52205439133642e9">operator=</a>(<a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a>&amp;);
-<a name="l00100"></a>00100 };
-<a name="l00101"></a>00101 
-<a name="l00102"></a>00102 <span class="preprocessor">#endif</span>
+<a name="l00062"></a>00062         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a5cd7d20c52b71cce60dc71c9ee488b53" title="Retrieve the current 3D object as a vtkPolyData.">GetAsMesh</a>(vtkPolyData *out,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings) <span class="keyword">const</span>;
+<a name="l00063"></a>00063         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a1083d6cbb93bd6fc16c488bf7db2f568" title="Retrieve the current 2D plane as a vtkImageData.">GetAs2DImage</a>(vtkImageData *out,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings) <span class="keyword">const</span>;
+<a name="l00064"></a>00064 
+<a name="l00065"></a>00065     <span class="keyword">protected</span>:
+<a name="l00066"></a>00066 
+<a name="l00067"></a><a class="code" href="classImageRD.html#adba4679bca0840937c0837bf2e7d787d">00067</a>         std::vector&lt;vtkImageData*&gt; <a class="code" href="classImageRD.html#adba4679bca0840937c0837bf2e7d787d" title="one for each chemical">images</a>; <span class="comment">///&lt; one for each chemical</span>
+<a name="l00068"></a>00068 <span class="comment"></span>
+<a name="l00069"></a>00069         <span class="comment">// we save the starting pattern, to allow the user to reset</span>
+<a name="l00070"></a><a class="code" href="classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97">00070</a>         vtkImageData *<a class="code" href="classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97">starting_pattern</a>;
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072         <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classImageRD.html#a5cbe2215bc54992c5c91b965ef376dcc" title="Retreive the dimensionality of the system volume, irrespective of the cells within it...">GetArenaDimensionality</a>() <span class="keyword">const</span>;
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074     <span class="keyword">protected</span>:
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076         vtkSmartPointer&lt;vtkImageData&gt; <a class="code" href="classImageRD.html#a6244057215a86492e80df2039e859e7b">GetImage</a>() <span class="keyword">const</span>;
+<a name="l00077"></a>00077         vtkImageData* <a class="code" href="classImageRD.html#a6244057215a86492e80df2039e859e7b">GetImage</a>(<span class="keywordtype">int</span> iChemical) <span class="keyword">const</span>;
+<a name="l00078"></a>00078 <span class="comment"></span>
+<a name="l00079"></a>00079 <span class="comment">        /// use to change the dimensions or the number of chemicals</span>
+<a name="l00080"></a>00080 <span class="comment"></span>        <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#ac496af879f4ae78d25403be495de8c45" title="use to change the dimensions or the number of chemicals">AllocateImages</a>(<span class="keywordtype">int</span> x,<span class="keywordtype">int</span> y,<span class="keywordtype">int</span> z,<span class="keywordtype">int</span> nc);
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a5787d806e02714685277a1cca21f77e1">DeallocateImages</a>();
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084         <span class="keyword">static</span> vtkImageData* <a class="code" href="classImageRD.html#aff86f7467e47e211e54f4d1783c90a60">AllocateVTKImage</a>(<span class="keywordtype">int</span> x,<span class="keywordtype">int</span> y,<span class="keywordtype">int</span> z);
+<a name="l00085"></a>00085 
+<a name="l00086"></a>00086     <span class="keyword">private</span>:
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#ad11e59b6578af83c6fd2cc81a6412bf6">InitializeVTKPipeline_1D</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
+<a name="l00089"></a>00089         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a46439572790aedbb04c21581024a78c9">InitializeVTKPipeline_2D</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
+<a name="l00090"></a>00090         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#aff2d08be6334fe8de83b3d828555e731">InitializeVTKPipeline_3D</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
+<a name="l00091"></a>00091 <span class="comment"></span>
+<a name="l00092"></a>00092 <span class="comment">        /// kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined</span>
+<a name="l00093"></a><a class="code" href="classImageRD.html#a182631158f77bcbde06da5013bf37bfc">00093</a> <span class="comment"></span>        vtkImageWrapPad *<a class="code" href="classImageRD.html#a182631158f77bcbde06da5013bf37bfc" title="kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined">image_wrap_pad_filter</a>;
+<a name="l00094"></a><a class="code" href="classImageRD.html#a977210c644a9b4fee2f02352fd27a7c8">00094</a>         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a977210c644a9b4fee2f02352fd27a7c8">SetImageWrapPadFilter</a>(vtkImageWrapPad *p) { this-&gt;<a class="code" href="classImageRD.html#a182631158f77bcbde06da5013bf37bfc" title="kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined">image_wrap_pad_filter</a> = p; }
+<a name="l00095"></a>00095         <span class="keywordtype">void</span> <a class="code" href="classImageRD.html#a78425460aa57de9f46a74ce3e4a0ea08">UpdateImageWrapPadFilter</a>();
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097     <span class="keyword">private</span>: <span class="comment">// deliberately not implemented, to prevent use</span>
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099         <a class="code" href="classImageRD.html#aea257c163ec0468ebdcdee0c332e1156">ImageRD</a>(<a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a>&amp;);
+<a name="l00100"></a>00100         <a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a>&amp; <a class="code" href="classImageRD.html#a1e4be1feaeb23fdf52205439133642e9">operator=</a>(<a class="code" href="classImageRD.html" title="Base class for image-based systems.">ImageRD</a>&amp;);
+<a name="l00101"></a>00101 };
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 27 2012 11:33:02 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

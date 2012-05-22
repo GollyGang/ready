@@ -10,10 +10,11 @@ var searchData=
   ['showtips',['showtips',['../prefs_8cpp.html#af831ab3ffe0ee800c61d7a73b2873ce3',1,'showtips():&#160;prefs.cpp'],['../prefs_8hpp.html#af831ab3ffe0ee800c61d7a73b2873ce3',1,'showtips():&#160;prefs.cpp']]],
   ['size',['size',['../struct__cl__buffer__region.html#a42a9ed9284cac1ed167664874ed2f0ee',1,'_cl_buffer_region']]],
   ['smallerbutt',['smallerbutt',['../classHelpPanel.html#a4134242fe50ad04a945545dc5ab9ed13',1,'HelpPanel::smallerbutt()'],['../classInfoPanel.html#a6c03d8b0f1506ec4dd203acd37eddfc9',1,'InfoPanel::smallerbutt()']]],
+  ['source_5fcombo',['source_combo',['../classRecordingDialog.html#a51880f96ecb8ad37a89397d2202a5408',1,'RecordingDialog']]],
   ['spinctrl',['spinctrl',['../classIntegerDialog.html#a6674b363f835e39f9a15762893c8c752',1,'IntegerDialog']]],
   ['starting_5fpattern',['starting_pattern',['../classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97',1,'ImageRD::starting_pattern()'],['../classMeshRD.html#a72da64fb3411931d74a0829a812865a7',1,'MeshRD::starting_pattern()']]],
   ['status',['status',['../classHelpPanel.html#a18c272c20a0e3466c680d1cb5eb331b4',1,'HelpPanel::status()'],['../classInfoPanel.html#a7ffc2a2563319eddd841f9cf3bd2ca41',1,'InfoPanel::status()']]],
-  ['stdhgap',['STDHGAP',['../dialogs_8cpp.html#a607262b46658a3198d2030948517ad09',1,'dialogs.cpp']]],
+  ['stdhgap',['STDHGAP',['../dialogs_8hpp.html#a607262b46658a3198d2030948517ad09',1,'dialogs.hpp']]],
   ['steps_5fsince_5flast_5frender',['steps_since_last_render',['../classMyFrame.html#a3e82fed8bcb312b985d96dd27ffbdaa3',1,'MyFrame']]],
   ['stereo',['Stereo',['../classwxVTKRenderWindowInteractor.html#ae5e0356a0183f9306869c79db509bc85',1,'wxVTKRenderWindowInteractor']]],
   ['system',['system',['../classMyFrame.html#aa0cf2515778738aa537052a169bc34f1',1,'MyFrame::system()'],['../classRD__XMLImageWriter.html#a266bcb01f93565b76d5e32daf6790983',1,'RD_XMLImageWriter::system()'],['../classRD__XMLUnstructuredGridWriter.html#a21ea3a6063bf8d19e59db3b0a54929ab',1,'RD_XMLUnstructuredGridWriter::system()']]]
