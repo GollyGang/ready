@@ -108,6 +108,7 @@ set( PATTERN_FILES
   grayscott_noisy_solitons_mitosis.vti
   mutually-catalytic_spots.vti
   parameter_modulation_demo.vti
+  parameter_modulation_demo2.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti

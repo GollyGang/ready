@@ -454,6 +454,52 @@ class LinearGradient : public BaseFill
         Point3D *p1,*p2;
 };
 
+class RadialGradient : public BaseFill
+{
+    public:
+
+        RadialGradient(vtkXMLDataElement* node) : BaseFill(node)
+        {
+            read_required_attribute(node,"val1",this->val1);
+            read_required_attribute(node,"val2",this->val2);
+            if(node->GetNumberOfNestedElements()!=2)
+                throw runtime_error("radial_gradient: expected two nested elements (point3D,point3D)");
+            this->p1 = new Point3D(node->GetNestedElement(0));
+            this->p2 = new Point3D(node->GetNestedElement(1));
+        }
+        virtual ~RadialGradient() { delete this->p1; delete this->p2; }
+
+        static const char* GetTypeName() { return "radial_gradient"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(RadialGradient::GetTypeName());
+            xml->SetFloatAttribute("val1",this->val1);
+            xml->SetFloatAttribute("val2",this->val2);
+            xml->AddNestedElement(this->p1->GetAsXML());
+            xml->AddNestedElement(this->p2->GetAsXML());
+            return xml;
+        }
+
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        {
+            // convert p1 and p2 to absolute coordinates
+            float rp1x = p1->x * system->GetX();
+            float rp1y = p1->y * system->GetY();
+            float rp1z = p1->z * system->GetZ();
+            float rp2x = p2->x * system->GetX();
+            float rp2y = p2->y * system->GetY();
+            float rp2z = p2->z * system->GetZ();
+            return val1 + (val2-val1) * hypot3(x-rp1x,y-rp1y,z-rp1z) / hypot3(rp2x-rp1x,rp2y-rp1y,rp2z-rp1z);
+        }
+
+    protected:
+
+        float val1,val2;
+        Point3D *p1,*p2;
+};
+
 // -------- shapes: -----------
 
 class Everywhere : public BaseShape
@@ -631,6 +677,7 @@ class Pixel : public BaseShape
     else if(name==OtherChemical::GetTypeName())   return new OtherChemical(node);
     else if(name==Parameter::GetTypeName())       return new Parameter(node);
     else if(name==LinearGradient::GetTypeName())  return new LinearGradient(node);
+    else if(name==RadialGradient::GetTypeName())  return new RadialGradient(node);
     else                                          return NULL;
 }
 

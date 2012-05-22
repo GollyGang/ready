@@ -10,8 +10,8 @@
 
 <p>
 <ul>
-<li> RD can now be run on the surface of meshes, or in a volume of tetrahedral cells. Load the *.vtu
-files to see examples.
+<li> Reaction-diffusion can now be run on the surface of meshes, or in a volume of tetrahedral cells. 
+Load the *.vtu files to see examples.
 <li> New menu commands:
   <ul>
   <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current 
@@ -47,7 +47,9 @@ dataset (e.g. geodesic spheres).
   <li><a href="open:Patterns/mutually-catalytic_spots.vti">mutually-catalytic_spots.vti</a>, where 
   big spots can only replicate if full of small spots.
   <li><a href="open:Patterns/parameter_modulation_demo.vti">parameter_modulation_demo.vti</a>, showing how
-  values in an extra chemical can be used to modulate the parameters of a system.
+  values in an extra chemical can be used to modulate the parameters of a system in an 'R' shape.
+  <li><a href="open:Patterns/parameter_modulation_demo2.vti">parameter_modulation_demo2.vti</a>, showing how
+  values in an extra chemical can be used to modulate the parameters of a system in a circular shape.
   </ul>
 <li> Changes to the <a href="formats.html#render_settings">render settings</a>:
   <ul>
@@ -63,7 +65,9 @@ dataset (e.g. geodesic spheres).
   <ul>
   <li> New overlay shape: <a href="formats.html#pixel">pixel</a>, for specifying cells directly.
   <li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for 
-       spatially-varying values.
+       values that follow a linear ramp.
+  <li> New overlay fill: <a href="formats.html#radial_gradient">radial_gradient</a>, for 
+       for values that vary depending on the distance from the center.
   <li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape 
     specifiers.
   </ul>
