@@ -10,7 +10,25 @@
 
 <p>
 <ul>
-<li> RD can now be run on the surface of meshes, or in a volume of tetrahedral cells.
+<li> RD can now be run on the surface of meshes, or in a volume of tetrahedral cells. Load the *.vtu
+files to see examples.
+<li> New menu commands:
+  <ul>
+  <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current 
+  pattern file from the saved version on disk.
+  <li><a href="file.html#File_ImportMesh">File > Import Mesh</a> : imports mesh files (*.obj, *.vtp, 
+  *.vtu) as surfaces to run RD on.
+  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> : exports a mesh file (*.obj, *.vtp) 
+  from the current contoured surface or displacement-mapped surface.
+  <li><a href="file.html#File_ExportImage">File > Export Image</a> : exports an image file (*.png, *.jpg) 
+  from the current slice or 2D system.
+  <li><a href="file.html#File_StartRecording">File > Start Recording...</a> : saves an image every 
+  frame, for making videos.
+  <li><a href="file.html#File_StopRecording">File > Stop Recording</a> : stops saving images.
+  <li><a href="action.html#Action_Blank">Action > Blank</a> : sets all the chemicals to zero.
+  </ul>
+<li><a href="file.html#File_NewPattern">File > New Pattern</a> now offers to create a new image or mesh
+dataset (e.g. geodesic spheres).
 <li> New patterns: 
   <ul>
   <li><a href="open:Patterns/bays_3D.vti">bays_3D.vti</a>, implements a 3D cellular automaton.
@@ -31,35 +49,27 @@
   <li><a href="open:Patterns/parameter_modulation_demo.vti">parameter_modulation_demo.vti</a>, showing how
   values in an extra chemical can be used to modulate the parameters of a system.
   </ul>
-<li> <tt>use_image_interpolation=false</tt> now gives voxelised Minecraft-style rendering in 3D.
-<li> New <a href="formats.html#render_settings">render settings</a>:
-<ul>
-<li><tt>show_color_scale</tt>: allows the color scale legend to be turned off.
-<li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D 
-    images) to be colored using the image.
-</ul>
-<li> New overlay shape: <a href="formats.html#pixel">pixel</a>, for specifying cells directly.
-<li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for 
-    spatially-varying values.
-<li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape 
+<li> Changes to the <a href="formats.html#render_settings">render settings</a>:
+  <ul>
+  <li> <tt>use_image_interpolation=false</tt> now gives voxelised Minecraft-style rendering in 3D.
+  <li> New entries:
+    <ul>
+      <li><tt>show_color_scale</tt>: allows the color scale legend to be turned off.
+      <li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D 
+      images) to be colored using the image.
+    </ul>
+  </ul>
+<li> Changes to the <a href="formats.html#overlay">overlays</a>:
+  <ul>
+  <li> New overlay shape: <a href="formats.html#pixel">pixel</a>, for specifying cells directly.
+  <li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for 
+       spatially-varying values.
+  <li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape 
     specifiers.
+  </ul>
 <li> Pattern files (*.vti, *.vtu) can now be loaded into Paraview correctly, with named chemicals 
     ('a', 'b', etc.). There they can be visualized by volume rendering, or contoured in various ways.
 <li> Ready has a new (much nicer!) icon.
-<li> New menu commands:
-  <ul>
-  <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current 
-  pattern file from the saved version on disk.
-  <li><a href="file.html#File_ImportMesh">File > Import Mesh</a> : imports mesh files (*.obj, *.vtp, 
-  *.vtu) as surfaces to run RD on.
-  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> : exports a mesh file (*.obj, *.vtp) 
-  from the current contoured surface or displacement-mapped surface.
-  <li><a href="file.html#File_ExportImage">File > Export Image</a> : exports an image file (*.png, *.jpg) 
-  from the current slice or 2D system.
-  <li><a href="file.html#File_StartRecording">File > Start Recording...</a> : saves an image out every 
-  frame, for making videos.
-  <li><a href="file.html#File_StopRecording">File > Stop Recording</a> : stops saving out images.
-  </ul>
 <li> New option for image-based systems: <a href="formats.html#rule">wrap</a>, to toggle toroidal 
     wrap-around on/off.
 </ul>

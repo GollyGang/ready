@@ -46,6 +46,8 @@
 #include <vtkPlane.h>
 #include <vtkXMLUnstructuredGridWriter.h>
 #include <vtkObjectFactory.h>
+#include <vtkLinearSubdivisionFilter.h>
+#include <vtkPlatonicSolidSource.h>
 
 // STL:
 #include <stdexcept>
@@ -227,67 +229,10 @@ float MeshRD::GetZ() const
 
 // ---------------------------------------------------------------------
 
-// DEBUG: some things used for making datasets, will remove before the next release
-#include <vtkPlatonicSolidSource.h>
-#include <vtkButterflySubdivisionFilter.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkMinimalStandardRandomSequence.h>
-#include <vtkPointSource.h>
-#include <vtkDelaunay3D.h>
-
 void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->mesh->DeepCopy(mesh2);
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
-
-    // DEBUG: make a tetrahedral mesh by delaunay tetrahedralization on a random point cloud
-    if(0)
-    {
-        vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
-        pts->SetNumberOfPoints(1000);
-        vtkSmartPointer<vtkDelaunay3D> del = vtkSmartPointer<vtkDelaunay3D>::New();
-        del->SetInputConnection(pts->GetOutputPort());
-        del->Update();
-        this->mesh->DeepCopy(del->GetOutput());
-    }
-
-    // DEBUG: make a geodesic sphere by subdividing an icosahedron
-    if(0)
-    {
-        vtkSmartPointer<vtkPlatonicSolidSource> icosahedron = vtkSmartPointer<vtkPlatonicSolidSource>::New();
-        icosahedron->SetSolidTypeToIcosahedron();
-        vtkSmartPointer<vtkButterflySubdivisionFilter> butterfly = vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
-        butterfly->SetInputConnection(icosahedron->GetOutputPort());
-        butterfly->SetNumberOfSubdivisions(4);
-        butterfly->Update();
-        this->mesh->SetPoints(butterfly->GetOutput()->GetPoints());
-        this->mesh->SetCells(VTK_POLYGON,butterfly->GetOutput()->GetPolys());
-
-        // push the vertices out into the shape of a sphere
-        vtkFloatingPointType p[3];
-        for(int i=0;i<this->mesh->GetNumberOfPoints();i++)
-        {
-            this->mesh->GetPoint(i,p);
-            vtkMath::Normalize(p);
-            this->mesh->GetPoints()->SetPoint(i,p);
-        }
-    }
-     
-    // DEBUG
-    if(0)
-    {
-        // assign some cell data
-        this->n_chemicals = 2;
-        for(int iChem=0;iChem<this->n_chemicals;iChem++)
-        {
-            vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
-            scalars->SetNumberOfComponents(1);
-            scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
-            scalars->SetName(GetChemicalName(iChem).c_str());
-            scalars->FillComponent(0,((iChem%2)?0.8:0.2));
-            this->mesh->GetCellData()->AddArray(scalars);
-        }
-    }
 
     this->buffer->DeepCopy(this->mesh);
 
@@ -619,6 +564,40 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
+/* static */ void MeshRD::GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid *mesh,int n_chems)
+{
+    vtkSmartPointer<vtkPlatonicSolidSource> icosahedron = vtkSmartPointer<vtkPlatonicSolidSource>::New();
+    icosahedron->SetSolidTypeToIcosahedron();
+    vtkSmartPointer<vtkLinearSubdivisionFilter> subdivider = vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
+    subdivider->SetInputConnection(icosahedron->GetOutputPort());
+    subdivider->SetNumberOfSubdivisions(n_subdivisions);
+    subdivider->Update();
+    mesh->SetPoints(subdivider->GetOutput()->GetPoints());
+    mesh->SetCells(VTK_POLYGON,subdivider->GetOutput()->GetPolys());
+
+    // push the vertices out into the shape of a sphere
+    vtkFloatingPointType p[3];
+    for(int i=0;i<mesh->GetNumberOfPoints();i++)
+    {
+        mesh->GetPoint(i,p);
+        vtkMath::Normalize(p);
+        mesh->GetPoints()->SetPoint(i,p);
+    }
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
 vtkStandardNewMacro(RD_XMLUnstructuredGridWriter);
 
 // ---------------------------------------------------------------------
@@ -639,3 +618,16 @@ int RD_XMLUnstructuredGridWriter::WritePrimaryElement(ostream& os,vtkIndent inde
 }
 
 // ---------------------------------------------------------------------
+
+/*
+void GetTetrahedralMesh()
+{
+    // make a tetrahedral mesh by delaunay tetrahedralization on a random point cloud
+    vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
+    pts->SetNumberOfPoints(1000);
+    vtkSmartPointer<vtkDelaunay3D> del = vtkSmartPointer<vtkDelaunay3D>::New();
+    del->SetInputConnection(pts->GetOutputPort());
+    del->Update();
+    this->mesh->DeepCopy(del->GetOutput());
+}
+*/

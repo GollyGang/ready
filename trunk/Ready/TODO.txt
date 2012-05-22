@@ -17,15 +17,15 @@ before 0.3 release:
   extended usage (not releasing something? or bug in driver - get on other platforms?)
     - to reproduce: repeatedly load OpenCL vti files
 
-- document MeshRD changes, add/improve new examples
-- update code documentation
-
 - 2D slices as slice through 3D volume (if available, else whole image) =>
   1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
 - add initial_pattern_generator to Info Pane for editing
-- add option to convert formula rules into full-kernel rules
+- add option to convert formula rules into full-kernel rules, and other implementation type changes
+
+- reorganise examples
+- add complex Ginsburg-Landau
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 

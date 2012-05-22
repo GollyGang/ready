@@ -83,6 +83,14 @@ void OpenCLMeshRD::InternalUpdate(int n_steps)
     int iBuffer;
     const int NC = this->GetNumberOfChemicals();
 
+    // pass the neighbor indices and weights as parameters for the kernel
+    ret = clSetKernelArg(this->kernel, 2*NC + 0, sizeof(cl_mem), (void *)&this->clBuffer_cell_neighbor_indices);
+    throwOnError(ret,"OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on indices array: ");
+    ret = clSetKernelArg(this->kernel, 2*NC + 1, sizeof(cl_mem), (void *)&this->clBuffer_cell_neighbor_weights);
+    throwOnError(ret,"OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on weights array: ");
+    ret = clSetKernelArg(this->kernel, 2*NC + 2, sizeof(int), &this->max_neighbors);
+    throwOnError(ret,"OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on max_neighbors parameter: ");
+
     for(int it=0;it<n_steps;it++)
     {
         for(int io=0;io<2;io++) // first input buffers (io=0) then output buffers (io=1)
@@ -155,6 +163,9 @@ void OpenCLMeshRD::ReloadKernelIfNeeded()
 
 void OpenCLMeshRD::CreateOpenCLBuffers()
 {
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
+
     const unsigned long MEM_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells();
     const int NC = this->GetNumberOfChemicals();
 
@@ -180,20 +191,15 @@ void OpenCLMeshRD::CreateOpenCLBuffers()
     const unsigned long NBORS_WEIGHTS_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_weights = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_WEIGHTS_SIZE, NULL, &ret);
     throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: ");
-
-    // pass the neighbor indices and weights as parameters for the kernel
-    ret = clSetKernelArg(this->kernel, 2*NC + 0, sizeof(cl_mem), (void *)&this->clBuffer_cell_neighbor_indices);
-    throwOnError(ret,"OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on indices array: ");
-    ret = clSetKernelArg(this->kernel, 2*NC + 1, sizeof(cl_mem), (void *)&this->clBuffer_cell_neighbor_weights);
-    throwOnError(ret,"OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on weights array: ");
-    ret = clSetKernelArg(this->kernel, 2*NC + 2, sizeof(int), &this->max_neighbors);
-    throwOnError(ret,"OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on max_neighbors parameter: ");
 }
 
 // ----------------------------------------------------------------------------------------------------------------
 
 void OpenCLMeshRD::WriteToOpenCLBuffers()
 {
+    if(this->buffers[0].empty())
+        this->CreateOpenCLBuffers();
+
     cl_int ret;
     const unsigned long MEM_SIZE = sizeof(float) * (int)this->mesh->GetNumberOfCells();
     this->iCurrentBuffer = 0;
@@ -234,10 +240,6 @@ void OpenCLMeshRD::ReadFromOpenCLBuffers()
 void OpenCLMeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     MeshRD::CopyFromMesh(mesh2);
-    this->need_reload_formula = true;
-    this->ReloadContextIfNeeded();
-    this->ReloadKernelIfNeeded();
-    this->CreateOpenCLBuffers();
     this->WriteToOpenCLBuffers();
 }
 

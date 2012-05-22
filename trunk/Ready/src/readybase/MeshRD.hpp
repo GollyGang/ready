@@ -65,6 +65,8 @@ class MeshRD : public AbstractRD
 
         virtual int GetArenaDimensionality() const;
 
+        static void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
+
     protected:
 
         /// work out which cells are neighbors of each other

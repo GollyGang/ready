@@ -130,23 +130,21 @@ bool MyApp::OnInit()
 
 /*! \mainpage 
  *
+ * The links above can be used to explore the classes and source code files.
+ *
+ * \section main_classes_sec Important base classes:
+ *
+ *  * AbstractRD - the base class for all our reaction-diffusion implementations
+ *  * XML_Object - many classes can be serialized to/from XML files
+ *  * MyFrame is the top-level window for the GUI
+ *
+ * \section external_sec External source code:
+ *
+ *  * <a href="http://www.vtk.org/doc/nightly/html/classes.html">VTK</a>
+ *  * <a href="http://docs.wxwidgets.org/trunk/classes.html">wxWidgets</a>
+ *
  * \section homepage_sec Homepage: 
  *
  * <http://code.google.com/p/reaction-diffusion/>
  *
- * \section source_org_sec Source code organization:
- *
- * The links above can be used to explore the classes and source code files.
- *
- *  * MyFrame is the top-level window for the GUI
- *
- * \subsection main_classes_sec Important base classes:
- *
- *  * AbstractRD - the base class for all our reaction-diffusion implementations
- *  * XML_Object - many classes can be serialized to/from XML files
- *
- * \subsection external_sec External source code documentation:
- *
- *  * <a href="http://www.vtk.org/doc/nightly/html/classes.html">VTK</a>
- *  * <a href="http://docs.wxwidgets.org/trunk/classes.html">wxWidgets</a>
  */

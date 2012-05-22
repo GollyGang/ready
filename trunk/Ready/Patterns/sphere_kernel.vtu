@@ -8,12 +8,6 @@
 
     <rule type="kernel" name="Test">
         
-      <param name="timestep"> 1.0    </param>
-      <param name="D_a">      0.082  </param>
-      <param name="D_b">      0.041  </param>
-      <param name="k">        0.0625 </param>
-      <param name="F">        0.035  </param>
-
       <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float* a_in,__global float* b_in,
                                  __global float* a_out,__global float* b_out,

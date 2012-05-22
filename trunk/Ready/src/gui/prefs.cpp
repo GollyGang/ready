@@ -338,11 +338,12 @@ const char* GetActionName(action_id action)
         case DO_STEP1:          return "Step by 1";
         case DO_STEPN:          return "Step by N";
         case DO_RUNSTOP:        return "Run/Stop";
-        case DO_RESET:          return "Reset";
         case DO_FASTER:         return "Run Faster";
         case DO_SLOWER:         return "Run Slower";
         case DO_CHANGESPEED:    return "Change Running Speed...";
+        case DO_RESET:          return "Reset";
         case DO_GENPATT:        return "Generate Pattern";
+        case DO_BLANK:          return "Blank";
         case DO_ADDPARAM:       return "Add Parameter...";
         case DO_DELPARAM:       return "Delete Parameter...";
         case DO_DEVICE:         return "Select OpenCL Device...";

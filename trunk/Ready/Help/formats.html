@@ -44,7 +44,7 @@ These are the Ready-specific XML elements, in alphabetical order:
 <p>
 Here is a simple example of a *.vti file:
 
-<p><table bgcolor="#FFFFF0"><tr><td><pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
+<p><table bgcolor="#FFFFD0"><tr><td><pre><tt>&lt;?xml version=&quot;1.0&quot;?&gt;
 &lt;VTKFile type=&quot;ImageData&quot; version=&quot;0.1&quot; byte_order=&quot;LittleEndian&quot; compressor=&quot;vtkZLibDataCompressor&quot;&gt;
 
   &lt;<a href="#RD">RD</a> format_version=&quot;2&quot;&gt;
@@ -88,8 +88,11 @@ Here is a simple example of a *.vti file:
 
 <p>
 This is the standard VTK format but with an <tt><a href="#RD">RD</a></tt> element (inside the <tt>VTKFile</tt> element)
-that contains all the Ready-specific data. Ready supports mesh-based systems as well (*.vtu) - these have
-UnstructuredGrid instead of ImageData sections. Both can be read as the standard VTK image format,
+that contains all the Ready-specific data. 
+
+<p>
+Ready supports mesh-based systems as well (*.vtu) - these have
+UnstructuredGrid instead of ImageData sections. Both can be read as the standard VTK format,
 for example in <a href="http://www.paraview.org">ParaView</a>.
 
 <p>
@@ -115,8 +118,14 @@ Used to alert the user that they might need to update their software.
 <p>
 A description of the pattern.
 <p>Contains:
-<p>Plain text, although simple HTML can also be used with suitable precautions.
-See the description in <a href="edit:Patterns/munafo-uskate.vti">munafo-uskate.vti</a> for an example.
+<p>Plain text. HTML can also be used but must be XML-escaped as in the table below. See the description 
+in <a href="edit:Patterns/munafo-uskate.vti">munafo-uskate.vti</a> for an example.
+
+<p>
+<table border="1" cellpadding="8" align="center">
+<tr><td>&lt;</td><td>&gt;</td><td>&quot;</td><td>&amp;</td><td>&apos;</td></tr>
+<tr><td>&amp;lt;</td><td>&amp;gt;</td><td>&amp;quot;</td><td>&amp;amp;</td><td>&amp;apos;</td></tr>
+</table>
 
 <h4><a name="rule"></a><b>&lt;rule&gt;</b></h4>
 <p>
@@ -165,14 +174,14 @@ E.g. for float4 we typically use a block size of 4x1x1. For kernels that process
 <li><tt>block_size_z</tt> (required) : The z component.
 </ul>
 <p>Contains:
-<p>A full OpenCL kernel. Parameters cannot currently be used with full-kernel rules. See the pattern files for examples.
+<p>A full OpenCL kernel, as plain text. Parameters cannot currently be used with full-kernel rules. See the pattern files for examples.
 
 <h4><a name="initial_pattern_generator"></a><b>&lt;initial_pattern_generator&gt;</b></h4>
 
-The initial pattern generator is a way to describe typical reaction-diffusion starting conditions. The Schlogl rule, for example, can be initialized with low-amplitude random noise.
+The initial pattern generator is a way to describe typical reaction-diffusion starting conditions. The <a href="edit:Patterns/schlogl.vti">Schlogl rule</a>, for example, can be initialized with low-amplitude random noise.
 <p>Attributes:
 <ul>
-<li><tt>apply_when_loading</tt> (optional) : "true" if the initial pattern generator should overwrite the image when the file is loaded.
+<li><tt>apply_when_loading</tt> (optional) : "true" if the initial pattern generator should overwrite the data when the file is loaded.
 </ul>
 <p>Contains:
 <ul>
@@ -181,7 +190,8 @@ The initial pattern generator is a way to describe typical reaction-diffusion st
 
 <h4><a name="overlay"></a><b>&lt;overlay&gt;</b></h4>
 
-Each overlay changes the values of a single chemical across the image. Overlays apply in the order given in the file, from a starting point where every chemical is zero.
+Each overlay changes the values of a single chemical. Overlays apply in the order given in the file, 
+from a starting point where every chemical is zero.
 <p>Attributes:
 <ul>
 <li><tt>chemical</tt> (required) : the chemical (a, b, c, etc.) that this overlay applies to.
@@ -194,19 +204,19 @@ Each overlay changes the values of a single chemical across the image. Overlays 
 </ol>
 
 <h4><a name="overwrite"></a><b>&lt;overwrite&gt;</b></h4>
-Specifies that this overlay should overwrite any existing values in the image.
+Specifies that this overlay should overwrite any existing values.
 
 <h4><a name="add"></a><b>&lt;add&gt;</b></h4>
-Specifies that this overlay should add to the existing values in the image.
+Specifies that this overlay should add to the existing values.
 
 <h4><a name="subtract"></a><b>&lt;subtract&gt;</b></h4>
-Specifies that this overlay should subtract from the existing values in the image.
+Specifies that this overlay should subtract from the existing values.
 
 <h4><a name="multiply"></a><b>&lt;multiply&gt;</b></h4>
-Specifies that this overlay should multiply the existing values in the image.
+Specifies that this overlay should multiply the existing values.
 
 <h4><a name="divide"></a><b>&lt;divide&gt;</b></h4>
-Specifies that this overlay should divide the existing values in the image.
+Specifies that this overlay should divide the existing values.
 
 <h4><a name="constant"></a><b>&lt;constant&gt;</b></h4>
 Specifies that the values in this overlay are constant.
@@ -251,21 +261,25 @@ Specifies that the values in this overlay are given by the current value of a na
 </ul>
 
 <h4><a name="everywhere"></a><b>&lt;everywhere&gt;</b></h4>
-Specifies that the overlay applies everywhere in the image.
+Specifies that the overlay applies everywhere.
 
 <h4><a name="rectangle"></a><b>&lt;rectangle&gt;</b></h4>
-Specifies that the overlay applies to a rectangle in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
+Specifies that the overlay applies to an axis-aligned rectangle. For a 1D image, only 
+the x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p>Contains:
 <ul>
 <li><tt><a href="#point3d">point3d</a></tt> (required) : the first corner of the rectangle.
-<li><tt><a href="#point3d">point3d</a></tt> (required) : the second corner of the rectangle. All the coordinates should be higher than in the first corner.
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the second corner of the rectangle. All the 
+coordinates should be higher than in the first corner.
 </ul>
 
 <h4><a name="circle"></a><b>&lt;circle&gt;</b></h4>
-Specifies that the overlay applies to a circle (sphere) in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
+Specifies that the overlay applies to a circle (sphere). For a 1D image, only the x-coordinate is 
+considered. For a 2D image, only x and y are considered. 
 <p>Attributes:
 <ul>
-<li><tt>radius</tt> (required) : the radius of the circle, in the range [0,1] as a proportion of the largest image dimension.
+<li><tt>radius</tt> (required) : the radius of the circle, in the range [0,1] as a proportion of the 
+largest image dimension.
 </ul>
 <p>Contains:
 <ul>
@@ -273,7 +287,8 @@ Specifies that the overlay applies to a circle (sphere) in the image. For a 1D i
 </ul>
 
 <h4><a name="pixel"></a><b>&lt;pixel&gt;</b></h4>
-Specifies that the overlay applies to a single pixel in the image. For a 1D image, only the x-coordinate is considered. For a 2D image, only x and y are considered. 
+Specifies that the overlay applies to a single pixel in the image. For a 1D image, only the 
+x-coordinate is considered. For a 2D image, only x and y are considered. 
 <p>Attributes:
 <ul>
 <li><tt>x</tt> (required) : the x-coordinate of the pixel, a 0-based integer.
@@ -283,7 +298,9 @@ Specifies that the overlay applies to a single pixel in the image. For a 1D imag
 
 <h4><a name="point3d"></a><b>&lt;point3d&gt;</b></h4>
 
-A location in space. Coordinates are in the range from zero to one and are given as a proportion of the image size.
+A location in space. Coordinates are in the range from zero to one and are given as a proportion of 
+the overall size. For images the size is the number of pixels in each direction. For meshes the size
+is given by the spatial range of the point coordinates in each direction.
 <p>Attributes:
 <ul>
 <li><tt>x</tt> (required) : the x-coordinate.
@@ -302,21 +319,29 @@ Default values are shown to illustrate the format.
 <li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt><br>The color for low values (range: 0.0-1.0).
 <li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt><br>The color for high values (range: 0.0-1.0).
 <li><tt>&lt;show_color_scale value="true" /&gt;</tt><br>Whether to show the color scale that maps values to colors.
-<li><tt>&lt;show_multiple_chemicals value="true" /&gt;</tt><br>Whether to show all the chemicals, or just the active one. Not supported in the 3D view which only shows the active chemical.
+<li><tt>&lt;show_multiple_chemicals value="true" /&gt;</tt><br>Whether to show all the chemicals, or 
+just the active one. Not supported in the 3D view which only shows the active chemical.
 <li><tt>&lt;active_chemical value="a" /&gt;</tt><br>The chemical to show (a, b, c, etc.).
-<li><tt>&lt;low value="0" /&gt;</tt><br>The lowest value that chemicals in this system typically take. Used to determine the colors and the axes.
+<li><tt>&lt;low value="0" /&gt;</tt><br>The lowest value that chemicals in this system typically take. 
+Used to determine the colors and the axes.
 <li><tt>&lt;high value="1" /&gt;</tt><br>The highest value that chemicals in this system typically take.
 <li><tt>&lt;vertical_scale_1D value="30" /&gt;</tt><br>The vertical size of the 1D line graphs.
 <li><tt>&lt;vertical_scale_2D value="15" /&gt;</tt><br>The vertical size of the 2D surface plots.
 <li><tt>&lt;contour_level value="0.25" /&gt;</tt><br>The value to use for the surface contour in 3D systems.
-<li><tt>&lt;use_wireframe value="false" /&gt;</tt><br>Whether to show the surface as wireframe or as smooth surface (false=surface, true=wireframe).
+<li><tt>&lt;use_wireframe value="false" /&gt;</tt><br>Whether to show the surface as wireframe or as 
+smooth surface (false=surface, true=wireframe).
 <li><tt>&lt;slice_3D value="true" /&gt;</tt><br>Whether to add a 2D color slice through the 3D volume.
 <li><tt>&lt;slice_3D_axis value="z" /&gt;</tt><br>The axis that the slice should be perpendicular to.
-<li><tt>&lt;slice_3D_position value="0.5" /&gt;</tt><br>The position along the slice_3D_axis to slice at (range: 0.0-1.0, relative to the image size).
-<li><tt>&lt;show_displacement_mapped_surface value="true" /&gt;</tt><br>Whether to show the height-mapped surface for 2D systems as well as the color-mapped image.
-<li><tt>&lt;color_displacement_mapped_surface value="true" /&gt;</tt><br>Whether to show the color image on the height-mapped surface.
-<li><tt>&lt;use_image_interpolation value="true" /&gt;</tt><br>Whether to interpolate the image or show sharp pixels (false=sharp pixels, true=interpolated).
-<li><tt>&lt;timesteps_per_render value="100" /&gt;</tt><br>Determines the initial running speed by specifying how often the render window should be updated.
+<li><tt>&lt;slice_3D_position value="0.5" /&gt;</tt><br>The position along the slice_3D_axis to slice 
+at (range: 0.0-1.0, relative to the overall size).
+<li><tt>&lt;show_displacement_mapped_surface value="true" /&gt;</tt><br>Whether to show the height-mapped 
+surface for 2D systems as well as the color-mapped image.
+<li><tt>&lt;color_displacement_mapped_surface value="true" /&gt;</tt><br>Whether to show the color 
+image on the height-mapped surface.
+<li><tt>&lt;use_image_interpolation value="true" /&gt;</tt><br>Whether to interpolate the image or 
+show sharp pixels (false=sharp pixels, true=interpolated).
+<li><tt>&lt;timesteps_per_render value="100" /&gt;</tt><br>Determines the initial running speed by 
+specifying how often the render window should be updated.
 </ul>
 
 </body>

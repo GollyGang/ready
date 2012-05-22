@@ -38,7 +38,7 @@ class BaseOperation : public XML_Object
 
         virtual ~BaseOperation() {}
 
-        /// construct when we don't know the derived type
+        /// construct when we don't know the derived type (returns NULL if name is unknown)
         static BaseOperation* New(vtkXMLDataElement* node);
 
         virtual void Apply(float& target,float value) const =0;
@@ -56,7 +56,7 @@ class BaseFill : public XML_Object
 
         virtual ~BaseFill() {}
 
-        /// construct when we don't know the derived type
+        /// construct when we don't know the derived type (returns NULL if name is unknown)
         static BaseFill* New(vtkXMLDataElement* node);
 
         /// what value would this fill type be at the given location, given the existing data
@@ -75,7 +75,7 @@ class BaseShape : public XML_Object
 
         virtual ~BaseShape() {}
 
-        /// construct when we don't know the derived type
+        /// construct when we don't know the derived type (returns NULL if name is unknown)
         static BaseShape* New(vtkXMLDataElement* node);
 
         virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const =0;
@@ -96,22 +96,28 @@ Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node), op(NULL), fill(NUL
     const int n_nested = node->GetNumberOfNestedElements();
     if(n_nested<3)
         throw runtime_error("overlay : expected at least 3 nested elements (operation, fill, shape)");
-    bool parsedOK;
+    BaseShape *pShape;
+    BaseOperation *pOp;
+    BaseFill *pFill;
     for(int i_nested=0;i_nested<n_nested;i_nested++)
     {
         vtkXMLDataElement *subnode = node->GetNestedElement(i_nested);
         // is this an operation element?
-        try { this->op = BaseOperation::New(subnode); parsedOK = true; }
-        catch(runtime_error&) { parsedOK = false; }
-        if(parsedOK) continue;
+        pOp = BaseOperation::New(subnode);
+        if(pOp) { 
+            this->op = pOp; // TODO: check if already supplied
+            continue; // (save time parsing as other types)
+        }
         // is this a fill element?
-        try { this->fill = BaseFill::New(subnode); parsedOK = true; }
-        catch(runtime_error&) { parsedOK = false; }
-        if(parsedOK) continue;
+        pFill = BaseFill::New(subnode);
+        if(pFill) {
+            this->fill = pFill; // TODO: check if already supplied
+            continue;
+        }
         // must be a shape element
-        this->shapes.push_back(BaseShape::New(subnode));
-        // (The usual advice is to not use exceptions for things that are expected to happen but arguably this
-        //  is an example of where the alternative (return values) is less desirable.)
+        pShape = BaseShape::New(subnode);
+        if(pShape)
+            this->shapes.push_back(pShape);
     }
     if(this->op == NULL) throw runtime_error("overlay: missing operation element");
     if(this->fill == NULL) throw runtime_error("overlay: missing fill element");
@@ -614,7 +620,7 @@ class Pixel : public BaseShape
     else if(name==Subtract::GetTypeName())     return new Subtract(node);
     else if(name==Multiply::GetTypeName())     return new Multiply(node);
     else if(name==Divide::GetTypeName())       return new Divide(node);
-    else throw runtime_error("Unsupported operation: "+name);
+    else                                       return NULL;
 }
 
 /* static */ BaseFill* BaseFill::New(vtkXMLDataElement* node)
@@ -625,7 +631,7 @@ class Pixel : public BaseShape
     else if(name==OtherChemical::GetTypeName())   return new OtherChemical(node);
     else if(name==Parameter::GetTypeName())       return new Parameter(node);
     else if(name==LinearGradient::GetTypeName())  return new LinearGradient(node);
-    else throw runtime_error("Unsupported fill type: "+name);
+    else                                          return NULL;
 }
 
 /* static */ BaseShape* BaseShape::New(vtkXMLDataElement* node)
@@ -635,5 +641,5 @@ class Pixel : public BaseShape
     else if(name==Rectangle::GetTypeName())    return new Rectangle(node);
     else if(name==Circle::GetTypeName())       return new Circle(node);
     else if(name==Pixel::GetTypeName())        return new Pixel(node);
-    else throw runtime_error("Unsupported shape: "+name);
+    else                                       return NULL;
 }
