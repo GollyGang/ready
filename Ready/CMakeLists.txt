@@ -208,7 +208,7 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
   
-#---------------------copy various files to build folder (just for testing)-------------------------
+#---------------copy installation files to build folder (helps with testing)--------------------
 
 foreach( pattern_file ${PATTERN_FILES} )
   add_custom_command( 
@@ -308,7 +308,7 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
-# install our source files
+# install our source files, resource files and text files
 foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${OTHER_FILES} )
   get_filename_component( path_name "${source_file}" PATH )
   install( FILES "${source_file}" DESTINATION ${path_name} )

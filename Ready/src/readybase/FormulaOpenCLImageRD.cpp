@@ -64,21 +64,18 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             kernel_source << ",";
     }
     // output the first part of the body
-    kernel_source << ")\n\
-{\n\
+    kernel_source << ")\n{\n\
     const int x = get_global_id(0);\n\
     const int y = get_global_id(1);\n\
     const int z = get_global_id(2);\n\
     const int X = get_global_size(0);\n\
     const int Y = get_global_size(1);\n\
     const int Z = get_global_size(2);\n\
-    const int i_here = X*(Y*z + y) + x;\n\
-\n";
+    const int i_here = X*(Y*z + y) + x;\n\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << "float4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[i_here];\n"; // "float4 a = a_in[i_here];"
     // output the Laplacian part of the body
-    kernel_source << "\
-\n\
+    kernel_source << "\n\
     // compute the Laplacians of each chemical\n";
     if(this->wrap)
         kernel_source << "\

@@ -149,12 +149,13 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::StepN, MyFrame::OnUpdateStep)
     EVT_MENU(ID::RunStop, MyFrame::OnRunStop)
     EVT_UPDATE_UI(ID::RunStop, MyFrame::OnUpdateRunStop)
-    EVT_MENU(ID::Reset, MyFrame::OnReset)
-    EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
     EVT_MENU(ID::Faster, MyFrame::OnRunFaster)
     EVT_MENU(ID::Slower, MyFrame::OnRunSlower)
     EVT_MENU(ID::ChangeRunningSpeed, MyFrame::OnChangeRunningSpeed)
+    EVT_MENU(ID::Reset, MyFrame::OnReset)
+    EVT_UPDATE_UI(ID::Reset, MyFrame::OnUpdateReset)
     EVT_MENU(ID::GenerateInitialPattern, MyFrame::OnGenerateInitialPattern)
+    EVT_MENU(ID::Blank, MyFrame::OnBlank)
     EVT_MENU(ID::AddParameter,MyFrame::OnAddParameter)
     EVT_UPDATE_UI(ID::AddParameter, MyFrame::OnUpdateAddParameter)
     EVT_MENU(ID::DeleteParameter,MyFrame::OnDeleteParameter)
@@ -183,7 +184,7 @@ END_EVENT_TABLE()
 
 // ---------------------------------------------------------------------
 
-// frame constructor
+// constructor
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
@@ -242,6 +243,16 @@ MyFrame::MyFrame(const wxString& title)
         wxCommandEvent cmdevent(wxID_NEW);
         OnNewPattern(cmdevent);
     }
+}
+
+// ---------------------------------------------------------------------
+
+MyFrame::~MyFrame()
+{
+    this->SaveSettings(); // save the current settings so it starts up the same next time
+    this->aui_mgr.UnInit();
+    this->pVTKWindow->Delete();
+    delete this->system;
 }
 
 // ---------------------------------------------------------------------
@@ -311,12 +322,13 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::StepN, _("Step by N") + GetAccelerator(DO_STEPN), _("Advance the simulation by timesteps per render"));
         menu->Append(ID::RunStop, _("Run") + GetAccelerator(DO_RUNSTOP), _("Start running the simulation"));
         menu->AppendSeparator();
-        menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
-        menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
-        menu->AppendSeparator();
         menu->Append(ID::Faster, _("Run Faster") + GetAccelerator(DO_FASTER),_("Run with more timesteps between each render"));
         menu->Append(ID::Slower, _("Run Slower") + GetAccelerator(DO_SLOWER),_("Run with fewer timesteps between each render"));
         menu->Append(ID::ChangeRunningSpeed, _("Change Running Speed...") + GetAccelerator(DO_CHANGESPEED),_("Change the number of timesteps between each render"));
+        menu->AppendSeparator();
+        menu->Append(ID::Reset, _("Reset") + GetAccelerator(DO_RESET), _("Go back to the starting pattern"));
+        menu->Append(ID::GenerateInitialPattern, _("Generate Initial &Pattern") + GetAccelerator(DO_GENPATT), _("Run the Initial Pattern Generator"));
+        menu->Append(ID::Blank, _("&Blank") + GetAccelerator(DO_BLANK), _("Sets every value to zero"));
         menu->AppendSeparator();
         menu->Append(ID::AddParameter, _("&Add Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
         menu->Append(ID::DeleteParameter, _("&Delete Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
@@ -522,16 +534,6 @@ void MyFrame::SaveSettings()
         auilayout = this->aui_mgr.SavePerspective();
     }
     SavePrefs();
-}
-
-// ---------------------------------------------------------------------
-
-MyFrame::~MyFrame()
-{
-    this->SaveSettings(); // save the current settings so it starts up the same next time
-    this->aui_mgr.UnInit();
-    this->pVTKWindow->Delete();
-    delete this->system;
 }
 
 // ---------------------------------------------------------------------
@@ -1323,7 +1325,77 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
-    this->system->BlankImage();
+    // ask user what type of dataset to generate:
+    int sel;
+    {
+        const int N_CHOICES=6;
+        wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
+            _("Geodesic sphere"), _("Triangular mesh"), _("Hexagonal mesh")};
+        wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
+        dlg.SetSelection(1); // default selection
+        if(dlg.ShowModal()!=wxID_OK) return;
+        sel = dlg.GetSelection();
+    }
+    switch(sel)
+    {
+        case 0:
+        {
+            FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+            s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
+            s->GenerateInitialPattern();
+            this->SetCurrentRDSystem(s);
+            wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
+            break;
+        }
+        case 1:
+        {
+            FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+            s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
+            s->GenerateInitialPattern();
+            this->SetCurrentRDSystem(s);
+            wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
+            break;
+        }
+        case 2:
+        {
+            FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+            s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
+            s->GenerateInitialPattern();
+            this->SetCurrentRDSystem(s);
+            wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
+            break;
+        }
+        case 3:
+        {
+            int divs;
+            {
+                const int N_CHOICES=9;
+                int div_choices[N_CHOICES] = {2,3,4,5,6,7,8,9,10};
+                wxString div_descriptions[N_CHOICES];
+                for(int i=0;i<N_CHOICES;i++)
+                    div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
+                wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
+                dlg.SetSelection(0); // default selection
+                if(dlg.ShowModal()!=wxID_OK) return;
+                divs = div_choices[dlg.GetSelection()];
+            }
+            vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+            MeshRD::GetGeodesicSphere(divs,mesh,2);
+            FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+            s->SetPlatform(opencl_platform);
+            s->SetDevice(opencl_device);
+            s->CopyFromMesh(mesh);
+            s->GenerateInitialPattern();
+            this->render_settings.GetProperty("slice_3D").SetBool(false);
+            this->SetCurrentRDSystem(s);
+            break;
+        }
+        default:
+        {
+            wxMessageBox(_("Not currently supported"));
+            return;
+        }
+    }
 
     this->is_running = false;
     this->system->SetFilename("untitled");
@@ -1915,11 +1987,12 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Step1,                     DO_STEP1);
         SetAccelerator(mbar, ID::StepN,                     DO_STEPN);
         SetAccelerator(mbar, ID::RunStop,                   DO_RUNSTOP);
-        SetAccelerator(mbar, ID::Reset,                     DO_RESET);
-        SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_GENPATT);
         SetAccelerator(mbar, ID::Faster,                    DO_FASTER);
         SetAccelerator(mbar, ID::Slower,                    DO_SLOWER);
         SetAccelerator(mbar, ID::ChangeRunningSpeed,        DO_CHANGESPEED);
+        SetAccelerator(mbar, ID::Reset,                     DO_RESET);
+        SetAccelerator(mbar, ID::GenerateInitialPattern,    DO_GENPATT);
+        SetAccelerator(mbar, ID::Blank,                     DO_BLANK);
         SetAccelerator(mbar, ID::AddParameter,              DO_ADDPARAM);
         SetAccelerator(mbar, ID::DeleteParameter,           DO_DELPARAM);
         SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
@@ -1978,11 +2051,12 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_STEP1:          cmdid = ID::Step1; break;
         case DO_STEPN:          cmdid = ID::StepN; break;
         case DO_RUNSTOP:        cmdid = ID::RunStop; break;
-        case DO_RESET:          cmdid = ID::Reset; break;
-        case DO_GENPATT:        cmdid = ID::GenerateInitialPattern; break;
         case DO_FASTER:         cmdid = ID::Faster; break;
         case DO_SLOWER:         cmdid = ID::Slower; break;
         case DO_CHANGESPEED:    cmdid = ID::ChangeRunningSpeed; break;
+        case DO_RESET:          cmdid = ID::Reset; break;
+        case DO_GENPATT:        cmdid = ID::GenerateInitialPattern; break;
+        case DO_BLANK:          cmdid = ID::Blank; break;
         case DO_ADDPARAM:       cmdid = ID::AddParameter; break;
         case DO_DELPARAM:       cmdid = ID::DeleteParameter; break;
         case DO_DEVICE:         cmdid = ID::SelectOpenCLDevice; break;
@@ -2588,6 +2662,15 @@ void MyFrame::OnStopRecording(wxCommandEvent &event)
 void MyFrame::OnUpdateStopRecording(wxUpdateUIEvent &event)
 {
     event.Enable(this->is_recording);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnBlank(wxCommandEvent& event)
+{
+    this->system->BlankImage();
+    this->is_running = false;
+    this->UpdateWindows();
 }
 
 // ---------------------------------------------------------------------
