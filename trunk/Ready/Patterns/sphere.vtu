@@ -26,16 +26,16 @@
         <overwrite />
         <white_noise low="0" high="1" />
         <rectangle>
-          <Point3D x="0.8" y="0" z="0" />
-          <Point3D x="1" y="1" z="1" />
+          <point3D x="0.8" y="0" z="0" />
+          <point3D x="1" y="1" z="1" />
         </rectangle>
       </overlay>
       <overlay chemical="a">
         <subtract />
         <other_chemical chemical="b" />
         <rectangle>
-          <Point3D x="0.8" y="0" z="0" />
-          <Point3D x="1" y="1" z="1" />
+          <point3D x="0.8" y="0" z="0" />
+          <point3D x="1" y="1" z="1" />
         </rectangle>
       </overlay>
     </initial_pattern_generator>
