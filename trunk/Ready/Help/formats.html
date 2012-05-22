@@ -33,6 +33,7 @@ These are the Ready-specific XML elements, in alphabetical order:
 <tt><a href="#parameter">&lt;parameter&gt;</a></tt><br>
 <tt><a href="#pixel">&lt;pixel&gt;</a></tt><br>
 <tt><a href="#point3d">&lt;point3d&gt;</a></tt><br>
+<tt><a href="#radial_gradient">&lt;radial_gradient&gt;</a></tt><br>
 <tt><a href="#RD">&lt;RD&gt;</a></tt><tt><br>
 <tt><a href="#rectangle">&lt;rectangle&gt;</a></tt><br>
 <tt><a href="#render_settings">&lt;render_settings&gt;</a></tt><br>
@@ -199,7 +200,7 @@ from a starting point where every chemical is zero.
 <p>Contains:
 <ol>
 <li>operation (required) : one of <tt><a href="#overwrite">overwrite</a></tt>, <tt><a href="#add">add</a></tt>, <tt><a href="#subtract">subtract</a></tt>, <tt><a href="#multiply">multiply</a></tt> or <tt><a href="#divide">divide</a></tt>.
-<li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt>, <tt><a href="#linear_gradient">linear_gradient</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
+<li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>, <tt><a href="#other_chemical">other_chemical</a></tt>, <tt><a href="#linear_gradient">linear_gradient</a></tt>, <tt><a href="#radial_gradient">radial_gradient</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
 <li>shape (required) : one or more of <tt><a href="#everywhere">everywhere</a></tt>, <tt><a href="#rectangle">rectangle</a></tt>, <tt><a href="#circle">circle</a></tt> or <tt><a href="#pixel">pixel</a></tt>.
 </ol>
 
@@ -251,6 +252,20 @@ Specifies that the values in this overlay vary linearly from val1 at the start t
 <ul>
 <li><tt><a href="#point3d">point3d</a></tt> (required) : the start point for the gradient.
 <li><tt><a href="#point3d">point3d</a></tt> (required) : the end point for the gradient.
+</ul>
+
+<h4><a name="radial_gradient"></a><b>&lt;radial_gradient&gt;</b></h4>
+Specifies that the values in this overlay vary linearly from val1 at points near the center
+to val2 at points near the edge.
+<p>Attributes:
+<ul>
+<li><tt>val1</tt> (required) : the value at the center of the gradient.
+<li><tt>val2</tt> (required) : the value at the edge of the gradient.
+</ul>
+<p>Contains:
+<ul>
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the center point for the gradient.
+<li><tt><a href="#point3d">point3d</a></tt> (required) : the edge point for the gradient.
 </ul>
 
 <h4><a name="parameter"></a><b>&lt;parameter&gt;</b></h4>

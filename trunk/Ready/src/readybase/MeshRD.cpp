@@ -497,7 +497,7 @@ void MeshRD::ComputeCellNeighbors()
             neighbors[iN].diffusion_coefficient /= coeff_sum;
         // store this list of neighbors
         cell_neighbors.push_back(neighbors);
-        if(neighbors.size()>this->max_neighbors)
+        if((int)neighbors.size()>this->max_neighbors)
             this->max_neighbors = (int)neighbors.size();
     }
     // N.B. we don't intend to support cells of mixed dimensionality in one mesh
