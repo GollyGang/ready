@@ -35,16 +35,16 @@
         <overwrite />
         <constant value="0" />
         <rectangle>
-          <Point3D x="0.40" y="0.62" z="0" />
-          <Point3D x="0.56" y="0.74" z="1" />
+          <point3D x="0.40" y="0.62" z="0" />
+          <point3D x="0.56" y="0.74" z="1" />
         </rectangle>
         <rectangle>
-          <Point3D x="0.40" y="0.40" z="0" />
-          <Point3D x="0.56" y="0.52" z="1" />
+          <point3D x="0.40" y="0.40" z="0" />
+          <point3D x="0.56" y="0.52" z="1" />
         </rectangle>
         <rectangle>
-          <Point3D x="0.48" y="0.50" z="0" />
-          <Point3D x="0.56" y="0.62" z="1" />
+          <point3D x="0.48" y="0.50" z="0" />
+          <point3D x="0.56" y="0.62" z="1" />
         </rectangle>
       </overlay>
     </initial_pattern_generator>
