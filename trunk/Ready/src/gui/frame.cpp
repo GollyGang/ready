@@ -1336,65 +1336,82 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         if(dlg.ShowModal()!=wxID_OK) return;
         sel = dlg.GetSelection();
     }
-    switch(sel)
+    try 
     {
-        case 0:
-        {
-            FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-            s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
-            s->GenerateInitialPattern();
-            this->SetCurrentRDSystem(s);
-            wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
-            break;
-        }
-        case 1:
-        {
-            FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-            s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
-            s->GenerateInitialPattern();
-            this->SetCurrentRDSystem(s);
-            wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
-            break;
-        }
-        case 2:
-        {
-            FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-            s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
-            s->GenerateInitialPattern();
-            this->SetCurrentRDSystem(s);
-            wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
-            break;
-        }
-        case 3:
-        {
-            int divs;
-            {
-                const int N_CHOICES=9;
-                int div_choices[N_CHOICES] = {2,3,4,5,6,7,8,9,10};
-                wxString div_descriptions[N_CHOICES];
-                for(int i=0;i<N_CHOICES;i++)
-                    div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
-                wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
-                dlg.SetSelection(0); // default selection
-                if(dlg.ShowModal()!=wxID_OK) return;
-                divs = div_choices[dlg.GetSelection()];
-            }
-            vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-            MeshRD::GetGeodesicSphere(divs,mesh,2);
-            FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-            s->SetPlatform(opencl_platform);
-            s->SetDevice(opencl_device);
-            s->CopyFromMesh(mesh);
-            s->GenerateInitialPattern();
-            this->render_settings.GetProperty("slice_3D").SetBool(false);
-            this->SetCurrentRDSystem(s);
-            break;
-        }
-        default:
-        {
-            wxMessageBox(_("Not currently supported"));
-            return;
-        }
+		switch(sel)
+		{
+			case 0:
+			{
+				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+				s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
+				s->GenerateInitialPattern();
+				this->SetCurrentRDSystem(s);
+				wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
+				break;
+			}
+			case 1:
+			{
+				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+				s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
+				s->GenerateInitialPattern();
+				this->SetCurrentRDSystem(s);
+				wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
+				break;
+			}
+			case 2:
+			{
+				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+				s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
+				s->GenerateInitialPattern();
+				this->SetCurrentRDSystem(s);
+				wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
+				break;
+			}
+			case 3:
+			{
+				int divs;
+				{
+					const int N_CHOICES=9;
+					int div_choices[N_CHOICES] = {2,3,4,5,6,7,8,9,10};
+					wxString div_descriptions[N_CHOICES];
+					for(int i=0;i<N_CHOICES;i++)
+						div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
+					wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
+					dlg.SetSelection(0); // default selection
+					if(dlg.ShowModal()!=wxID_OK) return;
+					divs = div_choices[dlg.GetSelection()];
+				}
+				wxBusyCursor busy;
+				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+				MeshRD::GetGeodesicSphere(divs,mesh,2);
+				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+				s->SetPlatform(opencl_platform);
+				s->SetDevice(opencl_device);
+				s->CopyFromMesh(mesh);
+				s->GenerateInitialPattern();
+				this->render_settings.GetProperty("slice_3D").SetBool(false);
+				this->SetCurrentRDSystem(s);
+				break;
+			}
+			default:
+			{
+				wxMessageBox(_("Not currently supported"));
+				return;
+			}
+		}
+	}
+	catch(const exception& e)
+    {
+        wxString message = _("Failed to create new pattern. Error:\n\n");
+        message += wxString(e.what(),wxConvUTF8);
+        MonospaceMessageBox(message,_("Error creating new pattern"),wxART_ERROR);
+        return;
+    }
+    catch(...)
+    {
+        wxString message = _("Failed to create new pattern.");
+        MonospaceMessageBox(message,_("Error creating pattern"),wxART_ERROR);
+        return;
     }
 
     this->is_running = false;
