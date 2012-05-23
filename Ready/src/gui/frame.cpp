@@ -1328,9 +1328,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     // ask user what type of dataset to generate:
     int sel;
     {
-        const int N_CHOICES=6;
+        const int N_CHOICES = 7;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
-            _("Geodesic sphere"), _("Triangular mesh"), _("Hexagonal mesh")};
+            _("Geodesic sphere"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh")};
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         if(dlg.ShowModal()!=wxID_OK) return;
@@ -1340,34 +1340,40 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     {
 		switch(sel)
 		{
-			case 0:
+			case 0: // 1D image
 			{
 				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
 				s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
+                s->CreateDefaultInitialPatternGenerator();
 				s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
 				this->SetCurrentRDSystem(s);
 				wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
 				break;
 			}
-			case 1:
+			case 1: // 2D image
 			{
 				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
 				s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
+                s->CreateDefaultInitialPatternGenerator();
 				s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
 				this->SetCurrentRDSystem(s);
 				wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
 				break;
 			}
-			case 2:
+			case 2: // 3D image
 			{
 				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
 				s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
+                s->CreateDefaultInitialPatternGenerator();
 				s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
 				this->SetCurrentRDSystem(s);
 				wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
 				break;
 			}
-			case 3:
+			case 3: // geodesic sphere
 			{
 				int divs;
 				{
@@ -1388,11 +1394,27 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 				s->SetPlatform(opencl_platform);
 				s->SetDevice(opencl_device);
 				s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
 				s->GenerateInitialPattern();
 				this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
 				this->SetCurrentRDSystem(s);
 				break;
 			}
+            case 4: // tetrahedral mesh
+            {
+				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+				MeshRD::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
+				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+				s->SetPlatform(opencl_platform);
+				s->SetDevice(opencl_device);
+				s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+				this->SetCurrentRDSystem(s);
+				break;
+            }
 			default:
 			{
 				wxMessageBox(_("Not currently supported"));

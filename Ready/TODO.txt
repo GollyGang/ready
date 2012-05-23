@@ -42,6 +42,7 @@ before 0.x release:
 - add orientation indicator, as in Paraview
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
+- make tetrahedral mesh from input surface: scatter internal points then tetrahedralize
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?

@@ -66,6 +66,7 @@ class MeshRD : public AbstractRD
         virtual int GetArenaDimensionality() const;
 
         static void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
+        static void GetTetrahedralMesh(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
 
     protected:
 
