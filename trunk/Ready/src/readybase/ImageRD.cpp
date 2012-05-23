@@ -801,7 +801,7 @@ void ImageRD::SaveStartingPattern()
 void ImageRD::RestoreStartingPattern()
 {
     this->CopyFromImage(this->starting_pattern);
-    this->SetTimestepsTaken(0);
+    this->timesteps_taken = 0;
 }
 
 // ---------------------------------------------------------------------

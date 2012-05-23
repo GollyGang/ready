@@ -50,40 +50,12 @@ void AbstractRD::ClearInitialPatternGenerator()
 
 // ---------------------------------------------------------------------
 
-int AbstractRD::GetTimestepsTaken() const
-{
-    return this->timesteps_taken;
-}
-
-// ---------------------------------------------------------------------
-
 void AbstractRD::SetFormula(string s)
 {
     if(s != this->formula)
         this->need_reload_formula = true;
     this->formula = s;
     this->is_modified = true;
-}
-
-// ---------------------------------------------------------------------
-
-string AbstractRD::GetFormula() const
-{
-    return this->formula;
-}
-
-// ---------------------------------------------------------------------
-
-std::string AbstractRD::GetRuleName() const
-{
-    return this->rule_name;
-}
-
-// ---------------------------------------------------------------------
-
-std::string AbstractRD::GetDescription() const
-{
-    return this->description;
 }
 
 // ---------------------------------------------------------------------
@@ -185,23 +157,9 @@ bool AbstractRD::IsParameter(const string& name) const
 
 // ---------------------------------------------------------------------
 
-bool AbstractRD::IsModified() const
-{
-    return this->is_modified;
-}
-
-// ---------------------------------------------------------------------
-
 void AbstractRD::SetModified(bool m)
 {
     this->is_modified = m;
-}
-
-// ---------------------------------------------------------------------
-
-std::string AbstractRD::GetFilename() const
-{
-    return this->filename;
 }
 
 // ---------------------------------------------------------------------

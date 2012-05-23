@@ -41,39 +41,41 @@ class AbstractRD
         AbstractRD();
         virtual ~AbstractRD();
 
+        /// Load this pattern from an RD element.
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        /// Retrieve an RD element for this pattern, suitable for saving to file.
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
+        /// Called to progress the simulation by N steps.
         virtual void Update(int n_steps) =0;
 
-        /// inbuilt implementations cannot have their number_of_chemicals edited
+        /// Some implementations (e.g. inbuilt ones) cannot have their number_of_chemicals edited.
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
         virtual void SetNumberOfChemicals(int n) =0;
 
-        /// how many timesteps have we advanced since being initialized?
-        int GetTimestepsTaken() const;
-        void SetTimestepsTaken(int t) { this->timesteps_taken=t; }
+        /// How many timesteps have we advanced since being initialized?
+        int GetTimestepsTaken() const { return this->timesteps_taken; }
 
-        /// inbuilt implementations cannot have their formula edited
+        /// Some implementations (e.g. inbuilt ones) cannot have their formula edited.
         virtual bool HasEditableFormula() const =0;
-        std::string GetFormula() const;
+        std::string GetFormula() const { return this->formula; }
         virtual void TestFormula(std::string program_string) {}
         virtual void SetFormula(std::string s);
 
-        /// returns e.g. "inbuilt", "formula", "kernel", as in the XML
+        /// Returns e.g. "inbuilt", "formula", "kernel", as in the XML.
         virtual std::string GetRuleType() const =0;
         virtual std::string GetFileExtension() const =0;
 
-        std::string GetRuleName() const;
+        std::string GetRuleName() const { return this->rule_name; }
         void SetRuleName(std::string s);
 
-        std::string GetDescription() const;
+        std::string GetDescription() const { return this->description; }
         void SetDescription(std::string s);
         
         virtual int GetNumberOfCells() const =0;
 
-        // every implementation has parameters that can be edited and changed 
+        // most implementations have parameters that can be edited and changed 
         // (will cause errors if they don't match the inbuilt names, the formula or the kernel)
         int GetNumberOfParameters() const;
         std::string GetParameterName(int iParam) const;
@@ -86,12 +88,12 @@ class AbstractRD
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
 
-        /// should the user be asked if they want to save?
-        bool IsModified() const;
+        /// Should the user be asked if they want to save this pattern?
+        bool IsModified() const { return this->is_modified; }
         void SetModified(bool m);
 
         virtual void SaveFile(const char* filename,const Properties& render_settings) const =0;
-        std::string GetFilename() const;
+        std::string GetFilename() const { return this->filename; }
         void SetFilename(const std::string& s);
 
         virtual void GenerateInitialPattern() =0;
@@ -110,7 +112,7 @@ class AbstractRD
         virtual float GetZ() const =0;
         virtual void SetDimensions(int x,int y,int z) {}
 
-        /// only some implementations (FullKernelOpenCLImageRD) can have their block size edited
+        /// Only some implementations (e.g. FullKernelOpenCLImageRD) can have their block size edited.
         virtual bool HasEditableBlockSize() const { return false; }
         virtual int GetBlockSizeX() const { return 1; } ///< e.g. block size may be 4x1x1 for kernels that use float4 (like FormulaOpenCLImageRD)
         virtual int GetBlockSizeY() const { return 1; }
