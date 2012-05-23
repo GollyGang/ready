@@ -94,12 +94,11 @@ class AbstractRD
         std::string GetFilename() const;
         void SetFilename(const std::string& s);
 
-        void AddInitialPatternGeneratorOverlay(Overlay* overlay);
         virtual void GenerateInitialPattern() =0;
         virtual void BlankImage() =0;
-        void ClearInitialPatternGenerator();
-        int GetNumberOfInitialPatternGeneratorOverlays() const { return (int)this->initial_pattern_generator.size(); }
-        Overlay* GetInitialPatternGeneratorOverlay(int i) const { return this->initial_pattern_generator[i]; }
+
+        /// Create a generator suitable for Gray-Scott, so that new patterns can start working immediately.
+        void CreateDefaultInitialPatternGenerator();
 
         virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings) =0;
         virtual void SaveStartingPattern() =0;
@@ -137,6 +136,8 @@ class AbstractRD
 
         /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps)=0;
+
+        void ClearInitialPatternGenerator();
 
     protected:
 

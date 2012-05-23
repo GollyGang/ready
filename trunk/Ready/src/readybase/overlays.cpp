@@ -114,10 +114,11 @@ Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node), op(NULL), fill(NUL
             this->fill = pFill; // TODO: check if already supplied
             continue;
         }
-        // must be a shape element
+        // must be a shape element?
         pShape = BaseShape::New(subnode);
         if(pShape)
             this->shapes.push_back(pShape);
+        else throw runtime_error(string("Unknown overlay element: ")+subnode->GetName());
     }
     if(this->op == NULL) throw runtime_error("overlay: missing operation element");
     if(this->fill == NULL) throw runtime_error("overlay: missing fill element");

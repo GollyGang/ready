@@ -31,6 +31,7 @@ using namespace std;
 
 FormulaOpenCLImageRD::FormulaOpenCLImageRD()
 {
+    // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");
     this->AddParameter("timestep",1.0f);
     this->AddParameter("D_a",0.082f);
