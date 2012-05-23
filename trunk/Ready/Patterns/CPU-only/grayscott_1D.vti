@@ -3,7 +3,8 @@
   <RD format_version="1">
   
     <description>
-        Self-replicating spots in one dimension.
+        Self-replicating spots in one dimension. This examples uses an inbuilt implementation
+        (currently only Gray-Scott is available) and so the formula cannot be edited.
     </description>
           
     <rule type="inbuilt" name="Gray-Scott">

@@ -3,8 +3,8 @@
   <RD format_version="1">
       
     <description>
-        Self-replicating spots in three dimensions, using the
-        Gray-Scott rule built into Ready (currently the only such rule).
+        The Gray-Scott rule in three dimensions. This examples uses an inbuilt implementation
+        (currently only Gray-Scott is available) and so the formula cannot be edited.
     </description>
       
     <rule type="inbuilt" name="Gray-Scott">
