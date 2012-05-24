@@ -11,6 +11,7 @@ UI annoyances:
 
 before 0.3 release:
 
+- File > New Pattern should use inbuilt implementation if OpenCL is not available
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
