@@ -603,7 +603,7 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
-void MeshRD::GetTetrahedralMesh(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
+/* static */ void MeshRD::GetTetrahedralMesh(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
 {
     // TODO: we could make any number of shapes here but we need a more general mechanism, 
     // e.g. input a closed surface, scatter points inside, tetrahedralize
@@ -620,6 +620,61 @@ void MeshRD::GetTetrahedralMesh(int n_points,vtkUnstructuredGrid *mesh,int n_che
     del->SetInputConnection(trans->GetOutputPort());
     del->Update();
     mesh->DeepCopy(del->GetOutput());
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+/* static */ void MeshRD::GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems)
+{
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+
+    float radius1 = 2.0f;
+    float radius2 = 3.0f;
+    vtkSmartPointer<vtkTransform> r1 = vtkSmartPointer<vtkTransform>::New();
+    vtkSmartPointer<vtkTransform> r2 = vtkSmartPointer<vtkTransform>::New();
+    double p[3],p2[3];
+    for(int x=0;x<nx;x++)
+    {
+        p[0]=p[1]=p[2]=0;
+        // translate, rotate
+        p[1] += radius1;
+        r1->TransformPoint(p,p);
+        // rotate the transform further for next time
+        r1->RotateX(360.0/nx);
+        for(int y=0;y<ny;y++)
+        {
+            // translate
+            p2[0] = p[0];
+            p2[1] = p[1] + radius2;
+            p2[2] = p[2];
+            // rotate
+            r2->TransformPoint(p2,p2);
+            pts->InsertNextPoint(p2);
+            // rotate the transform further for next time
+            r2->RotateZ(360.0/ny);
+            // make a quad 
+            cells->InsertNextCell(4);
+            cells->InsertCellPoint(x*ny+y);
+            cells->InsertCellPoint(x*ny+(y+1)%ny);
+            cells->InsertCellPoint(((x+1)%nx)*ny+(y+1)%ny);
+            cells->InsertCellPoint(((x+1)%nx)*ny+y);
+        }
+    }
+
+    mesh->SetPoints(pts);
+    mesh->SetCells(VTK_POLYGON,cells);
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)

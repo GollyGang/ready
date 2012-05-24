@@ -67,6 +67,7 @@ class MeshRD : public AbstractRD
 
         static void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
         static void GetTetrahedralMesh(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
+        static void GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
 
     protected:
 

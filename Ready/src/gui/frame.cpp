@@ -1328,9 +1328,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     // ask user what type of dataset to generate:
     int sel;
     {
-        const int N_CHOICES = 7;
+        const int N_CHOICES = 8;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
-            _("Geodesic sphere"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh")};
+            _("Geodesic sphere"), _("Torus"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh")};
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         if(dlg.ShowModal()!=wxID_OK) return;
@@ -1401,7 +1401,22 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 				this->SetCurrentRDSystem(s);
 				break;
 			}
-            case 4: // tetrahedral mesh
+            case 4: // torus
+            {
+				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+				MeshRD::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
+				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+				s->SetPlatform(opencl_platform);
+				s->SetDevice(opencl_device);
+				s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+				this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+				this->SetCurrentRDSystem(s);
+				break;
+            }
+            case 5: // tetrahedral mesh
             {
 				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
 				MeshRD::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
@@ -1412,6 +1427,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D_axis").SetChemical("y");
 				this->SetCurrentRDSystem(s);
 				break;
             }
