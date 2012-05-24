@@ -90,7 +90,6 @@ MeshRD::MeshRD()
 {
     this->starting_pattern = vtkUnstructuredGrid::New();
     this->mesh = vtkUnstructuredGrid::New();
-    this->buffer = vtkUnstructuredGrid::New();
     this->cell_neighbor_indices = NULL;
     this->cell_neighbor_weights = NULL;
 }
@@ -103,7 +102,6 @@ MeshRD::~MeshRD()
     delete []this->cell_neighbor_weights;
 
     this->mesh->Delete();
-    this->buffer->Delete();
     this->starting_pattern->Delete();
     this->n_chemicals = 0;
 }
@@ -135,8 +133,6 @@ void MeshRD::SetNumberOfChemicals(int n)
         scalars->FillComponent(0,0.0f);
         this->mesh->GetCellData()->AddArray(scalars);
     }
-
-    this->buffer->DeepCopy(this->mesh);
 }
 
 // ---------------------------------------------------------------------
@@ -237,8 +233,6 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->mesh->DeepCopy(mesh2);
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
-
-    this->buffer->DeepCopy(this->mesh);
 
     this->ComputeCellNeighbors();
 }

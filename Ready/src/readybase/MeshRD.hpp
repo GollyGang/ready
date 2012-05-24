@@ -80,7 +80,6 @@ class MeshRD : public AbstractRD
     protected:
 
         vtkUnstructuredGrid* mesh;             ///< the cell data contains a named array for each chemical ('a', 'b', etc.)
-        vtkUnstructuredGrid* buffer;           ///< temporary storage used during computation
         vtkUnstructuredGrid* starting_pattern; ///< we save the starting pattern, to allow the user to reset
 
         int max_neighbors;

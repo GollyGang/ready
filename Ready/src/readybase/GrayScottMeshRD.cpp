@@ -36,6 +36,14 @@ GrayScottMeshRD::GrayScottMeshRD()
     this->AddParameter("D_b",0.041f);
     this->AddParameter("k",0.062f);
     this->AddParameter("F",0.035f);
+    this->buffer = vtkUnstructuredGrid::New();
+}
+
+// ---------------------------------------------------------------------
+
+GrayScottMeshRD::~GrayScottMeshRD()
+{
+    this->buffer->Delete();
 }
 
 // ---------------------------------------------------------------------
@@ -106,27 +114,18 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
 
 // ---------------------------------------------------------------------
 
-void GrayScottMeshRD::CreateGrayScottStartingConditions()
+void GrayScottMeshRD::SetNumberOfChemicals(int n)
 {
-    vtkSmartPointer<vtkMinimalStandardRandomSequence> random = vtkSmartPointer<vtkMinimalStandardRandomSequence>::New();
-    vtkFloatArray *target_a,*target_b;
-    float a,b;
-    for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
-    {
-        target_a = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(0).c_str()) );
-        target_b = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(1).c_str()) );
-        a=1;
-        b=0;
-        if(iCell<this->mesh->GetNumberOfCells()/2)
-        {
-            b = random->GetValue();
-            a -= b;
-        }
-        target_a->SetValue(iCell,a);
-        target_b->SetValue(iCell,b);
-        random->Next();
-    }
-    this->mesh->Modified();
+    MeshRD::SetNumberOfChemicals(n);
+    this->buffer->DeepCopy(this->mesh);
+}
+
+// ---------------------------------------------------------------------
+
+void GrayScottMeshRD::CopyFromMesh(vtkUnstructuredGrid *mesh2)
+{
+    MeshRD::CopyFromMesh(mesh2);
+    this->buffer->DeepCopy(this->mesh);
 }
 
 // ---------------------------------------------------------------------

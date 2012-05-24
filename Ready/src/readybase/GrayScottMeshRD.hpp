@@ -36,11 +36,16 @@ class GrayScottMeshRD : public InbuiltMeshRD
     public:
 
         GrayScottMeshRD();
+        ~GrayScottMeshRD();
 
-        /// For imported meshes we need a way to get something going on the surface so the user can get started.
-        void CreateGrayScottStartingConditions();
+        virtual void SetNumberOfChemicals(int n);
+        virtual void CopyFromMesh(vtkUnstructuredGrid *mesh2);
 
     protected:
 
         virtual void InternalUpdate(int n_steps);
+
+    protected:
+
+        vtkUnstructuredGrid* buffer;           ///< temporary storage used during computation
 };
