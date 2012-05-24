@@ -2490,7 +2490,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
         rd->SetNumberOfChemicals(2);
-        rd->CreateGrayScottStartingConditions(); // get something going as an example
+        rd->CreateDefaultInitialPatternGenerator();
+        rd->GenerateInitialPattern();
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("vtu")))
@@ -2509,7 +2510,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         GrayScottMeshRD *rd = new GrayScottMeshRD();
         rd->CopyFromMesh(vtu_reader->GetOutput());
         rd->SetNumberOfChemicals(2);
-        rd->CreateGrayScottStartingConditions(); // get something going as an example
+        rd->CreateDefaultInitialPatternGenerator();
+        rd->GenerateInitialPattern();
         this->SetCurrentRDSystem(rd);
     }
     else if(mesh_filename.EndsWith(_T("obj")))
@@ -2531,7 +2533,8 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
         rd->CopyFromMesh(ug);
         rd->SetNumberOfChemicals(2);
-        rd->CreateGrayScottStartingConditions(); // get something going as an example
+        rd->CreateDefaultInitialPatternGenerator();
+        rd->GenerateInitialPattern();
         this->SetCurrentRDSystem(rd);
     }
     else
