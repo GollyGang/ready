@@ -1427,7 +1427,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D_axis").SetChemical("y");
+                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
 				this->SetCurrentRDSystem(s);
 				break;
             }
