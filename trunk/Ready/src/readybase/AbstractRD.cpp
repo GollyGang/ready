@@ -279,41 +279,48 @@ void AbstractRD::CreateDefaultInitialPatternGenerator()
     // this is ungainly, will need to improve later when we allow the user to edit the IPG through the Info Pane
     vtkSmartPointer<vtkXMLDataElement> ow = vtkSmartPointer<vtkXMLDataElement>::New();
     ow->SetName("overwrite");
+    vtkSmartPointer<vtkXMLDataElement> c1 = vtkSmartPointer<vtkXMLDataElement>::New();
+    c1->SetName("constant");
+    c1->SetFloatAttribute("value",1.0);
     vtkSmartPointer<vtkXMLDataElement> ew = vtkSmartPointer<vtkXMLDataElement>::New();
     ew->SetName("everywhere");
-    vtkSmartPointer<vtkXMLDataElement> con1 = vtkSmartPointer<vtkXMLDataElement>::New();
-    con1->SetName("constant");
-    con1->SetAttribute("value","1.0");
-    vtkSmartPointer<vtkXMLDataElement> a1 = vtkSmartPointer<vtkXMLDataElement>::New();
-    a1->SetAttribute("chemical","a");
-    a1->AddNestedElement(ow);
-    a1->AddNestedElement(con1);
-    a1->AddNestedElement(ew);
-    this->initial_pattern_generator.push_back(new Overlay(a1));
+
+    vtkSmartPointer<vtkXMLDataElement> ov1 = vtkSmartPointer<vtkXMLDataElement>::New();
+    ov1->SetName("overlay");
+    ov1->SetAttribute("chemical","a");
+    ov1->AddNestedElement(ow);
+    ov1->AddNestedElement(c1);
+    ov1->AddNestedElement(ew);
+    this->initial_pattern_generator.push_back(new Overlay(ov1));
+
     vtkSmartPointer<vtkXMLDataElement> wn = vtkSmartPointer<vtkXMLDataElement>::New();
     wn->SetName("white_noise");
-    wn->SetAttribute("low","0.0");
-    wn->SetAttribute("high","1.0");
+    wn->SetFloatAttribute("low",0.0);
+    wn->SetFloatAttribute("high",1.0);
     vtkSmartPointer<vtkXMLDataElement> p1 = vtkSmartPointer<vtkXMLDataElement>::New();
-    p1->SetName("point3d");
-    p1->SetAttribute("x","0.5");
-    p1->SetAttribute("y","0");
-    p1->SetAttribute("z","0");
+    p1->SetName("point3D");
+    p1->SetFloatAttribute("x",0.5);
+    p1->SetFloatAttribute("y",0);
+    p1->SetFloatAttribute("z",0);
     vtkSmartPointer<vtkXMLDataElement> p2 = vtkSmartPointer<vtkXMLDataElement>::New();
-    p2->SetName("point3d");
-    p2->SetAttribute("x","1");
-    p2->SetAttribute("y","1");
-    p2->SetAttribute("z","1");
+    p2->SetName("point3D");
+    p2->SetFloatAttribute("x",1.0);
+    p2->SetFloatAttribute("y",1.0);
+    p2->SetFloatAttribute("z",1.0);
     vtkSmartPointer<vtkXMLDataElement> r = vtkSmartPointer<vtkXMLDataElement>::New();
     r->SetName("rectangle");
     r->AddNestedElement(p1);
     r->AddNestedElement(p2);
-    vtkSmartPointer<vtkXMLDataElement> br = vtkSmartPointer<vtkXMLDataElement>::New();
-    br->SetAttribute("chemical","b");
-    br->AddNestedElement(ow);
-    br->AddNestedElement(wn);
-    br->AddNestedElement(r);
-    this->initial_pattern_generator.push_back(new Overlay(br));
+    for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
+    {
+        vtkSmartPointer<vtkXMLDataElement> ov = vtkSmartPointer<vtkXMLDataElement>::New();
+        ov->SetName("overlay");
+        ov->SetAttribute("chemical",GetChemicalName(iChem).c_str());
+        ov->AddNestedElement(ow);
+        ov->AddNestedElement(wn);
+        ov->AddNestedElement(r);
+        this->initial_pattern_generator.push_back(new Overlay(ov));
+    }
 }
 
 // ---------------------------------------------------------------------
