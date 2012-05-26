@@ -109,6 +109,7 @@ set( PATTERN_FILES
   mutually-catalytic_spots.vti
   parameter_modulation_demo.vti
   parameter_modulation_demo2.vti
+  life_torus.vtu
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti
