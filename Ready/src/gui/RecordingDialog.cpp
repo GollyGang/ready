@@ -15,7 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-
 // local:
 #include "dialogs.hpp"
 #include "RecordingDialog.hpp"
@@ -26,7 +25,7 @@ using namespace std;
 
 // -----------------------------------------------------------------------------------------------
 
-RecordingDialog::RecordingDialog(wxWindow *parent) 
+RecordingDialog::RecordingDialog(wxWindow *parent,bool default_is_2D_data) 
     : wxDialog(parent,wxID_ANY,_("Recording settings"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     // create the controls
@@ -37,7 +36,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent)
     this->source_combo = new wxComboBox(this,wxID_ANY);
     this->source_combo->AppendString(_("current view"));
     this->source_combo->AppendString(_("2D data"));
-    this->source_combo->SetSelection(1);
+    this->source_combo->SetSelection(default_is_2D_data?1:0);
 
     wxStaticText* folder_label = new wxStaticText(this, wxID_STATIC, _("Save frames here: (will overwrite)"));
     wxBoxSizer* hbox1 = new wxBoxSizer(wxHORIZONTAL);
