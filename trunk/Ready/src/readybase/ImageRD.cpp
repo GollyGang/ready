@@ -272,7 +272,8 @@ void ImageRD::GenerateInitialPattern()
 
                     int iC = overlay->GetTargetChemical();
                     if(iC<0 || iC>=this->GetNumberOfChemicals())
-                        throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
+                        continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
+                        //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
                     float *val = vtk_at(static_cast<float*>(this->GetImage(iC)->GetScalarPointer()),x,y,z,X,Y);
                     vector<float> vals(this->GetNumberOfChemicals());
