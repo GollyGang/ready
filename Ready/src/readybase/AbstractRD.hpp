@@ -61,7 +61,7 @@ class AbstractRD
         virtual bool HasEditableFormula() const =0;
         std::string GetFormula() const { return this->formula; }
         virtual void TestFormula(std::string program_string) {}
-        virtual void SetFormula(std::string s);
+        void SetFormula(std::string s);
 
         /// Returns e.g. "inbuilt", "formula", "kernel", as in the XML.
         virtual std::string GetRuleType() const =0;
