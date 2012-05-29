@@ -798,19 +798,21 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
+/// A two-dimensional triangle, used in MeshRD::GetPenroseRhombiTiling().
+struct Tri {
+    double ax,ay,bx,by,cx,cy;
+    Tri(double ax2,double ay2,double bx2,double by2,double cx2,double cy2)
+        : ax(ax2), ay(ay2), bx(bx2), by(by2), cx(cx2), cy(cy2) {}
+};
+
+/// The indices of a triangle, used in MeshRD::GetPenroseRhombiTiling().
+struct TriIndices {
+    double ind[3];
+};
+
 /* static */ void MeshRD::GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems)
 {
     // Many thanks to Jeff Preshing: http://preshing.com/20110831/penrose-tiling-explained
-
-    struct Tri {
-        double ax,ay,bx,by,cx,cy;
-        Tri(double ax2,double ay2,double bx2,double by2,double cx2,double cy2)
-            : ax(ax2), ay(ay2), bx(bx2), by(by2), cx(cx2), cy(cy2) {}
-    };
-
-    struct TriIndices {
-        double ind[3];
-    };
 
     vector<Tri> red_tris[2],blue_tris[2]; // each list has two buffers
     int iCurrentBuffer = 0;
