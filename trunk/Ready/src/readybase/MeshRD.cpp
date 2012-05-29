@@ -862,7 +862,7 @@ struct TriIndices {
 
     // merge coincident vertices
     double tol = hypot2(red_tris[iCurrentBuffer][0].ax-red_tris[iCurrentBuffer][0].bx,red_tris[iCurrentBuffer][0].ay-red_tris[iCurrentBuffer][0].by)/100.0;
-    vector<pair<double,double>> verts;
+    vector<pair<double,double> > verts;
     vector<TriIndices> tris;
     vector<Tri> all_tris(red_tris[iCurrentBuffer]);
     all_tris.insert(all_tris.end(),blue_tris[iCurrentBuffer].begin(),blue_tris[iCurrentBuffer].end());
