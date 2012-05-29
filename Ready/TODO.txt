@@ -17,8 +17,10 @@ before 0.3 release:
 - bug: get "Failed to allocate context: out of resources" errors (CL_OUT_OF_RESOURCES) after 
   extended usage (not releasing something? or bug in driver - get on other platforms?)
     - to reproduce: repeatedly load OpenCL vti files
-- reorganise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific, trippy)?
+- reorganise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - add complex Ginsburg-Landau
+- need for edges to be drawn on top of colored mesh (for penrose.vtu)
+- allow inbuilt -> formula -> full kernel conversions
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
@@ -30,18 +32,19 @@ before 0.x release:
 - allow user to change the default render settings
 - multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) 
 - read Turk's CASCADE language, for freeze-and-continue schemes
-- graphical UI for editing the initial-pattern-generator overlay stack
+- add initial_pattern_generator to Info Pane for editing
 - export rule to the WebGL Playground template
 - add orientation indicator, as in Paraview
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
 - make tetrahedral mesh from input surface: scatter internal points then tetrahedralize
-- allow inbuilt -> formula -> full kernel conversions
-- add initial_pattern_generator to Info Pane for editing
 - 2D slices as slice through 3D volume (if available, else whole image) =>
   1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
+- Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
+  5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
+  used a boundary-size weighting.
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
@@ -51,9 +54,7 @@ before 1.0 release:
 - allow user to paint, erase, even while running (2D only)
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
 - new overlay shape: scattered rectangles/circles (need some higher-level specifier for this?)
-- support boundary_size diffusion option, to match Turk's implementation. In general we want control
-  over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 5pt stencil
-  but sometimes want a 9pt stencil with equal weighting (for GoL) or something else. 
+- graphical UI for editing the initial-pattern-generator overlay stack
 
 future ideas:
 - bug: allow user to change OpenCL platform and device while a pattern is running
