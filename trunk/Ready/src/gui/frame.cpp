@@ -1328,9 +1328,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     // ask user what type of dataset to generate:
     int sel;
     {
-        const int N_CHOICES = 8;
+        const int N_CHOICES = 9;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
-            _("Geodesic sphere"), _("Torus"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh")};
+            _("Geodesic sphere"), _("Torus"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh"),
+            _("Penrose tiling (rhombi)") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         if(dlg.ShowModal()!=wxID_OK) return;
@@ -1428,6 +1429,36 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
+				this->SetCurrentRDSystem(s);
+				break;
+            }
+            case 6: // triangular mesh
+            {
+				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+				MeshRD::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
+				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+				s->SetPlatform(opencl_platform);
+				s->SetDevice(opencl_device);
+				s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+				this->SetCurrentRDSystem(s);
+				break;
+            }
+            case 7: // hexagonal mesh
+            {
+				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+				MeshRD::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
+				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+				s->SetPlatform(opencl_platform);
+				s->SetDevice(opencl_device);
+				s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
 				this->SetCurrentRDSystem(s);
 				break;
             }
