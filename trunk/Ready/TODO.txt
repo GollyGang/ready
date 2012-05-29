@@ -19,8 +19,8 @@ before 0.3 release:
     - to reproduce: repeatedly load OpenCL vti files
 - reorganise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - add complex Ginsburg-Landau
-- need for edges to be drawn on top of colored mesh (for penrose.vtu)
 - allow inbuilt -> formula -> full kernel conversions
+- bug: show_cell_edges is offset on images (same issue as with Minecraft-style surface)
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
