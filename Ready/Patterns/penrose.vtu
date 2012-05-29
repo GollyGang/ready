@@ -47,6 +47,7 @@
       <timesteps_per_render value="1" />
       <show_color_scale value="false" />
       <use_image_interpolation value="false" />
+	  <show_cell_edges value="true" />
     </render_settings>
     
   </RD>

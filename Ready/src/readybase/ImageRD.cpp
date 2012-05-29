@@ -73,6 +73,8 @@ using namespace std;
 #include <vtkObjectFactory.h>
 #include <vtkFloatArray.h>
 #include <vtkTextureMapToPlane.h>
+#include <vtkImageToStructuredPoints.h>
+#include <vtkDataSetMapper.h>
 
 // -------------------------------------------------------------------
 
@@ -363,6 +365,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
+    bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -388,13 +391,30 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     image_mapper->SetLookupTable(lut);
     image_mapper->SetInputConnection(pad->GetOutputPort());
   
-    // an actor determines how a scene object is displayed
-    vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-    actor->SetInput(image_mapper->GetOutput());
-    actor->SetPosition(0,low*scaling - 5.0,0);
-    if(!use_image_interpolation)
-        actor->InterpolateOff();
-    pRenderer->AddActor(actor);
+    if(show_cell_edges)
+    {
+        vtkSmartPointer<vtkImageToStructuredPoints> i2sp = vtkSmartPointer<vtkImageToStructuredPoints>::New();
+        i2sp->SetInputConnection(image_mapper->GetOutputPort());
+        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+        mapper->SetInputConnection(i2sp->GetOutputPort());
+        if(!use_image_interpolation)
+            mapper->InterpolateScalarsBeforeMappingOff();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->EdgeVisibilityOn();
+        actor->GetProperty()->SetEdgeColor(0,0,0);
+        actor->SetPosition(0,low*scaling - 5.0,0);
+        pRenderer->AddActor(actor);
+    }
+    else
+    {
+        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+        actor->SetInput(image_mapper->GetOutput());
+        actor->SetPosition(0,low*scaling - 5.0,0);
+        if(!use_image_interpolation)
+            actor->InterpolateOff();
+        pRenderer->AddActor(actor);
+    }
 
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
@@ -464,6 +484,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool show_displacement_mapped_surface = render_settings.GetProperty("show_displacement_mapped_surface").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
+    bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -489,6 +510,22 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         image_mapper->SetInput(this->GetImage(iChem));
 
         // add a color-mapped image plane
+        if(show_cell_edges)
+        {
+            vtkSmartPointer<vtkImageToStructuredPoints> i2sp = vtkSmartPointer<vtkImageToStructuredPoints>::New();
+            i2sp->SetInputConnection(image_mapper->GetOutputPort());
+            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+            mapper->SetInputConnection(i2sp->GetOutputPort());
+            if(!use_image_interpolation)
+                mapper->InterpolateScalarsBeforeMappingOff();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(0,0,0);
+            actor->SetPosition(offset[0],offset[1]-this->GetY()-3,offset[2]);
+            pRenderer->AddActor(actor);
+        }
+        else
         {
             vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
             actor->SetInput(image_mapper->GetOutput());
@@ -626,6 +663,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
+    bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
 
     // contour the 3D volume and render as a polygonal surface
 
@@ -770,15 +808,30 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         image_mapper->SetLookupTable(lut);
         image_mapper->SetInputConnection(voi->GetOutputPort());
       
-        // an actor determines how a scene object is displayed
-        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-        actor->SetInput(image_mapper->GetOutput());
-        actor->SetUserMatrix(resliceAxes);
-        if(!use_image_interpolation)
-            actor->InterpolateOff();
-
-        // add the actor to the renderer's scene
-        pRenderer->AddActor(actor);
+        if(show_cell_edges)
+        {
+            vtkSmartPointer<vtkImageToStructuredPoints> i2sp = vtkSmartPointer<vtkImageToStructuredPoints>::New();
+            i2sp->SetInputConnection(image_mapper->GetOutputPort());
+            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+            mapper->SetInputConnection(i2sp->GetOutputPort());
+            if(!use_image_interpolation)
+                mapper->InterpolateScalarsBeforeMappingOff();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(0,0,0);
+            actor->SetUserMatrix(resliceAxes);
+            pRenderer->AddActor(actor);
+        }
+        else
+        {
+            vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+            actor->SetInput(image_mapper->GetOutput());
+            actor->SetUserMatrix(resliceAxes);
+            if(!use_image_interpolation)
+                actor->InterpolateOff();
+            pRenderer->AddActor(actor);
+        }
 
         // also add a scalar bar to show how the colors correspond to values
         if(show_color_scale)

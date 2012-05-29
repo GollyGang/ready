@@ -1444,6 +1444,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
                 this->SetCurrentRDSystem(s);
                 break;
             }
@@ -1459,6 +1460,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
                 this->SetCurrentRDSystem(s);
                 break;
             }
@@ -1474,6 +1476,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
                 this->SetCurrentRDSystem(s);
                 break;
             }
@@ -2312,6 +2315,7 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("vertical_scale_2D",15.0f));
     this->render_settings.AddProperty(Property("contour_level",0.25f));
     this->render_settings.AddProperty(Property("use_wireframe",false));
+    this->render_settings.AddProperty(Property("show_cell_edges",false));
     this->render_settings.AddProperty(Property("slice_3D",true));
     this->render_settings.AddProperty(Property("slice_3D_axis","axis","z"));
     this->render_settings.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
