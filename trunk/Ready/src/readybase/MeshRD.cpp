@@ -52,6 +52,7 @@
 #include <vtkDelaunay3D.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
+#include <vtkCleanPolyData.h>
 
 // STL:
 #include <stdexcept>
@@ -797,8 +798,134 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
+/// A two-dimensional triangle.
+struct Tri {
+    double ax,ay,bx,by,cx,cy;
+    Tri(double ax2,double ay2,double bx2,double by2,double cx2,double cy2)
+        : ax(ax2), ay(ay2), bx(bx2), by(by2), cx(cx2), cy(cy2) {}
+};
+struct TriIndices {
+    double ind[3];
+};
+
 /* static */ void MeshRD::GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems)
 {
+    // Many thanks to Jeff Preshing: http://preshing.com/20110831/penrose-tiling-explained
+
+    vector<Tri> red_tris[2],blue_tris[2]; // each list has two buffers
+    int iCurrentBuffer = 0;
+
+    double goldenRatio = (1.0 + sqrt(5.0)) / 2.0;
+
+    // start with 10 red triangles in a wheel
+    double angle_step = 2.0 * 3.1415926535 / 10.0;
+    for(int i=0;i<10;i++)
+    {
+        double angle = angle_step * i;
+        if(i%2)
+            red_tris[iCurrentBuffer].push_back(Tri(0,0,cos(angle),sin(angle),cos(angle+angle_step),sin(angle+angle_step)));
+        else
+            red_tris[iCurrentBuffer].push_back(Tri(0,0,cos(angle+angle_step),sin(angle+angle_step),cos(angle),sin(angle)));
+    }
+
+    // subdivide
+    double px,py,qx,qy,rx,ry;
+    for(int i=0;i<n_subdivisions;i++)
+    {
+        int iTargetBuffer = 1-iCurrentBuffer;
+        red_tris[iTargetBuffer].clear();
+        blue_tris[iTargetBuffer].clear();
+        // each red triangle becomes a smaller red and a blue
+        for(vector<Tri>::const_iterator it = red_tris[iCurrentBuffer].begin();it!=red_tris[iCurrentBuffer].end();it++)
+        {
+            px = it->ax + (it->bx - it->ax) / goldenRatio;
+            py = it->ay + (it->by - it->ay) / goldenRatio;
+            red_tris[iTargetBuffer].push_back(Tri(it->cx,it->cy,px,py,it->bx,it->by));
+            blue_tris[iTargetBuffer].push_back(Tri(px,py,it->cx,it->cy,it->ax,it->ay));
+        }
+        // each blue triangle becomes a smaller red and two blues
+        for(vector<Tri>::const_iterator it = blue_tris[iCurrentBuffer].begin();it!=blue_tris[iCurrentBuffer].end();it++)
+        {
+            qx = it->bx + (it->ax - it->bx) / goldenRatio;
+            qy = it->by + (it->ay - it->by) / goldenRatio;
+            rx = it->bx + (it->cx - it->bx) / goldenRatio;
+            ry = it->by + (it->cy - it->by) / goldenRatio;
+            red_tris[iTargetBuffer].push_back(Tri(rx,ry,qx,qy,it->ax,it->ay));
+            blue_tris[iTargetBuffer].push_back(Tri(rx,ry,it->cx,it->cy,it->ax,it->ay));
+            blue_tris[iTargetBuffer].push_back(Tri(qx,qy,rx,ry,it->bx,it->by));
+        }
+        iCurrentBuffer = iTargetBuffer;
+    }
+
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+
+    // merge coincident vertices
+    double tol = hypot2(red_tris[iCurrentBuffer][0].ax-red_tris[iCurrentBuffer][0].bx,red_tris[iCurrentBuffer][0].ay-red_tris[iCurrentBuffer][0].by)/100.0;
+    vector<pair<double,double>> verts;
+    vector<TriIndices> tris;
+    vector<Tri> all_tris(red_tris[iCurrentBuffer]);
+    all_tris.insert(all_tris.end(),blue_tris[iCurrentBuffer].begin(),blue_tris[iCurrentBuffer].end());
+    for(vector<Tri>::const_iterator it = all_tris.begin();it!=all_tris.end();it++)
+    {
+        TriIndices tri;
+        for(int i=0;i<3;i++)
+        {
+            switch(i)
+            {
+                case 0: px = it->ax; py = it->ay; break;
+                case 1: px = it->bx; py = it->by; break;
+                case 2: px = it->cx; py = it->cy; break;
+            }
+            // have we seen px,py before?
+            int iPt;
+            bool found = false;
+            for(int j=0;j<(int)verts.size();j++)
+            {
+                if(hypot2(verts[j].first-px,verts[j].second-py) < tol)
+                {
+                    iPt = j;
+                    found = true;
+                    break;
+                }
+            }
+            if(!found)
+            {
+                verts.push_back(make_pair(px,py));
+                pts->InsertNextPoint(px,py,0);
+                iPt = (int)verts.size()-1;
+            }
+            tri.ind[i] = iPt;
+        }
+        // is this the other half of a triangle we've seen previously?
+        for(vector<TriIndices>::const_iterator it2 = tris.begin();it2!=tris.end();it2++)
+        {
+            if( (it2->ind[1] == tri.ind[1] && it2->ind[2] == tri.ind[2]) || (it2->ind[2] == tri.ind[1] && it2->ind[1] == tri.ind[2]) )
+            {
+                cells->InsertNextCell(4);
+                cells->InsertCellPoint(tri.ind[0]);
+                cells->InsertCellPoint(tri.ind[1]);
+                cells->InsertCellPoint(it2->ind[0]);
+                cells->InsertCellPoint(tri.ind[2]);
+            }
+        }
+        // go ahead and add the tri now
+        tris.push_back(tri);
+    }
+    
+    mesh->SetPoints(pts);
+    mesh->SetCells(VTK_POLYGON,cells);
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
 }
 
 // ---------------------------------------------------------------------
