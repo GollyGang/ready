@@ -798,19 +798,19 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
-/// A two-dimensional triangle.
-struct Tri {
-    double ax,ay,bx,by,cx,cy;
-    Tri(double ax2,double ay2,double bx2,double by2,double cx2,double cy2)
-        : ax(ax2), ay(ay2), bx(bx2), by(by2), cx(cx2), cy(cy2) {}
-};
-struct TriIndices {
-    double ind[3];
-};
-
 /* static */ void MeshRD::GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems)
 {
     // Many thanks to Jeff Preshing: http://preshing.com/20110831/penrose-tiling-explained
+
+    struct Tri {
+        double ax,ay,bx,by,cx,cy;
+        Tri(double ax2,double ay2,double bx2,double by2,double cx2,double cy2)
+            : ax(ax2), ay(ay2), bx(bx2), by(by2), cx(cx2), cy(cy2) {}
+    };
+
+    struct TriIndices {
+        double ind[3];
+    };
 
     vector<Tri> red_tris[2],blue_tris[2]; // each list has two buffers
     int iCurrentBuffer = 0;
@@ -860,7 +860,7 @@ struct TriIndices {
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
-    // merge coincident vertices
+    // merge coincident vertices and merge abutting triangles into quads
     double tol = hypot2(red_tris[iCurrentBuffer][0].ax-red_tris[iCurrentBuffer][0].bx,red_tris[iCurrentBuffer][0].ay-red_tris[iCurrentBuffer][0].by)/100.0;
     vector<pair<double,double> > verts;
     vector<TriIndices> tris;
