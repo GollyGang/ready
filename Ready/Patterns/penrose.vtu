@@ -44,6 +44,9 @@
     
     <render_settings>
       <slice_3D value="false" />
+      <timesteps_per_render value="1" />
+      <show_color_scale value="false" />
+      <use_image_interpolation value="false" />
     </render_settings>
     
   </RD>
