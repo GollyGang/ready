@@ -685,6 +685,124 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
+/* static */ void MeshRD::GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems)
+{
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+
+    double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
+
+    double p[3]={0,0,0};
+    for(int y=0;y<ny;y++)
+    {
+        p[1] = th*y;
+        for(int x=0;x<nx;x++)
+        {
+            p[0] = ((y%2)?0.5:0) + x;
+            pts->InsertNextPoint(p);
+            if(y%2 && x<nx-1)
+            {
+                cells->InsertNextCell(3);
+                cells->InsertCellPoint(y*nx+x);
+                cells->InsertCellPoint((y-1)*nx+x+1);
+                cells->InsertCellPoint((y-1)*nx+x);
+                cells->InsertNextCell(3);
+                cells->InsertCellPoint(y*nx+x);
+                cells->InsertCellPoint(y*nx+x+1);
+                cells->InsertCellPoint((y-1)*nx+x+1);
+                if(y<ny-1)
+                {
+                    cells->InsertNextCell(3);
+                    cells->InsertCellPoint(y*nx+x);
+                    cells->InsertCellPoint((y+1)*nx+x);
+                    cells->InsertCellPoint((y+1)*nx+x+1);
+                    cells->InsertNextCell(3);
+                    cells->InsertCellPoint(y*nx+x);
+                    cells->InsertCellPoint(y*nx+x+1);
+                    cells->InsertCellPoint((y+1)*nx+x+1);
+                }
+            }
+        }
+    }
+
+    mesh->SetPoints(pts);
+    mesh->SetCells(VTK_POLYGON,cells);
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+/* static */ void MeshRD::GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems)
+{
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+
+    double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
+
+    double p[3]={0,0,0};
+    for(int y=0;y<ny;y++)
+    {
+        p[1] = th*y;
+        for(int x=0;x<nx;x++)
+        {
+            p[0] = ((y%2)?0.5:0) + x;
+            pts->InsertNextPoint(p);
+            if(y%2 && x%3==2 && y<ny-1)
+            {
+                cells->InsertNextCell(6);
+                cells->InsertCellPoint(y*nx+x);
+                cells->InsertCellPoint((y-1)*nx+x);
+                cells->InsertCellPoint((y-1)*nx+x-1);
+                cells->InsertCellPoint(y*nx+x-2);
+                cells->InsertCellPoint((y+1)*nx+x-1);
+                cells->InsertCellPoint((y+1)*nx+x);
+            }
+            else if(y%2==0 && x%3==1 && y>0 && y<ny-1 && x>1)
+            {
+                cells->InsertNextCell(6);
+                cells->InsertCellPoint(y*nx+x);
+                cells->InsertCellPoint((y-1)*nx+x-1);
+                cells->InsertCellPoint((y-1)*nx+x-2);
+                cells->InsertCellPoint(y*nx+x-2);
+                cells->InsertCellPoint((y+1)*nx+x-2);
+                cells->InsertCellPoint((y+1)*nx+x-1);
+            }
+        }
+    }
+
+    mesh->SetPoints(pts);
+    mesh->SetCells(VTK_POLYGON,cells);
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+/* static */ void MeshRD::GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems)
+{
+}
+
+// ---------------------------------------------------------------------
+
 vtkStandardNewMacro(RD_XMLUnstructuredGridWriter);
 
 // ---------------------------------------------------------------------

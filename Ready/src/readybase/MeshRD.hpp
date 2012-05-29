@@ -65,9 +65,13 @@ class MeshRD : public AbstractRD
 
         virtual int GetArenaDimensionality() const;
 
+        // static methods for generating meshes from scratch
         static void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
         static void GetTetrahedralMesh(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
         static void GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+        static void GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+        static void GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+        static void GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
 
     protected:
 
