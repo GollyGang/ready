@@ -173,15 +173,15 @@ wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor()
 
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
     #if wxCHECK_VERSION(2, 9, 0) // the order of the parameters to wxGLCanvas::wxGLCanvas has changed
-		: wxGLCanvas(0, -1, wxvtk_attributes, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor")), 
-	#else
-		: wxGLCanvas(0, -1, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor"), wxvtk_attributes), 
-	#endif
+        : wxGLCanvas(0, -1, wxvtk_attributes, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor")), 
+    #else
+        : wxGLCanvas(0, -1, wxDefaultPosition, wxDefaultSize, 0, wxT("wxVTKRenderWindowInteractor"), wxvtk_attributes), 
+    #endif
 #else
-		: wxWindow(), 
+        : wxWindow(), 
 #endif //__WXGTK__
 
-	  vtkRenderWindowInteractor()
+      vtkRenderWindowInteractor()
       , timer(this, ID_wxVTKRenderWindowInteractor_TIMER)
       , ActiveButton(wxEVT_NULL)
       , Stereo(0)
@@ -216,7 +216,7 @@ wxVTKRenderWindowInteractor::wxVTKRenderWindowInteractor(wxWindow *parent,
 #else
       : wxWindow(parent, id, pos, size, style, name)
 #endif //__WXGTK__
-	  , vtkRenderWindowInteractor()
+      , vtkRenderWindowInteractor()
       , timer(this, ID_wxVTKRenderWindowInteractor_TIMER)
       , ActiveButton(wxEVT_NULL)
       , Stereo(0)

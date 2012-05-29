@@ -127,7 +127,7 @@ void OpenCLImageRD::CopyFromImage(vtkImageData* im)
 
 void OpenCLImageRD::GenerateInitialPattern()
 {
-	ImageRD::GenerateInitialPattern();
+    ImageRD::GenerateInitialPattern();
     this->WriteToOpenCLBuffers();
 }
 
@@ -135,7 +135,7 @@ void OpenCLImageRD::GenerateInitialPattern()
 
 void OpenCLImageRD::BlankImage()
 {
-	ImageRD::BlankImage();
+    ImageRD::BlankImage();
     this->WriteToOpenCLBuffers();
 }
 

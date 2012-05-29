@@ -254,7 +254,7 @@ void OpenCLMeshRD::TestFormula(std::string program_string)
 
 void OpenCLMeshRD::GenerateInitialPattern()
 {
-	MeshRD::GenerateInitialPattern();
+    MeshRD::GenerateInitialPattern();
     this->WriteToOpenCLBuffers();
 }
 
@@ -262,7 +262,7 @@ void OpenCLMeshRD::GenerateInitialPattern()
 
 void OpenCLMeshRD::BlankImage()
 {
-	MeshRD::BlankImage();
+    MeshRD::BlankImage();
     this->WriteToOpenCLBuffers();
 }
 

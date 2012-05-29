@@ -1339,152 +1339,152 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     }
     try 
     {
-		switch(sel)
-		{
-			case 0: // 1D image
-			{
-				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-				s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
-                s->CreateDefaultInitialPatternGenerator();
-				s->GenerateInitialPattern();
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-				this->SetCurrentRDSystem(s);
-				wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
-				break;
-			}
-			case 1: // 2D image
-			{
-				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-				s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
-                s->CreateDefaultInitialPatternGenerator();
-				s->GenerateInitialPattern();
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-				this->SetCurrentRDSystem(s);
-				wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
-				break;
-			}
-			case 2: // 3D image
-			{
-				FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-				s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
-                s->CreateDefaultInitialPatternGenerator();
-				s->GenerateInitialPattern();
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-				this->SetCurrentRDSystem(s);
-				wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
-				break;
-			}
-			case 3: // geodesic sphere
-			{
-				int divs;
-				{
-					const int N_CHOICES=9;
-					int div_choices[N_CHOICES] = {2,3,4,5,6,7,8,9,10};
-					wxString div_descriptions[N_CHOICES];
-					for(int i=0;i<N_CHOICES;i++)
-						div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
-					wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
-					dlg.SetSelection(0); // default selection
-					if(dlg.ShowModal()!=wxID_OK) return;
-					divs = div_choices[dlg.GetSelection()];
-				}
-				wxBusyCursor busy;
-				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-				MeshRD::GetGeodesicSphere(divs,mesh,2);
-				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-				s->SetPlatform(opencl_platform);
-				s->SetDevice(opencl_device);
-				s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-				s->GenerateInitialPattern();
-				this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-				this->SetCurrentRDSystem(s);
-				break;
-			}
-            case 4: // torus
+        switch(sel)
+        {
+            case 0: // 1D image
             {
-				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-				MeshRD::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
-				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-				s->SetPlatform(opencl_platform);
-				s->SetDevice(opencl_device);
-				s->CopyFromMesh(mesh);
+                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+                s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
-				this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-				this->SetCurrentRDSystem(s);
-				break;
+                this->SetCurrentRDSystem(s);
+                wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
+                break;
+            }
+            case 1: // 2D image
+            {
+                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+                s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->SetCurrentRDSystem(s);
+                wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
+                break;
+            }
+            case 2: // 3D image
+            {
+                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+                s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->SetCurrentRDSystem(s);
+                wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
+                break;
+            }
+            case 3: // geodesic sphere
+            {
+                int divs;
+                {
+                    const int N_CHOICES=9;
+                    int div_choices[N_CHOICES] = {2,3,4,5,6,7,8,9,10};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
+                    wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(0); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    divs = div_choices[dlg.GetSelection()];
+                }
+                wxBusyCursor busy;
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetGeodesicSphere(divs,mesh,2);
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->SetCurrentRDSystem(s);
+                break;
+            }
+            case 4: // torus
+            {
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->SetCurrentRDSystem(s);
+                break;
             }
             case 5: // tetrahedral mesh
             {
-				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-				MeshRD::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
-				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-				s->SetPlatform(opencl_platform);
-				s->SetDevice(opencl_device);
-				s->CopyFromMesh(mesh);
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
-				this->SetCurrentRDSystem(s);
-				break;
+                this->SetCurrentRDSystem(s);
+                break;
             }
             case 6: // triangular mesh
             {
-				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-				MeshRD::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
-				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-				s->SetPlatform(opencl_platform);
-				s->SetDevice(opencl_device);
-				s->CopyFromMesh(mesh);
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-				this->SetCurrentRDSystem(s);
-				break;
+                this->SetCurrentRDSystem(s);
+                break;
             }
             case 7: // hexagonal mesh
             {
-				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-				MeshRD::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
-				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-				s->SetPlatform(opencl_platform);
-				s->SetDevice(opencl_device);
-				s->CopyFromMesh(mesh);
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-				this->SetCurrentRDSystem(s);
-				break;
+                this->SetCurrentRDSystem(s);
+                break;
             }
             case 8: // Penrose rhombi tiling
             {
-				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-				MeshRD::GetPenroseRhombiTiling(7,mesh,2); // TODO: ask user for resolution
-				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-				s->SetPlatform(opencl_platform);
-				s->SetDevice(opencl_device);
-				s->CopyFromMesh(mesh);
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetPenroseRhombiTiling(7,mesh,2); // TODO: ask user for resolution
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
                 s->CreateDefaultInitialPatternGenerator();
                 s->GenerateInitialPattern();
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-				this->SetCurrentRDSystem(s);
-				break;
+                this->SetCurrentRDSystem(s);
+                break;
             }
-			default:
-			{
-				wxMessageBox(_("Not currently supported"));
-				return;
-			}
-		}
-	}
-	catch(const exception& e)
+            default:
+            {
+                wxMessageBox(_("Not currently supported"));
+                return;
+            }
+        }
+    }
+    catch(const exception& e)
     {
         wxString message = _("Failed to create new pattern. Error:\n\n");
         message += wxString(e.what(),wxConvUTF8);
