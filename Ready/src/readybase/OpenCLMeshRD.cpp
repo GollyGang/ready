@@ -185,12 +185,12 @@ void OpenCLMeshRD::CreateOpenCLBuffers()
     // create a buffer for the indices of the neighbors of each cell
     const unsigned long NBORS_INDICES_SIZE = sizeof(int) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_indices = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_INDICES_SIZE, NULL, &ret);
-    throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: ");
+    throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : neighbor_indices buffer creation failed: ");
 
     // create a buffer for the diffusion coefficients of the neighbors of each cell
     const unsigned long NBORS_WEIGHTS_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_weights = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_WEIGHTS_SIZE, NULL, &ret);
-    throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: ");
+    throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : neighbor_weights buffer creation failed: ");
 }
 
 // ----------------------------------------------------------------------------------------------------------------

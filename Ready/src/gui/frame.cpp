@@ -1462,6 +1462,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 				this->SetCurrentRDSystem(s);
 				break;
             }
+            case 8: // Penrose rhombi tiling
+            {
+				vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+				MeshRD::GetPenroseRhombiTiling(7,mesh,2); // TODO: ask user for resolution
+				FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+				s->SetPlatform(opencl_platform);
+				s->SetDevice(opencl_device);
+				s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+				this->SetCurrentRDSystem(s);
+				break;
+            }
 			default:
 			{
 				wxMessageBox(_("Not currently supported"));
