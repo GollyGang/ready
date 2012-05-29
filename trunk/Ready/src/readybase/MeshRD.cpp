@@ -255,6 +255,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
+    bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
 
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
     string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
@@ -272,6 +273,8 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     // add the mesh actor
     {
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
         if(use_wireframe && !slice_3D) // full wireframe mode: all internal edges
         {
             // explicitly extract the edges - the default mapper only shows the outside surface
@@ -290,13 +293,16 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         else // non-wireframe mode: shows filled external surface
         {
             mapper->SetInput(this->mesh);
+            if(show_cell_edges)
+            {
+                actor->GetProperty()->EdgeVisibilityOn();
+                actor->GetProperty()->SetEdgeColor(0,0,0);
+            }
         }
         mapper->SetScalarModeToUseCellFieldData();
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
 
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
 
         pRenderer->AddActor(actor);
     }
