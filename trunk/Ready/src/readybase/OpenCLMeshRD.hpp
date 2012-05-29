@@ -38,8 +38,8 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
 
-		virtual void GenerateInitialPattern();
-		virtual void BlankImage();
+        virtual void GenerateInitialPattern();
+        virtual void BlankImage();
 
         virtual void TestFormula(std::string program_string);
 

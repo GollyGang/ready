@@ -528,7 +528,7 @@ void MeshRD::ComputeCellNeighbors()
 
 int MeshRD::GetNumberOfCells() const
 {
-	return this->mesh->GetNumberOfCells();
+    return this->mesh->GetNumberOfCells();
 }
 
 // ---------------------------------------------------------------------

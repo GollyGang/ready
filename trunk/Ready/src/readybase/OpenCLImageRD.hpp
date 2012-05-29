@@ -29,11 +29,11 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual bool HasEditableFormula() const { return true; }
 
-		virtual void GenerateInitialPattern();
-		virtual void BlankImage();
+        virtual void GenerateInitialPattern();
+        virtual void BlankImage();
 
         virtual void TestFormula(std::string program_string);
-		
+
     protected:
 
         virtual void CopyFromImage(vtkImageData* im);
