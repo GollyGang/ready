@@ -3,22 +3,23 @@
   <RD format_version="2">
   
     <description>
-	  Conway's Game of Life, implemented on a torus. 
-	  
-	  Our implementation uses the OpenCL function step(edge,x) which returns 1 if x>edge, else 0.
+      Conway's Game of Life, implemented on a torus. 
+      
+      Our implementation uses the OpenCL function step(edge,x) which returns 1 if x>edge, else 0.
     </description>
-	
+    
     <rule name="Gray-Scott" type="formula">
-	
+    
       <param name="timestep"> 1 </param>
-	  
+      
       <formula number_of_chemicals="1">
-		delta_a = step(1.25f,laplacian_a)*step(-1.75f,-laplacian_a) - step(3.25f,-laplacian_a) - step(0.5f,a)*step(-2.25f,laplacian_a);
+        delta_a = step(1.25f,laplacian_a)*step(-1.75f,-laplacian_a) -
+                  step(3.25f,-laplacian_a) - step(0.5f,a)*step(-2.25f,laplacian_a);
         delta_a += step(0.5f,a)-a; // round output to nearest of 0 or 1
       </formula>
       
     </rule>
-	
+    
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -26,14 +27,14 @@
         <everywhere />
       </overlay>
     </initial_pattern_generator>
-	
+    
     <render_settings>
       <color_low r="1" g="1" b="1" />
       <color_high r="0" g="0" b="0" />
       <show_color_scale value="false" />
       <slice_3D value="false" />
-	  <timesteps_per_render value="1" />
-	  <use_image_interpolation value="false" />
+      <timesteps_per_render value="1" />
+      <use_image_interpolation value="false" />
     </render_settings>
     
   </RD>
