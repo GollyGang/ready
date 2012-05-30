@@ -374,7 +374,7 @@ void MeshRD::SaveStartingPattern()
 
 void MeshRD::RestoreStartingPattern()
 {
-    this->mesh->DeepCopy(this->starting_pattern);
+    this->CopyFromMesh(this->starting_pattern);
     this->timesteps_taken = 0;
 }
 
