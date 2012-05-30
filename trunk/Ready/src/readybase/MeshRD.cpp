@@ -816,24 +816,30 @@ struct TriIndices {
     double ind[3];
 };
 
-/* static */ void MeshRD::GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems)
+/* static */ void MeshRD::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems)
 {
     // Many thanks to Jeff Preshing: http://preshing.com/20110831/penrose-tiling-explained
+
+    const int RHOMBI = 0;
+    const int DARTS_AND_KITES = 1;
 
     vector<Tri> red_tris[2],blue_tris[2]; // each list has two buffers
     int iCurrentBuffer = 0;
 
     double goldenRatio = (1.0 + sqrt(5.0)) / 2.0;
 
-    // start with 10 red triangles in a wheel
+    // start with 10 red triangles in a wheel, to get a nice circular shape (with 5-fold rotational symmetry)
+    // (any correctly-tiled starting pattern will work too)
     double angle_step = 2.0 * 3.1415926535 / 10.0;
     for(int i=0;i<10;i++)
     {
-        double angle = angle_step * i;
-        if(i%2)
-            red_tris[iCurrentBuffer].push_back(Tri(0,0,cos(angle),sin(angle),cos(angle+angle_step),sin(angle+angle_step)));
-        else
-            red_tris[iCurrentBuffer].push_back(Tri(0,0,cos(angle+angle_step),sin(angle+angle_step),cos(angle),sin(angle)));
+        double angle1 = angle_step * (i + i%2);
+        double angle2 = angle_step * (i + 1 - i%2);
+        switch(type) {
+            default:
+            case RHOMBI: red_tris[iCurrentBuffer].push_back(Tri(0,0,cos(angle1),sin(angle1),cos(angle2),sin(angle2))); break;
+            case DARTS_AND_KITES: red_tris[iCurrentBuffer].push_back(Tri(cos(angle1),sin(angle1),0,0,cos(angle2),sin(angle2))); break;
+        }
     }
 
     // subdivide
@@ -846,21 +852,48 @@ struct TriIndices {
         // each red triangle becomes a smaller red and a blue
         for(vector<Tri>::const_iterator it = red_tris[iCurrentBuffer].begin();it!=red_tris[iCurrentBuffer].end();it++)
         {
-            px = it->ax + (it->bx - it->ax) / goldenRatio;
-            py = it->ay + (it->by - it->ay) / goldenRatio;
-            red_tris[iTargetBuffer].push_back(Tri(it->cx,it->cy,px,py,it->bx,it->by));
-            blue_tris[iTargetBuffer].push_back(Tri(px,py,it->cx,it->cy,it->ax,it->ay));
+            switch(type)
+            {
+                default:
+                case RHOMBI:
+                    px = it->ax + (it->bx - it->ax) / goldenRatio;
+                    py = it->ay + (it->by - it->ay) / goldenRatio;
+                    red_tris[iTargetBuffer].push_back(Tri(it->cx,it->cy,px,py,it->bx,it->by));
+                    blue_tris[iTargetBuffer].push_back(Tri(px,py,it->cx,it->cy,it->ax,it->ay));
+                    break;
+                case DARTS_AND_KITES:
+                    qx = it->ax + (it->bx - it->ax) / goldenRatio;
+                    qy = it->ay + (it->by - it->ay) / goldenRatio;
+                    rx = it->bx + (it->cx - it->bx) / goldenRatio;
+                    ry = it->by + (it->cy - it->by) / goldenRatio;
+                    blue_tris[iTargetBuffer].push_back(Tri(rx,ry,qx,qy,it->bx,it->by));
+                    red_tris[iTargetBuffer].push_back(Tri(qx,qy,it->ax,it->ay,rx,ry));
+                    red_tris[iTargetBuffer].push_back(Tri(it->cx,it->cy,it->ax,it->ay,rx,ry));
+                    break;
+            }
         }
         // each blue triangle becomes a smaller red and two blues
         for(vector<Tri>::const_iterator it = blue_tris[iCurrentBuffer].begin();it!=blue_tris[iCurrentBuffer].end();it++)
         {
-            qx = it->bx + (it->ax - it->bx) / goldenRatio;
-            qy = it->by + (it->ay - it->by) / goldenRatio;
-            rx = it->bx + (it->cx - it->bx) / goldenRatio;
-            ry = it->by + (it->cy - it->by) / goldenRatio;
-            red_tris[iTargetBuffer].push_back(Tri(rx,ry,qx,qy,it->ax,it->ay));
-            blue_tris[iTargetBuffer].push_back(Tri(rx,ry,it->cx,it->cy,it->ax,it->ay));
-            blue_tris[iTargetBuffer].push_back(Tri(qx,qy,rx,ry,it->bx,it->by));
+            switch(type)
+            {
+                default:
+                case RHOMBI:
+                    qx = it->bx + (it->ax - it->bx) / goldenRatio;
+                    qy = it->by + (it->ay - it->by) / goldenRatio;
+                    rx = it->bx + (it->cx - it->bx) / goldenRatio;
+                    ry = it->by + (it->cy - it->by) / goldenRatio;
+                    red_tris[iTargetBuffer].push_back(Tri(rx,ry,qx,qy,it->ax,it->ay));
+                    blue_tris[iTargetBuffer].push_back(Tri(rx,ry,it->cx,it->cy,it->ax,it->ay));
+                    blue_tris[iTargetBuffer].push_back(Tri(qx,qy,rx,ry,it->bx,it->by));
+                    break;
+                case DARTS_AND_KITES:
+                    px = it->cx + (it->ax - it->cx) / goldenRatio;
+                    py = it->cy + (it->ay - it->cy) / goldenRatio;
+                    blue_tris[iTargetBuffer].push_back(Tri(it->bx,it->by,px,py,it->ax,it->ay));
+                    red_tris[iTargetBuffer].push_back(Tri(px,py,it->cx,it->cy,it->bx,it->by));
+                    break;
+            }
         }
         iCurrentBuffer = iTargetBuffer;
     }
