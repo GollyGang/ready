@@ -71,7 +71,7 @@ class MeshRD : public AbstractRD
         static void GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
         static void GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
         static void GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
-        static void GetPenroseRhombiTiling(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
+        static void GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems);
 
     protected:
 
