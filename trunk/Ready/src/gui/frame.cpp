@@ -1328,10 +1328,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     // ask user what type of dataset to generate:
     int sel;
     {
-        const int N_CHOICES = 10;
+        const int N_CHOICES = 11;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh"),
-            _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)")  };
+            _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)")  };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         if(dlg.ShowModal()!=wxID_OK) return;
@@ -1464,7 +1464,23 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->SetCurrentRDSystem(s);
                 break;
             }
-            case 8: // Penrose rhombi tiling
+            case 8: // rhombille tiling
+            {
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshRD::GetRhombilleTiling(50,50,mesh,2); // TODO: ask user for resolution
+                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+                s->SetPlatform(opencl_platform);
+                s->SetDevice(opencl_device);
+                s->CopyFromMesh(mesh);
+                s->CreateDefaultInitialPatternGenerator();
+                s->GenerateInitialPattern();
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->SetCurrentRDSystem(s);
+                break;
+            }
+            case 9: // Penrose rhombi tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetPenroseTiling(7,0,mesh,2); // TODO: ask user for resolution
@@ -1480,7 +1496,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->SetCurrentRDSystem(s);
                 break;
             }
-            case 9: // Penrose darts and kites tiling
+            case 10: // Penrose darts and kites tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetPenroseTiling(7,1,mesh,2); // TODO: ask user for resolution
