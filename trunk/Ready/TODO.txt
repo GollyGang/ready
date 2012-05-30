@@ -21,11 +21,20 @@ before 0.3 release:
 - add complex Ginsburg-Landau
 - allow inbuilt -> formula -> full kernel conversions
 - bug: show_cell_edges is offset on images (same issue as with Minecraft-style surface)
+- mesh generators should output at a suitable scale for <pixel>s to access individual cells
+- document how <pixel> element coordinates work on meshes
+- rename 'Pattern' to 'Dataset'?
+
+before 0.4 release:
+- relax power of 2 size requirement (only a speed benefit)
+- allow user to paint, erase, even while running
+- Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
+  5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
+  used a boundary-size weighting.
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
   chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
-- relax power of 2 size requirement (only a speed benefit)
 - use better (big) toolbar icons in Mac app
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
@@ -42,16 +51,12 @@ before 0.x release:
   1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
 - add toolbar icons for: faster, slower, change running speed - need artwork :(
-- Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
-  5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
-  used a boundary-size weighting.
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
   and should work on meshes too (vtkCellDataToPointData?)
 - lots of patterns in library (primary UI for beginners is a list of examples to click)
 - copy/paste (2d only) (paste modes: add, overwrite)
-- allow user to paint, erase, even while running (2D only)
 - SSE for non-OpenCL implementations (will assume all target cpus support SSE)
 - new overlay shape: scattered rectangles/circles (need some higher-level specifier for this?)
 - graphical UI for editing the initial-pattern-generator overlay stack
