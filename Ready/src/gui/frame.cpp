@@ -32,13 +32,14 @@
 #include "utils.hpp"
 #include "GrayScottImageRD.hpp"
 #include "OpenCL_utils.hpp"
+using namespace OpenCL_utils;
 #include "IO_XML.hpp"
 #include "GrayScottMeshRD.hpp"
 #include "FormulaOpenCLImageRD.hpp"
 #include "FullKernelOpenCLImageRD.hpp"
 #include "FormulaOpenCLMeshRD.hpp"
 #include "FullKernelOpenCLMeshRD.hpp"
-using namespace OpenCL_utils;
+#include "MeshGenerators.hpp"
 
 // local resources:
 #include "appicon16.xpm"
@@ -1420,7 +1421,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 }
                 wxBusyCursor busy;
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetGeodesicSphere(divs,mesh,2);
+                MeshGenerators::GetGeodesicSphere(divs,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1442,7 +1443,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 4: // torus
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1464,7 +1465,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 5: // tetrahedral mesh
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
+                MeshGenerators::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1486,7 +1487,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 6: // triangular mesh
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1509,7 +1510,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 7: // hexagonal mesh
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1532,7 +1533,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 8: // rhombille tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetRhombilleTiling(50,50,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetRhombilleTiling(50,50,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1555,7 +1556,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 9: // Penrose rhombi tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetPenroseTiling(7,0,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetPenroseTiling(7,0,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
@@ -1578,7 +1579,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case 10: // Penrose darts and kites tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshRD::GetPenroseTiling(7,1,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetPenroseTiling(7,1,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                 {
