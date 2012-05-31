@@ -35,6 +35,8 @@
       <slice_3D value="false" />
       <timesteps_per_render value="1" />
       <use_image_interpolation value="false" />
+      <show_bounding_box value="false" />
+      <show_cell_edges value="true" />
     </render_settings>
     
   </RD>

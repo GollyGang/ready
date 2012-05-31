@@ -337,6 +337,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
+    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -456,6 +457,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
+    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -554,6 +556,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             }
 
             // add the bounding box
+            if(show_bounding_box)
             {
                 vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
                 box->SetBounds(0,this->GetX(),0,this->GetY(),low*scaling,high*scaling);
@@ -635,6 +638,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
+    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
 
     // contour the 3D volume and render as a polygonal surface
 
@@ -704,6 +708,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     pRenderer->AddActor(actor);
 
     // add the bounding box
+    if(show_bounding_box)
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
         box->SetBounds(this->GetImage(iActiveChemical)->GetBounds());
