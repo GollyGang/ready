@@ -32,7 +32,6 @@
 #include "utils.hpp"
 #include "GrayScottImageRD.hpp"
 #include "OpenCL_utils.hpp"
-using namespace OpenCL_utils;
 #include "IO_XML.hpp"
 #include "GrayScottMeshRD.hpp"
 #include "FormulaOpenCLImageRD.hpp"
@@ -736,7 +735,7 @@ void MyFrame::OnOpenCLDiagnostics(wxCommandEvent& event)
     wxString txt;
     {
         wxBusyCursor busy;
-        txt = wxString(GetOpenCLDiagnostics().c_str(),wxConvUTF8);
+        txt = wxString(OpenCL_utils::GetOpenCLDiagnostics().c_str(),wxConvUTF8);
     }
     MonospaceMessageBox(txt,_("OpenCL diagnostics"),wxART_INFORMATION);
 }
@@ -1181,7 +1180,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     int np;
     try 
     {
-        np = GetNumberOfPlatforms();
+        np = OpenCL_utils::GetNumberOfPlatforms();
     }
     catch(const exception& e)
     {
@@ -1196,13 +1195,13 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     }
     for(int ip=0;ip<np;ip++)
     {
-        int nd = GetNumberOfDevices(ip);
+        int nd = OpenCL_utils::GetNumberOfDevices(ip);
         for(int id=0;id<nd;id++)
         {
             if(ip==opencl_platform && id==opencl_device)
                 iOldSelection = (int)choices.size();
-            wxString s(GetPlatformDescription(ip).c_str(),wxConvUTF8);
-            s << _T(" : ") << wxString(GetDeviceDescription(ip,id).c_str(),wxConvUTF8);
+            wxString s(OpenCL_utils::GetPlatformDescription(ip).c_str(),wxConvUTF8);
+            s << _T(" : ") << wxString(OpenCL_utils::GetDeviceDescription(ip,id).c_str(),wxConvUTF8);
             choices.Add(s);
         }
     }
@@ -1216,7 +1215,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     int dc = 0;
     for(int ip=0;ip<np;ip++)
     {
-        int nd = GetNumberOfDevices(ip);
+        int nd = OpenCL_utils::GetNumberOfDevices(ip);
         if(iNewSelection < nd)
         {
             opencl_platform = ip;
