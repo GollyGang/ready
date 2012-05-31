@@ -209,6 +209,7 @@ class MyFrame : public wxFrame
         int realkey;  // used to pass info from OnKeyDown to OnChar
 
         bool fullscreen;    // in full screen mode?
+        bool is_opencl_available;
 
         DECLARE_EVENT_TABLE()
 };

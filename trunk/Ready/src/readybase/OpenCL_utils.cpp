@@ -26,6 +26,35 @@ using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 
+bool OpenCL_utils::IsOpenCLAvailable()
+{
+    if(LinkOpenCL()!= CL_SUCCESS)
+		return false; // no OpenCL SDK or driver installed
+
+    // get available OpenCL platforms
+    const size_t MAX_PLATFORMS = 10;
+    cl_platform_id platforms_available[MAX_PLATFORMS];
+    cl_uint num_platforms;
+    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    if(ret != CL_SUCCESS || num_platforms==0)
+		return false; // OpenCL is installed but no platforms available (in a virtualized OS?)
+
+	// look for OpenCL devices on any platform
+	const size_t MAX_DEVICES = 10;
+	cl_device_id devices_available[MAX_DEVICES];
+	cl_uint num_devices;
+    for(unsigned int iPlatform=0;iPlatform<num_platforms;iPlatform++)
+    {
+        clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,
+			devices_available,&num_devices);
+		if(num_devices>0)
+			return true;
+	}
+	return false; // platforms present but no OpenCL devices available
+}
+
+// ---------------------------------------------------------------------------------------------------------
+
 void OpenCL_utils::throwOnError(cl_int ret,const char* message)
 {
     if(ret == CL_SUCCESS) return;
