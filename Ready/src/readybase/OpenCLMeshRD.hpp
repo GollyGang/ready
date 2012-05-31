@@ -27,7 +27,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
 {
     public:
 
-        OpenCLMeshRD();
+        OpenCLMeshRD(int opencl_platform,int opencl_device);
         virtual ~OpenCLMeshRD();
 
         virtual bool HasEditableFormula() const { return true; }

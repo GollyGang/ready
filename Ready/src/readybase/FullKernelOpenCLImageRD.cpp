@@ -28,7 +28,8 @@ using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 
-FullKernelOpenCLImageRD::FullKernelOpenCLImageRD()
+FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_device)
+    : OpenCLImageRD(opencl_platform,opencl_device)
 {
     this->SetRuleName("Full kernel example");
     this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");

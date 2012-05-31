@@ -1348,16 +1348,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
-				{
-					FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					image_sys = s;
-				}
+					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
 				else
-				{
 					image_sys = new GrayScottImageRD();
-				}
                 image_sys->SetDimensionsAndNumberOfChemicals(128,1,1,2);
                 sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1368,16 +1361,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
-				{
-					FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					image_sys = s;
-				}
+					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
 				else
-				{
 					image_sys = new GrayScottImageRD();
-				}
                 image_sys->SetDimensionsAndNumberOfChemicals(128,128,1,2);
                 sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1388,16 +1374,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
-				{
-					FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					image_sys = s;
-				}
+					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
 				else
-				{
 					image_sys = new GrayScottImageRD();
-				}
                 image_sys->SetDimensionsAndNumberOfChemicals(32,32,32,2);
                 sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1423,16 +1402,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetGeodesicSphere(divs,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
@@ -1445,16 +1417,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
@@ -1467,16 +1432,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1489,16 +1447,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1512,16 +1463,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1535,16 +1479,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetRhombilleTiling(50,50,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1558,16 +1495,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetPenroseTiling(7,0,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1581,16 +1511,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetPenroseTiling(7,1,mesh,2); // TODO: ask user for resolution
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                {
-					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-					s->SetPlatform(opencl_platform);
-					s->SetDevice(opencl_device);
-					mesh_sys = s;
-				}
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 				else
-				{
 					mesh_sys = new GrayScottMeshRD();
-				}
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1712,19 +1635,11 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             }
             else if(type=="formula")
             {
-                // TODO: detect if opencl is available, abort if not
-                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                image_system = s;
+                image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
             }
             else if(type=="kernel")
             {
-                // TODO: detect if opencl is available, abort if not
-                FullKernelOpenCLImageRD *s = new FullKernelOpenCLImageRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                image_system = s;
+                image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device);
             }
             else throw runtime_error("Unsupported rule type: "+type);
             image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
@@ -1766,19 +1681,11 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             }
             else if(type=="formula")
             {
-                // TODO: detect if opencl is available, abort if not
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                mesh_system = s;
+                mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
             }
             else if(type=="kernel")
             {
-                // TODO: detect if opencl is available, abort if not
-                FullKernelOpenCLMeshRD *s = new FullKernelOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                mesh_system = s;
+                mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device);
             }
             else throw runtime_error("Unsupported rule type: "+type);
 
@@ -2664,16 +2571,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtp_reader->SetFileName(mesh_filename.mb_str());
         vtp_reader->Update();
         if(this->is_opencl_available)
-        {
-			FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-			s->SetPlatform(opencl_platform);
-			s->SetDevice(opencl_device);
-			mesh_sys = s;
-		}
+			mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 		else
-		{
 			mesh_sys = new GrayScottMeshRD();
-		}
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
@@ -2693,16 +2593,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtu_reader->SetFileName(mesh_filename.mb_str());
         vtu_reader->Update();
         if(this->is_opencl_available)
-        {
-			FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-			s->SetPlatform(opencl_platform);
-			s->SetDevice(opencl_device);
-			mesh_sys = s;
-		}
+			mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 		else
-		{
 			mesh_sys = new GrayScottMeshRD();
-		}
         mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
     }
     else if(mesh_filename.EndsWith(_T("obj")))
@@ -2719,16 +2612,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         obj_reader->SetFileName(mesh_filename.mb_str());
         obj_reader->Update();
         if(this->is_opencl_available)
-        {
-			FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-			s->SetPlatform(opencl_platform);
-			s->SetDevice(opencl_device);
-			mesh_sys = s;
-		}
+			mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
 		else
-		{
 			mesh_sys = new GrayScottMeshRD();
-		}
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());

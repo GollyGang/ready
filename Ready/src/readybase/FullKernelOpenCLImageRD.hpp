@@ -25,7 +25,7 @@ class FullKernelOpenCLImageRD : public OpenCLImageRD
 {
     public:
 
-        FullKernelOpenCLImageRD();
+        FullKernelOpenCLImageRD(int opencl_platform,int opencl_device);
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;

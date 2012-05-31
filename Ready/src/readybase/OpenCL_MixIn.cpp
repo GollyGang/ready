@@ -28,10 +28,10 @@ using namespace std;
 
 // ---------------------------------------------------------------------------
 
-OpenCL_MixIn::OpenCL_MixIn()
+OpenCL_MixIn::OpenCL_MixIn(int opencl_platform,int opencl_device)
 {
-    this->iPlatform = 0;
-    this->iDevice = 0;
+    this->iPlatform = opencl_platform;
+    this->iDevice = opencl_device;
     this->need_reload_context = true;
     this->kernel_function_name = "rd_compute";
 

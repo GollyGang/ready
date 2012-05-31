@@ -36,7 +36,7 @@ class OpenCL_MixIn
 {
     public:
 
-        OpenCL_MixIn();
+        OpenCL_MixIn(int opencl_platform,int opencl_device);
         virtual ~OpenCL_MixIn();
     
         void SetPlatform(int i);

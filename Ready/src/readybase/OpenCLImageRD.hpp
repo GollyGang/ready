@@ -27,6 +27,8 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 {
     public:
 
+        OpenCLImageRD(int opencl_platform,int opencl_device);
+
         virtual bool HasEditableFormula() const { return true; }
 
         virtual void GenerateInitialPattern();

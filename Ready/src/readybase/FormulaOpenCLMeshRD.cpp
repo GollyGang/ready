@@ -29,7 +29,8 @@ using namespace std;
 
 // -------------------------------------------------------------------------
 
-FormulaOpenCLMeshRD::FormulaOpenCLMeshRD()
+FormulaOpenCLMeshRD::FormulaOpenCLMeshRD(int opencl_platform,int opencl_device)
+    : OpenCLMeshRD(opencl_platform,opencl_device)
 {
     // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");
