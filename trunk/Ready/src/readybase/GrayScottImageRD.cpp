@@ -37,7 +37,7 @@ GrayScottImageRD::GrayScottImageRD()
     this->AddParameter("timestep",1.0f);
     this->AddParameter("D_a",0.082f);
     this->AddParameter("D_b",0.041f);
-    this->AddParameter("k",0.064f);
+    this->AddParameter("k",0.06f);
     this->AddParameter("F",0.035f);
 }
 
