@@ -19,6 +19,8 @@ before 0.3 release:
 - mesh generators should output at a suitable scale for <pixel>s to access individual cells
 - document how <pixel> element coordinates work on meshes
 - rename 'Pattern' to 'Dataset'?
+- grey-out OpenCL patterns if OpenCL not available?
+- show startup message if OpenCL not available?
 
 before 0.4 release:
 - relax power of 2 size requirement (only a speed benefit)

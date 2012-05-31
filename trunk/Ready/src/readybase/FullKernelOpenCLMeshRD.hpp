@@ -23,7 +23,7 @@ class FullKernelOpenCLMeshRD : public OpenCLMeshRD
 {
     public:
 
-        FullKernelOpenCLMeshRD();
+        FullKernelOpenCLMeshRD(int opencl_platform,int opencl_device);
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;

@@ -35,6 +35,13 @@ using namespace std;
 
 // ----------------------------------------------------------------------------------------------------------------
 
+OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device)
+    : OpenCL_MixIn(opencl_platform,opencl_device)
+{
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;

@@ -29,7 +29,8 @@ using namespace std;
 
 // -------------------------------------------------------------------------
 
-FormulaOpenCLImageRD::FormulaOpenCLImageRD()
+FormulaOpenCLImageRD::FormulaOpenCLImageRD(int opencl_platform,int opencl_device)
+    : OpenCLImageRD(opencl_platform,opencl_device)
 {
     // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");

@@ -34,7 +34,8 @@ using namespace std;
 
 // -------------------------------------------------------------------------
 
-OpenCLMeshRD::OpenCLMeshRD()
+OpenCLMeshRD::OpenCLMeshRD(int opencl_platform,int opencl_device)
+    : OpenCL_MixIn(opencl_platform,opencl_device)
 {
     this->clBuffer_cell_neighbor_indices = NULL;
     this->clBuffer_cell_neighbor_weights = NULL;

@@ -23,7 +23,7 @@ class FormulaOpenCLMeshRD : public OpenCLMeshRD
 {
     public:
 
-        FormulaOpenCLMeshRD();
+        FormulaOpenCLMeshRD(int opencl_platform,int opencl_device);
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
