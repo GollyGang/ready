@@ -54,6 +54,7 @@ class OpenCL_MixIn
         virtual void CreateOpenCLBuffers() =0;
         virtual void WriteToOpenCLBuffers() =0;
         virtual void ReadFromOpenCLBuffers() =0;
+        virtual void ReleaseOpenCLBuffers();
 
         /// Test a kernel string for errors on the current device.
         void TestKernel(std::string s);
@@ -62,6 +63,7 @@ class OpenCL_MixIn
 
         cl_context context;
         cl_device_id device_id;
+        cl_program program;
         cl_kernel kernel;
         std::string kernel_function_name;
         size_t global_range[3];

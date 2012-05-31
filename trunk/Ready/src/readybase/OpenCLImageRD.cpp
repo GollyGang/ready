@@ -45,7 +45,8 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
     const char *source = this->kernel_source.c_str();
     size_t source_size = this->kernel_source.length();
-    cl_program program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
+    clReleaseProgram(this->program);
+    this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
     // make a set of options to pass to the compiler
@@ -53,13 +54,13 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     //options << "-cl-denorms-are-zero -cl-fast-relaxed-math";
 
     // build the program
-    ret = clBuildProgram(program,1,&this->device_id,options.str().c_str(),NULL,NULL);
+    ret = clBuildProgram(this->program,1,&this->device_id,options.str().c_str(),NULL,NULL);
     if(ret != CL_SUCCESS)
     {
         const int MAX_BUILD_LOG = 10000;
         char build_log[MAX_BUILD_LOG];
         size_t build_log_length;
-        cl_int ret2 = clGetProgramBuildInfo(program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
+        cl_int ret2 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
         throwOnError(ret2,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving program build log failed: ");
         { ofstream out("kernel.txt"); out << kernel_source; }
         ostringstream oss;
@@ -68,8 +69,8 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     }
 
     // create the kernel
-    if(this->kernel) clReleaseKernel(this->kernel);
-    this->kernel = clCreateKernel(program,this->kernel_function_name.c_str(),&ret);
+    clReleaseKernel(this->kernel);
+    this->kernel = clCreateKernel(this->program,this->kernel_function_name.c_str(),&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
 
     this->global_range[0] = max(1,vtkMath::Round(this->GetX()) / this->GetBlockSizeX());
@@ -86,6 +87,8 @@ void OpenCLImageRD::CreateOpenCLBuffers()
 {
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
     const int NC = this->GetNumberOfChemicals();
+
+    this->ReleaseOpenCLBuffers();
 
     cl_int ret;
 

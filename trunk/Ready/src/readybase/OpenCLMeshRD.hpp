@@ -27,6 +27,9 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
 {
     public:
 
+        OpenCLMeshRD();
+        virtual ~OpenCLMeshRD();
+
         virtual bool HasEditableFormula() const { return true; }
 
         virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
@@ -52,6 +55,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         virtual void CreateOpenCLBuffers();
         virtual void WriteToOpenCLBuffers();
         virtual void ReadFromOpenCLBuffers();
+        virtual void ReleaseOpenCLBuffers();
 
     private:
 
