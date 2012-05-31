@@ -220,6 +220,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
+    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
 
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
     string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
@@ -308,6 +309,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     }
 
     // add the bounding box
+    if(show_bounding_box)
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
         box->SetBounds(this->mesh->GetBounds());
