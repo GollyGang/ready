@@ -69,41 +69,12 @@ using namespace std;
 #include <vtkGeometryFilter.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
-#include <vtkXMLImageDataWriter.h>
-#include <vtkObjectFactory.h>
 #include <vtkFloatArray.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkImageToStructuredPoints.h>
 #include <vtkDataSetMapper.h>
 
 // -------------------------------------------------------------------
-
-/// Used to write vtkImageData to XML, with an added RD section containing rule information.
-class RD_XMLImageWriter : public vtkXMLImageDataWriter
-{
-    public:
-
-        vtkTypeMacro(RD_XMLImageWriter, vtkXMLImageDataWriter);
-        static RD_XMLImageWriter* New();
-
-        void SetSystem(const ImageRD* rd_system);
-        void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
-
-    protected:  
-
-        RD_XMLImageWriter() : system(NULL) {} 
-
-        static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
-
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
-
-    protected:
-
-        const ImageRD* system;
-        const Properties* render_settings;
-};
-
-// ---------------------------------------------------------------------
 
 ImageRD::ImageRD()
 {
@@ -1082,27 +1053,6 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
     image_mapper->Update();
 
     out->DeepCopy(image_mapper->GetOutput());
-}
-
-// --------------------------------------------------------------------------------
-
-vtkStandardNewMacro(RD_XMLImageWriter);
-
-// --------------------------------------------------------------------------------
-
-void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system) 
-{ 
-    this->system = rd_system; 
-}
-
-// --------------------------------------------------------------------------------
-
-int RD_XMLImageWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
-{
-    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
-    xml->AddNestedElement(this->render_settings->GetAsXML());
-    xml->PrintXML(os,indent);
-    return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
 }
 
 // --------------------------------------------------------------------------------
