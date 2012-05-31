@@ -212,6 +212,8 @@ MyFrame::MyFrame(const wxString& title)
 
     CreateStatusBar(1);
     SetStatusText(_("Ready"));
+    
+    this->is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
 
     this->InitializePatternsPane();
     this->InitializeInfoPane();
@@ -1337,40 +1339,68 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         if(dlg.ShowModal()!=wxID_OK) return;
         sel = dlg.GetSelection();
     }
+    AbstractRD *sys;
     try 
     {
         switch(sel)
         {
             case 0: // 1D image
             {
-                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-                s->SetDimensionsAndNumberOfChemicals(128,1,1,2);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+				ImageRD *image_sys;
+				if(this->is_opencl_available)
+				{
+					FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					image_sys = s;
+				}
+				else
+				{
+					image_sys = new GrayScottImageRD();
+				}
+                image_sys->SetDimensionsAndNumberOfChemicals(128,1,1,2);
+                sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->SetCurrentRDSystem(s);
                 wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
                 break;
             }
             case 1: // 2D image
             {
-                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-                s->SetDimensionsAndNumberOfChemicals(128,128,1,2);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+				ImageRD *image_sys;
+				if(this->is_opencl_available)
+				{
+					FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					image_sys = s;
+				}
+				else
+				{
+					image_sys = new GrayScottImageRD();
+				}
+                image_sys->SetDimensionsAndNumberOfChemicals(128,128,1,2);
+                sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->SetCurrentRDSystem(s);
                 wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
                 break;
             }
             case 2: // 3D image
             {
-                FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
-                s->SetDimensionsAndNumberOfChemicals(32,32,32,2);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+				ImageRD *image_sys;
+				if(this->is_opencl_available)
+				{
+					FormulaOpenCLImageRD *s = new FormulaOpenCLImageRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					image_sys = s;
+				}
+				else
+				{
+					image_sys = new GrayScottImageRD();
+				}
+                image_sys->SetDimensionsAndNumberOfChemicals(32,32,32,2);
+                sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->SetCurrentRDSystem(s);
                 wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
                 break;
             }
@@ -1391,125 +1421,181 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetGeodesicSphere(divs,mesh,2);
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 4: // torus
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 5: // tetrahedral mesh
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 6: // triangular mesh
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 7: // hexagonal mesh
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 8: // rhombille tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetRhombilleTiling(50,50,mesh,2); // TODO: ask user for resolution
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 9: // Penrose rhombi tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetPenroseTiling(7,0,mesh,2); // TODO: ask user for resolution
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->SetCurrentRDSystem(s);
                 break;
             }
             case 10: // Penrose darts and kites tiling
             {
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshRD::GetPenroseTiling(7,1,mesh,2); // TODO: ask user for resolution
-                FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
-                s->SetPlatform(opencl_platform);
-                s->SetDevice(opencl_device);
-                s->CopyFromMesh(mesh);
-                s->CreateDefaultInitialPatternGenerator();
-                s->GenerateInitialPattern();
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                {
+					FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+					s->SetPlatform(opencl_platform);
+					s->SetDevice(opencl_device);
+					mesh_sys = s;
+				}
+				else
+				{
+					mesh_sys = new GrayScottMeshRD();
+				}
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->SetCurrentRDSystem(s);
                 wxMessageBox(_("There's a problem with rendering concave polygons in OpenGL, so the display might be slightly corrupted."));
                 break;
             }
@@ -1533,8 +1619,11 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         MonospaceMessageBox(message,_("Error creating pattern"),wxART_ERROR);
         return;
     }
+    
+	sys->CreateDefaultInitialPatternGenerator();
+	sys->GenerateInitialPattern();
+	this->SetCurrentRDSystem(sys);
 
-    this->is_running = false;
     this->system->SetFilename("untitled");
     this->system->SetModified(false);
     this->UpdateWindows();
@@ -2559,6 +2648,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
     // for now we give the mesh an inbuilt rule (Gray-Scott) but this should be different
 
+	MeshRD *mesh_sys;
     if(mesh_filename.EndsWith(_T("vtp")))
     {
         if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
@@ -2572,15 +2662,21 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
         vtp_reader->SetFileName(mesh_filename.mb_str());
         vtp_reader->Update();
-        GrayScottMeshRD *rd = new GrayScottMeshRD();
+        if(this->is_opencl_available)
+        {
+			FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+			s->SetPlatform(opencl_platform);
+			s->SetDevice(opencl_device);
+			mesh_sys = s;
+		}
+		else
+		{
+			mesh_sys = new GrayScottMeshRD();
+		}
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
-        rd->CopyFromMesh(ug);
-        rd->SetNumberOfChemicals(2);
-        rd->CreateDefaultInitialPatternGenerator();
-        rd->GenerateInitialPattern();
-        this->SetCurrentRDSystem(rd);
+        mesh_sys->CopyFromMesh(ug);
     }
     else if(mesh_filename.EndsWith(_T("vtu")))
     {
@@ -2595,12 +2691,18 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
         vtu_reader->SetFileName(mesh_filename.mb_str());
         vtu_reader->Update();
-        GrayScottMeshRD *rd = new GrayScottMeshRD();
-        rd->CopyFromMesh(vtu_reader->GetOutput());
-        rd->SetNumberOfChemicals(2);
-        rd->CreateDefaultInitialPatternGenerator();
-        rd->GenerateInitialPattern();
-        this->SetCurrentRDSystem(rd);
+        if(this->is_opencl_available)
+        {
+			FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+			s->SetPlatform(opencl_platform);
+			s->SetDevice(opencl_device);
+			mesh_sys = s;
+		}
+		else
+		{
+			mesh_sys = new GrayScottMeshRD();
+		}
+        mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
     }
     else if(mesh_filename.EndsWith(_T("obj")))
     {
@@ -2615,21 +2717,32 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
         obj_reader->SetFileName(mesh_filename.mb_str());
         obj_reader->Update();
-        GrayScottMeshRD *rd = new GrayScottMeshRD();
+        if(this->is_opencl_available)
+        {
+			FormulaOpenCLMeshRD *s = new FormulaOpenCLMeshRD();
+			s->SetPlatform(opencl_platform);
+			s->SetDevice(opencl_device);
+			mesh_sys = s;
+		}
+		else
+		{
+			mesh_sys = new GrayScottMeshRD();
+		}
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
-        rd->CopyFromMesh(ug);
-        rd->SetNumberOfChemicals(2);
-        rd->CreateDefaultInitialPatternGenerator();
-        rd->GenerateInitialPattern();
-        this->SetCurrentRDSystem(rd);
+        mesh_sys->CopyFromMesh(ug);
     }
     else
     {
         wxMessageBox(_("Unsupported file type")); 
         return; 
     }
+
+	mesh_sys->SetNumberOfChemicals(2);
+	mesh_sys->CreateDefaultInitialPatternGenerator();
+	mesh_sys->GenerateInitialPattern();
+	this->SetCurrentRDSystem(mesh_sys);
 }
 
 // ---------------------------------------------------------------------
