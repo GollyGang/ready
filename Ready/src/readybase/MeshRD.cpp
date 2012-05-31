@@ -510,6 +510,8 @@ void MeshRD::ComputeCellNeighbors()
     // N.B. we don't intend to support cells of mixed dimensionality in one mesh
 
     // copy data to plain arrays
+    if(this->cell_neighbor_indices) delete []this->cell_neighbor_indices;
+    if(this->cell_neighbor_weights) delete []this->cell_neighbor_weights;
     this->cell_neighbor_indices = new int[this->mesh->GetNumberOfCells()*this->max_neighbors];
     this->cell_neighbor_weights = new float[this->mesh->GetNumberOfCells()*this->max_neighbors];
     for(int i=0;i<this->mesh->GetNumberOfCells();i++)
