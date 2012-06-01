@@ -57,11 +57,16 @@ class AbstractRD
         /// How many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const { return this->timesteps_taken; }
 
+        /// The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that drives the system.
+        std::string GetFormula() const { return this->formula; }
+        /// Throws std::runtime_error with information if the formula doesn't work.
+        virtual void TestFormula(std::string program_string) {}
+        /// Changes the system's formula. The kernel will be reloaded on the next update step.
+        void SetFormula(std::string s);
         /// Some implementations (e.g. inbuilt ones) cannot have their formula edited.
         virtual bool HasEditableFormula() const =0;
-        std::string GetFormula() const { return this->formula; }
-        virtual void TestFormula(std::string program_string) {}
-        void SetFormula(std::string s);
+        /// Return the full OpenCL kernel (if available, else the empty string).
+        virtual std::string GetKernel() const { return ""; }
 
         /// Returns e.g. "inbuilt", "formula", "kernel", as in the XML.
         virtual std::string GetRuleType() const =0;

@@ -132,6 +132,8 @@ class MyFrame : public wxFrame
         void OnUpdateAddParameter(wxUpdateUIEvent& event);
         void OnDeleteParameter(wxCommandEvent& event);
         void OnUpdateDeleteParameter(wxUpdateUIEvent& event);
+        void OnViewFullKernel(wxCommandEvent& event);
+        void OnUpdateViewFullKernel(wxUpdateUIEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);
 

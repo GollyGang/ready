@@ -14,7 +14,6 @@ before 0.3 release:
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - reorganise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - add complex Ginsburg-Landau
-- allow inbuilt -> formula -> full kernel conversions
 - bug: show_cell_edges is offset on images (same issue as with Minecraft-style surface)
 - mesh generators should output at a suitable scale for <pixel>s to access individual cells
 - document how <pixel> element coordinates work on meshes
