@@ -160,6 +160,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::AddParameter, MyFrame::OnUpdateAddParameter)
     EVT_MENU(ID::DeleteParameter,MyFrame::OnDeleteParameter)
     EVT_UPDATE_UI(ID::DeleteParameter, MyFrame::OnUpdateDeleteParameter)
+    EVT_MENU(ID::ViewFullKernel,MyFrame::OnViewFullKernel)
+    EVT_UPDATE_UI(ID::ViewFullKernel, MyFrame::OnUpdateViewFullKernel)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
@@ -345,6 +347,7 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(ID::AddParameter, _("&Add Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
         menu->Append(ID::DeleteParameter, _("&Delete Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
+        menu->Append(ID::ViewFullKernel, _("View Full Kernel") + GetAccelerator(DO_VIEWKERNEL),_("Shows the full OpenCL kernel as expanded from the formula"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select &OpenCL Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
@@ -2147,6 +2150,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Blank,                     DO_BLANK);
         SetAccelerator(mbar, ID::AddParameter,              DO_ADDPARAM);
         SetAccelerator(mbar, ID::DeleteParameter,           DO_DELPARAM);
+        SetAccelerator(mbar, ID::ViewFullKernel,            DO_VIEWKERNEL);
         SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
         SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
     }
@@ -2211,6 +2215,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_BLANK:          cmdid = ID::Blank; break;
         case DO_ADDPARAM:       cmdid = ID::AddParameter; break;
         case DO_DELPARAM:       cmdid = ID::DeleteParameter; break;
+        case DO_VIEWKERNEL:     cmdid = ID::ViewFullKernel; break;
         case DO_DEVICE:         cmdid = ID::SelectOpenCLDevice; break;
         case DO_OPENCL:         cmdid = ID::OpenCLDiagnostics; break;
         
@@ -2838,6 +2843,21 @@ void MyFrame::OnBlank(wxCommandEvent& event)
     this->system->BlankImage();
     this->is_running = false;
     this->UpdateWindows();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnViewFullKernel(wxCommandEvent& event)
+{
+    MonospaceMessageBox(wxString(this->system->GetKernel().c_str(),wxConvUTF8),
+        _("The full OpenCL kernel for this formula rule:"),wxART_INFORMATION);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateViewFullKernel(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->GetRuleType()=="formula");
 }
 
 // ---------------------------------------------------------------------

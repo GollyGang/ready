@@ -36,6 +36,8 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual void TestFormula(std::string program_string);
 
+        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); } 
+
     protected:
 
         virtual void CopyFromImage(vtkImageData* im);

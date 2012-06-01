@@ -122,6 +122,7 @@ typedef enum
     DO_STEP1,                    // step by 1
     DO_STEPN,                    // step by N
     DO_STOPRECORDING,            // stop recording
+    DO_VIEWKERNEL,               // view full kernel
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;

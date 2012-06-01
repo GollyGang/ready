@@ -45,6 +45,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         virtual void BlankImage();
 
         virtual void TestFormula(std::string program_string);
+        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); } 
 
     protected:
 

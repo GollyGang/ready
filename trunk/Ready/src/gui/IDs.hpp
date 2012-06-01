@@ -71,6 +71,7 @@ namespace ID
         Slower,
         AddParameter,
         DeleteParameter,
+        ViewFullKernel,
         SelectOpenCLDevice,
         OpenCLDiagnostics,
         

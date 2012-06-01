@@ -346,6 +346,7 @@ const char* GetActionName(action_id action)
         case DO_BLANK:          return "Blank";
         case DO_ADDPARAM:       return "Add Parameter...";
         case DO_DELPARAM:       return "Delete Parameter...";
+        case DO_VIEWKERNEL:     return "View Full Kernel";
         case DO_DEVICE:         return "Select OpenCL Device...";
         case DO_OPENCL:         return "Show OpenCL Diagnostics...";
         // Help menu
