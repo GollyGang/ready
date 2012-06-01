@@ -3,10 +3,11 @@
   <RD format_version="2">
     <description>
         Here the heat equation applies to chemical &lt;i&gt;a&lt;/i&gt; but only in those places 
-        where chemical &lt;i&gt;b&lt;/i&gt; is greater than zero. This has the effect of locking 
-        certain areas to their starting values and shows how the heat equation can interpolate 
-        betweeen values in a spatial field. This is known as &lt;i&gt;solving&lt;/i&gt; the heat 
-        equation with fixed boundary conditions, or as &lt;a href=&quot;http://en.wikipedia.org/wiki/Kriging&quot;&gt;kriging&lt;/a&gt;.
+        where chemical &lt;i&gt;b&lt;/i&gt; is zero. This has the effect of locking certain areas to
+        their starting values and shows how the heat equation can interpolate betweeen values in a 
+        spatial field. This is known as &lt;i&gt;solving&lt;/i&gt; the heat equation with fixed 
+        boundary conditions, or as 
+        &lt;a href=&quot;http://en.wikipedia.org/wiki/Kriging&quot;&gt;kriging&lt;/a&gt;.
     </description>
 
     <rule type="formula" name="Heat equation" wrap="0">
