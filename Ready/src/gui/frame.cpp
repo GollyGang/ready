@@ -182,6 +182,17 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ANY, MyFrame::OnOpenRecent)
 END_EVENT_TABLE()
 
+const char* MyFrame::opencl_not_available_message = 
+	"This file requires OpenCL, which has not been detected on your system.\n\n"
+	"OpenCL allows Ready to take advantage of the many-core architectures on\n"
+	"graphics cards and modern CPUs. OpenCL also allows rules to be written in\n"
+	"a text format and compiled on the fly. It is available on every operating\n"
+	"system, so please install it to get the most out of Ready. (If your OS is\n"
+	"running in a virtual machine then it may not be possible to get OpenCL\n"
+	"working.)\n\n"
+	"You can load the files in the 'CPU-only' folder, which don't use OpenCL. Or\n"
+	"use File > New Pattern or File > Import Mesh to make new examples.";
+						
 // ---------------------------------------------------------------------
 
 // constructor
@@ -1635,10 +1646,14 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             }
             else if(type=="formula")
             {
+                if(!this->is_opencl_available) 
+                    throw runtime_error(this->opencl_not_available_message);
                 image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
             }
             else if(type=="kernel")
             {
+                if(!this->is_opencl_available) 
+                    throw runtime_error(this->opencl_not_available_message);
                 image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device);
             }
             else throw runtime_error("Unsupported rule type: "+type);
@@ -1681,10 +1696,14 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
             }
             else if(type=="formula")
             {
+                if(!this->is_opencl_available) 
+                    throw runtime_error(this->opencl_not_available_message);
                 mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
             }
             else if(type=="kernel")
             {
+                if(!this->is_opencl_available) 
+                    throw runtime_error(this->opencl_not_available_message);
                 mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device);
             }
             else throw runtime_error("Unsupported rule type: "+type);
