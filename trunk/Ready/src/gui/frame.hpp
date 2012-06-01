@@ -210,6 +210,8 @@ class MyFrame : public wxFrame
 
         bool fullscreen;    // in full screen mode?
         bool is_opencl_available;
+        
+        static const char *opencl_not_available_message;
 
         DECLARE_EVENT_TABLE()
 };
