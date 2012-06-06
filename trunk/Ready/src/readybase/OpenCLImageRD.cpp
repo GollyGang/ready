@@ -92,6 +92,8 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
 
 void OpenCLImageRD::CreateOpenCLBuffers()
 {
+    this->ReloadContextIfNeeded();
+
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
     const int NC = this->GetNumberOfChemicals();
 

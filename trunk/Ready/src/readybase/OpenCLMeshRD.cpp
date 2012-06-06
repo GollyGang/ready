@@ -134,6 +134,9 @@ void OpenCLMeshRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
 
+    if(this->n_chemicals==0)
+        throw runtime_error("OpenCLMeshRD::ReloadKernelIfNeeded : zero chemicals");
+
     cl_int ret;
 
     // create the program
@@ -182,7 +185,6 @@ void OpenCLMeshRD::ReloadKernelIfNeeded()
 void OpenCLMeshRD::CreateOpenCLBuffers()
 {
     this->ReloadContextIfNeeded();
-    this->ReloadKernelIfNeeded();
 
     const unsigned long MEM_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells();
     const int NC = this->GetNumberOfChemicals();

@@ -267,7 +267,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         mapper->SetScalarModeToUseCellFieldData();
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
-
+        mapper->UseLookupTableScalarRangeOn();
 
         pRenderer->AddActor(actor);
     }
@@ -294,6 +294,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         mapper->SetScalarModeToUseCellFieldData();
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
+        mapper->UseLookupTableScalarRangeOn();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->LightingOff();
@@ -466,6 +467,7 @@ void MeshRD::ComputeCellNeighbors()
         float coeff_sum=0.0f;
         for(int iN=0;iN<(int)neighbors.size();iN++)
             coeff_sum += neighbors[iN].diffusion_coefficient;
+        coeff_sum = max(coeff_sum,1e-5f); // avoid div0
         for(int iN=0;iN<(int)neighbors.size();iN++)
             neighbors[iN].diffusion_coefficient /= coeff_sum;
         // store this list of neighbors
