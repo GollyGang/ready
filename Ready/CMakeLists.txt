@@ -98,11 +98,6 @@ set( PATTERN_FILES
   kernel_test.vti 
   conway_life.vti 
   bays_3D.vti
-  sphere.vtu
-  sphere_formula.vtu
-  sphere_kernel.vtu
-  cow.vtu
-  tetramesh.vtu
   munafo-uskate.vti
   grayscott_parameter_map.vti
   grayscott_lesmes_noisy.vti
@@ -112,6 +107,9 @@ set( PATTERN_FILES
   parameter_modulation_demo2.vti
   life_torus.vtu
   penrose.vtu
+  bunny.vtu
+  horse.vtu
+  lion.vtu
   heat_equation_interpolation.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
