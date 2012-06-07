@@ -1427,8 +1427,23 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 4: // torus
             {
+                int nx,ny;
+                {
+                    const int N_CHOICES=4;
+                    int x_choices[N_CHOICES] = {100,160,200,500};
+                    int y_choices[N_CHOICES] = {125,200,250,625};
+                    int cells[N_CHOICES] = {12500,32000,50000,312500};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",x_choices[i],y_choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the resolution:"),_("Torus tiling options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(2); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    nx = x_choices[dlg.GetSelection()];
+                    ny = y_choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTorus(200,250,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetTorus(nx,ny,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1442,8 +1457,20 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 5: // tetrahedral mesh
             {
+                int npts;
+                {
+                    const int N_CHOICES=5;
+                    int choices[N_CHOICES] = {500,1000,1500,2000,5000};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%d points - approximately %d cells",choices[i],choices[i]*6);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of points:"),_("Tetrahedral mesh options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(1); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    npts = choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTetrahedralMesh(1000,mesh,2); // TODO: ask user for n_points
+                MeshGenerators::GetTetrahedralMesh(npts,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1457,8 +1484,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 6: // triangular mesh
             {
+                int n;
+                {
+                    const int N_CHOICES=5;
+                    int choices[N_CHOICES] = {30,50,100,200,500};
+                    int cells[N_CHOICES] = {1682,4802,19602,79202,498002};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Triangular mesh options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(1); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    n = choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTriangularMesh(50,50,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetTriangularMesh(n,n,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1473,8 +1513,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 7: // hexagonal mesh
             {
+                int n;
+                {
+                    const int N_CHOICES=4;
+                    int choices[N_CHOICES] = {100,150,200,500};
+                    int cells[N_CHOICES] = {3185,7326,13068,82668};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Hexagonal mesh options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(0); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    n = choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHexagonalMesh(100,100,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetHexagonalMesh(n,n,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1489,8 +1542,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 8: // rhombille tiling
             {
+                int n;
+                {
+                    const int N_CHOICES=5;
+                    int choices[N_CHOICES] = {50,75,100,150,200};
+                    int cells[N_CHOICES] = {2304,5367,9555,21978,39204};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Rhombille mesh options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(0); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    n = choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRhombilleTiling(50,50,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetRhombilleTiling(n,n,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1505,8 +1571,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 9: // Penrose rhombi tiling
             {
+                int divs;
+                {
+                    const int N_CHOICES=5;
+                    int div_choices[N_CHOICES] = {5,7,8,9,10};
+                    int cells[N_CHOICES] = {430,3010,7920,20800,54560};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(1); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    divs = div_choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetPenroseTiling(7,0,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetPenroseTiling(divs,0,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1521,8 +1600,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case 10: // Penrose darts and kites tiling
             {
+                int divs;
+                {
+                    const int N_CHOICES=5;
+                    int div_choices[N_CHOICES] = {5,6,7,8,9};
+                    int cells[N_CHOICES] = {705,1855,4885,12845,33705};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(2); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    divs = div_choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetPenroseTiling(7,1,mesh,2); // TODO: ask user for resolution
+                MeshGenerators::GetPenroseTiling(divs,1,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);

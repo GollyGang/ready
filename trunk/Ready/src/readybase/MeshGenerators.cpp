@@ -51,12 +51,13 @@ void MeshGenerators::GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid *m
     mesh->SetCells(VTK_POLYGON,subdivider->GetOutput()->GetPolys());
 
     // push the vertices out into the shape of a sphere
+    const float scale = 100.0f; // we make the sphere larger to make <pixel> access more useful
     vtkFloatingPointType p[3];
     for(int i=0;i<mesh->GetNumberOfPoints();i++)
     {
         mesh->GetPoint(i,p);
         vtkMath::Normalize(p);
-        mesh->GetPoints()->SetPoint(i,p);
+        mesh->GetPoints()->SetPoint(i,p[0]*scale,p[1]*scale,p[2]*scale);
     }
 
     // allocate the chemicals arrays
@@ -82,7 +83,7 @@ void MeshGenerators::GetTetrahedralMesh(int n_points,vtkUnstructuredGrid *mesh,i
     vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
     pts->SetNumberOfPoints(n_points);
     vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-    transform->Scale(2,1,1); // just to make it a bit more interesting we stretch the points in one direction
+    transform->Scale(200,100,100); // just to make it a bit more interesting we stretch the points in one direction
     vtkSmartPointer<vtkTransformPolyDataFilter> trans = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
     trans->SetTransform(transform);
     trans->SetInputConnection(pts->GetOutputPort());
@@ -110,8 +111,8 @@ void MeshGenerators::GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chem
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
-    float radius1 = 2.0f;
-    float radius2 = 3.0f;
+    float radius1 = nx; // we scale the torus to give <pixel> access a better chance of being useful
+    float radius2 = radius1 * 1.5f; // could allow user to change the proportions
     vtkSmartPointer<vtkTransform> r1 = vtkSmartPointer<vtkTransform>::New();
     vtkSmartPointer<vtkTransform> r2 = vtkSmartPointer<vtkTransform>::New();
     double p[3],p2[3];
@@ -165,15 +166,16 @@ void MeshGenerators::GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,i
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
-    double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
+    const double scale = 2.0;
+    const double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
 
     double p[3]={0,0,0};
     for(int y=0;y<ny;y++)
     {
-        p[1] = th*y;
+        p[1] = th*y * scale;
         for(int x=0;x<nx;x++)
         {
-            p[0] = ((y%2)?0.5:0) + x;
+            p[0] = ( ((y%2)?0.5:0) + x) * scale;
             pts->InsertNextPoint(p);
             if(y%2 && x<nx-1)
             {
@@ -222,15 +224,16 @@ void MeshGenerators::GetRhombilleTiling(int nx,int ny,vtkUnstructuredGrid* mesh,
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
-    double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
+    const double scale = 2.0;
+    const double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
 
     double p[3]={0,0,0};
     for(int y=0;y<ny;y++)
     {
-        p[1] = th*y;
+        p[1] = th*y * scale;
         for(int x=0;x<nx;x++)
         {
-            p[0] = ((y%2)?0.5:0) + x;
+            p[0] = (((y%2)?0.5:0) + x) * scale;
             pts->InsertNextPoint(p);
             if(y%2 && x%3==2 && y<ny-1)
             {
@@ -293,15 +296,16 @@ void MeshGenerators::GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,in
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
-    double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
+    const double scale = 2.0;
+    const double th = sqrt(3.0)/2.0; // height of an equilateral triangle with edge length 1
 
     double p[3]={0,0,0};
     for(int y=0;y<ny;y++)
     {
-        p[1] = th*y;
+        p[1] = th*y * scale;
         for(int x=0;x<nx;x++)
         {
-            p[0] = ((y%2)?0.5:0) + x;
+            p[0] = (((y%2)?0.5:0) + x) * scale;
             pts->InsertNextPoint(p);
             if(y%2 && x%3==2 && y<ny-1)
             {
@@ -362,6 +366,7 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
     const int RHOMBI = 0;
     const int DARTS_AND_KITES = 1;
 
+    // we keep a list of the 'red' and 'blue' Robinson triangles and use 'deflation' (decomposition)
     vector<Tri> red_tris[2],blue_tris[2]; // each list has two buffers
     int iCurrentBuffer = 0;
 
@@ -370,14 +375,17 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
     // start with 10 red triangles in a wheel, to get a nice circular shape (with 5-fold rotational symmetry)
     // (any correctly-tiled starting pattern will work too)
     double angle_step = 2.0 * 3.1415926535 / 10.0;
+    const double scale = pow( goldenRatio, n_subdivisions );
     for(int i=0;i<10;i++)
     {
         double angle1 = angle_step * (i + i%2);
         double angle2 = angle_step * (i + 1 - i%2);
         switch(type) {
             default:
-            case RHOMBI: red_tris[iCurrentBuffer].push_back(Tri(0,0,cos(angle1),sin(angle1),cos(angle2),sin(angle2))); break;
-            case DARTS_AND_KITES: red_tris[iCurrentBuffer].push_back(Tri(cos(angle1),sin(angle1),0,0,cos(angle2),sin(angle2))); break;
+            case RHOMBI: red_tris[iCurrentBuffer].push_back(Tri(0,0,scale*cos(angle1),scale*sin(angle1),
+                             scale*cos(angle2),scale*sin(angle2))); break;
+            case DARTS_AND_KITES: red_tris[iCurrentBuffer].push_back(Tri(scale*cos(angle1),scale*sin(angle1),0,0,
+                                      scale*cos(angle2),scale*sin(angle2))); break;
         }
     }
 
@@ -388,7 +396,7 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
         int iTargetBuffer = 1-iCurrentBuffer;
         red_tris[iTargetBuffer].clear();
         blue_tris[iTargetBuffer].clear();
-        // each red triangle becomes a smaller red and a blue
+        // subdivide the red triangles
         for(vector<Tri>::const_iterator it = red_tris[iCurrentBuffer].begin();it!=red_tris[iCurrentBuffer].end();it++)
         {
             switch(type)
@@ -411,7 +419,7 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
                     break;
             }
         }
-        // each blue triangle becomes a smaller red and two blues
+        // subdivide the blue triangles
         for(vector<Tri>::const_iterator it = blue_tris[iCurrentBuffer].begin();it!=blue_tris[iCurrentBuffer].end();it++)
         {
             switch(type)
