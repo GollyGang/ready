@@ -302,8 +302,9 @@ largest image dimension.
 </ul>
 
 <h4><a name="pixel"></a><b>&lt;pixel&gt;</b></h4>
-Specifies that the overlay applies to a single pixel in the image. For a 1D image, only the 
-x-coordinate is considered. For a 2D image, only x and y are considered. 
+Specifies that the overlay applies to a single pixel in the image. For meshes, any cell with a 
+centroid inside the pixel will be affected. For a 1D image, only the x-coordinate is considered. For
+a 2D image, only x and y are considered. 
 <p>Attributes:
 <ul>
 <li><tt>x</tt> (required) : the x-coordinate of the pixel, a 0-based integer.
