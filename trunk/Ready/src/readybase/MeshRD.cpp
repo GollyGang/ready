@@ -44,6 +44,7 @@
 #include <vtkGeometryFilter.h>
 #include <vtkCutter.h>
 #include <vtkPlane.h>
+#include <vtkCellDataToPointData.h>
 
 // STL:
 #include <stdexcept>
@@ -246,6 +247,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
             edges->SetInput(this->mesh);
             mapper->SetInputConnection(edges->GetOutputPort());
+            mapper->SetScalarModeToUseCellFieldData();
         }
         else if(slice_3D) // partial wireframe mode: only external surface edges
         {
@@ -254,17 +256,28 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
             edges->SetInputConnection(geom->GetOutputPort());
             mapper->SetInputConnection(edges->GetOutputPort());
+            mapper->SetScalarModeToUseCellFieldData();
         }
         else // non-wireframe mode: shows filled external surface
         {
-            mapper->SetInput(this->mesh);
+            if(use_image_interpolation)
+            {
+                vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+                to_point_data->SetInput(this->mesh);
+                mapper->SetInputConnection(to_point_data->GetOutputPort());
+                mapper->SetScalarModeToUsePointFieldData();
+            }
+            else
+            {
+                mapper->SetInput(this->mesh);
+                mapper->SetScalarModeToUseCellFieldData();
+            }
             if(show_cell_edges)
             {
                 actor->GetProperty()->EdgeVisibilityOn();
-                actor->GetProperty()->SetEdgeColor(0,0,0);
+                actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
             }
         }
-        mapper->SetScalarModeToUseCellFieldData();
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
         mapper->UseLookupTableScalarRangeOn();

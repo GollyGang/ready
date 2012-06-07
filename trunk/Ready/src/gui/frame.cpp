@@ -1509,6 +1509,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
             case 7: // hexagonal mesh
@@ -1538,6 +1539,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
             case 8: // rhombille tiling
@@ -1567,6 +1569,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
             case 9: // Penrose rhombi tiling
@@ -1596,6 +1599,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
             case 10: // Penrose darts and kites tiling
@@ -1625,6 +1629,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 wxMessageBox(_("There's a problem with rendering concave polygons in OpenGL, so the display might be slightly corrupted."));
                 break;
             }
