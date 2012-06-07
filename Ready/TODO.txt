@@ -10,7 +10,6 @@ UI annoyances:
 
 before 0.3 release:
 
-- document how <pixel> element coordinates work on meshes
 - bug: show_cell_edges is offset on images (same issue as with Minecraft-style surface)
 
 - rename 'Patterns' to 'Files'?
