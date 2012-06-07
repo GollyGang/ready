@@ -4,7 +4,7 @@ Dependencies:
 2) wxWidgets (2.9.2+): www.wxwidgets.org
 3) any OpenCL SDK.
 
-Ready uses CMake fr pre-build setup. You might need to read some CMake
+Ready uses CMake for pre-build setup. You might need to read some CMake
 documentation first to get the hang of it.
 
 =============== Windows, using the Visual Studio IDE =================
