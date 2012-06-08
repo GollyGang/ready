@@ -11,6 +11,8 @@ UI annoyances:
 
 before 0.3 release:
 
+- bug: 1D image with show_cell_edges looks like N x 3 grid
+- ImageRD::UpdateImageWrapPad() shouldn't be necessary - can use vtkAssignAttribute/vtkRearrangeFields as elsewhere?
 - rename 'Patterns' to 'Files'?
 - reorganise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - add complex Ginsburg-Landau
@@ -67,5 +69,4 @@ future ideas:
 - allow 3D view angle to be specified as a render setting
 
 code annoyances:
-- ImageRD::UpdateImageWrapPad() shouldn't be necessary
 - would prefer ImageRD to use named arrays internally, as in MeshRD
