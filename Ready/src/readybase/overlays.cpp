@@ -340,7 +340,7 @@ class OtherChemical : public BaseFill
 
         virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
         {
-            if(this->iOtherChemical<0 || this->iOtherChemical>=vals.size())
+            if(this->iOtherChemical < 0 || this->iOtherChemical >= (int)vals.size())
                 throw runtime_error("OtherChemical:GetValue : chemical out of range");
             return vals[this->iOtherChemical];
         }

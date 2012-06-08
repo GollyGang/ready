@@ -89,11 +89,6 @@ class ImageRD : public AbstractRD
         void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& render_settings);
 
-        /// kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined
-        vtkImageWrapPad *image_wrap_pad_filter;
-        void SetImageWrapPadFilter(vtkImageWrapPad *p) { this->image_wrap_pad_filter = p; }
-        void UpdateImageWrapPadFilter();
-
     private: // deliberately not implemented, to prevent use
 
         ImageRD(ImageRD&);
