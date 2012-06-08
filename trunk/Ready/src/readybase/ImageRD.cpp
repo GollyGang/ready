@@ -84,7 +84,6 @@ using namespace std;
 
 ImageRD::ImageRD()
 {
-    this->image_wrap_pad_filter = NULL;
     this->starting_pattern = vtkImageData::New();
 }
 
@@ -199,7 +198,6 @@ void ImageRD::CopyFromImage(vtkImageData* im)
     }
     else   
         throw runtime_error("ImageRD::CopyFromImage : chemical count mismatch");
-    UpdateImageWrapPadFilter();
 }
 
 // ---------------------------------------------------------------------
@@ -265,7 +263,6 @@ void ImageRD::GenerateInitialPattern()
     }
     for(int i=0;i<(int)this->images.size();i++)
         this->images[i]->Modified();
-    UpdateImageWrapPadFilter();
     this->timesteps_taken = 0;
 }
 
@@ -291,28 +288,12 @@ void ImageRD::Update(int n_steps)
 
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
         this->images[ic]->Modified();
-
-    UpdateImageWrapPadFilter();
-}
-
-// ---------------------------------------------------------------------
-
-void ImageRD::UpdateImageWrapPadFilter()
-{
-    // kludgy workaround for the GenerateCubesFromLabels approach not being fully pipelined
-    if(this->image_wrap_pad_filter)
-    {
-        this->image_wrap_pad_filter->Update();
-        this->image_wrap_pad_filter->GetOutput()->GetCellData()->SetScalars(
-            dynamic_cast<vtkImageData*>(this->image_wrap_pad_filter->GetInput())->GetPointData()->GetScalars());
-    }
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings)
 {
-    this->SetImageWrapPadFilter(NULL); // workaround for the GenerateCubesFromLabels approach not being fully pipelined
     switch(this->GetArenaDimensionality())
     {
         // TODO: merge the dimensionalities (often want one/more slices from lower dimensionalities)
@@ -711,13 +692,24 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
         pad->SetInput(image);
         pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
-        pad->Update();
-        pad->GetOutput()->GetCellData()->SetScalars(image->GetPointData()->GetScalars()); // a non-pipelined operation
 
-        this->SetImageWrapPadFilter(pad); // workaround for the GenerateCubesFromLabels approach not being fully pipelined
+        // move the pixel values (stored in the point data) to cell data
+        vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
+        prearrange_fields->SetInput(image);
+        prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
+            vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
+
+        // mark the new cell data array as the active attribute
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
+        assign_attribute->Assign("ImageScalars", vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+
+        vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
+        merge_datasets->SetGeometryConnection(pad->GetOutputPort());
+        merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
 
         vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
-        threshold->SetInputConnection(pad->GetOutputPort());
+        threshold->SetInputConnection(merge_datasets->GetOutputPort());
         threshold->SetInputArrayToProcess(0, 0, 0,
             vtkDataObject::FIELD_ASSOCIATION_CELLS,
             vtkDataSetAttributes::SCALARS);
