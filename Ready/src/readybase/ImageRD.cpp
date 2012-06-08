@@ -359,25 +359,20 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     lut->SetHueRange(low_hue,high_hue);
     lut->SetValueRange(low_val,high_val);
 
-    // pad the image a little so we can actually see it as a 2D strip rather than being invisible
-    vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
-    pad->SetInput(this->GetImage(iActiveChemical));
-    pad->SetOutputWholeExtent(0,this->GetX()-1,-1,this->GetY(),0,this->GetZ()-1);
-
     // pass the image through the lookup table
     vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
     image_mapper->SetLookupTable(lut);
-    image_mapper->SetInputConnection(pad->GetOutputPort());
+    image_mapper->SetInput(this->GetImage(iActiveChemical));
   
     if(show_cell_edges) // TODO: doesn't work with use_image_interpolation=true
     {
         // will convert the x*y 2D image to a x*y grid of quads
         vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
         plane->SetXResolution(this->GetX());
-        plane->SetYResolution(this->GetY()+2);
+        plane->SetYResolution(this->GetY());
         plane->SetOrigin(0,0,0);
         plane->SetPoint1(this->GetX(),0,0);
-        plane->SetPoint2(0,this->GetY()+2,0);
+        plane->SetPoint2(0,2,0);
 
         // move the pixel values (stored in the point data) to cell data
         vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
@@ -402,13 +397,18 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         actor->GetProperty()->EdgeVisibilityOn();
         actor->GetProperty()->SetEdgeColor(0,0,0);
         const double cell_shift = 0.5; // because we've gone from point data to cell data
-        actor->SetPosition(-cell_shift,low*scaling - cell_shift - 6.0,0);
+        actor->SetPosition(-cell_shift,low*scaling - 6.0,0);
         pRenderer->AddActor(actor);
     }
     else
     {
+        // pad the image a little so we can actually see it as a 2D strip rather than being invisible
+        vtkSmartPointer<vtkImageMirrorPad> pad = vtkSmartPointer<vtkImageMirrorPad>::New();
+        pad->SetInputConnection(image_mapper->GetOutputPort());
+        pad->SetOutputWholeExtent(0,this->GetX()-1,-1,this->GetY(),0,this->GetZ()-1);
+
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-        actor->SetInput(image_mapper->GetOutput());
+        actor->SetInput(pad->GetOutput());
         actor->SetPosition(0,low*scaling - 5.0,0);
         if(!use_image_interpolation)
             actor->InterpolateOff();
