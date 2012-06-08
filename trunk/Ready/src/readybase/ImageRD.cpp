@@ -71,8 +71,14 @@ using namespace std;
 #include <vtkTransformFilter.h>
 #include <vtkFloatArray.h>
 #include <vtkTextureMapToPlane.h>
-#include <vtkImageToStructuredPoints.h>
 #include <vtkDataSetMapper.h>
+#include <vtkImageMapper.h>
+#include <vtkPlaneSource.h>
+#include <vtkMergeFilter.h>
+#include <vtkRearrangeFields.h>
+#include <vtkAssignAttribute.h>
+#include <vtkCellDataToPointData.h>
+#include <vtkImageToStructuredPoints.h>
 
 // -------------------------------------------------------------------
 
@@ -363,19 +369,40 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     image_mapper->SetLookupTable(lut);
     image_mapper->SetInputConnection(pad->GetOutputPort());
   
-    if(show_cell_edges)
+    if(show_cell_edges) // TODO: doesn't work with use_image_interpolation=true
     {
-        vtkSmartPointer<vtkImageToStructuredPoints> i2sp = vtkSmartPointer<vtkImageToStructuredPoints>::New();
-        i2sp->SetInputConnection(image_mapper->GetOutputPort());
+        // will convert the x*y 2D image to a x*y grid of quads
+        vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+        plane->SetXResolution(this->GetX());
+        plane->SetYResolution(this->GetY()+2);
+        plane->SetOrigin(0,0,0);
+        plane->SetPoint1(this->GetX(),0,0);
+        plane->SetPoint2(0,this->GetY()+2,0);
+
+        // move the pixel values (stored in the point data) to cell data
+        vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
+        prearrange_fields->SetInputConnection(image_mapper->GetOutputPort());
+        prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
+
+        // mark the new cell data array as the active attribute
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
+        assign_attribute->Assign("ImageScalars", vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+
+        vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
+        merge_datasets->SetGeometryConnection(plane->GetOutputPort());
+        merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
+
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-        mapper->SetInputConnection(i2sp->GetOutputPort());
-        if(!use_image_interpolation)
-            mapper->InterpolateScalarsBeforeMappingOff();
+        mapper->SetInputConnection(merge_datasets->GetOutputPort());
+        mapper->SetScalarModeToUseCellData();
+
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->EdgeVisibilityOn();
         actor->GetProperty()->SetEdgeColor(0,0,0);
-        actor->SetPosition(0,low*scaling - 5.0,0);
+        const double cell_shift = 0.5; // because we've gone from point data to cell data
+        actor->SetPosition(-cell_shift,low*scaling - cell_shift - 6.0,0);
         pRenderer->AddActor(actor);
     }
     else
@@ -483,19 +510,40 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         image_mapper->SetInput(this->GetImage(iChem));
 
         // add a color-mapped image plane
-        if(show_cell_edges)
+        if(show_cell_edges) // TODO: doesn't work with use_image_interpolation=true
         {
-            vtkSmartPointer<vtkImageToStructuredPoints> i2sp = vtkSmartPointer<vtkImageToStructuredPoints>::New();
-            i2sp->SetInputConnection(image_mapper->GetOutputPort());
+            // will convert the x*y 2D image to a x*y grid of quads
+            vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+            plane->SetXResolution(this->GetX());
+            plane->SetYResolution(this->GetY());
+            plane->SetOrigin(0,0,0);
+            plane->SetPoint1(this->GetX(),0,0);
+            plane->SetPoint2(0,this->GetY(),0);
+
+            // move the pixel values (stored in the point data) to cell data
+            vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
+            prearrange_fields->SetInputConnection(image_mapper->GetOutputPort());
+            prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
+
+            // mark the new cell data array as the active attribute
+            vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+            assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
+            assign_attribute->Assign("ImageScalars", vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+
+            vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
+            merge_datasets->SetGeometryConnection(plane->GetOutputPort());
+            merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
+
             vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-            mapper->SetInputConnection(i2sp->GetOutputPort());
-            if(!use_image_interpolation)
-                mapper->InterpolateScalarsBeforeMappingOff();
+            mapper->SetInputConnection(merge_datasets->GetOutputPort());
+            mapper->SetScalarModeToUseCellData();
+
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
             actor->GetProperty()->EdgeVisibilityOn();
             actor->GetProperty()->SetEdgeColor(0,0,0);
-            actor->SetPosition(offset[0],offset[1]-this->GetY()-3,offset[2]);
+            const double cell_shift = 0.5; // because we've gone from point data to cell data
+            actor->SetPosition(offset[0]-cell_shift,offset[1]-cell_shift-this->GetY()-3,offset[2]);
             pRenderer->AddActor(actor);
         }
         else
@@ -786,10 +834,8 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
       
         if(show_cell_edges)
         {
-            vtkSmartPointer<vtkImageToStructuredPoints> i2sp = vtkSmartPointer<vtkImageToStructuredPoints>::New();
-            i2sp->SetInputConnection(image_mapper->GetOutputPort());
             vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-            mapper->SetInputConnection(i2sp->GetOutputPort());
+            mapper->SetInputConnection(image_mapper->GetOutputPort());
             if(!use_image_interpolation)
                 mapper->InterpolateScalarsBeforeMappingOff();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
