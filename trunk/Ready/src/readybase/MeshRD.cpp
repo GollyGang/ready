@@ -300,17 +300,32 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         else
             plane->SetNormal(0,0,1);
         vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
-        cutter->SetInput(this->mesh);
         cutter->SetCutFunction(plane);
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(cutter->GetOutputPort());
-        mapper->SetScalarModeToUseCellFieldData();
+        if(use_image_interpolation)
+        {
+            vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+            to_point_data->SetInput(this->mesh);
+            cutter->SetInputConnection(to_point_data->GetOutputPort());
+            mapper->SetScalarModeToUsePointFieldData();
+        }
+        else
+        {
+            cutter->SetInput(this->mesh);
+            mapper->SetScalarModeToUseCellFieldData();
+        }
         mapper->SelectColorArray(activeChemical.c_str());
         mapper->SetLookupTable(lut);
         mapper->UseLookupTableScalarRangeOn();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->LightingOff();
+        if(show_cell_edges)
+        {
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+        }
         pRenderer->AddActor(actor);
     }
 
