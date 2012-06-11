@@ -111,6 +111,7 @@ set( PATTERN_FILES
   horse.vtu
   lion.vtu
   heat_equation_interpolation.vti
+  complex_Ginsburg-Landau.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti

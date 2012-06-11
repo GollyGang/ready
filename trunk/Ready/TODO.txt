@@ -8,7 +8,6 @@ before 0.3 release:
 
 - rename 'Patterns' to 'Files'?
 - reorganise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
-- add complex Ginsburg-Landau
 
 before 0.4 release:
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
