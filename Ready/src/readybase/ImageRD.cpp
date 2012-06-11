@@ -79,6 +79,7 @@ using namespace std;
 #include <vtkAssignAttribute.h>
 #include <vtkCellDataToPointData.h>
 #include <vtkImageToStructuredPoints.h>
+#include <vtkPointDataToCellData.h>
 
 // -------------------------------------------------------------------
 
@@ -737,6 +738,11 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     actor->GetProperty()->SetSpecularPower(3);
     if(use_wireframe)
         actor->GetProperty()->SetRepresentationToWireframe();
+    if(show_cell_edges && !use_image_interpolation)
+    {
+        actor->GetProperty()->EdgeVisibilityOn();
+        actor->GetProperty()->SetEdgeColor(0,0,0);
+    }
     vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
     actor->SetBackfaceProperty(bfprop);
     bfprop->SetColor(0.3,0.3,0.3);
@@ -823,29 +829,15 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
         image_mapper->SetInputConnection(voi->GetOutputPort());
+
+        // TODO: find a way to get show_cell_edges working
       
-        if(show_cell_edges)
-        {
-            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-            mapper->SetInputConnection(image_mapper->GetOutputPort());
-            if(!use_image_interpolation)
-                mapper->InterpolateScalarsBeforeMappingOff();
-            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-            actor->SetMapper(mapper);
-            actor->GetProperty()->EdgeVisibilityOn();
-            actor->GetProperty()->SetEdgeColor(0,0,0);
-            actor->SetUserMatrix(resliceAxes);
-            pRenderer->AddActor(actor);
-        }
-        else
-        {
-            vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-            actor->SetInput(image_mapper->GetOutput());
-            actor->SetUserMatrix(resliceAxes);
-            if(!use_image_interpolation)
-                actor->InterpolateOff();
-            pRenderer->AddActor(actor);
-        }
+        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
+        actor->SetInput(image_mapper->GetOutput());
+        actor->SetUserMatrix(resliceAxes);
+        if(!use_image_interpolation)
+            actor->InterpolateOff();
+        pRenderer->AddActor(actor);
 
         // also add a scalar bar to show how the colors correspond to values
         if(show_color_scale)
