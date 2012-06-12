@@ -17,9 +17,12 @@
 <a href="http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/">Intel</a>
 that will work with your CPU. Ensure you are using the fastest available device by using the command "Select OpenCL Device" on the Action menu.
 <p>
-(Even if OpenCL is working it is sometimes worth updating to the latest stable version of the drivers for your graphics card - I had problems with the 275 series of nVidia drivers, for example.)
-<p>
-If you can't get OpenCL working (if you're working in a virtual machine, for example) then only the demos in the "CPU-only" folder will work.
+If you can't get OpenCL working (if you're working in a virtual machine, for example) then these options are available to you:
+<ul>
+<li>The demos in the "CPU-only" folder will work. These use the inbuilt Gray-Scott implementation.
+<li>Use File > New Pattern to make new patterns. They will use the inbuilt Gray-Scott implementation.
+<li>Use File > Import Mesh to run Gray-Scott on the surface of imported meshes.
+</ul>
 
 <p>
 <font size=+1><b>Interacting with the rendered scene</font>

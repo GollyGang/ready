@@ -77,6 +77,7 @@ namespace ID
         
         // help menu
         HelpQuick,
+        HelpIntro,
         HelpTips,
         HelpKeyboard,
         HelpMouse,

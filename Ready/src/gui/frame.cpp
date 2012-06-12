@@ -167,6 +167,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     // help menu
     EVT_MENU(wxID_HELP, MyFrame::OnHelp)
     EVT_MENU(ID::HelpQuick, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpIntro, MyFrame::OnHelp)
     EVT_MENU(ID::HelpTips, MyFrame::OnHelp)
     EVT_MENU(ID::HelpKeyboard, MyFrame::OnHelp)
     EVT_MENU(ID::HelpMouse, MyFrame::OnHelp)
@@ -357,6 +358,8 @@ void MyFrame::InitializeMenus()
         wxMenu *menu = new wxMenu;
         menu->Append(wxID_HELP,        _("Contents"));
         menu->Append(ID::HelpQuick,    _("Quick Start"));
+        menu->Append(ID::HelpIntro,    _("Introduction to RD"));
+        menu->AppendSeparator();
         menu->Append(ID::HelpTips,     _("Hints and Tips"));
         menu->Append(ID::HelpKeyboard, _("Keyboard Shortcuts"));
         menu->Append(ID::HelpMouse,    _("Mouse Shortcuts"));
@@ -1250,6 +1253,7 @@ void MyFrame::OnHelp(wxCommandEvent& event)
     {
         case wxID_HELP:         this->help_panel->ShowHelp(_("Help/index.html")); break;
         case ID::HelpQuick:     this->help_panel->ShowHelp(_("Help/quickstart.html")); break;
+        case ID::HelpIntro:     this->help_panel->ShowHelp(_("Help/introduction.html")); break;
         case ID::HelpTips:      this->help_panel->ShowHelp(_("Help/tips.html")); break;
         case ID::HelpKeyboard:  this->help_panel->ShowHelp(SHOW_KEYBOARD_SHORTCUTS); break;
         case ID::HelpMouse:     this->help_panel->ShowHelp(_("Help/mouse.html")); break;
