@@ -30,6 +30,8 @@
         <low value="-1.0" />
         <high value="1.0" />
 		<contour_level value="0" />
+        <timesteps_per_render value="1" />
+        <color_displacement_mapped_surface value="false" />
     </render_settings>
     
   </RD>
