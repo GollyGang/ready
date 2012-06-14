@@ -138,242 +138,275 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00034"></a>00034 
 <a name="l00035"></a>00035 <span class="comment">// -------------------------------------------------------------------------</span>
 <a name="l00036"></a>00036 
-<a name="l00037"></a><a class="code" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">00037</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">OpenCLMeshRD::SetParameterValue</a>(<span class="keywordtype">int</span> iParam,<span class="keywordtype">float</span> val)
-<a name="l00038"></a>00038 {
-<a name="l00039"></a>00039     <a class="code" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">AbstractRD::SetParameterValue</a>(iParam,val);
-<a name="l00040"></a>00040     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00041"></a>00041 }
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00044"></a>00044 
-<a name="l00045"></a><a class="code" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">00045</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">OpenCLMeshRD::SetParameterName</a>(<span class="keywordtype">int</span> iParam,<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
-<a name="l00046"></a>00046 {
-<a name="l00047"></a>00047     <a class="code" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">AbstractRD::SetParameterName</a>(iParam,s);
-<a name="l00048"></a>00048     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00049"></a>00049 }
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00052"></a>00052 
-<a name="l00053"></a><a class="code" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">00053</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87">OpenCLMeshRD::AddParameter</a>(<span class="keyword">const</span> std::string&amp; name,<span class="keywordtype">float</span> val)
-<a name="l00054"></a>00054 {
-<a name="l00055"></a>00055     <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87">AbstractRD::AddParameter</a>(name,val);
-<a name="l00056"></a>00056     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00057"></a>00057 }
-<a name="l00058"></a>00058 
-<a name="l00059"></a>00059 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00060"></a>00060 
-<a name="l00061"></a><a class="code" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">00061</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a9377f837fdf3eb370dd4d06d34dd1e29">OpenCLMeshRD::DeleteParameter</a>(<span class="keywordtype">int</span> iParam)
-<a name="l00062"></a>00062 {
-<a name="l00063"></a>00063     <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a9377f837fdf3eb370dd4d06d34dd1e29">AbstractRD::DeleteParameter</a>(iParam);
-<a name="l00064"></a>00064     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00065"></a>00065 }
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00068"></a>00068 
-<a name="l00069"></a><a class="code" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">00069</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">OpenCLMeshRD::DeleteAllParameters</a>()
-<a name="l00070"></a>00070 {
-<a name="l00071"></a>00071     <a class="code" href="classAbstractRD.html#af535ed6290815c65e33d2cee5398c3d7">AbstractRD::DeleteAllParameters</a>();
-<a name="l00072"></a>00072     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00073"></a>00073 }
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00076"></a>00076 
-<a name="l00077"></a><a class="code" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">00077</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e" title="advance the RD system by n timesteps">OpenCLMeshRD::InternalUpdate</a>(<span class="keywordtype">int</span> n_steps)
-<a name="l00078"></a>00078 {
-<a name="l00079"></a>00079     this-&gt;ReloadContextIfNeeded();
-<a name="l00080"></a>00080     this-&gt;ReloadKernelIfNeeded();
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082     cl_int ret;
-<a name="l00083"></a>00083     <span class="keywordtype">int</span> iBuffer;
-<a name="l00084"></a>00084     <span class="keyword">const</span> <span class="keywordtype">int</span> NC = this-&gt;GetNumberOfChemicals();
+<a name="l00037"></a><a class="code" href="classOpenCLMeshRD.html#a73747d0f031f282bc6b017475fe698b2">00037</a> <a class="code" href="classOpenCLMeshRD.html#a73747d0f031f282bc6b017475fe698b2">OpenCLMeshRD::OpenCLMeshRD</a>(<span class="keywordtype">int</span> <a class="code" href="prefs_8cpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>,<span class="keywordtype">int</span> <a class="code" href="prefs_8cpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)
+<a name="l00038"></a>00038     : <a class="code" href="classOpenCL__MixIn.html" title="OpenCL functionality, for adding to those implementations that use it.">OpenCL_MixIn</a>(opencl_platform,opencl_device)
+<a name="l00039"></a>00039 {
+<a name="l00040"></a>00040     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a> = NULL;
+<a name="l00041"></a>00041     this-&gt;<a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a> = NULL;
+<a name="l00042"></a>00042 }
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00045"></a>00045 
+<a name="l00046"></a><a class="code" href="classOpenCLMeshRD.html#ad59d9c02386b1408f6ab747010bbf6e7">00046</a> <a class="code" href="classOpenCLMeshRD.html#ad59d9c02386b1408f6ab747010bbf6e7">OpenCLMeshRD::~OpenCLMeshRD</a>()
+<a name="l00047"></a>00047 {
+<a name="l00048"></a>00048     <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(this-&gt;<a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a>);
+<a name="l00049"></a>00049     <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(this-&gt;<a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a>);
+<a name="l00050"></a>00050 }
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00053"></a>00053 
+<a name="l00054"></a><a class="code" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">00054</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">OpenCLMeshRD::SetParameterValue</a>(<span class="keywordtype">int</span> iParam,<span class="keywordtype">float</span> val)
+<a name="l00055"></a>00055 {
+<a name="l00056"></a>00056     <a class="code" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">AbstractRD::SetParameterValue</a>(iParam,val);
+<a name="l00057"></a>00057     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00058"></a>00058 }
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00061"></a>00061 
+<a name="l00062"></a><a class="code" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">00062</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">OpenCLMeshRD::SetParameterName</a>(<span class="keywordtype">int</span> iParam,<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
+<a name="l00063"></a>00063 {
+<a name="l00064"></a>00064     <a class="code" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">AbstractRD::SetParameterName</a>(iParam,s);
+<a name="l00065"></a>00065     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00066"></a>00066 }
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00069"></a>00069 
+<a name="l00070"></a><a class="code" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">00070</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">OpenCLMeshRD::AddParameter</a>(<span class="keyword">const</span> std::string&amp; name,<span class="keywordtype">float</span> val)
+<a name="l00071"></a>00071 {
+<a name="l00072"></a>00072     <a class="code" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">AbstractRD::AddParameter</a>(name,val);
+<a name="l00073"></a>00073     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00074"></a>00074 }
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00077"></a>00077 
+<a name="l00078"></a><a class="code" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">00078</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">OpenCLMeshRD::DeleteParameter</a>(<span class="keywordtype">int</span> iParam)
+<a name="l00079"></a>00079 {
+<a name="l00080"></a>00080     <a class="code" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">AbstractRD::DeleteParameter</a>(iParam);
+<a name="l00081"></a>00081     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00082"></a>00082 }
+<a name="l00083"></a>00083 
+<a name="l00084"></a>00084 <span class="comment">// -------------------------------------------------------------------------</span>
 <a name="l00085"></a>00085 
-<a name="l00086"></a>00086     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> it=0;it&lt;n_steps;it++)
-<a name="l00087"></a>00087     {
-<a name="l00088"></a>00088         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> io=0;io&lt;2;io++) <span class="comment">// first input buffers (io=0) then output buffers (io=1)</span>
-<a name="l00089"></a>00089         {
-<a name="l00090"></a>00090             iBuffer = (this-&gt;iCurrentBuffer+io)%2;
-<a name="l00091"></a>00091             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;NC;ic++)
-<a name="l00092"></a>00092             {
-<a name="l00093"></a>00093                 <span class="comment">// a_in, b_in, ... a_out, b_out ...</span>
-<a name="l00094"></a>00094                 ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;kernel, io*NC+ic, <span class="keyword">sizeof</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>), &amp;this-&gt;buffers[iBuffer][ic]);
-<a name="l00095"></a>00095                 <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on buffer: &quot;</span>);
-<a name="l00096"></a>00096             }
-<a name="l00097"></a>00097         }
-<a name="l00098"></a>00098         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a115fa124fbdbf15061277e6a3f143f2d">clEnqueueNDRangeKernel</a>(this-&gt;command_queue,this-&gt;kernel, 3, NULL, this-&gt;global_range, NULL, 0, NULL, NULL);
-<a name="l00099"></a>00099         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clEnqueueNDRangeKernel failed: &quot;</span>);
-<a name="l00100"></a>00100         this-&gt;iCurrentBuffer = 1 - this-&gt;iCurrentBuffer;
-<a name="l00101"></a>00101     }
+<a name="l00086"></a><a class="code" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">00086</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">OpenCLMeshRD::DeleteAllParameters</a>()
+<a name="l00087"></a>00087 {
+<a name="l00088"></a>00088     <a class="code" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">AbstractRD::DeleteAllParameters</a>();
+<a name="l00089"></a>00089     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00090"></a>00090 }
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00093"></a>00093 
+<a name="l00094"></a><a class="code" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">00094</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e" title="advance the RD system by n timesteps">OpenCLMeshRD::InternalUpdate</a>(<span class="keywordtype">int</span> n_steps)
+<a name="l00095"></a>00095 {
+<a name="l00096"></a>00096     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">ReloadContextIfNeeded</a>();
+<a name="l00097"></a>00097     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">ReloadKernelIfNeeded</a>();
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099     cl_int ret;
+<a name="l00100"></a>00100     <span class="keywordtype">int</span> iBuffer;
+<a name="l00101"></a>00101     <span class="keyword">const</span> <span class="keywordtype">int</span> NC = this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>();
 <a name="l00102"></a>00102 
-<a name="l00103"></a>00103     this-&gt;ReadFromOpenCLBuffers();
-<a name="l00104"></a>00104 }
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
-<a name="l00107"></a>00107 
-<a name="l00108"></a><a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">00108</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">OpenCLMeshRD::ReloadKernelIfNeeded</a>()
-<a name="l00109"></a>00109 {
-<a name="l00110"></a>00110     <span class="keywordflow">if</span>(!this-&gt;need_reload_formula) <span class="keywordflow">return</span>;
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112     cl_int ret;
-<a name="l00113"></a>00113 
-<a name="l00114"></a>00114     <span class="comment">// create the program</span>
-<a name="l00115"></a>00115     this-&gt;kernel_source = this-&gt;AssembleKernelSourceFromFormula(this-&gt;formula);
-<a name="l00116"></a>00116     <span class="keyword">const</span> <span class="keywordtype">char</span> *source = this-&gt;kernel_source.c_str();
-<a name="l00117"></a>00117     <span class="keywordtype">size_t</span> source_size = this-&gt;kernel_source.length();
-<a name="l00118"></a>00118     <a class="code" href="OpenCL__Dyn__Load_8h.html#a3d78b43bff66a3135ffcba6eb9b2f1b9">cl_program</a> program = <a class="code" href="OpenCL__Dyn__Load_8c.html#a5a1dcaa0b7c2972a3fd03f4498cd514b">clCreateProgramWithSource</a>(this-&gt;context,1,&amp;source,&amp;source_size,&amp;ret);
-<a name="l00119"></a>00119     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : Failed to create program with source: &quot;</span>);
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121     <span class="comment">// make a set of options to pass to the compiler</span>
-<a name="l00122"></a>00122     ostringstream options;
-<a name="l00123"></a>00123     <span class="comment">//options &lt;&lt; &quot;-cl-denorms-are-zero -cl-fast-relaxed-math&quot;;</span>
-<a name="l00124"></a>00124 
-<a name="l00125"></a>00125     <span class="comment">// build the program</span>
-<a name="l00126"></a>00126     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#affc3163962636065253cd39f2a1b41e8">clBuildProgram</a>(program,1,&amp;this-&gt;device_id,options.str().c_str(),NULL,NULL);
-<a name="l00127"></a>00127     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
-<a name="l00128"></a>00128     {
-<a name="l00129"></a>00129         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_BUILD_LOG = 10000;
-<a name="l00130"></a>00130         <span class="keywordtype">char</span> build_log[MAX_BUILD_LOG];
-<a name="l00131"></a>00131         <span class="keywordtype">size_t</span> build_log_length;
-<a name="l00132"></a>00132         cl_int ret2 = <a class="code" href="OpenCL__Dyn__Load_8c.html#a7915d7ee78c4b2a722fbeba391bfbabc">clGetProgramBuildInfo</a>(program,this-&gt;device_id,<a class="code" href="OpenCL__Dyn__Load_8h.html#a627bc679c4b66fb24eb4b7bb41380304">CL_PROGRAM_BUILD_LOG</a>,MAX_BUILD_LOG,build_log,&amp;build_log_length);
-<a name="l00133"></a>00133         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret2,<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : retrieving program build log failed: &quot;</span>);
-<a name="l00134"></a>00134         { ofstream out(<span class="stringliteral">&quot;kernel.txt&quot;</span>); out &lt;&lt; kernel_source; }
-<a name="l00135"></a>00135         ostringstream oss;
-<a name="l00136"></a>00136         oss &lt;&lt; <span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n&quot;</span> &lt;&lt; build_log;
-<a name="l00137"></a>00137         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,oss.str().c_str());
-<a name="l00138"></a>00138     }
+<a name="l00103"></a>00103     <span class="comment">// pass the neighbor indices and weights as parameters for the kernel</span>
+<a name="l00104"></a>00104     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>, 2*NC + 0, <span class="keyword">sizeof</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>), (<span class="keywordtype">void</span> *)&amp;this-&gt;<a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a>);
+<a name="l00105"></a>00105     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on indices array: &quot;</span>);
+<a name="l00106"></a>00106     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>, 2*NC + 1, <span class="keyword">sizeof</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>), (<span class="keywordtype">void</span> *)&amp;this-&gt;<a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a>);
+<a name="l00107"></a>00107     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on weights array: &quot;</span>);
+<a name="l00108"></a>00108     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>, 2*NC + 2, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), &amp;this-&gt;<a class="code" href="classMeshRD.html#aeefb408bac4a13de1327c578d1f7bd86">max_neighbors</a>);
+<a name="l00109"></a>00109     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on max_neighbors parameter: &quot;</span>);
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> it=0;it&lt;n_steps;it++)
+<a name="l00112"></a>00112     {
+<a name="l00113"></a>00113         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> io=0;io&lt;2;io++) <span class="comment">// first input buffers (io=0) then output buffers (io=1)</span>
+<a name="l00114"></a>00114         {
+<a name="l00115"></a>00115             iBuffer = (this-&gt;<a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a>+io)%2;
+<a name="l00116"></a>00116             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;NC;ic++)
+<a name="l00117"></a>00117             {
+<a name="l00118"></a>00118                 <span class="comment">// a_in, b_in, ... a_out, b_out ...</span>
+<a name="l00119"></a>00119                 ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>, io*NC+ic, <span class="keyword">sizeof</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>), &amp;this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[iBuffer][ic]);
+<a name="l00120"></a>00120                 <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on buffer: &quot;</span>);
+<a name="l00121"></a>00121             }
+<a name="l00122"></a>00122         }
+<a name="l00123"></a>00123         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a115fa124fbdbf15061277e6a3f143f2d">clEnqueueNDRangeKernel</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>,this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>, 3, NULL, this-&gt;<a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a>, NULL, 0, NULL, NULL);
+<a name="l00124"></a>00124         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clEnqueueNDRangeKernel failed: &quot;</span>);
+<a name="l00125"></a>00125         this-&gt;<a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a> = 1 - this-&gt;<a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a>;
+<a name="l00126"></a>00126     }
+<a name="l00127"></a>00127 
+<a name="l00128"></a>00128     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">ReadFromOpenCLBuffers</a>();
+<a name="l00129"></a>00129 }
+<a name="l00130"></a>00130 
+<a name="l00131"></a>00131 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00132"></a>00132 
+<a name="l00133"></a><a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">00133</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">OpenCLMeshRD::ReloadKernelIfNeeded</a>()
+<a name="l00134"></a>00134 {
+<a name="l00135"></a>00135     <span class="keywordflow">if</span>(!this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a>) <span class="keywordflow">return</span>;
+<a name="l00136"></a>00136 
+<a name="l00137"></a>00137     <span class="keywordflow">if</span>(this-&gt;<a class="code" href="classAbstractRD.html#a9448a66a1ea9dd6d56cfa25767ca85e8">n_chemicals</a>==0)
+<a name="l00138"></a>00138         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : zero chemicals&quot;</span>);
 <a name="l00139"></a>00139 
-<a name="l00140"></a>00140     <span class="comment">// create the kernel</span>
-<a name="l00141"></a>00141     <span class="keywordflow">if</span>(this-&gt;kernel) <a class="code" href="OpenCL__Dyn__Load_8c.html#a31e1aec3a1298cd204366f69ba59cd4f">clReleaseKernel</a>(this-&gt;kernel);
-<a name="l00142"></a>00142     this-&gt;kernel = <a class="code" href="OpenCL__Dyn__Load_8c.html#ad6d292fd27cd934ae13ec1fad7a97c4b">clCreateKernel</a>(program,this-&gt;kernel_function_name.c_str(),&amp;ret);
-<a name="l00143"></a>00143     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : kernel creation failed: &quot;</span>);
-<a name="l00144"></a>00144 
-<a name="l00145"></a>00145     <span class="comment">// TODO: round this up to an abundant number to enable many choices for division by local workgroup range?</span>
-<a name="l00146"></a>00146     this-&gt;global_range[0] = this-&gt;mesh-&gt;GetNumberOfCells();
-<a name="l00147"></a>00147     this-&gt;global_range[1] = 1;
-<a name="l00148"></a>00148     this-&gt;global_range[2] = 1;
-<a name="l00149"></a>00149     <span class="comment">// (we let the local work group size be automatically decided, seems to be faster and more flexible that way)</span>
-<a name="l00150"></a>00150 
-<a name="l00151"></a>00151     this-&gt;need_reload_formula = <span class="keyword">false</span>;
-<a name="l00152"></a>00152 }
+<a name="l00140"></a>00140     cl_int ret;
+<a name="l00141"></a>00141 
+<a name="l00142"></a>00142     <span class="comment">// create the program</span>
+<a name="l00143"></a>00143     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5f6cd25b2189785ac71885d8745ad4ce">kernel_source</a> = this-&gt;<a class="code" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">AssembleKernelSourceFromFormula</a>(this-&gt;<a class="code" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a>);
+<a name="l00144"></a>00144     <span class="keyword">const</span> <span class="keywordtype">char</span> *source = this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5f6cd25b2189785ac71885d8745ad4ce">kernel_source</a>.c_str();
+<a name="l00145"></a>00145     <span class="keywordtype">size_t</span> source_size = this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5f6cd25b2189785ac71885d8745ad4ce">kernel_source</a>.length();
+<a name="l00146"></a>00146     <a class="code" href="OpenCL__Dyn__Load_8c.html#a83710d3f3618caba8ab31151ce665256">clReleaseProgram</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">program</a>);
+<a name="l00147"></a>00147     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">program</a> = <a class="code" href="OpenCL__Dyn__Load_8c.html#a5a1dcaa0b7c2972a3fd03f4498cd514b">clCreateProgramWithSource</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a>,1,&amp;source,&amp;source_size,&amp;ret);
+<a name="l00148"></a>00148     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : Failed to create program with source: &quot;</span>);
+<a name="l00149"></a>00149 
+<a name="l00150"></a>00150     <span class="comment">// make a set of options to pass to the compiler</span>
+<a name="l00151"></a>00151     ostringstream options;
+<a name="l00152"></a>00152     <span class="comment">//options &lt;&lt; &quot;-cl-denorms-are-zero -cl-fast-relaxed-math&quot;;</span>
 <a name="l00153"></a>00153 
-<a name="l00154"></a>00154 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
-<a name="l00155"></a>00155 
-<a name="l00156"></a><a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">00156</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">OpenCLMeshRD::CreateOpenCLBuffers</a>()
-<a name="l00157"></a>00157 {
-<a name="l00158"></a>00158     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> MEM_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;mesh-&gt;GetNumberOfCells();
-<a name="l00159"></a>00159     <span class="keyword">const</span> <span class="keywordtype">int</span> NC = this-&gt;GetNumberOfChemicals();
-<a name="l00160"></a>00160 
-<a name="l00161"></a>00161     cl_int ret;
-<a name="l00162"></a>00162 
-<a name="l00163"></a>00163     <span class="comment">// create two buffers for each chemical (we will switch between them)</span>
-<a name="l00164"></a>00164     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> io=0;io&lt;2;io++)
-<a name="l00165"></a>00165     {
-<a name="l00166"></a>00166         this-&gt;buffers[io].resize(NC);
-<a name="l00167"></a>00167         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;NC;ic++)
-<a name="l00168"></a>00168         {
-<a name="l00169"></a>00169             this-&gt;buffers[io][ic] = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da">clCreateBuffer</a>(this-&gt;context, <a class="code" href="OpenCL__Dyn__Load_8h.html#ae4b6005553b4f965e26366ca8c9dfe8c">CL_MEM_READ_WRITE</a>, MEM_SIZE, NULL, &amp;ret);
-<a name="l00170"></a>00170             <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: &quot;</span>);
-<a name="l00171"></a>00171         }
-<a name="l00172"></a>00172     }
-<a name="l00173"></a>00173     
-<a name="l00174"></a>00174     <span class="comment">// create a buffer for the indices of the neighbors of each cell</span>
-<a name="l00175"></a>00175     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_INDICES_SIZE = <span class="keyword">sizeof</span>(int) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;mesh-&gt;GetNumberOfCells() * this-&gt;max_neighbors;
-<a name="l00176"></a>00176     this-&gt;clBuffer_cell_neighbor_indices = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da">clCreateBuffer</a>(this-&gt;context, <a class="code" href="OpenCL__Dyn__Load_8h.html#a2b5b9d978b4dd5e32f9b9671ed75b394">CL_MEM_READ_ONLY</a>, NBORS_INDICES_SIZE, NULL, &amp;ret);
-<a name="l00177"></a>00177     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: &quot;</span>);
-<a name="l00178"></a>00178 
-<a name="l00179"></a>00179     <span class="comment">// create a buffer for the diffusion coefficients of the neighbors of each cell</span>
-<a name="l00180"></a>00180     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_WEIGHTS_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;mesh-&gt;GetNumberOfCells() * this-&gt;max_neighbors;
-<a name="l00181"></a>00181     this-&gt;clBuffer_cell_neighbor_weights = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da">clCreateBuffer</a>(this-&gt;context, <a class="code" href="OpenCL__Dyn__Load_8h.html#a2b5b9d978b4dd5e32f9b9671ed75b394">CL_MEM_READ_ONLY</a>, NBORS_WEIGHTS_SIZE, NULL, &amp;ret);
-<a name="l00182"></a>00182     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: &quot;</span>);
-<a name="l00183"></a>00183 
-<a name="l00184"></a>00184     <span class="comment">// pass the neighbor indices and weights as parameters for the kernel</span>
-<a name="l00185"></a>00185     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;kernel, 2*NC + 0, <span class="keyword">sizeof</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>), (<span class="keywordtype">void</span> *)&amp;this-&gt;clBuffer_cell_neighbor_indices);
-<a name="l00186"></a>00186     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on indices array: &quot;</span>);
-<a name="l00187"></a>00187     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;kernel, 2*NC + 1, <span class="keyword">sizeof</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>), (<span class="keywordtype">void</span> *)&amp;this-&gt;clBuffer_cell_neighbor_weights);
-<a name="l00188"></a>00188     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on weights array: &quot;</span>);
-<a name="l00189"></a>00189     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#aa7c3329eb88b98bc9fc7366fee4f596b">clSetKernelArg</a>(this-&gt;kernel, 2*NC + 2, <span class="keyword">sizeof</span>(<span class="keywordtype">int</span>), &amp;this-&gt;max_neighbors);
-<a name="l00190"></a>00190     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::InternalUpdate : clSetKernelArg failed on max_neighbors parameter: &quot;</span>);
-<a name="l00191"></a>00191 }
-<a name="l00192"></a>00192 
-<a name="l00193"></a>00193 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
-<a name="l00194"></a>00194 
-<a name="l00195"></a><a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">00195</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">OpenCLMeshRD::WriteToOpenCLBuffers</a>()
-<a name="l00196"></a>00196 {
-<a name="l00197"></a>00197     cl_int ret;
-<a name="l00198"></a>00198     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> MEM_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">int</span>)this-&gt;mesh-&gt;GetNumberOfCells();
-<a name="l00199"></a>00199     this-&gt;iCurrentBuffer = 0;
-<a name="l00200"></a>00200     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;this-&gt;GetNumberOfChemicals();ic++)
-<a name="l00201"></a>00201     {
-<a name="l00202"></a>00202         <span class="keywordtype">float</span>* data = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(ic).c_str()) )-&gt;GetPointer(0);
-<a name="l00203"></a>00203         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a9e49269711035b1c39b9e474f48017b3">clEnqueueWriteBuffer</a>(this-&gt;command_queue,this-&gt;buffers[this-&gt;iCurrentBuffer][ic], <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, MEM_SIZE, data, 0, NULL, NULL);
-<a name="l00204"></a>00204         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: &quot;</span>);
+<a name="l00154"></a>00154     <span class="comment">// build the program</span>
+<a name="l00155"></a>00155     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#affc3163962636065253cd39f2a1b41e8">clBuildProgram</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">program</a>,1,&amp;this-&gt;<a class="code" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">device_id</a>,options.str().c_str(),NULL,NULL);
+<a name="l00156"></a>00156     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00157"></a>00157     {
+<a name="l00158"></a>00158         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_BUILD_LOG = 10000;
+<a name="l00159"></a>00159         <span class="keywordtype">char</span> build_log[MAX_BUILD_LOG];
+<a name="l00160"></a>00160         <span class="keywordtype">size_t</span> build_log_length;
+<a name="l00161"></a>00161         cl_int ret2 = <a class="code" href="OpenCL__Dyn__Load_8c.html#a7915d7ee78c4b2a722fbeba391bfbabc">clGetProgramBuildInfo</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">program</a>,this-&gt;<a class="code" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">device_id</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a627bc679c4b66fb24eb4b7bb41380304">CL_PROGRAM_BUILD_LOG</a>,MAX_BUILD_LOG,build_log,&amp;build_log_length);
+<a name="l00162"></a>00162         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret2,<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : retrieving program build log failed: &quot;</span>);
+<a name="l00163"></a>00163         { ofstream out(<span class="stringliteral">&quot;kernel.txt&quot;</span>); out &lt;&lt; <a class="code" href="classOpenCL__MixIn.html#a5f6cd25b2189785ac71885d8745ad4ce">kernel_source</a>; }
+<a name="l00164"></a>00164         ostringstream oss;
+<a name="l00165"></a>00165         oss &lt;&lt; <span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n&quot;</span> &lt;&lt; build_log;
+<a name="l00166"></a>00166         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,oss.str().c_str());
+<a name="l00167"></a>00167     }
+<a name="l00168"></a>00168 
+<a name="l00169"></a>00169     <span class="comment">// create the kernel</span>
+<a name="l00170"></a>00170     <a class="code" href="OpenCL__Dyn__Load_8c.html#a31e1aec3a1298cd204366f69ba59cd4f">clReleaseKernel</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a>);
+<a name="l00171"></a>00171     this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a> = <a class="code" href="OpenCL__Dyn__Load_8c.html#ad6d292fd27cd934ae13ec1fad7a97c4b">clCreateKernel</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">program</a>,this-&gt;<a class="code" href="classOpenCL__MixIn.html#a88fd7f9a2535f8435a5dbc01e44d48cd">kernel_function_name</a>.c_str(),&amp;ret);
+<a name="l00172"></a>00172     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::ReloadKernelIfNeeded : kernel creation failed: &quot;</span>);
+<a name="l00173"></a>00173 
+<a name="l00174"></a>00174     <span class="comment">// TODO: round this up to an abundant number to enable many choices for division by local workgroup range?</span>
+<a name="l00175"></a>00175     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a>[0] = this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells();
+<a name="l00176"></a>00176     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a>[1] = 1;
+<a name="l00177"></a>00177     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a>[2] = 1;
+<a name="l00178"></a>00178     <span class="comment">// (we let the local work group size be automatically decided, seems to be faster and more flexible that way)</span>
+<a name="l00179"></a>00179 
+<a name="l00180"></a>00180     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">false</span>;
+<a name="l00181"></a>00181 }
+<a name="l00182"></a>00182 
+<a name="l00183"></a>00183 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00184"></a>00184 
+<a name="l00185"></a><a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">00185</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">OpenCLMeshRD::CreateOpenCLBuffers</a>()
+<a name="l00186"></a>00186 {
+<a name="l00187"></a>00187     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">ReloadContextIfNeeded</a>();
+<a name="l00188"></a>00188 
+<a name="l00189"></a>00189     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> MEM_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells();
+<a name="l00190"></a>00190     <span class="keyword">const</span> <span class="keywordtype">int</span> NC = this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>();
+<a name="l00191"></a>00191 
+<a name="l00192"></a>00192     this-&gt;<a class="code" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">ReleaseOpenCLBuffers</a>();
+<a name="l00193"></a>00193 
+<a name="l00194"></a>00194     cl_int ret;
+<a name="l00195"></a>00195 
+<a name="l00196"></a>00196     <span class="comment">// create two buffers for each chemical (we will switch between them)</span>
+<a name="l00197"></a>00197     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> io=0;io&lt;2;io++)
+<a name="l00198"></a>00198     {
+<a name="l00199"></a>00199         this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[io].resize(NC);
+<a name="l00200"></a>00200         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;NC;ic++)
+<a name="l00201"></a>00201         {
+<a name="l00202"></a>00202             this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[io][ic] = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da">clCreateBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a>, <a class="code" href="OpenCL__Dyn__Load_8h.html#ae4b6005553b4f965e26366ca8c9dfe8c">CL_MEM_READ_WRITE</a>, MEM_SIZE, NULL, &amp;ret);
+<a name="l00203"></a>00203             <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: &quot;</span>);
+<a name="l00204"></a>00204         }
 <a name="l00205"></a>00205     }
-<a name="l00206"></a>00206 
-<a name="l00207"></a>00207     <span class="comment">// fill indices buffer</span>
-<a name="l00208"></a>00208     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_INDICES_SIZE = <span class="keyword">sizeof</span>(int) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;mesh-&gt;GetNumberOfCells() * this-&gt;max_neighbors;
-<a name="l00209"></a>00209     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a9e49269711035b1c39b9e474f48017b3">clEnqueueWriteBuffer</a>(this-&gt;command_queue,this-&gt;clBuffer_cell_neighbor_indices, <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, NBORS_INDICES_SIZE, this-&gt;cell_neighbor_indices, 0, NULL, NULL);
-<a name="l00210"></a>00210     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: &quot;</span>);
+<a name="l00206"></a>00206     
+<a name="l00207"></a>00207     <span class="comment">// create a buffer for the indices of the neighbors of each cell</span>
+<a name="l00208"></a>00208     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_INDICES_SIZE = <span class="keyword">sizeof</span>(int) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells() * this-&gt;<a class="code" href="classMeshRD.html#aeefb408bac4a13de1327c578d1f7bd86">max_neighbors</a>;
+<a name="l00209"></a>00209     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a> = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da">clCreateBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a>, <a class="code" href="OpenCL__Dyn__Load_8h.html#a2b5b9d978b4dd5e32f9b9671ed75b394">CL_MEM_READ_ONLY</a>, NBORS_INDICES_SIZE, NULL, &amp;ret);
+<a name="l00210"></a>00210     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::CreateOpenCLBuffers : neighbor_indices buffer creation failed: &quot;</span>);
 <a name="l00211"></a>00211 
-<a name="l00212"></a>00212     <span class="comment">// fill weights buffer</span>
-<a name="l00213"></a>00213     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_WEIGHTS_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;mesh-&gt;GetNumberOfCells() * this-&gt;max_neighbors;
-<a name="l00214"></a>00214     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a9e49269711035b1c39b9e474f48017b3">clEnqueueWriteBuffer</a>(this-&gt;command_queue,this-&gt;clBuffer_cell_neighbor_weights, <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, NBORS_WEIGHTS_SIZE, this-&gt;cell_neighbor_weights, 0, NULL, NULL);
-<a name="l00215"></a>00215     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: &quot;</span>);
+<a name="l00212"></a>00212     <span class="comment">// create a buffer for the diffusion coefficients of the neighbors of each cell</span>
+<a name="l00213"></a>00213     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_WEIGHTS_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells() * this-&gt;<a class="code" href="classMeshRD.html#aeefb408bac4a13de1327c578d1f7bd86">max_neighbors</a>;
+<a name="l00214"></a>00214     this-&gt;<a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a> = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c7ff86a3c27f18a1234273412c783da">clCreateBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a>, <a class="code" href="OpenCL__Dyn__Load_8h.html#a2b5b9d978b4dd5e32f9b9671ed75b394">CL_MEM_READ_ONLY</a>, NBORS_WEIGHTS_SIZE, NULL, &amp;ret);
+<a name="l00215"></a>00215     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::CreateOpenCLBuffers : neighbor_weights buffer creation failed: &quot;</span>);
 <a name="l00216"></a>00216 }
 <a name="l00217"></a>00217 
 <a name="l00218"></a>00218 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
 <a name="l00219"></a>00219 
-<a name="l00220"></a><a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">00220</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">OpenCLMeshRD::ReadFromOpenCLBuffers</a>()
+<a name="l00220"></a><a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">00220</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">OpenCLMeshRD::WriteToOpenCLBuffers</a>()
 <a name="l00221"></a>00221 {
-<a name="l00222"></a>00222     <span class="comment">// read from opencl buffers into our mesh data</span>
-<a name="l00223"></a>00223     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> MEM_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">int</span>)this-&gt;mesh-&gt;GetNumberOfCells();
-<a name="l00224"></a>00224     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;this-&gt;GetNumberOfChemicals();ic++)
-<a name="l00225"></a>00225     {
-<a name="l00226"></a>00226         <span class="keywordtype">float</span>* data = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(ic).c_str()) )-&gt;GetPointer(0);
-<a name="l00227"></a>00227         cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c853bc9e61677663b693a6816b12b55">clEnqueueReadBuffer</a>(this-&gt;command_queue,this-&gt;buffers[this-&gt;iCurrentBuffer][ic], <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, MEM_SIZE, data, 0, NULL, NULL);
-<a name="l00228"></a>00228         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::ReadFromOpenCLBuffers : buffer reading failed: &quot;</span>);
-<a name="l00229"></a>00229     }
-<a name="l00230"></a>00230 }
-<a name="l00231"></a>00231 
-<a name="l00232"></a>00232 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
-<a name="l00233"></a>00233 
-<a name="l00234"></a><a class="code" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">00234</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">OpenCLMeshRD::CopyFromMesh</a>(vtkUnstructuredGrid* mesh2)
-<a name="l00235"></a>00235 {
-<a name="l00236"></a>00236     <a class="code" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">MeshRD::CopyFromMesh</a>(mesh2);
-<a name="l00237"></a>00237     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00238"></a>00238     this-&gt;ReloadContextIfNeeded();
-<a name="l00239"></a>00239     this-&gt;ReloadKernelIfNeeded();
-<a name="l00240"></a>00240     this-&gt;CreateOpenCLBuffers();
-<a name="l00241"></a>00241     this-&gt;WriteToOpenCLBuffers();
-<a name="l00242"></a>00242 }
-<a name="l00243"></a>00243 
-<a name="l00244"></a>00244 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00222"></a>00222     <span class="keywordflow">if</span>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[0].empty())
+<a name="l00223"></a>00223         this-&gt;<a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">CreateOpenCLBuffers</a>();
+<a name="l00224"></a>00224 
+<a name="l00225"></a>00225     cl_int ret;
+<a name="l00226"></a>00226     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> MEM_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">int</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells();
+<a name="l00227"></a>00227     this-&gt;<a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a> = 0;
+<a name="l00228"></a>00228     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>();ic++)
+<a name="l00229"></a>00229     {
+<a name="l00230"></a>00230         <span class="keywordtype">float</span>* data = vtkFloatArray::SafeDownCast( this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(ic).c_str()) )-&gt;GetPointer(0);
+<a name="l00231"></a>00231         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a9e49269711035b1c39b9e474f48017b3">clEnqueueWriteBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>,this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[this-&gt;<a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a>][ic], <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, MEM_SIZE, data, 0, NULL, NULL);
+<a name="l00232"></a>00232         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: &quot;</span>);
+<a name="l00233"></a>00233     }
+<a name="l00234"></a>00234 
+<a name="l00235"></a>00235     <span class="comment">// fill indices buffer</span>
+<a name="l00236"></a>00236     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_INDICES_SIZE = <span class="keyword">sizeof</span>(int) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells() * this-&gt;<a class="code" href="classMeshRD.html#aeefb408bac4a13de1327c578d1f7bd86">max_neighbors</a>;
+<a name="l00237"></a>00237     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a9e49269711035b1c39b9e474f48017b3">clEnqueueWriteBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>,this-&gt;<a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a>, <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, NBORS_INDICES_SIZE, this-&gt;<a class="code" href="classMeshRD.html#a3e7eed75884e6c8bcb237df5f25a1275" title="index of each neighbor of a cell">cell_neighbor_indices</a>, 0, NULL, NULL);
+<a name="l00238"></a>00238     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: &quot;</span>);
+<a name="l00239"></a>00239 
+<a name="l00240"></a>00240     <span class="comment">// fill weights buffer</span>
+<a name="l00241"></a>00241     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> NBORS_WEIGHTS_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells() * this-&gt;<a class="code" href="classMeshRD.html#aeefb408bac4a13de1327c578d1f7bd86">max_neighbors</a>;
+<a name="l00242"></a>00242     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a9e49269711035b1c39b9e474f48017b3">clEnqueueWriteBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>,this-&gt;<a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a>, <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, NBORS_WEIGHTS_SIZE, this-&gt;<a class="code" href="classMeshRD.html#ae18bc016b672b125b350e241efd9d283" title="diffusion coefficient between each cell and a neighbor">cell_neighbor_weights</a>, 0, NULL, NULL);
+<a name="l00243"></a>00243     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: &quot;</span>);
+<a name="l00244"></a>00244 }
 <a name="l00245"></a>00245 
-<a name="l00246"></a><a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44">00246</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44">OpenCLMeshRD::TestFormula</a>(std::string program_string)
-<a name="l00247"></a>00247 {
-<a name="l00248"></a>00248     this-&gt;TestKernel(this-&gt;AssembleKernelSourceFromFormula(program_string));
-<a name="l00249"></a>00249 }
-<a name="l00250"></a>00250 
-<a name="l00251"></a>00251 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
-<a name="l00252"></a>00252 
-<a name="l00253"></a><a class="code" href="classOpenCLMeshRD.html#a86c56c6ad5224dfc6b9535b0d41a6fa7">00253</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a8b6dde37a380581b5c30d1d5f912f183">OpenCLMeshRD::GenerateInitialPattern</a>()
-<a name="l00254"></a>00254 {
-<a name="l00255"></a>00255         <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a8b6dde37a380581b5c30d1d5f912f183">MeshRD::GenerateInitialPattern</a>();
-<a name="l00256"></a>00256     this-&gt;WriteToOpenCLBuffers();
-<a name="l00257"></a>00257 }
-<a name="l00258"></a>00258 
-<a name="l00259"></a>00259 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
-<a name="l00260"></a>00260 
-<a name="l00261"></a><a class="code" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">00261</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">OpenCLMeshRD::BlankImage</a>()
-<a name="l00262"></a>00262 {
-<a name="l00263"></a>00263         <a class="code" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">MeshRD::BlankImage</a>();
-<a name="l00264"></a>00264     this-&gt;WriteToOpenCLBuffers();
-<a name="l00265"></a>00265 }
-<a name="l00266"></a>00266 
-<a name="l00267"></a>00267 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00246"></a>00246 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00247"></a>00247 
+<a name="l00248"></a><a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">00248</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">OpenCLMeshRD::ReadFromOpenCLBuffers</a>()
+<a name="l00249"></a>00249 {
+<a name="l00250"></a>00250     <span class="comment">// read from opencl buffers into our mesh data</span>
+<a name="l00251"></a>00251     <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> MEM_SIZE = <span class="keyword">sizeof</span>(float) * (<span class="keywordtype">int</span>)this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetNumberOfCells();
+<a name="l00252"></a>00252     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> ic=0;ic&lt;this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>();ic++)
+<a name="l00253"></a>00253     {
+<a name="l00254"></a>00254         <span class="keywordtype">float</span>* data = vtkFloatArray::SafeDownCast( this-&gt;<a class="code" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644" title="the cell data contains a named array for each chemical (&#39;a&#39;, &#39;b&#39;, etc.)">mesh</a>-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(ic).c_str()) )-&gt;GetPointer(0);
+<a name="l00255"></a>00255         cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a1c853bc9e61677663b693a6816b12b55">clEnqueueReadBuffer</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15">command_queue</a>,this-&gt;<a class="code" href="classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508">buffers</a>[this-&gt;<a class="code" href="classOpenCL__MixIn.html#a49b12efc7ec4fcf7688f11114c6455d0">iCurrentBuffer</a>][ic], <a class="code" href="OpenCL__Dyn__Load_8h.html#a0de7de1fc7ab88baddd443b405ac429d">CL_TRUE</a>, 0, MEM_SIZE, data, 0, NULL, NULL);
+<a name="l00256"></a>00256         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCLMeshRD::ReadFromOpenCLBuffers : buffer reading failed: &quot;</span>);
+<a name="l00257"></a>00257     }
+<a name="l00258"></a>00258 }
+<a name="l00259"></a>00259 
+<a name="l00260"></a>00260 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00261"></a>00261 
+<a name="l00262"></a><a class="code" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">00262</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">OpenCLMeshRD::CopyFromMesh</a>(vtkUnstructuredGrid* mesh2)
+<a name="l00263"></a>00263 {
+<a name="l00264"></a>00264     <a class="code" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">MeshRD::CopyFromMesh</a>(mesh2);
+<a name="l00265"></a>00265     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">WriteToOpenCLBuffers</a>();
+<a name="l00266"></a>00266 }
+<a name="l00267"></a>00267 
+<a name="l00268"></a>00268 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00269"></a>00269 
+<a name="l00270"></a><a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44">00270</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44" title="Throws std::runtime_error with information if the formula doesn&#39;t work.">OpenCLMeshRD::TestFormula</a>(std::string program_string)
+<a name="l00271"></a>00271 {
+<a name="l00272"></a>00272     this-&gt;<a class="code" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870" title="Test a kernel string for errors on the current device.">TestKernel</a>(this-&gt;<a class="code" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">AssembleKernelSourceFromFormula</a>(program_string));
+<a name="l00273"></a>00273 }
+<a name="l00274"></a>00274 
+<a name="l00275"></a>00275 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00276"></a>00276 
+<a name="l00277"></a><a class="code" href="classOpenCLMeshRD.html#a86c56c6ad5224dfc6b9535b0d41a6fa7">00277</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a86c56c6ad5224dfc6b9535b0d41a6fa7">OpenCLMeshRD::GenerateInitialPattern</a>()
+<a name="l00278"></a>00278 {
+<a name="l00279"></a>00279     <a class="code" href="classOpenCLMeshRD.html#a86c56c6ad5224dfc6b9535b0d41a6fa7">MeshRD::GenerateInitialPattern</a>();
+<a name="l00280"></a>00280     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">WriteToOpenCLBuffers</a>();
+<a name="l00281"></a>00281 }
+<a name="l00282"></a>00282 
+<a name="l00283"></a>00283 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00284"></a>00284 
+<a name="l00285"></a><a class="code" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">00285</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">OpenCLMeshRD::BlankImage</a>()
+<a name="l00286"></a>00286 {
+<a name="l00287"></a>00287     <a class="code" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">MeshRD::BlankImage</a>();
+<a name="l00288"></a>00288     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">WriteToOpenCLBuffers</a>();
+<a name="l00289"></a>00289 }
+<a name="l00290"></a>00290 
+<a name="l00291"></a>00291 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
+<a name="l00292"></a>00292 
+<a name="l00293"></a><a class="code" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">00293</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">OpenCLMeshRD::ReleaseOpenCLBuffers</a>()
+<a name="l00294"></a>00294 {
+<a name="l00295"></a>00295     <a class="code" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">OpenCL_MixIn::ReleaseOpenCLBuffers</a>();
+<a name="l00296"></a>00296     <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(this-&gt;<a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a>);
+<a name="l00297"></a>00297     <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(this-&gt;<a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a>);
+<a name="l00298"></a>00298 }
+<a name="l00299"></a>00299 
+<a name="l00300"></a>00300 <span class="comment">// ----------------------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

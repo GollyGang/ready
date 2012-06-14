@@ -128,7 +128,7 @@ Inheritance diagram for OpenCL_MixIn:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aafa2fbab3e4863eafe5bc028405b2041"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#aafa2fbab3e4863eafe5bc028405b2041">OpenCL_MixIn</a> ()</td></tr>
+<tr class="memitem:a2569ea56709f80c1f796204e88a4b793"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a2569ea56709f80c1f796204e88a4b793">OpenCL_MixIn</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
 <tr class="memitem:a4e9faf6b3087799987d0551f740e2cef"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">~OpenCL_MixIn</a> ()</td></tr>
 <tr class="memitem:aaec65d3cb1d6bca590c377df36ad229a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">SetPlatform</a> (int i)</td></tr>
 <tr class="memitem:adb3a6ccfecf048fd02e1bbbf285ba8d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">SetDevice</a> (int i)</td></tr>
@@ -142,12 +142,14 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a2ccc9b27cd3680e56f05fd9dad2a1a76"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76">CreateOpenCLBuffers</a> ()=0</td></tr>
 <tr class="memitem:a1c5b9547ee99df7afc391c86028403f0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0">WriteToOpenCLBuffers</a> ()=0</td></tr>
 <tr class="memitem:a8342ea34c3d1d359f85f5606729441f0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0">ReadFromOpenCLBuffers</a> ()=0</td></tr>
+<tr class="memitem:a2133bd4a3de7d30703d778bc607163e9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">ReleaseOpenCLBuffers</a> ()</td></tr>
 <tr class="memitem:add01f335ebf6b2cdc56466aa29991870"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870">TestKernel</a> (std::string s)</td></tr>
 <tr class="memdesc:add01f335ebf6b2cdc56466aa29991870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test a kernel string for errors on the current device.  <a href="#add01f335ebf6b2cdc56466aa29991870"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a7afb13f03befcb61bce28b85f7c2dc57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="OpenCL__Dyn__Load_8h.html#a96a7d9b65e8319e2f8c751455ae92ec8">cl_context</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57">context</a></td></tr>
 <tr class="memitem:a8c223af5850cf7a2b859974b4a30514a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a">device_id</a></td></tr>
+<tr class="memitem:a156cbf7984d4fbb79b154d748467c69f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="OpenCL__Dyn__Load_8h.html#a3d78b43bff66a3135ffcba6eb9b2f1b9">cl_program</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">program</a></td></tr>
 <tr class="memitem:ab48363dfed5b16c93bbea7244039ab19"><td class="memItemLeft" align="right" valign="top"><a class="el" href="OpenCL__Dyn__Load_8h.html#ad555869572d7067f86762cd9e032cf2b">cl_kernel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a></td></tr>
 <tr class="memitem:a88fd7f9a2535f8435a5dbc01e44d48cd"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a88fd7f9a2535f8435a5dbc01e44d48cd">kernel_function_name</a></td></tr>
 <tr class="memitem:a11fe8a6e7805b62372629e15acf0ee80"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCL__MixIn.html#a11fe8a6e7805b62372629e15acf0ee80">global_range</a> [3]</td></tr>
@@ -166,15 +168,26 @@ Private Attributes</h2></td></tr>
 
 <p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00035">35</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aafa2fbab3e4863eafe5bc028405b2041"></a>
+<a class="anchor" id="a2569ea56709f80c1f796204e88a4b793"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classOpenCL__MixIn.html#aafa2fbab3e4863eafe5bc028405b2041">OpenCL_MixIn::OpenCL_MixIn</a> </td>
+          <td class="memname"><a class="el" href="classOpenCL__MixIn.html#a2569ea56709f80c1f796204e88a4b793">OpenCL_MixIn::OpenCL_MixIn</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_platform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_device</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
@@ -198,7 +211,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00052">52</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00053">53</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -254,7 +267,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00090">90</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00093">93</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +285,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00083">83</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00086">86</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -294,6 +307,26 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a2133bd4a3de7d30703d778bc607163e9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">OpenCL_MixIn::ReleaseOpenCLBuffers</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">OpenCLMeshRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00182">182</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a4b774e983ba77397dba64e633606149c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -308,7 +341,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00097">97</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00100">100</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +378,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00074">74</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00077">77</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +397,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00065">65</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00068">68</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -385,7 +418,7 @@ Private Attributes</h2></td></tr>
 
 <p>Test a kernel string for errors on the current device. </p>
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00147">147</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8cpp_source.html#l00150">150</a> of file <a class="el" href="OpenCL__MixIn_8cpp_source.html">OpenCL_MixIn.cpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +452,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00073">73</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00075">75</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +467,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00069">69</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00071">71</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -449,7 +482,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00063">63</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00064">64</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -464,7 +497,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00064">64</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00065">65</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -479,7 +512,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00067">67</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00069">69</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -494,7 +527,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00074">74</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00076">76</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +542,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00080">80</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00082">82</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -524,7 +557,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00080">80</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00082">82</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -539,7 +572,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00065">65</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00067">67</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -554,7 +587,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00066">66</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00068">68</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -569,7 +602,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00076">76</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00078">78</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -584,7 +617,22 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00071">71</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00073">73</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a156cbf7984d4fbb79b154d748467c69f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="OpenCL__Dyn__Load_8h.html#a3d78b43bff66a3135ffcba6eb9b2f1b9">cl_program</a> <a class="el" href="classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f">OpenCL_MixIn::program</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="OpenCL__MixIn_8hpp_source.html#l00066">66</a> of file <a class="el" href="OpenCL__MixIn_8hpp_source.html">OpenCL_MixIn.hpp</a>.</p>
 
 </div>
 </div>
@@ -596,7 +644,7 @@ Private Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

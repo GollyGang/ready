@@ -130,384 +130,413 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00026"></a>00026 
 <a name="l00027"></a>00027 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
 <a name="l00028"></a>00028 
-<a name="l00029"></a><a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308">00029</a> <span class="keywordtype">void</span> <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">OpenCL_utils::throwOnError</a>(cl_int ret,<span class="keyword">const</span> <span class="keywordtype">char</span>* message)
+<a name="l00029"></a><a class="code" href="namespaceOpenCL__utils.html#a426b51800ee7948af966128dffb3890e">00029</a> <span class="keywordtype">bool</span> <a class="code" href="namespaceOpenCL__utils.html#a426b51800ee7948af966128dffb3890e" title="Determines whether at least one OpenCL device is available.">OpenCL_utils::IsOpenCLAvailable</a>()
 <a name="l00030"></a>00030 {
-<a name="l00031"></a>00031     <span class="keywordflow">if</span>(ret == <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>) <span class="keywordflow">return</span>;
-<a name="l00032"></a>00032 
-<a name="l00033"></a>00033     ostringstream oss;
-<a name="l00034"></a>00034     oss &lt;&lt; message &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45" title="Returns a description of the OpenCL error code.">GetDescriptionOfOpenCLError</a>(ret);
-<a name="l00035"></a>00035     <span class="keywordflow">throw</span> runtime_error(oss.str().c_str());
-<a name="l00036"></a>00036 }
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00039"></a>00039 
-<a name="l00040"></a><a class="code" href="namespaceOpenCL__utils.html#af6a3ee46b7c1f42b9f5a18d9de6b5f10">00040</a> std::string <a class="code" href="namespaceOpenCL__utils.html#af6a3ee46b7c1f42b9f5a18d9de6b5f10" title="Returns a full report on the available OpenCL devices.">OpenCL_utils::GetOpenCLDiagnostics</a>()
-<a name="l00041"></a>00041 {
-<a name="l00042"></a>00042     ostringstream report;
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>()!= <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
-<a name="l00045"></a>00045     {
-<a name="l00046"></a>00046         report &lt;&lt; <span class="stringliteral">&quot;Failed to load dynamic library for OpenCL&quot;</span>;
-<a name="l00047"></a>00047         <span class="keywordflow">return</span> report.str();
-<a name="l00048"></a>00048     }
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050     <span class="comment">// get available OpenCL platforms</span>
-<a name="l00051"></a>00051     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
-<a name="l00052"></a>00052     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
-<a name="l00053"></a>00053     cl_uint num_platforms;
-<a name="l00054"></a>00054     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
-<a name="l00055"></a>00055     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a> || num_platforms==0)
-<a name="l00056"></a>00056     {
-<a name="l00057"></a>00057         report &lt;&lt; <span class="stringliteral">&quot;No OpenCL platforms available&quot;</span>;
-<a name="l00058"></a>00058         <span class="comment">// currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn&#39;t work</span>
-<a name="l00059"></a>00059         <span class="keywordflow">return</span> report.str();
-<a name="l00060"></a>00060     }
+<a name="l00031"></a>00031     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>()!= <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00032"></a>00032                 <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// no OpenCL SDK or driver installed</span>
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034     <span class="comment">// get available OpenCL platforms</span>
+<a name="l00035"></a>00035     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
+<a name="l00036"></a>00036     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00037"></a>00037     cl_uint num_platforms;
+<a name="l00038"></a>00038     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00039"></a>00039     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a> || num_platforms==0)
+<a name="l00040"></a>00040                 <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// OpenCL is installed but no platforms available (in a virtualized OS?)</span>
+<a name="l00041"></a>00041 
+<a name="l00042"></a>00042         <span class="comment">// look for OpenCL devices on any platform</span>
+<a name="l00043"></a>00043         <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
+<a name="l00044"></a>00044         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
+<a name="l00045"></a>00045         cl_uint num_devices;
+<a name="l00046"></a>00046     <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iPlatform=0;iPlatform&lt;num_platforms;iPlatform++)
+<a name="l00047"></a>00047     {
+<a name="l00048"></a>00048         <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,
+<a name="l00049"></a>00049                         devices_available,&amp;num_devices);
+<a name="l00050"></a>00050                 <span class="keywordflow">if</span>(num_devices&gt;0)
+<a name="l00051"></a>00051                         <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00052"></a>00052         }
+<a name="l00053"></a>00053         <span class="keywordflow">return</span> <span class="keyword">false</span>; <span class="comment">// platforms present but no OpenCL devices available</span>
+<a name="l00054"></a>00054 }
+<a name="l00055"></a>00055 
+<a name="l00056"></a>00056 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00057"></a>00057 
+<a name="l00058"></a><a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308">00058</a> <span class="keywordtype">void</span> <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">OpenCL_utils::throwOnError</a>(cl_int ret,<span class="keyword">const</span> <span class="keywordtype">char</span>* message)
+<a name="l00059"></a>00059 {
+<a name="l00060"></a>00060     <span class="keywordflow">if</span>(ret == <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>) <span class="keywordflow">return</span>;
 <a name="l00061"></a>00061 
-<a name="l00062"></a>00062     report &lt;&lt; <span class="stringliteral">&quot;Found &quot;</span> &lt;&lt; num_platforms &lt;&lt; <span class="stringliteral">&quot; platform(s):\n&quot;</span>;
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064     <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iPlatform=0;iPlatform&lt;num_platforms;iPlatform++)
-<a name="l00065"></a>00065     {
-<a name="l00066"></a>00066         report &lt;&lt; <span class="stringliteral">&quot;Platform &quot;</span> &lt;&lt; iPlatform+1 &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;
-<a name="l00067"></a>00067         <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_INFO_LENGTH = 1000;
-<a name="l00068"></a>00068         <span class="keywordtype">char</span> info[MAX_INFO_LENGTH];
-<a name="l00069"></a>00069         <span class="keywordtype">size_t</span> info_length;
-<a name="l00070"></a>00070         <span class="keywordflow">for</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ad98cdc72ca4405d5bdeedc433b3dc451">cl_platform_info</a> i=<a class="code" href="OpenCL__Dyn__Load_8h.html#a28f84e7180309ccbca33d02d4c2f6fce">CL_PLATFORM_PROFILE</a>;i&lt;=<a class="code" href="OpenCL__Dyn__Load_8h.html#a429d14eeed15c8f3dd1b9b8e09a4676e">CL_PLATFORM_EXTENSIONS</a>;i++)
-<a name="l00071"></a>00071         {
-<a name="l00072"></a>00072             <a class="code" href="OpenCL__Dyn__Load_8c.html#ae95aaff74ad556a778ee33cfa84bcee5">clGetPlatformInfo</a>(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&amp;info_length);
-<a name="l00073"></a>00073             report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122" title="Converts cl_platform_info to a string.">GetPlatformInfoIdAsString</a>(i) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; info &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00074"></a>00074         }
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076         <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
-<a name="l00077"></a>00077         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
-<a name="l00078"></a>00078         cl_uint num_devices;
-<a name="l00079"></a>00079         <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,devices_available,&amp;num_devices);
-<a name="l00080"></a>00080         report &lt;&lt; <span class="stringliteral">&quot;\nFound &quot;</span> &lt;&lt; num_devices &lt;&lt; <span class="stringliteral">&quot; device(s) on this platform.\n&quot;</span>;
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082         <span class="keyword">const</span> <span class="keywordtype">int</span> N_CHAR_RETURNING_IDS = 6;
-<a name="l00083"></a>00083         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> charReturningIds[N_CHAR_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#a9a2110903f2cc7f66eb3206c13252b5e">CL_DEVICE_EXTENSIONS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a2d85fd4bd76635b9d62f568863349f0a">CL_DEVICE_NAME</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad70b200a567553e26eadc0c8134d5f66">CL_DEVICE_PROFILE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a47d21a8f1818ecc0f4451191fd678cf6">CL_DEVICE_VENDOR</a>,
-<a name="l00084"></a>00084             <a class="code" href="OpenCL__Dyn__Load_8h.html#a4cee8549bdffef2ad102fc4f9eeb9314">CL_DEVICE_VERSION</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad9c6d7144c3974b88f7d54976dc4b909">CL_DRIVER_VERSION</a>};
-<a name="l00085"></a>00085         <span class="keyword">const</span> <span class="keywordtype">int</span> N_UINT_RETURNING_IDS = 13;
-<a name="l00086"></a>00086         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> uintReturningIds[N_UINT_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#aa5008870099bba4b6d69d69c29663ee1">CL_DEVICE_ADDRESS_BITS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6f2dcf5cdb998718dfb6cd6355b379">CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a943bf452641977e6c1734d1ebe19c6bc">CL_DEVICE_MAX_CLOCK_FREQUENCY</a>,
-<a name="l00087"></a>00087             <a class="code" href="OpenCL__Dyn__Load_8h.html#ac997c9097e9c205285fef1c44f7b09d1">CL_DEVICE_MAX_COMPUTE_UNITS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#adb8065f02b580a44f2cfda6fa939d268">CL_DEVICE_MAX_CONSTANT_ARGS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a6f54a959aec901a982d82a9ffe2f8a22">CL_DEVICE_MAX_READ_IMAGE_ARGS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a7d601f44ac2dd1c4045d34cddab9920c">CL_DEVICE_MAX_SAMPLERS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a9f1a14560f24157151c8bfec2ea93c2a">CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS</a>,
-<a name="l00088"></a>00088             <a class="code" href="OpenCL__Dyn__Load_8h.html#a9fd6d2a388a0ba37a8946813b182144b">CL_DEVICE_MAX_WRITE_IMAGE_ARGS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ae95d7ca0646f0a6f93afac1a09f8fff0">CL_DEVICE_MEM_BASE_ADDR_ALIGN</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a68a1909222396c3519c82c2dac525e49">CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a4273a1c34fa38c329bf329ddfa79ac38">CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT</a>,
-<a name="l00089"></a>00089             <a class="code" href="OpenCL__Dyn__Load_8h.html#ab66733187fc357747da91708b411d7f1">CL_DEVICE_VENDOR_ID</a>};
-<a name="l00090"></a>00090         <span class="keyword">const</span> <span class="keywordtype">int</span> N_BOOL_RETURNING_IDS = 5;
-<a name="l00091"></a>00091         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> boolReturningIds[N_BOOL_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#a09d38f7f86dc4aa07ae68b2d4425dddd">CL_DEVICE_AVAILABLE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#aa488d95378ddf3573e9a3451afc6dd84">CL_DEVICE_COMPILER_AVAILABLE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad5db91e8f89ed5945bcdeada84601766">CL_DEVICE_ENDIAN_LITTLE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad1767a468cdcc7f6231a400f79543e6b">CL_DEVICE_ERROR_CORRECTION_SUPPORT</a>,
-<a name="l00092"></a>00092             <a class="code" href="OpenCL__Dyn__Load_8h.html#adc306de94990f7d24e277af4f6c99d43">CL_DEVICE_IMAGE_SUPPORT</a>};
-<a name="l00093"></a>00093         <span class="keyword">const</span> <span class="keywordtype">int</span> N_ULONG_RETURNING_IDS = 5;
-<a name="l00094"></a>00094         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> ulongReturningIds[N_ULONG_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#ab241a4e7ecac03fc2d5c5f4a681745fb">CL_DEVICE_GLOBAL_MEM_CACHE_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a3d39df3c0f4a7d4b23aad88de9b12fa4">CL_DEVICE_GLOBAL_MEM_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a7edb0a7b869583f75c91651df73cbb27">CL_DEVICE_LOCAL_MEM_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a5495195a5a5c9554dbda966f67f1a107">CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE</a>,
-<a name="l00095"></a>00095             <a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6948c9585720bf6a29feda117f7995">CL_DEVICE_MAX_MEM_ALLOC_SIZE</a>};
-<a name="l00096"></a>00096         <span class="keyword">const</span> <span class="keywordtype">int</span> N_SIZET_RETURNING_IDS = 8;
-<a name="l00097"></a>00097         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> sizetReturningIds[N_SIZET_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#a6fdf9680b871ac77b1a107a18bc1e3a3">CL_DEVICE_IMAGE2D_MAX_HEIGHT</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a2f08a4e880e76e1a85613ed2d4c40694">CL_DEVICE_IMAGE2D_MAX_WIDTH</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#aaf240ea1fdd2b643df37b1a5d8472b5c">CL_DEVICE_IMAGE3D_MAX_DEPTH</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a05006ec68b9b0508ff66981f241bff5e">CL_DEVICE_IMAGE3D_MAX_HEIGHT</a>,
-<a name="l00098"></a>00098             <a class="code" href="OpenCL__Dyn__Load_8h.html#ad10d5fd02c635d7591ead277f188fe28">CL_DEVICE_IMAGE3D_MAX_WIDTH</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#afe3388a3f723f77801eedd6b4a2afb2e">CL_DEVICE_MAX_PARAMETER_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a85f0b0c5b569b78d6987ea0ab202de54">CL_DEVICE_MAX_WORK_GROUP_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#acb9159d1d293abe2b25712b0b2424bcc">CL_DEVICE_PROFILING_TIMER_RESOLUTION</a>};
-<a name="l00099"></a>00099 
-<a name="l00100"></a>00100         cl_uint uint_value;
-<a name="l00101"></a>00101         <a class="code" href="OpenCL__Dyn__Load_8h.html#a8706dd93aca3c4a117cac1e593a01feb">cl_bool</a> bool_value;
-<a name="l00102"></a>00102         cl_ulong ulong_value;
-<a name="l00103"></a>00103         <span class="keywordtype">size_t</span> sizet_value;
-<a name="l00104"></a>00104         <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iDevice=0;iDevice&lt;num_devices;iDevice++)
-<a name="l00105"></a>00105         {
-<a name="l00106"></a>00106             report &lt;&lt; <span class="stringliteral">&quot;Device &quot;</span> &lt;&lt; iDevice+1 &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;
-<a name="l00107"></a>00107             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_CHAR_RETURNING_IDS;i++)
-<a name="l00108"></a>00108             {
-<a name="l00109"></a>00109                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,&amp;info_length);
-<a name="l00110"></a>00110                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(charReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; info &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00111"></a>00111             }
-<a name="l00112"></a>00112             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_UINT_RETURNING_IDS;i++)
-<a name="l00113"></a>00113             {
-<a name="l00114"></a>00114                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],uintReturningIds[i],<span class="keyword">sizeof</span>(uint_value),&amp;uint_value,&amp;info_length);
-<a name="l00115"></a>00115                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(uintReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; uint_value &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00116"></a>00116             }
-<a name="l00117"></a>00117             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_BOOL_RETURNING_IDS;i++)
-<a name="l00118"></a>00118             {
-<a name="l00119"></a>00119                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],boolReturningIds[i],<span class="keyword">sizeof</span>(bool_value),&amp;bool_value,&amp;info_length);
-<a name="l00120"></a>00120                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(boolReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; (bool_value?<span class="stringliteral">&quot;yes&quot;</span>:<span class="stringliteral">&quot;no&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00121"></a>00121             }
-<a name="l00122"></a>00122             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_ULONG_RETURNING_IDS;i++)
-<a name="l00123"></a>00123             {
-<a name="l00124"></a>00124                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],ulongReturningIds[i],<span class="keyword">sizeof</span>(ulong_value),&amp;ulong_value,&amp;info_length);
-<a name="l00125"></a>00125                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(ulongReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; ulong_value &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00126"></a>00126             }
-<a name="l00127"></a>00127             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_SIZET_RETURNING_IDS;i++)
-<a name="l00128"></a>00128             {
-<a name="l00129"></a>00129                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],sizetReturningIds[i],<span class="keyword">sizeof</span>(sizet_value),&amp;sizet_value,&amp;info_length);
-<a name="l00130"></a>00130                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(sizetReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; sizet_value &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00131"></a>00131             }
-<a name="l00132"></a>00132             <span class="comment">// CL_DEVICE_MAX_WORK_ITEM_SIZES:</span>
-<a name="l00133"></a>00133             <span class="keywordtype">size_t</span> dim[3];
-<a name="l00134"></a>00134             <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],<a class="code" href="OpenCL__Dyn__Load_8h.html#ade485e4470d51680c6fb586bcc3f4ea2">CL_DEVICE_MAX_WORK_ITEM_SIZES</a>,<span class="keyword">sizeof</span>(dim),dim,&amp;info_length);
-<a name="l00135"></a>00135             report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ade485e4470d51680c6fb586bcc3f4ea2">CL_DEVICE_MAX_WORK_ITEM_SIZES</a>) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; dim[0] &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; dim[1] &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; dim[2] &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00136"></a>00136             <span class="comment">// CL_DEVICE_TYPE:</span>
-<a name="l00137"></a>00137             <a class="code" href="OpenCL__Dyn__Load_8h.html#a3bf05e7149b1f375c84f2a963cd4a522">cl_device_type</a> device_type;
-<a name="l00138"></a>00138             <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],<a class="code" href="OpenCL__Dyn__Load_8h.html#a88e5387c43bc0d19b9f7f8c0211e2994">CL_DEVICE_TYPE</a>,<span class="keyword">sizeof</span>(device_type),&amp;device_type,&amp;info_length);
-<a name="l00139"></a>00139             ostringstream oss;
-<a name="l00140"></a>00140             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#a23a7f5cbd2438408fb3235e1506a2268">CL_DEVICE_TYPE_CPU</a>) oss &lt;&lt; <span class="stringliteral">&quot;CPU&quot;</span>;
-<a name="l00141"></a>00141             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#ae4adb7526b250c314e2719c77737332b">CL_DEVICE_TYPE_GPU</a>) { <span class="keywordflow">if</span>(!oss.str().empty()) { oss &lt;&lt; <span class="stringliteral">&quot; &amp; &quot;</span>; } oss &lt;&lt; <span class="stringliteral">&quot;GPU&quot;</span>; }
-<a name="l00142"></a>00142             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#aa174a666d07cee68ed3a4624e7092674">CL_DEVICE_TYPE_ACCELERATOR</a>) { <span class="keywordflow">if</span>(!oss.str().empty()) { oss &lt;&lt; <span class="stringliteral">&quot; &amp; &quot;</span>; } oss &lt;&lt; <span class="stringliteral">&quot;ACCELERATOR&quot;</span>; }
-<a name="l00143"></a>00143             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#a10bd4bb5f345255fa3f051bde4ffbaaa">CL_DEVICE_TYPE_DEFAULT</a>) { <span class="keywordflow">if</span>(!oss.str().empty()) { oss &lt;&lt; <span class="stringliteral">&quot; &amp; &quot;</span>; } oss &lt;&lt; <span class="stringliteral">&quot;DEFAULT&quot;</span>; }
-<a name="l00144"></a>00144             report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#a88e5387c43bc0d19b9f7f8c0211e2994">CL_DEVICE_TYPE</a>) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; oss.str() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00145"></a>00145         }
-<a name="l00146"></a>00146         report &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00147"></a>00147     }
-<a name="l00148"></a>00148 
-<a name="l00149"></a>00149     <span class="keywordflow">return</span> report.str();
-<a name="l00150"></a>00150 }
-<a name="l00151"></a>00151 
-<a name="l00152"></a>00152 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00153"></a>00153 
-<a name="l00154"></a><a class="code" href="namespaceOpenCL__utils.html#a17e5ec4397c2d70c8430f17ec53d83d5">00154</a> <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#a17e5ec4397c2d70c8430f17ec53d83d5" title="Returns the number of OpenCL platforms (from vendors) that are available.">OpenCL_utils::GetNumberOfPlatforms</a>()
-<a name="l00155"></a>00155 {
-<a name="l00156"></a>00156     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>() != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
-<a name="l00157"></a>00157         <span class="keywordflow">return</span> 0;
-<a name="l00158"></a>00158 
-<a name="l00159"></a>00159     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
-<a name="l00160"></a>00160     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
-<a name="l00161"></a>00161     cl_uint num_platforms;
-<a name="l00162"></a>00162     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
-<a name="l00163"></a>00163     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetNumberOfPlatforms : clGetPlatformIDs failed: &quot;</span>);
-<a name="l00164"></a>00164     <span class="keywordflow">return</span> num_platforms;
-<a name="l00165"></a>00165 }
-<a name="l00166"></a>00166 
-<a name="l00167"></a>00167 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00168"></a>00168 
-<a name="l00169"></a><a class="code" href="namespaceOpenCL__utils.html#ae182ffd5ff716e80e9d19dd3b2409daf">00169</a> <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#ae182ffd5ff716e80e9d19dd3b2409daf" title="Returns the number of OpenCL devices available on this platform.">OpenCL_utils::GetNumberOfDevices</a>(<span class="keywordtype">int</span> iPlatform)
-<a name="l00170"></a>00170 {
-<a name="l00171"></a>00171     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>() != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
-<a name="l00172"></a>00172         <span class="keywordflow">return</span> 0;
-<a name="l00173"></a>00173 
-<a name="l00174"></a>00174     <span class="comment">// get available OpenCL platforms</span>
-<a name="l00175"></a>00175     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
-<a name="l00176"></a>00176     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
-<a name="l00177"></a>00177     cl_uint num_platforms;
-<a name="l00178"></a>00178     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
-<a name="l00179"></a>00179     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetNumberOfDevices : clGetPlatformIDs failed: &quot;</span>);
+<a name="l00062"></a>00062     ostringstream oss;
+<a name="l00063"></a>00063     oss &lt;&lt; message &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45" title="Returns a description of the OpenCL error code.">GetDescriptionOfOpenCLError</a>(ret);
+<a name="l00064"></a>00064     <span class="keywordflow">throw</span> runtime_error(oss.str().c_str());
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00068"></a>00068 
+<a name="l00069"></a><a class="code" href="namespaceOpenCL__utils.html#af6a3ee46b7c1f42b9f5a18d9de6b5f10">00069</a> std::string <a class="code" href="namespaceOpenCL__utils.html#af6a3ee46b7c1f42b9f5a18d9de6b5f10" title="Returns a full report on the available OpenCL devices.">OpenCL_utils::GetOpenCLDiagnostics</a>()
+<a name="l00070"></a>00070 {
+<a name="l00071"></a>00071     ostringstream report;
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>()!= <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00074"></a>00074     {
+<a name="l00075"></a>00075         report &lt;&lt; <span class="stringliteral">&quot;Failed to load dynamic library for OpenCL&quot;</span>;
+<a name="l00076"></a>00076         <span class="keywordflow">return</span> report.str();
+<a name="l00077"></a>00077     }
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079     <span class="comment">// get available OpenCL platforms</span>
+<a name="l00080"></a>00080     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
+<a name="l00081"></a>00081     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00082"></a>00082     cl_uint num_platforms;
+<a name="l00083"></a>00083     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00084"></a>00084     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a> || num_platforms==0)
+<a name="l00085"></a>00085     {
+<a name="l00086"></a>00086         report &lt;&lt; <span class="stringliteral">&quot;No OpenCL platforms available&quot;</span>;
+<a name="l00087"></a>00087         <span class="comment">// currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn&#39;t work</span>
+<a name="l00088"></a>00088         <span class="keywordflow">return</span> report.str();
+<a name="l00089"></a>00089     }
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091     report &lt;&lt; <span class="stringliteral">&quot;Found &quot;</span> &lt;&lt; num_platforms &lt;&lt; <span class="stringliteral">&quot; platform(s):\n&quot;</span>;
+<a name="l00092"></a>00092 
+<a name="l00093"></a>00093     <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iPlatform=0;iPlatform&lt;num_platforms;iPlatform++)
+<a name="l00094"></a>00094     {
+<a name="l00095"></a>00095         report &lt;&lt; <span class="stringliteral">&quot;Platform &quot;</span> &lt;&lt; iPlatform+1 &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;
+<a name="l00096"></a>00096         <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_INFO_LENGTH = 1000;
+<a name="l00097"></a>00097         <span class="keywordtype">char</span> info[MAX_INFO_LENGTH];
+<a name="l00098"></a>00098         <span class="keywordtype">size_t</span> info_length;
+<a name="l00099"></a>00099         <span class="keywordflow">for</span>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ad98cdc72ca4405d5bdeedc433b3dc451">cl_platform_info</a> i=<a class="code" href="OpenCL__Dyn__Load_8h.html#a28f84e7180309ccbca33d02d4c2f6fce">CL_PLATFORM_PROFILE</a>;i&lt;=<a class="code" href="OpenCL__Dyn__Load_8h.html#a429d14eeed15c8f3dd1b9b8e09a4676e">CL_PLATFORM_EXTENSIONS</a>;i++)
+<a name="l00100"></a>00100         {
+<a name="l00101"></a>00101             <a class="code" href="OpenCL__Dyn__Load_8c.html#ae95aaff74ad556a778ee33cfa84bcee5">clGetPlatformInfo</a>(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&amp;info_length);
+<a name="l00102"></a>00102             report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122" title="Converts cl_platform_info to a string.">GetPlatformInfoIdAsString</a>(i) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; info &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00103"></a>00103         }
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105         <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
+<a name="l00106"></a>00106         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
+<a name="l00107"></a>00107         cl_uint num_devices;
+<a name="l00108"></a>00108         <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,devices_available,&amp;num_devices);
+<a name="l00109"></a>00109         report &lt;&lt; <span class="stringliteral">&quot;\nFound &quot;</span> &lt;&lt; num_devices &lt;&lt; <span class="stringliteral">&quot; device(s) on this platform.\n&quot;</span>;
+<a name="l00110"></a>00110 
+<a name="l00111"></a>00111         <span class="keyword">const</span> <span class="keywordtype">int</span> N_CHAR_RETURNING_IDS = 6;
+<a name="l00112"></a>00112         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> charReturningIds[N_CHAR_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#a9a2110903f2cc7f66eb3206c13252b5e">CL_DEVICE_EXTENSIONS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a2d85fd4bd76635b9d62f568863349f0a">CL_DEVICE_NAME</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad70b200a567553e26eadc0c8134d5f66">CL_DEVICE_PROFILE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a47d21a8f1818ecc0f4451191fd678cf6">CL_DEVICE_VENDOR</a>,
+<a name="l00113"></a>00113             <a class="code" href="OpenCL__Dyn__Load_8h.html#a4cee8549bdffef2ad102fc4f9eeb9314">CL_DEVICE_VERSION</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad9c6d7144c3974b88f7d54976dc4b909">CL_DRIVER_VERSION</a>};
+<a name="l00114"></a>00114         <span class="keyword">const</span> <span class="keywordtype">int</span> N_UINT_RETURNING_IDS = 13;
+<a name="l00115"></a>00115         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> uintReturningIds[N_UINT_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#aa5008870099bba4b6d69d69c29663ee1">CL_DEVICE_ADDRESS_BITS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6f2dcf5cdb998718dfb6cd6355b379">CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a943bf452641977e6c1734d1ebe19c6bc">CL_DEVICE_MAX_CLOCK_FREQUENCY</a>,
+<a name="l00116"></a>00116             <a class="code" href="OpenCL__Dyn__Load_8h.html#ac997c9097e9c205285fef1c44f7b09d1">CL_DEVICE_MAX_COMPUTE_UNITS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#adb8065f02b580a44f2cfda6fa939d268">CL_DEVICE_MAX_CONSTANT_ARGS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a6f54a959aec901a982d82a9ffe2f8a22">CL_DEVICE_MAX_READ_IMAGE_ARGS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a7d601f44ac2dd1c4045d34cddab9920c">CL_DEVICE_MAX_SAMPLERS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a9f1a14560f24157151c8bfec2ea93c2a">CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS</a>,
+<a name="l00117"></a>00117             <a class="code" href="OpenCL__Dyn__Load_8h.html#a9fd6d2a388a0ba37a8946813b182144b">CL_DEVICE_MAX_WRITE_IMAGE_ARGS</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ae95d7ca0646f0a6f93afac1a09f8fff0">CL_DEVICE_MEM_BASE_ADDR_ALIGN</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a68a1909222396c3519c82c2dac525e49">CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a4273a1c34fa38c329bf329ddfa79ac38">CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT</a>,
+<a name="l00118"></a>00118             <a class="code" href="OpenCL__Dyn__Load_8h.html#ab66733187fc357747da91708b411d7f1">CL_DEVICE_VENDOR_ID</a>};
+<a name="l00119"></a>00119         <span class="keyword">const</span> <span class="keywordtype">int</span> N_BOOL_RETURNING_IDS = 5;
+<a name="l00120"></a>00120         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> boolReturningIds[N_BOOL_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#a09d38f7f86dc4aa07ae68b2d4425dddd">CL_DEVICE_AVAILABLE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#aa488d95378ddf3573e9a3451afc6dd84">CL_DEVICE_COMPILER_AVAILABLE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad5db91e8f89ed5945bcdeada84601766">CL_DEVICE_ENDIAN_LITTLE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#ad1767a468cdcc7f6231a400f79543e6b">CL_DEVICE_ERROR_CORRECTION_SUPPORT</a>,
+<a name="l00121"></a>00121             <a class="code" href="OpenCL__Dyn__Load_8h.html#adc306de94990f7d24e277af4f6c99d43">CL_DEVICE_IMAGE_SUPPORT</a>};
+<a name="l00122"></a>00122         <span class="keyword">const</span> <span class="keywordtype">int</span> N_ULONG_RETURNING_IDS = 5;
+<a name="l00123"></a>00123         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> ulongReturningIds[N_ULONG_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#ab241a4e7ecac03fc2d5c5f4a681745fb">CL_DEVICE_GLOBAL_MEM_CACHE_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a3d39df3c0f4a7d4b23aad88de9b12fa4">CL_DEVICE_GLOBAL_MEM_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a7edb0a7b869583f75c91651df73cbb27">CL_DEVICE_LOCAL_MEM_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a5495195a5a5c9554dbda966f67f1a107">CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE</a>,
+<a name="l00124"></a>00124             <a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6948c9585720bf6a29feda117f7995">CL_DEVICE_MAX_MEM_ALLOC_SIZE</a>};
+<a name="l00125"></a>00125         <span class="keyword">const</span> <span class="keywordtype">int</span> N_SIZET_RETURNING_IDS = 8;
+<a name="l00126"></a>00126         <a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> sizetReturningIds[N_SIZET_RETURNING_IDS] = {<a class="code" href="OpenCL__Dyn__Load_8h.html#a6fdf9680b871ac77b1a107a18bc1e3a3">CL_DEVICE_IMAGE2D_MAX_HEIGHT</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a2f08a4e880e76e1a85613ed2d4c40694">CL_DEVICE_IMAGE2D_MAX_WIDTH</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#aaf240ea1fdd2b643df37b1a5d8472b5c">CL_DEVICE_IMAGE3D_MAX_DEPTH</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a05006ec68b9b0508ff66981f241bff5e">CL_DEVICE_IMAGE3D_MAX_HEIGHT</a>,
+<a name="l00127"></a>00127             <a class="code" href="OpenCL__Dyn__Load_8h.html#ad10d5fd02c635d7591ead277f188fe28">CL_DEVICE_IMAGE3D_MAX_WIDTH</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#afe3388a3f723f77801eedd6b4a2afb2e">CL_DEVICE_MAX_PARAMETER_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#a85f0b0c5b569b78d6987ea0ab202de54">CL_DEVICE_MAX_WORK_GROUP_SIZE</a>,<a class="code" href="OpenCL__Dyn__Load_8h.html#acb9159d1d293abe2b25712b0b2424bcc">CL_DEVICE_PROFILING_TIMER_RESOLUTION</a>};
+<a name="l00128"></a>00128 
+<a name="l00129"></a>00129         cl_uint uint_value;
+<a name="l00130"></a>00130         <a class="code" href="OpenCL__Dyn__Load_8h.html#a8706dd93aca3c4a117cac1e593a01feb">cl_bool</a> bool_value;
+<a name="l00131"></a>00131         cl_ulong ulong_value;
+<a name="l00132"></a>00132         <span class="keywordtype">size_t</span> sizet_value;
+<a name="l00133"></a>00133         <span class="keywordflow">for</span>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> iDevice=0;iDevice&lt;num_devices;iDevice++)
+<a name="l00134"></a>00134         {
+<a name="l00135"></a>00135             report &lt;&lt; <span class="stringliteral">&quot;Device &quot;</span> &lt;&lt; iDevice+1 &lt;&lt; <span class="stringliteral">&quot;:\n&quot;</span>;
+<a name="l00136"></a>00136             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_CHAR_RETURNING_IDS;i++)
+<a name="l00137"></a>00137             {
+<a name="l00138"></a>00138                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,&amp;info_length);
+<a name="l00139"></a>00139                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(charReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; info &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00140"></a>00140             }
+<a name="l00141"></a>00141             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_UINT_RETURNING_IDS;i++)
+<a name="l00142"></a>00142             {
+<a name="l00143"></a>00143                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],uintReturningIds[i],<span class="keyword">sizeof</span>(uint_value),&amp;uint_value,&amp;info_length);
+<a name="l00144"></a>00144                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(uintReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; uint_value &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00145"></a>00145             }
+<a name="l00146"></a>00146             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_BOOL_RETURNING_IDS;i++)
+<a name="l00147"></a>00147             {
+<a name="l00148"></a>00148                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],boolReturningIds[i],<span class="keyword">sizeof</span>(bool_value),&amp;bool_value,&amp;info_length);
+<a name="l00149"></a>00149                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(boolReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; (bool_value?<span class="stringliteral">&quot;yes&quot;</span>:<span class="stringliteral">&quot;no&quot;</span>) &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00150"></a>00150             }
+<a name="l00151"></a>00151             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_ULONG_RETURNING_IDS;i++)
+<a name="l00152"></a>00152             {
+<a name="l00153"></a>00153                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],ulongReturningIds[i],<span class="keyword">sizeof</span>(ulong_value),&amp;ulong_value,&amp;info_length);
+<a name="l00154"></a>00154                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(ulongReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; ulong_value &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00155"></a>00155             }
+<a name="l00156"></a>00156             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;N_SIZET_RETURNING_IDS;i++)
+<a name="l00157"></a>00157             {
+<a name="l00158"></a>00158                 <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],sizetReturningIds[i],<span class="keyword">sizeof</span>(sizet_value),&amp;sizet_value,&amp;info_length);
+<a name="l00159"></a>00159                 report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(sizetReturningIds[i]) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; sizet_value &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00160"></a>00160             }
+<a name="l00161"></a>00161             <span class="comment">// CL_DEVICE_MAX_WORK_ITEM_SIZES:</span>
+<a name="l00162"></a>00162             <span class="keywordtype">size_t</span> dim[3];
+<a name="l00163"></a>00163             <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],<a class="code" href="OpenCL__Dyn__Load_8h.html#ade485e4470d51680c6fb586bcc3f4ea2">CL_DEVICE_MAX_WORK_ITEM_SIZES</a>,<span class="keyword">sizeof</span>(dim),dim,&amp;info_length);
+<a name="l00164"></a>00164             report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ade485e4470d51680c6fb586bcc3f4ea2">CL_DEVICE_MAX_WORK_ITEM_SIZES</a>) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; dim[0] &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; dim[1] &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; dim[2] &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00165"></a>00165             <span class="comment">// CL_DEVICE_TYPE:</span>
+<a name="l00166"></a>00166             <a class="code" href="OpenCL__Dyn__Load_8h.html#a3bf05e7149b1f375c84f2a963cd4a522">cl_device_type</a> device_type;
+<a name="l00167"></a>00167             <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],<a class="code" href="OpenCL__Dyn__Load_8h.html#a88e5387c43bc0d19b9f7f8c0211e2994">CL_DEVICE_TYPE</a>,<span class="keyword">sizeof</span>(device_type),&amp;device_type,&amp;info_length);
+<a name="l00168"></a>00168             ostringstream oss;
+<a name="l00169"></a>00169             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#a23a7f5cbd2438408fb3235e1506a2268">CL_DEVICE_TYPE_CPU</a>) oss &lt;&lt; <span class="stringliteral">&quot;CPU&quot;</span>;
+<a name="l00170"></a>00170             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#ae4adb7526b250c314e2719c77737332b">CL_DEVICE_TYPE_GPU</a>) { <span class="keywordflow">if</span>(!oss.str().empty()) { oss &lt;&lt; <span class="stringliteral">&quot; &amp; &quot;</span>; } oss &lt;&lt; <span class="stringliteral">&quot;GPU&quot;</span>; }
+<a name="l00171"></a>00171             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#aa174a666d07cee68ed3a4624e7092674">CL_DEVICE_TYPE_ACCELERATOR</a>) { <span class="keywordflow">if</span>(!oss.str().empty()) { oss &lt;&lt; <span class="stringliteral">&quot; &amp; &quot;</span>; } oss &lt;&lt; <span class="stringliteral">&quot;ACCELERATOR&quot;</span>; }
+<a name="l00172"></a>00172             <span class="keywordflow">if</span>(device_type&amp;<a class="code" href="OpenCL__Dyn__Load_8h.html#a10bd4bb5f345255fa3f051bde4ffbaaa">CL_DEVICE_TYPE_DEFAULT</a>) { <span class="keywordflow">if</span>(!oss.str().empty()) { oss &lt;&lt; <span class="stringliteral">&quot; &amp; &quot;</span>; } oss &lt;&lt; <span class="stringliteral">&quot;DEFAULT&quot;</span>; }
+<a name="l00173"></a>00173             report &lt;&lt; <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#a88e5387c43bc0d19b9f7f8c0211e2994">CL_DEVICE_TYPE</a>) &lt;&lt; <span class="stringliteral">&quot; : &quot;</span> &lt;&lt; oss.str() &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00174"></a>00174         }
+<a name="l00175"></a>00175         report &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00176"></a>00176     }
+<a name="l00177"></a>00177 
+<a name="l00178"></a>00178     <span class="keywordflow">return</span> report.str();
+<a name="l00179"></a>00179 }
 <a name="l00180"></a>00180 
-<a name="l00181"></a>00181     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
-<a name="l00182"></a>00182     <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
-<a name="l00183"></a>00183     cl_uint num_devices;
-<a name="l00184"></a>00184     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,devices_available,&amp;num_devices);
-<a name="l00185"></a>00185     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetNumberOfDevices : clGetDeviceIDs failed: &quot;</span>);
-<a name="l00186"></a>00186 
-<a name="l00187"></a>00187     <span class="keywordflow">return</span> num_devices;
-<a name="l00188"></a>00188 }
-<a name="l00189"></a>00189 
-<a name="l00190"></a>00190 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00191"></a>00191 
-<a name="l00192"></a><a class="code" href="namespaceOpenCL__utils.html#a8d16f21d70ff47eeeefa7f8b3f3e897c">00192</a> <span class="keywordtype">string</span> <a class="code" href="namespaceOpenCL__utils.html#a8d16f21d70ff47eeeefa7f8b3f3e897c" title="Returns a description of this platform.">OpenCL_utils::GetPlatformDescription</a>(<span class="keywordtype">int</span> iPlatform)
-<a name="l00193"></a>00193 {
-<a name="l00194"></a>00194     <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>();
+<a name="l00181"></a>00181 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00182"></a>00182 
+<a name="l00183"></a><a class="code" href="namespaceOpenCL__utils.html#a17e5ec4397c2d70c8430f17ec53d83d5">00183</a> <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#a17e5ec4397c2d70c8430f17ec53d83d5" title="Returns the number of OpenCL platforms (from vendors) that are available.">OpenCL_utils::GetNumberOfPlatforms</a>()
+<a name="l00184"></a>00184 {
+<a name="l00185"></a>00185     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>() != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00186"></a>00186         <span class="keywordflow">return</span> 0;
+<a name="l00187"></a>00187 
+<a name="l00188"></a>00188     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
+<a name="l00189"></a>00189     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00190"></a>00190     cl_uint num_platforms;
+<a name="l00191"></a>00191     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00192"></a>00192     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetNumberOfPlatforms : clGetPlatformIDs failed: &quot;</span>);
+<a name="l00193"></a>00193     <span class="keywordflow">return</span> num_platforms;
+<a name="l00194"></a>00194 }
 <a name="l00195"></a>00195 
-<a name="l00196"></a>00196     <span class="comment">// get available OpenCL platforms</span>
-<a name="l00197"></a>00197     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
-<a name="l00198"></a>00198     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
-<a name="l00199"></a>00199     cl_uint num_platforms;
-<a name="l00200"></a>00200     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
-<a name="l00201"></a>00201     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetPlatformDescription : clGetPlatformIDs failed: &quot;</span>);
+<a name="l00196"></a>00196 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00197"></a>00197 
+<a name="l00198"></a><a class="code" href="namespaceOpenCL__utils.html#ae182ffd5ff716e80e9d19dd3b2409daf">00198</a> <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#ae182ffd5ff716e80e9d19dd3b2409daf" title="Returns the number of OpenCL devices available on this platform.">OpenCL_utils::GetNumberOfDevices</a>(<span class="keywordtype">int</span> iPlatform)
+<a name="l00199"></a>00199 {
+<a name="l00200"></a>00200     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>() != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00201"></a>00201         <span class="keywordflow">return</span> 0;
 <a name="l00202"></a>00202 
-<a name="l00203"></a>00203     ostringstream oss;
-<a name="l00204"></a>00204     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_INFO_LENGTH = 1000;
-<a name="l00205"></a>00205     <span class="keywordtype">char</span> info[MAX_INFO_LENGTH];
-<a name="l00206"></a>00206     <span class="keywordtype">size_t</span> info_length;
-<a name="l00207"></a>00207     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ae95aaff74ad556a778ee33cfa84bcee5">clGetPlatformInfo</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a7721d27aacffe231bd96c763481bd7c9">CL_PLATFORM_NAME</a>,
-<a name="l00208"></a>00208         MAX_INFO_LENGTH,info,&amp;info_length);
-<a name="l00209"></a>00209     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetPlatformDescription : clGetPlatformInfo failed: &quot;</span>);
-<a name="l00210"></a>00210     <span class="keywordtype">string</span> platform_name = info;
-<a name="l00211"></a>00211     platform_name = platform_name.substr(platform_name.find_first_not_of(<span class="stringliteral">&quot; \n\r\t&quot;</span>));
-<a name="l00212"></a>00212     oss &lt;&lt; platform_name;
-<a name="l00213"></a>00213     <span class="keywordflow">return</span> oss.str();
-<a name="l00214"></a>00214 }
+<a name="l00203"></a>00203     <span class="comment">// get available OpenCL platforms</span>
+<a name="l00204"></a>00204     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
+<a name="l00205"></a>00205     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00206"></a>00206     cl_uint num_platforms;
+<a name="l00207"></a>00207     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00208"></a>00208     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetNumberOfDevices : clGetPlatformIDs failed: &quot;</span>);
+<a name="l00209"></a>00209 
+<a name="l00210"></a>00210     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
+<a name="l00211"></a>00211     <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
+<a name="l00212"></a>00212     cl_uint num_devices;
+<a name="l00213"></a>00213     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,devices_available,&amp;num_devices);
+<a name="l00214"></a>00214     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetNumberOfDevices : clGetDeviceIDs failed: &quot;</span>);
 <a name="l00215"></a>00215 
-<a name="l00216"></a>00216 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00217"></a>00217 
-<a name="l00218"></a><a class="code" href="namespaceOpenCL__utils.html#a7ad04228a76befc69c19c55b15aca091">00218</a> <span class="keywordtype">string</span> <a class="code" href="namespaceOpenCL__utils.html#a7ad04228a76befc69c19c55b15aca091" title="Returns a description of this device.">OpenCL_utils::GetDeviceDescription</a>(<span class="keywordtype">int</span> iPlatform,<span class="keywordtype">int</span> iDevice)
-<a name="l00219"></a>00219 {
-<a name="l00220"></a>00220     <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>();
-<a name="l00221"></a>00221 
-<a name="l00222"></a>00222     <span class="comment">// get available OpenCL platforms</span>
-<a name="l00223"></a>00223     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
-<a name="l00224"></a>00224     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
-<a name="l00225"></a>00225     cl_uint num_platforms;
-<a name="l00226"></a>00226     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
-<a name="l00227"></a>00227     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetDeviceDescription : clGetPlatformIDs failed: &quot;</span>);
-<a name="l00228"></a>00228 
-<a name="l00229"></a>00229     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_INFO_LENGTH = 1000;
-<a name="l00230"></a>00230     <span class="keywordtype">char</span> info[MAX_INFO_LENGTH];
-<a name="l00231"></a>00231     <span class="keywordtype">size_t</span> info_length;
-<a name="l00232"></a>00232 
-<a name="l00233"></a>00233     ostringstream oss;
-<a name="l00234"></a>00234     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
-<a name="l00235"></a>00235     <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
-<a name="l00236"></a>00236     cl_uint num_devices;
-<a name="l00237"></a>00237     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,
-<a name="l00238"></a>00238         MAX_DEVICES,devices_available,&amp;num_devices);
-<a name="l00239"></a>00239     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetDeviceDescription : clGetDeviceIDs failed: &quot;</span>);
-<a name="l00240"></a>00240     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],<a class="code" href="OpenCL__Dyn__Load_8h.html#a2d85fd4bd76635b9d62f568863349f0a">CL_DEVICE_NAME</a>,
-<a name="l00241"></a>00241         MAX_INFO_LENGTH,info,&amp;info_length);
-<a name="l00242"></a>00242     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetDeviceDescription : clGetDeviceInfo failed: &quot;</span>);
-<a name="l00243"></a>00243     <span class="keywordtype">string</span> device_name = info;
-<a name="l00244"></a>00244     device_name = device_name.substr(device_name.find_first_not_of(<span class="stringliteral">&quot; \n\r\t&quot;</span>));
-<a name="l00245"></a>00245     oss &lt;&lt; device_name;
-<a name="l00246"></a>00246     <span class="keywordflow">return</span> oss.str();
-<a name="l00247"></a>00247 }
-<a name="l00248"></a>00248 
-<a name="l00249"></a>00249 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00216"></a>00216     <span class="keywordflow">return</span> num_devices;
+<a name="l00217"></a>00217 }
+<a name="l00218"></a>00218 
+<a name="l00219"></a>00219 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00220"></a>00220 
+<a name="l00221"></a><a class="code" href="namespaceOpenCL__utils.html#a8d16f21d70ff47eeeefa7f8b3f3e897c">00221</a> <span class="keywordtype">string</span> <a class="code" href="namespaceOpenCL__utils.html#a8d16f21d70ff47eeeefa7f8b3f3e897c" title="Returns a description of this platform.">OpenCL_utils::GetPlatformDescription</a>(<span class="keywordtype">int</span> iPlatform)
+<a name="l00222"></a>00222 {
+<a name="l00223"></a>00223     <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>();
+<a name="l00224"></a>00224 
+<a name="l00225"></a>00225     <span class="comment">// get available OpenCL platforms</span>
+<a name="l00226"></a>00226     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
+<a name="l00227"></a>00227     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00228"></a>00228     cl_uint num_platforms;
+<a name="l00229"></a>00229     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00230"></a>00230     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetPlatformDescription : clGetPlatformIDs failed: &quot;</span>);
+<a name="l00231"></a>00231 
+<a name="l00232"></a>00232     ostringstream oss;
+<a name="l00233"></a>00233     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_INFO_LENGTH = 1000;
+<a name="l00234"></a>00234     <span class="keywordtype">char</span> info[MAX_INFO_LENGTH];
+<a name="l00235"></a>00235     <span class="keywordtype">size_t</span> info_length;
+<a name="l00236"></a>00236     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ae95aaff74ad556a778ee33cfa84bcee5">clGetPlatformInfo</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a7721d27aacffe231bd96c763481bd7c9">CL_PLATFORM_NAME</a>,
+<a name="l00237"></a>00237         MAX_INFO_LENGTH,info,&amp;info_length);
+<a name="l00238"></a>00238     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetPlatformDescription : clGetPlatformInfo failed: &quot;</span>);
+<a name="l00239"></a>00239     <span class="keywordtype">string</span> platform_name = info;
+<a name="l00240"></a>00240     platform_name = platform_name.substr(platform_name.find_first_not_of(<span class="stringliteral">&quot; \n\r\t&quot;</span>));
+<a name="l00241"></a>00241     oss &lt;&lt; platform_name;
+<a name="l00242"></a>00242     <span class="keywordflow">return</span> oss.str();
+<a name="l00243"></a>00243 }
+<a name="l00244"></a>00244 
+<a name="l00245"></a>00245 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00246"></a>00246 
+<a name="l00247"></a><a class="code" href="namespaceOpenCL__utils.html#a7ad04228a76befc69c19c55b15aca091">00247</a> <span class="keywordtype">string</span> <a class="code" href="namespaceOpenCL__utils.html#a7ad04228a76befc69c19c55b15aca091" title="Returns a description of this device.">OpenCL_utils::GetDeviceDescription</a>(<span class="keywordtype">int</span> iPlatform,<span class="keywordtype">int</span> iDevice)
+<a name="l00248"></a>00248 {
+<a name="l00249"></a>00249     <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>();
 <a name="l00250"></a>00250 
-<a name="l00251"></a><a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b">00251</a> cl_int <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">OpenCL_utils::LinkOpenCL</a>()
-<a name="l00252"></a>00252 {
-<a name="l00253"></a>00253 <span class="preprocessor">#ifdef __APPLE__</span>
-<a name="l00254"></a>00254 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>;
-<a name="l00255"></a>00255 <span class="preprocessor">#else</span>
-<a name="l00256"></a>00256 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="OpenCL__Dyn__Load_8c.html#ada1028462629c0bc598ad91f5996af04">clLibLoad</a>();
-<a name="l00257"></a>00257 <span class="preprocessor">#endif</span>
-<a name="l00258"></a>00258 <span class="preprocessor"></span>}
-<a name="l00259"></a>00259 
-<a name="l00260"></a>00260 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00251"></a>00251     <span class="comment">// get available OpenCL platforms</span>
+<a name="l00252"></a>00252     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_PLATFORMS = 10;
+<a name="l00253"></a>00253     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00254"></a>00254     cl_uint num_platforms;
+<a name="l00255"></a>00255     cl_int ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00256"></a>00256     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetDeviceDescription : clGetPlatformIDs failed: &quot;</span>);
+<a name="l00257"></a>00257 
+<a name="l00258"></a>00258     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_INFO_LENGTH = 1000;
+<a name="l00259"></a>00259     <span class="keywordtype">char</span> info[MAX_INFO_LENGTH];
+<a name="l00260"></a>00260     <span class="keywordtype">size_t</span> info_length;
 <a name="l00261"></a>00261 
-<a name="l00262"></a>00262 <span class="comment">// http://www.khronos.org/message_boards/viewtopic.php?f=37&amp;t=2107</span>
-<a name="l00263"></a><a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45">00263</a> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45" title="Returns a description of the OpenCL error code.">OpenCL_utils::GetDescriptionOfOpenCLError</a>(cl_int err)
-<a name="l00264"></a>00264 {
-<a name="l00265"></a>00265     <span class="keywordflow">switch</span> (err) {
-<a name="l00266"></a>00266         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>:                            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Success!&quot;</span>;
-<a name="l00267"></a>00267         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a0bf212dc821aa0e9abdd1c5bc074aaa1">CL_DEVICE_NOT_FOUND</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Device not found.&quot;</span>;
-<a name="l00268"></a>00268         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a68aca49c4b464bd0d692cd9ea397acd4">CL_DEVICE_NOT_AVAILABLE</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;Device not available&quot;</span>;
-<a name="l00269"></a>00269         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab8423268f4e2a4fed4720647e21ad817">CL_COMPILER_NOT_AVAILABLE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;Compiler not available&quot;</span>;
-<a name="l00270"></a>00270         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3b88b4f40c5260152752fdbf648d63e6">CL_MEM_OBJECT_ALLOCATION_FAILURE</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;Memory object allocation failure&quot;</span>;
-<a name="l00271"></a>00271         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a96305d5e5479cc02c8a0e72016793fa6">CL_OUT_OF_RESOURCES</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Out of resources&quot;</span>;
-<a name="l00272"></a>00272         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad51674367572f46be65c19078ae039eb">CL_OUT_OF_HOST_MEMORY</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;Out of host memory&quot;</span>;
-<a name="l00273"></a>00273         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ada02865ea652de8774b9ffa85e57588c">CL_PROFILING_INFO_NOT_AVAILABLE</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;Profiling information not available&quot;</span>;
-<a name="l00274"></a>00274         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aaa273c20c3a8713b772a9a2294705886">CL_MEM_COPY_OVERLAP</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Memory copy overlap&quot;</span>;
-<a name="l00275"></a>00275         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a15e2625169ad0d34e0cb33792ce44527">CL_IMAGE_FORMAT_MISMATCH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Image format mismatch&quot;</span>;
-<a name="l00276"></a>00276         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac35f540118c8a516deb01bd04b219642">CL_IMAGE_FORMAT_NOT_SUPPORTED</a>:         <span class="keywordflow">return</span> <span class="stringliteral">&quot;Image format not supported&quot;</span>;
-<a name="l00277"></a>00277         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aba9981e17ef3040af24d2dabad6b327f">CL_BUILD_PROGRAM_FAILURE</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Program build failure&quot;</span>;
-<a name="l00278"></a>00278         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a261a254c1ff5bf32d37adeecfba890fe">CL_MAP_FAILURE</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;Map failure&quot;</span>;
-<a name="l00279"></a>00279         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a8b326461b820145628c98153eaee3e10">CL_INVALID_VALUE</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid value&quot;</span>;
-<a name="l00280"></a>00280         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a94478a41e903bc09eb0717d9c559b7a1">CL_INVALID_DEVICE_TYPE</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid device type&quot;</span>;
-<a name="l00281"></a>00281         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad1b82f6a9569a424f0ef01a977135741">CL_INVALID_PLATFORM</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid platform&quot;</span>;
-<a name="l00282"></a>00282         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa0594fc4fa8ccc0ad1b03ee81f115c63">CL_INVALID_DEVICE</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid device&quot;</span>;
-<a name="l00283"></a>00283         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aca5e32a5a32d13fefed749af6e0d2637">CL_INVALID_CONTEXT</a>:                    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid context&quot;</span>;
-<a name="l00284"></a>00284         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a874c65a241a09445cbfbca637143d3d4">CL_INVALID_QUEUE_PROPERTIES</a>:           <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid queue properties&quot;</span>;
-<a name="l00285"></a>00285         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a83860164be464a89478a5065439561d5">CL_INVALID_COMMAND_QUEUE</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid command queue&quot;</span>;
-<a name="l00286"></a>00286         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a714b4faa69aa7d7796b696b04fdaef07">CL_INVALID_HOST_PTR</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid host pointer&quot;</span>;
-<a name="l00287"></a>00287         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a81088683f630d74d79b91ed905088fec">CL_INVALID_MEM_OBJECT</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid memory object&quot;</span>;
-<a name="l00288"></a>00288         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa256faae2dd7f80759f48b910157a231">CL_INVALID_IMAGE_FORMAT_DESCRIPTOR</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid image format descriptor&quot;</span>;
-<a name="l00289"></a>00289         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aee88b00f73caa39b9e231a97d2034cbf">CL_INVALID_IMAGE_SIZE</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid image size&quot;</span>;
-<a name="l00290"></a>00290         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a92e81a4961d354eee6cb6f95a37a5131">CL_INVALID_SAMPLER</a>:                    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid sampler&quot;</span>;
-<a name="l00291"></a>00291         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab4c38ad0b05a3268f93a7af198871567">CL_INVALID_BINARY</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid binary&quot;</span>;
-<a name="l00292"></a>00292         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ae79d5ac182093f383963ff70cf3ea689">CL_INVALID_BUILD_OPTIONS</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid build options&quot;</span>;
-<a name="l00293"></a>00293         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3ca47a98592d66d3db82141be6036f0d">CL_INVALID_PROGRAM</a>:                    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid program&quot;</span>;
-<a name="l00294"></a>00294         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2d7487296d2c9aa8ba2609dd07688989">CL_INVALID_PROGRAM_EXECUTABLE</a>:         <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid program executable&quot;</span>;
-<a name="l00295"></a>00295         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3e18e51a0431e3568f90a5fc25852036">CL_INVALID_KERNEL_NAME</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel name&quot;</span>;
-<a name="l00296"></a>00296         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa15d65bdd832c5473420bc528a2d4fa4">CL_INVALID_KERNEL_DEFINITION</a>:          <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel definition&quot;</span>;
-<a name="l00297"></a>00297         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a24f4e78b09bd6faf19d031d64c9183d0">CL_INVALID_KERNEL</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel&quot;</span>;
-<a name="l00298"></a>00298         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a0cb5f44806ed1ac269ee8150533741c4">CL_INVALID_ARG_INDEX</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid argument index&quot;</span>;
-<a name="l00299"></a>00299         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#af4bb87857d0a4483ade34d87137a72c9">CL_INVALID_ARG_VALUE</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid argument value&quot;</span>;
-<a name="l00300"></a>00300         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a29d8f6839c6eba56cac99234eaccb2d9">CL_INVALID_ARG_SIZE</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid argument size&quot;</span>;
-<a name="l00301"></a>00301         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a47e4b90ff4ee9594e6dd51e562b7e46c">CL_INVALID_KERNEL_ARGS</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel arguments&quot;</span>;
-<a name="l00302"></a>00302         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a00dc6fac757b7ca1220f09abb9da9dab">CL_INVALID_WORK_DIMENSION</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid work dimension&quot;</span>;
-<a name="l00303"></a>00303         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adf8ebec1f9179ad6a25a20c42be63e42">CL_INVALID_WORK_GROUP_SIZE</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid work group size&quot;</span>;
-<a name="l00304"></a>00304         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad401056e3d623cede58c3568e321b011">CL_INVALID_WORK_ITEM_SIZE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid work item size&quot;</span>;
-<a name="l00305"></a>00305         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#abb7da6def53fa3aeea3c7a4bcd4b5a5a">CL_INVALID_GLOBAL_OFFSET</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid global offset&quot;</span>;
-<a name="l00306"></a>00306         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ae03cee35dc497187895d6f897210bf6e">CL_INVALID_EVENT_WAIT_LIST</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid event wait list&quot;</span>;
-<a name="l00307"></a>00307         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a26d32102944347a69ae06d1a55aebe39">CL_INVALID_EVENT</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid event&quot;</span>;
-<a name="l00308"></a>00308         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad2a75cc7141ebf22241afe0c236354e2">CL_INVALID_OPERATION</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid operation&quot;</span>;
-<a name="l00309"></a>00309         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6a342ec00e0cf289833bc180aad305e7">CL_INVALID_GL_OBJECT</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid OpenGL object&quot;</span>;
-<a name="l00310"></a>00310         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adf6af715f5f27ff113e5da2f34c356c7">CL_INVALID_BUFFER_SIZE</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid buffer size&quot;</span>;
-<a name="l00311"></a>00311         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3a65413efb49842b93967810e2332723">CL_INVALID_MIP_LEVEL</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid mip-map level&quot;</span>;
-<a name="l00312"></a>00312         <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;
-<a name="l00313"></a>00313     }
-<a name="l00314"></a>00314 }
-<a name="l00315"></a>00315 
-<a name="l00316"></a>00316 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00317"></a>00317 
-<a name="l00318"></a><a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122">00318</a> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122" title="Converts cl_platform_info to a string.">OpenCL_utils::GetPlatformInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ad98cdc72ca4405d5bdeedc433b3dc451">cl_platform_info</a> i)
-<a name="l00319"></a>00319 {
-<a name="l00320"></a>00320     <span class="keywordflow">switch</span>(i)
-<a name="l00321"></a>00321     {
-<a name="l00322"></a>00322         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a28f84e7180309ccbca33d02d4c2f6fce">CL_PLATFORM_PROFILE</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_PROFILE&quot;</span>;
-<a name="l00323"></a>00323         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa22fdbfed8cb040b027285df2c56f34d">CL_PLATFORM_VERSION</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_VERSION&quot;</span>;
-<a name="l00324"></a>00324         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7721d27aacffe231bd96c763481bd7c9">CL_PLATFORM_NAME</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_NAME&quot;</span>;
-<a name="l00325"></a>00325         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9f1e19bbc9cbedae965d3d5ab84c99ea">CL_PLATFORM_VENDOR</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_VENDOR&quot;</span>;
-<a name="l00326"></a>00326         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a429d14eeed15c8f3dd1b9b8e09a4676e">CL_PLATFORM_EXTENSIONS</a>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_EXTENSIONS&quot;</span>;
-<a name="l00327"></a>00327         <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;
-<a name="l00328"></a>00328     }
-<a name="l00329"></a>00329 }
-<a name="l00330"></a>00330 
-<a name="l00331"></a>00331 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
-<a name="l00332"></a>00332 
-<a name="l00333"></a><a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041">00333</a> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">OpenCL_utils::GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> i)
-<a name="l00334"></a>00334 {
-<a name="l00335"></a>00335     <span class="keywordflow">switch</span>(i)
-<a name="l00336"></a>00336     {
-<a name="l00337"></a>00337         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a88e5387c43bc0d19b9f7f8c0211e2994">CL_DEVICE_TYPE</a>:                           <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_TYPE&quot;</span>;
-<a name="l00338"></a>00338         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab66733187fc357747da91708b411d7f1">CL_DEVICE_VENDOR_ID</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_VENDOR_ID&quot;</span>;
-<a name="l00339"></a>00339         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac997c9097e9c205285fef1c44f7b09d1">CL_DEVICE_MAX_COMPUTE_UNITS</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_COMPUTE_UNITS&quot;</span>;
-<a name="l00340"></a>00340         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9f1a14560f24157151c8bfec2ea93c2a">CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS&quot;</span>;
-<a name="l00341"></a>00341         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a85f0b0c5b569b78d6987ea0ab202de54">CL_DEVICE_MAX_WORK_GROUP_SIZE</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WORK_GROUP_SIZE&quot;</span>;
-<a name="l00342"></a>00342         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ade485e4470d51680c6fb586bcc3f4ea2">CL_DEVICE_MAX_WORK_ITEM_SIZES</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WORK_ITEM_SIZES&quot;</span>;
-<a name="l00343"></a>00343         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3a88b826165d553bb04053d69f832948">CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR&quot;</span>;
-<a name="l00344"></a>00344         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a277b59e4a07da047e3a68e58e806c208">CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT</a>:   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT&quot;</span>;
-<a name="l00345"></a>00345         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#af8f738c21bfcb93d8fbb040b498d4572">CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT&quot;</span>;
-<a name="l00346"></a>00346         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa95204d538ac78e8381cf42650aa2fe8">CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG&quot;</span>;
-<a name="l00347"></a>00347         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a4273a1c34fa38c329bf329ddfa79ac38">CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT</a>:   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT&quot;</span>;
-<a name="l00348"></a>00348         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa9c8cb31259de6ac689bf214013cc834">CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE</a>:  <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE&quot;</span>;
-<a name="l00349"></a>00349         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a943bf452641977e6c1734d1ebe19c6bc">CL_DEVICE_MAX_CLOCK_FREQUENCY</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_CLOCK_FREQUENCY&quot;</span>;
-<a name="l00350"></a>00350         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa5008870099bba4b6d69d69c29663ee1">CL_DEVICE_ADDRESS_BITS</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_ADDRESS_BITS&quot;</span>;
-<a name="l00351"></a>00351         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6f54a959aec901a982d82a9ffe2f8a22">CL_DEVICE_MAX_READ_IMAGE_ARGS</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_READ_IMAGE_ARGS&quot;</span>;
-<a name="l00352"></a>00352         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9fd6d2a388a0ba37a8946813b182144b">CL_DEVICE_MAX_WRITE_IMAGE_ARGS</a>:           <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WRITE_IMAGE_ARGS&quot;</span>;
-<a name="l00353"></a>00353         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6948c9585720bf6a29feda117f7995">CL_DEVICE_MAX_MEM_ALLOC_SIZE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_MEM_ALLOC_SIZE&quot;</span>;
-<a name="l00354"></a>00354         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2f08a4e880e76e1a85613ed2d4c40694">CL_DEVICE_IMAGE2D_MAX_WIDTH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE2D_MAX_WIDTH&quot;</span>;
-<a name="l00355"></a>00355         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6fdf9680b871ac77b1a107a18bc1e3a3">CL_DEVICE_IMAGE2D_MAX_HEIGHT</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE2D_MAX_HEIGHT&quot;</span>;
-<a name="l00356"></a>00356         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad10d5fd02c635d7591ead277f188fe28">CL_DEVICE_IMAGE3D_MAX_WIDTH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE3D_MAX_WIDTH&quot;</span>;
-<a name="l00357"></a>00357         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a05006ec68b9b0508ff66981f241bff5e">CL_DEVICE_IMAGE3D_MAX_HEIGHT</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE3D_MAX_HEIGHT&quot;</span>;
-<a name="l00358"></a>00358         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aaf240ea1fdd2b643df37b1a5d8472b5c">CL_DEVICE_IMAGE3D_MAX_DEPTH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE3D_MAX_DEPTH&quot;</span>;
-<a name="l00359"></a>00359         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adc306de94990f7d24e277af4f6c99d43">CL_DEVICE_IMAGE_SUPPORT</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE_SUPPORT&quot;</span>;
-<a name="l00360"></a>00360         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#afe3388a3f723f77801eedd6b4a2afb2e">CL_DEVICE_MAX_PARAMETER_SIZE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_PARAMETER_SIZE&quot;</span>;
-<a name="l00361"></a>00361         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7d601f44ac2dd1c4045d34cddab9920c">CL_DEVICE_MAX_SAMPLERS</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_SAMPLERS&quot;</span>;
-<a name="l00362"></a>00362         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ae95d7ca0646f0a6f93afac1a09f8fff0">CL_DEVICE_MEM_BASE_ADDR_ALIGN</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MEM_BASE_ADDR_ALIGN&quot;</span>;
-<a name="l00363"></a>00363         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a68a1909222396c3519c82c2dac525e49">CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE&quot;</span>;
-<a name="l00364"></a>00364         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa023e47f1aa245e23851c00c45fd098a">CL_DEVICE_SINGLE_FP_CONFIG</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_SINGLE_FP_CONFIG&quot;</span>;
-<a name="l00365"></a>00365         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6127c26495e7c47559ad13c7fa798ae3">CL_DEVICE_GLOBAL_MEM_CACHE_TYPE</a>:          <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_CACHE_TYPE&quot;</span>;
-<a name="l00366"></a>00366         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6f2dcf5cdb998718dfb6cd6355b379">CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE&quot;</span>;
-<a name="l00367"></a>00367         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab241a4e7ecac03fc2d5c5f4a681745fb">CL_DEVICE_GLOBAL_MEM_CACHE_SIZE</a>:          <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_CACHE_SIZE&quot;</span>;
-<a name="l00368"></a>00368         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3d39df3c0f4a7d4b23aad88de9b12fa4">CL_DEVICE_GLOBAL_MEM_SIZE</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_SIZE&quot;</span>;
-<a name="l00369"></a>00369         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5495195a5a5c9554dbda966f67f1a107">CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE&quot;</span>;
-<a name="l00370"></a>00370         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adb8065f02b580a44f2cfda6fa939d268">CL_DEVICE_MAX_CONSTANT_ARGS</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_CONSTANT_ARGS&quot;</span>;
-<a name="l00371"></a>00371         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac3858de07cd53a002cae04dabbe4b4be">CL_DEVICE_LOCAL_MEM_TYPE</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_LOCAL_MEM_TYPE&quot;</span>;
-<a name="l00372"></a>00372         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7edb0a7b869583f75c91651df73cbb27">CL_DEVICE_LOCAL_MEM_SIZE</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_LOCAL_MEM_SIZE&quot;</span>;
-<a name="l00373"></a>00373         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad1767a468cdcc7f6231a400f79543e6b">CL_DEVICE_ERROR_CORRECTION_SUPPORT</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_ERROR_CORRECTION_SUPPORT&quot;</span>;
-<a name="l00374"></a>00374         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#acb9159d1d293abe2b25712b0b2424bcc">CL_DEVICE_PROFILING_TIMER_RESOLUTION</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PROFILING_TIMER_RESOLUTION&quot;</span>;
-<a name="l00375"></a>00375         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad5db91e8f89ed5945bcdeada84601766">CL_DEVICE_ENDIAN_LITTLE</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_ENDIAN_LITTLE&quot;</span>;
-<a name="l00376"></a>00376         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a09d38f7f86dc4aa07ae68b2d4425dddd">CL_DEVICE_AVAILABLE</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_AVAILABLE&quot;</span>;
-<a name="l00377"></a>00377         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa488d95378ddf3573e9a3451afc6dd84">CL_DEVICE_COMPILER_AVAILABLE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_COMPILER_AVAILABLE&quot;</span>;
-<a name="l00378"></a>00378         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a67b397529da3ddc80e27aa1825284be3">CL_DEVICE_EXECUTION_CAPABILITIES</a>:         <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_EXECUTION_CAPABILITIES&quot;</span>;
-<a name="l00379"></a>00379         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6e2f8dfca8b553b0ca61d311ea11c012">CL_DEVICE_QUEUE_PROPERTIES</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_QUEUE_PROPERTIES&quot;</span>;
-<a name="l00380"></a>00380         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2d85fd4bd76635b9d62f568863349f0a">CL_DEVICE_NAME</a>:                           <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NAME&quot;</span>;
-<a name="l00381"></a>00381         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a47d21a8f1818ecc0f4451191fd678cf6">CL_DEVICE_VENDOR</a>:                         <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_VENDOR&quot;</span>;
-<a name="l00382"></a>00382         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad9c6d7144c3974b88f7d54976dc4b909">CL_DRIVER_VERSION</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DRIVER_VERSION&quot;</span>;
-<a name="l00383"></a>00383         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad70b200a567553e26eadc0c8134d5f66">CL_DEVICE_PROFILE</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PROFILE&quot;</span>;
-<a name="l00384"></a>00384         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a4cee8549bdffef2ad102fc4f9eeb9314">CL_DEVICE_VERSION</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_VERSION&quot;</span>;
-<a name="l00385"></a>00385         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9a2110903f2cc7f66eb3206c13252b5e">CL_DEVICE_EXTENSIONS</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_EXTENSIONS&quot;</span>;
-<a name="l00386"></a>00386         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a211314146298da16960b02b3e98203ee">CL_DEVICE_PLATFORM</a>:                       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PLATFORM&quot;</span>;
-<a name="l00387"></a>00387         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa37218d6028b77268883330bbcf74496">CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF&quot;</span>;
-<a name="l00388"></a>00388         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac2768310622db55155f7e27e01429f96">CL_DEVICE_HOST_UNIFIED_MEMORY</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_HOST_UNIFIED_MEMORY&quot;</span>;
-<a name="l00389"></a>00389         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a955337e96e8e0d8d8e865e153eca497e">CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR&quot;</span>;
-<a name="l00390"></a>00390         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2c9f6b52c36b9364cec8c52d4065d685">CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT&quot;</span>;
-<a name="l00391"></a>00391         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a553c5888f198859b3eac3f4f68b8b818">CL_DEVICE_NATIVE_VECTOR_WIDTH_INT</a>:        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_INT&quot;</span>;
-<a name="l00392"></a>00392         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a425a9d07e249f25986903bc58f884c32">CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG&quot;</span>;
-<a name="l00393"></a>00393         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a51bfb6f25936715a6bb0dc8cb09263e4">CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT&quot;</span>;
-<a name="l00394"></a>00394         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7d75f831df132cd53a24f3ca0ed030ce">CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE&quot;</span>;
-<a name="l00395"></a>00395         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5c72fe9a99b135b9b33e53cc53bb2d6d">CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF&quot;</span>;
-<a name="l00396"></a>00396         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#af27ce7119dd9c6bfae5ab5ec3e9d8b4a">CL_DEVICE_OPENCL_C_VERSION</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_OPENCL_C_VERSION&quot;</span>;
-<a name="l00397"></a>00397         <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;
-<a name="l00398"></a>00398     }
-<a name="l00399"></a>00399 }
-<a name="l00400"></a>00400 
-<a name="l00401"></a>00401 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00262"></a>00262     ostringstream oss;
+<a name="l00263"></a>00263     <span class="keyword">const</span> <span class="keywordtype">size_t</span> MAX_DEVICES = 10;
+<a name="l00264"></a>00264     <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
+<a name="l00265"></a>00265     cl_uint num_devices;
+<a name="l00266"></a>00266     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platforms_available[iPlatform],<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,
+<a name="l00267"></a>00267         MAX_DEVICES,devices_available,&amp;num_devices);
+<a name="l00268"></a>00268     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetDeviceDescription : clGetDeviceIDs failed: &quot;</span>);
+<a name="l00269"></a>00269     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a43365f8c5dc26c0fb309886db0fdd2aa">clGetDeviceInfo</a>(devices_available[iDevice],<a class="code" href="OpenCL__Dyn__Load_8h.html#a2d85fd4bd76635b9d62f568863349f0a">CL_DEVICE_NAME</a>,
+<a name="l00270"></a>00270         MAX_INFO_LENGTH,info,&amp;info_length);
+<a name="l00271"></a>00271     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_utils::GetDeviceDescription : clGetDeviceInfo failed: &quot;</span>);
+<a name="l00272"></a>00272     <span class="keywordtype">string</span> device_name = info;
+<a name="l00273"></a>00273     device_name = device_name.substr(device_name.find_first_not_of(<span class="stringliteral">&quot; \n\r\t&quot;</span>));
+<a name="l00274"></a>00274     oss &lt;&lt; device_name;
+<a name="l00275"></a>00275     <span class="keywordflow">return</span> oss.str();
+<a name="l00276"></a>00276 }
+<a name="l00277"></a>00277 
+<a name="l00278"></a>00278 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00279"></a>00279 
+<a name="l00280"></a><a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b">00280</a> cl_int <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">OpenCL_utils::LinkOpenCL</a>()
+<a name="l00281"></a>00281 {
+<a name="l00282"></a>00282 <span class="preprocessor">#ifdef __APPLE__</span>
+<a name="l00283"></a>00283 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>;
+<a name="l00284"></a>00284 <span class="preprocessor">#else</span>
+<a name="l00285"></a>00285 <span class="preprocessor"></span>    <span class="keywordflow">return</span> <a class="code" href="OpenCL__Dyn__Load_8c.html#ada1028462629c0bc598ad91f5996af04">clLibLoad</a>();
+<a name="l00286"></a>00286 <span class="preprocessor">#endif</span>
+<a name="l00287"></a>00287 <span class="preprocessor"></span>}
+<a name="l00288"></a>00288 
+<a name="l00289"></a>00289 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00290"></a>00290 
+<a name="l00291"></a>00291 <span class="comment">// http://www.khronos.org/message_boards/viewtopic.php?f=37&amp;t=2107</span>
+<a name="l00292"></a><a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45">00292</a> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45" title="Returns a description of the OpenCL error code.">OpenCL_utils::GetDescriptionOfOpenCLError</a>(cl_int err)
+<a name="l00293"></a>00293 {
+<a name="l00294"></a>00294     <span class="keywordflow">switch</span> (err) {
+<a name="l00295"></a>00295         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>:                            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Success!&quot;</span>;
+<a name="l00296"></a>00296         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a0bf212dc821aa0e9abdd1c5bc074aaa1">CL_DEVICE_NOT_FOUND</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Device not found.&quot;</span>;
+<a name="l00297"></a>00297         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a68aca49c4b464bd0d692cd9ea397acd4">CL_DEVICE_NOT_AVAILABLE</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;Device not available&quot;</span>;
+<a name="l00298"></a>00298         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab8423268f4e2a4fed4720647e21ad817">CL_COMPILER_NOT_AVAILABLE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;Compiler not available&quot;</span>;
+<a name="l00299"></a>00299         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3b88b4f40c5260152752fdbf648d63e6">CL_MEM_OBJECT_ALLOCATION_FAILURE</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;Memory object allocation failure&quot;</span>;
+<a name="l00300"></a>00300         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a96305d5e5479cc02c8a0e72016793fa6">CL_OUT_OF_RESOURCES</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Out of resources&quot;</span>;
+<a name="l00301"></a>00301         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad51674367572f46be65c19078ae039eb">CL_OUT_OF_HOST_MEMORY</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;Out of host memory&quot;</span>;
+<a name="l00302"></a>00302         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ada02865ea652de8774b9ffa85e57588c">CL_PROFILING_INFO_NOT_AVAILABLE</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;Profiling information not available&quot;</span>;
+<a name="l00303"></a>00303         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aaa273c20c3a8713b772a9a2294705886">CL_MEM_COPY_OVERLAP</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Memory copy overlap&quot;</span>;
+<a name="l00304"></a>00304         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a15e2625169ad0d34e0cb33792ce44527">CL_IMAGE_FORMAT_MISMATCH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Image format mismatch&quot;</span>;
+<a name="l00305"></a>00305         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac35f540118c8a516deb01bd04b219642">CL_IMAGE_FORMAT_NOT_SUPPORTED</a>:         <span class="keywordflow">return</span> <span class="stringliteral">&quot;Image format not supported&quot;</span>;
+<a name="l00306"></a>00306         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aba9981e17ef3040af24d2dabad6b327f">CL_BUILD_PROGRAM_FAILURE</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Program build failure&quot;</span>;
+<a name="l00307"></a>00307         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a261a254c1ff5bf32d37adeecfba890fe">CL_MAP_FAILURE</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;Map failure&quot;</span>;
+<a name="l00308"></a>00308         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a8b326461b820145628c98153eaee3e10">CL_INVALID_VALUE</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid value&quot;</span>;
+<a name="l00309"></a>00309         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a94478a41e903bc09eb0717d9c559b7a1">CL_INVALID_DEVICE_TYPE</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid device type&quot;</span>;
+<a name="l00310"></a>00310         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad1b82f6a9569a424f0ef01a977135741">CL_INVALID_PLATFORM</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid platform&quot;</span>;
+<a name="l00311"></a>00311         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa0594fc4fa8ccc0ad1b03ee81f115c63">CL_INVALID_DEVICE</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid device&quot;</span>;
+<a name="l00312"></a>00312         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aca5e32a5a32d13fefed749af6e0d2637">CL_INVALID_CONTEXT</a>:                    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid context&quot;</span>;
+<a name="l00313"></a>00313         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a874c65a241a09445cbfbca637143d3d4">CL_INVALID_QUEUE_PROPERTIES</a>:           <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid queue properties&quot;</span>;
+<a name="l00314"></a>00314         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a83860164be464a89478a5065439561d5">CL_INVALID_COMMAND_QUEUE</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid command queue&quot;</span>;
+<a name="l00315"></a>00315         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a714b4faa69aa7d7796b696b04fdaef07">CL_INVALID_HOST_PTR</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid host pointer&quot;</span>;
+<a name="l00316"></a>00316         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a81088683f630d74d79b91ed905088fec">CL_INVALID_MEM_OBJECT</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid memory object&quot;</span>;
+<a name="l00317"></a>00317         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa256faae2dd7f80759f48b910157a231">CL_INVALID_IMAGE_FORMAT_DESCRIPTOR</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid image format descriptor&quot;</span>;
+<a name="l00318"></a>00318         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aee88b00f73caa39b9e231a97d2034cbf">CL_INVALID_IMAGE_SIZE</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid image size&quot;</span>;
+<a name="l00319"></a>00319         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a92e81a4961d354eee6cb6f95a37a5131">CL_INVALID_SAMPLER</a>:                    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid sampler&quot;</span>;
+<a name="l00320"></a>00320         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab4c38ad0b05a3268f93a7af198871567">CL_INVALID_BINARY</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid binary&quot;</span>;
+<a name="l00321"></a>00321         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ae79d5ac182093f383963ff70cf3ea689">CL_INVALID_BUILD_OPTIONS</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid build options&quot;</span>;
+<a name="l00322"></a>00322         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3ca47a98592d66d3db82141be6036f0d">CL_INVALID_PROGRAM</a>:                    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid program&quot;</span>;
+<a name="l00323"></a>00323         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2d7487296d2c9aa8ba2609dd07688989">CL_INVALID_PROGRAM_EXECUTABLE</a>:         <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid program executable&quot;</span>;
+<a name="l00324"></a>00324         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3e18e51a0431e3568f90a5fc25852036">CL_INVALID_KERNEL_NAME</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel name&quot;</span>;
+<a name="l00325"></a>00325         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa15d65bdd832c5473420bc528a2d4fa4">CL_INVALID_KERNEL_DEFINITION</a>:          <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel definition&quot;</span>;
+<a name="l00326"></a>00326         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a24f4e78b09bd6faf19d031d64c9183d0">CL_INVALID_KERNEL</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel&quot;</span>;
+<a name="l00327"></a>00327         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a0cb5f44806ed1ac269ee8150533741c4">CL_INVALID_ARG_INDEX</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid argument index&quot;</span>;
+<a name="l00328"></a>00328         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#af4bb87857d0a4483ade34d87137a72c9">CL_INVALID_ARG_VALUE</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid argument value&quot;</span>;
+<a name="l00329"></a>00329         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a29d8f6839c6eba56cac99234eaccb2d9">CL_INVALID_ARG_SIZE</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid argument size&quot;</span>;
+<a name="l00330"></a>00330         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a47e4b90ff4ee9594e6dd51e562b7e46c">CL_INVALID_KERNEL_ARGS</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid kernel arguments&quot;</span>;
+<a name="l00331"></a>00331         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a00dc6fac757b7ca1220f09abb9da9dab">CL_INVALID_WORK_DIMENSION</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid work dimension&quot;</span>;
+<a name="l00332"></a>00332         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adf8ebec1f9179ad6a25a20c42be63e42">CL_INVALID_WORK_GROUP_SIZE</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid work group size&quot;</span>;
+<a name="l00333"></a>00333         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad401056e3d623cede58c3568e321b011">CL_INVALID_WORK_ITEM_SIZE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid work item size&quot;</span>;
+<a name="l00334"></a>00334         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#abb7da6def53fa3aeea3c7a4bcd4b5a5a">CL_INVALID_GLOBAL_OFFSET</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid global offset&quot;</span>;
+<a name="l00335"></a>00335         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ae03cee35dc497187895d6f897210bf6e">CL_INVALID_EVENT_WAIT_LIST</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid event wait list&quot;</span>;
+<a name="l00336"></a>00336         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a26d32102944347a69ae06d1a55aebe39">CL_INVALID_EVENT</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid event&quot;</span>;
+<a name="l00337"></a>00337         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad2a75cc7141ebf22241afe0c236354e2">CL_INVALID_OPERATION</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid operation&quot;</span>;
+<a name="l00338"></a>00338         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6a342ec00e0cf289833bc180aad305e7">CL_INVALID_GL_OBJECT</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid OpenGL object&quot;</span>;
+<a name="l00339"></a>00339         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adf6af715f5f27ff113e5da2f34c356c7">CL_INVALID_BUFFER_SIZE</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid buffer size&quot;</span>;
+<a name="l00340"></a>00340         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3a65413efb49842b93967810e2332723">CL_INVALID_MIP_LEVEL</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;Invalid mip-map level&quot;</span>;
+<a name="l00341"></a>00341         <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;
+<a name="l00342"></a>00342     }
+<a name="l00343"></a>00343 }
+<a name="l00344"></a>00344 
+<a name="l00345"></a>00345 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00346"></a>00346 
+<a name="l00347"></a><a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122">00347</a> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122" title="Converts cl_platform_info to a string.">OpenCL_utils::GetPlatformInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ad98cdc72ca4405d5bdeedc433b3dc451">cl_platform_info</a> i)
+<a name="l00348"></a>00348 {
+<a name="l00349"></a>00349     <span class="keywordflow">switch</span>(i)
+<a name="l00350"></a>00350     {
+<a name="l00351"></a>00351         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a28f84e7180309ccbca33d02d4c2f6fce">CL_PLATFORM_PROFILE</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_PROFILE&quot;</span>;
+<a name="l00352"></a>00352         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa22fdbfed8cb040b027285df2c56f34d">CL_PLATFORM_VERSION</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_VERSION&quot;</span>;
+<a name="l00353"></a>00353         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7721d27aacffe231bd96c763481bd7c9">CL_PLATFORM_NAME</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_NAME&quot;</span>;
+<a name="l00354"></a>00354         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9f1e19bbc9cbedae965d3d5ab84c99ea">CL_PLATFORM_VENDOR</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_VENDOR&quot;</span>;
+<a name="l00355"></a>00355         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a429d14eeed15c8f3dd1b9b8e09a4676e">CL_PLATFORM_EXTENSIONS</a>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_PLATFORM_EXTENSIONS&quot;</span>;
+<a name="l00356"></a>00356         <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;
+<a name="l00357"></a>00357     }
+<a name="l00358"></a>00358 }
+<a name="l00359"></a>00359 
+<a name="l00360"></a>00360 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00361"></a>00361 
+<a name="l00362"></a><a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041">00362</a> <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">OpenCL_utils::GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> i)
+<a name="l00363"></a>00363 {
+<a name="l00364"></a>00364     <span class="keywordflow">switch</span>(i)
+<a name="l00365"></a>00365     {
+<a name="l00366"></a>00366         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a88e5387c43bc0d19b9f7f8c0211e2994">CL_DEVICE_TYPE</a>:                           <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_TYPE&quot;</span>;
+<a name="l00367"></a>00367         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab66733187fc357747da91708b411d7f1">CL_DEVICE_VENDOR_ID</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_VENDOR_ID&quot;</span>;
+<a name="l00368"></a>00368         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac997c9097e9c205285fef1c44f7b09d1">CL_DEVICE_MAX_COMPUTE_UNITS</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_COMPUTE_UNITS&quot;</span>;
+<a name="l00369"></a>00369         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9f1a14560f24157151c8bfec2ea93c2a">CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS&quot;</span>;
+<a name="l00370"></a>00370         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a85f0b0c5b569b78d6987ea0ab202de54">CL_DEVICE_MAX_WORK_GROUP_SIZE</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WORK_GROUP_SIZE&quot;</span>;
+<a name="l00371"></a>00371         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ade485e4470d51680c6fb586bcc3f4ea2">CL_DEVICE_MAX_WORK_ITEM_SIZES</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WORK_ITEM_SIZES&quot;</span>;
+<a name="l00372"></a>00372         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3a88b826165d553bb04053d69f832948">CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR&quot;</span>;
+<a name="l00373"></a>00373         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a277b59e4a07da047e3a68e58e806c208">CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT</a>:   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT&quot;</span>;
+<a name="l00374"></a>00374         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#af8f738c21bfcb93d8fbb040b498d4572">CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT&quot;</span>;
+<a name="l00375"></a>00375         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa95204d538ac78e8381cf42650aa2fe8">CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG&quot;</span>;
+<a name="l00376"></a>00376         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a4273a1c34fa38c329bf329ddfa79ac38">CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT</a>:   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT&quot;</span>;
+<a name="l00377"></a>00377         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa9c8cb31259de6ac689bf214013cc834">CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE</a>:  <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE&quot;</span>;
+<a name="l00378"></a>00378         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a943bf452641977e6c1734d1ebe19c6bc">CL_DEVICE_MAX_CLOCK_FREQUENCY</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_CLOCK_FREQUENCY&quot;</span>;
+<a name="l00379"></a>00379         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa5008870099bba4b6d69d69c29663ee1">CL_DEVICE_ADDRESS_BITS</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_ADDRESS_BITS&quot;</span>;
+<a name="l00380"></a>00380         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6f54a959aec901a982d82a9ffe2f8a22">CL_DEVICE_MAX_READ_IMAGE_ARGS</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_READ_IMAGE_ARGS&quot;</span>;
+<a name="l00381"></a>00381         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9fd6d2a388a0ba37a8946813b182144b">CL_DEVICE_MAX_WRITE_IMAGE_ARGS</a>:           <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_WRITE_IMAGE_ARGS&quot;</span>;
+<a name="l00382"></a>00382         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6948c9585720bf6a29feda117f7995">CL_DEVICE_MAX_MEM_ALLOC_SIZE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_MEM_ALLOC_SIZE&quot;</span>;
+<a name="l00383"></a>00383         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2f08a4e880e76e1a85613ed2d4c40694">CL_DEVICE_IMAGE2D_MAX_WIDTH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE2D_MAX_WIDTH&quot;</span>;
+<a name="l00384"></a>00384         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6fdf9680b871ac77b1a107a18bc1e3a3">CL_DEVICE_IMAGE2D_MAX_HEIGHT</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE2D_MAX_HEIGHT&quot;</span>;
+<a name="l00385"></a>00385         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad10d5fd02c635d7591ead277f188fe28">CL_DEVICE_IMAGE3D_MAX_WIDTH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE3D_MAX_WIDTH&quot;</span>;
+<a name="l00386"></a>00386         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a05006ec68b9b0508ff66981f241bff5e">CL_DEVICE_IMAGE3D_MAX_HEIGHT</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE3D_MAX_HEIGHT&quot;</span>;
+<a name="l00387"></a>00387         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aaf240ea1fdd2b643df37b1a5d8472b5c">CL_DEVICE_IMAGE3D_MAX_DEPTH</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE3D_MAX_DEPTH&quot;</span>;
+<a name="l00388"></a>00388         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adc306de94990f7d24e277af4f6c99d43">CL_DEVICE_IMAGE_SUPPORT</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_IMAGE_SUPPORT&quot;</span>;
+<a name="l00389"></a>00389         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#afe3388a3f723f77801eedd6b4a2afb2e">CL_DEVICE_MAX_PARAMETER_SIZE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_PARAMETER_SIZE&quot;</span>;
+<a name="l00390"></a>00390         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7d601f44ac2dd1c4045d34cddab9920c">CL_DEVICE_MAX_SAMPLERS</a>:                   <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_SAMPLERS&quot;</span>;
+<a name="l00391"></a>00391         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ae95d7ca0646f0a6f93afac1a09f8fff0">CL_DEVICE_MEM_BASE_ADDR_ALIGN</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MEM_BASE_ADDR_ALIGN&quot;</span>;
+<a name="l00392"></a>00392         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a68a1909222396c3519c82c2dac525e49">CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE&quot;</span>;
+<a name="l00393"></a>00393         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa023e47f1aa245e23851c00c45fd098a">CL_DEVICE_SINGLE_FP_CONFIG</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_SINGLE_FP_CONFIG&quot;</span>;
+<a name="l00394"></a>00394         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6127c26495e7c47559ad13c7fa798ae3">CL_DEVICE_GLOBAL_MEM_CACHE_TYPE</a>:          <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_CACHE_TYPE&quot;</span>;
+<a name="l00395"></a>00395         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5a6f2dcf5cdb998718dfb6cd6355b379">CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE&quot;</span>;
+<a name="l00396"></a>00396         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ab241a4e7ecac03fc2d5c5f4a681745fb">CL_DEVICE_GLOBAL_MEM_CACHE_SIZE</a>:          <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_CACHE_SIZE&quot;</span>;
+<a name="l00397"></a>00397         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a3d39df3c0f4a7d4b23aad88de9b12fa4">CL_DEVICE_GLOBAL_MEM_SIZE</a>:                <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_GLOBAL_MEM_SIZE&quot;</span>;
+<a name="l00398"></a>00398         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5495195a5a5c9554dbda966f67f1a107">CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE&quot;</span>;
+<a name="l00399"></a>00399         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#adb8065f02b580a44f2cfda6fa939d268">CL_DEVICE_MAX_CONSTANT_ARGS</a>:              <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_MAX_CONSTANT_ARGS&quot;</span>;
+<a name="l00400"></a>00400         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac3858de07cd53a002cae04dabbe4b4be">CL_DEVICE_LOCAL_MEM_TYPE</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_LOCAL_MEM_TYPE&quot;</span>;
+<a name="l00401"></a>00401         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7edb0a7b869583f75c91651df73cbb27">CL_DEVICE_LOCAL_MEM_SIZE</a>:                 <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_LOCAL_MEM_SIZE&quot;</span>;
+<a name="l00402"></a>00402         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad1767a468cdcc7f6231a400f79543e6b">CL_DEVICE_ERROR_CORRECTION_SUPPORT</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_ERROR_CORRECTION_SUPPORT&quot;</span>;
+<a name="l00403"></a>00403         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#acb9159d1d293abe2b25712b0b2424bcc">CL_DEVICE_PROFILING_TIMER_RESOLUTION</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PROFILING_TIMER_RESOLUTION&quot;</span>;
+<a name="l00404"></a>00404         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad5db91e8f89ed5945bcdeada84601766">CL_DEVICE_ENDIAN_LITTLE</a>:                  <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_ENDIAN_LITTLE&quot;</span>;
+<a name="l00405"></a>00405         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a09d38f7f86dc4aa07ae68b2d4425dddd">CL_DEVICE_AVAILABLE</a>:                      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_AVAILABLE&quot;</span>;
+<a name="l00406"></a>00406         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa488d95378ddf3573e9a3451afc6dd84">CL_DEVICE_COMPILER_AVAILABLE</a>:             <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_COMPILER_AVAILABLE&quot;</span>;
+<a name="l00407"></a>00407         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a67b397529da3ddc80e27aa1825284be3">CL_DEVICE_EXECUTION_CAPABILITIES</a>:         <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_EXECUTION_CAPABILITIES&quot;</span>;
+<a name="l00408"></a>00408         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a6e2f8dfca8b553b0ca61d311ea11c012">CL_DEVICE_QUEUE_PROPERTIES</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_QUEUE_PROPERTIES&quot;</span>;
+<a name="l00409"></a>00409         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2d85fd4bd76635b9d62f568863349f0a">CL_DEVICE_NAME</a>:                           <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NAME&quot;</span>;
+<a name="l00410"></a>00410         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a47d21a8f1818ecc0f4451191fd678cf6">CL_DEVICE_VENDOR</a>:                         <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_VENDOR&quot;</span>;
+<a name="l00411"></a>00411         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad9c6d7144c3974b88f7d54976dc4b909">CL_DRIVER_VERSION</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DRIVER_VERSION&quot;</span>;
+<a name="l00412"></a>00412         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ad70b200a567553e26eadc0c8134d5f66">CL_DEVICE_PROFILE</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PROFILE&quot;</span>;
+<a name="l00413"></a>00413         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a4cee8549bdffef2ad102fc4f9eeb9314">CL_DEVICE_VERSION</a>:                        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_VERSION&quot;</span>;
+<a name="l00414"></a>00414         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a9a2110903f2cc7f66eb3206c13252b5e">CL_DEVICE_EXTENSIONS</a>:                     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_EXTENSIONS&quot;</span>;
+<a name="l00415"></a>00415         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a211314146298da16960b02b3e98203ee">CL_DEVICE_PLATFORM</a>:                       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PLATFORM&quot;</span>;
+<a name="l00416"></a>00416         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#aa37218d6028b77268883330bbcf74496">CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF</a>:    <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF&quot;</span>;
+<a name="l00417"></a>00417         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#ac2768310622db55155f7e27e01429f96">CL_DEVICE_HOST_UNIFIED_MEMORY</a>:            <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_HOST_UNIFIED_MEMORY&quot;</span>;
+<a name="l00418"></a>00418         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a955337e96e8e0d8d8e865e153eca497e">CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR&quot;</span>;
+<a name="l00419"></a>00419         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a2c9f6b52c36b9364cec8c52d4065d685">CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT&quot;</span>;
+<a name="l00420"></a>00420         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a553c5888f198859b3eac3f4f68b8b818">CL_DEVICE_NATIVE_VECTOR_WIDTH_INT</a>:        <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_INT&quot;</span>;
+<a name="l00421"></a>00421         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a425a9d07e249f25986903bc58f884c32">CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG&quot;</span>;
+<a name="l00422"></a>00422         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a51bfb6f25936715a6bb0dc8cb09263e4">CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT</a>:      <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT&quot;</span>;
+<a name="l00423"></a>00423         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a7d75f831df132cd53a24f3ca0ed030ce">CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE</a>:     <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE&quot;</span>;
+<a name="l00424"></a>00424         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#a5c72fe9a99b135b9b33e53cc53bb2d6d">CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF</a>:       <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF&quot;</span>;
+<a name="l00425"></a>00425         <span class="keywordflow">case</span> <a class="code" href="OpenCL__Dyn__Load_8h.html#af27ce7119dd9c6bfae5ab5ec3e9d8b4a">CL_DEVICE_OPENCL_C_VERSION</a>:               <span class="keywordflow">return</span> <span class="stringliteral">&quot;CL_DEVICE_OPENCL_C_VERSION&quot;</span>;
+<a name="l00426"></a>00426         <span class="keywordflow">default</span>: <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;
+<a name="l00427"></a>00427     }
+<a name="l00428"></a>00428 }
+<a name="l00429"></a>00429 
+<a name="l00430"></a>00430 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

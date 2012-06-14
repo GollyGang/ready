@@ -123,12 +123,14 @@ Inheritance diagram for FullKernelOpenCLMeshRD:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5302cae9c103705a6188cb8962317581"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLMeshRD.html#a5302cae9c103705a6188cb8962317581">FullKernelOpenCLMeshRD</a> ()</td></tr>
+<tr class="memitem:a67c7998870d5a8a096419da67c294d8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLMeshRD.html#a67c7998870d5a8a096419da67c294d8e">FullKernelOpenCLMeshRD</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
 <tr class="memitem:aa47a0c34eaf69110b4198ea2a95f8eb4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLMeshRD.html#aa47a0c34eaf69110b4198ea2a95f8eb4">InitializeFromXML</a> (vtkXMLDataElement *rd, bool &amp;warn_to_update)</td></tr>
+<tr class="memdesc:aa47a0c34eaf69110b4198ea2a95f8eb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load this pattern from an RD element.  <a href="#aa47a0c34eaf69110b4198ea2a95f8eb4"></a><br/></td></tr>
 <tr class="memitem:a162a4a8d4a79d71e57cd2c6b3c49f617"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
 &lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLMeshRD.html#a162a4a8d4a79d71e57cd2c6b3c49f617">GetAsXML</a> () const </td></tr>
+<tr class="memdesc:a162a4a8d4a79d71e57cd2c6b3c49f617"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a162a4a8d4a79d71e57cd2c6b3c49f617"></a><br/></td></tr>
 <tr class="memitem:a26da17c8cb1d25a0aaf870babf66d880"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLMeshRD.html#a26da17c8cb1d25a0aaf870babf66d880">GetRuleType</a> () const </td></tr>
-<tr class="memdesc:a26da17c8cb1d25a0aaf870babf66d880"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns e.g. "inbuilt", "formula", "kernel", as in the XML  <a href="#a26da17c8cb1d25a0aaf870babf66d880"></a><br/></td></tr>
+<tr class="memdesc:a26da17c8cb1d25a0aaf870babf66d880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#a26da17c8cb1d25a0aaf870babf66d880"></a><br/></td></tr>
 <tr class="memitem:a1ee9ef955cbcac6f8199fabea04a3371"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLMeshRD.html#a1ee9ef955cbcac6f8199fabea04a3371">AssembleKernelSourceFromFormula</a> (std::string <a class="el" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a>) const </td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
@@ -136,15 +138,26 @@ Public Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8hpp_source.html#l00022">22</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8hpp_source.html">FullKernelOpenCLMeshRD.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a5302cae9c103705a6188cb8962317581"></a>
+<a class="anchor" id="a67c7998870d5a8a096419da67c294d8e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classFullKernelOpenCLMeshRD.html#a5302cae9c103705a6188cb8962317581">FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD</a> </td>
+          <td class="memname"><a class="el" href="classFullKernelOpenCLMeshRD.html#a67c7998870d5a8a096419da67c294d8e">FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_platform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_device</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
@@ -172,7 +185,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html#l00039">39</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html">FullKernelOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html#l00040">40</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html">FullKernelOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -190,9 +203,11 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Retrieve an RD element for this pattern, suitable for saving to file. </p>
+
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html#l00068">68</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html">FullKernelOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html#l00069">69</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html">FullKernelOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -210,7 +225,7 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>returns e.g. "inbuilt", "formula", "kernel", as in the XML </p>
+<p>Returns e.g. "inbuilt", "formula", "kernel", as in the XML. </p>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#a5f62de46848365e6d77e6ea1b7cc23d6">MeshRD</a>.</p>
 
@@ -243,9 +258,11 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Load this pattern from an RD element. </p>
+
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html#l00046">46</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html">FullKernelOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html#l00047">47</a> of file <a class="el" href="FullKernelOpenCLMeshRD_8cpp_source.html">FullKernelOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +274,7 @@ Public Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

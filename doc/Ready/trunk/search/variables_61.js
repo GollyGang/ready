@@ -10,5 +10,7 @@ var searchData=
   ['askonnew',['askonnew',['../prefs_8cpp.html#af99b0c2f2338ed759034777927bd3101',1,'askonnew():&#160;prefs.cpp'],['../prefs_8hpp.html#af99b0c2f2338ed759034777927bd3101',1,'askonnew():&#160;prefs.cpp']]],
   ['askonquit',['askonquit',['../prefs_8cpp.html#a0498f5ccb6ca073727aa39f77e82660b',1,'askonquit():&#160;prefs.cpp'],['../prefs_8hpp.html#a0498f5ccb6ca073727aa39f77e82660b',1,'askonquit():&#160;prefs.cpp']]],
   ['aui_5fmgr',['aui_mgr',['../classMyFrame.html#abf9f45d8ca80d5bca40f853dea878e5c',1,'MyFrame']]],
-  ['auilayout',['auilayout',['../prefs_8cpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp'],['../prefs_8hpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp']]]
+  ['auilayout',['auilayout',['../prefs_8cpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp'],['../prefs_8hpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp']]],
+  ['ax',['ax',['../structTri.html#a33f4dd72d19b2bf1f6b3e4c1b4eccdd3',1,'Tri']]],
+  ['ay',['ay',['../structTri.html#a8ebb57399125cce54f42601e1f85af35',1,'Tri']]]
 ];

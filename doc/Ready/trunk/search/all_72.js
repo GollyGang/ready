@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['radialgradient',['RadialGradient',['../classRadialGradient.html',1,'RadialGradient'],['../classRadialGradient.html#aa537b3da9dd1bdcc682e5b75c860de15',1,'RadialGradient::RadialGradient()']]],
   ['radius',['radius',['../classCircle.html#a47644132ec8bec0f3a4e8d0e15bcd5d3',1,'Circle']]],
   ['rd_5fxmlimagereader',['RD_XMLImageReader',['../classRD__XMLImageReader.html',1,'RD_XMLImageReader'],['../classRD__XMLImageReader.html#a04216d87853aabc2fa817e370079541b',1,'RD_XMLImageReader::RD_XMLImageReader()']]],
   ['rd_5fxmlimagewriter',['RD_XMLImageWriter',['../classRD__XMLImageWriter.html',1,'RD_XMLImageWriter'],['../classRD__XMLImageWriter.html#abcad230bb87b7162f5cf7f140ff2669c',1,'RD_XMLImageWriter::RD_XMLImageWriter()']]],
@@ -14,11 +15,12 @@ var searchData=
   ['recordframe',['RecordFrame',['../classMyFrame.html#ab85937d2dd40e771a900c367dda30085',1,'MyFrame']]],
   ['recording_5fextension',['recording_extension',['../classMyFrame.html#a6cfd83bee452962b99b71bbe0650ddb1',1,'MyFrame::recording_extension()'],['../classRecordingDialog.html#a8577bc91b2ff2c3d62574b73c2e1cc61',1,'RecordingDialog::recording_extension()']]],
   ['recording_5fprefix',['recording_prefix',['../classMyFrame.html#a76c91777f5933c8cfa09b6d320910793',1,'MyFrame::recording_prefix()'],['../classRecordingDialog.html#a5bc47a8b3ad70f9999ed86b153d9b08b',1,'RecordingDialog::recording_prefix()']]],
-  ['recordingdialog',['RecordingDialog',['../classRecordingDialog.html',1,'RecordingDialog'],['../classRecordingDialog.html#ad36ea998e1fe7904afb7c58fc4fc725e',1,'RecordingDialog::RecordingDialog()']]],
+  ['recordingdialog',['RecordingDialog',['../classRecordingDialog.html',1,'RecordingDialog'],['../classRecordingDialog.html#a6aea8add1e0da9cb26e8219a5110dd1a',1,'RecordingDialog::RecordingDialog()']]],
   ['recordingdialog_2ecpp',['RecordingDialog.cpp',['../RecordingDialog_8cpp.html',1,'']]],
   ['recordingdialog_2ehpp',['RecordingDialog.hpp',['../RecordingDialog_8hpp.html',1,'']]],
   ['recordingdir',['recordingdir',['../prefs_8cpp.html#ab452266aeee4716a62c33d520df9ba7f',1,'recordingdir():&#160;prefs.cpp'],['../prefs_8hpp.html#ab452266aeee4716a62c33d520df9ba7f',1,'recordingdir():&#160;prefs.cpp']]],
   ['rectangle',['Rectangle',['../classRectangle.html',1,'Rectangle'],['../classRectangle.html#a89135f9b37443c7ae6621fccb49a17b4',1,'Rectangle::Rectangle()']]],
+  ['releaseopenclbuffers',['ReleaseOpenCLBuffers',['../classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9',1,'OpenCL_MixIn::ReleaseOpenCLBuffers()'],['../classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9',1,'OpenCLMeshRD::ReleaseOpenCLBuffers()']]],
   ['reloadcontextifneeded',['ReloadContextIfNeeded',['../classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c',1,'OpenCL_MixIn']]],
   ['reloadfromdisk',['ReloadFromDisk',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ae7bda90ebbf43016198827042d4096a6',1,'ID']]],
   ['reloadkernelifneeded',['ReloadKernelIfNeeded',['../classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011',1,'OpenCL_MixIn::ReloadKernelIfNeeded()'],['../classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a',1,'OpenCLImageRD::ReloadKernelIfNeeded()'],['../classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd',1,'OpenCLMeshRD::ReloadKernelIfNeeded()']]],

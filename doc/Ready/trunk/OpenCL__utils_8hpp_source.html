@@ -146,41 +146,44 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00042"></a>00042 <span class="comment">/// Utilities for working with OpenCL.</span>
 <a name="l00043"></a><a class="code" href="namespaceOpenCL__utils.html">00043</a> <span class="comment"></span><span class="keyword">namespace </span>OpenCL_utils
 <a name="l00044"></a>00044 {<span class="comment"></span>
-<a name="l00045"></a>00045 <span class="comment">    /// Returns a full report on the available OpenCL devices.</span>
-<a name="l00046"></a>00046 <span class="comment"></span>    std::string <a class="code" href="namespaceOpenCL__utils.html#af6a3ee46b7c1f42b9f5a18d9de6b5f10" title="Returns a full report on the available OpenCL devices.">GetOpenCLDiagnostics</a>();
-<a name="l00047"></a>00047 <span class="comment"></span>
-<a name="l00048"></a>00048 <span class="comment">    /// Returns the number of OpenCL platforms (from vendors) that are available.</span>
-<a name="l00049"></a>00049 <span class="comment"></span>    <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#a17e5ec4397c2d70c8430f17ec53d83d5" title="Returns the number of OpenCL platforms (from vendors) that are available.">GetNumberOfPlatforms</a>();
+<a name="l00045"></a>00045 <span class="comment">        /// Determines whether at least one OpenCL device is available.</span>
+<a name="l00046"></a>00046 <span class="comment"></span>        <span class="keywordtype">bool</span> <a class="code" href="namespaceOpenCL__utils.html#a426b51800ee7948af966128dffb3890e" title="Determines whether at least one OpenCL device is available.">IsOpenCLAvailable</a>();
+<a name="l00047"></a>00047         <span class="comment"></span>
+<a name="l00048"></a>00048 <span class="comment">    /// Returns a full report on the available OpenCL devices.</span>
+<a name="l00049"></a>00049 <span class="comment"></span>    std::string <a class="code" href="namespaceOpenCL__utils.html#af6a3ee46b7c1f42b9f5a18d9de6b5f10" title="Returns a full report on the available OpenCL devices.">GetOpenCLDiagnostics</a>();
 <a name="l00050"></a>00050 <span class="comment"></span>
-<a name="l00051"></a>00051 <span class="comment">    /// Returns the number of OpenCL devices available on this platform.</span>
-<a name="l00052"></a>00052 <span class="comment"></span>    <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#ae182ffd5ff716e80e9d19dd3b2409daf" title="Returns the number of OpenCL devices available on this platform.">GetNumberOfDevices</a>(<span class="keywordtype">int</span> iPlatform);
+<a name="l00051"></a>00051 <span class="comment">    /// Returns the number of OpenCL platforms (from vendors) that are available.</span>
+<a name="l00052"></a>00052 <span class="comment"></span>    <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#a17e5ec4397c2d70c8430f17ec53d83d5" title="Returns the number of OpenCL platforms (from vendors) that are available.">GetNumberOfPlatforms</a>();
 <a name="l00053"></a>00053 <span class="comment"></span>
-<a name="l00054"></a>00054 <span class="comment">    /// Returns a description of this platform.</span>
-<a name="l00055"></a>00055 <span class="comment"></span>    std::string <a class="code" href="namespaceOpenCL__utils.html#a8d16f21d70ff47eeeefa7f8b3f3e897c" title="Returns a description of this platform.">GetPlatformDescription</a>(<span class="keywordtype">int</span> iPlatform);
+<a name="l00054"></a>00054 <span class="comment">    /// Returns the number of OpenCL devices available on this platform.</span>
+<a name="l00055"></a>00055 <span class="comment"></span>    <span class="keywordtype">int</span> <a class="code" href="namespaceOpenCL__utils.html#ae182ffd5ff716e80e9d19dd3b2409daf" title="Returns the number of OpenCL devices available on this platform.">GetNumberOfDevices</a>(<span class="keywordtype">int</span> iPlatform);
 <a name="l00056"></a>00056 <span class="comment"></span>
-<a name="l00057"></a>00057 <span class="comment">    /// Returns a description of this device.</span>
-<a name="l00058"></a>00058 <span class="comment"></span>    std::string <a class="code" href="namespaceOpenCL__utils.html#a7ad04228a76befc69c19c55b15aca091" title="Returns a description of this device.">GetDeviceDescription</a>(<span class="keywordtype">int</span> iPlatform,<span class="keywordtype">int</span> iDevice);
+<a name="l00057"></a>00057 <span class="comment">    /// Returns a description of this platform.</span>
+<a name="l00058"></a>00058 <span class="comment"></span>    std::string <a class="code" href="namespaceOpenCL__utils.html#a8d16f21d70ff47eeeefa7f8b3f3e897c" title="Returns a description of this platform.">GetPlatformDescription</a>(<span class="keywordtype">int</span> iPlatform);
 <a name="l00059"></a>00059 <span class="comment"></span>
-<a name="l00060"></a>00060 <span class="comment">    /// Returns a description of the OpenCL error code.</span>
-<a name="l00061"></a>00061 <span class="comment"></span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45" title="Returns a description of the OpenCL error code.">GetDescriptionOfOpenCLError</a>(cl_int err);
+<a name="l00060"></a>00060 <span class="comment">    /// Returns a description of this device.</span>
+<a name="l00061"></a>00061 <span class="comment"></span>    std::string <a class="code" href="namespaceOpenCL__utils.html#a7ad04228a76befc69c19c55b15aca091" title="Returns a description of this device.">GetDeviceDescription</a>(<span class="keywordtype">int</span> iPlatform,<span class="keywordtype">int</span> iDevice);
 <a name="l00062"></a>00062 <span class="comment"></span>
-<a name="l00063"></a>00063 <span class="comment">    /// Converts cl_platform_info to a string.</span>
-<a name="l00064"></a>00064 <span class="comment"></span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122" title="Converts cl_platform_info to a string.">GetPlatformInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ad98cdc72ca4405d5bdeedc433b3dc451">cl_platform_info</a> i);
+<a name="l00063"></a>00063 <span class="comment">    /// Returns a description of the OpenCL error code.</span>
+<a name="l00064"></a>00064 <span class="comment"></span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#a4e863d52359543642e66125f722f0d45" title="Returns a description of the OpenCL error code.">GetDescriptionOfOpenCLError</a>(cl_int err);
 <a name="l00065"></a>00065 <span class="comment"></span>
-<a name="l00066"></a>00066 <span class="comment">    /// Converts cl_device_info to a string.</span>
-<a name="l00067"></a>00067 <span class="comment"></span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> i);
+<a name="l00066"></a>00066 <span class="comment">    /// Converts cl_platform_info to a string.</span>
+<a name="l00067"></a>00067 <span class="comment"></span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#aa1ae2f8ee6fe859105d1f63c4d85d122" title="Converts cl_platform_info to a string.">GetPlatformInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#ad98cdc72ca4405d5bdeedc433b3dc451">cl_platform_info</a> i);
 <a name="l00068"></a>00068 <span class="comment"></span>
-<a name="l00069"></a>00069 <span class="comment">    /// Links OpenCL dynamically (if appropriate for this OS).</span>
-<a name="l00070"></a>00070 <span class="comment"></span>    cl_int <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>();
+<a name="l00069"></a>00069 <span class="comment">    /// Converts cl_device_info to a string.</span>
+<a name="l00070"></a>00070 <span class="comment"></span>    <span class="keyword">const</span> <span class="keywordtype">char</span>* <a class="code" href="namespaceOpenCL__utils.html#ab9d9e4e0badf39b31e1697204d63c041" title="Converts cl_device_info to a string.">GetDeviceInfoIdAsString</a>(<a class="code" href="OpenCL__Dyn__Load_8h.html#aabdb99d353f2db1f8d6140f26ec54a78">cl_device_info</a> i);
 <a name="l00071"></a>00071 <span class="comment"></span>
-<a name="l00072"></a>00072 <span class="comment">    /// Throws a std::runtime_error with a descriptive message of the OpenCL error code.</span>
-<a name="l00073"></a>00073 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(cl_int ret,<span class="keyword">const</span> <span class="keywordtype">char</span>* message);
-<a name="l00074"></a>00074 }
+<a name="l00072"></a>00072 <span class="comment">    /// Links OpenCL dynamically (if appropriate for this OS).</span>
+<a name="l00073"></a>00073 <span class="comment"></span>    cl_int <a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>();
+<a name="l00074"></a>00074 <span class="comment"></span>
+<a name="l00075"></a>00075 <span class="comment">    /// Throws a std::runtime_error with a descriptive message of the OpenCL error code.</span>
+<a name="l00076"></a>00076 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(cl_int ret,<span class="keyword">const</span> <span class="keywordtype">char</span>* message);
+<a name="l00077"></a>00077 }
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

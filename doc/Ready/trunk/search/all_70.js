@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['p1',['p1',['../classLinearGradient.html#a52061b8a5eedbc925d02fca6a45cc531',1,'LinearGradient']]],
-  ['p2',['p2',['../classLinearGradient.html#adf1a370f8c9ba5904a163d5b66aa7b7d',1,'LinearGradient']]],
+  ['p1',['p1',['../classLinearGradient.html#a52061b8a5eedbc925d02fca6a45cc531',1,'LinearGradient::p1()'],['../classRadialGradient.html#a267feb58862b273e9c7897aa9b1876aa',1,'RadialGradient::p1()']]],
+  ['p2',['p2',['../classLinearGradient.html#adf1a370f8c9ba5904a163d5b66aa7b7d',1,'LinearGradient::p2()'],['../classRadialGradient.html#a68c5ac30042542baa0bc9bd2927088b1',1,'RadialGradient::p2()']]],
   ['panel',['panel',['../classHtmlView.html#a17159a122f613e34d245a54a7923c738',1,'HtmlView::panel()'],['../classHtmlInfo.html#a537802be5db2f91a49dd0d5ef630e66f',1,'HtmlInfo::panel()']]],
   ['panename',['PaneName',['../frame_8cpp.html#adb2d02d23949d250b57d1b3e00210c70',1,'frame.cpp']]],
   ['parameter',['Parameter',['../classParameter.html',1,'Parameter'],['../classParameter.html#ac4bebcb6f564c3b250a584a9d80e4b19',1,'Parameter::Parameter()']]],
@@ -38,6 +38,7 @@ var searchData=
   ['prefspath',['prefspath',['../prefs_8cpp.html#ab9caae868f071ef53f59a17b995b45ec',1,'prefs.cpp']]],
   ['printself',['PrintSelf',['../classwxVTKRenderWindowInteractor.html#a79fca453ebf097cedf62a78deed768c6',1,'wxVTKRenderWindowInteractor']]],
   ['processkey',['ProcessKey',['../classMyFrame.html#a47a959eefdac32d85b8d3fe6b675329a',1,'MyFrame']]],
+  ['program',['program',['../classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f',1,'OpenCL_MixIn']]],
   ['properties',['Properties',['../classProperties.html',1,'Properties'],['../classProperties.html#ae4f2f65968a832feebb599684e104100',1,'Properties::Properties(std::string set_name)'],['../classProperties.html#a142291b2488b5298a7834ad523b768f6',1,'Properties::properties()']]],
   ['properties_2ecpp',['Properties.cpp',['../Properties_8cpp.html',1,'']]],
   ['properties_2ehpp',['Properties.hpp',['../Properties_8hpp.html',1,'']]],

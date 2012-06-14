@@ -97,7 +97,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a>  </div>
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">GrayScottMeshRD Class Reference</div>  </div>
 </div><!--header-->
@@ -124,12 +125,17 @@ Inheritance diagram for GrayScottMeshRD:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a59ebc9185cf09142bddf0bf941819833"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#a59ebc9185cf09142bddf0bf941819833">GrayScottMeshRD</a> ()</td></tr>
-<tr class="memitem:a1f867cdc417f0d03321a1a81c78cc0fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#a1f867cdc417f0d03321a1a81c78cc0fb">CreateGrayScottStartingConditions</a> ()</td></tr>
-<tr class="memdesc:a1f867cdc417f0d03321a1a81c78cc0fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">For imported meshes we need a way to get something going on the surface so the user can get started.  <a href="#a1f867cdc417f0d03321a1a81c78cc0fb"></a><br/></td></tr>
+<tr class="memitem:a7f544018d384fe4fe868e107f4c2eded"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#a7f544018d384fe4fe868e107f4c2eded">~GrayScottMeshRD</a> ()</td></tr>
+<tr class="memitem:af9737ef0e3853da16b4fd985f7eed065"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#af9737ef0e3853da16b4fd985f7eed065">SetNumberOfChemicals</a> (int n)</td></tr>
+<tr class="memitem:a8b54c1b8d5d39e6ec5bc19913245f0a8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#a8b54c1b8d5d39e6ec5bc19913245f0a8">CopyFromMesh</a> (vtkUnstructuredGrid *mesh2)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a7fd076c5fef1473d3a27087a7e899ec9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9">InternalUpdate</a> (int n_steps)</td></tr>
 <tr class="memdesc:a7fd076c5fef1473d3a27087a7e899ec9"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#a7fd076c5fef1473d3a27087a7e899ec9"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:aaee5af55bfdfb922a469364ebc2f8415"><td class="memItemLeft" align="right" valign="top">vtkUnstructuredGrid *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415">buffer</a></td></tr>
+<tr class="memdesc:aaee5af55bfdfb922a469364ebc2f8415"><td class="mdescLeft">&#160;</td><td class="mdescRight">temporary storage used during computation  <a href="#aaee5af55bfdfb922a469364ebc2f8415"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>A non-OpenCL mesh implementation, just as an example. </p>
@@ -154,13 +160,12 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a1f867cdc417f0d03321a1a81c78cc0fb"></a>
+<a class="anchor" id="a7f544018d384fe4fe868e107f4c2eded"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classGrayScottMeshRD.html#a1f867cdc417f0d03321a1a81c78cc0fb">GrayScottMeshRD::CreateGrayScottStartingConditions</a> </td>
+          <td class="memname"><a class="el" href="classGrayScottMeshRD.html#a7f544018d384fe4fe868e107f4c2eded">GrayScottMeshRD::~GrayScottMeshRD</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -169,9 +174,29 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>For imported meshes we need a way to get something going on the surface so the user can get started. </p>
+<p>Definition at line <a class="el" href="GrayScottMeshRD_8cpp_source.html#l00044">44</a> of file <a class="el" href="GrayScottMeshRD_8cpp_source.html">GrayScottMeshRD.cpp</a>.</p>
 
-<p>Definition at line <a class="el" href="GrayScottMeshRD_8cpp_source.html#l00109">109</a> of file <a class="el" href="GrayScottMeshRD_8cpp_source.html">GrayScottMeshRD.cpp</a>.</p>
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
+<a class="anchor" id="a8b54c1b8d5d39e6ec5bc19913245f0a8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classGrayScottMeshRD.html#a8b54c1b8d5d39e6ec5bc19913245f0a8">GrayScottMeshRD::CopyFromMesh</a> </td>
+          <td>(</td>
+          <td class="paramtype">vtkUnstructuredGrid *&#160;</td>
+          <td class="paramname"><em>mesh2</em></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">MeshRD</a>.</p>
+
+<p>Definition at line <a class="el" href="GrayScottMeshRD_8cpp_source.html#l00125">125</a> of file <a class="el" href="GrayScottMeshRD_8cpp_source.html">GrayScottMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -194,7 +219,46 @@ Protected Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="GrayScottMeshRD_8cpp_source.html#l00043">43</a> of file <a class="el" href="GrayScottMeshRD_8cpp_source.html">GrayScottMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="GrayScottMeshRD_8cpp_source.html#l00051">51</a> of file <a class="el" href="GrayScottMeshRD_8cpp_source.html">GrayScottMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af9737ef0e3853da16b4fd985f7eed065"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classGrayScottMeshRD.html#af9737ef0e3853da16b4fd985f7eed065">GrayScottMeshRD::SetNumberOfChemicals</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">MeshRD</a>.</p>
+
+<p>Definition at line <a class="el" href="GrayScottMeshRD_8cpp_source.html#l00117">117</a> of file <a class="el" href="GrayScottMeshRD_8cpp_source.html">GrayScottMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="aaee5af55bfdfb922a469364ebc2f8415"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkUnstructuredGrid* <a class="el" href="classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415">GrayScottMeshRD::buffer</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>temporary storage used during computation </p>
+
+<p>Definition at line <a class="el" href="GrayScottMeshRD_8hpp_source.html#l00050">50</a> of file <a class="el" href="GrayScottMeshRD_8hpp_source.html">GrayScottMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -206,7 +270,7 @@ Protected Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

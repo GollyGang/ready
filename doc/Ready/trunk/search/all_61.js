@@ -15,7 +15,6 @@ var searchData=
   ['add',['Add',['../classAdd.html',1,'Add'],['../classAdd.html#a42660a9b5eaaf7abfbe50c8602a1076e',1,'Add::Add()']]],
   ['add_5fif_5fnew',['add_if_new',['../MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501',1,'MeshRD.cpp']]],
   ['adddefaultkeyactions',['AddDefaultKeyActions',['../prefs_8cpp.html#a561f8734ac9b2da848da296a0ce2a8e2',1,'prefs.cpp']]],
-  ['addinitialpatterngeneratoroverlay',['AddInitialPatternGeneratorOverlay',['../classAbstractRD.html#a5ada482d021c856c38c8553b502da80e',1,'AbstractRD']]],
   ['addmypatterns',['AddMyPatterns',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a96cb152725348747ab810e2f61fd95b8',1,'ID']]],
   ['addparameter',['AddParameter',['../classAbstractRD.html#abef0fac4cc1d8426a37ebef49e172998',1,'AbstractRD::AddParameter()'],['../classFormulaOpenCLImageRD.html#a49c870bdbf13801f04885fc07871e54a',1,'FormulaOpenCLImageRD::AddParameter()'],['../classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9',1,'FormulaOpenCLMeshRD::AddParameter()'],['../classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6',1,'OpenCLMeshRD::AddParameter()'],['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87',1,'ID::AddParameter()']]],
   ['addproperty',['AddProperty',['../classProperties.html#a4dead31cae115f63e8d9100f44ee0f5b',1,'Properties']]],
@@ -34,5 +33,7 @@ var searchData=
   ['askonquit',['askonquit',['../prefs_8cpp.html#a0498f5ccb6ca073727aa39f77e82660b',1,'askonquit():&#160;prefs.cpp'],['../prefs_8hpp.html#a0498f5ccb6ca073727aa39f77e82660b',1,'askonquit():&#160;prefs.cpp']]],
   ['assemblekernelsourcefromformula',['AssembleKernelSourceFromFormula',['../classFormulaOpenCLImageRD.html#a06166b3d9360045c9dd1d23113ec368b',1,'FormulaOpenCLImageRD::AssembleKernelSourceFromFormula()'],['../classFormulaOpenCLMeshRD.html#a0e1e716166edee0856dcda2bd8423a64',1,'FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula()'],['../classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832',1,'FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula()'],['../classFullKernelOpenCLMeshRD.html#a1ee9ef955cbcac6f8199fabea04a3371',1,'FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula()'],['../classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7',1,'OpenCL_MixIn::AssembleKernelSourceFromFormula()']]],
   ['aui_5fmgr',['aui_mgr',['../classMyFrame.html#abf9f45d8ca80d5bca40f853dea878e5c',1,'MyFrame']]],
-  ['auilayout',['auilayout',['../prefs_8cpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp'],['../prefs_8hpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp']]]
+  ['auilayout',['auilayout',['../prefs_8cpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp'],['../prefs_8hpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp']]],
+  ['ax',['ax',['../structTri.html#a33f4dd72d19b2bf1f6b3e4c1b4eccdd3',1,'Tri']]],
+  ['ay',['ay',['../structTri.html#a8ebb57399125cce54f42601e1f85af35',1,'Tri']]]
 ];

@@ -5,7 +5,9 @@ var searchData=
   ['biggerbutt',['biggerbutt',['../classHelpPanel.html#a75a9fa64121b70e929598c31d2a02179',1,'HelpPanel::biggerbutt()'],['../classInfoPanel.html#aa2316e4112dae724575f2fa7d17c9d1f',1,'InfoPanel::biggerbutt()']]],
   ['block_5fsize',['block_size',['../classFullKernelOpenCLImageRD.html#ad49c0662612b8a198860d212afb75ab1',1,'FullKernelOpenCLImageRD']]],
   ['block_5fsize_5flabel',['block_size_label',['../InfoPanel_8cpp.html#a35021f1f9df3867cb007729783d3c987',1,'InfoPanel.cpp']]],
-  ['buffer',['buffer',['../classMeshRD.html#a3e371590e647939854d46257743ec1bc',1,'MeshRD']]],
+  ['buffer',['buffer',['../classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415',1,'GrayScottMeshRD']]],
   ['buffer_5fimages',['buffer_images',['../classGrayScottImageRD.html#a56c534592723311d74e2b4563fef4a76',1,'GrayScottImageRD']]],
-  ['buffers',['buffers',['../classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508',1,'OpenCL_MixIn']]]
+  ['buffers',['buffers',['../classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508',1,'OpenCL_MixIn']]],
+  ['bx',['bx',['../structTri.html#a6788d0a7dc0332ad74caffe90f4fc7b8',1,'Tri']]],
+  ['by',['by',['../structTri.html#afe4677e191f5fb8c279eccfaa63c879e',1,'Tri']]]
 ];

@@ -136,23 +136,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad8b9cf3e0212bdc64f12b8d220e73425"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425">AbstractRD</a> ()</td></tr>
 <tr class="memitem:a08440b8e0cfecfd1dd919f96b637577e"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a08440b8e0cfecfd1dd919f96b637577e">~AbstractRD</a> ()</td></tr>
 <tr class="memitem:a4b3c5316c168951a9d8990ec9832839d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">InitializeFromXML</a> (vtkXMLDataElement *rd, bool &amp;warn_to_update)</td></tr>
+<tr class="memdesc:a4b3c5316c168951a9d8990ec9832839d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load this pattern from an RD element.  <a href="#a4b3c5316c168951a9d8990ec9832839d"></a><br/></td></tr>
 <tr class="memitem:a8f9f1e2f5cd91b445e898dc5a8f1ce4b"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
 &lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">GetAsXML</a> () const </td></tr>
+<tr class="memdesc:a8f9f1e2f5cd91b445e898dc5a8f1ce4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a8f9f1e2f5cd91b445e898dc5a8f1ce4b"></a><br/></td></tr>
 <tr class="memitem:aa365a78f2c1773ee94d70503d2068c87"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aa365a78f2c1773ee94d70503d2068c87">Update</a> (int n_steps)=0</td></tr>
+<tr class="memdesc:aa365a78f2c1773ee94d70503d2068c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called to progress the simulation by N steps.  <a href="#aa365a78f2c1773ee94d70503d2068c87"></a><br/></td></tr>
 <tr class="memitem:aae5036cfdaea9d54ae80ccea26e4f1b0"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aae5036cfdaea9d54ae80ccea26e4f1b0">HasEditableNumberOfChemicals</a> () const </td></tr>
-<tr class="memdesc:aae5036cfdaea9d54ae80ccea26e4f1b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">inbuilt implementations cannot have their number_of_chemicals edited  <a href="#aae5036cfdaea9d54ae80ccea26e4f1b0"></a><br/></td></tr>
+<tr class="memdesc:aae5036cfdaea9d54ae80ccea26e4f1b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some implementations (e.g. inbuilt ones) cannot have their number_of_chemicals edited.  <a href="#aae5036cfdaea9d54ae80ccea26e4f1b0"></a><br/></td></tr>
 <tr class="memitem:a1af68c913b7bdf6b344b15dc46415646"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a> () const </td></tr>
 <tr class="memitem:a2e9794397c5b55bc2220392bd6b8cd57"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a2e9794397c5b55bc2220392bd6b8cd57">SetNumberOfChemicals</a> (int n)=0</td></tr>
 <tr class="memitem:a934c6964a64b86f963133f45f81bf776"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a934c6964a64b86f963133f45f81bf776">GetTimestepsTaken</a> () const </td></tr>
-<tr class="memdesc:a934c6964a64b86f963133f45f81bf776"><td class="mdescLeft">&#160;</td><td class="mdescRight">how many timesteps have we advanced since being initialized?  <a href="#a934c6964a64b86f963133f45f81bf776"></a><br/></td></tr>
-<tr class="memitem:adf04af53e1b0d60e61f063b015cda19b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#adf04af53e1b0d60e61f063b015cda19b">SetTimestepsTaken</a> (int t)</td></tr>
-<tr class="memitem:a8d2907ae4dd4a0cec5c97f7ee67edaec"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a8d2907ae4dd4a0cec5c97f7ee67edaec">HasEditableFormula</a> () const =0</td></tr>
-<tr class="memdesc:a8d2907ae4dd4a0cec5c97f7ee67edaec"><td class="mdescLeft">&#160;</td><td class="mdescRight">inbuilt implementations cannot have their formula edited  <a href="#a8d2907ae4dd4a0cec5c97f7ee67edaec"></a><br/></td></tr>
-<tr class="memitem:a55dd39c621a5aacc5cd4a4920035effa"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a55dd39c621a5aacc5cd4a4920035effa">GetFormula</a> () const </td></tr>
+<tr class="memdesc:a934c6964a64b86f963133f45f81bf776"><td class="mdescLeft">&#160;</td><td class="mdescRight">How many timesteps have we advanced since being initialized?  <a href="#a934c6964a64b86f963133f45f81bf776"></a><br/></td></tr>
+<tr class="memitem:a0bdce58dce0010ad86ad2cbd9ffcdb77"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77">GetFormula</a> () const </td></tr>
+<tr class="memdesc:a0bdce58dce0010ad86ad2cbd9ffcdb77"><td class="mdescLeft">&#160;</td><td class="mdescRight">The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that drives the system.  <a href="#a0bdce58dce0010ad86ad2cbd9ffcdb77"></a><br/></td></tr>
 <tr class="memitem:a1f8ac307cb768147fcef9ebfffe0a637"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a1f8ac307cb768147fcef9ebfffe0a637">TestFormula</a> (std::string program_string)</td></tr>
-<tr class="memitem:a39f16d952fea98afd72ae0ab43b27880"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880">SetFormula</a> (std::string s)</td></tr>
+<tr class="memdesc:a1f8ac307cb768147fcef9ebfffe0a637"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throws std::runtime_error with information if the formula doesn't work.  <a href="#a1f8ac307cb768147fcef9ebfffe0a637"></a><br/></td></tr>
+<tr class="memitem:a39f16d952fea98afd72ae0ab43b27880"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880">SetFormula</a> (std::string s)</td></tr>
+<tr class="memdesc:a39f16d952fea98afd72ae0ab43b27880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the system's formula. The kernel will be reloaded on the next update step.  <a href="#a39f16d952fea98afd72ae0ab43b27880"></a><br/></td></tr>
+<tr class="memitem:a8d2907ae4dd4a0cec5c97f7ee67edaec"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a8d2907ae4dd4a0cec5c97f7ee67edaec">HasEditableFormula</a> () const =0</td></tr>
+<tr class="memdesc:a8d2907ae4dd4a0cec5c97f7ee67edaec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some implementations (e.g. inbuilt ones) cannot have their formula edited.  <a href="#a8d2907ae4dd4a0cec5c97f7ee67edaec"></a><br/></td></tr>
+<tr class="memitem:aaaf0cf8a776d2ed3917f044f1cc05e33"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aaaf0cf8a776d2ed3917f044f1cc05e33">GetKernel</a> () const </td></tr>
+<tr class="memdesc:aaaf0cf8a776d2ed3917f044f1cc05e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full OpenCL kernel (if available, else the empty string).  <a href="#aaaf0cf8a776d2ed3917f044f1cc05e33"></a><br/></td></tr>
 <tr class="memitem:a6f3719fcbeaae0ac22c6de2af086f078"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a6f3719fcbeaae0ac22c6de2af086f078">GetRuleType</a> () const =0</td></tr>
-<tr class="memdesc:a6f3719fcbeaae0ac22c6de2af086f078"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns e.g. "inbuilt", "formula", "kernel", as in the XML  <a href="#a6f3719fcbeaae0ac22c6de2af086f078"></a><br/></td></tr>
+<tr class="memdesc:a6f3719fcbeaae0ac22c6de2af086f078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#a6f3719fcbeaae0ac22c6de2af086f078"></a><br/></td></tr>
 <tr class="memitem:a7c7bb16083029c258a1cc4b39a2f0504"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a7c7bb16083029c258a1cc4b39a2f0504">GetFileExtension</a> () const =0</td></tr>
 <tr class="memitem:a977cf3ff44048b54f2fdafe270b02075"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a977cf3ff44048b54f2fdafe270b02075">GetRuleName</a> () const </td></tr>
 <tr class="memitem:a37127318d60d79fe6e5346ef959accca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a37127318d60d79fe6e5346ef959accca">SetRuleName</a> (std::string s)</td></tr>
@@ -170,17 +177,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab7ae2af183b1d3641ff386cb9631b17e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">SetParameterName</a> (int iParam, const std::string &amp;s)</td></tr>
 <tr class="memitem:a8ea48695b8ee59e6932828d111d54521"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">SetParameterValue</a> (int iParam, float val)</td></tr>
 <tr class="memitem:ab8afae10f6fd8170d70edfc74b88beac"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ab8afae10f6fd8170d70edfc74b88beac">IsModified</a> () const </td></tr>
-<tr class="memdesc:ab8afae10f6fd8170d70edfc74b88beac"><td class="mdescLeft">&#160;</td><td class="mdescRight">should the user be asked if they want to save?  <a href="#ab8afae10f6fd8170d70edfc74b88beac"></a><br/></td></tr>
+<tr class="memdesc:ab8afae10f6fd8170d70edfc74b88beac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should the user be asked if they want to save this pattern?  <a href="#ab8afae10f6fd8170d70edfc74b88beac"></a><br/></td></tr>
 <tr class="memitem:a6bcf10c119c33cde1604bdc33a19a8e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a6bcf10c119c33cde1604bdc33a19a8e9">SetModified</a> (bool m)</td></tr>
 <tr class="memitem:a77c2f176da53d7c5b3dbb322a8910d68"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a77c2f176da53d7c5b3dbb322a8910d68">SaveFile</a> (const char *<a class="el" href="classAbstractRD.html#acb8e6b64b80df97fb751ac5c70598225">filename</a>, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings) const =0</td></tr>
 <tr class="memitem:a0ecbe358a8da06e1c87f0f6e885e8c15"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a0ecbe358a8da06e1c87f0f6e885e8c15">GetFilename</a> () const </td></tr>
 <tr class="memitem:a1ac0701d5f1d0ce7a65ce08f19d4d6e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a1ac0701d5f1d0ce7a65ce08f19d4d6e7">SetFilename</a> (const std::string &amp;s)</td></tr>
-<tr class="memitem:a5ada482d021c856c38c8553b502da80e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a5ada482d021c856c38c8553b502da80e">AddInitialPatternGeneratorOverlay</a> (<a class="el" href="classOverlay.html">Overlay</a> *overlay)</td></tr>
 <tr class="memitem:a434004b8c1197c3d82a8c0a89ebf09e1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a434004b8c1197c3d82a8c0a89ebf09e1">GenerateInitialPattern</a> ()=0</td></tr>
 <tr class="memitem:a15ee19303ed2801df202ac29c6ea3534"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a15ee19303ed2801df202ac29c6ea3534">BlankImage</a> ()=0</td></tr>
-<tr class="memitem:a079b3af2b7537aee71ba7c1b77218c54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">ClearInitialPatternGenerator</a> ()</td></tr>
-<tr class="memitem:a828d238e85c72dd7edb8d9ea6786fcda"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a828d238e85c72dd7edb8d9ea6786fcda">GetNumberOfInitialPatternGeneratorOverlays</a> () const </td></tr>
-<tr class="memitem:aa529c1b9e26c5ce61a64b1afd6d23e06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classOverlay.html">Overlay</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aa529c1b9e26c5ce61a64b1afd6d23e06">GetInitialPatternGeneratorOverlay</a> (int i) const </td></tr>
+<tr class="memitem:a3da00130c9bded5c65b891307486cecc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc">CreateDefaultInitialPatternGenerator</a> ()</td></tr>
+<tr class="memdesc:a3da00130c9bded5c65b891307486cecc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a generator suitable for Gray-Scott, so that new patterns can start working immediately.  <a href="#a3da00130c9bded5c65b891307486cecc"></a><br/></td></tr>
 <tr class="memitem:a9fba6f8368f4317934ccdbdfa185c44b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a9fba6f8368f4317934ccdbdfa185c44b">InitializeRenderPipeline</a> (vtkRenderer *pRenderer, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)=0</td></tr>
 <tr class="memitem:aec9f3320b27e8f79891ca02da04bcf7f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aec9f3320b27e8f79891ca02da04bcf7f">SaveStartingPattern</a> ()=0</td></tr>
 <tr class="memitem:aa3b511ef22685dc79c26380b6c454f8f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aa3b511ef22685dc79c26380b6c454f8f">RestoreStartingPattern</a> ()=0</td></tr>
@@ -190,7 +195,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3e207e17ccdf980501c20b4f3153877d"><td class="memItemLeft" align="right" valign="top">virtual float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a3e207e17ccdf980501c20b4f3153877d">GetZ</a> () const =0</td></tr>
 <tr class="memitem:af51917604735dca12ed3f57d51116fb5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#af51917604735dca12ed3f57d51116fb5">SetDimensions</a> (int x, int y, int z)</td></tr>
 <tr class="memitem:aa0e894e42989321515ea217ad5b0dced"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aa0e894e42989321515ea217ad5b0dced">HasEditableBlockSize</a> () const </td></tr>
-<tr class="memdesc:aa0e894e42989321515ea217ad5b0dced"><td class="mdescLeft">&#160;</td><td class="mdescRight">only some implementations (<a class="el" href="classFullKernelOpenCLImageRD.html" title="An RD system that uses an OpenCL program.">FullKernelOpenCLImageRD</a>) can have their block size edited  <a href="#aa0e894e42989321515ea217ad5b0dced"></a><br/></td></tr>
+<tr class="memdesc:aa0e894e42989321515ea217ad5b0dced"><td class="mdescLeft">&#160;</td><td class="mdescRight">Only some implementations (e.g. <a class="el" href="classFullKernelOpenCLImageRD.html" title="An RD system that uses an OpenCL program.">FullKernelOpenCLImageRD</a>) can have their block size edited.  <a href="#aa0e894e42989321515ea217ad5b0dced"></a><br/></td></tr>
 <tr class="memitem:a8a7c1f17f119ae853635a88749df89c9"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a8a7c1f17f119ae853635a88749df89c9">GetBlockSizeX</a> () const </td></tr>
 <tr class="memdesc:a8a7c1f17f119ae853635a88749df89c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">e.g. block size may be 4x1x1 for kernels that use float4 (like <a class="el" href="classFormulaOpenCLImageRD.html" title="An RD system that uses an OpenCL formula snippet.">FormulaOpenCLImageRD</a>)  <a href="#a8a7c1f17f119ae853635a88749df89c9"></a><br/></td></tr>
 <tr class="memitem:ac1bcfe8ed67ff5e7aee5f9bbdc9903ca"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ac1bcfe8ed67ff5e7aee5f9bbdc9903ca">GetBlockSizeY</a> () const </td></tr>
@@ -211,6 +216,7 @@ Public Member Functions</h2></td></tr>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a6353d2e211e79a2d0d883cbe8719801b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a6353d2e211e79a2d0d883cbe8719801b">InternalUpdate</a> (int n_steps)=0</td></tr>
 <tr class="memdesc:a6353d2e211e79a2d0d883cbe8719801b"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#a6353d2e211e79a2d0d883cbe8719801b"></a><br/></td></tr>
+<tr class="memitem:a079b3af2b7537aee71ba7c1b77218c54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">ClearInitialPatternGenerator</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:ab22830afbc4e94b9f9cde3334a6bf858"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ab22830afbc4e94b9f9cde3334a6bf858">rule_name</a></td></tr>
@@ -269,25 +275,6 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a5ada482d021c856c38c8553b502da80e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classAbstractRD.html#a5ada482d021c856c38c8553b502da80e">AbstractRD::AddInitialPatternGeneratorOverlay</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classOverlay.html">Overlay</a> *&#160;</td>
-          <td class="paramname"><em>overlay</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00053">53</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="abef0fac4cc1d8426a37ebef49e172998"></a>
 <div class="memitem">
 <div class="memproto">
@@ -313,9 +300,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a49c870bdbf13801f04885fc07871e54a">FormulaOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">FormulaOpenCLMeshRD</a>, and <a class="el" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">OpenCLMeshRD</a>.</p>
+<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a49c870bdbf13801f04885fc07871e54a">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00145">145</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00110">110</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -345,13 +332,33 @@ Protected Attributes</h2></td></tr>
           <td class="memname">void <a class="el" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">AbstractRD::ClearInitialPatternGenerator</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td><code> [protected]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
 <p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00044">44</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3da00130c9bded5c65b891307486cecc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc">AbstractRD::CreateDefaultInitialPatternGenerator</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create a generator suitable for Gray-Scott, so that new patterns can start working immediately. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00276">276</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -369,9 +376,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#aa58d5daf08867d213fb0c207be705efb">FormulaOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">FormulaOpenCLMeshRD</a>, and <a class="el" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">OpenCLMeshRD</a>.</p>
+<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#aa58d5daf08867d213fb0c207be705efb">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00161">161</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00126">126</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -390,9 +397,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#adbd2de7bb25c22726c328359da0df589">FormulaOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">FormulaOpenCLMeshRD</a>, and <a class="el" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">OpenCLMeshRD</a>.</p>
+<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#adbd2de7bb25c22726c328359da0df589">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00153">153</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00118">118</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -510,9 +517,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Retrieve an RD element for this pattern, suitable for saving to file. </p>
+
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a3b6904e036b2233f0e0b8d06f29401c8">FormulaOpenCLImageRD</a>, <a class="el" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">FullKernelOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">FormulaOpenCLMeshRD</a>, and <a class="el" href="classFullKernelOpenCLMeshRD.html#a162a4a8d4a79d71e57cd2c6b3c49f617">FullKernelOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00282">282</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00233">233</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -534,7 +543,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a7c73fcc8f1969201d280357ac41fd409">FormulaOpenCLImageRD</a>, and <a class="el" href="classFullKernelOpenCLImageRD.html#ac815a91584ced8f7bd9f061a26498c49">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00116">116</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00122">122</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -554,7 +563,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFullKernelOpenCLImageRD.html#a1d01f0743c642d74de659e0ce291ce21">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00117">117</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00123">123</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -574,7 +583,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFullKernelOpenCLImageRD.html#a9d9e241095553fbd7f3fb2f661b4994a">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00118">118</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00124">124</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -586,13 +595,13 @@ Protected Attributes</h2></td></tr>
           <td class="memname">std::string <a class="el" href="classAbstractRD.html#a18114046e857e8ca78fa57707bca0105">AbstractRD::GetDescription</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00091">91</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00078">78</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -622,50 +631,55 @@ Protected Attributes</h2></td></tr>
           <td class="memname">std::string <a class="el" href="classAbstractRD.html#a0ecbe358a8da06e1c87f0f6e885e8c15">AbstractRD::GetFilename</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00209">209</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a55dd39c621a5aacc5cd4a4920035effa"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">string <a class="el" href="classAbstractRD.html#a55dd39c621a5aacc5cd4a4920035effa">AbstractRD::GetFormula</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00077">77</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa529c1b9e26c5ce61a64b1afd6d23e06"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classOverlay.html">Overlay</a>* <a class="el" href="classAbstractRD.html#aa529c1b9e26c5ce61a64b1afd6d23e06">AbstractRD::GetInitialPatternGeneratorOverlay</a> </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>i</em></td><td>)</td>
           <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00102">102</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00101">101</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0bdce58dce0010ad86ad2cbd9ffcdb77"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77">AbstractRD::GetFormula</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that drives the system. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00061">61</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaaf0cf8a776d2ed3917f044f1cc05e33"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string <a class="el" href="classAbstractRD.html#aaaf0cf8a776d2ed3917f044f1cc05e33">AbstractRD::GetKernel</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Return the full OpenCL kernel (if available, else the empty string). </p>
+
+<p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#a639a6822e36b5ed7709941707924a55c">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#a31a6a8577a8daf5a8839747554fe7420">OpenCLImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00069">69</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -701,25 +715,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00051">51</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a828d238e85c72dd7edb8d9ea6786fcda"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classAbstractRD.html#a828d238e85c72dd7edb8d9ea6786fcda">AbstractRD::GetNumberOfInitialPatternGeneratorOverlays</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00101">101</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00054">54</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -737,7 +733,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00114">114</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00079">79</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -756,7 +752,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00121">121</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00086">86</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -775,7 +771,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00128">128</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00093">93</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -794,7 +790,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00135">135</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00100">100</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -806,13 +802,13 @@ Protected Attributes</h2></td></tr>
           <td class="memname">std::string <a class="el" href="classAbstractRD.html#a977cf3ff44048b54f2fdafe270b02075">AbstractRD::GetRuleName</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00084">84</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00075">75</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -830,7 +826,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>returns e.g. "inbuilt", "formula", "kernel", as in the XML </p>
+<p>Returns e.g. "inbuilt", "formula", "kernel", as in the XML. </p>
 
 <p>Implemented in <a class="el" href="classMeshRD.html#a5f62de46848365e6d77e6ea1b7cc23d6">MeshRD</a>, <a class="el" href="classFormulaOpenCLImageRD.html#a568b117415a8709ab349c3538ec85c0b">FormulaOpenCLImageRD</a>, <a class="el" href="classFullKernelOpenCLImageRD.html#a2cc4ba99e7ff66d667a93f0980547dcb">FullKernelOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#ac889d885056a20510e6bb7b828080fe1">FormulaOpenCLMeshRD</a>, <a class="el" href="classFullKernelOpenCLMeshRD.html#a26da17c8cb1d25a0aaf870babf66d880">FullKernelOpenCLMeshRD</a>, <a class="el" href="classInbuiltImageRD.html#a1da0578a5fa2153052b478d18e5ef99c">InbuiltImageRD</a>, and <a class="el" href="classInbuiltMeshRD.html#a54f5bdf2608da9af703c5225dda9f434">InbuiltMeshRD</a>.</p>
 
@@ -844,15 +840,15 @@ Protected Attributes</h2></td></tr>
           <td class="memname">int <a class="el" href="classAbstractRD.html#a934c6964a64b86f963133f45f81bf776">AbstractRD::GetTimestepsTaken</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>how many timesteps have we advanced since being initialized? </p>
+<p>How many timesteps have we advanced since being initialized? </p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00060">60</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00058">58</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -870,7 +866,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00124">124</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00130">130</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -942,11 +938,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>only some implementations (<a class="el" href="classFullKernelOpenCLImageRD.html" title="An RD system that uses an OpenCL program.">FullKernelOpenCLImageRD</a>) can have their block size edited </p>
+<p>Only some implementations (e.g. <a class="el" href="classFullKernelOpenCLImageRD.html" title="An RD system that uses an OpenCL program.">FullKernelOpenCLImageRD</a>) can have their block size edited. </p>
 
 <p>Reimplemented in <a class="el" href="classFullKernelOpenCLImageRD.html#af3ce0fc05d80d84982379de2eda2ff76">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00115">115</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00121">121</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -966,7 +962,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classImageRD.html#a05adae73a275832426c5de590ad31cb6">ImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00108">108</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00114">114</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -984,9 +980,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>inbuilt implementations cannot have their formula edited </p>
+<p>Some implementations (e.g. inbuilt ones) cannot have their formula edited. </p>
 
-<p>Implemented in <a class="el" href="classMeshRD.html#a5b64cad228c7ffeacf6a0a581ecdcc32">MeshRD</a>, <a class="el" href="classOpenCLImageRD.html#a43f497ccbec90f3f01a58b5a1de80d4d">OpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#a57b894f349817078b1158fa06174fd2e">OpenCLMeshRD</a>, <a class="el" href="classInbuiltImageRD.html#a5d228d275ca8517262245dc4239e4540">InbuiltImageRD</a>, and <a class="el" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd">InbuiltMeshRD</a>.</p>
+<p>Implemented in <a class="el" href="classMeshRD.html#a5b64cad228c7ffeacf6a0a581ecdcc32">MeshRD</a>, <a class="el" href="classOpenCLMeshRD.html#a57b894f349817078b1158fa06174fd2e">OpenCLMeshRD</a>, <a class="el" href="classOpenCLImageRD.html#a43f497ccbec90f3f01a58b5a1de80d4d">OpenCLImageRD</a>, <a class="el" href="classInbuiltImageRD.html#a5d228d275ca8517262245dc4239e4540">InbuiltImageRD</a>, and <a class="el" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd">InbuiltMeshRD</a>.</p>
 
 </div>
 </div>
@@ -1004,11 +1000,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>inbuilt implementations cannot have their number_of_chemicals edited </p>
+<p>Some implementations (e.g. inbuilt ones) cannot have their number_of_chemicals edited. </p>
 
 <p>Reimplemented in <a class="el" href="classInbuiltImageRD.html#a73f493aa19aac81ac15af23f67754ad4">InbuiltImageRD</a>, and <a class="el" href="classInbuiltMeshRD.html#a3c734508fd4a53c158dde077d50f22b0">InbuiltMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00050">50</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00053">53</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1028,7 +1024,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a46e42ed22cef0734f9b858cb4d4a8273">FormulaOpenCLImageRD</a>, and <a class="el" href="classInbuiltImageRD.html#a0a9c3d02f2ed85d17ed159c9f2c49aa0">InbuiltImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00123">123</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00129">129</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1057,9 +1053,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Load this pattern from an RD element. </p>
+
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#ad15c313f1449f02e319b52a920ad5695">FormulaOpenCLImageRD</a>, <a class="el" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">FullKernelOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1">FormulaOpenCLMeshRD</a>, and <a class="el" href="classFullKernelOpenCLMeshRD.html#aa47a0c34eaf69110b4198ea2a95f8eb4">FullKernelOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00223">223</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00174">174</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1109,7 +1107,7 @@ Protected Attributes</h2></td></tr>
 
 <p>advance the RD system by n timesteps </p>
 
-<p>Implemented in <a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">MeshRD</a>, <a class="el" href="classGrayScottImageRD.html#a16c871d8849a539857bf7773e02ae20c">GrayScottImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">OpenCLMeshRD</a>, <a class="el" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9">GrayScottMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#a4740537884f5b8d7e544d9a0689c11a5">OpenCLImageRD</a>.</p>
+<p>Implemented in <a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">MeshRD</a>, <a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">OpenCLMeshRD</a>, <a class="el" href="classGrayScottImageRD.html#a16c871d8849a539857bf7773e02ae20c">GrayScottImageRD</a>, <a class="el" href="classOpenCLImageRD.html#a4740537884f5b8d7e544d9a0689c11a5">OpenCLImageRD</a>, and <a class="el" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9">GrayScottMeshRD</a>.</p>
 
 </div>
 </div>
@@ -1121,15 +1119,15 @@ Protected Attributes</h2></td></tr>
           <td class="memname">bool <a class="el" href="classAbstractRD.html#ab8afae10f6fd8170d70edfc74b88beac">AbstractRD::IsModified</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>should the user be asked if they want to save? </p>
+<p>Should the user be asked if they want to save this pattern? </p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00195">195</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00097">97</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1148,7 +1146,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00185">185</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00150">150</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1234,7 +1232,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFullKernelOpenCLImageRD.html#ab5d4d3db53e1eefd7cc6e64d2f254c91">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00119">119</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00125">125</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1255,7 +1253,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFullKernelOpenCLImageRD.html#ab2aedd6420c1b016371b3de34be9973a">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00120">120</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00126">126</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1276,7 +1274,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFullKernelOpenCLImageRD.html#a30c688105fad7d1f2665e3e80c0de891">FullKernelOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00121">121</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00127">127</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1295,7 +1293,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00106">106</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00071">71</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1332,7 +1330,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classImageRD.html#a73be8ca9a7b6659fc2f085f08b3375ca">ImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00112">112</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00118">118</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1351,7 +1349,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00216">216</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00167">167</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1364,13 +1362,15 @@ Protected Attributes</h2></td></tr>
           <td>(</td>
           <td class="paramtype">std::string&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
-          <td><code> [virtual]</code></td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00067">67</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Changes the system's formula. The kernel will be reloaded on the next update step. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00053">53</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1389,7 +1389,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00202">202</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00160">160</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1408,7 +1408,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classImageRD.html#af933532d2ba634c8887bd31f3b8f95f1">ImageRD</a>, and <a class="el" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">MeshRD</a>.</p>
+<p>Implemented in <a class="el" href="classImageRD.html#af933532d2ba634c8887bd31f3b8f95f1">ImageRD</a>, <a class="el" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">MeshRD</a>, and <a class="el" href="classGrayScottMeshRD.html#af9737ef0e3853da16b4fd985f7eed065">GrayScottMeshRD</a>.</p>
 
 </div>
 </div>
@@ -1437,9 +1437,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a0c43f70ab42de350d85d96128126fe77">FormulaOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">FormulaOpenCLMeshRD</a>, and <a class="el" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">OpenCLMeshRD</a>.</p>
+<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a0c43f70ab42de350d85d96128126fe77">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00169">169</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00134">134</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1468,9 +1468,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a553764a8c5314b678dfa2a3081b3d744">FormulaOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">FormulaOpenCLMeshRD</a>, and <a class="el" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">OpenCLMeshRD</a>.</p>
+<p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a553764a8c5314b678dfa2a3081b3d744">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00177">177</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00142">142</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1489,26 +1489,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00098">98</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="adf04af53e1b0d60e61f063b015cda19b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classAbstractRD.html#adf04af53e1b0d60e61f063b015cda19b">AbstractRD::SetTimestepsTaken</a> </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td><code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00056">56</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00063">63</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1529,7 +1510,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#adb24e7ea1e40d21ba9d9fe516c6779ae">FormulaOpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00125">125</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00131">131</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1548,9 +1529,11 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Throws std::runtime_error with information if the formula doesn't work. </p>
+
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#a5e16eb5ca7640418eca7339634cdfb2b">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00061">61</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00063">63</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1569,6 +1552,8 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Called to progress the simulation by N steps. </p>
+
 <p>Implemented in <a class="el" href="classImageRD.html#a6ca70515b0210ce9311b340076e4ed5d">ImageRD</a>, and <a class="el" href="classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96">MeshRD</a>.</p>
 
 </div>
@@ -1585,7 +1570,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00143">143</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00151">151</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1600,7 +1585,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00156">156</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00164">164</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1615,7 +1600,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00153">153</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00161">161</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1630,7 +1615,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00147">147</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00155">155</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1645,7 +1630,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00157">157</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00165">165</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1660,7 +1645,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00145">145</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00153">153</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1675,7 +1660,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00154">154</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00162">162</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1690,7 +1675,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00149">149</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00157">157</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1705,7 +1690,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00143">143</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00151">151</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1720,7 +1705,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00151">151</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00159">159</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1737,7 +1722,7 @@ Protected Attributes</h2></td></tr>
 
 <p>should the data wrap-around or have a boundary? </p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00159">159</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00167">167</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1749,7 +1734,7 @@ Protected Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

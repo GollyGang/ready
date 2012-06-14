@@ -112,12 +112,13 @@ Inheritance diagram for BaseFill:</div>
  <div class="center">
   <img src="classBaseFill.png" usemap="#BaseFill_map" alt=""/>
   <map id="BaseFill_map" name="BaseFill_map">
-<area href="classXML__Object.html" title="Abstract interface for XML objects." alt="XML_Object" shape="rect" coords="212,0,308,24"/>
+<area href="classXML__Object.html" title="Abstract interface for XML objects." alt="XML_Object" shape="rect" coords="265,0,361,24"/>
 <area href="classConstant.html" alt="Constant" shape="rect" coords="0,112,96,136"/>
 <area href="classLinearGradient.html" alt="LinearGradient" shape="rect" coords="106,112,202,136"/>
 <area href="classOtherChemical.html" alt="OtherChemical" shape="rect" coords="212,112,308,136"/>
 <area href="classParameter.html" alt="Parameter" shape="rect" coords="318,112,414,136"/>
-<area href="classWhiteNoise.html" alt="WhiteNoise" shape="rect" coords="424,112,520,136"/>
+<area href="classRadialGradient.html" alt="RadialGradient" shape="rect" coords="424,112,520,136"/>
+<area href="classWhiteNoise.html" alt="WhiteNoise" shape="rect" coords="530,112,626,136"/>
 </map>
  </div></div>
 
@@ -131,7 +132,7 @@ Public Member Functions</h2></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa33832fc3cbcafe57563eb3a6aaff4a6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classBaseFill.html">BaseFill</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBaseFill.html#aa33832fc3cbcafe57563eb3a6aaff4a6">New</a> (vtkXMLDataElement *node)</td></tr>
-<tr class="memdesc:aa33832fc3cbcafe57563eb3a6aaff4a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct when we don't know the derived type  <a href="#aa33832fc3cbcafe57563eb3a6aaff4a6"></a><br/></td></tr>
+<tr class="memdesc:aa33832fc3cbcafe57563eb3a6aaff4a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct when we don't know the derived type (returns NULL if name is unknown)  <a href="#aa33832fc3cbcafe57563eb3a6aaff4a6"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a9c7ffe163d57808f0ddd7a4a733ba28a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBaseFill.html#a9c7ffe163d57808f0ddd7a4a733ba28a">BaseFill</a> (vtkXMLDataElement *node)</td></tr>
@@ -227,7 +228,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>what value would this fill type be at the given location, given the existing data </p>
 
-<p>Implemented in <a class="el" href="classLinearGradient.html#a2697594a242f14c0a1676af07eddfd85">LinearGradient</a>, <a class="el" href="classWhiteNoise.html#a1178359336e8262d617ca440a96478be">WhiteNoise</a>, <a class="el" href="classParameter.html#a0761caa8cbc0be280cbc7f17a7075b0f">Parameter</a>, <a class="el" href="classOtherChemical.html#a3d3ffae13317ced5aee8346b1c262430">OtherChemical</a>, and <a class="el" href="classConstant.html#ab05ec169ee49f493978935c03a39b590">Constant</a>.</p>
+<p>Implemented in <a class="el" href="classRadialGradient.html#a08f95fbc902b084981bd6c286624e097">RadialGradient</a>, <a class="el" href="classLinearGradient.html#a2697594a242f14c0a1676af07eddfd85">LinearGradient</a>, <a class="el" href="classWhiteNoise.html#a1178359336e8262d617ca440a96478be">WhiteNoise</a>, <a class="el" href="classParameter.html#a0761caa8cbc0be280cbc7f17a7075b0f">Parameter</a>, <a class="el" href="classOtherChemical.html#a3d3ffae13317ced5aee8346b1c262430">OtherChemical</a>, and <a class="el" href="classConstant.html#ab05ec169ee49f493978935c03a39b590">Constant</a>.</p>
 
 </div>
 </div>
@@ -246,9 +247,9 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>construct when we don't know the derived type </p>
+<p>construct when we don't know the derived type (returns NULL if name is unknown) </p>
 
-<p>Definition at line <a class="el" href="overlays_8cpp_source.html#l00620">620</a> of file <a class="el" href="overlays_8cpp_source.html">overlays.cpp</a>.</p>
+<p>Definition at line <a class="el" href="overlays_8cpp_source.html#l00675">675</a> of file <a class="el" href="overlays_8cpp_source.html">overlays.cpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +260,7 @@ Protected Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

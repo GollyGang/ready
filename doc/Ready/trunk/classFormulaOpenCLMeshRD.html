@@ -123,12 +123,14 @@ Inheritance diagram for FormulaOpenCLMeshRD:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae3e602acd8287722523781020880096c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#ae3e602acd8287722523781020880096c">FormulaOpenCLMeshRD</a> ()</td></tr>
+<tr class="memitem:aefee61beae9ddefeeab5832ef3654b9a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#aefee61beae9ddefeeab5832ef3654b9a">FormulaOpenCLMeshRD</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
 <tr class="memitem:af922159bcfd584bfd286617bd1f627b1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1">InitializeFromXML</a> (vtkXMLDataElement *rd, bool &amp;warn_to_update)</td></tr>
+<tr class="memdesc:af922159bcfd584bfd286617bd1f627b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load this pattern from an RD element.  <a href="#af922159bcfd584bfd286617bd1f627b1"></a><br/></td></tr>
 <tr class="memitem:a16224a57fe0beb33dd387b35ae2170f4"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
 &lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">GetAsXML</a> () const </td></tr>
+<tr class="memdesc:a16224a57fe0beb33dd387b35ae2170f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a16224a57fe0beb33dd387b35ae2170f4"></a><br/></td></tr>
 <tr class="memitem:ac889d885056a20510e6bb7b828080fe1"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#ac889d885056a20510e6bb7b828080fe1">GetRuleType</a> () const </td></tr>
-<tr class="memdesc:ac889d885056a20510e6bb7b828080fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns e.g. "inbuilt", "formula", "kernel", as in the XML  <a href="#ac889d885056a20510e6bb7b828080fe1"></a><br/></td></tr>
+<tr class="memdesc:ac889d885056a20510e6bb7b828080fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#ac889d885056a20510e6bb7b828080fe1"></a><br/></td></tr>
 <tr class="memitem:a0e1e716166edee0856dcda2bd8423a64"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a0e1e716166edee0856dcda2bd8423a64">AssembleKernelSourceFromFormula</a> (std::string <a class="el" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a>) const </td></tr>
 <tr class="memitem:a2d1fb48c79bf5a08b4c9479eb8f5e7f9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">AddParameter</a> (const std::string &amp;name, float val)</td></tr>
 <tr class="memitem:a3666b9e142c8af2d9798c1709a8786e0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">DeleteParameter</a> (int iParam)</td></tr>
@@ -141,15 +143,26 @@ Public Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8hpp_source.html#l00022">22</a> of file <a class="el" href="FormulaOpenCLMeshRD_8hpp_source.html">FormulaOpenCLMeshRD.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ae3e602acd8287722523781020880096c"></a>
+<a class="anchor" id="aefee61beae9ddefeeab5832ef3654b9a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classFormulaOpenCLMeshRD.html#ae3e602acd8287722523781020880096c">FormulaOpenCLMeshRD::FormulaOpenCLMeshRD</a> </td>
+          <td class="memname"><a class="el" href="classFormulaOpenCLMeshRD.html#aefee61beae9ddefeeab5832ef3654b9a">FormulaOpenCLMeshRD::FormulaOpenCLMeshRD</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_platform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_device</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
@@ -187,7 +200,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00155">155</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00158">158</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -208,7 +221,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00047">47</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00049">49</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -228,7 +241,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00171">171</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00174">174</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -249,7 +262,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00163">163</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00166">166</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,9 +280,11 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Retrieve an RD element for this pattern, suitable for saving to file. </p>
+
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00120">120</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00123">123</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +302,7 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>returns e.g. "inbuilt", "formula", "kernel", as in the XML </p>
+<p>Returns e.g. "inbuilt", "formula", "kernel", as in the XML. </p>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#a5f62de46848365e6d77e6ea1b7cc23d6">MeshRD</a>.</p>
 
@@ -320,9 +335,11 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Load this pattern from an RD element. </p>
+
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00099">99</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00102">102</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -353,7 +370,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00147">147</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00150">150</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -384,7 +401,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00139">139</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00142">142</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -396,7 +413,7 @@ Public Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

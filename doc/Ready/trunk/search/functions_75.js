@@ -5,7 +5,6 @@ var searchData=
   ['updatebuttons',['UpdateButtons',['../classInfoPanel.html#a8757b7331b0df61ed6853787fe68c160',1,'InfoPanel']]],
   ['updatechosenfile',['UpdateChosenFile',['../classPrefsDialog.html#aaff94d6e344082dc6c1991a7dd466dd4',1,'PrefsDialog']]],
   ['updatehelpbuttons',['UpdateHelpButtons',['../classHelpPanel.html#aca4828f0f05308db8f54e545496b95e5',1,'HelpPanel']]],
-  ['updateimagewrappadfilter',['UpdateImageWrapPadFilter',['../classImageRD.html#a78425460aa57de9f46a74ce3e4a0ea08',1,'ImageRD']]],
   ['updateinfopane',['UpdateInfoPane',['../classMyFrame.html#a5e712e937780b265b60781518399df4e',1,'MyFrame']]],
   ['updatemenuaccelerators',['UpdateMenuAccelerators',['../classMyFrame.html#a2fb74621355633ddff14d83943003550',1,'MyFrame']]],
   ['updatesize',['UpdateSize',['../classwxVTKRenderWindowInteractor.html#aeef1b2e99c22dbaead287c811cffcced',1,'wxVTKRenderWindowInteractor']]],

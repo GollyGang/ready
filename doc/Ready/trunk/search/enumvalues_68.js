@@ -7,6 +7,7 @@ var searchData=
   ['helpfile',['HelpFile',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a34623182ac086372c85925d0939f666b',1,'ID']]],
   ['helpformats',['HelpFormats',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a05b3c81109c55177ad668803cb8c6e1a',1,'ID']]],
   ['helphelp',['HelpHelp',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a34a6d520118d6a6012bd9e8f0f9a1560',1,'ID']]],
+  ['helpintro',['HelpIntro',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a11b4d5cc94f2a3b6cee7cb09da2126d6',1,'ID']]],
   ['helpkeyboard',['HelpKeyboard',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a19e87388929f7a4f3d961de8105c5f6d',1,'ID']]],
   ['helpmouse',['HelpMouse',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a4c430f7f8809a8418a14a2641b48719a',1,'ID']]],
   ['helppane',['HelpPane',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994aa793fe9cd53e4212456e78a881d61e73',1,'ID']]],

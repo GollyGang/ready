@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['p1',['p1',['../classLinearGradient.html#a52061b8a5eedbc925d02fca6a45cc531',1,'LinearGradient']]],
-  ['p2',['p2',['../classLinearGradient.html#adf1a370f8c9ba5904a163d5b66aa7b7d',1,'LinearGradient']]],
+  ['p1',['p1',['../classLinearGradient.html#a52061b8a5eedbc925d02fca6a45cc531',1,'LinearGradient::p1()'],['../classRadialGradient.html#a267feb58862b273e9c7897aa9b1876aa',1,'RadialGradient::p1()']]],
+  ['p2',['p2',['../classLinearGradient.html#adf1a370f8c9ba5904a163d5b66aa7b7d',1,'LinearGradient::p2()'],['../classRadialGradient.html#a68c5ac30042542baa0bc9bd2927088b1',1,'RadialGradient::p2()']]],
   ['panel',['panel',['../classHtmlView.html#a17159a122f613e34d245a54a7923c738',1,'HtmlView::panel()'],['../classHtmlInfo.html#a537802be5db2f91a49dd0d5ef630e66f',1,'HtmlInfo::panel()']]],
   ['parameter_5fname',['parameter_name',['../classParameter.html#a8a73bbce84b28531b7e911c4099d362c',1,'Parameter']]],
   ['parameters',['parameters',['../classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526',1,'AbstractRD']]],
@@ -14,6 +14,7 @@ var searchData=
   ['prefs_5fname',['PREFS_NAME',['../prefs_8cpp.html#affe07b3e664c212da7b1732908dd3fba',1,'prefs.cpp']]],
   ['prefs_5fversion',['PREFS_VERSION',['../prefs_8cpp.html#a8f18c82361263ce84f69cb17db9dfe9a',1,'prefs.cpp']]],
   ['prefspath',['prefspath',['../prefs_8cpp.html#ab9caae868f071ef53f59a17b995b45ec',1,'prefs.cpp']]],
+  ['program',['program',['../classOpenCL__MixIn.html#a156cbf7984d4fbb79b154d748467c69f',1,'OpenCL_MixIn']]],
   ['properties',['properties',['../classProperties.html#a142291b2488b5298a7834ad523b768f6',1,'Properties']]],
   ['pvtkwindow',['pVTKWindow',['../classMyFrame.html#aef9ac7887dbc9fb2f3c907e9c2f356c1',1,'MyFrame']]],
   ['px',['px',['../classPixel.html#a3c52fbdac0a9c4c5b6db4fff7d91ba5c',1,'Pixel']]],

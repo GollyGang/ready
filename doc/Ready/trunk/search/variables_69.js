@@ -23,9 +23,9 @@ var searchData=
   ['ik_5fup',['IK_UP',['../prefs_8cpp.html#aa8222f0c05ece7f3c908487b5775cd69',1,'prefs.cpp']]],
   ['image_5fchannel_5fdata_5ftype',['image_channel_data_type',['../struct__cl__image__format.html#ae965ba5f74cd52eabffc4e0904adea34',1,'_cl_image_format']]],
   ['image_5fchannel_5forder',['image_channel_order',['../struct__cl__image__format.html#aaedf0bf00bd2b217e865cad706bfad02',1,'_cl_image_format']]],
-  ['image_5fwrap_5fpad_5ffilter',['image_wrap_pad_filter',['../classImageRD.html#a182631158f77bcbde06da5013bf37bfc',1,'ImageRD']]],
   ['images',['images',['../classImageRD.html#adba4679bca0840937c0837bf2e7d787d',1,'ImageRD']]],
   ['inabout',['inAbout',['../classHtmlView.html#a279253185a7a24d90f91e8a44c4259b8',1,'HtmlView']]],
+  ['ind',['ind',['../structTriIndices.html#a7cc99617e4e4a1c85c6093556087f025',1,'TriIndices']]],
   ['ineighbor',['iNeighbor',['../structTNeighbor.html#a799107451fc00a468659663d44e309ed',1,'TNeighbor']]],
   ['info_5fpanel',['info_panel',['../classMyFrame.html#a2f1705495767375a3a81b28b90f7749c',1,'MyFrame']]],
   ['infofontsize',['infofontsize',['../prefs_8cpp.html#a7af6ffef487690c55989fafb52cad837',1,'infofontsize():&#160;prefs.cpp'],['../prefs_8hpp.html#a7af6ffef487690c55989fafb52cad837',1,'infofontsize():&#160;prefs.cpp']]],
@@ -34,6 +34,7 @@ var searchData=
   ['iplatform',['iPlatform',['../classOpenCL__MixIn.html#a8536c05ae194417bb816744e1a042b30',1,'OpenCL_MixIn']]],
   ['irecordingframe',['iRecordingFrame',['../classMyFrame.html#ac8872d8cdb198385e55e7bea0dad8c17',1,'MyFrame']]],
   ['is_5fmodified',['is_modified',['../classAbstractRD.html#abbf06675d6f5342317203a85cdff0fec',1,'AbstractRD']]],
+  ['is_5fopencl_5favailable',['is_opencl_available',['../classMyFrame.html#a78ea73836337e2cc40b7b286cff5a631',1,'MyFrame']]],
   ['is_5frecording',['is_recording',['../classMyFrame.html#ab5981f19f643c26ef5a0b2eacae4d276',1,'MyFrame']]],
   ['is_5frunning',['is_running',['../classMyFrame.html#ac16a2ad94c97411d14cfca97647b9710',1,'MyFrame']]],
   ['itargetchemical',['iTargetChemical',['../classOverlay.html#af61ec051e76500404d5a0d04c69b373f',1,'Overlay']]]

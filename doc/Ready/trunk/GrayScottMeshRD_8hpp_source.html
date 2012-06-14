@@ -128,10 +128,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00024"></a>00024 {
 <a name="l00025"></a>00025     <span class="keyword">public</span>:
 <a name="l00026"></a>00026 
-<a name="l00027"></a><a class="code" href="classInbuiltMeshRD.html#a54f5bdf2608da9af703c5225dda9f434">00027</a>         <span class="keyword">virtual</span> std::string <a class="code" href="classInbuiltMeshRD.html#a54f5bdf2608da9af703c5225dda9f434" title="returns e.g. &quot;inbuilt&quot;, &quot;formula&quot;, &quot;kernel&quot;, as in the XML">GetRuleType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;inbuilt&quot;</span>; }
+<a name="l00027"></a><a class="code" href="classInbuiltMeshRD.html#a54f5bdf2608da9af703c5225dda9f434">00027</a>         <span class="keyword">virtual</span> std::string <a class="code" href="classInbuiltMeshRD.html#a54f5bdf2608da9af703c5225dda9f434" title="Returns e.g. &quot;inbuilt&quot;, &quot;formula&quot;, &quot;kernel&quot;, as in the XML.">GetRuleType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;inbuilt&quot;</span>; }
 <a name="l00028"></a>00028 
-<a name="l00029"></a><a class="code" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd">00029</a>         <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd" title="inbuilt implementations cannot have their formula edited">HasEditableFormula</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }
-<a name="l00030"></a><a class="code" href="classInbuiltMeshRD.html#a3c734508fd4a53c158dde077d50f22b0">00030</a>         <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classInbuiltMeshRD.html#a3c734508fd4a53c158dde077d50f22b0" title="inbuilt implementations cannot have their number_of_chemicals edited">HasEditableNumberOfChemicals</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }
+<a name="l00029"></a><a class="code" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd">00029</a>         <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd" title="Some implementations (e.g. inbuilt ones) cannot have their formula edited.">HasEditableFormula</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }
+<a name="l00030"></a><a class="code" href="classInbuiltMeshRD.html#a3c734508fd4a53c158dde077d50f22b0">00030</a>         <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classInbuiltMeshRD.html#a3c734508fd4a53c158dde077d50f22b0" title="Some implementations (e.g. inbuilt ones) cannot have their number_of_chemicals edited.">HasEditableNumberOfChemicals</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">false</span>; }
 <a name="l00031"></a>00031 };
 <a name="l00032"></a>00032 <span class="comment"></span>
 <a name="l00033"></a>00033 <span class="comment">/// A non-OpenCL mesh implementation, just as an example.</span>
@@ -140,19 +140,24 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00036"></a>00036     <span class="keyword">public</span>:
 <a name="l00037"></a>00037 
 <a name="l00038"></a>00038         <a class="code" href="classGrayScottMeshRD.html#a59ebc9185cf09142bddf0bf941819833">GrayScottMeshRD</a>();
-<a name="l00039"></a>00039 <span class="comment"></span>
-<a name="l00040"></a>00040 <span class="comment">        /// For imported meshes we need a way to get something going on the surface so the user can get started.</span>
-<a name="l00041"></a>00041 <span class="comment"></span>        <span class="keywordtype">void</span> <a class="code" href="classGrayScottMeshRD.html#a1f867cdc417f0d03321a1a81c78cc0fb" title="For imported meshes we need a way to get something going on the surface so the user can get started...">CreateGrayScottStartingConditions</a>();
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043     <span class="keyword">protected</span>:
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9" title="advance the RD system by n timesteps">InternalUpdate</a>(<span class="keywordtype">int</span> n_steps);
-<a name="l00046"></a>00046 };
+<a name="l00039"></a>00039         <a class="code" href="classGrayScottMeshRD.html#a7f544018d384fe4fe868e107f4c2eded">~GrayScottMeshRD</a>();
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classGrayScottMeshRD.html#af9737ef0e3853da16b4fd985f7eed065">SetNumberOfChemicals</a>(<span class="keywordtype">int</span> n);
+<a name="l00042"></a>00042         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classGrayScottMeshRD.html#a8b54c1b8d5d39e6ec5bc19913245f0a8">CopyFromMesh</a>(vtkUnstructuredGrid *mesh2);
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044     <span class="keyword">protected</span>:
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9" title="advance the RD system by n timesteps">InternalUpdate</a>(<span class="keywordtype">int</span> n_steps);
+<a name="l00047"></a>00047 
+<a name="l00048"></a>00048     <span class="keyword">protected</span>:
+<a name="l00049"></a>00049 
+<a name="l00050"></a><a class="code" href="classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415">00050</a>         vtkUnstructuredGrid* <a class="code" href="classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415" title="temporary storage used during computation">buffer</a>;           <span class="comment">///&lt; temporary storage used during computation</span>
+<a name="l00051"></a>00051 <span class="comment"></span>};
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -126,8 +126,10 @@ Inheritance diagram for OpenCLMeshRD:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a73747d0f031f282bc6b017475fe698b2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a73747d0f031f282bc6b017475fe698b2">OpenCLMeshRD</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
+<tr class="memitem:ad59d9c02386b1408f6ab747010bbf6e7"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#ad59d9c02386b1408f6ab747010bbf6e7">~OpenCLMeshRD</a> ()</td></tr>
 <tr class="memitem:a57b894f349817078b1158fa06174fd2e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a57b894f349817078b1158fa06174fd2e">HasEditableFormula</a> () const </td></tr>
-<tr class="memdesc:a57b894f349817078b1158fa06174fd2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">inbuilt implementations cannot have their formula edited  <a href="#a57b894f349817078b1158fa06174fd2e"></a><br/></td></tr>
+<tr class="memdesc:a57b894f349817078b1158fa06174fd2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some implementations (e.g. inbuilt ones) cannot have their formula edited.  <a href="#a57b894f349817078b1158fa06174fd2e"></a><br/></td></tr>
 <tr class="memitem:a58070b870e1a6aa593157aad15c9d32c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">CopyFromMesh</a> (vtkUnstructuredGrid *mesh2)</td></tr>
 <tr class="memitem:a0b7a38d554a6765cad0b90fb9ecc9eb6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">AddParameter</a> (const std::string &amp;name, float val)</td></tr>
 <tr class="memitem:aec2be8f7fe2f9d2b7122398ea9b988b1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">DeleteParameter</a> (int iParam)</td></tr>
@@ -137,6 +139,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a86c56c6ad5224dfc6b9535b0d41a6fa7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a86c56c6ad5224dfc6b9535b0d41a6fa7">GenerateInitialPattern</a> ()</td></tr>
 <tr class="memitem:af8c9f3cfb3e74368f4d632c53009b78e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">BlankImage</a> ()</td></tr>
 <tr class="memitem:a784148e1b4b6694f70e9f898c4a87b44"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44">TestFormula</a> (std::string program_string)</td></tr>
+<tr class="memdesc:a784148e1b4b6694f70e9f898c4a87b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throws std::runtime_error with information if the formula doesn't work.  <a href="#a784148e1b4b6694f70e9f898c4a87b44"></a><br/></td></tr>
+<tr class="memitem:a639a6822e36b5ed7709941707924a55c"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a639a6822e36b5ed7709941707924a55c">GetKernel</a> () const </td></tr>
+<tr class="memdesc:a639a6822e36b5ed7709941707924a55c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full OpenCL kernel (if available, else the empty string).  <a href="#a639a6822e36b5ed7709941707924a55c"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3f804403758cabc9447cd549a9b5a53e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">InternalUpdate</a> (int n_steps)</td></tr>
@@ -145,6 +150,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a73c82e4bb80dcb8a307812f2bc1c129d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">CreateOpenCLBuffers</a> ()</td></tr>
 <tr class="memitem:a2f3d61ad3a701892732157ee689164ab"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">WriteToOpenCLBuffers</a> ()</td></tr>
 <tr class="memitem:a02059787f6d3b34b84edfb8402a6735a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">ReadFromOpenCLBuffers</a> ()</td></tr>
+<tr class="memitem:aa34d1d56b52cb1e21a52aeb26f4af8d9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">ReleaseOpenCLBuffers</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
 <tr class="memitem:a9395118c63a8fbe709c77eda83c93b79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a></td></tr>
@@ -154,7 +160,55 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p>Base class for mesh implementations that use OpenCL. </p>
 
 <p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00026">26</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
-</div><hr/><h2>Member Function Documentation</h2>
+</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a73747d0f031f282bc6b017475fe698b2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classOpenCLMeshRD.html#a73747d0f031f282bc6b017475fe698b2">OpenCLMeshRD::OpenCLMeshRD</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_platform</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>opencl_device</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00037">37</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad59d9c02386b1408f6ab747010bbf6e7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classOpenCLMeshRD.html#ad59d9c02386b1408f6ab747010bbf6e7">OpenCLMeshRD::~OpenCLMeshRD</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00046">46</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a0b7a38d554a6765cad0b90fb9ecc9eb6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -184,7 +238,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00053">53</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00070">70</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -204,7 +258,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00261">261</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00285">285</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -225,7 +279,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00234">234</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00262">262</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +299,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00156">156</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00185">185</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +321,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00069">69</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00086">86</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -290,7 +344,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00061">61</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00078">78</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +364,29 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#aea439a0c84c616efb787cce88a64e51c">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00253">253</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00277">277</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a639a6822e36b5ed7709941707924a55c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string <a class="el" href="classOpenCLMeshRD.html#a639a6822e36b5ed7709941707924a55c">OpenCLMeshRD::GetKernel</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Return the full OpenCL kernel (if available, else the empty string). </p>
+
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#aaaf0cf8a776d2ed3917f044f1cc05e33">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00048">48</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -328,11 +404,11 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>inbuilt implementations cannot have their formula edited </p>
+<p>Some implementations (e.g. inbuilt ones) cannot have their formula edited. </p>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#a5b64cad228c7ffeacf6a0a581ecdcc32">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00030">30</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00033">33</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -355,7 +431,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00077">77</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00094">94</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -375,7 +451,27 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00220">220</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00248">248</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa34d1d56b52cb1e21a52aeb26f4af8d9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">OpenCLMeshRD::ReleaseOpenCLBuffers</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">OpenCL_MixIn</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00293">293</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -395,7 +491,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00108">108</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00133">133</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -428,7 +524,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00045">45</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00062">62</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +557,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00037">37</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00054">54</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -480,9 +576,11 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Throws std::runtime_error with information if the formula doesn't work. </p>
+
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a1f8ac307cb768147fcef9ebfffe0a637">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00246">246</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00270">270</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -502,7 +600,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00195">195</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00220">220</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -518,7 +616,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00058">58</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00063">63</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -533,7 +631,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00059">59</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00064">64</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -545,7 +643,7 @@ Private Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:39 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

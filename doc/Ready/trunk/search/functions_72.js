@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['radialgradient',['RadialGradient',['../classRadialGradient.html#aa537b3da9dd1bdcc682e5b75c860de15',1,'RadialGradient']]],
   ['rd_5fxmlimagereader',['RD_XMLImageReader',['../classRD__XMLImageReader.html#a04216d87853aabc2fa817e370079541b',1,'RD_XMLImageReader']]],
   ['rd_5fxmlimagewriter',['RD_XMLImageWriter',['../classRD__XMLImageWriter.html#abcad230bb87b7162f5cf7f140ff2669c',1,'RD_XMLImageWriter']]],
   ['rd_5fxmlunstructuredgridreader',['RD_XMLUnstructuredGridReader',['../classRD__XMLUnstructuredGridReader.html#aefad3da2352e08e8a9a841e7f466503a',1,'RD_XMLUnstructuredGridReader']]],
@@ -8,8 +9,9 @@ var searchData=
   ['readfromopenclbuffers',['ReadFromOpenCLBuffers',['../classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0',1,'OpenCL_MixIn::ReadFromOpenCLBuffers()'],['../classOpenCLImageRD.html#ab0e9644914548bce785cf766e0aa0f40',1,'OpenCLImageRD::ReadFromOpenCLBuffers()'],['../classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a',1,'OpenCLMeshRD::ReadFromOpenCLBuffers()']]],
   ['readfromxml',['ReadFromXML',['../classProperty.html#ac920a8d45977714e3edf719cbc9108ea',1,'Property']]],
   ['recordframe',['RecordFrame',['../classMyFrame.html#ab85937d2dd40e771a900c367dda30085',1,'MyFrame']]],
-  ['recordingdialog',['RecordingDialog',['../classRecordingDialog.html#ad36ea998e1fe7904afb7c58fc4fc725e',1,'RecordingDialog']]],
+  ['recordingdialog',['RecordingDialog',['../classRecordingDialog.html#a6aea8add1e0da9cb26e8219a5110dd1a',1,'RecordingDialog']]],
   ['rectangle',['Rectangle',['../classRectangle.html#a89135f9b37443c7ae6621fccb49a17b4',1,'Rectangle']]],
+  ['releaseopenclbuffers',['ReleaseOpenCLBuffers',['../classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9',1,'OpenCL_MixIn::ReleaseOpenCLBuffers()'],['../classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9',1,'OpenCLMeshRD::ReleaseOpenCLBuffers()']]],
   ['reloadcontextifneeded',['ReloadContextIfNeeded',['../classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c',1,'OpenCL_MixIn']]],
   ['reloadkernelifneeded',['ReloadKernelIfNeeded',['../classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011',1,'OpenCL_MixIn::ReloadKernelIfNeeded()'],['../classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a',1,'OpenCLImageRD::ReloadKernelIfNeeded()'],['../classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd',1,'OpenCLMeshRD::ReloadKernelIfNeeded()']]],
   ['removeaccelerator',['RemoveAccelerator',['../prefs_8cpp.html#ac27fe116b1c94a4a74cafc5aa8564e60',1,'RemoveAccelerator(wxMenuBar *mbar, int item, action_id action):&#160;prefs.cpp'],['../prefs_8hpp.html#ac27fe116b1c94a4a74cafc5aa8564e60',1,'RemoveAccelerator(wxMenuBar *mbar, int item, action_id action):&#160;prefs.cpp']]],

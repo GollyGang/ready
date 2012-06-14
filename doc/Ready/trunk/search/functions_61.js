@@ -4,7 +4,6 @@ var searchData=
   ['add',['Add',['../classAdd.html#a42660a9b5eaaf7abfbe50c8602a1076e',1,'Add']]],
   ['add_5fif_5fnew',['add_if_new',['../MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501',1,'MeshRD.cpp']]],
   ['adddefaultkeyactions',['AddDefaultKeyActions',['../prefs_8cpp.html#a561f8734ac9b2da848da296a0ce2a8e2',1,'prefs.cpp']]],
-  ['addinitialpatterngeneratoroverlay',['AddInitialPatternGeneratorOverlay',['../classAbstractRD.html#a5ada482d021c856c38c8553b502da80e',1,'AbstractRD']]],
   ['addparameter',['AddParameter',['../classAbstractRD.html#abef0fac4cc1d8426a37ebef49e172998',1,'AbstractRD::AddParameter()'],['../classFormulaOpenCLImageRD.html#a49c870bdbf13801f04885fc07871e54a',1,'FormulaOpenCLImageRD::AddParameter()'],['../classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9',1,'FormulaOpenCLMeshRD::AddParameter()'],['../classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6',1,'OpenCLMeshRD::AddParameter()']]],
   ['addproperty',['AddProperty',['../classProperties.html#a4dead31cae115f63e8d9100f44ee0f5b',1,'Properties']]],
   ['addrecentpattern',['AddRecentPattern',['../classMyFrame.html#a73641e373264629dc3cc639222847135',1,'MyFrame']]],

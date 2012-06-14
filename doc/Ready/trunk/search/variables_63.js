@@ -89,5 +89,7 @@ var searchData=
   ['currkey',['currkey',['../prefs_8cpp.html#aaacf1a77c10b6c97201e93054bf86843',1,'prefs.cpp']]],
   ['currmods',['currmods',['../prefs_8cpp.html#a76d947d833846c69306f2bee3a6f9b9f',1,'prefs.cpp']]],
   ['currpage',['currpage',['../prefs_8cpp.html#aad818288638918d0901b9d818c0ff852',1,'prefs.cpp']]],
-  ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'prefs.cpp']]]
+  ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'prefs.cpp']]],
+  ['cx',['cx',['../structTri.html#a67db4aca10a65afd99a4188918bcf446',1,'Tri']]],
+  ['cy',['cy',['../structTri.html#af330fd997de95791b22150a6075856db',1,'Tri']]]
 ];

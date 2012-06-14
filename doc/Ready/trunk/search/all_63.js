@@ -429,16 +429,16 @@ var searchData=
   ['context',['context',['../classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57',1,'OpenCL_MixIn']]],
   ['convertkeyandmodifiers',['ConvertKeyAndModifiers',['../prefs_8cpp.html#a6947434df6c6efa4e866e0e8667b1096',1,'prefs.cpp']]],
   ['copyfromimage',['CopyFromImage',['../classImageRD.html#a7f4d538f7c74d6f6ec6e70c4cc4236f4',1,'ImageRD::CopyFromImage()'],['../classOpenCLImageRD.html#aa84aaabe35569bcfafd50ea8c0f36352',1,'OpenCLImageRD::CopyFromImage()']]],
-  ['copyfrommesh',['CopyFromMesh',['../classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5',1,'MeshRD::CopyFromMesh()'],['../classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c',1,'OpenCLMeshRD::CopyFromMesh()']]],
+  ['copyfrommesh',['CopyFromMesh',['../classGrayScottMeshRD.html#a8b54c1b8d5d39e6ec5bc19913245f0a8',1,'GrayScottMeshRD::CopyFromMesh()'],['../classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5',1,'MeshRD::CopyFromMesh()'],['../classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c',1,'OpenCLMeshRD::CopyFromMesh()']]],
   ['copyselection',['CopySelection',['../classHelpPanel.html#afe852659f969717f8c40b2ac0d943205',1,'HelpPanel::CopySelection()'],['../classInfoPanel.html#a10ed983e8814aac407c1f6b0c62490d9',1,'InfoPanel::CopySelection()']]],
   ['copytexttoclipboard',['CopyTextToClipboard',['../wxutils_8cpp.html#abebc97dc3ed0ec2f296fe97f3ad8fd1d',1,'CopyTextToClipboard(const wxString &amp;text):&#160;wxutils.cpp'],['../wxutils_8hpp.html#abebc97dc3ed0ec2f296fe97f3ad8fd1d',1,'CopyTextToClipboard(const wxString &amp;text):&#160;wxutils.cpp']]],
   ['cr',['CR',['../prefs_8cpp.html#a984744e7980d3a3646a27dbb40871365',1,'prefs.cpp']]],
   ['createaccelerator',['CreateAccelerator',['../prefs_8cpp.html#a36905fbfd1fa1436a4b983217e079229',1,'prefs.cpp']]],
   ['createactionprefs',['CreateActionPrefs',['../classPrefsDialog.html#a359e83e7843fce110e7181b0e04a7b93',1,'PrefsDialog']]],
   ['created',['Created',['../classwxVTKRenderWindowInteractor.html#a305f711fa4c8004357caeaed32e4ec32',1,'wxVTKRenderWindowInteractor']]],
+  ['createdefaultinitialpatterngenerator',['CreateDefaultInitialPatternGenerator',['../classAbstractRD.html#a3da00130c9bded5c65b891307486cecc',1,'AbstractRD']]],
   ['createeditprefs',['CreateEditPrefs',['../classPrefsDialog.html#adcdddc6ae06520ad194efb2e29123ac8',1,'PrefsDialog']]],
   ['createfileprefs',['CreateFilePrefs',['../classPrefsDialog.html#a45e3ed2ff24cfe3a8b27d7b06e2fb923',1,'PrefsDialog']]],
-  ['creategrayscottstartingconditions',['CreateGrayScottStartingConditions',['../classGrayScottMeshRD.html#a1f867cdc417f0d03321a1a81c78cc0fb',1,'GrayScottMeshRD']]],
   ['createkeyboardprefs',['CreateKeyboardPrefs',['../classPrefsDialog.html#a972b4afdca775ce6fec10b25c3529293',1,'PrefsDialog']]],
   ['createopenclbuffers',['CreateOpenCLBuffers',['../classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76',1,'OpenCL_MixIn::CreateOpenCLBuffers()'],['../classOpenCLImageRD.html#a4548ce92403d8765c6bd42e584df9ce2',1,'OpenCLImageRD::CreateOpenCLBuffers()'],['../classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d',1,'OpenCLMeshRD::CreateOpenCLBuffers()']]],
   ['createtimer',['CreateTimer',['../classwxVTKRenderWindowInteractor.html#a8189ccd19029eb608e1d5324e91b0a6b',1,'wxVTKRenderWindowInteractor']]],
@@ -448,5 +448,7 @@ var searchData=
   ['currmods',['currmods',['../prefs_8cpp.html#a76d947d833846c69306f2bee3a6f9b9f',1,'prefs.cpp']]],
   ['currpage',['currpage',['../prefs_8cpp.html#aad818288638918d0901b9d818c0ff852',1,'prefs.cpp']]],
   ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'prefs.cpp']]],
-  ['cvgap',['CVGAP',['../prefs_8cpp.html#a1ee9dd82018135f43d1c0ffe2ef4dad5',1,'prefs.cpp']]]
+  ['cvgap',['CVGAP',['../prefs_8cpp.html#a1ee9dd82018135f43d1c0ffe2ef4dad5',1,'prefs.cpp']]],
+  ['cx',['cx',['../structTri.html#a67db4aca10a65afd99a4188918bcf446',1,'Tri']]],
+  ['cy',['cy',['../structTri.html#af330fd997de95791b22150a6075856db',1,'Tri']]]
 ];

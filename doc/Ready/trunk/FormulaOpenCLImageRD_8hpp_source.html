@@ -131,12 +131,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00027"></a>00027 {
 <a name="l00028"></a>00028     <span class="keyword">public</span>:
 <a name="l00029"></a>00029 
-<a name="l00030"></a>00030         <a class="code" href="classFormulaOpenCLImageRD.html#ab553219b787fff5bb1b48ac29f72e1e3">FormulaOpenCLImageRD</a>();
+<a name="l00030"></a>00030         <a class="code" href="classFormulaOpenCLImageRD.html#ab15e1ceefd9761efb2bdeeedca1b8d22">FormulaOpenCLImageRD</a>(<span class="keywordtype">int</span> <a class="code" href="prefs_8cpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>,<span class="keywordtype">int</span> <a class="code" href="prefs_8cpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>);
 <a name="l00031"></a>00031 
-<a name="l00032"></a>00032         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLImageRD.html#ad15c313f1449f02e319b52a920ad5695">InitializeFromXML</a>(vtkXMLDataElement* rd,<span class="keywordtype">bool</span>&amp; warn_to_update);
-<a name="l00033"></a>00033         <span class="keyword">virtual</span> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFormulaOpenCLImageRD.html#a3b6904e036b2233f0e0b8d06f29401c8">GetAsXML</a>() <span class="keyword">const</span>;
+<a name="l00032"></a>00032         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLImageRD.html#ad15c313f1449f02e319b52a920ad5695" title="Load this pattern from an RD element.">InitializeFromXML</a>(vtkXMLDataElement* rd,<span class="keywordtype">bool</span>&amp; warn_to_update);
+<a name="l00033"></a>00033         <span class="keyword">virtual</span> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFormulaOpenCLImageRD.html#a3b6904e036b2233f0e0b8d06f29401c8" title="Retrieve an RD element for this pattern, suitable for saving to file.">GetAsXML</a>() <span class="keyword">const</span>;
 <a name="l00034"></a>00034 
-<a name="l00035"></a><a class="code" href="classFormulaOpenCLImageRD.html#a568b117415a8709ab349c3538ec85c0b">00035</a>         <span class="keyword">virtual</span> std::string <a class="code" href="classFormulaOpenCLImageRD.html#a568b117415a8709ab349c3538ec85c0b" title="returns e.g. &quot;inbuilt&quot;, &quot;formula&quot;, &quot;kernel&quot;, as in the XML">GetRuleType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;formula&quot;</span>; }
+<a name="l00035"></a><a class="code" href="classFormulaOpenCLImageRD.html#a568b117415a8709ab349c3538ec85c0b">00035</a>         <span class="keyword">virtual</span> std::string <a class="code" href="classFormulaOpenCLImageRD.html#a568b117415a8709ab349c3538ec85c0b" title="Returns e.g. &quot;inbuilt&quot;, &quot;formula&quot;, &quot;kernel&quot;, as in the XML.">GetRuleType</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;formula&quot;</span>; }
 <a name="l00036"></a>00036 
 <a name="l00037"></a><a class="code" href="classFormulaOpenCLImageRD.html#a7c73fcc8f1969201d280357ac41fd409">00037</a>         <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classFormulaOpenCLImageRD.html#a7c73fcc8f1969201d280357ac41fd409" title="e.g. block size may be 4x1x1 for kernels that use float4 (like FormulaOpenCLImageRD)">GetBlockSizeX</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> 4; } <span class="comment">// we use float4 in a 4x1x1 block</span>
 <a name="l00038"></a>00038 
@@ -156,7 +156,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 22 2012 11:01:38 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

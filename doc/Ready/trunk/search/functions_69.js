@@ -24,6 +24,7 @@ var searchData=
   ['ishtmlfile',['IsHTMLFile',['../wxutils_8cpp.html#a76758ad632040bc87bae5d58aa9358de',1,'IsHTMLFile(const wxString &amp;filename):&#160;wxutils.cpp'],['../wxutils_8hpp.html#a76758ad632040bc87bae5d58aa9358de',1,'IsHTMLFile(const wxString &amp;filename):&#160;wxutils.cpp']]],
   ['isinside',['IsInside',['../classBaseShape.html#a59a533782daf645cadabb6a0f3e9f2d3',1,'BaseShape::IsInside()'],['../classEverywhere.html#a5921a2c66631c66be5deb50d1126278f',1,'Everywhere::IsInside()'],['../classRectangle.html#a33c146433bb10c0cf75d52252e536657',1,'Rectangle::IsInside()'],['../classCircle.html#a334839ad42dd7f91815a46ee5f776580',1,'Circle::IsInside()'],['../classPixel.html#a9ac14d3d14c8d166994ebe39e4b8f2f2',1,'Pixel::IsInside()']]],
   ['ismodified',['IsModified',['../classAbstractRD.html#ab8afae10f6fd8170d70edfc74b88beac',1,'AbstractRD']]],
+  ['isopenclavailable',['IsOpenCLAvailable',['../namespaceOpenCL__utils.html#a426b51800ee7948af966128dffb3890e',1,'OpenCL_utils']]],
   ['isparameter',['IsParameter',['../classAbstractRD.html#a7bffde59b2ce710ded44fca88dfa602a',1,'AbstractRD']]],
   ['isproperty',['IsProperty',['../classProperties.html#ac91e0c702726b0c49d972c19bfabb86d',1,'Properties']]],
   ['istextfile',['IsTextFile',['../wxutils_8cpp.html#aa390352c0253eff8ca804e20566a4ce6',1,'IsTextFile(const wxString &amp;filename):&#160;wxutils.cpp'],['../wxutils_8hpp.html#aa390352c0253eff8ca804e20566a4ce6',1,'IsTextFile(const wxString &amp;filename):&#160;wxutils.cpp']]]
