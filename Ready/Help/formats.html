@@ -26,8 +26,8 @@ These are the Ready-specific XML elements, in alphabetical order:
 <tt><a href="#linear_gradient">&lt;linear_gradient&gt;</a></tt><br>
 <tt><a href="#multiply">&lt;multiply</a></tt><br>
 <tt><a href="#other_chemical">&lt;other_chemical&gt;</a></tt><br>
-</td><td width="50%">
 <tt><a href="#overlay">&lt;overlay&gt;</a></tt><br>
+</td><td width="50%">
 <tt><a href="#overwrite">&lt;overwrite&gt;</a></tt><br>
 <tt><a href="#param">&lt;param&gt;</a></tt><br>
 <tt><a href="#parameter">&lt;parameter&gt;</a></tt><br>
@@ -162,20 +162,93 @@ Attributes:
 </ul>
 <p>Contains:
 <p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc. 
-The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). See the pattern files for examples.
+The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). In the <a href="#kernel">kernel</a> section below, the "<tt>delta_a = ...</tt>" lines show how the formula might be inserted at that location in a full kernel.
+<p>
+See the pattern files for more examples.
 
 <h4><a name="kernel"></a><b>&lt;kernel&gt;</b></h4>
 
 <p>Attributes:
 <ul>
 <li><tt>number_of_chemicals</tt> (required) : The number of chemicals used.
-<li><tt>block_size_x</tt> (required) : The x component of the dimensions of the spatial unit processed by each kernel call. 
-E.g. for float4 we typically use a block size of 4x1x1. For kernels that process individual floats, the block size will be 1x1x1.
-<li><tt>block_size_y</tt> (required) : The y component.
-<li><tt>block_size_z</tt> (required) : The z component.
+<li><tt>block_size_x</tt> (required for images) : The x component of the dimensions of the spatial unit processed by each kernel call. For float4 possible block size are: 4x1x1, 2x2x1, 1x4x1, etc. For float2: 2x1x1, etc. For float: 1x1x1.
+<li><tt>block_size_y</tt> (required for images) : The y component.
+<li><tt>block_size_z</tt> (required for images) : The z component.
 </ul>
-<p>Contains:
-<p>A full OpenCL kernel, as plain text. Parameters cannot currently be used with full-kernel rules. See the pattern files for examples.
+<p>
+Contains:
+<p>
+A full OpenCL kernel, as plain text. Below is an example kernel that works on a 2-chemical image. Arrays <tt>a_in</tt> and <tt>b_in</tt> contain the current state of the chemicals <tt>a</tt> and <tt>b</tt>, and <tt>a_out</tt> and <tt>b_out</tt> should get written with the new values.
+<p><table bgcolor="#FFFFD0"><tr><td><pre><tt>
+__kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global float4 *a_out,__global float4 *b_out)
+{
+    const int x = get_global_id(0);   // returns the x-coordinate of this kernel call
+    const int y = get_global_id(1);
+    const int z = get_global_id(2);
+    const int X = get_global_size(0);   // returns the x size of the image
+    const int Y = get_global_size(1);
+    const int Z = get_global_size(2);
+    const int i_here = X*(Y*z + y) + x;   // use this to get the array index of cell x,y,z
+
+    float4 a = a_in[i_here];   // this kernel processes 4 floats at once, stored in a float4 type
+    float4 b = b_in[i_here];
+
+    // parameters:
+    float timestep = 1.0f;
+
+    // update step:
+    float delta_a = 0.0f;
+    float delta_b = 0.0f;
+    delta_a = 0.1f;    // formula line
+    delta_b = -0.2f;   // formula line
+    a_out[x] = a + timestep * delta_a;
+    b_out[x] = b + timestep * delta_b;
+}
+</tt></pre></td></tr></table>
+<p>
+Below is an example that works on 2-chemical meshes. The cells can have different numbers of neighbors but for efficiency we pass in fixed-length arrays: <tt>neighbor_indices</tt> contains the index of each neighbor, <tt>neighbor_weights</tt> contains a normalized weight (non-zero for valid neighbors), while <tt>max_neighbors</tt> contains the size of the arrays. The code below shows how we can compute a Laplacian from this input.
+<p><table bgcolor="#FFFFD0"><tr><td><pre><tt>
+__kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out,
+                         __global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)
+{
+    const int x = get_global_id(0);
+    float a = a_in[x];   // this kernel processes single floats
+    float b = b_in[x];
+    float laplacian_a = 0.0f;
+    float laplacian_b = 0.0f;
+    int offset = x * max_neighbors;
+    for(int i=0;i&lt;max_neighbors;i++)
+    {
+        laplacian_a += a_in[neighbor_indices[offset+i]] * neighbor_weights[offset+i];
+        laplacian_b += b_in[neighbor_indices[offset+i]] * neighbor_weights[offset+i];
+    }
+    laplacian_a -= a;
+    laplacian_b -= b;
+    // scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work
+    laplacian_a *= 4.0f;
+    laplacian_b *= 4.0f;
+    // avoid denormals
+    laplacian_a += 1e-10f;
+    laplacian_b += 1e-10f;
+
+    // parameters:
+    float timestep = 1.000000f;
+    float D_a = 0.082000f;
+    float D_b = 0.041000f;
+    float k = 0.060000f;
+    float F = 0.035000f;
+
+    // update step (Gray-Scott)
+    float delta_a = 0.0f;
+    float delta_b = 0.0f;
+    delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);    // formula line
+    delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;       // formula line
+    a_out[x] = a + timestep * delta_a;
+    b_out[x] = b + timestep * delta_b;
+}
+</tt></pre></td></tr></table>
+<p>
+See the pattern files for more examples.
 
 <h4><a name="initial_pattern_generator"></a><b>&lt;initial_pattern_generator&gt;</b></h4>
 

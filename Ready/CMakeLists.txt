@@ -112,6 +112,7 @@ set( PATTERN_FILES
   lion.vtu
   heat_equation_interpolation.vti
   complex_Ginsburg-Landau.vti
+  wave_equation.vti
   CPU-only/grayscott_1D.vti 
   CPU-only/grayscott_2D.vti 
   CPU-only/grayscott_3D.vti
