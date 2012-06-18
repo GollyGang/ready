@@ -76,9 +76,6 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML() const
     vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
     kernel->SetName("kernel");
     kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    kernel->SetIntAttribute("block_size_x",1);
-    kernel->SetIntAttribute("block_size_y",1);
-    kernel->SetIntAttribute("block_size_z",1);
     kernel->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
     rule->AddNestedElement(kernel);
 
