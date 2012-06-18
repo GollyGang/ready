@@ -4,7 +4,13 @@ UI annoyances:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - can floating panes go behind main window?
 
+before 0.3 release:
+- help on how to write kernels/formulae
+- pattern competition
+
 before 0.4 release:
+- Gaussian fill
+- wave equation
 - phase diagrams (plotting trajectories of individual locations through chemical space): keep track of
   a sample of points over time, allow the user to plot different pairs/triples
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
