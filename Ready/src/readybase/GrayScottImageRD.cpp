@@ -144,15 +144,13 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
                                 *vtk_at(old_a,x_prev,y,z,X,Y) + 
                                 *vtk_at(old_a,x_next,y,z,X,Y) +
                                 *vtk_at(old_a,x,y,z_prev,X,Y) + 
-                                *vtk_at(old_a,x,y,z_next,X,Y) - 6*aval 
-                                + 1e-10f; // (avoid denormals)
+                                *vtk_at(old_a,x,y,z_next,X,Y) - 6*aval;
                     float ddb = *vtk_at(old_b,x,y_prev,z,X,Y) +
                                 *vtk_at(old_b,x,y_next,z,X,Y) +
                                 *vtk_at(old_b,x_prev,y,z,X,Y) + 
                                 *vtk_at(old_b,x_next,y,z,X,Y) +
                                 *vtk_at(old_b,x,y,z_prev,X,Y) + 
-                                *vtk_at(old_b,x,y,z_next,X,Y) - 6*bval
-                                + 1e-10f; // (avoid denormals)
+                                *vtk_at(old_b,x,y,z_next,X,Y) - 6*bval;
      
                     // compute the new rate of change of a and b
                     float da = D_a * dda - aval*bval*bval + F*(1-aval);

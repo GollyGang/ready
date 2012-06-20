@@ -22,6 +22,9 @@
 // STL:
 using namespace std;
 
+// SSE:
+#include <xmmintrin.h>
+
 // ---------------------------------------------------------------------
 
 AbstractRD::AbstractRD()
@@ -30,6 +33,13 @@ AbstractRD::AbstractRD()
     this->need_reload_formula = true;
     this->is_modified = false;
     this->wrap = true;
+
+    // disable accurate handling of denormals and zeros, for speed
+    #if (defined(__i386__) || defined(__x64_64__) || defined(__amd64__) || defined(_M_X64) || defined(_M_IX86))
+     int oldMXCSR = _mm_getcsr(); //read the old MXCSR setting
+     int newMXCSR = oldMXCSR | 0x8040; // set DAZ and FZ bits
+     _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
+    #endif
 }
 
 // ---------------------------------------------------------------------

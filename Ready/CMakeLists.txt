@@ -246,6 +246,13 @@ add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
 #-------------------------------- build ------------------------------------------------------
 
+# enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
+if(MSVC)
+  add_definitions(/arch:SSE2 /fp:fast)
+else()
+  add_definitions(-msse2 -ffast-math)
+endif()
+
 if( APPLE )
   # support Mac OS 10.5 or later
   add_definitions( -mmacosx-version-min=10.5 )

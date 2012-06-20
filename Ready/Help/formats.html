@@ -227,9 +227,6 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
     // scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work
     laplacian_a *= 4.0f;
     laplacian_b *= 4.0f;
-    // avoid denormals
-    laplacian_a += 1e-10f;
-    laplacian_b += 1e-10f;
 
     // parameters:
     float timestep = 1.000000f;
