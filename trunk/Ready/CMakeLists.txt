@@ -238,7 +238,10 @@ add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
 # enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
 if(MSVC)
-  add_definitions(/arch:SSE2 /fp:fast)
+  add_definitions(/fp:fast)
+  if(NOT CMAKE_CL_64) # avoid warning on x64, which always comes with SSE2
+    add_definitions(/arch:SSE2)
+  endif()
 else()
   add_definitions(-msse2 -ffast-math)
 endif()
