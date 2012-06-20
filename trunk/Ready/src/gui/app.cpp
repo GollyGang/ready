@@ -128,6 +128,8 @@ bool MyApp::OnInit()
     return true;
 }
 
+// homepage for doxygen docs:
+
 /*! \mainpage 
  *
  * The links above can be used to explore the classes and source code files.

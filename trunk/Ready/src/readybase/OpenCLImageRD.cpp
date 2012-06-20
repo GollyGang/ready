@@ -56,12 +56,8 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
-    // make a set of options to pass to the compiler
-    ostringstream options;
-    //options << "-cl-denorms-are-zero -cl-fast-relaxed-math";
-
     // build the program
-    ret = clBuildProgram(this->program,1,&this->device_id,options.str().c_str(),NULL,NULL);
+    ret = clBuildProgram(this->program,1,&this->device_id,"-cl-denorms-are-zero -cl-fast-relaxed-math",NULL,NULL);
     if(ret != CL_SUCCESS)
     {
         const int MAX_BUILD_LOG = 10000;

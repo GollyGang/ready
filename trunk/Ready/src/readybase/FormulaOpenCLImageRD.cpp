@@ -116,8 +116,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             << "_down.z + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_fore.z + " << GetChemicalName(iC) << "_back.z,\n";
         kernel_source << indent << GetChemicalName(iC) << "_up.w + " << GetChemicalName(iC) << "_right.x + " << GetChemicalName(iC) 
             << "_down.w + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_fore.w + " << GetChemicalName(iC) 
-            << "_back.w) - 6.0f*" << GetChemicalName(iC) << "\n";
-        kernel_source << indent << "+ (float4)(1e-10f,1e-10f,1e-10f,1e-10f); // (kill denormals)\n";
+            << "_back.w) - 6.0f*" << GetChemicalName(iC) << ";\n";
     }
     kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)

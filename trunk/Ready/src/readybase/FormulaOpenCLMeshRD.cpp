@@ -79,9 +79,6 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
     kernel_source << indent << "// scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << "laplacian_" << GetChemicalName(i) << " *= 4.0f;\n";
-    kernel_source << indent << "// avoid denormals\n";
-    for(int i=0;i<NC;i++)
-        kernel_source << indent << "laplacian_" << GetChemicalName(i) << " += 1e-10f;\n";
     // the parameters (assume all float for now)
     kernel_source << "\n" << indent << "// parameters:\n";
     for(int i=0;i<(int)this->parameters.size();i++)
