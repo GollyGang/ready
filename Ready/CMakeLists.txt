@@ -89,51 +89,59 @@ set( RESOURCES
 include_directories( resources )
 
 set( PATTERN_FILES
-  grayscott_demo.vti 
-  meinhardt_stripes.vti 
-  schlogl.vti 
-  heat_equation.vti 
-  turing.vti
-  turing_noisy.vti
-  kernel_test.vti 
-  conway_life.vti 
-  bays_3D.vti
-  munafo-uskate.vti
-  grayscott_parameter_map.vti
-  grayscott_lesmes_noisy.vti
-  grayscott_noisy_solitons_mitosis.vti
-  mutually-catalytic_spots.vti
-  parameter_modulation_demo.vti
-  parameter_modulation_demo2.vti
-  life_torus.vtu
-  penrose.vtu
-  bunny.vtu
-  horse.vtu
-  lion.vtu
-  heat_equation_interpolation.vti
-  complex_Ginsburg-Landau.vti
-  wave_equation.vti
-  CPU-only/grayscott_1D.vti 
-  CPU-only/grayscott_2D.vti 
-  CPU-only/grayscott_3D.vti
-  FitzHugh-Nagumo/tip-splitting.vti 
-  FitzHugh-Nagumo/spiral_turbulence.vti
-  FitzHugh-Nagumo/pulsate.vti 
-  FitzHugh-Nagumo/squid_axon.vti
-  FitzHugh-Nagumo/Ising_regime.vti
+  Patterns/grayscott_demo.vti 
+  Patterns/meinhardt_stripes.vti 
+  Patterns/schlogl.vti 
+  Patterns/heat_equation.vti 
+  Patterns/turing.vti
+  Patterns/turing_noisy.vti
+  Patterns/kernel_test.vti 
+  Patterns/conway_life.vti 
+  Patterns/bays_3D.vti
+  Patterns/munafo-uskate.vti
+  Patterns/grayscott_parameter_map.vti
+  Patterns/grayscott_lesmes_noisy.vti
+  Patterns/grayscott_noisy_solitons_mitosis.vti
+  Patterns/mutually-catalytic_spots.vti
+  Patterns/parameter_modulation_demo.vti
+  Patterns/parameter_modulation_demo2.vti
+  Patterns/life_torus.vtu
+  Patterns/penrose.vtu
+  Patterns/bunny.vtu
+  Patterns/horse.vtu
+  Patterns/lion.vtu
+  Patterns/heat_equation_interpolation.vti
+  Patterns/complex_Ginsburg-Landau.vti
+  Patterns/wave_equation.vti
+  Patterns/CPU-only/grayscott_1D.vti 
+  Patterns/CPU-only/grayscott_2D.vti 
+  Patterns/CPU-only/grayscott_3D.vti
+  Patterns/FitzHugh-Nagumo/tip-splitting.vti 
+  Patterns/FitzHugh-Nagumo/spiral_turbulence.vti
+  Patterns/FitzHugh-Nagumo/pulsate.vti 
+  Patterns/FitzHugh-Nagumo/squid_axon.vti
+  Patterns/FitzHugh-Nagumo/Ising_regime.vti
 )
 
 set( HELP_FILES
-  about.gif about.html
-  action.html credits.html file.html help.html mouse.html quickstart.html tips.html
-  changes.html edit.html formats.html index.html problems.html view.html
-  introduction.html
+  Help/about.gif              Help/about.html
+  Help/action.html            Help/credits.html 
+  Help/file.html              Help/help.html 
+  Help/mouse.html             Help/quickstart.html 
+  Help/tips.html              Help/changes.html 
+  Help/edit.html              Help/formats.html 
+  Help/index.html             Help/problems.html 
+  Help/view.html              Help/introduction.html
 )
 
 set( OTHER_FILES
-  ./README.txt ./COPYING.txt ./TODO.txt ./BUILD.txt 
+  ./README.txt 
+  ./COPYING.txt 
+  ./TODO.txt 
+  ./BUILD.txt 
   ./CMakeLists.txt 
-  src/FindOpenCL.cmake src/Doxyfile.in
+  src/FindOpenCL.cmake 
+  src/Doxyfile.in
 )
 
 #-------------------------------------------VTK----------------------------------------------
@@ -215,31 +223,13 @@ endif()
   
 #---------------copy installation files to build folder (helps with testing)--------------------
 
-foreach( pattern_file ${PATTERN_FILES} )
+foreach( file ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
   add_custom_command( 
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}"
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/Patterns/${pattern_file}" "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Patterns/${pattern_file}"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${file}"
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}/${file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${file}"
   )
-  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/Patterns/${pattern_file}" )
-endforeach() 
-
-foreach( help_file ${HELP_FILES} )
-  add_custom_command( 
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}"
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}" "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Help/${help_file}"
-  )
-  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/Help/${help_file}" )
-endforeach() 
-
-foreach( other_file ${OTHER_FILES} )
-  add_custom_command( 
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${other_file}"
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${other_file}" "${CMAKE_CURRENT_BINARY_DIR}/${other_file}"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${other_file}"
-  )
-  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${other_file}" )
+  list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${file}" )
 endforeach() 
 
 add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
@@ -320,22 +310,10 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )
 
-# install our source files, resource files and text files
-foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${OTHER_FILES} )
+# install our source files, resource files, pattern file, help files and text files
+foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
   get_filename_component( path_name "${source_file}" PATH )
   install( FILES "${source_file}" DESTINATION ${path_name} )
-endforeach()
-
-# install our pattern files
-foreach( pattern_file ${PATTERN_FILES} )
-  get_filename_component( path_name "Patterns/${pattern_file}" PATH )
-  install( FILES "Patterns/${pattern_file}" DESTINATION ${path_name} )
-endforeach()
-
-# install our help files
-foreach( help_file ${HELP_FILES} )
-  get_filename_component( path_name "Help/${help_file}" PATH )
-  install( FILES "Help/${help_file}" DESTINATION ${path_name} )
 endforeach()
 
 #----------------------------------------package----------------------------------------------
