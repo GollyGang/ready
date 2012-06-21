@@ -292,6 +292,11 @@ if( MSVC_IDE )
   set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
 endif()
 
+# avoid security warnings
+if(MSVC)
+  add_definitions(/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
+endif()
+
 if(CMAKE_COMPILER_IS_GNUCXX)
   list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )  # strip release binary, for smaller file size
 endif()
