@@ -2526,6 +2526,13 @@ bool MyFrame::SetDimensions(int x,int y,int z)
     try 
     {
         if(x<1 || y<1 || z<1) throw runtime_error("Dimensions must be at least 1");
+        if( x%this->system->GetBlockSizeX() || y%this->system->GetBlockSizeY() || z%this->system->GetBlockSizeZ() )
+        {
+            ostringstream oss;
+            oss << "Dimensions must be a multiple of the current block size (" << this->system->GetBlockSizeX() << 
+                "x" << this->system->GetBlockSizeY() << "x" << this->system->GetBlockSizeZ() << ")";
+            throw runtime_error(oss.str().c_str());
+        }
         // rearrange the dimensions (for visualization we need the z to be 1 for 2D images, and both y and z to be 1 for 1D images)
         if( (x==1 && (y>1 || z>1)) || (y==1 && z>1) )
         {

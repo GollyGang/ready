@@ -15,6 +15,7 @@ before 0.4 release:
   5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
   used a boundary-size weighting.
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
+- allow block size to be changed for formula rules on images
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 

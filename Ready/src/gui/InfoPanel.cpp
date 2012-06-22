@@ -411,10 +411,9 @@ void InfoPanel::Update(const AbstractRD* const system)
                                         vtkMath::Round(system->GetX()),vtkMath::Round(system->GetY()),vtkMath::Round(system->GetZ())),
                                         system->HasEditableDimensions());
 
-    if(system->HasEditableBlockSize())
-        contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
-                                            system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
-                                            true);
+    contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
+                                        system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
+                                        system->HasEditableBlockSize());
                                             
     if(system->HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
