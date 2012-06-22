@@ -46,7 +46,6 @@ C) Build Ready:
     E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/lib/Win32/OpenCL.lib
  - Set OPENCL_INCLUDE_DIRS to e.g.
     E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/inc
- - Check the Advanced checkbox. Change all /MD to /MT, and /MDd to /MTd
  - Generate, then open the resulting Ready.sln and build the Debug and
    Release targets. Set Ready as the "StartUp Project" to have it run
    by default.
@@ -109,7 +108,6 @@ C) Build Ready:
     E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/lib/Win32/OpenCL.lib
  - Set OPENCL_INCLUDE_DIRS to e.g.
     E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/inc
- - Check the Advanced checkbox. Change all /MD to /MT, and /MDd to /MTd
  - Configure, generate, quit.
  - Build Ready:
     nmake
