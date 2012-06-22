@@ -298,6 +298,7 @@ void ImageRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& 
     switch(this->GetArenaDimensionality())
     {
         // TODO: merge the dimensionalities (often want one/more slices from lower dimensionalities)
+        case 0:
         case 1: this->InitializeVTKPipeline_1D(pRenderer,render_settings); break;
         case 2: this->InitializeVTKPipeline_2D(pRenderer,render_settings); break;
         case 3: this->InitializeVTKPipeline_3D(pRenderer,render_settings); break;
@@ -430,7 +431,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(0,0,low*scaling,high*scaling,0,0);
+    axis->SetBounds(-0.5,-0.5,low*scaling,high*scaling,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
