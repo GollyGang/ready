@@ -1,0 +1,8 @@
+// first icon file is used by Windows Explorer:
+aaaaaaaa ICON "appicon.ico"
+
+// these icons are for the frame:
+appicon16 ICON "appicon16.ico"
+appicon32 ICON "appicon32.ico"
+
+#include "wx/msw/wx.rc"
