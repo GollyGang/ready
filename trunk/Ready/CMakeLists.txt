@@ -334,6 +334,12 @@ endforeach()
 
 if( APPLE )
   set( CPACK_SYSTEM_NAME "Mac" )  # nicer than "Darwin"
+elseif( UNIX)
+  set( bitness 32 )
+  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    set( bitness 64 )
+  endif()
+  set( CPACK_SYSTEM_NAME "Linux-${bitness}bit" )
 endif()
 set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
