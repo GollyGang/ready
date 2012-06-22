@@ -236,6 +236,12 @@ add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
 #-------------------------------- build ------------------------------------------------------
 
+# ensure we link the C runtime statically (N.B. still appears as /MD in the CMake gui but ignore this)
+# see: http://www.cmake.org/Wiki/CMake_FAQ#Dynamic_Replace
+foreach( var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO )
+  string( REGEX REPLACE "/MD" "/MT" ${var} "${${var}}" )
+endforeach()
+
 # enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
 if(MSVC)
   add_definitions(/fp:fast)
