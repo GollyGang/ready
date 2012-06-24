@@ -11,7 +11,7 @@
         the work of Nick Owens and Susan Stepney&lt;/a&gt;.
     </description>
 
-    <rule type="kernel" name="B3/S3">
+    <rule type="kernel" name="B3/S23">
         
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float* a_in,

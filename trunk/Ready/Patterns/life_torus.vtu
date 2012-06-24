@@ -8,7 +8,7 @@
       Our implementation uses the OpenCL function step(edge,x) which returns 1 if x>edge, else 0.
     </description>
     
-    <rule name="Gray-Scott" type="formula">
+    <rule name="B3/S23" type="formula">
     
       <param name="timestep"> 1 </param>
       
