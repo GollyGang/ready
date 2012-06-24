@@ -16,7 +16,7 @@
         'show multiple chemicals' to true to see all five chemicals.
     </description>
 
-    <rule type="formula" name="Gray-Scott" wrap="0">
+    <rule type="formula" name="coupled Gray-Scott" wrap="0">
         
       <param name="timestep"> 0.06    </param>
       <param name="diff_ab">  2       </param>
