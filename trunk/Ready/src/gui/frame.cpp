@@ -549,7 +549,9 @@ void MyFrame::LoadSettings()
     // use global info set by GetPrefs()
     this->SetPosition(wxPoint(mainx,mainy));
     this->SetSize(mainwd,mainht);
-    if (auilayout.length() > 0) this->aui_mgr.LoadPerspective(auilayout);
+    if (auilayout.length() > 0 
+        && currversion > 1)  // one-off fix for issue of IDs being used as names
+        this->aui_mgr.LoadPerspective(auilayout);
 }
 
 // ---------------------------------------------------------------------
