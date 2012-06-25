@@ -417,6 +417,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(warp->GetOutputPort());
         mapper->ScalarVisibilityOff();
+        mapper->ImmediateModeRenderingOn();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->SetAmbient(1);
@@ -520,6 +521,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
             mapper->SetInputConnection(merge_datasets->GetOutputPort());
             mapper->SetScalarModeToUseCellData();
+            mapper->ImmediateModeRenderingOn();
 
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
@@ -562,6 +564,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             else
                 mapper->SetInputConnection(normals->GetOutputPort());
             mapper->ScalarVisibilityOff();
+            mapper->ImmediateModeRenderingOn();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
             actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
@@ -597,6 +600,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
 
                 vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
                 mapper->SetInputConnection(edges->GetOutputPort());
+                mapper->ImmediateModeRenderingOn();
 
                 vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
                 actor->SetMapper(mapper);
@@ -674,6 +678,8 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     // contour the 3D volume and render as a polygonal surface
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->ImmediateModeRenderingOn();
+
     if(use_image_interpolation)
     {
         // turns the 3d grid of sampled values into a polygon mesh for rendering,
@@ -765,6 +771,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(edges->GetOutputPort());
+        mapper->ImmediateModeRenderingOn();
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);

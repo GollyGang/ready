@@ -6,7 +6,7 @@ UI annoyances:
 
 before 0.4 release:
 - phase diagrams (plotting trajectories of individual locations through chemical space): keep track of
-  a sample of points over time, allow the user to plot different pairs/triples
+  a sample of points over time, allow the user to plot different pairs/triples; vtkDataObjectToTable->vtkChart?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - relax power of 2 size requirement (only a speed benefit)

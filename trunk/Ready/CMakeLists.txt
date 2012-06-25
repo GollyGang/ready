@@ -22,7 +22,7 @@ cmake_policy( SET CMP0003 NEW )
 
 project( Ready )
 
-set( READY_VERSION 0.3 )   # check matches Help/about.html
+set( READY_VERSION 0.4 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
@@ -334,12 +334,12 @@ endforeach()
 
 if( APPLE )
   set( CPACK_SYSTEM_NAME "Mac" )  # nicer than "Darwin"
-elseif( UNIX)
-  set( bitness 32 )
+elseif( UNIX )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( bitness 64 )
+    set( CPACK_SYSTEM_NAME "Linux-64bit" )  
+  else()
+    set( CPACK_SYSTEM_NAME "Linux-32bit" )  
   endif()
-  set( CPACK_SYSTEM_NAME "Linux-${bitness}bit" )
 endif()
 set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )
