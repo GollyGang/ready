@@ -53,7 +53,7 @@ wxString choosedir;              // directory used by Choose File button
 // location of supplied pattern collection (relative to app)
 const wxString PATT_DIR = wxT("Patterns");
 
-const int PREFS_VERSION = 1;     // increment if necessary due to changes in syntax/semantics
+const int PREFS_VERSION = 2;     // increment if necessary due to changes in syntax/semantics
 int currversion = PREFS_VERSION; // might be changed by prefs_version
 const int PREF_LINE_SIZE = 5000; // must be quite long for storing file paths
 

@@ -49,6 +49,7 @@ extern wxString recordingdir;    // directory for recording images
 
 // Global preference data:
 
+extern int currversion;          // prefs version information from file
 extern int mainx;                // main window's location
 extern int mainy;
 extern int mainwd;               // main window's size
