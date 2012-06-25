@@ -5,7 +5,6 @@ UI annoyances:
 - can floating panes go behind main window?
 
 before 0.4 release:
-- bug: old preferences file causes blank window (aui layout string using ids, not names)
 - phase diagrams (plotting trajectories of individual locations through chemical space): keep track of
   a sample of points over time, allow the user to plot different pairs/triples; vtkDataObjectToTable->vtkChart?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?

@@ -94,9 +94,18 @@ using namespace std;
 
 // ---------------------------------------------------------------------
 
-wxString PaneName(int id)
+const char* PaneName(int id)
 {
-    return wxString::Format(_T("%d"),id);
+    switch(id)
+    {
+        case ID::FileToolbar:   return "FileToolbar";
+        case ID::ActionToolbar: return "ActionToolbar";
+        case ID::PatternsPane:  return "PatternsPane";
+        case ID::InfoPane:      return "InfoPane";
+        case ID::HelpPane:      return "HelpPane";
+        case ID::CanvasPane:    return "CanvasPane";
+        default: throw runtime_error("PaneName : unlisted ID");
+    }
 }
 
 // ---------------------------------------------------------------------
