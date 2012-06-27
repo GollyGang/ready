@@ -5,8 +5,6 @@ UI annoyances:
 - can floating panes go behind main window?
 
 before 0.4 release:
-- phase diagrams (plotting trajectories of individual locations through chemical space): keep track of
-  a sample of points over time, allow the user to plot different pairs/triples; vtkDataObjectToTable->vtkChart?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - relax power of 2 size requirement (only a speed benefit)
@@ -46,6 +44,10 @@ before 1.0 release:
 - graphical UI for editing the initial-pattern-generator overlay stack
 
 future ideas:
+- phase diagrams (plotting trajectories of individual locations through chemical space): keep track of
+  a sample of points over time, allow the user to plot different pairs/triples
+  (Ideally would use vtkDataObjectToTable->vtkChartXY but this doesn't currently support pipelining:
+  http://www.vtk.org/Bug/view.php?id=13268)
 - bug: allow user to change OpenCL platform and device while a pattern is running
 - full control over scene graph, e.g. nodes+connections interface
 - radiosity rendering for better visualization of tangled structures (embed a raytracer)
