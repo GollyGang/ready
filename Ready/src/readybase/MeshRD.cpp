@@ -235,6 +235,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     lut->SetSaturationRange(low_sat,high_sat);
     lut->SetHueRange(low_hue,high_hue);
     lut->SetValueRange(low_val,high_val);
+    lut->Build();
 
     // add the mesh actor
     {
