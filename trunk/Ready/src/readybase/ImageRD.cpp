@@ -341,6 +341,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     lut->SetSaturationRange(low_sat,high_sat);
     lut->SetHueRange(low_hue,high_hue);
     lut->SetValueRange(low_val,high_val);
+    lut->Build();
 
     // pass the image through the lookup table
     vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -485,6 +486,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     lut->SetSaturationRange(low_sat,high_sat);
     lut->SetHueRange(low_hue,high_hue);
     lut->SetValueRange(low_val,high_val);
+    lut->Build();
 
     for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
@@ -792,6 +794,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         lut->SetSaturationRange(low_sat,high_sat);
         lut->SetHueRange(low_hue,high_hue);
         lut->SetValueRange(low_val,high_val);
+        lut->Build();
 
         // extract a slice
         vtkImageData *image = this->GetImage(iActiveChemical);
