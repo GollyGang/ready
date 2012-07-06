@@ -314,8 +314,7 @@ const char* GetActionName(action_id action)
         case DO_EXPORTIMAGE:    return "Export Image...";
         case DO_SAVE:           return "Save Pattern...";
         case DO_SCREENSHOT:     return "Save Screenshot...";
-        case DO_STARTRECORDING: return "Start Recording...";
-        case DO_STOPRECORDING:  return "Stop Recording";
+        case DO_RECORDFRAMES:   return "Start Recording...";
         case DO_ADDPATTS:       return "Add My Patterns...";
         case DO_PREFS:          return "Preferences...";
         case DO_QUIT:           return "Quit Ready";

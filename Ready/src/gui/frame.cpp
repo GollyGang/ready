@@ -125,10 +125,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
     EVT_MENU(ID::ExportImage, MyFrame::OnExportImage)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
-    EVT_MENU(ID::StartRecording, MyFrame::OnStartRecording)
-    EVT_UPDATE_UI(ID::StartRecording, MyFrame::OnUpdateStartRecording)
-    EVT_MENU(ID::StopRecording, MyFrame::OnStopRecording)
-    EVT_UPDATE_UI(ID::StopRecording, MyFrame::OnUpdateStopRecording)
+    EVT_MENU(ID::RecordFrames, MyFrame::OnRecordFrames)
+    EVT_UPDATE_UI(ID::RecordFrames, MyFrame::OnUpdateRecordFrames)
     EVT_MENU(ID::AddMyPatterns, MyFrame::OnAddMyPatterns)
     EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
@@ -310,8 +308,7 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
         menu->AppendSeparator();
-        menu->Append(ID::StartRecording, _("Start Recording...") + GetAccelerator(DO_STARTRECORDING), _("Start recording frames as images to disk"));
-        menu->Append(ID::StopRecording, _("Stop Recording") + GetAccelerator(DO_STOPRECORDING), _("Stop recording frames"));
+        menu->AppendCheckItem(ID::RecordFrames, _("Start Recording...") + GetAccelerator(DO_RECORDFRAMES), _("Record frames as images to disk"));
         menu->AppendSeparator();
         menu->Append(ID::AddMyPatterns, _("Add My Patterns...") + GetAccelerator(DO_ADDPATTS), _("Add chosen folder to patterns pane"));
         #if !defined(__WXOSX_COCOA__)
@@ -421,9 +418,18 @@ void MyFrame::InitializeToolbars()
 {
     {   // file menu items
         this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
-        this->file_toolbar->AddTool(wxID_NEW,wxEmptyString,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),_("Create a new pattern"));
-        this->file_toolbar->AddTool(wxID_OPEN,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),_("Choose a pattern file to open"));
-        this->file_toolbar->AddTool(wxID_SAVE,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),_("Save the current pattern"));
+        this->file_toolbar->AddTool(wxID_NEW,wxEmptyString,wxBitmap(_T("resources/Icons/document-new.png"),wxBITMAP_TYPE_PNG),
+            _("New Pattern"));
+        this->file_toolbar->AddTool(wxID_OPEN,wxEmptyString,wxBitmap(_T("resources/Icons/document-open.png"),wxBITMAP_TYPE_PNG),
+            _("Open Pattern..."));
+        this->file_toolbar->AddTool(ID::ReloadFromDisk,wxEmptyString,wxBitmap(_T("resources/Icons/document-revert.png"),wxBITMAP_TYPE_PNG),
+            _("Reload from disk"));
+        this->file_toolbar->AddTool(wxID_SAVE,wxEmptyString,wxBitmap(_T("resources/Icons/document-save.png"),wxBITMAP_TYPE_PNG),
+            _("Save Pattern..."));
+        this->file_toolbar->AddTool(ID::Screenshot,wxEmptyString,wxBitmap(_T("resources/Icons/camera-photo.png"),wxBITMAP_TYPE_PNG),
+            _("Save Screenshot..."));
+        this->file_toolbar->AddTool(ID::RecordFrames,wxEmptyString,wxBitmap(_T("resources/Icons/media-record.png"),wxBITMAP_TYPE_PNG),
+            _("Start Recording..."),wxITEM_CHECK);
         #ifdef __WXMAC__
             this->file_toolbar->SetToolBorderPadding(10);
         #endif
@@ -432,14 +438,18 @@ void MyFrame::InitializeToolbars()
     }
     {   // action menu items
         this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
-        this->action_toolbar->AddTool(ID::Step1,wxEmptyString,wxArtProvider::GetBitmap(wxART_PLUS,wxART_TOOLBAR),
+        this->action_toolbar->AddTool(ID::Step1,wxEmptyString,wxBitmap(_T("resources/Icons/list-add_gray.png"),wxBITMAP_TYPE_PNG),
             _("Step by 1"));
-        this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR),
-            _("Start running the simulation"));
-        this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxArtProvider::GetBitmap(wxART_GOTO_FIRST,wxART_TOOLBAR),
-            _("Go back to the starting pattern"));
-        this->action_toolbar->AddTool(ID::GenerateInitialPattern,wxEmptyString,wxArtProvider::GetBitmap(wxART_EXECUTABLE_FILE,wxART_TOOLBAR),
-            _("Run the Initial Pattern Generator"));
+        this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxBitmap(_T("resources/Icons/media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
+            _("Run"));
+        this->action_toolbar->AddTool(ID::Slower,wxEmptyString,wxBitmap(_T("resources/Icons/media-seek-backward.png"),wxBITMAP_TYPE_PNG),
+            _("Run Slower"));
+        this->action_toolbar->AddTool(ID::Faster,wxEmptyString,wxBitmap(_T("resources/Icons/media-seek-forward.png"),wxBITMAP_TYPE_PNG),
+            _("Run Faster"));
+        this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxBitmap(_T("resources/Icons/media-skip-backward_modified.png"),wxBITMAP_TYPE_PNG),
+            _("Reset"));
+        this->action_toolbar->AddTool(ID::GenerateInitialPattern,wxEmptyString,wxBitmap(_T("resources/Icons/system-run.png"),wxBITMAP_TYPE_PNG),
+            _("Generate Initial Pattern"));
         #ifdef __WXMAC__
             this->action_toolbar->SetToolBorderPadding(10);
         #endif
@@ -448,10 +458,14 @@ void MyFrame::InitializeToolbars()
     }
     {   // paint items
         this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
-        this->paint_toolbar->AddTool(ID::Pointer,wxEmptyString,wxBitmap(_T("resources/Icons/icon-pointer.png"),wxBITMAP_TYPE_PNG),_("Pointer"),wxITEM_RADIO);
-        this->paint_toolbar->AddTool(ID::Pencil,wxEmptyString,wxBitmap(_T("resources/Icons/draw-freehand.png"),wxBITMAP_TYPE_PNG),_("Pencil"),wxITEM_RADIO);
-        this->paint_toolbar->AddTool(ID::Brush,wxEmptyString,wxBitmap(_T("resources/Icons/draw-brush.png"),wxBITMAP_TYPE_PNG),_("Brush"),wxITEM_RADIO);
-        this->paint_toolbar->AddTool(ID::Picker,wxEmptyString,wxBitmap(_T("resources/Icons/color-picker.png"),wxBITMAP_TYPE_PNG),_("Color picker"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Pointer,wxEmptyString,wxBitmap(_T("resources/Icons/icon-pointer.png"),wxBITMAP_TYPE_PNG),
+            _("Pointer"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Pencil,wxEmptyString,wxBitmap(_T("resources/Icons/draw-freehand.png"),wxBITMAP_TYPE_PNG)
+            ,_("Pencil"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Brush,wxEmptyString,wxBitmap(_T("resources/Icons/draw-brush.png"),wxBITMAP_TYPE_PNG),
+            _("Brush"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Picker,wxEmptyString,wxBitmap(_T("resources/Icons/color-picker.png"),wxBITMAP_TYPE_PNG),
+            _("Color picker"),wxITEM_RADIO);
         #ifdef __WXMAC__
             this->paint_toolbar->SetToolBorderPadding(10);
         #endif
@@ -1042,8 +1056,8 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 void MyFrame::UpdateToolbars()
 {
     this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
-        this->is_running ? wxArtProvider::GetBitmap(wxART_CROSS_MARK,wxART_TOOLBAR)
-                         : wxArtProvider::GetBitmap(wxART_GO_FORWARD,wxART_TOOLBAR) );
+        this->is_running ? wxBitmap(_T("resources/Icons/media-playback-pause_green.png"),wxBITMAP_TYPE_PNG)
+                         : wxBitmap(_T("resources/Icons/media-playback-start_green.png"),wxBITMAP_TYPE_PNG) );
     
     this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
         this->is_running ? _("Stop running the simulation")
@@ -2265,8 +2279,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::ExportImage,               DO_EXPORTIMAGE);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
-        SetAccelerator(mbar, ID::StartRecording,            DO_STARTRECORDING);
-        SetAccelerator(mbar, ID::StopRecording,             DO_STOPRECORDING);
+        SetAccelerator(mbar, ID::RecordFrames,              DO_RECORDFRAMES);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
         
         // edit menu
@@ -2335,8 +2348,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_EXPORTIMAGE:    cmdid = ID::ExportImage; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
         case DO_SCREENSHOT:     cmdid = ID::Screenshot; break;
-        case DO_STARTRECORDING: cmdid = ID::StartRecording; break;
-        case DO_STOPRECORDING:  cmdid = ID::StopRecording; break;
+        case DO_RECORDFRAMES:   cmdid = ID::RecordFrames; break;
         case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
         case DO_PREFS:          cmdid = wxID_PREFERENCES; break;
         case DO_QUIT:           cmdid = wxID_EXIT; break;
@@ -2971,38 +2983,29 @@ void MyFrame::RecordFrame()
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnStartRecording(wxCommandEvent &event)
+void MyFrame::OnRecordFrames(wxCommandEvent &event)
 {
-    bool default_to_2D_data = (this->system->GetArenaDimensionality()==2);
+    if(!this->is_recording)
+    {
+        bool default_to_2D_data = (this->system->GetArenaDimensionality()==2);
 
-    RecordingDialog dlg(this,default_to_2D_data);
-    if(dlg.ShowModal()!=wxID_OK) return;
-    this->recording_prefix = dlg.recording_prefix;
-    this->recording_extension = dlg.recording_extension;
-    this->record_data_image = dlg.record_data_image;
-    this->iRecordingFrame = 0;
-    this->is_recording = true;
+        RecordingDialog dlg(this,default_to_2D_data);
+        if(dlg.ShowModal()!=wxID_OK) return;
+        this->recording_prefix = dlg.recording_prefix;
+        this->recording_extension = dlg.recording_extension;
+        this->record_data_image = dlg.record_data_image;
+        this->iRecordingFrame = 0;
+        this->is_recording = true;
+    }
+    else
+        this->is_recording = false;
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnUpdateStartRecording(wxUpdateUIEvent &event)
+void MyFrame::OnUpdateRecordFrames(wxUpdateUIEvent &event)
 {
-    event.Enable(!this->is_recording);
-}
-
-// ---------------------------------------------------------------------
-
-void MyFrame::OnStopRecording(wxCommandEvent &event)
-{
-    this->is_recording = false;
-}
-
-// ---------------------------------------------------------------------
-
-void MyFrame::OnUpdateStopRecording(wxUpdateUIEvent &event)
-{
-    event.Enable(this->is_recording);
+    event.Check(this->is_recording);
 }
 
 // ---------------------------------------------------------------------
@@ -3035,6 +3038,7 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
+    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Enable();
 }
 
 // ---------------------------------------------------------------------
@@ -3050,6 +3054,7 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PENCIL;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PENCIL));
+    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Disable();
 }
 
 // ---------------------------------------------------------------------
@@ -3065,6 +3070,7 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
     this->CurrentCursor = BRUSH;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PAINT_BRUSH));
+    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Disable();
 }
 
 // ---------------------------------------------------------------------
@@ -3080,6 +3086,7 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PICKER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW)); // TODO: find a better cursor
+    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Disable();
 }
 
 // ---------------------------------------------------------------------
