@@ -85,6 +85,10 @@ set( RESOURCES
   resources/app.icns 
   resources/file.icns
   resources/logo.png
+  resources/Icons/icon-pointer.png
+  resources/Icons/draw-freehand.png
+  resources/Icons/draw-brush.png
+  resources/Icons/color-picker.png
 )
 include_directories( resources )
 
@@ -223,7 +227,7 @@ endif()
   
 #---------------copy installation files to build folder (helps with testing)--------------------
 
-foreach( file ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
+foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
   add_custom_command( 
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${file}"
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}/${file}"

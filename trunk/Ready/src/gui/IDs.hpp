@@ -47,6 +47,12 @@ namespace ID
         ImportMesh,
         ExportMesh,
         ExportImage,
+
+        // edit menu
+        Pointer,
+        Pencil,
+        Brush,
+        Picker,
         
         // view menu
         FullScreen,
@@ -56,6 +62,9 @@ namespace ID
         PatternsPane,
         InfoPane,
         HelpPane,
+        FileToolbar,
+        ActionToolbar,
+        PaintToolbar,
         RestoreDefaultPerspective,
         ChangeActiveChemical,
         
@@ -100,9 +109,5 @@ namespace ID
         ContentsButton,
         SmallerButton,
         BiggerButton,
-
-        // toolbars:
-        FileToolbar,
-        ActionToolbar,
     }; 
 };
