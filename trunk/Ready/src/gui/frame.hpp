@@ -80,10 +80,8 @@ class MyFrame : public wxFrame
         void OnReloadFromDisk(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
         void OnScreenshot(wxCommandEvent& event);
-        void OnStartRecording(wxCommandEvent& event);
-        void OnUpdateStartRecording(wxUpdateUIEvent& event);
-        void OnStopRecording(wxCommandEvent& event);
-        void OnUpdateStopRecording(wxUpdateUIEvent& event);
+        void OnRecordFrames(wxCommandEvent& event);
+        void OnUpdateRecordFrames(wxUpdateUIEvent& event);
         void OnAddMyPatterns(wxCommandEvent& event);
         void OnPreferences(wxCommandEvent& event);
         void OnImportMesh(wxCommandEvent& event);

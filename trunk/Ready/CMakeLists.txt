@@ -89,6 +89,19 @@ set( RESOURCES
   resources/Icons/draw-freehand.png
   resources/Icons/draw-brush.png
   resources/Icons/color-picker.png
+  resources/Icons/document-new.png
+  resources/Icons/document-open.png
+  resources/Icons/document-save.png
+  resources/Icons/document-revert.png
+  resources/Icons/media-playback-start_green.png
+  resources/Icons/media-playback-pause_green.png
+  resources/Icons/media-seek-forward.png
+  resources/Icons/media-seek-backward.png
+  resources/Icons/media-skip-backward_modified.png
+  resources/Icons/media-record.png
+  resources/Icons/system-run.png
+  resources/Icons/list-add_gray.png
+  resources/Icons/camera-photo.png
 )
 include_directories( resources )
 

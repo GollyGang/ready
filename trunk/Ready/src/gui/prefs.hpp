@@ -123,10 +123,9 @@ typedef enum
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
     DO_OPENCL,                   // show OpenCL diagnostics...
-    DO_STARTRECORDING,           // start recording
+    DO_RECORDFRAMES,             // start recording
     DO_STEP1,                    // step by 1
     DO_STEPN,                    // step by N
-    DO_STOPRECORDING,            // stop recording
     DO_ACTIONTOOLBAR,            // view action toolbar
     DO_FILETOOLBAR,              // view file toolbar
     DO_VIEWKERNEL,               // view full kernel
