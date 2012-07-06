@@ -108,6 +108,8 @@ bool MyApp::OnInit()
     // now set global readydir for use elsewhere
     readydir = wxFileName::GetCwd();
     if (readydir.Last() != wxFILE_SEP_PATH) readydir += wxFILE_SEP_PATH;
+    
+    ::wxInitAllImageHandlers(); // make sure we can handle all sorts of images
 
     currframe = new MyFrame(_("Ready"));
     
