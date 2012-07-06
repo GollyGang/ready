@@ -139,6 +139,14 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE, MyFrame::OnUpdatePaste)
     EVT_MENU(wxID_CLEAR, MyFrame::OnClear)
     EVT_MENU(wxID_SELECTALL, MyFrame::OnSelectAll)
+    EVT_MENU(ID::Pointer, MyFrame::OnSelectPointerTool)
+    EVT_UPDATE_UI(ID::Pointer, MyFrame::OnUpdateSelectPointerTool)
+    EVT_MENU(ID::Pencil, MyFrame::OnSelectPencilTool)
+    EVT_UPDATE_UI(ID::Pencil, MyFrame::OnUpdateSelectPencilTool)
+    EVT_MENU(ID::Brush, MyFrame::OnSelectBrushTool)
+    EVT_UPDATE_UI(ID::Brush, MyFrame::OnUpdateSelectBrushTool)
+    EVT_MENU(ID::Picker, MyFrame::OnSelectPickerTool)
+    EVT_UPDATE_UI(ID::Picker, MyFrame::OnUpdateSelectPickerTool)
     // view menu
     EVT_MENU(ID::FullScreen, MyFrame::OnFullScreen)
     EVT_MENU(ID::FitPattern, MyFrame::OnFitPattern)
@@ -223,7 +231,8 @@ MyFrame::MyFrame(const wxString& title)
        million_cell_generations_per_second(0.0),
        fullscreen(false),
        render_settings("render_settings"),
-       is_recording(false)
+       is_recording(false),
+       CurrentCursor(POINTER)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -326,10 +335,10 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(wxID_SELECTALL, _("Select All") + GetAccelerator(DO_SELALL), _("Select everything"));
         menu->AppendSeparator();
-        menu->AppendCheckItem(ID::Pointer, _("Select Pointer") + GetAccelerator(DO_POINTER), _("Select pointer tool"));
-        menu->AppendCheckItem(ID::Pencil, _("Select Pencil") + GetAccelerator(DO_PENCIL), _("Select pencil tool"));
-        menu->AppendCheckItem(ID::Brush, _("Select Brush") + GetAccelerator(DO_BRUSH), _("Select brush tool"));
-        menu->AppendCheckItem(ID::Picker, _("Select Color Picker") + GetAccelerator(DO_PICKER), _("Select color picker tool"));
+        menu->AppendRadioItem(ID::Pointer, _("Select Pointer") + GetAccelerator(DO_POINTER), _("Select pointer tool"));
+        menu->AppendRadioItem(ID::Pencil, _("Select Pencil") + GetAccelerator(DO_PENCIL), _("Select pencil tool"));
+        menu->AppendRadioItem(ID::Brush, _("Select Brush") + GetAccelerator(DO_BRUSH), _("Select brush tool"));
+        menu->AppendRadioItem(ID::Picker, _("Select Color Picker") + GetAccelerator(DO_PICKER), _("Select color picker tool"));
         menuBar->Append(menu, _("&Edit"));
     }
     {   // view menu:
@@ -439,10 +448,10 @@ void MyFrame::InitializeToolbars()
     }
     {   // paint items
         this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
-        this->paint_toolbar->AddTool(ID::Pointer,wxEmptyString,wxBitmap(_T("resources/Icons/icon-pointer.png"),wxBITMAP_TYPE_PNG),_("Pointer"),wxITEM_CHECK);
-        this->paint_toolbar->AddTool(ID::Pencil,wxEmptyString,wxBitmap(_T("resources/Icons/draw-freehand.png"),wxBITMAP_TYPE_PNG),_("Pencil"),wxITEM_CHECK);
-        this->paint_toolbar->AddTool(ID::Brush,wxEmptyString,wxBitmap(_T("resources/Icons/draw-brush.png"),wxBITMAP_TYPE_PNG),_("Brush"),wxITEM_CHECK);
-        this->paint_toolbar->AddTool(ID::Picker,wxEmptyString,wxBitmap(_T("resources/Icons/color-picker.png"),wxBITMAP_TYPE_PNG),_("Color picker"),wxITEM_CHECK);
+        this->paint_toolbar->AddTool(ID::Pointer,wxEmptyString,wxBitmap(_T("resources/Icons/icon-pointer.png"),wxBITMAP_TYPE_PNG),_("Pointer"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Pencil,wxEmptyString,wxBitmap(_T("resources/Icons/draw-freehand.png"),wxBITMAP_TYPE_PNG),_("Pencil"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Brush,wxEmptyString,wxBitmap(_T("resources/Icons/draw-brush.png"),wxBITMAP_TYPE_PNG),_("Brush"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Picker,wxEmptyString,wxBitmap(_T("resources/Icons/color-picker.png"),wxBITMAP_TYPE_PNG),_("Color picker"),wxITEM_RADIO);
         #ifdef __WXMAC__
             this->paint_toolbar->SetToolBorderPadding(10);
         #endif
@@ -3018,6 +3027,66 @@ void MyFrame::OnViewFullKernel(wxCommandEvent& event)
 void MyFrame::OnUpdateViewFullKernel(wxUpdateUIEvent& event)
 {
     event.Enable(this->system->GetRuleType()=="formula");
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
+{
+    this->CurrentCursor = POINTER;
+    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateSelectPointerTool(wxUpdateUIEvent& event)
+{
+    event.Check(this->CurrentCursor==POINTER);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
+{
+    this->CurrentCursor = PENCIL;
+    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PENCIL));
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateSelectPencilTool(wxUpdateUIEvent& event)
+{
+    event.Check(this->CurrentCursor==PENCIL);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
+{
+    this->CurrentCursor = BRUSH;
+    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PAINT_BRUSH));
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateSelectBrushTool(wxUpdateUIEvent& event)
+{
+    event.Check(this->CurrentCursor==BRUSH);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
+{
+    this->CurrentCursor = PICKER;
+    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW)); // TODO: find a better cursor
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateSelectPickerTool(wxUpdateUIEvent& event)
+{
+    event.Check(this->CurrentCursor==PICKER);
 }
 
 // ---------------------------------------------------------------------

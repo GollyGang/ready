@@ -105,6 +105,14 @@ class MyFrame : public wxFrame
         void OnUpdatePaste(wxUpdateUIEvent& event);
         void OnClear(wxCommandEvent& event);
         void OnSelectAll(wxCommandEvent& event);
+        void OnSelectPointerTool(wxCommandEvent& event);
+        void OnUpdateSelectPointerTool(wxUpdateUIEvent& event);
+        void OnSelectPencilTool(wxCommandEvent& event);
+        void OnUpdateSelectPencilTool(wxUpdateUIEvent& event);
+        void OnSelectBrushTool(wxCommandEvent& event);
+        void OnUpdateSelectBrushTool(wxUpdateUIEvent& event);
+        void OnSelectPickerTool(wxCommandEvent& event);
+        void OnUpdateSelectPickerTool(wxUpdateUIEvent& event);
 
         // View menu
         void OnFullScreen(wxCommandEvent& event);
@@ -215,6 +223,8 @@ class MyFrame : public wxFrame
         bool is_opencl_available;
         
         static const char *opencl_not_available_message;
+
+        enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
 
         DECLARE_EVENT_TABLE()
 };
