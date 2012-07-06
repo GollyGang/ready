@@ -100,11 +100,12 @@ const char* PaneName(int id)
     {
         case ID::FileToolbar:   return "FileToolbar";
         case ID::ActionToolbar: return "ActionToolbar";
+        case ID::PaintToolbar:  return "PaintToolbar";
         case ID::PatternsPane:  return "PatternsPane";
         case ID::InfoPane:      return "InfoPane";
         case ID::HelpPane:      return "HelpPane";
         case ID::CanvasPane:    return "CanvasPane";
-        default: throw runtime_error("PaneName : unlisted ID");
+        default:                throw runtime_error("PaneName : unlisted ID");
     }
 }
 
@@ -149,6 +150,12 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::InfoPane, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::HelpPane, MyFrame::OnToggleViewPane)
     EVT_UPDATE_UI(ID::HelpPane, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::FileToolbar, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::FileToolbar, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::ActionToolbar, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::ActionToolbar, MyFrame::OnUpdateViewPane)
+    EVT_MENU(ID::PaintToolbar, MyFrame::OnToggleViewPane)
+    EVT_UPDATE_UI(ID::PaintToolbar, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
     // action menu
@@ -254,13 +261,7 @@ MyFrame::MyFrame(const wxString& title)
     #endif
 
     // initialize an RD system to get us started
-    #ifdef __WXMSW__
-        // use back slashes on Windows
-        const wxString initfile = _T("Patterns\\CPU-only\\grayscott_3D.vti");
-    #else
-        // use forward slashes on Mac/Linux
-        const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
-    #endif
+    const wxString initfile = _T("Patterns/CPU-only/grayscott_3D.vti");
     if (wxFileExists(initfile)) {
         this->OpenFile(initfile);
     } else {
@@ -324,6 +325,11 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_CLEAR, _("Clear") + GetAccelerator(DO_CLEAR), _("Clear the selection"));
         menu->AppendSeparator();
         menu->Append(wxID_SELECTALL, _("Select All") + GetAccelerator(DO_SELALL), _("Select everything"));
+        menu->AppendSeparator();
+        menu->AppendCheckItem(ID::Pointer, _("Select Pointer") + GetAccelerator(DO_POINTER), _("Select pointer tool"));
+        menu->AppendCheckItem(ID::Pencil, _("Select Pencil") + GetAccelerator(DO_PENCIL), _("Select pencil tool"));
+        menu->AppendCheckItem(ID::Brush, _("Select Brush") + GetAccelerator(DO_BRUSH), _("Select brush tool"));
+        menu->AppendCheckItem(ID::Picker, _("Select Color Picker") + GetAccelerator(DO_PICKER), _("Select color picker tool"));
         menuBar->Append(menu, _("&Edit"));
     }
     {   // view menu:
@@ -336,7 +342,11 @@ void MyFrame::InitializeMenus()
         menu->AppendCheckItem(ID::InfoPane, _("&Info Pane") + GetAccelerator(DO_INFO), _("View the info pane"));
         menu->AppendCheckItem(ID::HelpPane, _("&Help Pane") + GetAccelerator(DO_HELP), _("View the help pane"));
         menu->AppendSeparator();
-        menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout") + GetAccelerator(DO_RESTORE), _("Put the windows back where they were"));
+        menu->AppendCheckItem(ID::FileToolbar, _("File Toolbar") + GetAccelerator(DO_FILETOOLBAR), _("View the file toolbar"));
+        menu->AppendCheckItem(ID::ActionToolbar, _("Action Toolbar") + GetAccelerator(DO_ACTIONTOOLBAR), _("View the action toolbar"));
+        menu->AppendCheckItem(ID::PaintToolbar, _("Paint Toolbar") + GetAccelerator(DO_PAINTTOOLBAR), _("View the paint toolbar"));
+        menu->AppendSeparator();
+        menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout") + GetAccelerator(DO_RESTORE), _("Put the windows and toolbars back where they were"));
         menu->AppendSeparator();
         menu->Append(ID::ChangeActiveChemical, _("&Change Active Chemical...") + GetAccelerator(DO_CHEMICAL), _("Change which chemical is being visualized"));
         menuBar->Append(menu, _("&View"));
@@ -401,14 +411,14 @@ void MyFrame::InitializeMenus()
 void MyFrame::InitializeToolbars()
 {
     {   // file menu items
-        wxAuiToolBar *tb = new wxAuiToolBar(this,ID::FileToolbar);
-        tb->AddTool(wxID_NEW,wxEmptyString,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),_("Create a new pattern"));
-        tb->AddTool(wxID_OPEN,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),_("Choose a pattern file to open"));
-        tb->AddTool(wxID_SAVE,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),_("Save the current pattern"));
+        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
+        this->file_toolbar->AddTool(wxID_NEW,wxEmptyString,wxArtProvider::GetBitmap(wxART_NEW,wxART_TOOLBAR),_("Create a new pattern"));
+        this->file_toolbar->AddTool(wxID_OPEN,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_OPEN,wxART_TOOLBAR),_("Choose a pattern file to open"));
+        this->file_toolbar->AddTool(wxID_SAVE,wxEmptyString,wxArtProvider::GetBitmap(wxART_FILE_SAVE,wxART_TOOLBAR),_("Save the current pattern"));
         #ifdef __WXMAC__
-            tb->SetToolBorderPadding(10);
+            this->file_toolbar->SetToolBorderPadding(10);
         #endif
-        this->aui_mgr.AddPane(tb,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
+        this->aui_mgr.AddPane(this->file_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
             .Position(0).Caption(_("File tools")));
     }
     {   // action menu items
@@ -426,6 +436,18 @@ void MyFrame::InitializeToolbars()
         #endif
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top()
             .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
+    }
+    {   // paint items
+        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
+        this->paint_toolbar->AddTool(ID::Pointer,wxEmptyString,wxBitmap(_T("resources/Icons/icon-pointer.png"),wxBITMAP_TYPE_PNG),_("Pointer"),wxITEM_CHECK);
+        this->paint_toolbar->AddTool(ID::Pencil,wxEmptyString,wxBitmap(_T("resources/Icons/draw-freehand.png"),wxBITMAP_TYPE_PNG),_("Pencil"),wxITEM_CHECK);
+        this->paint_toolbar->AddTool(ID::Brush,wxEmptyString,wxBitmap(_T("resources/Icons/draw-brush.png"),wxBITMAP_TYPE_PNG),_("Brush"),wxITEM_CHECK);
+        this->paint_toolbar->AddTool(ID::Picker,wxEmptyString,wxBitmap(_T("resources/Icons/color-picker.png"),wxBITMAP_TYPE_PNG),_("Color picker"),wxITEM_CHECK);
+        #ifdef __WXMAC__
+            this->paint_toolbar->SetToolBorderPadding(10);
+        #endif
+        this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
+            .Position(2).Caption(_("Paint tools")));
     }
 }
 
@@ -2218,12 +2240,14 @@ void MyFrame::UpdateMenuAccelerators()
     // keyboard shortcuts have changed, so update all menu item accelerators
     wxMenuBar* mbar = GetMenuBar();
     if (mbar) {
+        // app menu (or file menu on Windows/Linux)
         // AKT TODO!!! wxOSX-Cocoa bug: these app menu items aren't updated
         // (but user isn't likely to change them so not critical)
         SetAccelerator(mbar, wxID_ABOUT,                    DO_ABOUT);
         SetAccelerator(mbar, wxID_PREFERENCES,              DO_PREFS);
         SetAccelerator(mbar, wxID_EXIT,                     DO_QUIT);
         
+        // file menu
         SetAccelerator(mbar, wxID_NEW,                      DO_NEWPATT);
         SetAccelerator(mbar, wxID_OPEN,                     DO_OPENPATT);
         SetAccelerator(mbar, ID::ReloadFromDisk,            DO_RELOAD);
@@ -2236,21 +2260,31 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::StopRecording,             DO_STOPRECORDING);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
         
+        // edit menu
         SetAccelerator(mbar, wxID_CUT,                      DO_CUT);
         SetAccelerator(mbar, wxID_COPY,                     DO_COPY);
         SetAccelerator(mbar, wxID_PASTE,                    DO_PASTE);
         SetAccelerator(mbar, wxID_CLEAR,                    DO_CLEAR);
         SetAccelerator(mbar, wxID_SELECTALL,                DO_SELALL);
+        SetAccelerator(mbar, ID::Pointer,                   DO_POINTER);
+        SetAccelerator(mbar, ID::Pencil,                    DO_PENCIL);
+        SetAccelerator(mbar, ID::Brush,                     DO_BRUSH);
+        SetAccelerator(mbar, ID::Picker,                    DO_PICKER);
         
+        // view menu
         SetAccelerator(mbar, ID::FullScreen,                DO_FULLSCREEN);
         SetAccelerator(mbar, ID::FitPattern,                DO_FIT);
         SetAccelerator(mbar, ID::Wireframe,                 DO_WIREFRAME);
         SetAccelerator(mbar, ID::PatternsPane,              DO_PATTERNS);
         SetAccelerator(mbar, ID::InfoPane,                  DO_INFO);
         SetAccelerator(mbar, ID::HelpPane,                  DO_HELP);
+        SetAccelerator(mbar, ID::FileToolbar,               DO_FILETOOLBAR);
+        SetAccelerator(mbar, ID::ActionToolbar,             DO_ACTIONTOOLBAR);
+        SetAccelerator(mbar, ID::PaintToolbar,              DO_PAINTTOOLBAR);
         SetAccelerator(mbar, ID::RestoreDefaultPerspective, DO_RESTORE);
         SetAccelerator(mbar, ID::ChangeActiveChemical,      DO_CHEMICAL);
         
+        // actions menu
         SetAccelerator(mbar, ID::Step1,                     DO_STEP1);
         SetAccelerator(mbar, ID::StepN,                     DO_STEPN);
         SetAccelerator(mbar, ID::RunStop,                   DO_RUNSTOP);
@@ -2304,6 +2338,10 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_PASTE:          cmdid = wxID_PASTE; break;
         case DO_CLEAR:          cmdid = wxID_CLEAR; break;
         case DO_SELALL:         cmdid = wxID_SELECTALL; break;
+        case DO_POINTER:        cmdid = ID::Pointer; break;
+        case DO_PENCIL:         cmdid = ID::Pencil; break;
+        case DO_BRUSH:          cmdid = ID::Brush; break;
+        case DO_PICKER:         cmdid = ID::Picker; break;
         
         // View menu
         case DO_FULLSCREEN:     cmdid = ID::FullScreen; break;
@@ -2312,6 +2350,9 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_PATTERNS:       cmdid = ID::PatternsPane; break;
         case DO_INFO:           cmdid = ID::InfoPane; break;
         case DO_HELP:           cmdid = ID::HelpPane; break;
+        case DO_FILETOOLBAR:    cmdid = ID::FileToolbar; break;
+        case DO_ACTIONTOOLBAR:  cmdid = ID::ActionToolbar; break;
+        case DO_PAINTTOOLBAR:   cmdid = ID::PaintToolbar; break;
         case DO_RESTORE:        cmdid = ID::RestoreDefaultPerspective; break;
         case DO_CHEMICAL:       cmdid = ID::ChangeActiveChemical; break;
         

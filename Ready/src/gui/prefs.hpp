@@ -113,6 +113,10 @@ typedef enum
     DO_RUNSTOP,                  // run/stop
     DO_SAVE,                     // save pattern...
     DO_SCREENSHOT,               // save screenshot...
+    DO_BRUSH,                    // select brush tool
+    DO_PICKER,                   // select color picker tool
+    DO_PENCIL,                   // select pencil tool
+    DO_POINTER,                  // select pointer tool
     DO_HELP,                     // show help pane
     DO_INFO,                     // show info pane
     DO_PATTERNS,                 // show patterns pane
@@ -123,7 +127,10 @@ typedef enum
     DO_STEP1,                    // step by 1
     DO_STEPN,                    // step by N
     DO_STOPRECORDING,            // stop recording
+    DO_ACTIONTOOLBAR,            // view action toolbar
+    DO_FILETOOLBAR,              // view file toolbar
     DO_VIEWKERNEL,               // view full kernel
+    DO_PAINTTOOLBAR,             // view paint toolbar
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;

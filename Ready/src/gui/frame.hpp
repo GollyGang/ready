@@ -184,11 +184,12 @@ class MyFrame : public wxFrame
         // current system being simulated (in future we might want more than one)
         AbstractRD *system;
 
-        // panes and toolbars:
+        // panes:
         PatternsPanel *patterns_panel;
         InfoPanel *info_panel;
         HelpPanel *help_panel;
-        wxAuiToolBar *action_toolbar;
+        // toolbars:
+        wxAuiToolBar *file_toolbar,*action_toolbar,*paint_toolbar;
 
         // settings:
         Properties render_settings;

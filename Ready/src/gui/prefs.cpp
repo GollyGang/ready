@@ -325,6 +325,10 @@ const char* GetActionName(action_id action)
         case DO_PASTE:          return "Paste";
         case DO_CLEAR:          return "Clear Selection";
         case DO_SELALL:         return "Select All";
+        case DO_POINTER:        return "Select Pointer Tool";
+        case DO_PENCIL:         return "Select Pencil Tool";
+        case DO_BRUSH:          return "Select Brush Tool";
+        case DO_PICKER:         return "Select Color Picker Tool";
         // View menu
         case DO_FULLSCREEN:     return "Full Screen";
         case DO_FIT:            return "Fit Pattern";
@@ -332,6 +336,9 @@ const char* GetActionName(action_id action)
         case DO_PATTERNS:       return "Show Patterns Pane";
         case DO_INFO:           return "Show Info Pane";
         case DO_HELP:           return "Show Help Pane";
+        case DO_FILETOOLBAR:    return "Show File Toolbar";
+        case DO_ACTIONTOOLBAR:  return "Show Action Toolbar";
+        case DO_PAINTTOOLBAR:   return "Show Paint Toolbar";
         case DO_RESTORE:        return "Restore Default Layout";
         case DO_CHEMICAL:       return "Change Active Chemical...";
         // Action menu
