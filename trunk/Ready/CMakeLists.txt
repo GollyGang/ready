@@ -84,24 +84,6 @@ set( RESOURCES
   resources/Info.plist.in
   resources/app.icns 
   resources/file.icns
-  resources/logo.png
-  resources/Icons/22px/icon-pointer.png
-  resources/Icons/22px/draw-freehand.png
-  resources/Icons/22px/draw-brush.png
-  resources/Icons/22px/color-picker.png
-  resources/Icons/22px/document-new.png
-  resources/Icons/22px/document-open.png
-  resources/Icons/22px/document-save.png
-  resources/Icons/22px/document-revert.png
-  resources/Icons/22px/media-playback-start_green.png
-  resources/Icons/22px/media-playback-pause_green.png
-  resources/Icons/22px/media-seek-forward.png
-  resources/Icons/22px/media-seek-backward.png
-  resources/Icons/22px/media-skip-backward_modified.png
-  resources/Icons/22px/media-record.png
-  resources/Icons/22px/system-run.png
-  resources/Icons/22px/list-add_gray.png
-  resources/Icons/22px/camera-photo.png
 )
 include_directories( resources )
 
@@ -159,6 +141,41 @@ set( OTHER_FILES
   ./CMakeLists.txt 
   src/FindOpenCL.cmake 
   src/Doxyfile.in
+  resources/logo.png
+  resources/Icons/22px/icon-pointer.png
+  resources/Icons/22px/draw-freehand.png
+  resources/Icons/22px/draw-brush.png
+  resources/Icons/22px/color-picker.png
+  resources/Icons/22px/document-new.png
+  resources/Icons/22px/document-open.png
+  resources/Icons/22px/document-save.png
+  resources/Icons/22px/document-revert.png
+  resources/Icons/22px/media-playback-start_green.png
+  resources/Icons/22px/media-playback-pause_green.png
+  resources/Icons/22px/media-seek-forward.png
+  resources/Icons/22px/media-seek-backward.png
+  resources/Icons/22px/media-skip-backward_modified.png
+  resources/Icons/22px/media-record.png
+  resources/Icons/22px/system-run.png
+  resources/Icons/22px/list-add_gray.png
+  resources/Icons/22px/camera-photo.png
+  resources/Icons/32px/icon-pointer.png
+  resources/Icons/32px/draw-freehand.png
+  resources/Icons/32px/draw-brush.png
+  resources/Icons/32px/color-picker.png
+  resources/Icons/32px/document-new.png
+  resources/Icons/32px/document-open.png
+  resources/Icons/32px/document-save.png
+  resources/Icons/32px/document-revert.png
+  resources/Icons/32px/media-playback-start_green.png
+  resources/Icons/32px/media-playback-pause_green.png
+  resources/Icons/32px/media-seek-forward.png
+  resources/Icons/32px/media-seek-backward.png
+  resources/Icons/32px/media-skip-backward_modified.png
+  resources/Icons/32px/media-record.png
+  resources/Icons/32px/system-run.png
+  resources/Icons/32px/list-add_gray.png
+  resources/Icons/32px/camera-photo.png
 )
 
 #-------------------------------------------VTK----------------------------------------------
