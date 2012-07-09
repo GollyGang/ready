@@ -239,6 +239,13 @@ MyFrame::MyFrame(const wxString& title)
     #endif
     #ifdef __WXMAC__
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
+        this->toolbar_padding = 10;
+        this->show_toolbar_labels = true;
+        this->icons_folder = _T("resources/Icons/22px/"); // TODO: will probably be 32px soon
+    #else
+        this->toolbar_padding = 5;
+        this->show_toolbar_labels = false;
+        this->icons_folder = _T("resources/Icons/22px/");
     #endif
     this->aui_mgr.SetManagedWindow(this);
     
@@ -416,59 +423,56 @@ void MyFrame::InitializeMenus()
 
 void MyFrame::InitializeToolbars()
 {
+    long toolbar_style = wxAUI_TB_DEFAULT_STYLE;
+    if(this->show_toolbar_labels)
+        toolbar_style |= wxAUI_TB_TEXT;
     {   // file menu items
-        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
-        this->file_toolbar->AddTool(wxID_NEW,wxEmptyString,wxBitmap(_T("resources/Icons/document-new.png"),wxBITMAP_TYPE_PNG),
+        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar,wxDefaultPosition,wxDefaultSize,toolbar_style);
+        this->file_toolbar->AddTool(wxID_NEW,_("New Pattern"),wxBitmap(this->icons_folder + _T("document-new.png"),wxBITMAP_TYPE_PNG),
             _("New Pattern"));
-        this->file_toolbar->AddTool(wxID_OPEN,wxEmptyString,wxBitmap(_T("resources/Icons/document-open.png"),wxBITMAP_TYPE_PNG),
+        this->file_toolbar->AddTool(wxID_OPEN,_("Open Pattern..."),wxBitmap(this->icons_folder + _T("document-open.png"),wxBITMAP_TYPE_PNG),
             _("Open Pattern..."));
-        this->file_toolbar->AddTool(ID::ReloadFromDisk,wxEmptyString,wxBitmap(_T("resources/Icons/document-revert.png"),wxBITMAP_TYPE_PNG),
+        this->file_toolbar->AddTool(ID::ReloadFromDisk,_("Reload from disk"),wxBitmap(this->icons_folder + _T("document-revert.png"),wxBITMAP_TYPE_PNG),
             _("Reload from disk"));
-        this->file_toolbar->AddTool(wxID_SAVE,wxEmptyString,wxBitmap(_T("resources/Icons/document-save.png"),wxBITMAP_TYPE_PNG),
+        this->file_toolbar->AddTool(wxID_SAVE,_("Save Pattern..."),wxBitmap(this->icons_folder + _T("document-save.png"),wxBITMAP_TYPE_PNG),
             _("Save Pattern..."));
-        this->file_toolbar->AddTool(ID::Screenshot,wxEmptyString,wxBitmap(_T("resources/Icons/camera-photo.png"),wxBITMAP_TYPE_PNG),
+        this->file_toolbar->AddTool(ID::Screenshot,_("Save Screenshot..."),wxBitmap(this->icons_folder + _T("camera-photo.png"),wxBITMAP_TYPE_PNG),
             _("Save Screenshot..."));
-        this->file_toolbar->AddTool(ID::RecordFrames,wxEmptyString,wxBitmap(_T("resources/Icons/media-record.png"),wxBITMAP_TYPE_PNG),
+        this->file_toolbar->AddTool(ID::RecordFrames,_("Start Recording..."),wxBitmap(this->icons_folder + _T("media-record.png"),wxBITMAP_TYPE_PNG),
             _("Start Recording..."),wxITEM_CHECK);
-        #ifdef __WXMAC__
-            this->file_toolbar->SetToolBorderPadding(10);
-        #endif
+        this->file_toolbar->SetToolBorderPadding(this->toolbar_padding);
         this->aui_mgr.AddPane(this->file_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
             .Position(0).Caption(_("File tools")));
     }
     {   // action menu items
-        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
-        this->action_toolbar->AddTool(ID::Step1,wxEmptyString,wxBitmap(_T("resources/Icons/list-add_gray.png"),wxBITMAP_TYPE_PNG),
+        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar,wxDefaultPosition,wxDefaultSize,toolbar_style);
+        this->action_toolbar->AddTool(ID::Step1, _("Step by 1"),wxBitmap(this->icons_folder + _T("list-add_gray.png"),wxBITMAP_TYPE_PNG),
             _("Step by 1"));
-        this->action_toolbar->AddTool(ID::RunStop,wxEmptyString,wxBitmap(_T("resources/Icons/media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
+        this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
             _("Run"));
-        this->action_toolbar->AddTool(ID::Slower,wxEmptyString,wxBitmap(_T("resources/Icons/media-seek-backward.png"),wxBITMAP_TYPE_PNG),
+        this->action_toolbar->AddTool(ID::Slower,_("Run Slower"),wxBitmap(this->icons_folder + _T("media-seek-backward.png"),wxBITMAP_TYPE_PNG),
             _("Run Slower"));
-        this->action_toolbar->AddTool(ID::Faster,wxEmptyString,wxBitmap(_T("resources/Icons/media-seek-forward.png"),wxBITMAP_TYPE_PNG),
+        this->action_toolbar->AddTool(ID::Faster,_("Run Faster"),wxBitmap(this->icons_folder + _T("media-seek-forward.png"),wxBITMAP_TYPE_PNG),
             _("Run Faster"));
-        this->action_toolbar->AddTool(ID::Reset,wxEmptyString,wxBitmap(_T("resources/Icons/media-skip-backward_modified.png"),wxBITMAP_TYPE_PNG),
+        this->action_toolbar->AddTool(ID::Reset, _("Reset"),wxBitmap(this->icons_folder + _T("media-skip-backward_modified.png"),wxBITMAP_TYPE_PNG),
             _("Reset"));
-        this->action_toolbar->AddTool(ID::GenerateInitialPattern,wxEmptyString,wxBitmap(_T("resources/Icons/system-run.png"),wxBITMAP_TYPE_PNG),
+        this->action_toolbar->AddTool(ID::GenerateInitialPattern,_("Generate Initial Pattern"),wxBitmap(this->icons_folder + _T("system-run.png"),wxBITMAP_TYPE_PNG),
             _("Generate Initial Pattern"));
-        #ifdef __WXMAC__
-            this->action_toolbar->SetToolBorderPadding(10);
-        #endif
+        this->action_toolbar->SetToolBorderPadding(this->toolbar_padding);
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top()
             .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
     }
     {   // paint items
-        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
-        this->paint_toolbar->AddTool(ID::Pointer,wxEmptyString,wxBitmap(_T("resources/Icons/icon-pointer.png"),wxBITMAP_TYPE_PNG),
+        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar,wxDefaultPosition,wxDefaultSize,toolbar_style);
+        this->paint_toolbar->AddTool(ID::Pointer,_("Pointer"),wxBitmap(this->icons_folder + _T("icon-pointer.png"),wxBITMAP_TYPE_PNG),
             _("Pointer"),wxITEM_RADIO);
-        this->paint_toolbar->AddTool(ID::Pencil,wxEmptyString,wxBitmap(_T("resources/Icons/draw-freehand.png"),wxBITMAP_TYPE_PNG)
-            ,_("Pencil"),wxITEM_RADIO);
-        this->paint_toolbar->AddTool(ID::Brush,wxEmptyString,wxBitmap(_T("resources/Icons/draw-brush.png"),wxBITMAP_TYPE_PNG),
+        this->paint_toolbar->AddTool(ID::Pencil,_("Pencil"),wxBitmap(this->icons_folder + _T("draw-freehand.png"),wxBITMAP_TYPE_PNG),
+            _("Pencil"),wxITEM_RADIO);
+        this->paint_toolbar->AddTool(ID::Brush,_("Brush"),wxBitmap(this->icons_folder + _T("draw-brush.png"),wxBITMAP_TYPE_PNG),
             _("Brush"),wxITEM_RADIO);
-        this->paint_toolbar->AddTool(ID::Picker,wxEmptyString,wxBitmap(_T("resources/Icons/color-picker.png"),wxBITMAP_TYPE_PNG),
+        this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
-        #ifdef __WXMAC__
-            this->paint_toolbar->SetToolBorderPadding(10);
-        #endif
+        this->paint_toolbar->SetToolBorderPadding(this->toolbar_padding);
         this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
             .Position(2).Caption(_("Paint tools")));
     }
@@ -1056,8 +1060,8 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 void MyFrame::UpdateToolbars()
 {
     this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
-        this->is_running ? wxBitmap(_T("resources/Icons/media-playback-pause_green.png"),wxBITMAP_TYPE_PNG)
-                         : wxBitmap(_T("resources/Icons/media-playback-start_green.png"),wxBITMAP_TYPE_PNG) );
+        this->is_running ? wxBitmap(this->icons_folder + _T("media-playback-pause_green.png"),wxBITMAP_TYPE_PNG)
+                         : wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG) );
     
     this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
         this->is_running ? _("Stop running the simulation")

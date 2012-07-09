@@ -222,7 +222,11 @@ class MyFrame : public wxFrame
         
         static const char *opencl_not_available_message;
 
+        // toolbar things
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
+        wxString icons_folder;
+        bool show_toolbar_labels;
+        int toolbar_padding;
 
         DECLARE_EVENT_TABLE()
 };

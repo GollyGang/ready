@@ -85,23 +85,23 @@ set( RESOURCES
   resources/app.icns 
   resources/file.icns
   resources/logo.png
-  resources/Icons/icon-pointer.png
-  resources/Icons/draw-freehand.png
-  resources/Icons/draw-brush.png
-  resources/Icons/color-picker.png
-  resources/Icons/document-new.png
-  resources/Icons/document-open.png
-  resources/Icons/document-save.png
-  resources/Icons/document-revert.png
-  resources/Icons/media-playback-start_green.png
-  resources/Icons/media-playback-pause_green.png
-  resources/Icons/media-seek-forward.png
-  resources/Icons/media-seek-backward.png
-  resources/Icons/media-skip-backward_modified.png
-  resources/Icons/media-record.png
-  resources/Icons/system-run.png
-  resources/Icons/list-add_gray.png
-  resources/Icons/camera-photo.png
+  resources/Icons/22px/icon-pointer.png
+  resources/Icons/22px/draw-freehand.png
+  resources/Icons/22px/draw-brush.png
+  resources/Icons/22px/color-picker.png
+  resources/Icons/22px/document-new.png
+  resources/Icons/22px/document-open.png
+  resources/Icons/22px/document-save.png
+  resources/Icons/22px/document-revert.png
+  resources/Icons/22px/media-playback-start_green.png
+  resources/Icons/22px/media-playback-pause_green.png
+  resources/Icons/22px/media-seek-forward.png
+  resources/Icons/22px/media-seek-backward.png
+  resources/Icons/22px/media-skip-backward_modified.png
+  resources/Icons/22px/media-record.png
+  resources/Icons/22px/system-run.png
+  resources/Icons/22px/list-add_gray.png
+  resources/Icons/22px/camera-photo.png
 )
 include_directories( resources )
 
