@@ -239,9 +239,9 @@ MyFrame::MyFrame(const wxString& title)
     #endif
     #ifdef __WXMAC__
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
-        this->toolbar_padding = 10;
+        this->toolbar_padding = 5;
         this->show_toolbar_labels = true;
-        this->icons_folder = _T("resources/Icons/22px/"); // TODO: will probably be 32px soon
+        this->icons_folder = _T("resources/Icons/32px/");
     #else
         this->toolbar_padding = 5;
         this->show_toolbar_labels = false;
