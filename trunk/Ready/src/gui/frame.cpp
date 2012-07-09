@@ -1066,6 +1066,9 @@ void MyFrame::UpdateToolbars()
     this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
         this->is_running ? _("Stop running the simulation")
                          : _("Start running the simulation") );
+    this->action_toolbar->FindTool(ID::RunStop)->SetLabel( 
+        this->is_running ? _("Stop")
+                         : _("Run") );
 }
 
 // ---------------------------------------------------------------------
