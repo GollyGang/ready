@@ -14,11 +14,11 @@ before 0.4 release:
   used a boundary-size weighting.
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - allow block size to be changed for formula rules on images
+- finish toolbars: paint color (&value), timesteps_per_render
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
   chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
-- use better (big) toolbar icons in Mac app
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - allow user to change the default render settings
@@ -33,7 +33,6 @@ before 0.x release:
 - 2D slices as slice through 3D volume (if available, else whole image) =>
   1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
-- add toolbar icons for: faster, slower, change running speed - need artwork :(
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
