@@ -82,4 +82,7 @@ class XML_Object
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
 };
 
+/// Interpolate between two RGB colors, first converting to HSV and converting the result back to RGB
+void InterpolateInHSV(const float r1,const float g1,const float b1,const float r2,const float g2,const float b2,const float u,float& r,float& g,float& b);
+
 #endif

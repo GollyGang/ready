@@ -24,9 +24,14 @@
 #include <math.h>
 #include <limits.h>
 
+// VTK:
+#include <vtkMath.h>
+
 // STL:
 #include <vector>
 using namespace std;
+
+// ---------------------------------------------------------------------------------------------------------
 
 #ifdef _WIN32
     #include <sys/timeb.h>
@@ -49,6 +54,8 @@ using namespace std;
     #include <sys/time.h>
 #endif
 
+// ---------------------------------------------------------------------------------------------------------
+
 double get_time_in_seconds()
 {
     struct timeval tod_record;
@@ -56,20 +63,28 @@ double get_time_in_seconds()
     return double(tod_record.tv_sec) + double(tod_record.tv_usec) / 1.0e6;
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 float frand(float lower,float upper)
 {
     return lower + rand()*(upper-lower)/RAND_MAX;
 }
+
+// ---------------------------------------------------------------------------------------------------------
 
 double hypot2(double x,double y) 
 { 
     return sqrt(x*x+y*y); 
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 double hypot3(double x,double y,double z) 
 { 
     return sqrt(x*x+y*y+z*z); 
 }
+
+// ---------------------------------------------------------------------------------------------------------
 
 float* vtk_at(float* origin,int x,int y,int z,int X,int Y)
 {
@@ -77,11 +92,15 @@ float* vtk_at(float* origin,int x,int y,int z,int X,int Y)
     return origin + x + X*(y + Y*z);
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 template <> bool from_string<string> (const string& s,string& val) 
 { 
     val = s;
     return true;
 } 
+
+// ---------------------------------------------------------------------------------------------------------
 
 string GetChemicalName(int i)
 { 
@@ -92,6 +111,8 @@ string GetChemicalName(int i)
     throw runtime_error("GetChemicalName: out of range");
 }
 
+// ---------------------------------------------------------------------------------------------------------
+
 int IndexFromChemicalName(const string& s)
 {
     for(int i=0;i<26*27;i++)
@@ -99,6 +120,8 @@ int IndexFromChemicalName(const string& s)
             return i;
     throw runtime_error("IndexFromChemicalName: unrecognised chemical name: "+s);
 }
+
+// ---------------------------------------------------------------------------------------------------------
 
 // read a multiline string, strip leading whitespace where shared by all lines
 string trim_multiline_string(const char* s)
@@ -134,3 +157,15 @@ string trim_multiline_string(const char* s)
     }
     return oss.str();
 }
+
+// ---------------------------------------------------------------------------------------------------------
+
+void InterpolateInHSV(const float r1,const float g1,const float b1,const float r2,const float g2,const float b2,const float u,float& r,float& g,float& b)
+{
+    float h1,s1,v1,h2,s2,v2;
+    vtkMath::RGBToHSV(r1,g1,b1,&h1,&s1,&v1);
+    vtkMath::RGBToHSV(r2,g2,b2,&h2,&s2,&v2);
+    vtkMath::HSVToRGB(h1+(h2-h1)*u,s1+(s2-s1)*u,v1+(v2-v1)*u,&r,&g,&b);
+}
+
+// ---------------------------------------------------------------------------------------------------------

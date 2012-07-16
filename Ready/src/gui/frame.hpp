@@ -224,6 +224,7 @@ class MyFrame : public wxFrame
 
         // toolbar things
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
+        float current_paint_value;
         wxString icons_folder;
         bool show_toolbar_labels;
         int toolbar_padding;

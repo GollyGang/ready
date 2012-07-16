@@ -108,5 +108,9 @@ namespace ID
         ContentsButton,
         SmallerButton,
         BiggerButton,
+
+        // Toolbars:
+        CurrentValueText,
+        CurrentValueColor,
     }; 
 };

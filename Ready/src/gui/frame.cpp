@@ -230,7 +230,8 @@ MyFrame::MyFrame(const wxString& title)
        fullscreen(false),
        render_settings("render_settings"),
        is_recording(false),
-       CurrentCursor(POINTER)
+       CurrentCursor(POINTER),
+       current_paint_value(0.0f)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -438,8 +439,6 @@ void MyFrame::InitializeToolbars()
             _("Save Pattern..."));
         this->file_toolbar->AddTool(ID::Screenshot,_("Save Screenshot..."),wxBitmap(this->icons_folder + _T("camera-photo.png"),wxBITMAP_TYPE_PNG),
             _("Save Screenshot..."));
-        this->file_toolbar->AddTool(ID::RecordFrames,_("Start Recording..."),wxBitmap(this->icons_folder + _T("media-record.png"),wxBITMAP_TYPE_PNG),
-            _("Start Recording..."),wxITEM_CHECK);
         this->file_toolbar->SetToolBorderPadding(this->toolbar_padding);
         this->aui_mgr.AddPane(this->file_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
             .Position(0).Caption(_("File tools")));
@@ -450,6 +449,8 @@ void MyFrame::InitializeToolbars()
             _("Step by 1"));
         this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
             _("Run"));
+        this->action_toolbar->AddTool(ID::RecordFrames,_("Start Recording..."),wxBitmap(this->icons_folder + _T("media-record.png"),wxBITMAP_TYPE_PNG),
+            _("Start Recording..."),wxITEM_CHECK);
         this->action_toolbar->AddTool(ID::Slower,_("Run Slower"),wxBitmap(this->icons_folder + _T("media-seek-backward.png"),wxBITMAP_TYPE_PNG),
             _("Run Slower"));
         this->action_toolbar->AddTool(ID::Faster,_("Run Faster"),wxBitmap(this->icons_folder + _T("media-seek-forward.png"),wxBITMAP_TYPE_PNG),
@@ -472,6 +473,10 @@ void MyFrame::InitializeToolbars()
             _("Brush"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
+        this->paint_toolbar->AddControl(new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("1.000000 ")),_("Color"));
+        wxImage im(22,22);
+        im.SetRGB(wxRect(0,0,22,22),255,0,0);
+        this->paint_toolbar->AddControl(new wxBitmapButton(this->paint_toolbar,ID::CurrentValueColor,wxBitmap(im)),_("Color"));
         this->paint_toolbar->SetToolBorderPadding(this->toolbar_padding);
         this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
             .Position(2).Caption(_("Paint tools")));
@@ -1069,6 +1074,19 @@ void MyFrame::UpdateToolbars()
     this->action_toolbar->FindTool(ID::RunStop)->SetLabel( 
         this->is_running ? _("Stop")
                          : _("Run") );
+    this->paint_toolbar->FindControl(ID::CurrentValueText)->SetLabel( wxString::Format(_T("%f"),
+        this->current_paint_value) );
+    // update the color swatch with the current color
+    wxImage im(22,22);
+    float r1,g1,b1,r2,g2,b2,low,high,r,g,b;
+    this->render_settings.GetProperty("color_low").GetColor(r1,g1,b1);
+    this->render_settings.GetProperty("color_high").GetColor(r2,g2,b2);
+    low = this->render_settings.GetProperty("low").GetFloat();
+    high = this->render_settings.GetProperty("high").GetFloat();
+    InterpolateInHSV(r1,g1,b1,r2,g2,b2,min(1.0f,max(0.0f,(this->current_paint_value-low)/(high-low))),r,g,b);
+    im.SetRGB(wxRect(0,0,22,22),r*255,g*255,b*255);
+    dynamic_cast<wxBitmapButton*>(this->paint_toolbar->FindControl(ID::CurrentValueColor))->SetBitmap(wxBitmap(im));
+    this->aui_mgr.Update();
 }
 
 // ---------------------------------------------------------------------
@@ -3046,6 +3064,8 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
     this->CurrentCursor = POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
     this->pVTKWindow->GetRenderWindow()->GetInteractor()->Enable();
+    this->current_paint_value += 0.1f; // DEBUG
+    this->UpdateToolbars(); // DEBUG
 }
 
 // ---------------------------------------------------------------------
