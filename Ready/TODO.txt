@@ -10,7 +10,7 @@ before 0.4 release:
   - brush tool not working yet
   - how to change size of brush?
   - need undo
-  - drawing is offset on images unless show_cell_edges=true
+  - drawing is offset on images unless show_cell_edges=true or use_image_interpolation=false
   - how to paint on 3d image? paint on slice?
   - need better cursors: pencil, brush, picker (copy from icons)
 
