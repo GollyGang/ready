@@ -348,7 +348,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     image_mapper->SetLookupTable(lut);
     image_mapper->SetInput(this->GetImage(iActiveChemical));
   
-    if(show_cell_edges) // TODO: doesn't work with use_image_interpolation=true
+    if(show_cell_edges || !use_image_interpolation) // TODO: doesn't work with use_image_interpolation=true
     {
         // will convert the x*y 2D image to a x*y grid of quads
         vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
@@ -378,7 +378,8 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->GetProperty()->EdgeVisibilityOn();
+        if(show_cell_edges)
+            actor->GetProperty()->EdgeVisibilityOn();
         actor->GetProperty()->SetEdgeColor(0,0,0);
         const double cell_shift = 0.5; // because we've gone from point data to cell data
         actor->SetPosition(-cell_shift,low*scaling - 6.0,0);
@@ -394,8 +395,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
         actor->SetInput(pad->GetOutput());
         actor->SetPosition(0,low*scaling - 5.0,0);
-        if(!use_image_interpolation)
-            actor->InterpolateOff();
         pRenderer->AddActor(actor);
     }
 
@@ -498,7 +497,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         image_mapper->SetInput(this->GetImage(iChem));
 
         // add a color-mapped image plane
-        if(show_cell_edges) // TODO: doesn't work with use_image_interpolation=true
+        if(show_cell_edges || !use_image_interpolation) // TODO: doesn't work with use_image_interpolation=true
         {
             // will convert the x*y 2D image to a x*y grid of quads
             vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
@@ -529,7 +528,8 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
 
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
-            actor->GetProperty()->EdgeVisibilityOn();
+            if(show_cell_edges)
+                actor->GetProperty()->EdgeVisibilityOn();
             actor->GetProperty()->SetEdgeColor(0,0,0);
             const double cell_shift = 0.5; // because we've gone from point data to cell data
             actor->SetPosition(offset[0]-cell_shift,offset[1]-cell_shift-this->GetY()-3,offset[2]);
@@ -539,8 +539,6 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         {
             vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
             actor->SetInput(image_mapper->GetOutput());
-            if(!use_image_interpolation)
-                actor->InterpolateOff();
             actor->SetPosition(offset[0],offset[1]-this->GetY()-3,offset[2]);
             pRenderer->AddActor(actor);
         }

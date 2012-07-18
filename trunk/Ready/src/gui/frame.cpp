@@ -3193,7 +3193,7 @@ bool MyFrame::FindClickTarget(int x,int y,int &iChemical,int &cell_id)
         // detect which chemical was drawn on from the click position
         double *p = picker->GetPickPosition();
         double gap = 5.0f; // gap of 5 is hardwired in ImageRD::InitializeVTKPipeline_2D()
-        iChemical = int(floor((p[0]+gap/2)/(this->system->GetX()+5.0f))); 
+        iChemical = int(floor((p[0]+gap/2)/(this->system->GetX()+gap))); 
         iChemical = min(this->system->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range
     }
     else
