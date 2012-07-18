@@ -3066,6 +3066,7 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
+    this->mouse_is_down = false;
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->pVTKWindow->SetInteractorStyle(is);
 }
@@ -3083,6 +3084,7 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PENCIL;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PENCIL));
+    this->mouse_is_down = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3101,6 +3103,7 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
     this->CurrentCursor = BRUSH;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PAINT_BRUSH));
+    this->mouse_is_down = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3119,6 +3122,7 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PICKER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW)); // TODO: find a better cursor
+    this->mouse_is_down = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3192,7 +3196,7 @@ bool MyFrame::FindClickTarget(int x,int y,int &iChemical,int &cell_id)
     {
         // detect which chemical was drawn on from the click position
         double *p = picker->GetPickPosition();
-        double gap = 5.0f; // gap of 5 is hardwired in ImageRD::InitializeVTKPipeline_2D()
+        double gap = 5.0f; // gap of 5 is hardwired in ImageRD::InitializeVTKPipeline_2D() (not ideal)
         iChemical = int(floor((p[0]+gap/2)/(this->system->GetX()+gap))); 
         iChemical = min(this->system->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range
     }
