@@ -294,3 +294,11 @@ void OpenCLMeshRD::ReleaseOpenCLBuffers()
 }
 
 // ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLMeshRD::SetValue(int iChemical,int cellID,float val)
+{
+    MeshRD::SetValue(iChemical,cellID,val);
+    this->WriteToOpenCLBuffers();
+}
+
+// --------------------------------------------------------------------------------

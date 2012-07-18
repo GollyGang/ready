@@ -139,6 +139,11 @@ class AbstractRD
         /// Retreive the dimensionality of the system volume, irrespective of the cells within it.
         virtual int GetArenaDimensionality() const =0;
 
+        /// Retrieve the value at a given location.
+        virtual float GetValue(int iChemical,int cellID) const =0;
+        /// Set the value at a given location.
+        virtual void SetValue(int iChemical,int cellID,float val) =0;
+
     protected:
 
         /// advance the RD system by n timesteps

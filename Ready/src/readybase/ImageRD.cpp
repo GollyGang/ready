@@ -427,6 +427,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         else
             actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
+        actor->PickableOff();
         pRenderer->AddActor(actor);
     }
     
@@ -443,6 +444,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     axis->SetInertia(10000);
     axis->SetCornerOffset(0);
     axis->SetNumberOfLabels(5);
+    axis->PickableOff();
     pRenderer->AddActor(axis);
 }
 
@@ -577,6 +579,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             if(use_wireframe)
                 actor->GetProperty()->SetRepresentationToWireframe();
             actor->SetPosition(offset);
+            actor->PickableOff();
             pRenderer->AddActor(actor);
 
             // add the color image as the texture of the displacement-mapped surface
@@ -609,6 +612,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
                 actor->GetProperty()->SetColor(0,0,0);  
                 actor->GetProperty()->SetAmbient(1);
                 actor->SetPosition(offset);
+                actor->PickableOff();
 
                 pRenderer->AddActor(actor);
             }
@@ -620,6 +624,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             vtkSmartPointer<vtkTextActor3D> label = vtkSmartPointer<vtkTextActor3D>::New();
             label->SetInput(GetChemicalName(iChem).c_str());
             label->SetPosition(offset[0]+this->GetX()/2,offset[1]-this->GetY()-20,offset[2]);
+            label->PickableOff();
             pRenderer->AddActor(label);
         }
 
@@ -641,6 +646,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         axis->SetInertia(10000);
         axis->SetCornerOffset(0);
         axis->SetNumberOfLabels(5);
+        axis->PickableOff();
         pRenderer->AddActor(axis);
     }
 
@@ -760,6 +766,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bfprop->SetSpecular(0.1);
 
     // add the actor to the renderer's scene
+    actor->PickableOff(); // (painting is performed on the 2D slice, not the 3D contour)
     pRenderer->AddActor(actor);
 
     // add the bounding box
@@ -779,6 +786,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         actor->SetMapper(mapper);
         actor->GetProperty()->SetColor(0,0,0);  
         actor->GetProperty()->SetAmbient(1);
+        actor->PickableOff();
 
         pRenderer->AddActor(actor);
     }
@@ -1099,6 +1107,21 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
     image_mapper->Update();
 
     out->DeepCopy(image_mapper->GetOutput());
+}
+
+// --------------------------------------------------------------------------------
+
+float ImageRD::GetValue(int iChemical,int cellID) const
+{
+    return *(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer())+cellID);
+}
+
+// --------------------------------------------------------------------------------
+
+void ImageRD::SetValue(int iChemical,int cellID,float val)
+{
+    *(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer())+cellID) = val;
+    this->images[iChemical]->Modified();
 }
 
 // --------------------------------------------------------------------------------

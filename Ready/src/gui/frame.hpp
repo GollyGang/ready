@@ -30,13 +30,14 @@ class PatternsPanel;
 class InfoPanel;
 class HelpPanel;
 class wxVTKRenderWindowInteractor;
+#include "InteractorStylePainter.hpp"
 
 // readybase
 #include "Properties.hpp"
 class AbstractRD;
 
 /// The wxFrame-derived top-level window for the Ready GUI.
-class MyFrame : public wxFrame
+class MyFrame : public wxFrame, public IPaintHandler
 {
     public:
 
@@ -71,6 +72,11 @@ class MyFrame : public wxFrame
         void ProcessKey(int key, int modifiers);
 
         bool IsFullScreen() { return this->fullscreen; }
+
+        // implementation of IPaintHandler interface
+        virtual void LeftMouseDown(int x,int y);
+        virtual void LeftMouseUp(int x,int y);
+        virtual void MouseMove(int x,int y);
 
     private:
 
@@ -225,6 +231,7 @@ class MyFrame : public wxFrame
         // toolbar things
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
         float current_paint_value;
+        bool mouse_is_down;
         wxString icons_folder;
         bool show_toolbar_labels;
         int toolbar_padding;

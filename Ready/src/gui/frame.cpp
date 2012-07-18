@@ -81,6 +81,8 @@ using namespace std;
 #include <vtkPointData.h>
 #include <vtkRendererCollection.h>
 #include <vtkXMLGenericDataObjectReader.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkCellPicker.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -231,7 +233,8 @@ MyFrame::MyFrame(const wxString& title)
        render_settings("render_settings"),
        is_recording(false),
        CurrentCursor(POINTER),
-       current_paint_value(0.0f)
+       current_paint_value(0.0f),
+       mouse_is_down(false)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -3063,9 +3066,8 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
-    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Enable();
-    this->current_paint_value += 0.1f; // DEBUG
-    this->UpdateToolbars(); // DEBUG
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    this->pVTKWindow->SetInteractorStyle(is);
 }
 
 // ---------------------------------------------------------------------
@@ -3081,7 +3083,9 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PENCIL;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PENCIL));
-    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Disable();
+    vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
+    is->SetPaintHandler(this);
+    this->pVTKWindow->SetInteractorStyle(is);
 }
 
 // ---------------------------------------------------------------------
@@ -3097,7 +3101,9 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
     this->CurrentCursor = BRUSH;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PAINT_BRUSH));
-    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Disable();
+    vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
+    is->SetPaintHandler(this);
+    this->pVTKWindow->SetInteractorStyle(is);
 }
 
 // ---------------------------------------------------------------------
@@ -3113,7 +3119,9 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PICKER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW)); // TODO: find a better cursor
-    this->pVTKWindow->GetRenderWindow()->GetInteractor()->Disable();
+    vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
+    is->SetPaintHandler(this);
+    this->pVTKWindow->SetInteractorStyle(is);
 }
 
 // ---------------------------------------------------------------------
@@ -3121,6 +3129,63 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 void MyFrame::OnUpdateSelectPickerTool(wxUpdateUIEvent& event)
 {
     event.Check(this->CurrentCursor==PICKER);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::LeftMouseDown(int x, int y)
+{
+    this->mouse_is_down = true;
+
+    vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+    picker->SetTolerance(0.000001);
+    picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+    //double* worldPosition = picker->GetPickPosition();
+    int cell_id = picker->GetCellId();
+    if(cell_id<0) return;
+
+    int iActiveChemical = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
+
+    switch(this->CurrentCursor)
+    {
+        case PENCIL:
+        {
+            this->system->SetValue(iActiveChemical,cell_id,this->current_paint_value);
+            this->pVTKWindow->Refresh();
+        }
+        break;
+        case PICKER:
+        {
+            this->current_paint_value = this->system->GetValue(iActiveChemical,cell_id);
+            this->UpdateToolbars();
+        }
+        break;
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::LeftMouseUp(int x, int y)
+{
+    this->mouse_is_down = false;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::MouseMove(int x, int y)
+{
+    if(!this->mouse_is_down || this->CurrentCursor!=PENCIL) return;
+
+    vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+    picker->SetTolerance(0.000001);
+    picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+    //double* worldPosition = picker->GetPickPosition();
+    int cell_id = picker->GetCellId();
+    if(cell_id<0) return;
+
+    int iActiveChemical = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
+    this->system->SetValue(iActiveChemical,cell_id,this->current_paint_value);
+    this->pVTKWindow->Refresh();
 }
 
 // ---------------------------------------------------------------------

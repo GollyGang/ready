@@ -38,6 +38,8 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); } 
 
+        virtual void SetValue(int iChemical,int cellID,float val);
+
     protected:
 
         virtual void CopyFromImage(vtkImageData* im);

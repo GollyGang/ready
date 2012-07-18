@@ -212,4 +212,12 @@ void OpenCLImageRD::TestFormula(std::string program_string)
     this->TestKernel(this->AssembleKernelSourceFromFormula(program_string));
 }
 
-// ----------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+void OpenCLImageRD::SetValue(int iChemical,int cellID,float val)
+{
+    ImageRD::SetValue(iChemical,cellID,val);
+    this->WriteToOpenCLBuffers();
+}
+
+// --------------------------------------------------------------------------------
