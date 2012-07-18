@@ -358,6 +358,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         actor->GetProperty()->SetColor(0,0,0);  
         actor->GetProperty()->SetAmbient(1);
 
+        actor->PickableOff();
         pRenderer->AddActor(actor);
     }
 }
@@ -572,3 +573,18 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 }
 
 // ---------------------------------------------------------------------
+
+float MeshRD::GetValue(int iChemical,int cellID) const
+{
+    return vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->GetValue(cellID);
+}
+
+// --------------------------------------------------------------------------------
+
+void MeshRD::SetValue(int iChemical,int cellID,float val)
+{
+    vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(cellID,val);
+    this->mesh->Modified();
+}
+
+// --------------------------------------------------------------------------------

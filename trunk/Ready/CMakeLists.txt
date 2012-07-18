@@ -69,6 +69,7 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/InfoPanel.hpp                    src/gui/InfoPanel.cpp
   src/gui/PatternsPanel.hpp                src/gui/PatternsPanel.cpp
   src/gui/vtk_pipeline.hpp                 src/gui/vtk_pipeline.cpp
+  src/gui/InteractorStylePainter.hpp       src/gui/InteractorStylePainter.cpp
   src/gui/wxVTKRenderWindowInteractor.h    src/gui/wxVTKRenderWindowInteractor.cxx
   src/gui/RecordingDialog.hpp              src/gui/RecordingDialog.cpp
 )

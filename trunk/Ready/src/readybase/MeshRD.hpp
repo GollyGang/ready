@@ -65,6 +65,9 @@ class MeshRD : public AbstractRD
 
         virtual int GetArenaDimensionality() const;
 
+        virtual float GetValue(int iChemical,int cellID) const;
+        virtual void SetValue(int iChemical,int cellID,float val);
+
     protected:
 
         /// work out which cells are neighbors of each other

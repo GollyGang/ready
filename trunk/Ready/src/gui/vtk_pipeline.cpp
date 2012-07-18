@@ -27,12 +27,15 @@
 // VTK:
 #include <vtkRendererCollection.h>
 #include <vtkRenderer.h>
-#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkCamera.h>
+#include <vtkObjectFactory.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 
 // STL:
 #include <stdexcept>
 using namespace std;
+
+// ------------------------------------------------------------------------------------------------
 
 void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* system,const Properties& render_settings,
     bool reset_camera)
@@ -73,3 +76,5 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
         pRenderer->ResetCamera();
     }
 }
+
+// ------------------------------------------------------------------------------------------------
