@@ -184,6 +184,9 @@ class MyFrame : public wxFrame, public IPaintHandler
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
 
+        /// Ask the 3D scene which cell was clicked on.
+        bool FindClickTarget(int x,int y,int &iChemical,int &cell_id);
+
     private:
 
         // using wxAUI for window management
