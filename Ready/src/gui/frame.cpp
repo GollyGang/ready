@@ -476,7 +476,7 @@ void MyFrame::InitializeToolbars()
             _("Brush"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
-        this->paint_toolbar->AddControl(new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("1.000000 ")),_("Color"));
+        this->paint_toolbar->AddControl(new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("  1.000000  "),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL),_("Color"));
         wxImage im(22,22);
         im.SetRGB(wxRect(0,0,22,22),255,0,0);
         this->paint_toolbar->AddControl(new wxBitmapButton(this->paint_toolbar,ID::CurrentValueColor,wxBitmap(im)),_("Color"));
@@ -3137,26 +3137,20 @@ void MyFrame::LeftMouseDown(int x, int y)
 {
     this->mouse_is_down = true;
 
-    vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
-    picker->SetTolerance(0.000001);
-    picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-    //double* worldPosition = picker->GetPickPosition();
-    int cell_id = picker->GetCellId();
-    if(cell_id<0) return;
-
-    int iActiveChemical = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
+    int cell_id,iChemical;
+    if(!this->FindClickTarget(x,y,iChemical,cell_id)) return;
 
     switch(this->CurrentCursor)
     {
         case PENCIL:
         {
-            this->system->SetValue(iActiveChemical,cell_id,this->current_paint_value);
+            this->system->SetValue(iChemical,cell_id,this->current_paint_value);
             this->pVTKWindow->Refresh();
         }
         break;
         case PICKER:
         {
-            this->current_paint_value = this->system->GetValue(iActiveChemical,cell_id);
+            this->current_paint_value = this->system->GetValue(iChemical,cell_id);
             this->UpdateToolbars();
         }
         break;
@@ -3176,16 +3170,39 @@ void MyFrame::MouseMove(int x, int y)
 {
     if(!this->mouse_is_down || this->CurrentCursor!=PENCIL) return;
 
+    int cell_id,iChemical;
+    if(!this->FindClickTarget(x,y,iChemical,cell_id)) return;
+
+    this->system->SetValue(iChemical,cell_id,this->current_paint_value);
+    this->pVTKWindow->Refresh();
+}
+
+// ---------------------------------------------------------------------
+
+bool MyFrame::FindClickTarget(int x,int y,int &iChemical,int &cell_id)
+{
     vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
     picker->SetTolerance(0.000001);
     picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-    //double* worldPosition = picker->GetPickPosition();
-    int cell_id = picker->GetCellId();
-    if(cell_id<0) return;
+    cell_id = picker->GetCellId();
+    if(cell_id<0) return false;
 
-    int iActiveChemical = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
-    this->system->SetValue(iActiveChemical,cell_id,this->current_paint_value);
-    this->pVTKWindow->Refresh();
+    bool show_multiple_chemicals = this->render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    if(show_multiple_chemicals && this->system->GetArenaDimensionality()==2)
+    {
+        // detect which chemical was drawn on from the click position
+        double *p = picker->GetPickPosition();
+        double gap = 5.0f; // gap of 5 is hardwired in ImageRD::InitializeVTKPipeline_2D()
+        iChemical = int(floor((p[0]+gap/2)/(this->system->GetX()+5.0f))); 
+        iChemical = min(this->system->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
+    }
+
+    return true;
 }
 
 // ---------------------------------------------------------------------
