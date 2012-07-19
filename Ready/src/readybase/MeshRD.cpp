@@ -45,6 +45,7 @@
 #include <vtkCutter.h>
 #include <vtkPlane.h>
 #include <vtkCellDataToPointData.h>
+#include <vtkCellLocator.h>
 
 // STL:
 #include <stdexcept>
@@ -58,6 +59,7 @@ MeshRD::MeshRD()
     this->mesh = vtkUnstructuredGrid::New();
     this->cell_neighbor_indices = NULL;
     this->cell_neighbor_weights = NULL;
+    this->cell_locator = NULL;
 }
 
 // ---------------------------------------------------------------------
@@ -70,6 +72,9 @@ MeshRD::~MeshRD()
     this->mesh->Delete();
     this->starting_pattern->Delete();
     this->n_chemicals = 0;
+
+    if(this->cell_locator)
+        this->cell_locator->Delete();
 }
 
 // ---------------------------------------------------------------------
@@ -200,6 +205,12 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->mesh->DeepCopy(mesh2);
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
+
+    if(this->cell_locator)
+    {
+        this->cell_locator->Delete();
+        this->cell_locator = NULL;
+    }
 
     this->ComputeCellNeighbors();
 }
@@ -574,17 +585,69 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
-float MeshRD::GetValue(int iChemical,int cellID) const
+float MeshRD::GetValue(float x,float y,float z,const Properties& render_settings)
 {
-    return vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->GetValue(cellID);
+    this->CreateCellLocatorIfNeeded();
+
+    double p[3]={x,y,z};
+    vtkIdType iCell = this->cell_locator->FindCell(p);
+
+    if(iCell<0)
+        return 0.0f;
+
+    int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    return vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->GetValue(iCell);
 }
 
 // --------------------------------------------------------------------------------
 
-void MeshRD::SetValue(int iChemical,int cellID,float val)
+void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
-    vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(cellID,val);
+    this->CreateCellLocatorIfNeeded();
+
+    double p[3]={x,y,z};
+    vtkIdType iCell = this->cell_locator->FindCell(p);
+
+    if(iCell<0)
+        return;
+
+    int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(iCell,val);
     this->mesh->Modified();
+}
+
+// --------------------------------------------------------------------------------
+
+void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
+{
+    this->CreateCellLocatorIfNeeded();
+
+    double *dataset_bbox = this->mesh->GetBounds();
+    r *= hypot3(dataset_bbox[1]-dataset_bbox[0],dataset_bbox[3]-dataset_bbox[2],dataset_bbox[5]-dataset_bbox[4]);
+
+    double bbox[6]={x-r,x+r,y-r,y+r,z-r,z+r};
+    vtkSmartPointer<vtkIdList> cells = vtkSmartPointer<vtkIdList>::New();
+    this->cell_locator->FindCellsWithinBounds(bbox,cells);
+
+    int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    for(vtkIdType i=0;i<cells->GetNumberOfIds();i++)
+    {
+        // TODO: check for actual distance here
+        vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(cells->GetId(i),val);
+    }
+    this->mesh->Modified();
+}
+
+// --------------------------------------------------------------------------------
+
+void MeshRD::CreateCellLocatorIfNeeded()
+{
+    if(this->cell_locator) return;
+
+    this->cell_locator = vtkCellLocator::New();
+    this->cell_locator->SetDataSet(this->mesh);
+    this->cell_locator->SetTolerance(0.0001);
+    this->cell_locator->BuildLocator();
 }
 
 // --------------------------------------------------------------------------------
