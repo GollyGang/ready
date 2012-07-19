@@ -80,10 +80,12 @@ using namespace std;
 #include <vtkCellDataToPointData.h>
 #include <vtkImageToStructuredPoints.h>
 #include <vtkPointDataToCellData.h>
+#include <vtkPlane.h>
+#include <vtkCutter.h>
 
 // -------------------------------------------------------------------
 
-ImageRD::ImageRD()
+ImageRD::ImageRD() : xgap(5.0),ygap(3.0)
 {
     this->starting_pattern = vtkImageData::New();
 }
@@ -389,8 +391,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     if(show_cell_edges)
         actor->GetProperty()->EdgeVisibilityOn();
     actor->GetProperty()->SetEdgeColor(0,0,0);
-    const double cell_shift = 0.5; // because we've gone from point data to cell data
-    actor->SetPosition(-cell_shift,low*scaling - 6.0,0);
     pRenderer->AddActor(actor);
 
     // also add a scalar bar to show how the colors correspond to values
@@ -422,13 +422,14 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
         actor->PickableOff();
+        actor->SetPosition(0.5,-low*scaling+this->ygap,0);
         pRenderer->AddActor(actor);
     }
     
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(-0.5,-0.5,low*scaling,high*scaling,0,0);
+    axis->SetBounds(0,0,this->ygap,(high-low)*scaling+this->ygap,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -535,8 +536,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         if(show_cell_edges)
             actor->GetProperty()->EdgeVisibilityOn();
         actor->GetProperty()->SetEdgeColor(0,0,0);
-        const double cell_shift = 0.5; // because we've gone from point data to cell data
-        actor->SetPosition(offset[0]-cell_shift,offset[1]-cell_shift-this->GetY()-3,offset[2]);
+        actor->SetPosition(offset);
         pRenderer->AddActor(actor);
 
         if(show_displacement_mapped_surface)
@@ -572,7 +572,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetSpecularPower(3);
             if(use_wireframe)
                 actor->GetProperty()->SetRepresentationToWireframe();
-            actor->SetPosition(offset);
+            actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
             actor->PickableOff();
             pRenderer->AddActor(actor);
 
@@ -592,7 +592,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             if(show_bounding_box)
             {
                 vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-                box->SetBounds(0,this->GetX(),0,this->GetY(),low*scaling,high*scaling);
+                box->SetBounds(0,this->GetX()-1,0,this->GetY()-1,low*scaling,high*scaling);
 
                 vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
                 edges->SetInputConnection(box->GetOutputPort());
@@ -605,7 +605,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
                 actor->SetMapper(mapper);
                 actor->GetProperty()->SetColor(0,0,0);  
                 actor->GetProperty()->SetAmbient(1);
-                actor->SetPosition(offset);
+                actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
                 actor->PickableOff();
 
                 pRenderer->AddActor(actor);
@@ -617,12 +617,13 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         {
             vtkSmartPointer<vtkTextActor3D> label = vtkSmartPointer<vtkTextActor3D>::New();
             label->SetInput(GetChemicalName(iChem).c_str());
-            label->SetPosition(offset[0]+this->GetX()/2,offset[1]-this->GetY()-20,offset[2]);
+            const float text_label_offset = 20.0f;
+            label->SetPosition(offset[0]+this->GetX()/2,offset[1]-text_label_offset,offset[2]);
             label->PickableOff();
             pRenderer->AddActor(label);
         }
 
-        offset[0] += this->GetX()+5; // the next chemical should appear further to the right
+        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
     }
 
     if(show_displacement_mapped_surface)
@@ -630,7 +631,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0,0,this->GetY(),this->GetY(),low*scaling,high*scaling);
+        axis->SetBounds(0.5,0.5,this->GetY()-0.5+this->GetY()+this->ygap,this->GetY()-0.5+this->GetY()+this->ygap,low*scaling,high*scaling);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
@@ -677,47 +678,48 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
 
-    // contour the 3D volume and render as a polygonal surface
-
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->ImmediateModeRenderingOn();
+
+    vtkImageData *image = this->GetImage(iActiveChemical);
+    int *extent = image->GetExtent();
+
+    // we first convert the image from point data to cell data, to match the users expectations
+
+    vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
+    pad->SetInput(image);
+    pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
+
+    // move the pixel values (stored in the point data) to cell data
+    vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
+    prearrange_fields->SetInput(image);
+    prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
+        vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
+
+    // mark the new cell data array as the active attribute
+    vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+    assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
+    assign_attribute->Assign("ImageScalars", vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+
+    vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
+    merge_datasets->SetGeometryConnection(pad->GetOutputPort());
+    merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
+
+    vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New(); // (only used if needed)
+    to_point_data->SetInputConnection(merge_datasets->GetOutputPort());
 
     if(use_image_interpolation)
     {
         // turns the 3d grid of sampled values into a polygon mesh for rendering,
         // by making a surface that contours the volume at a specified level    
         vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInput(this->GetImage(iActiveChemical));
-        surface->SetValue(0, contour_level);
-
-        // a mapper converts scene objects to graphics primitives
+        surface->SetInputConnection(to_point_data->GetOutputPort());
+        surface->SetValue(0,contour_level);
         mapper->SetInputConnection(surface->GetOutputPort());
     }
     else
     {
         // render as cubes, Minecraft-style
-        vtkImageData *image = this->GetImage(iActiveChemical);
-        int *extent = image->GetExtent();
-
-        vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
-        pad->SetInput(image);
-        pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
-
-        // move the pixel values (stored in the point data) to cell data
-        vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
-        prearrange_fields->SetInput(image);
-        prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
-            vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
-
-        // mark the new cell data array as the active attribute
-        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
-        assign_attribute->Assign("ImageScalars", vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
-
-        vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
-        merge_datasets->SetGeometryConnection(pad->GetOutputPort());
-        merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
-
         vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
         threshold->SetInputConnection(merge_datasets->GetOutputPort());
         threshold->SetInputArrayToProcess(0, 0, 0,
@@ -725,19 +727,13 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             vtkDataSetAttributes::SCALARS);
         threshold->ThresholdByUpper(contour_level);
 
-        vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-        transform->Translate (-.5, -.5, -.5);
-        vtkSmartPointer<vtkTransformFilter> transformModel = vtkSmartPointer<vtkTransformFilter>::New();
-        transformModel->SetTransform(transform);
-        transformModel->SetInputConnection(threshold->GetOutputPort());
-
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
-        geometry->SetInputConnection(transformModel->GetOutputPort());
+        geometry->SetInputConnection(threshold->GetOutputPort());
+
         mapper->SetInputConnection(geometry->GetOutputPort());
     }
     mapper->ScalarVisibilityOff();
 
-    // an actor determines how a scene object is displayed
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
     actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
@@ -760,14 +756,14 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bfprop->SetSpecular(0.1);
 
     // add the actor to the renderer's scene
-    actor->PickableOff(); // (painting is performed on the 2D slice, not the 3D contour)
+    actor->PickableOff();
     pRenderer->AddActor(actor);
 
     // add the bounding box
     if(show_bounding_box)
     {
         vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(this->GetImage(iActiveChemical)->GetBounds());
+        box->SetBounds(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
 
         vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
         edges->SetInputConnection(box->GetOutputPort());
@@ -798,58 +794,36 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         lut->SetValueRange(low_val,high_val);
         lut->Build();
 
-        // extract a slice
-        vtkImageData *image = this->GetImage(iActiveChemical);
-        // Matrices for axial, coronal, sagittal, oblique view orientations
-        static double sagittalElements[16] = { // x
-               0, 0,-1, 0,
-               1, 0, 0, 0,
-               0,-1, 0, 0,
-               0, 0, 0, 1 };
-        static double coronalElements[16] = { // y
-                 1, 0, 0, 0,
-                 0, 0, 1, 0,
-                 0,-1, 0, 0,
-                 0, 0, 0, 1 };
-        static double axialElements[16] = { // z
-                 1, 0, 0, 0,
-                 0, 1, 0, 0,
-                 0, 0, 1, 0,
-                 0, 0, 0, 1 };
-        /*static double obliqueElements[16] = { // could get fancy and have slanting slices
-                 1, 0, 0, 0,
-                 0, 0.866025, -0.5, 0,
-                 0, 0.5, 0.866025, 0,
-                 0, 0, 0, 1 };*/
-        // Set the slice orientation
-        vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
+        vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+        vtkFloatingPointType *bounds = image->GetBounds();
+        plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
+                         slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
+                         slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
         if(slice_3D_axis=="x")
-            resliceAxes->DeepCopy(sagittalElements);
+            plane->SetNormal(1,0,0);
         else if(slice_3D_axis=="y")
-            resliceAxes->DeepCopy(coronalElements);
-        else if(slice_3D_axis=="z")
-            resliceAxes->DeepCopy(axialElements);
-        resliceAxes->SetElement(0, 3, slice_3D_position * this->GetX());
-        resliceAxes->SetElement(1, 3, slice_3D_position * this->GetY());
-        resliceAxes->SetElement(2, 3, slice_3D_position * this->GetZ());
-
-        vtkSmartPointer<vtkImageReslice> voi = vtkSmartPointer<vtkImageReslice>::New();
-        voi->SetInput(image);
-        voi->SetOutputDimensionality(2);
-        voi->SetResliceAxes(resliceAxes);
-
-        // pass the image through the lookup table
-        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
-        image_mapper->SetLookupTable(lut);
-        image_mapper->SetInputConnection(voi->GetOutputPort());
-
-        // TODO: find a way to get show_cell_edges working
-      
-        vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
-        actor->SetInput(image_mapper->GetOutput());
-        actor->SetUserMatrix(resliceAxes);
-        if(!use_image_interpolation)
-            actor->InterpolateOff();
+            plane->SetNormal(0,1,0);
+        else
+            plane->SetNormal(0,0,1);
+        vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+        cutter->SetCutFunction(plane);
+        if(use_image_interpolation)
+            cutter->SetInputConnection(to_point_data->GetOutputPort());
+        else
+            cutter->SetInputConnection(merge_datasets->GetOutputPort());
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(cutter->GetOutputPort());
+        mapper->ImmediateModeRenderingOn();
+        mapper->SetLookupTable(lut);
+        mapper->UseLookupTableScalarRangeOn();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->LightingOff();
+        if(show_cell_edges)
+        {
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+        }
         pRenderer->AddActor(actor);
 
         // also add a scalar bar to show how the colors correspond to values
@@ -1105,16 +1079,118 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
 
 // --------------------------------------------------------------------------------
 
-float ImageRD::GetValue(int iChemical,int cellID) const
+float ImageRD::GetValue(float x,float y,float z,const Properties& render_settings)
 {
-    return *(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer())+cellID);
+    const int X = this->images.front()->GetDimensions()[0];
+    const int Y = this->images.front()->GetDimensions()[1];
+    const int Z = this->images.front()->GetDimensions()[2];
+
+    // which chemical was clicked-on?
+    float offset_x = 0.0f;
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iChemical;
+    if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    {
+        // detect which chemical was drawn on from the click position
+        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+        offset_x = iChemical * (X+this->xgap);
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    }
+
+    int ix,iy,iz;
+    ix = int(floor(x-offset_x));
+    iy = int(floor(y));
+    iz = int(floor(z));
+    ix = min(X-1,max(0,ix));
+    iy = min(Y-1,max(0,iy));
+    iz = min(Z-1,max(0,iz));
+
+    return *vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),ix,iy,iz,X,Y);
 }
 
 // --------------------------------------------------------------------------------
 
-void ImageRD::SetValue(int iChemical,int cellID,float val)
+void ImageRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
-    *(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer())+cellID) = val;
+    const int X = this->images.front()->GetDimensions()[0];
+    const int Y = this->images.front()->GetDimensions()[1];
+    const int Z = this->images.front()->GetDimensions()[2];
+
+    // which chemical was clicked-on?
+    float offset_x = 0.0f;
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iChemical;
+    if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    {
+        // detect which chemical was drawn on from the click position
+        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+        offset_x = iChemical * (X+this->xgap);
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    }
+
+    int ix,iy,iz;
+    ix = int(floor(x-offset_x));
+    iy = int(floor(y));
+    iz = int(floor(z));
+    ix = min(X-1,max(0,ix));
+    iy = min(Y-1,max(0,iy));
+    iz = min(Z-1,max(0,iz));
+
+    *vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),ix,iy,iz,X,Y) = val;
+    this->images[iChemical]->Modified();
+}
+
+// --------------------------------------------------------------------------------
+
+void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
+{
+    const int X = this->images.front()->GetDimensions()[0];
+    const int Y = this->images.front()->GetDimensions()[1];
+    const int Z = this->images.front()->GetDimensions()[2];
+
+    // which chemical was clicked-on?
+    float offset_x = 0.0f;
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iChemical;
+    if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    {
+        // detect which chemical was drawn on from the click position
+        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+        offset_x = iChemical * (X+this->xgap);
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    }
+
+    double *dataset_bbox = this->images.front()->GetBounds();
+    r *= hypot3(dataset_bbox[1]-dataset_bbox[0],dataset_bbox[3]-dataset_bbox[2],dataset_bbox[5]-dataset_bbox[4]);
+
+    int ix,iy,iz;
+    ix = int(floor(x-offset_x));
+    iy = int(floor(y));
+    iz = int(floor(z));
+    ix = min(X-1,max(0,ix));
+    iy = min(Y-1,max(0,iy));
+    iz = min(Z-1,max(0,iz));
+
+    for(int tz=max(0,int(iz-r));tz<=min(Z-1,int(iz+r));tz++)
+        for(int ty=max(0,int(iy-r));ty<=min(Y-1,int(iy+r));ty++)
+            for(int tx=max(0,int(ix-r));tx<=min(X-1,int(ix+r));tx++)
+                if(hypot3(ix-tx,iy-ty,iz-tz)<r)
+                    *vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),tx,ty,tz,X,Y) = val;
     this->images[iChemical]->Modified();
 }
 

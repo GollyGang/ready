@@ -295,10 +295,18 @@ void OpenCLMeshRD::ReleaseOpenCLBuffers()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLMeshRD::SetValue(int iChemical,int cellID,float val)
+void OpenCLMeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
-    MeshRD::SetValue(iChemical,cellID,val);
+    MeshRD::SetValue(x,y,z,val,render_settings);
     this->WriteToOpenCLBuffers();
 }
 
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLMeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
+{
+    MeshRD::SetValuesInRadius(x,y,z,r,val,render_settings);
+    this->WriteToOpenCLBuffers();
+}
+
+// ----------------------------------------------------------------------------------------------------------------

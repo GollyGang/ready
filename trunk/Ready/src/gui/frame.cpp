@@ -3141,20 +3141,30 @@ void MyFrame::LeftMouseDown(int x, int y)
 {
     this->mouse_is_down = true;
 
-    int cell_id,iChemical;
-    if(!this->FindClickTarget(x,y,iChemical,cell_id)) return;
+    vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+    picker->SetTolerance(0.000001);
+    int ret = picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+    if(!ret) return;
+    double *p = picker->GetPickPosition();
 
     switch(this->CurrentCursor)
     {
         case PENCIL:
         {
-            this->system->SetValue(iChemical,cell_id,this->current_paint_value);
+            this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            this->pVTKWindow->Refresh();
+        }
+        break;
+        case BRUSH:
+        {
+            float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
+            this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
             this->pVTKWindow->Refresh();
         }
         break;
         case PICKER:
         {
-            this->current_paint_value = this->system->GetValue(iChemical,cell_id);
+            this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
             this->UpdateToolbars();
         }
         break;
@@ -3172,41 +3182,36 @@ void MyFrame::LeftMouseUp(int x, int y)
 
 void MyFrame::MouseMove(int x, int y)
 {
-    if(!this->mouse_is_down || this->CurrentCursor!=PENCIL) return;
+    if(!this->mouse_is_down) return;
 
-    int cell_id,iChemical;
-    if(!this->FindClickTarget(x,y,iChemical,cell_id)) return;
-
-    this->system->SetValue(iChemical,cell_id,this->current_paint_value);
-    this->pVTKWindow->Refresh();
-}
-
-// ---------------------------------------------------------------------
-
-bool MyFrame::FindClickTarget(int x,int y,int &iChemical,int &cell_id)
-{
     vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
     picker->SetTolerance(0.000001);
-    picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-    cell_id = picker->GetCellId();
-    if(cell_id<0) return false;
+    int ret = picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+    if(!ret) return;
+    double *p = picker->GetPickPosition();
 
-    bool show_multiple_chemicals = this->render_settings.GetProperty("show_multiple_chemicals").GetBool();
-    if(show_multiple_chemicals && this->system->GetArenaDimensionality()==2)
+    switch(this->CurrentCursor)
     {
-        // detect which chemical was drawn on from the click position
-        double *p = picker->GetPickPosition();
-        double gap = 5.0f; // gap of 5 is hardwired in ImageRD::InitializeVTKPipeline_2D() (not ideal)
-        iChemical = int(floor((p[0]+gap/2)/(this->system->GetX()+gap))); 
-        iChemical = min(this->system->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range
+        case PENCIL:
+        {
+            this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            this->pVTKWindow->Refresh();
+        }
+        break;
+        case BRUSH:
+        {
+            float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
+            this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
+            this->pVTKWindow->Refresh();
+        }
+        break;
+        case PICKER:
+        {
+            this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
+            this->UpdateToolbars();
+        }
+        break;
     }
-    else
-    {
-        // only one chemical is shown, must be that one
-        iChemical = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
-    }
-
-    return true;
 }
 
 // ---------------------------------------------------------------------

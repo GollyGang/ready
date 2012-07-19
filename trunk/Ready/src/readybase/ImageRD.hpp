@@ -62,8 +62,9 @@ class ImageRD : public AbstractRD
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
 
-        virtual float GetValue(int iChemical,int cellID) const;
-        virtual void SetValue(int iChemical,int cellID,float val);
+        virtual float GetValue(float x,float y,float z,const Properties& render_settings);
+        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
+        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
 
     protected:
 
@@ -71,6 +72,8 @@ class ImageRD : public AbstractRD
 
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;
+
+        double xgap,ygap; /// spatial separation for rendering multiple chemicals (currently only used in 2D)
 
         virtual int GetArenaDimensionality() const;
 

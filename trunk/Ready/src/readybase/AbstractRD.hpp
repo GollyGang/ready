@@ -140,13 +140,15 @@ class AbstractRD
         virtual int GetArenaDimensionality() const =0;
 
         /// Retrieve the value at a given location.
-        virtual float GetValue(int iChemical,int cellID) const =0;
+        virtual float GetValue(float x,float y,float z,const Properties& render_settings) =0;
         /// Set the value at a given location.
-        virtual void SetValue(int iChemical,int cellID,float val) =0;
+        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings) =0;
+        /// Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.
+        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) =0;
 
     protected:
 
-        /// advance the RD system by n timesteps
+        /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;
 
         void ClearInitialPatternGenerator();

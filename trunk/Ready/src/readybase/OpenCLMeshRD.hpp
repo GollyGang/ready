@@ -47,7 +47,8 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         virtual void TestFormula(std::string program_string);
         virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); } 
 
-        virtual void SetValue(int iChemical,int cellID,float val);
+        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
+        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
 
     protected:
 

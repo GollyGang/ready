@@ -24,6 +24,7 @@
 // VTK:
 #include <vtkType.h>
 class vtkUnstructuredGrid;
+class vtkCellLocator;
 
 /// Base class for mesh-based systems.
 class MeshRD : public AbstractRD
@@ -65,8 +66,9 @@ class MeshRD : public AbstractRD
 
         virtual int GetArenaDimensionality() const;
 
-        virtual float GetValue(int iChemical,int cellID) const;
-        virtual void SetValue(int iChemical,int cellID,float val);
+        virtual float GetValue(float x,float y,float z,const Properties& render_settings);
+        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
+        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
 
     protected:
 
@@ -76,6 +78,8 @@ class MeshRD : public AbstractRD
         /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps) =0;
 
+        void CreateCellLocatorIfNeeded();
+
     protected:
 
         vtkUnstructuredGrid* mesh;             ///< the cell data contains a named array for each chemical ('a', 'b', etc.)
@@ -84,6 +88,8 @@ class MeshRD : public AbstractRD
         int max_neighbors;
         int *cell_neighbor_indices;   ///< index of each neighbor of a cell
         float *cell_neighbor_weights; ///< diffusion coefficient between each cell and a neighbor
+
+        vtkCellLocator* cell_locator; ///< Returns a cell ID when given a 3D location
 
     private: // deliberately not implemented, to prevent use
 
