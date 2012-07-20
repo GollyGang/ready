@@ -7,11 +7,9 @@ UI annoyances:
 before 0.4 release:
 
 - drawing issues: 
-  - brush tool not working yet
   - how to change size of brush?
   - need undo
-  - how to paint on 3d image? paint on slice? - pass 3d coord to system
-  - need better cursors: pencil, brush, picker (copy from icons)
+  - current color button should offer spectrum choice
 
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
