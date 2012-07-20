@@ -756,7 +756,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bfprop->SetSpecular(0.1);
 
     // add the actor to the renderer's scene
-    actor->PickableOff();
+    actor->PickableOff(); // not sure about this - sometimes it is nice to paint on the contoured surface too, for 3d sculpting
     pRenderer->AddActor(actor);
 
     // add the bounding box
