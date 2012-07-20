@@ -46,6 +46,9 @@
 #include <vtkPlane.h>
 #include <vtkCellDataToPointData.h>
 #include <vtkCellLocator.h>
+#include <vtkContourFilter.h>
+#include <vtkAssignAttribute.h>
+#include <vtkReverseSense.h>
 
 // STL:
 #include <stdexcept>
@@ -233,7 +236,9 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
-
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+    float surface_r,surface_g,surface_b;
+    render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
     string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
     float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
@@ -248,8 +253,9 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     lut->SetValueRange(low_val,high_val);
     lut->Build();
 
-    // add the mesh actor
+    if(this->mesh->GetCellType(0)==VTK_POLYGON)
     {
+        // add the mesh actor
         vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
         mapper->ImmediateModeRenderingOn();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
@@ -297,6 +303,43 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
         pRenderer->AddActor(actor);
     }
+    else if(this->mesh->GetCellType(0)==VTK_TETRA)
+    {
+        // show a contour
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInput(this->mesh);
+        assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+        vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+        to_point_data->SetInputConnection(assign_attribute->GetOutputPort());
+        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+        surface->SetInputConnection(to_point_data->GetOutputPort());
+        surface->SetValue(0,contour_level);
+        vtkSmartPointer<vtkReverseSense> reverse = vtkSmartPointer<vtkReverseSense>::New();
+        reverse->SetInputConnection(surface->GetOutputPort());
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(reverse->GetOutputPort());
+        mapper->ImmediateModeRenderingOn();
+        mapper->ScalarVisibilityOff();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
+        actor->GetProperty()->SetAmbient(0.1);
+        actor->GetProperty()->SetDiffuse(0.7);
+        actor->GetProperty()->SetSpecular(0.2);
+        actor->GetProperty()->SetSpecularPower(3);
+        if(use_wireframe)
+            actor->GetProperty()->SetRepresentationToWireframe();
+        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+        actor->SetBackfaceProperty(bfprop);
+        bfprop->SetColor(0.3,0.3,0.3);
+        bfprop->SetAmbient(0.3);
+        bfprop->SetDiffuse(0.6);
+        bfprop->SetSpecular(0.1);
+        actor->PickableOff();
+        pRenderer->AddActor(actor);
+    }
+    else
+        throw runtime_error("MeshRD::InitializeRenderPipeline : unsupported cell type");
 
     // add a slice
     if(slice_3D)

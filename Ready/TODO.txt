@@ -10,7 +10,8 @@ before 0.4 release:
   - how to change size of brush?
   - need undo
   - current color button should offer spectrum choice
-
+  - document painting tools
+  
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - relax power of 2 size requirement (only a speed benefit)
