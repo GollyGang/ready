@@ -241,22 +241,22 @@ MyFrame::MyFrame(const wxString& title)
         // advanced docking hints cause problems on xfce (and probably others)
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_RECTANGLE_HINT );
     #endif
+    this->toolbar_padding = 5;
+    this->show_toolbar_labels = false;
     #ifdef __WXMAC__
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
-        this->toolbar_padding = 5;
-        this->show_toolbar_labels = false;
         this->icons_folder = _T("resources/Icons/32px/");
     #else
-        this->toolbar_padding = 5;
-        this->show_toolbar_labels = false;
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
+    this->cursors_folder = _T("resources/Cursors/");
     this->aui_mgr.SetManagedWindow(this);
     
     GetPrefs();     // must be called before InitializeMenus
 
     this->InitializeMenus();
     this->InitializeToolbars();
+    this->InitializeCursors();
 
     CreateStatusBar(1);
     SetStatusText(_("Ready"));
@@ -296,6 +296,9 @@ MyFrame::~MyFrame()
     this->SaveSettings(); // save the current settings so it starts up the same next time
     this->aui_mgr.UnInit();
     this->pVTKWindow->Delete();
+    delete this->pencil_cursor;
+    delete this->brush_cursor;
+    delete this->picker_cursor;
     delete this->system;
 }
 
@@ -484,6 +487,26 @@ void MyFrame::InitializeToolbars()
         this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
             .Position(2).Caption(_("Paint tools")));
     }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::InitializeCursors()
+{
+    wxImage im1(this->cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
+    im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
+    im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 18);
+    this->pencil_cursor = new wxCursor(im1);
+
+    wxImage im2(this->cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
+    im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
+    im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 21);
+    this->brush_cursor = new wxCursor(im2);
+
+    wxImage im3(this->cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
+    im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
+    im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 14);
+    this->picker_cursor = new wxCursor(im3);
 }
 
 // ---------------------------------------------------------------------
@@ -3083,7 +3106,7 @@ void MyFrame::OnUpdateSelectPointerTool(wxUpdateUIEvent& event)
 void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PENCIL;
-    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PENCIL));
+    this->pVTKWindow->SetCursor(*this->pencil_cursor);
     this->mouse_is_down = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
@@ -3102,7 +3125,7 @@ void MyFrame::OnUpdateSelectPencilTool(wxUpdateUIEvent& event)
 void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
     this->CurrentCursor = BRUSH;
-    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_PAINT_BRUSH));
+    this->pVTKWindow->SetCursor(*this->brush_cursor);
     this->mouse_is_down = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
@@ -3121,7 +3144,7 @@ void MyFrame::OnUpdateSelectBrushTool(wxUpdateUIEvent& event)
 void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PICKER;
-    this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW)); // TODO: find a better cursor
+    this->pVTKWindow->SetCursor(*this->picker_cursor);
     this->mouse_is_down = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);

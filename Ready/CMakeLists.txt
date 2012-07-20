@@ -177,6 +177,9 @@ set( OTHER_FILES
   resources/Icons/32px/system-run.png
   resources/Icons/32px/list-add_gray.png
   resources/Icons/32px/camera-photo.png
+  resources/Cursors/pencil-cursor.png
+  resources/Cursors/brush-cursor.png
+  resources/Cursors/picker-cursor.png
 )
 
 #-------------------------------------------VTK----------------------------------------------

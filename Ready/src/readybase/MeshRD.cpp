@@ -632,8 +632,18 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
     int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     for(vtkIdType i=0;i<cells->GetNumberOfIds();i++)
     {
-        // TODO: check for actual distance here
-        vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(cells->GetId(i),val);
+        int iCell = cells->GetId(i);
+        vtkIdType npts,*pts;
+        this->mesh->GetCellPoints(iCell,npts,pts);
+        // get a point at the centre of the cell (need a location to sample the overlays)
+        double cp[3] = {0,0,0};
+        for(vtkIdType iPt=0;iPt<npts;iPt++)
+            for(int xyz=0;xyz<3;xyz++)
+                cp[xyz] += this->mesh->GetPoint(pts[iPt])[xyz];
+        for(int xyz=0;xyz<3;xyz++)
+            cp[xyz] /= npts;
+        if(hypot3(cp[0]-x,cp[1]-y,cp[2]-z)<r)
+            vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(iCell,val);
     }
     this->mesh->Modified();
 }

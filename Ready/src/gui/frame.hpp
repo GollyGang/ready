@@ -163,6 +163,7 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         void InitializeMenus();
         void InitializeToolbars();
+        void InitializeCursors();
         void InitializePatternsPane();
         void InitializeInfoPane();
         void UpdateInfoPane();
@@ -230,9 +231,10 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         // toolbar things
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
+        wxCursor *pencil_cursor,*brush_cursor,*picker_cursor;
         float current_paint_value;
         bool mouse_is_down;
-        wxString icons_folder;
+        wxString icons_folder,cursors_folder;
         bool show_toolbar_labels;
         int toolbar_padding;
 
