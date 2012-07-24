@@ -234,6 +234,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         wxCursor *pencil_cursor,*brush_cursor,*picker_cursor;
         float current_paint_value;
         bool mouse_is_down;
+        bool erasing;
         wxString icons_folder,cursors_folder;
         bool show_toolbar_labels;
         int toolbar_padding;

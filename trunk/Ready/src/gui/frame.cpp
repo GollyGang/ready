@@ -495,16 +495,19 @@ void MyFrame::InitializeCursors()
 {
     wxImage im1(this->cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
+
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 18);
     this->pencil_cursor = new wxCursor(im1);
 
     wxImage im2(this->cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
+
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 21);
     this->brush_cursor = new wxCursor(im2);
 
     wxImage im3(this->cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
+
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 14);
     this->picker_cursor = new wxCursor(im3);
 }
@@ -3090,6 +3093,7 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
     this->CurrentCursor = POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
     this->mouse_is_down = false;
+    this->erasing = false;
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->pVTKWindow->SetInteractorStyle(is);
 }
@@ -3108,6 +3112,7 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
     this->CurrentCursor = PENCIL;
     this->pVTKWindow->SetCursor(*this->pencil_cursor);
     this->mouse_is_down = false;
+    this->erasing = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3127,6 +3132,7 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
     this->CurrentCursor = BRUSH;
     this->pVTKWindow->SetCursor(*this->brush_cursor);
     this->mouse_is_down = false;
+    this->erasing = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3146,6 +3152,7 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
     this->CurrentCursor = PICKER;
     this->pVTKWindow->SetCursor(*this->picker_cursor);
     this->mouse_is_down = false;
+    this->erasing = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3174,7 +3181,14 @@ void MyFrame::LeftMouseDown(int x, int y)
     {
         case PENCIL:
         {
-            this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            if (this->current_paint_value == this->system->GetValue(p[0],p[1],p[2],this->render_settings)) {
+                // erase cell by using low value
+                this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
+                // set flag in case mouse is moved (see MouseMove)
+                this->erasing = true;
+            } else {
+                this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            }
             this->pVTKWindow->Refresh();
         }
         break;
@@ -3199,6 +3213,7 @@ void MyFrame::LeftMouseDown(int x, int y)
 void MyFrame::LeftMouseUp(int x, int y)
 {
     this->mouse_is_down = false;
+    this->erasing = false;
 }
 
 // ---------------------------------------------------------------------
@@ -3217,7 +3232,11 @@ void MyFrame::MouseMove(int x, int y)
     {
         case PENCIL:
         {
-            this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            if (erasing) {
+                this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
+            } else {
+                this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            }
             this->pVTKWindow->Refresh();
         }
         break;
