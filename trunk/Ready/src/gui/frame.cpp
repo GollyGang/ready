@@ -17,9 +17,9 @@
 
 // local:
 #include "frame.hpp"
-#include "app.hpp"              // for wxGetApp
+#include "app.hpp"
 #include "wxutils.hpp"
-#include "prefs.hpp"            // for GetPrefs, SavePrefs, etc
+#include "prefs.hpp"
 #include "PatternsPanel.hpp"
 #include "InfoPanel.hpp"
 #include "HelpPanel.hpp"
@@ -44,25 +44,18 @@
 #include "appicon16.xpm"
 
 // wxWidgets:
-#include <wx/config.h>
-#include <wx/aboutdlg.h>
 #include <wx/filename.h>
-#include <wx/font.h>
 #include <wx/dir.h>
-#include <wx/dnd.h>             // for wxFileDropTarget
-#include <wx/artprov.h>
+#include <wx/dnd.h>
 #if wxUSE_TOOLTIPS
-   #include "wx/tooltip.h"      // for wxToolTip
+   #include "wx/tooltip.h"
 #endif
-#include <wx/choicdlg.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
 
 // STL:
-#include <fstream>
 #include <string>
-#include <stdexcept>
 #include <algorithm>
 using namespace std;
 
@@ -133,6 +126,10 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_PREFERENCES, MyFrame::OnPreferences)
     EVT_MENU(wxID_EXIT, MyFrame::OnQuit)
     // edit menu
+    EVT_MENU(wxID_UNDO, MyFrame::OnUndo)
+    EVT_UPDATE_UI(wxID_UNDO, MyFrame::OnUpdateUndo)
+    EVT_MENU(wxID_REDO, MyFrame::OnRedo)
+    EVT_UPDATE_UI(wxID_REDO, MyFrame::OnUpdateRedo)
     EVT_MENU(wxID_CUT, MyFrame::OnCut)
     EVT_MENU(wxID_COPY, MyFrame::OnCopy)
     EVT_MENU(wxID_PASTE, MyFrame::OnPaste)
@@ -233,7 +230,7 @@ MyFrame::MyFrame(const wxString& title)
        render_settings("render_settings"),
        is_recording(false),
        CurrentCursor(POINTER),
-       current_paint_value(0.0f),
+       current_paint_value(0.5f),
        mouse_is_down(false)
 {
     this->SetIcon(wxICON(appicon16));
@@ -241,15 +238,12 @@ MyFrame::MyFrame(const wxString& title)
         // advanced docking hints cause problems on xfce (and probably others)
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_RECTANGLE_HINT );
     #endif
-    this->toolbar_padding = 5;
-    this->show_toolbar_labels = false;
     #ifdef __WXMAC__
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
         this->icons_folder = _T("resources/Icons/32px/");
     #else
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
-    this->cursors_folder = _T("resources/Cursors/");
     this->aui_mgr.SetManagedWindow(this);
     
     GetPrefs();     // must be called before InitializeMenus
@@ -339,6 +333,9 @@ void MyFrame::InitializeMenus()
     }
     {   // edit menu:
         wxMenu *menu = new wxMenu;
+        menu->Append(wxID_UNDO, _("Undo")); // TODO
+        menu->Append(wxID_REDO, _("Redo")); // TODO
+        menu->AppendSeparator();
         menu->Append(wxID_CUT, _("Cut") + GetAccelerator(DO_CUT), _("Cut the selection and save it to the clipboard"));
         menu->Append(wxID_COPY, _("Copy") + GetAccelerator(DO_COPY), _("Copy the selection to the clipboard"));
         menu->Append(wxID_PASTE, _("Paste") + GetAccelerator(DO_PASTE), _("Paste in the contents of the clipboard"));
@@ -422,19 +419,12 @@ void MyFrame::InitializeMenus()
 
 // ---------------------------------------------------------------------
 
-#ifdef __WXMAC__
-    // smaller toolbar bitmaps look much nicer on Mac
-    #undef wxART_TOOLBAR
-    #define wxART_TOOLBAR wxART_BUTTON
-#endif
-
 void MyFrame::InitializeToolbars()
 {
-    long toolbar_style = wxAUI_TB_DEFAULT_STYLE;
-    if(this->show_toolbar_labels)
-        toolbar_style |= wxAUI_TB_TEXT;
+    const int toolbar_padding = 5;
+
     {   // file menu items
-        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar,wxDefaultPosition,wxDefaultSize,toolbar_style);
+        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
         this->file_toolbar->AddTool(wxID_NEW,_("New Pattern"),wxBitmap(this->icons_folder + _T("document-new.png"),wxBITMAP_TYPE_PNG),
             _("New Pattern"));
         this->file_toolbar->AddTool(wxID_OPEN,_("Open Pattern..."),wxBitmap(this->icons_folder + _T("document-open.png"),wxBITMAP_TYPE_PNG),
@@ -445,18 +435,18 @@ void MyFrame::InitializeToolbars()
             _("Save Pattern..."));
         this->file_toolbar->AddTool(ID::Screenshot,_("Save Screenshot..."),wxBitmap(this->icons_folder + _T("camera-photo.png"),wxBITMAP_TYPE_PNG),
             _("Save Screenshot..."));
-        this->file_toolbar->SetToolBorderPadding(this->toolbar_padding);
+        this->file_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->file_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
             .Position(0).Caption(_("File tools")));
     }
     {   // action menu items
-        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar,wxDefaultPosition,wxDefaultSize,toolbar_style);
+        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
         this->action_toolbar->AddTool(ID::Step1, _("Step by 1"),wxBitmap(this->icons_folder + _T("list-add_gray.png"),wxBITMAP_TYPE_PNG),
             _("Step by 1"));
         this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
             _("Run"));
-        this->action_toolbar->AddTool(ID::RecordFrames,_("Start Recording..."),wxBitmap(this->icons_folder + _T("media-record.png"),wxBITMAP_TYPE_PNG),
-            _("Start Recording..."),wxITEM_CHECK);
+        //this->action_toolbar->AddTool(ID::RecordFrames,_("Start Recording..."),wxBitmap(this->icons_folder + _T("media-record.png"),wxBITMAP_TYPE_PNG),
+        //    _("Start Recording..."),wxITEM_CHECK);
         this->action_toolbar->AddTool(ID::Slower,_("Run Slower"),wxBitmap(this->icons_folder + _T("media-seek-backward.png"),wxBITMAP_TYPE_PNG),
             _("Run Slower"));
         this->action_toolbar->AddTool(ID::Faster,_("Run Faster"),wxBitmap(this->icons_folder + _T("media-seek-forward.png"),wxBITMAP_TYPE_PNG),
@@ -465,12 +455,12 @@ void MyFrame::InitializeToolbars()
             _("Reset"));
         this->action_toolbar->AddTool(ID::GenerateInitialPattern,_("Generate Initial Pattern"),wxBitmap(this->icons_folder + _T("system-run.png"),wxBITMAP_TYPE_PNG),
             _("Generate Initial Pattern"));
-        this->action_toolbar->SetToolBorderPadding(this->toolbar_padding);
+        this->action_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top()
             .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
     }
     {   // paint items
-        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar,wxDefaultPosition,wxDefaultSize,toolbar_style);
+        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
         this->paint_toolbar->AddTool(ID::Pointer,_("Pointer"),wxBitmap(this->icons_folder + _T("icon-pointer.png"),wxBITMAP_TYPE_PNG),
             _("Pointer"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Pencil,_("Pencil"),wxBitmap(this->icons_folder + _T("draw-freehand.png"),wxBITMAP_TYPE_PNG),
@@ -483,7 +473,7 @@ void MyFrame::InitializeToolbars()
         wxImage im(22,22);
         im.SetRGB(wxRect(0,0,22,22),255,0,0);
         this->paint_toolbar->AddControl(new wxBitmapButton(this->paint_toolbar,ID::CurrentValueColor,wxBitmap(im)),_("Color"));
-        this->paint_toolbar->SetToolBorderPadding(this->toolbar_padding);
+        this->paint_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
             .Position(2).Caption(_("Paint tools")));
     }
@@ -493,19 +483,21 @@ void MyFrame::InitializeToolbars()
 
 void MyFrame::InitializeCursors()
 {
-    wxImage im1(this->cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
+    const wxString cursors_folder(_T("resources/Cursors/"));
+
+    wxImage im1(cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
 
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 18);
     this->pencil_cursor = new wxCursor(im1);
 
-    wxImage im2(this->cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
+    wxImage im2(cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
 
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 21);
     this->brush_cursor = new wxCursor(im2);
 
-    wxImage im3(this->cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
+    wxImage im3(cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
 
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 14);
@@ -3214,6 +3206,7 @@ void MyFrame::LeftMouseUp(int x, int y)
 {
     this->mouse_is_down = false;
     this->erasing = false;
+    this->system->SetUndoPoint();
 }
 
 // ---------------------------------------------------------------------
@@ -3254,6 +3247,36 @@ void MyFrame::MouseMove(int x, int y)
         }
         break;
     }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUndo(wxCommandEvent& event)
+{
+    this->system->Undo();
+    this->pVTKWindow->Refresh();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateUndo(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->CanUndo());
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnRedo(wxCommandEvent& event)
+{
+    this->system->Redo();
+    this->pVTKWindow->Refresh();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateRedo(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->CanRedo());
 }
 
 // ---------------------------------------------------------------------

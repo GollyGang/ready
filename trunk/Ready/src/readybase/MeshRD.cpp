@@ -84,6 +84,7 @@ MeshRD::~MeshRD()
 
 void MeshRD::Update(int n_steps)
 {
+    this->undo_stack.clear();
     this->InternalUpdate(n_steps);
 
     this->timesteps_taken += n_steps;
@@ -179,6 +180,7 @@ void MeshRD::BlankImage()
         scalars->FillComponent(0,0.0);
     }
     this->mesh->Modified();
+    this->undo_stack.clear();
 }
 
 // ---------------------------------------------------------------------
@@ -206,6 +208,7 @@ float MeshRD::GetZ() const
 
 void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
+    this->undo_stack.clear();
     this->mesh->DeepCopy(mesh2);
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
 
@@ -655,7 +658,9 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
         return;
 
     int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
-    vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(iCell,val);
+    float *pCell = vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->GetPointer(iCell);
+    this->StorePaintAction(iChemical,iCell,*pCell);
+    *pCell = val;
     this->mesh->Modified();
 }
 
@@ -672,21 +677,25 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
     vtkSmartPointer<vtkIdList> cells = vtkSmartPointer<vtkIdList>::New();
     this->cell_locator->FindCellsWithinBounds(bbox,cells);
 
+    double p[3] = {x,y,z};
+
     int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     for(vtkIdType i=0;i<cells->GetNumberOfIds();i++)
     {
         int iCell = cells->GetId(i);
         vtkIdType npts,*pts;
         this->mesh->GetCellPoints(iCell,npts,pts);
-        // get a point at the centre of the cell (need a location to sample the overlays)
-        double cp[3] = {0,0,0};
+        // set this cell if any of its points are inside
         for(vtkIdType iPt=0;iPt<npts;iPt++)
-            for(int xyz=0;xyz<3;xyz++)
-                cp[xyz] += this->mesh->GetPoint(pts[iPt])[xyz];
-        for(int xyz=0;xyz<3;xyz++)
-            cp[xyz] /= npts;
-        if(hypot3(cp[0]-x,cp[1]-y,cp[2]-z)<r)
-            vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->SetValue(iCell,val);
+        {
+            if(vtkMath::Distance2BetweenPoints(this->mesh->GetPoint(pts[iPt]),p)<r*r)
+            {
+                float *pCell = vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str()))->GetPointer(iCell);
+                this->StorePaintAction(iChemical,iCell,*pCell);
+                *pCell = val;
+                break;
+            }
+        }
     }
     this->mesh->Modified();
 }
@@ -701,6 +710,18 @@ void MeshRD::CreateCellLocatorIfNeeded()
     this->cell_locator->SetDataSet(this->mesh);
     this->cell_locator->SetTolerance(0.0001);
     this->cell_locator->BuildLocator();
+}
+
+// --------------------------------------------------------------------------------
+
+void MeshRD::FlipPaintAction(PaintAction& cca)
+{
+    float *pCell = vtkFloatArray::SafeDownCast(this->mesh->GetCellData()->GetArray(GetChemicalName(cca.iChemical).c_str()))->GetPointer(cca.iCell);
+    float old_val = *pCell;
+    *pCell = cca.val;
+    cca.val = old_val;
+    cca.done = !cca.done;
+    this->mesh->Modified();
 }
 
 // --------------------------------------------------------------------------------

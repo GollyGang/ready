@@ -33,6 +33,7 @@ OpenCL_MixIn::OpenCL_MixIn(int opencl_platform,int opencl_device)
     this->iPlatform = opencl_platform;
     this->iDevice = opencl_device;
     this->need_reload_context = true;
+    this->need_write_to_opencl_buffers = true;
     this->kernel_function_name = "rd_compute";
 
     // initialise the opencl things to null in case we fail to create them

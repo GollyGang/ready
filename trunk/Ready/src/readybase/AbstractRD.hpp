@@ -146,12 +146,11 @@ class AbstractRD
         /// Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) =0;
 
-    protected:
-
-        /// Advance the RD system by n timesteps.
-        virtual void InternalUpdate(int n_steps)=0;
-
-        void ClearInitialPatternGenerator();
+        bool CanUndo() const; ///< Returns true if there is anything to undo.
+        bool CanRedo() const; ///< Returns true if there is anything to redo.
+        virtual void Undo();  ///< Rewind all actions until the previous undo point.
+        virtual void Redo();  ///< Redo all actions until the next undo point.
+        void SetUndoPoint();  ///< Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block.
 
     protected:
 
@@ -172,6 +171,24 @@ class AbstractRD
         bool is_modified;
 
         bool wrap; ///< should the data wrap-around or have a boundary?
+
+        /// We only allow undo for paint actions.
+        struct PaintAction {
+            int iChemical,iCell;
+            bool done,last_of_group;
+            float val; // value to paint to undo/redo this action
+        };
+        std::vector<PaintAction> undo_stack;
+
+    protected:
+
+        /// Advance the RD system by n timesteps.
+        virtual void InternalUpdate(int n_steps)=0;
+
+        void ClearInitialPatternGenerator();
+
+        virtual void FlipPaintAction(PaintAction& cca) =0; /// << Undo/redo this paint action.
+        void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.
 };
 
 #endif 

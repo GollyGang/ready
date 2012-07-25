@@ -95,6 +95,7 @@ void OpenCLMeshRD::InternalUpdate(int n_steps)
 {
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
+    this->WriteToOpenCLBuffersIfNeeded();
 
     cl_int ret;
     int iBuffer;
@@ -213,8 +214,10 @@ void OpenCLMeshRD::CreateOpenCLBuffers()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLMeshRD::WriteToOpenCLBuffers()
+void OpenCLMeshRD::WriteToOpenCLBuffersIfNeeded()
 {
+    if(!this->need_write_to_opencl_buffers) return;
+
     if(this->buffers[0].empty())
         this->CreateOpenCLBuffers();
 
@@ -237,6 +240,8 @@ void OpenCLMeshRD::WriteToOpenCLBuffers()
     const unsigned long NBORS_WEIGHTS_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
     ret = clEnqueueWriteBuffer(this->command_queue,this->clBuffer_cell_neighbor_weights, CL_TRUE, 0, NBORS_WEIGHTS_SIZE, this->cell_neighbor_weights, 0, NULL, NULL);
     throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: ");
+
+    this->need_write_to_opencl_buffers = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -258,7 +263,7 @@ void OpenCLMeshRD::ReadFromOpenCLBuffers()
 void OpenCLMeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     MeshRD::CopyFromMesh(mesh2);
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -273,7 +278,7 @@ void OpenCLMeshRD::TestFormula(std::string program_string)
 void OpenCLMeshRD::GenerateInitialPattern()
 {
     MeshRD::GenerateInitialPattern();
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -281,7 +286,7 @@ void OpenCLMeshRD::GenerateInitialPattern()
 void OpenCLMeshRD::BlankImage()
 {
     MeshRD::BlankImage();
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -298,7 +303,7 @@ void OpenCLMeshRD::ReleaseOpenCLBuffers()
 void OpenCLMeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
     MeshRD::SetValue(x,y,z,val,render_settings);
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -306,7 +311,23 @@ void OpenCLMeshRD::SetValue(float x,float y,float z,float val,const Properties& 
 void OpenCLMeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
 {
     MeshRD::SetValuesInRadius(x,y,z,r,val,render_settings);
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLMeshRD::Undo()
+{
+    MeshRD::Undo();
+    this->need_write_to_opencl_buffers = true;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLMeshRD::Redo()
+{
+    MeshRD::Redo();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------

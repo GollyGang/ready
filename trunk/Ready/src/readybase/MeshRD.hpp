@@ -80,6 +80,8 @@ class MeshRD : public AbstractRD
 
         void CreateCellLocatorIfNeeded();
 
+        virtual void FlipPaintAction(PaintAction& cca);
+
     protected:
 
         vtkUnstructuredGrid* mesh;             ///< the cell data contains a named array for each chemical ('a', 'b', etc.)
