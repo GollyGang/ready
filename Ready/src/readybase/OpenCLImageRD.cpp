@@ -110,8 +110,10 @@ void OpenCLImageRD::CreateOpenCLBuffers()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::WriteToOpenCLBuffers()
+void OpenCLImageRD::WriteToOpenCLBuffersIfNeeded()
 {
+    if(!this->need_write_to_opencl_buffers) return;
+
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
 
     this->iCurrentBuffer = 0;
@@ -121,6 +123,8 @@ void OpenCLImageRD::WriteToOpenCLBuffers()
         cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
     }
+
+    this->need_write_to_opencl_buffers = false;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -128,7 +132,7 @@ void OpenCLImageRD::WriteToOpenCLBuffers()
 void OpenCLImageRD::CopyFromImage(vtkImageData* im)
 {
     ImageRD::CopyFromImage(im);
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -136,7 +140,7 @@ void OpenCLImageRD::CopyFromImage(vtkImageData* im)
 void OpenCLImageRD::GenerateInitialPattern()
 {
     ImageRD::GenerateInitialPattern();
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -144,7 +148,7 @@ void OpenCLImageRD::GenerateInitialPattern()
 void OpenCLImageRD::BlankImage()
 {
     ImageRD::BlankImage();
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -158,6 +162,7 @@ void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc)
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
     this->CreateOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -166,6 +171,7 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
 {
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
+    this->WriteToOpenCLBuffersIfNeeded();
 
     cl_int ret;
     int iBuffer;
@@ -217,7 +223,7 @@ void OpenCLImageRD::TestFormula(std::string program_string)
 void OpenCLImageRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
     ImageRD::SetValue(x,y,z,val,render_settings);
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -225,7 +231,23 @@ void OpenCLImageRD::SetValue(float x,float y,float z,float val,const Properties&
 void OpenCLImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
 {
     ImageRD::SetValuesInRadius(x,y,z,r,val,render_settings);
-    this->WriteToOpenCLBuffers();
+    this->need_write_to_opencl_buffers = true;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::Undo()
+{
+    ImageRD::Undo();
+    this->need_write_to_opencl_buffers = true;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::Redo()
+{
+    ImageRD::Redo();
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------

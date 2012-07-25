@@ -201,6 +201,8 @@ void ImageRD::CopyFromImage(vtkImageData* im)
     }
     else   
         throw runtime_error("ImageRD::CopyFromImage : chemical count mismatch");
+
+    this->undo_stack.clear();
 }
 
 // ---------------------------------------------------------------------
@@ -213,6 +215,7 @@ void ImageRD::AllocateImages(int x,int y,int z,int nc)
     for(int i=0;i<nc;i++)
         this->images[i] = AllocateVTKImage(x,y,z);
     this->is_modified = true;
+    this->undo_stack.clear();
 }
 
 // ---------------------------------------------------------------------
@@ -279,12 +282,14 @@ void ImageRD::BlankImage()
         this->images[iImage]->Modified();
     }
     this->timesteps_taken = 0;
+    this->undo_stack.clear();
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::Update(int n_steps)
 {
+    this->undo_stack.clear();
     this->InternalUpdate(n_steps);
 
     this->timesteps_taken += n_steps;
@@ -1146,7 +1151,10 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
     iy = min(Y-1,max(0,iy));
     iz = min(Z-1,max(0,iz));
 
-    *vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),ix,iy,iz,X,Y) = val;
+    float *pCell = vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),ix,iy,iz,X,Y);
+    int iCell = pCell - static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer());
+    this->StorePaintAction(iChemical,iCell,*pCell);
+    *pCell = val;
     this->images[iChemical]->Modified();
 }
 
@@ -1187,11 +1195,34 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
     iz = min(Z-1,max(0,iz));
 
     for(int tz=max(0,int(iz-r));tz<=min(Z-1,int(iz+r));tz++)
+    {
         for(int ty=max(0,int(iy-r));ty<=min(Y-1,int(iy+r));ty++)
+        {
             for(int tx=max(0,int(ix-r));tx<=min(X-1,int(ix+r));tx++)
+            {
                 if(hypot3(ix-tx,iy-ty,iz-tz)<r)
-                    *vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),tx,ty,tz,X,Y) = val;
+                {
+                    float *pCell = vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),tx,ty,tz,X,Y);
+                    int iCell = pCell - static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer());
+                    this->StorePaintAction(iChemical,iCell,*pCell);
+                    *pCell = val;
+                }
+            }
+        }
+    }
     this->images[iChemical]->Modified();
+}
+
+// --------------------------------------------------------------------------------
+
+void ImageRD::FlipPaintAction(PaintAction& cca)
+{
+    float *pCell = static_cast<float*>(this->GetImage(cca.iChemical)->GetScalarPointer()) + cca.iCell;
+    float old_val = *pCell;
+    *pCell = cca.val;
+    cca.val = old_val;
+    cca.done = !cca.done;
+    this->images[cca.iChemical]->Modified();
 }
 
 // --------------------------------------------------------------------------------

@@ -103,6 +103,10 @@ class MyFrame : public wxFrame, public IPaintHandler
         void ClearAllPatterns();
 
         // Edit menu
+        void OnUndo(wxCommandEvent& event);
+        void OnUpdateUndo(wxUpdateUIEvent& event);
+        void OnRedo(wxCommandEvent& event);
+        void OnUpdateRedo(wxUpdateUIEvent& event);
         void OnCut(wxCommandEvent& event);
         void OnCopy(wxCommandEvent& event);
         void OnPaste(wxCommandEvent& event);
@@ -234,10 +238,8 @@ class MyFrame : public wxFrame, public IPaintHandler
         wxCursor *pencil_cursor,*brush_cursor,*picker_cursor;
         float current_paint_value;
         bool mouse_is_down;
+        wxString icons_folder;
         bool erasing;
-        wxString icons_folder,cursors_folder;
-        bool show_toolbar_labels;
-        int toolbar_padding;
 
         DECLARE_EVENT_TABLE()
 };

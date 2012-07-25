@@ -8,9 +8,10 @@ before 0.4 release:
 
 - drawing issues: 
   - how to change size of brush?
-  - need undo
-  - current color button should offer spectrum choice
+  - current color button should be replaced by spectrum slider plus value indicators
   - document painting tools
+  
+- test Ready for making new patterns: e.g. advection equation, without crashing
   
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
@@ -21,6 +22,7 @@ before 0.4 release:
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - allow block size to be changed for formula rules on images
 - add timesteps_per_render to action toolbar
+- set scene rotating by a setting in the start recording dialog box, or for general use?
 
 before 0.x release:
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 

@@ -52,7 +52,7 @@ class OpenCL_MixIn
         virtual void ReloadKernelIfNeeded() =0;
 
         virtual void CreateOpenCLBuffers() =0;
-        virtual void WriteToOpenCLBuffers() =0;
+        virtual void WriteToOpenCLBuffersIfNeeded() =0;
         virtual void ReadFromOpenCLBuffers() =0;
         virtual void ReleaseOpenCLBuffers();
 
@@ -70,7 +70,7 @@ class OpenCL_MixIn
 
         cl_command_queue command_queue;
 
-        bool need_reload_context;
+        bool need_reload_context,need_write_to_opencl_buffers;
 
         std::vector<cl_mem> buffers[2];
         int iCurrentBuffer;

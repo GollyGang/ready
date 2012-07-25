@@ -334,3 +334,79 @@ void AbstractRD::CreateDefaultInitialPatternGenerator()
 }
 
 // ---------------------------------------------------------------------
+
+bool AbstractRD::CanUndo() const
+{
+    return !this->undo_stack.empty() && this->undo_stack.front().done;
+}
+
+// ---------------------------------------------------------------------
+
+bool AbstractRD::CanRedo() const
+{
+    return !this->undo_stack.empty() && !this->undo_stack.back().done;
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::SetUndoPoint()
+{
+    // paint events are treated as a block until (e.g.) mouse up calls this function
+    if(!this->undo_stack.empty())
+        this->undo_stack.back().last_of_group = true;
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::Undo()
+{
+    if(!this->CanUndo()) throw runtime_error("AbstractRD::Undo() : attempt to undo when undo not possible");
+
+    // find the last done paint action, undo backwards from there until the previous last_of_group (exclusive)
+    vector<PaintAction>::reverse_iterator rit;
+    for(rit=this->undo_stack.rbegin();!rit->done;rit++); // skip over actions that have already been undone
+    while(true)
+    {
+        this->FlipPaintAction(*rit);
+        rit++;
+        if(rit==this->undo_stack.rend() || rit->last_of_group)
+            break;
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::Redo()
+{
+    if(!this->CanRedo()) throw runtime_error("AbstractRD::Redo() : attempt to redo when redo not possible");
+
+    // find the first undone paint action, redo forwards from there until the next last_of_group (inclusive)
+    vector<PaintAction>::iterator it;
+    for(it=this->undo_stack.begin();it->done;it++); // skip over actions that have already been done
+    do
+    {
+        this->FlipPaintAction(*it);
+        if(it->last_of_group) 
+            break;
+        it++;
+    } while(it!=this->undo_stack.end());
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::StorePaintAction(int iChemical,int iCell,float old_val)
+{
+    // forget all stored undone actions
+    while(!this->undo_stack.empty() && !this->undo_stack.back().done)
+        this->undo_stack.pop_back();
+    // add the new paint action
+    PaintAction pa;
+    pa.iCell = iCell;
+    pa.iChemical = iChemical;
+    pa.val = old_val; // (the cell itself stores the new val, we just need the old one)
+    pa.done = true;
+    pa.last_of_group = false;
+    this->undo_stack.push_back(pa);
+}
+
+// ---------------------------------------------------------------------

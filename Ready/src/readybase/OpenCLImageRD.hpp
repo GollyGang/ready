@@ -41,6 +41,9 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
 
+        virtual void Undo();
+        virtual void Redo();
+
     protected:
 
         virtual void CopyFromImage(vtkImageData* im);
@@ -52,7 +55,7 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
         virtual void ReloadKernelIfNeeded();
 
         virtual void CreateOpenCLBuffers();
-        virtual void WriteToOpenCLBuffers();
+        virtual void WriteToOpenCLBuffersIfNeeded();
         virtual void ReadFromOpenCLBuffers();
 };
 

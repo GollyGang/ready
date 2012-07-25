@@ -75,8 +75,6 @@ class ImageRD : public AbstractRD
 
         double xgap,ygap; /// spatial separation for rendering multiple chemicals (currently only used in 2D)
 
-        virtual int GetArenaDimensionality() const;
-
     protected:
 
         vtkSmartPointer<vtkImageData> GetImage() const;
@@ -88,6 +86,10 @@ class ImageRD : public AbstractRD
         void DeallocateImages();
 
         static vtkImageData* AllocateVTKImage(int x,int y,int z);
+
+        virtual int GetArenaDimensionality() const;
+
+        virtual void FlipPaintAction(PaintAction& cca);
 
     private:
 
