@@ -1821,7 +1821,8 @@ wxPanel* PrefsDialog::CreateEditPrefs(wxWindow* parent)
 
     // repaint_to_erase
 
-    wxCheckBox* erasecheck = new wxCheckBox(panel, PREF_ERASE, _("Erase by repainting with same value"));
+    wxCheckBox* erasecheck = new wxCheckBox(panel, PREF_ERASE,
+        _("Pencil tool erases (to low value) if cell is redrawn with same value"));
 
     // allow_beep
 
