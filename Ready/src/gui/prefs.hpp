@@ -75,6 +75,7 @@ extern wxString texteditor;      // path of user's preferred text editor
 extern wxMenu* patternSubMenu;   // submenu of recent pattern files
 extern int numpatterns;          // current number of recent pattern files
 extern int maxpatterns;          // maximum number of recent pattern files
+extern bool repaint_to_erase;    // whether painting over the current color reverts to low
 
 // Keyboard shortcuts:
 

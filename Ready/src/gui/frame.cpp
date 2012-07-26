@@ -231,7 +231,8 @@ MyFrame::MyFrame(const wxString& title)
        is_recording(false),
        CurrentCursor(POINTER),
        current_paint_value(0.5f),
-       mouse_is_down(false)
+       left_mouse_is_down(false),
+       right_mouse_is_down(false)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -464,9 +465,9 @@ void MyFrame::InitializeToolbars()
         this->paint_toolbar->AddTool(ID::Pointer,_("Pointer"),wxBitmap(this->icons_folder + _T("icon-pointer.png"),wxBITMAP_TYPE_PNG),
             _("Pointer"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Pencil,_("Pencil"),wxBitmap(this->icons_folder + _T("draw-freehand.png"),wxBITMAP_TYPE_PNG),
-            _("Pencil"),wxITEM_RADIO);
+            _("Pencil (right-click to pick color)"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Brush,_("Brush"),wxBitmap(this->icons_folder + _T("draw-brush.png"),wxBITMAP_TYPE_PNG),
-            _("Brush"),wxITEM_RADIO);
+            _("Brush (right-click to pick color)"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
         this->paint_toolbar->AddControl(new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("  1.000000  "),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL),_("Color"));
@@ -3088,7 +3089,8 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
-    this->mouse_is_down = false;
+    this->left_mouse_is_down = false;
+    this->right_mouse_is_down = false;
     this->erasing = false;
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->pVTKWindow->SetInteractorStyle(is);
@@ -3107,7 +3109,8 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PENCIL;
     this->pVTKWindow->SetCursor(*this->pencil_cursor);
-    this->mouse_is_down = false;
+    this->left_mouse_is_down = false;
+    this->right_mouse_is_down = false;
     this->erasing = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
@@ -3127,7 +3130,8 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
     this->CurrentCursor = BRUSH;
     this->pVTKWindow->SetCursor(*this->brush_cursor);
-    this->mouse_is_down = false;
+    this->left_mouse_is_down = false;
+    this->right_mouse_is_down = false;
     this->erasing = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
@@ -3147,7 +3151,8 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
     this->CurrentCursor = PICKER;
     this->pVTKWindow->SetCursor(*this->picker_cursor);
-    this->mouse_is_down = false;
+    this->left_mouse_is_down = false;
+    this->right_mouse_is_down = false;
     this->erasing = false;
     vtkSmartPointer<InteractorStylePainter> is = vtkSmartPointer<InteractorStylePainter>::New();
     is->SetPaintHandler(this);
@@ -3165,7 +3170,7 @@ void MyFrame::OnUpdateSelectPickerTool(wxUpdateUIEvent& event)
 
 void MyFrame::LeftMouseDown(int x, int y)
 {
-    this->mouse_is_down = true;
+    this->left_mouse_is_down = true;
 
     vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
     picker->SetTolerance(0.000001);
@@ -3173,34 +3178,43 @@ void MyFrame::LeftMouseDown(int x, int y)
     if(!ret) return;
     double *p = picker->GetPickPosition();
 
-    switch(this->CurrentCursor)
+    if(!this->pVTKWindow->GetShiftKey())
     {
-        case PENCIL:
+        switch(this->CurrentCursor)
         {
-            if (this->current_paint_value == this->system->GetValue(p[0],p[1],p[2],this->render_settings)) {
-                // erase cell by using low value
-                this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
-                // set flag in case mouse is moved (see MouseMove)
-                this->erasing = true;
-            } else {
-                this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            case PENCIL:
+            {
+                if (repaint_to_erase && this->current_paint_value == this->system->GetValue(p[0],p[1],p[2],this->render_settings)) {
+                    // erase cell by using low value
+                    this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
+                    // set flag in case mouse is moved (see MouseMove)
+                    this->erasing = true;
+                } else {
+                    this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+                }
+                this->pVTKWindow->Refresh();
             }
-            this->pVTKWindow->Refresh();
+            break;
+            case BRUSH:
+            {
+                float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
+                this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
+                this->pVTKWindow->Refresh();
+            }
+            break;
+            case PICKER:
+            {
+                this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
+                this->UpdateToolbars();
+            }
+            break;
         }
-        break;
-        case BRUSH:
-        {
-            float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
-            this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
-            this->pVTKWindow->Refresh();
-        }
-        break;
-        case PICKER:
-        {
-            this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
-            this->UpdateToolbars();
-        }
-        break;
+    }
+    else
+    {
+        // pick
+        this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
+        this->UpdateToolbars();
     }
 }
 
@@ -3208,16 +3222,16 @@ void MyFrame::LeftMouseDown(int x, int y)
 
 void MyFrame::LeftMouseUp(int x, int y)
 {
-    this->mouse_is_down = false;
+    this->left_mouse_is_down = false;
     this->erasing = false;
     this->system->SetUndoPoint();
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::MouseMove(int x, int y)
+void MyFrame::RightMouseDown(int x, int y)
 {
-    if(!this->mouse_is_down) return;
+    this->right_mouse_is_down = true;
 
     vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
     picker->SetTolerance(0.000001);
@@ -3225,31 +3239,64 @@ void MyFrame::MouseMove(int x, int y)
     if(!ret) return;
     double *p = picker->GetPickPosition();
 
-    switch(this->CurrentCursor)
+    // color pick
+    this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
+    this->UpdateToolbars();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::RightMouseUp(int x, int y)
+{
+    this->right_mouse_is_down = false;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::MouseMove(int x, int y)
+{
+    if(!this->left_mouse_is_down && !this->right_mouse_is_down) return;
+
+    vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+    picker->SetTolerance(0.000001);
+    int ret = picker->Pick(x,y,0,this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+    if(!ret) return;
+    double *p = picker->GetPickPosition();
+
+    if(this->left_mouse_is_down && !this->pVTKWindow->GetShiftKey())
     {
-        case PENCIL:
+        switch(this->CurrentCursor)
         {
-            if (erasing) {
-                this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
-            } else {
-                this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+            case PENCIL:
+            {
+                if (erasing) {
+                    this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
+                } else {
+                    this->system->SetValue(p[0],p[1],p[2],this->current_paint_value,this->render_settings);
+                }
+                this->pVTKWindow->Refresh();
             }
-            this->pVTKWindow->Refresh();
+            break;
+            case BRUSH:
+            {
+                float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
+                this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
+                this->pVTKWindow->Refresh();
+            }
+            break;
+            case PICKER:
+            {
+                this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
+                this->UpdateToolbars();
+            }
+            break;
         }
-        break;
-        case BRUSH:
-        {
-            float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
-            this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
-            this->pVTKWindow->Refresh();
-        }
-        break;
-        case PICKER:
-        {
-            this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
-            this->UpdateToolbars();
-        }
-        break;
+    }
+    else
+    {
+        // color pick
+        this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
+        this->UpdateToolbars();
     }
 }
 

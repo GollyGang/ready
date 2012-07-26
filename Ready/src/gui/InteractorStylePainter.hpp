@@ -23,8 +23,10 @@ class IPaintHandler
 {
     public:
         virtual void LeftMouseDown(int x,int y) =0;
-        virtual void MouseMove(int x,int y) =0;
         virtual void LeftMouseUp(int x,int y) =0;
+        virtual void RightMouseDown(int x,int y) =0;
+        virtual void RightMouseUp(int x,int y) =0;
+        virtual void MouseMove(int x,int y) =0;
 
         virtual ~IPaintHandler() {}
 };
@@ -41,8 +43,10 @@ class InteractorStylePainter : public vtkInteractorStyleTrackballCamera
 
         // handle mouse events:
         virtual void OnLeftButtonDown();
-        virtual void OnMouseMove();
         virtual void OnLeftButtonUp();
+        virtual void OnRightButtonDown();
+        virtual void OnRightButtonUp();
+        virtual void OnMouseMove();
 
     private:
 

@@ -76,6 +76,8 @@ class MyFrame : public wxFrame, public IPaintHandler
         // implementation of IPaintHandler interface
         virtual void LeftMouseDown(int x,int y);
         virtual void LeftMouseUp(int x,int y);
+        virtual void RightMouseDown(int x,int y);
+        virtual void RightMouseUp(int x,int y);
         virtual void MouseMove(int x,int y);
 
     private:
@@ -237,7 +239,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
         wxCursor *pencil_cursor,*brush_cursor,*picker_cursor;
         float current_paint_value;
-        bool mouse_is_down;
+        bool left_mouse_is_down,right_mouse_is_down;
         wxString icons_folder;
         bool erasing;
 

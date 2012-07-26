@@ -10,15 +10,17 @@ before 0.4 release:
   - how to change size of brush?
   - current color button should be replaced by spectrum slider plus value indicators
   - document painting tools
+  - change cursor to picker when shift key is held down in pencil or brush mode
   
 - test Ready for making new patterns: e.g. advection equation, without crashing
   
+- add random 2D grids as an option in File > New Pattern
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - relax power of 2 size requirement (only a speed benefit)
 - Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
   5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
-  used a boundary-size weighting.
+  used a boundary-size weighting. Robert recommends an unequal 9pt stencil for square grids.
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - allow block size to be changed for formula rules on images
 - add timesteps_per_render to action toolbar
