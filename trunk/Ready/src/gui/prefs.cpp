@@ -98,6 +98,7 @@ wxString texteditor;             // path of user's preferred text editor
 wxMenu* patternSubMenu = NULL;   // submenu of recent pattern files
 int numpatterns = 0;             // current number of recent pattern files
 int maxpatterns = 20;            // maximum number of recent pattern files (1..MAX_RECENT)
+bool repaint_to_erase = false;   // whether painting over the current color reverts to low
 
 // local (ie. non-exported) globals:
 

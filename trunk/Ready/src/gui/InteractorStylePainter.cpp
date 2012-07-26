@@ -55,6 +55,24 @@ void InteractorStylePainter::OnLeftButtonUp()
 
 // ------------------------------------------------------------------------------------------------
 
+void InteractorStylePainter::OnRightButtonDown()
+{
+    if(!this->paint_handler) return; // can't do anything if not connected to an event handler
+    int *pos = this->GetInteractor()->GetEventPosition();
+    this->paint_handler->RightMouseDown(pos[0],pos[1]);
+}
+
+// ------------------------------------------------------------------------------------------------
+
+void InteractorStylePainter::OnRightButtonUp()
+{
+    if(!this->paint_handler) return; // can't do anything if not connected to an event handler
+    int *pos = this->GetInteractor()->GetEventPosition();
+    this->paint_handler->RightMouseUp(pos[0],pos[1]);
+}
+
+// ------------------------------------------------------------------------------------------------
+
 void InteractorStylePainter::OnMouseMove()
 {
     if(!this->paint_handler) return; // can't do anything if not connected to an event handler
