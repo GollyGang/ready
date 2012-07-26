@@ -105,6 +105,7 @@ typedef enum
     DO_PASTE,                    // paste
     DO_PREFS,                    // preferences...
     DO_QUIT,                     // quit Ready
+    DO_REDO,                     // redo
     DO_RELOAD,                   // reload pattern from disk
     DO_RESET,                    // reset
     DO_RESTORE,                  // restore default layout
@@ -123,24 +124,26 @@ typedef enum
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
     DO_OPENCL,                   // show OpenCL diagnostics...
+    DO_ACTIONTOOLBAR,            // show action toolbar
+    DO_FILETOOLBAR,              // show file toolbar
+    DO_PAINTTOOLBAR,             // show paint toolbar
     DO_RECORDFRAMES,             // start recording
     DO_STEP1,                    // step by 1
     DO_STEPN,                    // step by N
-    DO_ACTIONTOOLBAR,            // view action toolbar
-    DO_FILETOOLBAR,              // view file toolbar
+    DO_UNDO,                     // undo
     DO_VIEWKERNEL,               // view full kernel
-    DO_PAINTTOOLBAR,             // view paint toolbar
     DO_WIREFRAME,                // wireframe
     MAX_ACTIONS
 } action_id;
 
-// N.B. Above list should be alphabetical by the string shown to the user (shown as a comment above), so that
-// they appear in the right order in the Preferences dialog.
+// N.B. Above list should be alphabetical by the string shown to the user (shown as a comment above),
+// so that they appear in the right order in the Preferences dialog.
 
 // When adding to the above, you must also manually update the following:
-//  - prefs.cpp (throughout)
-//  - MyFrame::ProcessKey()
-//  - MyFrame::UpdateMenuAccelerators();
+//  - prefs.cpp (GetActionName and possibly AddDefaultKeyActions)
+//  - MyFrame::InitializeMenus
+//  - MyFrame::ProcessKey
+//  - MyFrame::UpdateMenuAccelerators
 
 typedef struct {
     action_id id;                // one of the above

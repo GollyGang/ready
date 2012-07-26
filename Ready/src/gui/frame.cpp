@@ -333,8 +333,8 @@ void MyFrame::InitializeMenus()
     }
     {   // edit menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_UNDO, _("Undo")); // TODO
-        menu->Append(wxID_REDO, _("Redo")); // TODO
+        menu->Append(wxID_UNDO, _("Undo") + GetAccelerator(DO_UNDO), _("Undo an edit"));
+        menu->Append(wxID_REDO, _("Redo") + GetAccelerator(DO_REDO), _("Redo what was undone"));
         menu->AppendSeparator();
         menu->Append(wxID_CUT, _("Cut") + GetAccelerator(DO_CUT), _("Cut the selection and save it to the clipboard"));
         menu->Append(wxID_COPY, _("Copy") + GetAccelerator(DO_COPY), _("Copy the selection to the clipboard"));
@@ -2329,6 +2329,8 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
         
         // edit menu
+        SetAccelerator(mbar, wxID_UNDO,                     DO_UNDO);
+        SetAccelerator(mbar, wxID_REDO,                     DO_REDO);
         SetAccelerator(mbar, wxID_CUT,                      DO_CUT);
         SetAccelerator(mbar, wxID_COPY,                     DO_COPY);
         SetAccelerator(mbar, wxID_PASTE,                    DO_PASTE);
@@ -2400,6 +2402,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_QUIT:           cmdid = wxID_EXIT; break;
         
         // Edit menu
+        case DO_UNDO:           cmdid = wxID_UNDO; break;
+        case DO_REDO:           cmdid = wxID_REDO; break;
         case DO_CUT:            cmdid = wxID_CUT; break;
         case DO_COPY:           cmdid = wxID_COPY; break;
         case DO_PASTE:          cmdid = wxID_PASTE; break;
@@ -3253,8 +3257,10 @@ void MyFrame::MouseMove(int x, int y)
 
 void MyFrame::OnUndo(wxCommandEvent& event)
 {
-    this->system->Undo();
-    this->pVTKWindow->Refresh();
+    if (this->system->CanUndo()) {
+        this->system->Undo();
+        this->pVTKWindow->Refresh();
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -3268,8 +3274,10 @@ void MyFrame::OnUpdateUndo(wxUpdateUIEvent& event)
 
 void MyFrame::OnRedo(wxCommandEvent& event)
 {
-    this->system->Redo();
-    this->pVTKWindow->Refresh();
+    if (this->system->CanRedo()) {
+        this->system->Redo();
+        this->pVTKWindow->Refresh();
+    }
 }
 
 // ---------------------------------------------------------------------
