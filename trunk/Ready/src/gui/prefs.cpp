@@ -261,6 +261,8 @@ void AddDefaultKeyActions()
     keyaction[(int)'q'][mk_CMD].id =    DO_QUIT;
 
     // Edit menu
+    keyaction[(int)'z'][mk_CMD].id =    DO_UNDO;
+    keyaction[(int)'z'][mk_SHIFT+mk_CMD].id = DO_REDO;
     keyaction[(int)'x'][mk_CMD].id =    DO_CUT;
     keyaction[(int)'c'][mk_CMD].id =    DO_COPY;
     keyaction[(int)'v'][mk_CMD].id =    DO_PASTE;
@@ -319,6 +321,8 @@ const char* GetActionName(action_id action)
         case DO_PREFS:          return "Preferences...";
         case DO_QUIT:           return "Quit Ready";
         // Edit menu
+        case DO_UNDO:           return "Undo";
+        case DO_REDO:           return "Redo";
         case DO_CUT:            return "Cut Selection";
         case DO_COPY:           return "Copy Selection";
         case DO_PASTE:          return "Paste";
