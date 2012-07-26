@@ -262,7 +262,11 @@ void AddDefaultKeyActions()
 
     // Edit menu
     keyaction[(int)'z'][mk_CMD].id =    DO_UNDO;
+#ifdef __WXMAC__
     keyaction[(int)'z'][mk_SHIFT+mk_CMD].id = DO_REDO;
+#else
+    keyaction[(int)'y'][mk_CMD].id =    DO_REDO;
+#endif
     keyaction[(int)'x'][mk_CMD].id =    DO_CUT;
     keyaction[(int)'c'][mk_CMD].id =    DO_COPY;
     keyaction[(int)'v'][mk_CMD].id =    DO_PASTE;
