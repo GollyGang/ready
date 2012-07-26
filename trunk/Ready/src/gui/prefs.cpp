@@ -87,6 +87,7 @@ int debuglevel = 0;              // for displaying debug info if > 0
 int textdlgwd = 500;             // width of multi-line text dialog
 int textdlght = 300;             // height of multi-line text dialog
 bool showtips = true;            // show button tips?
+bool repaint_to_erase = false;   // whether painting over the current color reverts to low
 bool allowbeep = true;           // okay to play beep sound?
 bool askonnew = true;            // ask to save changes before creating new pattern?
 bool askonload = true;           // ask to save changes before loading pattern file?
@@ -98,7 +99,6 @@ wxString texteditor;             // path of user's preferred text editor
 wxMenu* patternSubMenu = NULL;   // submenu of recent pattern files
 int numpatterns = 0;             // current number of recent pattern files
 int maxpatterns = 20;            // maximum number of recent pattern files (1..MAX_RECENT)
-bool repaint_to_erase = false;   // whether painting over the current color reverts to low
 
 // local (ie. non-exported) globals:
 
@@ -916,6 +916,7 @@ void SavePrefs()
     fprintf(f, "text_dlg_wd=%d\n", textdlgwd);
     fprintf(f, "text_dlg_ht=%d\n", textdlght);
     fprintf(f, "show_tips=%d\n", showtips ? 1 : 0);
+    fprintf(f, "repaint_to_erase=%d\n", repaint_to_erase ? 1 : 0);
     fprintf(f, "allow_beep=%d\n", allowbeep ? 1 : 0);
     fprintf(f, "ask_on_new=%d\n", askonnew ? 1 : 0);
     fprintf(f, "ask_on_load=%d\n", askonload ? 1 : 0);
@@ -1226,6 +1227,7 @@ void GetPrefs()
             if (textdlght < 100) textdlght = 100;
 
         } else if (strcmp(keyword, "show_tips") == 0)   { showtips = value[0] == '1';
+        } else if (strcmp(keyword, "repaint_to_erase") == 0)  { repaint_to_erase = value[0] == '1';
         } else if (strcmp(keyword, "allow_beep") == 0)  { allowbeep = value[0] == '1';
         } else if (strcmp(keyword, "ask_on_new") == 0)  { askonnew = value[0] == '1';
         } else if (strcmp(keyword, "ask_on_load") == 0) { askonload = value[0] == '1';
@@ -1311,6 +1313,7 @@ enum
         PREF_HIDDEN,    // needed to fix wxOSX bug
     #endif
     // Edit prefs
+    PREF_ERASE,
     PREF_BEEP,
     // View prefs
     PREF_SHOW_TIPS,
@@ -1816,15 +1819,22 @@ wxPanel* PrefsDialog::CreateEditPrefs(wxWindow* parent)
     wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 
+    // repaint_to_erase
+
+    wxCheckBox* erasecheck = new wxCheckBox(panel, PREF_ERASE, _("Erase by repainting with same value"));
+
     // allow_beep
 
     wxCheckBox* beepcheck = new wxCheckBox(panel, PREF_BEEP, _("Allow beep sound"));
 
     // position things
     vbox->AddSpacer(5);
+    vbox->Add(erasecheck, 0, wxLEFT | wxRIGHT, LRGAP);
+    vbox->AddSpacer(5);
     vbox->Add(beepcheck, 0, wxLEFT | wxRIGHT, LRGAP);
 
     // init control values
+    erasecheck->SetValue(repaint_to_erase);
     beepcheck->SetValue(allowbeep);
 
     topSizer->Add(vbox, 1, wxGROW | wxALIGN_CENTER | wxALL, 5);
@@ -2266,6 +2276,7 @@ bool PrefsDialog::TransferDataFromWindow()
     texteditor    = neweditor;
 
     // EDIT_PAGE
+    repaint_to_erase = GetCheckVal(PREF_ERASE);
     allowbeep     = GetCheckVal(PREF_BEEP);
 
     // VIEW_PAGE
