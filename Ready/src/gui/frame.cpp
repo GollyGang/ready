@@ -3237,6 +3237,7 @@ void MyFrame::RightMouseDown(int x, int y)
     double *p = picker->GetPickPosition();
 
     // color pick
+    this->pVTKWindow->SetCursor(*this->picker_cursor);
     this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
     this->UpdateToolbars();
 }
@@ -3246,6 +3247,13 @@ void MyFrame::RightMouseDown(int x, int y)
 void MyFrame::RightMouseUp(int x, int y)
 {
     this->right_mouse_is_down = false;
+    if(!this->pVTKWindow->GetShiftKey())
+    {
+        if(this->CurrentCursor == PENCIL)
+            this->pVTKWindow->SetCursor(*this->pencil_cursor);
+        else if(this->CurrentCursor == BRUSH )
+            this->pVTKWindow->SetCursor(*this->brush_cursor);
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -3294,6 +3302,27 @@ void MyFrame::MouseMove(int x, int y)
         // color pick
         this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
         this->UpdateToolbars();
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::KeyDown()
+{
+    if(this->pVTKWindow->GetShiftKey() && ( this->CurrentCursor == PENCIL || this->CurrentCursor == BRUSH ) )
+        this->pVTKWindow->SetCursor(*this->picker_cursor);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::KeyUp()
+{
+    if(!this->pVTKWindow->GetShiftKey())
+    {
+        if(this->CurrentCursor == PENCIL)
+            this->pVTKWindow->SetCursor(*this->pencil_cursor);
+        else if(this->CurrentCursor == BRUSH )
+            this->pVTKWindow->SetCursor(*this->brush_cursor);
     }
 }
 
