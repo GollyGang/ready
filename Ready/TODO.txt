@@ -13,6 +13,9 @@ before 0.4 release:
   - change cursor to picker when shift key is held down in pencil or brush mode
   
 - test Ready for making new patterns: e.g. advection equation, without crashing
+- add Adam's Penrose glider, plus some Penrose life patterns
+
+before 0.5 release:
   
 - add random 2D grids as an option in File > New Pattern
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
@@ -27,6 +30,8 @@ before 0.4 release:
 - set scene rotating by a setting in the start recording dialog box, or for general use?
 
 before 0.x release:
+- toggle between single channel painting and multi-channel painting. Sometimes we want to paint just in channels
+  a and b, though, for example, which is trickier.
 - parameter map(s) in a separate window, to allow user to explore parameters (could just use extra 
   chemicals for this but want some kind of UI for zooming in and out of interesting areas, etc.)
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
