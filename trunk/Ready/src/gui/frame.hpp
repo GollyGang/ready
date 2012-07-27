@@ -79,6 +79,8 @@ class MyFrame : public wxFrame, public IPaintHandler
         virtual void RightMouseDown(int x,int y);
         virtual void RightMouseUp(int x,int y);
         virtual void MouseMove(int x,int y);
+        virtual void KeyDown();
+        virtual void KeyUp();
 
     private:
 

@@ -10,7 +10,6 @@ before 0.4 release:
   - how to change size of brush?
   - current color button should be replaced by spectrum slider plus value indicators
   - document painting tools
-  - change cursor to picker when shift key is held down in pencil or brush mode
   
 - test Ready for making new patterns: e.g. advection equation, without crashing
 - add Adam's Penrose glider, plus some Penrose life patterns

@@ -27,6 +27,8 @@ class IPaintHandler
         virtual void RightMouseDown(int x,int y) =0;
         virtual void RightMouseUp(int x,int y) =0;
         virtual void MouseMove(int x,int y) =0;
+        virtual void KeyDown() =0;
+        virtual void KeyUp() =0;
 
         virtual ~IPaintHandler() {}
 };
@@ -47,6 +49,8 @@ class InteractorStylePainter : public vtkInteractorStyleTrackballCamera
         virtual void OnRightButtonDown();
         virtual void OnRightButtonUp();
         virtual void OnMouseMove();
+        virtual void OnKeyDown();
+        virtual void OnKeyUp();
 
     private:
 

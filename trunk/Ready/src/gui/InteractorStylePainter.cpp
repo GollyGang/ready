@@ -88,3 +88,19 @@ void InteractorStylePainter::SetPaintHandler(IPaintHandler* ph)
 }
 
 // ------------------------------------------------------------------------------------------------
+
+void InteractorStylePainter::OnKeyDown()
+{
+    if(!this->paint_handler) return; // can't do anything if not connected to an event handler
+    this->paint_handler->KeyDown();
+}
+
+// ------------------------------------------------------------------------------------------------
+
+void InteractorStylePainter::OnKeyUp()
+{
+    if(!this->paint_handler) return; // can't do anything if not connected to an event handler
+    this->paint_handler->KeyUp();
+}
+
+// ------------------------------------------------------------------------------------------------
