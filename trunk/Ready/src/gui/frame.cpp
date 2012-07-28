@@ -202,6 +202,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::HelpChanges, MyFrame::OnHelp)
     EVT_MENU(ID::HelpCredits, MyFrame::OnHelp)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
+    // paint toolbar:
+    EVT_BUTTON(ID::CurrentValueColor, MyFrame::OnChangeCurrentColor)
     // items in Open Recent submenu must be handled last
     EVT_MENU(wxID_ANY, MyFrame::OnOpenRecent)
 END_EVENT_TABLE()
@@ -3359,5 +3361,13 @@ void MyFrame::OnUpdateRedo(wxUpdateUIEvent& event)
 {
     event.Enable(this->system->CanRedo());
 }
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnChangeCurrentColor(wxCommandEvent& event)
+{
+    if(GetFloat(_("Enter a new value to paint with:"),_("Value:"),
+        this->current_paint_value,&this->current_paint_value))
+        this->UpdateToolbars();}
 
 // ---------------------------------------------------------------------
