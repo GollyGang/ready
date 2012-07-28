@@ -107,6 +107,7 @@ set( PATTERN_FILES
   Patterns/parameter_modulation_demo2.vti
   Patterns/life_torus.vtu
   Patterns/penrose.vtu
+  Patterns/penrose_goucher_glider.vtu
   Patterns/bunny.vtu
   Patterns/horse.vtu
   Patterns/lion.vtu
