@@ -472,10 +472,14 @@ void MyFrame::InitializeToolbars()
             _("Brush (right-click to pick color)"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
-        this->paint_toolbar->AddControl(new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("  1.000000  "),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL),_("Color"));
+        wxStaticText *st = new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("  1.000000  "),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
+        st->SetToolTip(_("Current value to paint with"));
+        this->paint_toolbar->AddControl(st,_("Color"));
         wxImage im(22,22);
         im.SetRGB(wxRect(0,0,22,22),255,0,0);
-        this->paint_toolbar->AddControl(new wxBitmapButton(this->paint_toolbar,ID::CurrentValueColor,wxBitmap(im)),_("Color"));
+        wxBitmapButton *cb = new wxBitmapButton(this->paint_toolbar,ID::CurrentValueColor,wxBitmap(im));
+        cb->SetToolTip(_("Color of the current paint value. Click to change the value."));
+        this->paint_toolbar->AddControl(cb,_("Color"));
         this->paint_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
             .Position(2).Caption(_("Paint tools")));

@@ -6,9 +6,7 @@ UI annoyances:
 
 before 0.4 release:
 
-- document painting tools
 - test Ready for making new patterns: e.g. advection equation, without crashing
-- add Adam's Penrose glider, plus some Penrose life patterns
 
 before 0.5 release:
   
