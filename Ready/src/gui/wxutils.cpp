@@ -102,6 +102,23 @@ bool GetInteger(const wxString& title, const wxString& prompt,
     }
 }
 
+// -----------------------------------------------------------------------------
+
+bool GetFloat(const wxString& title, const wxString& prompt,
+              float inval, float* outval,
+              const wxPoint& pos, const wxSize& size)
+{
+    FloatDialog dialog(wxGetApp().GetTopWindow(), title, prompt,
+                         inval, pos, size);
+    if ( dialog.ShowModal() == wxID_OK ) {
+        *outval = dialog.GetValue();
+        return true;
+    } else {
+        // user hit Cancel button
+        return false;
+    }
+}
+
 // =============================================================================
 
 bool IsHTMLFile(const wxString& filename)

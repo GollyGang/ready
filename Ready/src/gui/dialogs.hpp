@@ -205,6 +205,25 @@ class IntegerDialog : public wxDialog
         #endif
 };
 
+/// A modal dialog for getting a float.
+class FloatDialog : public wxDialog
+{
+    public:
+        FloatDialog(wxWindow* parent,
+                    const wxString& title,
+                    const wxString& prompt,
+                    float inval, 
+                    const wxPoint& pos, const wxSize& size);
+    
+        virtual bool TransferDataFromWindow();     // called when user hits OK
+    
+        float GetValue() { return result; }
+    
+    private:
+        wxTextCtrl* textbox;       // text box for entering the float
+        float result;              // the resulting float
+};
+
 // -----------------------------------------------------------------------------
 
 // need platform-specific gap after OK/Cancel buttons

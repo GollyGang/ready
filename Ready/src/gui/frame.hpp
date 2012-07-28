@@ -161,6 +161,9 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnAbout(wxCommandEvent& event);
         void OnHelp(wxCommandEvent& event);
 
+        // Paint toolbar:
+        void OnChangeCurrentColor(wxCommandEvent& event);
+
         // other event handlers
         void OnActivate(wxActivateEvent& event);
         void OnIdle(wxIdleEvent& event);

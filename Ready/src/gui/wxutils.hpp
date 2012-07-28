@@ -60,6 +60,13 @@ bool GetInteger(const wxString& title, const wxString& prompt,
 // Display a dialog box to get an integer value from the user.
 // Returns false if user hits Cancel button.
 
+bool GetFloat(const wxString& title, const wxString& prompt,
+              float inval, float* outval,
+              const wxPoint& pos = wxDefaultPosition,
+              const wxSize& size = wxDefaultSize);
+// Display a dialog box to get a float value from the user.
+// Returns false if user hits Cancel button.
+
 bool IsHTMLFile(const wxString& filename);
 // Return true if the given file's extension is .htm or .html
 // (ignoring case).

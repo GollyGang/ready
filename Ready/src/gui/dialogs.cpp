@@ -681,3 +681,63 @@ bool IntegerDialog::TransferDataFromWindow()
 }
 
 // =============================================================================
+
+FloatDialog::FloatDialog(wxWindow* parent, const wxString& title,
+                         const wxString& prompt, float inval,
+                         const wxPoint& pos, const wxSize& size)
+{
+    Create(parent, wxID_ANY, title, pos, size);
+
+    // create the controls
+    wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
+    SetSizer(topSizer);
+
+    textbox = new wxTextCtrl(this, wxID_ANY, wxString::Format(_T("%f"),inval));
+
+    wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
+
+    wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
+    
+    // position the controls
+    wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
+    stdhbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    wxSize minsize = stdhbox->GetMinSize();
+    if (minsize.GetWidth() < 250) {
+        minsize.SetWidth(250);
+        stdhbox->SetMinSize(minsize);
+    }
+
+    topSizer->AddSpacer(12);
+    topSizer->Add(promptlabel, 0, wxLEFT | wxRIGHT, 10);
+    topSizer->AddSpacer(10);
+    topSizer->Add(textbox, 0, wxGROW | wxLEFT | wxRIGHT, 10);
+    topSizer->AddSpacer(12);
+    topSizer->Add(stdhbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
+
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
+    
+    if (pos == wxDefaultPosition) Centre();
+    if (size != wxDefaultSize) SetSize(size);
+
+    // select initial string (must do this last on Windows)
+    textbox->SetFocus();
+    textbox->SetSelection(-1,-1);
+}
+
+// -----------------------------------------------------------------------------
+
+bool FloatDialog::TransferDataFromWindow()
+{
+    double dr;
+    if(!this->textbox->GetValue().ToDouble(&dr))
+    {
+        Warning(_("Failed to parse float"));
+        return false;
+    } else {
+        this->result = dr;
+        return true;
+    }
+}
+
+// =============================================================================

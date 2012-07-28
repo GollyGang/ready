@@ -6,15 +6,16 @@ UI annoyances:
 
 before 0.4 release:
 
-- drawing issues: 
-  - how to change size of brush?
-  - current color button should be replaced by spectrum slider plus value indicators
-  - document painting tools
-  
+- document painting tools
 - test Ready for making new patterns: e.g. advection equation, without crashing
 - add Adam's Penrose glider, plus some Penrose life patterns
 
 before 0.5 release:
+  
+- drawing issues: 
+  - how to change size of brush?
+  - current color button should be replaced by spectrum slider plus value indicators
+  - document painting tools
   
 - add random 2D grids as an option in File > New Pattern
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
