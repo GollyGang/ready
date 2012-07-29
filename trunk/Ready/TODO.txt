@@ -13,7 +13,6 @@ before 0.5 release:
 - drawing issues: 
   - how to change size of brush?
   - current color button should be replaced by spectrum slider plus value indicators
-  - document painting tools
   
 - add random 2D grids as an option in File > New Pattern
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?

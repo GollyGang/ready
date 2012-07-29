@@ -2642,6 +2642,11 @@ void MyFrame::SetNumberOfChemicals(int n)
         }
     }
     // (we allow the user to proceed because they might now want to change other things to match)
+
+    // limit active_chemical to legal range
+    int ic = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
+    if(ic>=n)
+        this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(n-1));
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
