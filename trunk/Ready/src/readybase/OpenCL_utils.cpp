@@ -25,7 +25,9 @@ using namespace OpenCL_utils;
 using namespace std;
 
 // SSE:
-#include <intrin.h>
+#if (defined(_WIN32) || defined(_WIN64))
+  #include <intrin.h>
+#endif
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -179,6 +181,8 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
     }
 
     // bonus feature: report CPU capabilities
+    // TODO: use a cross-platform replacement for __cpuid()
+    #if (defined(_WIN32) || defined(_WIN64))
     {
         // http://stackoverflow.com/questions/6121792/is-this-code-valid-to-check-for-sse3
         int x64     = false;
@@ -241,6 +245,7 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
         report << "FMA3: " << FMA3 << "\n";
         report << "FMA4: " << FMA4 << "\n";
     }
+    #endif
 
     return report.str();
 }
