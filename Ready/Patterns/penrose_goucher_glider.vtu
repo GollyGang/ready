@@ -3,47 +3,53 @@
   <RD format_version="2">
     <description>
       Adam Goucher&apos;s Penrose glider rule.
-	  See discussion here: 
-	  &lt;a href=&quot;http://news.ycombinator.com/item?id=4298515&quot;&gt;http://news.ycombinator.com/item?id=4298515&lt;/a&gt;
+      See discussion here: 
+      &lt;a href=&quot;http://news.ycombinator.com/item?id=4298515&quot;&gt;http://news.ycombinator.com/item?id=4298515&lt;/a&gt;
     </description>
-    <rule name="Goucher Glider" type="kernel">
+    <rule name="Goucher's Glider" type="kernel">
       <kernel number_of_chemicals="1">
-__kernel void rd_compute(__global float* a_in,
-				 __global float* a_out,
-				 __global int* neighbor_indices,
-				 __global float* neighbor_weights,
-				 const int max_neighbors) 
-{
-    const int x = get_global_id(0);
-    // count neighbors of each type
-    int n1=0,n2=0,n3=0;
-    int offset = x * max_neighbors;
-    for(int i=0;i &lt; max_neighbors;i++)
-    {
-		if(neighbor_weights[offset+i]&lt;0.0001f) continue; // not a neighbor
-        float y = a_in[neighbor_indices[offset+i]];
-        if(y&gt;0.5f &amp;&amp; y&lt;1.5f) n1++;
-        else if(y&gt;1.5f &amp;&amp; y&lt;2.5f) n2++;
-        else if(y&gt;2.5f &amp;&amp; y&lt;3.5f) n3++;
-    }
-    // update step:
-    float a = a_in[x];
-    a_out[x]=0.0f;
-    if(a&gt;-0.5f &amp;&amp; a&lt;0.5f) // 0: background
-    {
-        if(n1&gt;0 &amp;&amp; n2&gt;0) a_out[x] = 3.0f;
-        else if(n1&gt;0 &amp;&amp; n3&gt;=2) a_out[x] = 1.0f;
-    }
-    else if(a&gt;0.5f &amp;&amp; a&lt;1.5f) // 1: head
-    {
-        if(n3&gt;0)
-            a_out[x] = 2.0f;
-        else
-            a_out[x] = 1.0f;
-    }
-    else if(a&gt;1.5f &amp;&amp; a&lt;2.5f) // 2: tail
-        a_out[x] = 3.0f;
-}
+        __kernel void rd_compute(__global float* a_in,
+                         __global float* a_out,
+                         __global int* neighbor_indices,
+                         __global float* neighbor_weights,
+                         const int max_neighbors) 
+        {
+            const int x = get_global_id(0);
+            // count neighbors of each type
+            int n1=0,n2=0,n3=0;
+            int offset = x * max_neighbors;
+            for(int i=0;i &lt; max_neighbors;i++)
+            {
+                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                    continue; // not a neighbor
+                float y = a_in[neighbor_indices[offset+i]];
+                if(y&gt;0.5f &amp;&amp; y&lt;1.5f) 
+                    n1++;
+                else if(y&gt;1.5f &amp;&amp; y&lt;2.5f) 
+                    n2++;
+                else if(y&gt;2.5f &amp;&amp; y&lt;3.5f) 
+                    n3++;
+            }
+            // update step:
+            float a = a_in[x];
+            a_out[x] = 0.0f; // unless changed below
+            if(a&gt;-0.5f &amp;&amp; a&lt;0.5f) // 0: background
+            {
+                if(n1&gt;0 &amp;&amp; n2&gt;0) 
+                    a_out[x] = 3.0f;
+                else if(n1&gt;0 &amp;&amp; n3&gt;=2) 
+                    a_out[x] = 1.0f;
+            }
+            else if(a&gt;0.5f &amp;&amp; a&lt;1.5f) // 1: head
+            {
+                if(n3&gt;0)
+                    a_out[x] = 2.0f;
+                else
+                    a_out[x] = 1.0f;
+            }
+            else if(a&gt;1.5f &amp;&amp; a&lt;2.5f) // 2: tail
+                a_out[x] = 3.0f;
+        }
       </kernel>
       
     </rule>
@@ -58,12 +64,12 @@ __kernel void rd_compute(__global float* a_in,
       </overlay>
     </initial_pattern_generator>
     <render_settings>
-	  <low value="0" />
-	  <high value="3" />
+      <low value="0" />
+      <high value="3" />
       <show_cell_edges value="true" />
       <timesteps_per_render value="1" />
-	  <use_image_interpolation value="false" />
-	  <slice_3D value="false" />
+      <use_image_interpolation value="false" />
+      <slice_3D value="false" />
     </render_settings>
     
   </RD>
