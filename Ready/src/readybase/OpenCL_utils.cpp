@@ -24,6 +24,9 @@ using namespace OpenCL_utils;
 #include <stdexcept>
 using namespace std;
 
+// SSE:
+#include <intrin.h>
+
 // ---------------------------------------------------------------------------------------------------------
 
 bool OpenCL_utils::IsOpenCLAvailable()
@@ -173,6 +176,70 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
             report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
         }
         report << "\n";
+    }
+
+    // bonus feature: report CPU capabilities
+    {
+        // http://stackoverflow.com/questions/6121792/is-this-code-valid-to-check-for-sse3
+        int x64     = false;
+        int MMX     = false;
+        int SSE     = false;
+        int SSE2    = false;
+        int SSE3    = false;
+        int SSSE3   = false;
+        int SSE41   = false;
+        int SSE42   = false;
+        int SSE4a   = false;
+        int AVX     = false;
+        int XOP     = false;
+        int FMA3    = false;
+        int FMA4    = false;
+
+        int info[4];
+        __cpuid(info, 0);
+        int nIds = info[0];
+
+        __cpuid(info, 0x80000000);
+        int nExIds = info[0];
+
+        //  Detect Instruction Set
+        if (nIds >= 1){
+            __cpuid(info,0x00000001);
+            MMX   = (info[3] & ((int)1 << 23)) != 0;
+            SSE   = (info[3] & ((int)1 << 25)) != 0;
+            SSE2  = (info[3] & ((int)1 << 26)) != 0;
+            SSE3  = (info[2] & ((int)1 <<  0)) != 0;
+
+            SSSE3 = (info[2] & ((int)1 <<  9)) != 0;
+            SSE41 = (info[2] & ((int)1 << 19)) != 0;
+            SSE42 = (info[2] & ((int)1 << 20)) != 0;
+
+            AVX   = (info[2] & ((int)1 << 28)) != 0;
+            FMA3  = (info[2] & ((int)1 << 12)) != 0;
+        }
+
+        if (nExIds >= 0x80000001){
+            __cpuid(info,0x80000001);
+            x64   = (info[3] & ((int)1 << 29)) != 0;
+            SSE4a = (info[2] & ((int)1 <<  6)) != 0;
+            FMA4  = (info[2] & ((int)1 << 16)) != 0;
+            XOP   = (info[2] & ((int)1 << 11)) != 0;
+        }
+
+        report << "----------- CPU information: ------------\n";
+        report << "x64: " << x64 << "\n";
+        report << "MMX: " << MMX << "\n";
+        report << "SSE: " << SSE << "\n";
+        report << "SSE2: " << SSE2 << "\n";
+        report << "SSE3: " << SSE3 << "\n";
+        report << "SSSE3: " << SSSE3 << "\n";
+        report << "SSE41: " << SSE41 << "\n";
+        report << "SSE42: " << SSE42 << "\n";
+        report << "SSE4a: " << SSE4a << "\n";
+        report << "AVX: " << AVX << "\n";
+        report << "XOP: " << XOP << "\n";
+        report << "FMA3: " << FMA3 << "\n";
+        report << "FMA4: " << FMA4 << "\n";
     }
 
     return report.str();
