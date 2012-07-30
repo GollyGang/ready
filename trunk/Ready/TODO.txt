@@ -4,10 +4,6 @@ UI annoyances:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - can floating panes go behind main window?
 
-before 0.4 release:
-
-- test Ready for making new patterns: e.g. advection equation, without crashing
-
 before 0.5 release:
   
 - drawing issues: 
