@@ -8,11 +8,12 @@
     </description>
     <rule name="Goucher's Glider" type="kernel">
       <kernel number_of_chemicals="1">
-        __kernel void rd_compute(__global float* a_in,
-                         __global float* a_out,
-                         __global int* neighbor_indices,
-                         __global float* neighbor_weights,
-                         const int max_neighbors) 
+        __kernel void rd_compute(
+                __global float* a_in,
+                __global float* a_out,
+                __global int* neighbor_indices,
+                __global float* neighbor_weights,
+                const int max_neighbors) 
         {
             const int x = get_global_id(0);
             // count neighbors of each type
@@ -53,6 +54,7 @@
       </kernel>
       
     </rule>
+    
     <initial_pattern_generator>
       <overlay chemical="a">
         <overwrite />
@@ -63,6 +65,7 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
+    
     <render_settings>
       <low value="0" />
       <high value="3" />

@@ -14,11 +14,12 @@
     <rule type="kernel" name="B3/S23">
         
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
-        __kernel void rd_compute(__global float* a_in,
-                                 __global float* a_out,
-                                 __global int* neighbor_indices,
-                                 __global float* neighbor_weights,
-                                 const int max_neighbors) 
+        __kernel void rd_compute(
+                    __global float* a_in,
+                    __global float* a_out,
+                    __global int* neighbor_indices,
+                    __global float* neighbor_weights,
+                    const int max_neighbors) 
         {
             const int x = get_global_id(0);
             // compute the neighbor sum
@@ -28,9 +29,10 @@
                 sum += a_in[neighbor_indices[offset+i]]
                        * step(0.001f,neighbor_weights[offset+i]);
             // update step:
-            float ainx = a_in[x];
-            a_out[x] = step(-0.5f,-ainx)*step(2.5f,sum)*step(-3.5f,-sum)   // B3
-                       + step(0.5f,ainx)*step(1.5f,sum)*step(-3.5f,-sum);  // S23
+            float a = a_in[x];
+            a_out[x] = 
+                step(-0.5f,-a)*step(2.5f,sum)*step(-3.5f,-sum)   // B3
+                + step(0.5f,a)*step(1.5f,sum)*step(-3.5f,-sum);  // S23
         }
       </kernel>
       
