@@ -24,7 +24,9 @@ using namespace std;
 
 // SSE:
 #include <xmmintrin.h>
-#include <intrin.h>
+#if (defined(_WIN32) || defined(_WIN64))
+  #include <intrin.h>
+#endif
 
 // ---------------------------------------------------------------------
 
@@ -35,54 +37,58 @@ AbstractRD::AbstractRD()
     this->is_modified = false;
     this->wrap = true;
 
-    // detect availability of SSE
-    int x64     = false;
-    int MMX     = false;
-    int SSE     = false;
-    int SSE2    = false;
-    int SSE3    = false;
-    int SSSE3   = false;
-    int SSE41   = false;
-    int SSE42   = false;
-    int SSE4a   = false;
-    int AVX     = false;
-    int XOP     = false;
-    int FMA3    = false;
-    int FMA4    = false;
-    {
-        // http://stackoverflow.com/questions/6121792/is-this-code-valid-to-check-for-sse3
+    int SSE     = true;
+    #if (defined(_WIN32) || defined(_WIN64))    
+        // detect availability of SSE
+        // TODO: use a cross-platform replacement for __cpuid()
+        SSE = false;
+        int x64     = false;
+        int MMX     = false;
+        int SSE2    = false;
+        int SSE3    = false;
+        int SSSE3   = false;
+        int SSE41   = false;
+        int SSE42   = false;
+        int SSE4a   = false;
+        int AVX     = false;
+        int XOP     = false;
+        int FMA3    = false;
+        int FMA4    = false;
+        {
+            // http://stackoverflow.com/questions/6121792/is-this-code-valid-to-check-for-sse3
 
-        int info[4];
-        __cpuid(info, 0);
-        int nIds = info[0];
+            int info[4];
+            __cpuid(info, 0);
+            int nIds = info[0];
 
-        __cpuid(info, 0x80000000);
-        int nExIds = info[0];
+            __cpuid(info, 0x80000000);
+            int nExIds = info[0];
 
-        //  Detect Instruction Set
-        if (nIds >= 1){
-            __cpuid(info,0x00000001);
-            MMX   = (info[3] & ((int)1 << 23)) != 0;
-            SSE   = (info[3] & ((int)1 << 25)) != 0;
-            SSE2  = (info[3] & ((int)1 << 26)) != 0;
-            SSE3  = (info[2] & ((int)1 <<  0)) != 0;
+            //  Detect Instruction Set
+            if (nIds >= 1){
+                __cpuid(info,0x00000001);
+                MMX   = (info[3] & ((int)1 << 23)) != 0;
+                SSE   = (info[3] & ((int)1 << 25)) != 0;
+                SSE2  = (info[3] & ((int)1 << 26)) != 0;
+                SSE3  = (info[2] & ((int)1 <<  0)) != 0;
 
-            SSSE3 = (info[2] & ((int)1 <<  9)) != 0;
-            SSE41 = (info[2] & ((int)1 << 19)) != 0;
-            SSE42 = (info[2] & ((int)1 << 20)) != 0;
+                SSSE3 = (info[2] & ((int)1 <<  9)) != 0;
+                SSE41 = (info[2] & ((int)1 << 19)) != 0;
+                SSE42 = (info[2] & ((int)1 << 20)) != 0;
 
-            AVX   = (info[2] & ((int)1 << 28)) != 0;
-            FMA3  = (info[2] & ((int)1 << 12)) != 0;
+                AVX   = (info[2] & ((int)1 << 28)) != 0;
+                FMA3  = (info[2] & ((int)1 << 12)) != 0;
+            }
+
+            if (nExIds >= 0x80000001){
+                __cpuid(info,0x80000001);
+                x64   = (info[3] & ((int)1 << 29)) != 0;
+                SSE4a = (info[2] & ((int)1 <<  6)) != 0;
+                FMA4  = (info[2] & ((int)1 << 16)) != 0;
+                XOP   = (info[2] & ((int)1 << 11)) != 0;
+            }
         }
-
-        if (nExIds >= 0x80000001){
-            __cpuid(info,0x80000001);
-            x64   = (info[3] & ((int)1 << 29)) != 0;
-            SSE4a = (info[2] & ((int)1 <<  6)) != 0;
-            FMA4  = (info[2] & ((int)1 << 16)) != 0;
-            XOP   = (info[2] & ((int)1 << 11)) != 0;
-        }
-    }
+    #endif
 
     if(SSE) // (suspect that this code causes crash when run on non-SSE CPUs)
     {
