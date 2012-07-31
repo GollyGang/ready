@@ -2,6 +2,7 @@ var searchData=
 [
   ['c',['c',['../classCircle.html#abaac03542a55d0112b0fa670dd30338d',1,'Circle']]],
   ['canreload',['canreload',['../classHtmlView.html#a12450519cd8dce10b29e1d0e66b56f84',1,'HtmlView']]],
+  ['cell_5flocator',['cell_locator',['../classMeshRD.html#a180cc9116edd98a0453cb89e9c39efff',1,'MeshRD']]],
   ['cell_5fneighbor_5findices',['cell_neighbor_indices',['../classMeshRD.html#a3e7eed75884e6c8bcb237df5f25a1275',1,'MeshRD']]],
   ['cell_5fneighbor_5fweights',['cell_neighbor_weights',['../classMeshRD.html#ae18bc016b672b125b350e241efd9d283',1,'MeshRD']]],
   ['change_5fprefix',['change_prefix',['../InfoPanel_8cpp.html#a28d380cadc0862ccd87175cd446fc93c',1,'InfoPanel.cpp']]],
@@ -85,11 +86,13 @@ var searchData=
   ['context',['context',['../classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57',1,'OpenCL_MixIn']]],
   ['cr',['CR',['../prefs_8cpp.html#a984744e7980d3a3646a27dbb40871365',1,'prefs.cpp']]],
   ['created',['Created',['../classwxVTKRenderWindowInteractor.html#a305f711fa4c8004357caeaed32e4ec32',1,'wxVTKRenderWindowInteractor']]],
+  ['current_5fpaint_5fvalue',['current_paint_value',['../classMyFrame.html#a42bc27e5bddc2edb0b0f5b33515a8846',1,'MyFrame']]],
+  ['currentcursor',['CurrentCursor',['../classMyFrame.html#a669096a31d1757214f08a296f4691a38',1,'MyFrame']]],
   ['currframe',['currframe',['../classMyApp.html#a41d92eb91e01037a0265b86bef4e910a',1,'MyApp']]],
   ['currkey',['currkey',['../prefs_8cpp.html#aaacf1a77c10b6c97201e93054bf86843',1,'prefs.cpp']]],
   ['currmods',['currmods',['../prefs_8cpp.html#a76d947d833846c69306f2bee3a6f9b9f',1,'prefs.cpp']]],
   ['currpage',['currpage',['../prefs_8cpp.html#aad818288638918d0901b9d818c0ff852',1,'prefs.cpp']]],
-  ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'prefs.cpp']]],
+  ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'currversion():&#160;prefs.cpp'],['../prefs_8hpp.html#af6fe256936340f78df9e04549496d809',1,'currversion():&#160;prefs.cpp']]],
   ['cx',['cx',['../structTri.html#a67db4aca10a65afd99a4188918bcf446',1,'Tri']]],
   ['cy',['cy',['../structTri.html#af330fd997de95791b22150a6075856db',1,'Tri']]]
 ];

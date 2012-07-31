@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -97,6 +97,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-types">Private Types</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="#pri-static-attribs">Static Private Attributes</a>  </div>
@@ -109,6 +110,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
  <a href="classMyFrame.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="frame_8hpp_source.html">frame.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for MyFrame:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classMyFrame.png" usemap="#MyFrame_map" alt=""/>
+  <map id="MyFrame_map" name="MyFrame_map">
+<area href="classIPaintHandler.html" title="Interface for handling callbacks from InteractorStylePainter. MyFrame implements this interface..." alt="IPaintHandler" shape="rect" coords="0,0,88,24"/>
+</map>
+ </div></div>
 
 <p><a href="classMyFrame-members.html">List of all members.</a></p>
 <table class="memberdecls">
@@ -136,6 +146,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7d2dd27713dc21ead65462aeca0d0d75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a7d2dd27713dc21ead65462aeca0d0d75">OnChar</a> (wxKeyEvent &amp;event)</td></tr>
 <tr class="memitem:a47a959eefdac32d85b8d3fe6b675329a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a47a959eefdac32d85b8d3fe6b675329a">ProcessKey</a> (int key, int modifiers)</td></tr>
 <tr class="memitem:a1bea8a15bb46eb21b3ccc1e7627a5ef9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a1bea8a15bb46eb21b3ccc1e7627a5ef9">IsFullScreen</a> ()</td></tr>
+<tr class="memitem:a64c4a96cd0b29fe0a654cbd23b55f8f1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a64c4a96cd0b29fe0a654cbd23b55f8f1">LeftMouseDown</a> (int x, int y)</td></tr>
+<tr class="memitem:aa8a411a7f8453af64e58e1b147b5cfbd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aa8a411a7f8453af64e58e1b147b5cfbd">LeftMouseUp</a> (int x, int y)</td></tr>
+<tr class="memitem:a22dbe4a2c263d6270c887d31b0c82ce1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a22dbe4a2c263d6270c887d31b0c82ce1">RightMouseDown</a> (int x, int y)</td></tr>
+<tr class="memitem:a29a43a43ca04de27d35b33e2d9f0ed5d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a29a43a43ca04de27d35b33e2d9f0ed5d">RightMouseUp</a> (int x, int y)</td></tr>
+<tr class="memitem:aae275c1eabb67ebba6ee0dc6304e192a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aae275c1eabb67ebba6ee0dc6304e192a">MouseMove</a> (int x, int y)</td></tr>
+<tr class="memitem:ae7ad110dd2710a9b776274ed26f0324f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ae7ad110dd2710a9b776274ed26f0324f">KeyDown</a> ()</td></tr>
+<tr class="memitem:a852c32da653099d26e90b75e62dbc796"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a852c32da653099d26e90b75e62dbc796">KeyUp</a> ()</td></tr>
+<tr><td colspan="2"><h2><a name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:a0b64967ace9157e00513aa5a2ef9cc4c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4c">TCursorType</a> { <a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4ca89d845e2b8031319d8852dd24321a87c">POINTER</a>, 
+<a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4ca3bb24ca1d2d856112c57bdc28078af6c">PENCIL</a>, 
+<a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4ca185a2aa8e290376b90a7a4017d0775d7">BRUSH</a>, 
+<a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4caec77662436bd649b60156cfd54044efc">PICKER</a>
+ }</td></tr>
 <tr><td colspan="2"><h2><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:af1bae8e07814a9375a27844eb1b65b09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#af1bae8e07814a9375a27844eb1b65b09">OnNewPattern</a> (wxCommandEvent &amp;event)</td></tr>
@@ -143,10 +167,8 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a8ea505e7020bdb7a997d29f61113be0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a8ea505e7020bdb7a997d29f61113be0a">OnReloadFromDisk</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a06843eec325e9393b35b542944cb31b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a06843eec325e9393b35b542944cb31b9">OnSavePattern</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:aa4f7b2abb9bcde53ea6ee6235179888d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aa4f7b2abb9bcde53ea6ee6235179888d">OnScreenshot</a> (wxCommandEvent &amp;event)</td></tr>
-<tr class="memitem:a29a86cbaf1242cbbc8853a532c631480"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a29a86cbaf1242cbbc8853a532c631480">OnStartRecording</a> (wxCommandEvent &amp;event)</td></tr>
-<tr class="memitem:a6fd41e5d2c29122469bec56d2e4a13cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6fd41e5d2c29122469bec56d2e4a13cd">OnUpdateStartRecording</a> (wxUpdateUIEvent &amp;event)</td></tr>
-<tr class="memitem:a3490771b8abfdcba16a1122e83d720c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a3490771b8abfdcba16a1122e83d720c7">OnStopRecording</a> (wxCommandEvent &amp;event)</td></tr>
-<tr class="memitem:aa7324fd8ad78e980bf6583446bc701d0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aa7324fd8ad78e980bf6583446bc701d0">OnUpdateStopRecording</a> (wxUpdateUIEvent &amp;event)</td></tr>
+<tr class="memitem:a7d7e5f90144d2673603071d8af6e291c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a7d7e5f90144d2673603071d8af6e291c">OnRecordFrames</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:a3dc917ffed9fdb983dd91ddbc2744b97"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a3dc917ffed9fdb983dd91ddbc2744b97">OnUpdateRecordFrames</a> (wxUpdateUIEvent &amp;event)</td></tr>
 <tr class="memitem:a189588e62a253e87d392a42ad9da4be6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a189588e62a253e87d392a42ad9da4be6">OnAddMyPatterns</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a7fcd634b78a7900d13e0d7ae2afbea6d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a7fcd634b78a7900d13e0d7ae2afbea6d">OnPreferences</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:af033176052c30566f52a90c97386b7f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#af033176052c30566f52a90c97386b7f0">OnImportMesh</a> (wxCommandEvent &amp;event)</td></tr>
@@ -158,12 +180,24 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:aad11d3b14d33f240778eacb7862b18f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aad11d3b14d33f240778eacb7862b18f7">OpenRecentPattern</a> (int id)</td></tr>
 <tr class="memitem:a6e65158f18a4be192fbc284d15c4315c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6e65158f18a4be192fbc284d15c4315c">ClearMissingPatterns</a> ()</td></tr>
 <tr class="memitem:a1e7f4fab4dab3f3b8d6d28bc43755eea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a1e7f4fab4dab3f3b8d6d28bc43755eea">ClearAllPatterns</a> ()</td></tr>
+<tr class="memitem:a6022c54366d0d192a5ecca9f5549c2fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6022c54366d0d192a5ecca9f5549c2fd">OnUndo</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:aa441da3286da275203e1ce6b40c775a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aa441da3286da275203e1ce6b40c775a3">OnUpdateUndo</a> (wxUpdateUIEvent &amp;event)</td></tr>
+<tr class="memitem:a65b4b5ca13e8530d79ca95319abd063b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a65b4b5ca13e8530d79ca95319abd063b">OnRedo</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:ae1791aa8fa1912ec61167253d0546e2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ae1791aa8fa1912ec61167253d0546e2b">OnUpdateRedo</a> (wxUpdateUIEvent &amp;event)</td></tr>
 <tr class="memitem:a96aaaff9d90a787f70587d5d9184f27b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a96aaaff9d90a787f70587d5d9184f27b">OnCut</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a5a67d598f37e13825032c15ce275e30d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a5a67d598f37e13825032c15ce275e30d">OnCopy</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a6b7eb93dc671ae87351d9555f5b0d0d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6b7eb93dc671ae87351d9555f5b0d0d5">OnPaste</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:ac12aa086bdab2c68f62c9b52f819f88c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ac12aa086bdab2c68f62c9b52f819f88c">OnUpdatePaste</a> (wxUpdateUIEvent &amp;event)</td></tr>
 <tr class="memitem:ae65e6947cf2f55d5a10391f69d1b0557"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ae65e6947cf2f55d5a10391f69d1b0557">OnClear</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a23a6bc0797a79648a27a18c5ecb6bb7d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a23a6bc0797a79648a27a18c5ecb6bb7d">OnSelectAll</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:a5e0206ac1b74b61a2471d2d8f685859d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a5e0206ac1b74b61a2471d2d8f685859d">OnSelectPointerTool</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:ac7e47f16b714af68d6eb77f980e37a8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ac7e47f16b714af68d6eb77f980e37a8a">OnUpdateSelectPointerTool</a> (wxUpdateUIEvent &amp;event)</td></tr>
+<tr class="memitem:aadbb91db7e448c5b23dde23ba3a86af1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aadbb91db7e448c5b23dde23ba3a86af1">OnSelectPencilTool</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:ac3e387954bf2ec236bf98f6529415cc4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ac3e387954bf2ec236bf98f6529415cc4">OnUpdateSelectPencilTool</a> (wxUpdateUIEvent &amp;event)</td></tr>
+<tr class="memitem:a04d44874b316b00b2f2041f12d6fe7be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a04d44874b316b00b2f2041f12d6fe7be">OnSelectBrushTool</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:a0b33ead8fd62fc5bf06356e76c3aa5ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a0b33ead8fd62fc5bf06356e76c3aa5ac">OnUpdateSelectBrushTool</a> (wxUpdateUIEvent &amp;event)</td></tr>
+<tr class="memitem:ac846c6c7f57c78fd095842aa759f75bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ac846c6c7f57c78fd095842aa759f75bf">OnSelectPickerTool</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:afe3bf1b5ddca83b4b9f00de2ded1f27d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#afe3bf1b5ddca83b4b9f00de2ded1f27d">OnUpdateSelectPickerTool</a> (wxUpdateUIEvent &amp;event)</td></tr>
 <tr class="memitem:aedf9dc8c2a723fd8de16d90596500b50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aedf9dc8c2a723fd8de16d90596500b50">OnFullScreen</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:afa6b1e7abbc33e4c1a487e796f2f183b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#afa6b1e7abbc33e4c1a487e796f2f183b">OnFitPattern</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a79715a0026a2ba48bffc82408d5486eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a79715a0026a2ba48bffc82408d5486eb">OnWireframe</a> (wxCommandEvent &amp;event)</td></tr>
@@ -193,12 +227,14 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a97767bd1acede9a4755cda62741a6cf6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a97767bd1acede9a4755cda62741a6cf6">OnOpenCLDiagnostics</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:ab470cba0c5d8d46980c602589d556ee5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ab470cba0c5d8d46980c602589d556ee5">OnAbout</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:a63b23742f9322a0ae726aa2a29eae96d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a63b23742f9322a0ae726aa2a29eae96d">OnHelp</a> (wxCommandEvent &amp;event)</td></tr>
+<tr class="memitem:a6428f219489dc6a278221a14cf0cd795"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6428f219489dc6a278221a14cf0cd795">OnChangeCurrentColor</a> (wxCommandEvent &amp;event)</td></tr>
 <tr class="memitem:ab1b7872607e17b76d86f104c94518ec6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ab1b7872607e17b76d86f104c94518ec6">OnActivate</a> (wxActivateEvent &amp;event)</td></tr>
 <tr class="memitem:a58d9c1d5b2197bfac0be4a55ccc3efa7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a58d9c1d5b2197bfac0be4a55ccc3efa7">OnIdle</a> (wxIdleEvent &amp;event)</td></tr>
 <tr class="memitem:ade1ee7abd7620c01deeafaee1c75a79d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ade1ee7abd7620c01deeafaee1c75a79d">OnSize</a> (wxSizeEvent &amp;event)</td></tr>
 <tr class="memitem:aca8e8d9ade335e41689ae7ccbbc8675a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aca8e8d9ade335e41689ae7ccbbc8675a">OnClose</a> (wxCloseEvent &amp;event)</td></tr>
 <tr class="memitem:a8c4a61f9dd46a80206b1d9af7b2052ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a8c4a61f9dd46a80206b1d9af7b2052ee">InitializeMenus</a> ()</td></tr>
 <tr class="memitem:ad18dcc0ba063d7b92ac9bb99eb92bebf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ad18dcc0ba063d7b92ac9bb99eb92bebf">InitializeToolbars</a> ()</td></tr>
+<tr class="memitem:afaf0773191c9decc042a7d2815a60798"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#afaf0773191c9decc042a7d2815a60798">InitializeCursors</a> ()</td></tr>
 <tr class="memitem:aa3c6e7102c269c79b734517e5da97ed2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aa3c6e7102c269c79b734517e5da97ed2">InitializePatternsPane</a> ()</td></tr>
 <tr class="memitem:a843de9600d3363f8c49aeacca8fcefe9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a843de9600d3363f8c49aeacca8fcefe9">InitializeInfoPane</a> ()</td></tr>
 <tr class="memitem:a5e712e937780b265b60781518399df4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a5e712e937780b265b60781518399df4e">UpdateInfoPane</a> ()</td></tr>
@@ -226,7 +262,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a6e95b4e5846c2a5510b3acdfb719bfa4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPatternsPanel.html">PatternsPanel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6e95b4e5846c2a5510b3acdfb719bfa4">patterns_panel</a></td></tr>
 <tr class="memitem:a2f1705495767375a3a81b28b90f7749c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classInfoPanel.html">InfoPanel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a2f1705495767375a3a81b28b90f7749c">info_panel</a></td></tr>
 <tr class="memitem:a10f045f7b325ff70d75fdb1d3508aaa7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classHelpPanel.html">HelpPanel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a10f045f7b325ff70d75fdb1d3508aaa7">help_panel</a></td></tr>
-<tr class="memitem:a025a54ea4d1767909eb3273b02cd8604"><td class="memItemLeft" align="right" valign="top">wxAuiToolBar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a025a54ea4d1767909eb3273b02cd8604">action_toolbar</a></td></tr>
+<tr class="memitem:af1c6519a36f9d087911638e962f8fec8"><td class="memItemLeft" align="right" valign="top">wxAuiToolBar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#af1c6519a36f9d087911638e962f8fec8">file_toolbar</a></td></tr>
+<tr class="memitem:af79ffa4ddde431d3a71403bbe570709b"><td class="memItemLeft" align="right" valign="top">wxAuiToolBar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#af79ffa4ddde431d3a71403bbe570709b">action_toolbar</a></td></tr>
+<tr class="memitem:ab30188ff7990001bf888b639c77d43fd"><td class="memItemLeft" align="right" valign="top">wxAuiToolBar *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ab30188ff7990001bf888b639c77d43fd">paint_toolbar</a></td></tr>
 <tr class="memitem:a14b5c05621f8ebece2a3cb9ca2488f76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classProperties.html">Properties</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a14b5c05621f8ebece2a3cb9ca2488f76">render_settings</a></td></tr>
 <tr class="memitem:ac16a2ad94c97411d14cfca97647b9710"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#ac16a2ad94c97411d14cfca97647b9710">is_running</a></td></tr>
 <tr class="memitem:a751e49ed926e305ead6a52b01ce081bb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a751e49ed926e305ead6a52b01ce081bb">frames_per_second</a></td></tr>
@@ -243,6 +281,15 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:acd5404b46590c790947f98cfeab83e3b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#acd5404b46590c790947f98cfeab83e3b">realkey</a></td></tr>
 <tr class="memitem:a80f3e088cee8c8d00693ef206398b473"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a80f3e088cee8c8d00693ef206398b473">fullscreen</a></td></tr>
 <tr class="memitem:a78ea73836337e2cc40b7b286cff5a631"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a78ea73836337e2cc40b7b286cff5a631">is_opencl_available</a></td></tr>
+<tr class="memitem:a669096a31d1757214f08a296f4691a38"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4c">MyFrame::TCursorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a669096a31d1757214f08a296f4691a38">CurrentCursor</a></td></tr>
+<tr class="memitem:aff1fc5b7526d5993a0058c805b3b8586"><td class="memItemLeft" align="right" valign="top">wxCursor *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#aff1fc5b7526d5993a0058c805b3b8586">pencil_cursor</a></td></tr>
+<tr class="memitem:a7c142f3f370721b63d285c8bdaf85b76"><td class="memItemLeft" align="right" valign="top">wxCursor *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a7c142f3f370721b63d285c8bdaf85b76">brush_cursor</a></td></tr>
+<tr class="memitem:a73ccf8ae71b4257dbbd01186bec8e5f6"><td class="memItemLeft" align="right" valign="top">wxCursor *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a73ccf8ae71b4257dbbd01186bec8e5f6">picker_cursor</a></td></tr>
+<tr class="memitem:a42bc27e5bddc2edb0b0f5b33515a8846"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a42bc27e5bddc2edb0b0f5b33515a8846">current_paint_value</a></td></tr>
+<tr class="memitem:a1737956b39c1e33f4bfa7a3da815f85b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a1737956b39c1e33f4bfa7a3da815f85b">left_mouse_is_down</a></td></tr>
+<tr class="memitem:a6fbcef92968334eadf7bc234a15d1e59"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a6fbcef92968334eadf7bc234a15d1e59">right_mouse_is_down</a></td></tr>
+<tr class="memitem:adb7b9ae9a9d0016375da17e64f8a93ab"><td class="memItemLeft" align="right" valign="top">wxString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#adb7b9ae9a9d0016375da17e64f8a93ab">icons_folder</a></td></tr>
+<tr class="memitem:a073afb3f25d02d34bc6eb4a89bc44d9a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a073afb3f25d02d34bc6eb4a89bc44d9a">erasing</a></td></tr>
 <tr><td colspan="2"><h2><a name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
 <tr class="memitem:a168fe8215b1cd99fad646460d601afac"><td class="memItemLeft" align="right" valign="top">static const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMyFrame.html#a168fe8215b1cd99fad646460d601afac">MAX_TIMESTEPS_PER_RENDER</a> = 1e8</td></tr>
@@ -251,8 +298,36 @@ Static Private Attributes</h2></td></tr>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The wxFrame-derived top-level window for the Ready GUI. </p>
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00039">39</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
-</div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00040">40</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+</div><hr/><h2>Member Enumeration Documentation</h2>
+<a class="anchor" id="a0b64967ace9157e00513aa5a2ef9cc4c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4c">MyFrame::TCursorType</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="a0b64967ace9157e00513aa5a2ef9cc4ca89d845e2b8031319d8852dd24321a87c"></a>POINTER</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a0b64967ace9157e00513aa5a2ef9cc4ca3bb24ca1d2d856112c57bdc28078af6c"></a>PENCIL</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a0b64967ace9157e00513aa5a2ef9cc4ca185a2aa8e290376b90a7a4017d0775d7"></a>BRUSH</em>&nbsp;</td><td>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a0b64967ace9157e00513aa5a2ef9cc4caec77662436bd649b60156cfd54044efc"></a>PICKER</em>&nbsp;</td><td>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00244">244</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="af13d7bffe3d6844c2331085f423764a4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -268,7 +343,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00202">202</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00225">225</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -286,7 +361,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00266">266</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00291">291</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -306,7 +381,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01884">1884</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02026">2026</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -324,7 +399,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01034">1034</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01140">1140</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -342,7 +417,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02023">2023</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02165">2165</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +435,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01975">1975</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02117">2117</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -379,7 +454,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02035">2035</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02177">2177</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -398,7 +473,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02173">2173</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02315">2315</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +491,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00052">52</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00053">53</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +509,25 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00061">61</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00062">62</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afaf0773191c9decc042a7d2815a60798"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#afaf0773191c9decc042a7d2815a60798">MyFrame::InitializeCursors</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00491">491</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -452,7 +545,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02457">2457</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02620">2620</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -470,7 +563,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00462">462</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00550">550</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -488,7 +581,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00440">440</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00528">528</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -506,7 +599,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00276">276</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00304">304</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -524,7 +617,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00425">425</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00513">513</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -542,7 +635,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00512">512</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00600">600</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -560,7 +653,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00392">392</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00425">425</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -578,7 +671,109 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00073">73</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00074">74</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae7ad110dd2710a9b776274ed26f0324f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#ae7ad110dd2710a9b776274ed26f0324f">MyFrame::KeyDown</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#a088d2aa52cf5b271d5524068617be8a5">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03357">3357</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a852c32da653099d26e90b75e62dbc796"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a852c32da653099d26e90b75e62dbc796">MyFrame::KeyUp</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#aedd22360e2ce8d6971e838dae6ea92d0">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03365">3365</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a64c4a96cd0b29fe0a654cbd23b55f8f1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a64c4a96cd0b29fe0a654cbd23b55f8f1">MyFrame::LeftMouseDown</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#aa5aeddc34014dff0aa0bf052e89fecf7">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03215">3215</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa8a411a7f8453af64e58e1b147b5cfbd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#aa8a411a7f8453af64e58e1b147b5cfbd">MyFrame::LeftMouseUp</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#a5dbde0154d1a9074faa902ac93a3b23c">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03267">3267</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -596,7 +791,38 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00538">538</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00626">626</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aae275c1eabb67ebba6ee0dc6304e192a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#aae275c1eabb67ebba6ee0dc6304e192a">MyFrame::MouseMove</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#a0356fa8ff380b2fcec8cdd94c69881e4">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03308">3308</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -615,7 +841,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00568">568</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00658">658</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -634,7 +860,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02194">2194</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02336">2336</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -653,7 +879,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00831">831</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00921">921</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +898,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02587">2587</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02762">2762</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -691,7 +917,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02942">2942</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03108">3108</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -710,7 +936,26 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02067">2067</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02209">2209</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6428f219489dc6a278221a14cf0cd795"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a6428f219489dc6a278221a14cf0cd795">MyFrame::OnChangeCurrentColor</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03412">3412</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -729,7 +974,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02647">2647</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02822">2822</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -748,7 +993,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02385">2385</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02548">2548</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -767,7 +1012,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00618">618</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00708">708</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -786,7 +1031,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02146">2146</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02288">2288</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -805,7 +1050,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00585">585</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00675">675</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -824,7 +1069,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00575">575</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00665">665</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -843,7 +1088,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02597">2597</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02772">2772</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -862,7 +1107,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02833">2833</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03008">3008</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -881,7 +1126,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02762">2762</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02937">2937</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -900,7 +1145,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00698">698</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00788">788</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -919,7 +1164,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00644">644</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00734">734</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -938,7 +1183,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01170">1170</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01276">1276</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -957,7 +1202,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01249">1249</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01355">1355</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -976,7 +1221,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01050">1050</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01156">1156</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -995,7 +1240,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02659">2659</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02834">2834</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1014,7 +1259,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02338">2338</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02501">2501</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1033,7 +1278,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01332">1332</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01438">1438</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1052,7 +1297,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00749">749</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00839">839</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1071,7 +1316,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01672">1672</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01814">1814</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1090,7 +1335,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01868">1868</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02010">2010</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1109,7 +1354,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00601">601</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00691">691</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1128,7 +1373,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02166">2166</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02308">2308</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1147,7 +1392,45 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00560">560</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00650">650</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7d7e5f90144d2673603071d8af6e291c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a7d7e5f90144d2673603071d8af6e291c">MyFrame::OnRecordFrames</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03081">3081</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a65b4b5ca13e8530d79ca95319abd063b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a65b4b5ca13e8530d79ca95319abd063b">MyFrame::OnRedo</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03395">3395</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1166,7 +1449,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02826">2826</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03001">3001</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1185,7 +1468,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01013">1013</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01119">1119</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1204,7 +1487,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01163">1163</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01269">1269</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1223,7 +1506,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02625">2625</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02800">2800</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1242,7 +1525,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02636">2636</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02811">2811</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1261,7 +1544,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00955">955</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01045">1045</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1280,7 +1563,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01310">1310</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01416">1416</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1299,7 +1582,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00785">785</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00875">875</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1318,7 +1601,26 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00628">628</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00718">718</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a04d44874b316b00b2f2041f12d6fe7be"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a04d44874b316b00b2f2041f12d6fe7be">MyFrame::OnSelectBrushTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03173">3173</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1337,7 +1639,64 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01192">1192</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01298">1298</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aadbb91db7e448c5b23dde23ba3a86af1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#aadbb91db7e448c5b23dde23ba3a86af1">MyFrame::OnSelectPencilTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03152">3152</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac846c6c7f57c78fd095842aa759f75bf"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#ac846c6c7f57c78fd095842aa759f75bf">MyFrame::OnSelectPickerTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03194">3194</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5e0206ac1b74b61a2471d2d8f685859d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a5e0206ac1b74b61a2471d2d8f685859d">MyFrame::OnSelectPointerTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03132">3132</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1356,26 +1715,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00762">762</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a29a86cbaf1242cbbc8853a532c631480"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classMyFrame.html#a29a86cbaf1242cbbc8853a532c631480">MyFrame::OnStartRecording</a> </td>
-          <td>(</td>
-          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02906">2906</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00852">852</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1394,26 +1734,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00903">903</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a3490771b8abfdcba16a1122e83d720c7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classMyFrame.html#a3490771b8abfdcba16a1122e83d720c7">MyFrame::OnStopRecording</a> </td>
-          <td>(</td>
-          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td><code> [private]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02928">2928</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00993">993</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1432,7 +1753,26 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00730">730</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00820">820</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6022c54366d0d192a5ecca9f5549c2fd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a6022c54366d0d192a5ecca9f5549c2fd">MyFrame::OnUndo</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxCommandEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03378">3378</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1451,7 +1791,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02610">2610</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02785">2785</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1810,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02617">2617</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02792">2792</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1489,7 +1829,45 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00611">611</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00701">701</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3dc917ffed9fdb983dd91ddbc2744b97"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a3dc917ffed9fdb983dd91ddbc2744b97">MyFrame::OnUpdateRecordFrames</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03101">3101</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae1791aa8fa1912ec61167253d0546e2b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#ae1791aa8fa1912ec61167253d0546e2b">MyFrame::OnUpdateRedo</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03405">3405</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1508,7 +1886,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01027">1027</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01133">1133</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1527,16 +1905,16 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00984">984</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01074">1074</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6fd41e5d2c29122469bec56d2e4a13cd"></a>
+<a class="anchor" id="a0b33ead8fd62fc5bf06356e76c3aa5ac"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classMyFrame.html#a6fd41e5d2c29122469bec56d2e4a13cd">MyFrame::OnUpdateStartRecording</a> </td>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a0b33ead8fd62fc5bf06356e76c3aa5ac">MyFrame::OnUpdateSelectBrushTool</a> </td>
           <td>(</td>
           <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
           <td class="paramname"><em>event</em></td><td>)</td>
@@ -1546,7 +1924,64 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02921">2921</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03187">3187</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac3e387954bf2ec236bf98f6529415cc4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#ac3e387954bf2ec236bf98f6529415cc4">MyFrame::OnUpdateSelectPencilTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03166">3166</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afe3bf1b5ddca83b4b9f00de2ded1f27d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#afe3bf1b5ddca83b4b9f00de2ded1f27d">MyFrame::OnUpdateSelectPickerTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03208">3208</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac7e47f16b714af68d6eb77f980e37a8a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#ac7e47f16b714af68d6eb77f980e37a8a">MyFrame::OnUpdateSelectPointerTool</a> </td>
+          <td>(</td>
+          <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
+          <td class="paramname"><em>event</em></td><td>)</td>
+          <td><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03145">3145</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1565,16 +2000,16 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00947">947</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01037">1037</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa7324fd8ad78e980bf6583446bc701d0"></a>
+<a class="anchor" id="aa441da3286da275203e1ce6b40c775a3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classMyFrame.html#aa7324fd8ad78e980bf6583446bc701d0">MyFrame::OnUpdateStopRecording</a> </td>
+          <td class="memname">void <a class="el" href="classMyFrame.html#aa441da3286da275203e1ce6b40c775a3">MyFrame::OnUpdateUndo</a> </td>
           <td>(</td>
           <td class="paramtype">wxUpdateUIEvent &amp;&#160;</td>
           <td class="paramname"><em>event</em></td><td>)</td>
@@ -1584,7 +2019,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02935">2935</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03388">3388</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1603,7 +2038,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02959">2959</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03125">3125</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1622,7 +2057,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00740">740</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00830">830</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1641,7 +2076,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00723">723</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00813">813</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1660,7 +2095,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02951">2951</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03117">3117</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1679,7 +2114,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00711">711</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00801">801</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1708,7 +2143,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01690">1690</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01832">1832</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1727,7 +2162,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01953">1953</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02095">2095</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1756,7 +2191,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02262">2262</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02417">2417</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1774,7 +2209,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02880">2880</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03055">3055</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1792,7 +2227,69 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02574">2574</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02749">2749</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a22dbe4a2c263d6270c887d31b0c82ce1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a22dbe4a2c263d6270c887d31b0c82ce1">MyFrame::RightMouseDown</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#ae698e31df39f40f14092cb9c2f92ec9f">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03276">3276</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a29a43a43ca04de27d35b33e2d9f0ed5d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMyFrame.html#a29a43a43ca04de27d35b33e2d9f0ed5d">MyFrame::RightMouseUp</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classIPaintHandler.html#a84221976bb145414aa9ee6f24d0645d5">IPaintHandler</a>.</p>
+
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l03294">3294</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1811,7 +2308,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01318">1318</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01424">1424</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1829,7 +2326,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01283">1283</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01389">1389</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1847,7 +2344,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00548">548</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00638">638</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1882,7 +2379,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02562">2562</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02737">2737</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1901,7 +2398,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00849">849</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00939">939</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1920,7 +2417,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02092">2092</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02234">2234</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1955,7 +2452,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02524">2524</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02692">2692</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1974,7 +2471,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02119">2119</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02261">2261</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -1993,7 +2490,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02486">2486</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02649">2649</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2022,7 +2519,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02101">2101</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02243">2243</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2051,7 +2548,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02110">2110</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02252">2252</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2070,7 +2567,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02083">2083</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02225">2225</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2088,7 +2585,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01144">1144</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01250">1250</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2107,7 +2604,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02154">2154</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02296">2296</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2125,7 +2622,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00455">455</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00543">543</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2143,7 +2640,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02205">2205</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02347">2347</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2161,7 +2658,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01000">1000</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l01090">1090</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2179,7 +2676,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00892">892</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00982">982</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2197,7 +2694,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00864">864</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00954">954</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2215,7 +2712,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02128">2128</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l02270">2270</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -2231,22 +2728,22 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00201">201</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00226">226</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a025a54ea4d1767909eb3273b02cd8604"></a>
+<a class="anchor" id="af79ffa4ddde431d3a71403bbe570709b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">wxAuiToolBar* <a class="el" href="classMyFrame.html#a025a54ea4d1767909eb3273b02cd8604">MyFrame::action_toolbar</a><code> [private]</code></td>
+          <td class="memname">wxAuiToolBar * <a class="el" href="classMyFrame.html#af79ffa4ddde431d3a71403bbe570709b">MyFrame::action_toolbar</a><code> [private]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00191">191</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00216">216</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2261,7 +2758,50 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00178">178</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00202">202</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7c142f3f370721b63d285c8bdaf85b76"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">wxCursor * <a class="el" href="classMyFrame.html#a7c142f3f370721b63d285c8bdaf85b76">MyFrame::brush_cursor</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00245">245</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a42bc27e5bddc2edb0b0f5b33515a8846"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float <a class="el" href="classMyFrame.html#a42bc27e5bddc2edb0b0f5b33515a8846">MyFrame::current_paint_value</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00246">246</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a669096a31d1757214f08a296f4691a38"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4c">MyFrame::TCursorType</a>  <a class="el" href="classMyFrame.html#a669096a31d1757214f08a296f4691a38">MyFrame::CurrentCursor</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
 
 </div>
 </div>
@@ -2276,7 +2816,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00179">179</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00203">203</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2291,7 +2831,37 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00202">202</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00227">227</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a073afb3f25d02d34bc6eb4a89bc44d9a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classMyFrame.html#a073afb3f25d02d34bc6eb4a89bc44d9a">MyFrame::erasing</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00249">249</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af1c6519a36f9d087911638e962f8fec8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">wxAuiToolBar* <a class="el" href="classMyFrame.html#af1c6519a36f9d087911638e962f8fec8">MyFrame::file_toolbar</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00216">216</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2306,7 +2876,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00198">198</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00223">223</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2321,7 +2891,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00213">213</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00238">238</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2336,7 +2906,22 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00190">190</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00214">214</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adb7b9ae9a9d0016375da17e64f8a93ab"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">wxString <a class="el" href="classMyFrame.html#adb7b9ae9a9d0016375da17e64f8a93ab">MyFrame::icons_folder</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00248">248</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2351,7 +2936,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00189">189</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00213">213</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2366,7 +2951,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00207">207</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00232">232</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2381,7 +2966,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00214">214</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00239">239</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2396,7 +2981,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00205">205</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00230">230</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2411,7 +2996,22 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00197">197</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00222">222</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1737956b39c1e33f4bfa7a3da815f85b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classMyFrame.html#a1737956b39c1e33f4bfa7a3da815f85b">MyFrame::left_mouse_is_down</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00247">247</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2426,7 +3026,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00209">209</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00234">234</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2441,7 +3041,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00198">198</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00223">223</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2456,7 +3056,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00199">199</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00224">224</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2466,6 +3066,21 @@ Static Private Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const char * <a class="el" href="classMyFrame.html#a89d16a091bd7531fc30bdd1c36e5c01b">MyFrame::opencl_not_available_message</a> = &quot;use File &gt; New Pattern or File &gt; Import Mesh to make new examples.&quot;<code> [static, private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00241">241</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab30188ff7990001bf888b639c77d43fd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">wxAuiToolBar * <a class="el" href="classMyFrame.html#ab30188ff7990001bf888b639c77d43fd">MyFrame::paint_toolbar</a><code> [private]</code></td>
         </tr>
       </table>
 </div>
@@ -2486,7 +3101,37 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00188">188</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00212">212</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aff1fc5b7526d5993a0058c805b3b8586"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">wxCursor* <a class="el" href="classMyFrame.html#aff1fc5b7526d5993a0058c805b3b8586">MyFrame::pencil_cursor</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00245">245</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a73ccf8ae71b4257dbbd01186bec8e5f6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">wxCursor * <a class="el" href="classMyFrame.html#a73ccf8ae71b4257dbbd01186bec8e5f6">MyFrame::picker_cursor</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00245">245</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2501,7 +3146,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00182">182</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00206">206</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2516,7 +3161,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00211">211</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00236">236</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2531,7 +3176,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00205">205</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00230">230</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2546,7 +3191,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00206">206</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00231">231</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2561,7 +3206,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00206">206</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00231">231</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2576,7 +3221,22 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00194">194</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00219">219</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6fbcef92968334eadf7bc234a15d1e59"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classMyFrame.html#a6fbcef92968334eadf7bc234a15d1e59">MyFrame::right_mouse_is_down</a><code> [private]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00247">247</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2591,7 +3251,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00200">200</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00225">225</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2606,7 +3266,7 @@ Static Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00185">185</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8hpp_source.html#l00209">209</a> of file <a class="el" href="frame_8hpp_source.html">frame.hpp</a>.</p>
 
 </div>
 </div>
@@ -2618,7 +3278,7 @@ Static Private Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

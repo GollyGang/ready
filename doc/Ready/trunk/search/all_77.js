@@ -6,7 +6,7 @@ var searchData=
   ['wrap',['wrap',['../classAbstractRD.html#ada7a0672e610d7fbdecc41ebbaf04899',1,'AbstractRD']]],
   ['wrap_5flabel',['wrap_label',['../InfoPanel_8cpp.html#a2e4f0538ac6acd37a124f6c46479fda1',1,'InfoPanel.cpp']]],
   ['writeprimaryelement',['WritePrimaryElement',['../classRD__XMLImageWriter.html#aa2a83a921bc6c70a04dc432f299db3a8',1,'RD_XMLImageWriter::WritePrimaryElement()'],['../classRD__XMLUnstructuredGridWriter.html#ae26c6a2992b66661374bc43a35fd052f',1,'RD_XMLUnstructuredGridWriter::WritePrimaryElement()']]],
-  ['writetoopenclbuffers',['WriteToOpenCLBuffers',['../classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0',1,'OpenCL_MixIn::WriteToOpenCLBuffers()'],['../classOpenCLImageRD.html#abcd5e979e5af088561f1601ef91669e8',1,'OpenCLImageRD::WriteToOpenCLBuffers()'],['../classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab',1,'OpenCLMeshRD::WriteToOpenCLBuffers()']]],
+  ['writetoopenclbuffersifneeded',['WriteToOpenCLBuffersIfNeeded',['../classOpenCL__MixIn.html#ac0b554b0a226df5b766d2fb6cdb0b7e5',1,'OpenCL_MixIn::WriteToOpenCLBuffersIfNeeded()'],['../classOpenCLImageRD.html#a21ee57d6237f583f5f47b04012dc7ae2',1,'OpenCLImageRD::WriteToOpenCLBuffersIfNeeded()'],['../classOpenCLMeshRD.html#af0fa718e880cd8ace9c77bdb78da07ac',1,'OpenCLMeshRD::WriteToOpenCLBuffersIfNeeded()']]],
   ['wx_5fuse_5fx_5fcapture',['WX_USE_X_CAPTURE',['../wxVTKRenderWindowInteractor_8cxx.html#ab889b99d13e128dadbd85bcb97413d4a',1,'wxVTKRenderWindowInteractor.cxx']]],
   ['wxgettoplevelparent',['wxGetTopLevelParent',['../wxVTKRenderWindowInteractor_8cxx.html#a6cd578878ca0a487cf70208fd15444ae',1,'wxVTKRenderWindowInteractor.cxx']]],
   ['wxutils_2ecpp',['wxutils.cpp',['../wxutils_8cpp.html',1,'']]],

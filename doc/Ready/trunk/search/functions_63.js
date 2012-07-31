@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['canredo',['CanRedo',['../classAbstractRD.html#a45c7dc3120973f42eaea81707696aa86',1,'AbstractRD']]],
+  ['canundo',['CanUndo',['../classAbstractRD.html#a0a9deeb64ed0d3b69e5e70de5a7b9ff5',1,'AbstractRD']]],
   ['changeblocksize',['ChangeBlockSize',['../classInfoPanel.html#ae7cc75469642c207eae550ea03b6af99',1,'InfoPanel']]],
   ['changedescription',['ChangeDescription',['../classInfoPanel.html#ac35f59b010416403191b569b93fc3b8e',1,'InfoPanel']]],
   ['changedimensions',['ChangeDimensions',['../classInfoPanel.html#aaaf715fba80eee2f4fdd95b89946091f',1,'InfoPanel']]],
@@ -32,6 +34,7 @@ var searchData=
   ['copytexttoclipboard',['CopyTextToClipboard',['../wxutils_8cpp.html#abebc97dc3ed0ec2f296fe97f3ad8fd1d',1,'CopyTextToClipboard(const wxString &amp;text):&#160;wxutils.cpp'],['../wxutils_8hpp.html#abebc97dc3ed0ec2f296fe97f3ad8fd1d',1,'CopyTextToClipboard(const wxString &amp;text):&#160;wxutils.cpp']]],
   ['createaccelerator',['CreateAccelerator',['../prefs_8cpp.html#a36905fbfd1fa1436a4b983217e079229',1,'prefs.cpp']]],
   ['createactionprefs',['CreateActionPrefs',['../classPrefsDialog.html#a359e83e7843fce110e7181b0e04a7b93',1,'PrefsDialog']]],
+  ['createcelllocatorifneeded',['CreateCellLocatorIfNeeded',['../classMeshRD.html#a547cc071fdb4eb7dd0b87bd875488485',1,'MeshRD']]],
   ['createdefaultinitialpatterngenerator',['CreateDefaultInitialPatternGenerator',['../classAbstractRD.html#a3da00130c9bded5c65b891307486cecc',1,'AbstractRD']]],
   ['createeditprefs',['CreateEditPrefs',['../classPrefsDialog.html#adcdddc6ae06520ad194efb2e29123ac8',1,'PrefsDialog']]],
   ['createfileprefs',['CreateFilePrefs',['../classPrefsDialog.html#a45e3ed2ff24cfe3a8b27d7b06e2fb923',1,'PrefsDialog']]],

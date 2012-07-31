@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -131,57 +131,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00027"></a>00027 <span class="comment">// VTK:</span>
 <a name="l00028"></a>00028 <span class="preprocessor">#include &lt;vtkRendererCollection.h&gt;</span>
 <a name="l00029"></a>00029 <span class="preprocessor">#include &lt;vtkRenderer.h&gt;</span>
-<a name="l00030"></a>00030 <span class="preprocessor">#include &lt;vtkInteractorStyleTrackballCamera.h&gt;</span>
-<a name="l00031"></a>00031 <span class="preprocessor">#include &lt;vtkCamera.h&gt;</span>
-<a name="l00032"></a>00032 
-<a name="l00033"></a>00033 <span class="comment">// STL:</span>
-<a name="l00034"></a>00034 <span class="preprocessor">#include &lt;stdexcept&gt;</span>
-<a name="l00035"></a>00035 <span class="keyword">using namespace </span>std;
-<a name="l00036"></a>00036 
-<a name="l00037"></a><a class="code" href="vtk__pipeline_8hpp.html#a83eef6bea304823921ff32ce0afb6d2b">00037</a> <span class="keywordtype">void</span> <a class="code" href="vtk__pipeline_8cpp.html#a83eef6bea304823921ff32ce0afb6d2b">InitializeVTKPipeline</a>(<a class="code" href="classwxVTKRenderWindowInteractor.html">wxVTKRenderWindowInteractor</a>* pVTKWindow,<a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>* system,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings,
-<a name="l00038"></a>00038     <span class="keywordtype">bool</span> reset_camera)
-<a name="l00039"></a>00039 {
-<a name="l00040"></a>00040     assert(pVTKWindow);
-<a name="l00041"></a>00041     assert(system);
-<a name="l00042"></a>00042     
-<a name="l00043"></a>00043     <span class="comment">// the VTK renderer is responsible for drawing the scene onto the screen</span>
-<a name="l00044"></a>00044     vtkSmartPointer&lt;vtkRenderer&gt; pRenderer;
-<a name="l00045"></a>00045     <span class="keywordflow">if</span>(pVTKWindow-&gt;GetRenderWindow()-&gt;GetRenderers()-&gt;GetNumberOfItems()&gt;0)
-<a name="l00046"></a>00046     {
-<a name="l00047"></a>00047         pRenderer = pVTKWindow-&gt;GetRenderWindow()-&gt;GetRenderers()-&gt;GetFirstRenderer();
-<a name="l00048"></a>00048         pRenderer-&gt;RemoveAllViewProps();
-<a name="l00049"></a>00049     }
-<a name="l00050"></a>00050     <span class="keywordflow">else</span>
-<a name="l00051"></a>00051     {
-<a name="l00052"></a>00052         pRenderer = vtkSmartPointer&lt;vtkRenderer&gt;::New();
-<a name="l00053"></a>00053         pVTKWindow-&gt;GetRenderWindow()-&gt;AddRenderer(pRenderer); <span class="comment">// connect it to the window</span>
-<a name="l00054"></a>00054         
-<a name="l00055"></a>00055         <span class="comment">// set the background color</span>
-<a name="l00056"></a>00056         pRenderer-&gt;GradientBackgroundOn();
-<a name="l00057"></a>00057         pRenderer-&gt;SetBackground(0,0.4,0.6);
-<a name="l00058"></a>00058         pRenderer-&gt;SetBackground2(0,0.2,0.3);
-<a name="l00059"></a>00059         
-<a name="l00060"></a>00060         <span class="comment">// change the interactor style to a trackball</span>
-<a name="l00061"></a>00061         vtkSmartPointer&lt;vtkInteractorStyleTrackballCamera&gt; is = vtkSmartPointer&lt;vtkInteractorStyleTrackballCamera&gt;::New();
-<a name="l00062"></a>00062         pVTKWindow-&gt;SetInteractorStyle(is);
-<a name="l00063"></a>00063     }
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065     system-&gt;<a class="code" href="classAbstractRD.html#a9fba6f8368f4317934ccdbdfa185c44b">InitializeRenderPipeline</a>(pRenderer,render_settings);
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067     <span class="keywordflow">if</span>(reset_camera)
-<a name="l00068"></a>00068     {
-<a name="l00069"></a>00069         vtkSmartPointer&lt;vtkCamera&gt; camera = vtkSmartPointer&lt;vtkCamera&gt;::New();
-<a name="l00070"></a>00070         <span class="keywordflow">if</span>(system-&gt;<a class="code" href="classAbstractRD.html#ad06725e8898ba2e16772cda74368a0ed" title="Retreive the dimensionality of the system volume, irrespective of the cells within it...">GetArenaDimensionality</a>()&gt;2)
-<a name="l00071"></a>00071             camera-&gt;SetPosition(-3,3,10); <span class="comment">// move off-axis to look more natural</span>
-<a name="l00072"></a>00072         pRenderer-&gt;SetActiveCamera(camera);
-<a name="l00073"></a>00073         pRenderer-&gt;ResetCamera();
-<a name="l00074"></a>00074     }
-<a name="l00075"></a>00075 }
+<a name="l00030"></a>00030 <span class="preprocessor">#include &lt;vtkCamera.h&gt;</span>
+<a name="l00031"></a>00031 <span class="preprocessor">#include &lt;vtkObjectFactory.h&gt;</span>
+<a name="l00032"></a>00032 <span class="preprocessor">#include &lt;vtkInteractorStyleTrackballCamera.h&gt;</span>
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 <span class="comment">// STL:</span>
+<a name="l00035"></a>00035 <span class="preprocessor">#include &lt;stdexcept&gt;</span>
+<a name="l00036"></a>00036 <span class="keyword">using namespace </span>std;
+<a name="l00037"></a>00037 
+<a name="l00038"></a>00038 <span class="comment">// ------------------------------------------------------------------------------------------------</span>
+<a name="l00039"></a>00039 
+<a name="l00040"></a><a class="code" href="vtk__pipeline_8hpp.html#a83eef6bea304823921ff32ce0afb6d2b">00040</a> <span class="keywordtype">void</span> <a class="code" href="vtk__pipeline_8cpp.html#a83eef6bea304823921ff32ce0afb6d2b">InitializeVTKPipeline</a>(<a class="code" href="classwxVTKRenderWindowInteractor.html">wxVTKRenderWindowInteractor</a>* pVTKWindow,<a class="code" href="classAbstractRD.html" title="Abstract base class for all reaction-diffusion systems.">AbstractRD</a>* system,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings,
+<a name="l00041"></a>00041     <span class="keywordtype">bool</span> reset_camera)
+<a name="l00042"></a>00042 {
+<a name="l00043"></a>00043     assert(pVTKWindow);
+<a name="l00044"></a>00044     assert(system);
+<a name="l00045"></a>00045     
+<a name="l00046"></a>00046     <span class="comment">// the VTK renderer is responsible for drawing the scene onto the screen</span>
+<a name="l00047"></a>00047     vtkSmartPointer&lt;vtkRenderer&gt; pRenderer;
+<a name="l00048"></a>00048     <span class="keywordflow">if</span>(pVTKWindow-&gt;GetRenderWindow()-&gt;GetRenderers()-&gt;GetNumberOfItems()&gt;0)
+<a name="l00049"></a>00049     {
+<a name="l00050"></a>00050         pRenderer = pVTKWindow-&gt;GetRenderWindow()-&gt;GetRenderers()-&gt;GetFirstRenderer();
+<a name="l00051"></a>00051         pRenderer-&gt;RemoveAllViewProps();
+<a name="l00052"></a>00052     }
+<a name="l00053"></a>00053     <span class="keywordflow">else</span>
+<a name="l00054"></a>00054     {
+<a name="l00055"></a>00055         pRenderer = vtkSmartPointer&lt;vtkRenderer&gt;::New();
+<a name="l00056"></a>00056         pVTKWindow-&gt;GetRenderWindow()-&gt;AddRenderer(pRenderer); <span class="comment">// connect it to the window</span>
+<a name="l00057"></a>00057         
+<a name="l00058"></a>00058         <span class="comment">// set the background color</span>
+<a name="l00059"></a>00059         pRenderer-&gt;GradientBackgroundOn();
+<a name="l00060"></a>00060         pRenderer-&gt;SetBackground(0,0.4,0.6);
+<a name="l00061"></a>00061         pRenderer-&gt;SetBackground2(0,0.2,0.3);
+<a name="l00062"></a>00062         
+<a name="l00063"></a>00063         <span class="comment">// change the interactor style to a trackball</span>
+<a name="l00064"></a>00064         vtkSmartPointer&lt;vtkInteractorStyleTrackballCamera&gt; is = vtkSmartPointer&lt;vtkInteractorStyleTrackballCamera&gt;::New();
+<a name="l00065"></a>00065         pVTKWindow-&gt;SetInteractorStyle(is);
+<a name="l00066"></a>00066     }
+<a name="l00067"></a>00067 
+<a name="l00068"></a>00068     system-&gt;<a class="code" href="classAbstractRD.html#a9fba6f8368f4317934ccdbdfa185c44b">InitializeRenderPipeline</a>(pRenderer,render_settings);
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070     <span class="keywordflow">if</span>(reset_camera)
+<a name="l00071"></a>00071     {
+<a name="l00072"></a>00072         vtkSmartPointer&lt;vtkCamera&gt; camera = vtkSmartPointer&lt;vtkCamera&gt;::New();
+<a name="l00073"></a>00073         <span class="keywordflow">if</span>(system-&gt;<a class="code" href="classAbstractRD.html#ad06725e8898ba2e16772cda74368a0ed" title="Retreive the dimensionality of the system volume, irrespective of the cells within it...">GetArenaDimensionality</a>()&gt;2)
+<a name="l00074"></a>00074             camera-&gt;SetPosition(-3,3,10); <span class="comment">// move off-axis to look more natural</span>
+<a name="l00075"></a>00075         pRenderer-&gt;SetActiveCamera(camera);
+<a name="l00076"></a>00076         pRenderer-&gt;ResetCamera();
+<a name="l00077"></a>00077     }
+<a name="l00078"></a>00078 }
+<a name="l00079"></a>00079 
+<a name="l00080"></a>00080 <span class="comment">// ------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

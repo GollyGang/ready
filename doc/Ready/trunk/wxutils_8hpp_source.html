@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -164,34 +164,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00060"></a>00060 <span class="comment">// Display a dialog box to get an integer value from the user.</span>
 <a name="l00061"></a>00061 <span class="comment">// Returns false if user hits Cancel button.</span>
 <a name="l00062"></a>00062 
-<a name="l00063"></a>00063 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#a76758ad632040bc87bae5d58aa9358de">IsHTMLFile</a>(<span class="keyword">const</span> wxString&amp; filename);
-<a name="l00064"></a>00064 <span class="comment">// Return true if the given file&#39;s extension is .htm or .html</span>
-<a name="l00065"></a>00065 <span class="comment">// (ignoring case).</span>
-<a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#aa390352c0253eff8ca804e20566a4ce6">IsTextFile</a>(<span class="keyword">const</span> wxString&amp; filename);
-<a name="l00068"></a>00068 <span class="comment">// Return true if the given file&#39;s extension is .txt or .doc,</span>
-<a name="l00069"></a>00069 <span class="comment">// or if it&#39;s not a HTML file and its name contains &quot;readme&quot;</span>
-<a name="l00070"></a>00070 <span class="comment">// (ignoring case).</span>
-<a name="l00071"></a>00071 
-<a name="l00072"></a>00072 <span class="keywordtype">int</span> <a class="code" href="wxutils_8cpp.html#aba71c60bf2fbed7083e7f571655e41f7">SaveChanges</a>(<span class="keyword">const</span> wxString&amp; query, <span class="keyword">const</span> wxString&amp; msg);
-<a name="l00073"></a>00073 <span class="comment">// Ask user if changes should be saved and return following result:</span>
-<a name="l00074"></a>00074 <span class="comment">// wxYES if user selects Yes/Save button,</span>
-<a name="l00075"></a>00075 <span class="comment">// wxNO if user selects No/Don&#39;t Save button,</span>
-<a name="l00076"></a>00076 <span class="comment">// wxCANCEL if user selects Cancel button.</span>
-<a name="l00077"></a>00077 
-<a name="l00078"></a>00078 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#a9207b602b6bd12d3c7283558f80e5dc8">ClipboardHasText</a>();
-<a name="l00079"></a>00079 <span class="comment">// Return true if the clipboard contains text.</span>
-<a name="l00080"></a>00080 
-<a name="l00081"></a>00081 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#abebc97dc3ed0ec2f296fe97f3ad8fd1d">CopyTextToClipboard</a>(<span class="keyword">const</span> wxString&amp; text);
-<a name="l00082"></a>00082 <span class="comment">// Copy given text to the clipboard.</span>
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 <span class="comment">// strip trailing zeros</span>
-<a name="l00085"></a>00085 wxString <a class="code" href="wxutils_8cpp.html#ac78e08ecac126652c9690598e37cdc4c">FormatFloat</a>(<span class="keywordtype">float</span> f,<span class="keywordtype">int</span> mdp=6);
+<a name="l00063"></a>00063 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#aa06489641002f4077a9a4b2ef0d90bb7">GetFloat</a>(<span class="keyword">const</span> wxString&amp; title, <span class="keyword">const</span> wxString&amp; prompt,
+<a name="l00064"></a>00064               <span class="keywordtype">float</span> inval, <span class="keywordtype">float</span>* outval,
+<a name="l00065"></a>00065               <span class="keyword">const</span> wxPoint&amp; pos = wxDefaultPosition,
+<a name="l00066"></a>00066               <span class="keyword">const</span> wxSize&amp; size = wxDefaultSize);
+<a name="l00067"></a>00067 <span class="comment">// Display a dialog box to get a float value from the user.</span>
+<a name="l00068"></a>00068 <span class="comment">// Returns false if user hits Cancel button.</span>
+<a name="l00069"></a>00069 
+<a name="l00070"></a>00070 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#a76758ad632040bc87bae5d58aa9358de">IsHTMLFile</a>(<span class="keyword">const</span> wxString&amp; filename);
+<a name="l00071"></a>00071 <span class="comment">// Return true if the given file&#39;s extension is .htm or .html</span>
+<a name="l00072"></a>00072 <span class="comment">// (ignoring case).</span>
+<a name="l00073"></a>00073 
+<a name="l00074"></a>00074 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#aa390352c0253eff8ca804e20566a4ce6">IsTextFile</a>(<span class="keyword">const</span> wxString&amp; filename);
+<a name="l00075"></a>00075 <span class="comment">// Return true if the given file&#39;s extension is .txt or .doc,</span>
+<a name="l00076"></a>00076 <span class="comment">// or if it&#39;s not a HTML file and its name contains &quot;readme&quot;</span>
+<a name="l00077"></a>00077 <span class="comment">// (ignoring case).</span>
+<a name="l00078"></a>00078 
+<a name="l00079"></a>00079 <span class="keywordtype">int</span> <a class="code" href="wxutils_8cpp.html#aba71c60bf2fbed7083e7f571655e41f7">SaveChanges</a>(<span class="keyword">const</span> wxString&amp; query, <span class="keyword">const</span> wxString&amp; msg);
+<a name="l00080"></a>00080 <span class="comment">// Ask user if changes should be saved and return following result:</span>
+<a name="l00081"></a>00081 <span class="comment">// wxYES if user selects Yes/Save button,</span>
+<a name="l00082"></a>00082 <span class="comment">// wxNO if user selects No/Don&#39;t Save button,</span>
+<a name="l00083"></a>00083 <span class="comment">// wxCANCEL if user selects Cancel button.</span>
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#a9207b602b6bd12d3c7283558f80e5dc8">ClipboardHasText</a>();
+<a name="l00086"></a>00086 <span class="comment">// Return true if the clipboard contains text.</span>
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088 <span class="keywordtype">bool</span> <a class="code" href="wxutils_8cpp.html#abebc97dc3ed0ec2f296fe97f3ad8fd1d">CopyTextToClipboard</a>(<span class="keyword">const</span> wxString&amp; text);
+<a name="l00089"></a>00089 <span class="comment">// Copy given text to the clipboard.</span>
+<a name="l00090"></a>00090 
+<a name="l00091"></a>00091 <span class="comment">// strip trailing zeros</span>
+<a name="l00092"></a>00092 wxString <a class="code" href="wxutils_8cpp.html#ac78e08ecac126652c9690598e37cdc4c">FormatFloat</a>(<span class="keywordtype">float</span> f,<span class="keywordtype">int</span> mdp=6);
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

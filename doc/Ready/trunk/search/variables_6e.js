@@ -5,6 +5,7 @@ var searchData=
   ['namebox',['namebox',['../classParameterDialog.html#a6096491bf3b11e09f20a88c5569ccec9',1,'ParameterDialog']]],
   ['need_5freload_5fcontext',['need_reload_context',['../classOpenCL__MixIn.html#ad8b0dffce6141a1315487371557752d6',1,'OpenCL_MixIn']]],
   ['need_5freload_5fformula',['need_reload_formula',['../classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244',1,'AbstractRD']]],
+  ['need_5fwrite_5fto_5fopencl_5fbuffers',['need_write_to_opencl_buffers',['../classOpenCL__MixIn.html#a4d4f95deed18283bb7f5a750f0c7e901',1,'OpenCL_MixIn']]],
   ['newdownloaddir',['newdownloaddir',['../classPrefsDialog.html#a92efaf99742dff680820b7c836b16279',1,'PrefsDialog']]],
   ['neweditor',['neweditor',['../classPrefsDialog.html#ab70af43614d3d362387ac81eb4ddd98f',1,'PrefsDialog']]],
   ['newuserrules',['newuserrules',['../classPrefsDialog.html#a09a8f5db653315e44d3313631e54ab6f',1,'PrefsDialog']]],

@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['undo',['Undo',['../classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed',1,'AbstractRD::Undo()'],['../classOpenCLImageRD.html#ab2f28d1ce7b1da3bd50e1ce94f58311b',1,'OpenCLImageRD::Undo()'],['../classOpenCLMeshRD.html#a2c7f65f4469a014233cff41117a4c3cf',1,'OpenCLMeshRD::Undo()']]],
+  ['undo_5fstack',['undo_stack',['../classAbstractRD.html#a81242589c372ea1ac84a6800059a5682',1,'AbstractRD']]],
   ['update',['Update',['../classInfoPanel.html#a71eb08cab64fdaa92e237c9de9cab226',1,'InfoPanel::Update()'],['../classAbstractRD.html#aa365a78f2c1773ee94d70503d2068c87',1,'AbstractRD::Update()'],['../classImageRD.html#a6ca70515b0210ce9311b340076e4ed5d',1,'ImageRD::Update()'],['../classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96',1,'MeshRD::Update()']]],
   ['updateacceleratorstrings',['UpdateAcceleratorStrings',['../prefs_8cpp.html#a3b1ae22a369445497a51790d57de407c',1,'prefs.cpp']]],
   ['updatebuttons',['UpdateButtons',['../classInfoPanel.html#a8757b7331b0df61ed6853787fe68c160',1,'InfoPanel']]],

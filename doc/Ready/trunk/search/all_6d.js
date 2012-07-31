@@ -32,6 +32,7 @@ var searchData=
   ['mk_5fcmd',['mk_CMD',['../prefs_8cpp.html#aaca2c4e8c2dbb1214dde1c0bb46dbe2f',1,'prefs.cpp']]],
   ['mk_5fshift',['mk_SHIFT',['../prefs_8cpp.html#a438c6e768372ad8199c47855d968ed12',1,'prefs.cpp']]],
   ['monospacemessagebox',['MonospaceMessageBox',['../classMonospaceMessageBox.html',1,'MonospaceMessageBox'],['../classMonospaceMessageBox.html#a9b5f254fe29242c6324afc7f7f376b0a',1,'MonospaceMessageBox::MonospaceMessageBox()']]],
+  ['mousemove',['MouseMove',['../classMyFrame.html#aae275c1eabb67ebba6ee0dc6304e192a',1,'MyFrame::MouseMove()'],['../classIPaintHandler.html#a0356fa8ff380b2fcec8cdd94c69881e4',1,'IPaintHandler::MouseMove()']]],
   ['multilinedialog',['MultiLineDialog',['../classMultiLineDialog.html',1,'MultiLineDialog'],['../classMultiLineDialog.html#a398010fa4f698c9e6881f607917c402e',1,'MultiLineDialog::MultiLineDialog()']]],
   ['multiply',['Multiply',['../classMultiply.html',1,'Multiply'],['../classMultiply.html#a4846a07b5bbe8ebbac4190c2e6cbf4d2',1,'Multiply::Multiply()']]],
   ['myapp',['MyApp',['../classMyApp.html',1,'']]],

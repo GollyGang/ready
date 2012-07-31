@@ -9,7 +9,7 @@ var searchData=
   ['action_5fid',['action_id',['../prefs_8hpp.html#a15b03b1d71b001298165979475b1aa62',1,'prefs.hpp']]],
   ['action_5finfo',['action_info',['../structaction__info.html',1,'']]],
   ['action_5fpage',['ACTION_PAGE',['../prefs_8cpp.html#a99fb83031ce9923c84392b4e92f956b5ae6193528cfdfbc97479fe6ef2ff962f6',1,'prefs.cpp']]],
-  ['action_5ftoolbar',['action_toolbar',['../classMyFrame.html#a025a54ea4d1767909eb3273b02cd8604',1,'MyFrame']]],
+  ['action_5ftoolbar',['action_toolbar',['../classMyFrame.html#af79ffa4ddde431d3a71403bbe570709b',1,'MyFrame']]],
   ['actiontoolbar',['ActionToolbar',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ac5933a5c56a2cda5c854446f3256ff91',1,'ID']]],
   ['activebutton',['ActiveButton',['../classwxVTKRenderWindowInteractor.html#a9d3b0f728fcb602ae47fd20db24f6af3',1,'wxVTKRenderWindowInteractor']]],
   ['add',['Add',['../classAdd.html',1,'Add'],['../classAdd.html#a42660a9b5eaaf7abfbe50c8602a1076e',1,'Add::Add()']]],

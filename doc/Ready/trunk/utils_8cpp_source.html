@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -128,121 +128,156 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00024"></a>00024 <span class="preprocessor">#include &lt;math.h&gt;</span>
 <a name="l00025"></a>00025 <span class="preprocessor">#include &lt;limits.h&gt;</span>
 <a name="l00026"></a>00026 
-<a name="l00027"></a>00027 <span class="comment">// STL:</span>
-<a name="l00028"></a>00028 <span class="preprocessor">#include &lt;vector&gt;</span>
-<a name="l00029"></a>00029 <span class="keyword">using namespace </span>std;
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <span class="preprocessor">#ifdef _WIN32</span>
-<a name="l00032"></a>00032 <span class="preprocessor"></span><span class="preprocessor">    #include &lt;sys/timeb.h&gt;</span>
-<a name="l00033"></a>00033 <span class="preprocessor">    #include &lt;sys/types.h&gt;</span>
-<a name="l00034"></a>00034 <span class="preprocessor">    #include &lt;winsock.h&gt;</span>
-<a name="l00035"></a>00035     <span class="comment">// http://www.linuxjournal.com/article/5574</span>
-<a name="l00036"></a>00036     <span class="keywordtype">void</span> gettimeofday(<span class="keyword">struct</span> timeval* t,<span class="keywordtype">void</span>* timezone)
-<a name="l00037"></a>00037     {
-<a name="l00038"></a>00038         <span class="keyword">struct </span>_timeb timebuffer;
-<a name="l00039"></a>00039 <span class="preprocessor">        #if _MSC_VER &lt; 1400</span>
-<a name="l00040"></a>00040 <span class="preprocessor"></span>            _ftime( &amp;timebuffer );
-<a name="l00041"></a>00041 <span class="preprocessor">        #else</span>
-<a name="l00042"></a>00042 <span class="preprocessor"></span>            <span class="comment">// MSVC 2005+</span>
-<a name="l00043"></a>00043             _ftime_s( &amp;timebuffer );
-<a name="l00044"></a>00044 <span class="preprocessor">        #endif</span>
-<a name="l00045"></a>00045 <span class="preprocessor"></span>        t-&gt;tv_sec = (long)timebuffer.time;
-<a name="l00046"></a>00046         t-&gt;tv_usec = 1000 * timebuffer.millitm;
-<a name="l00047"></a>00047     }
-<a name="l00048"></a>00048 <span class="preprocessor">#else</span>
-<a name="l00049"></a>00049 <span class="preprocessor"></span><span class="preprocessor">    #include &lt;sys/time.h&gt;</span>
-<a name="l00050"></a>00050 <span class="preprocessor">#endif</span>
-<a name="l00051"></a>00051 <span class="preprocessor"></span>
-<a name="l00052"></a><a class="code" href="utils_8hpp.html#a1287a1eb9d39297d5f181e01acc9de18">00052</a> <span class="keywordtype">double</span> <a class="code" href="utils_8cpp.html#a1287a1eb9d39297d5f181e01acc9de18">get_time_in_seconds</a>()
-<a name="l00053"></a>00053 {
-<a name="l00054"></a>00054     <span class="keyword">struct </span>timeval tod_record;
-<a name="l00055"></a>00055     gettimeofday(&amp;tod_record, 0);
-<a name="l00056"></a>00056     <span class="keywordflow">return</span> double(tod_record.tv_sec) + double(tod_record.tv_usec) / 1.0e6;
-<a name="l00057"></a>00057 }
+<a name="l00027"></a>00027 <span class="comment">// VTK:</span>
+<a name="l00028"></a>00028 <span class="preprocessor">#include &lt;vtkMath.h&gt;</span>
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="comment">// STL:</span>
+<a name="l00031"></a>00031 <span class="preprocessor">#include &lt;vector&gt;</span>
+<a name="l00032"></a>00032 <span class="keyword">using namespace </span>std;
+<a name="l00033"></a>00033 
+<a name="l00034"></a>00034 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 <span class="preprocessor">#ifdef _WIN32</span>
+<a name="l00037"></a>00037 <span class="preprocessor"></span><span class="preprocessor">    #include &lt;sys/timeb.h&gt;</span>
+<a name="l00038"></a>00038 <span class="preprocessor">    #include &lt;sys/types.h&gt;</span>
+<a name="l00039"></a>00039 <span class="preprocessor">    #include &lt;winsock.h&gt;</span>
+<a name="l00040"></a>00040     <span class="comment">// http://www.linuxjournal.com/article/5574</span>
+<a name="l00041"></a>00041     <span class="keywordtype">void</span> gettimeofday(<span class="keyword">struct</span> timeval* t,<span class="keywordtype">void</span>* timezone)
+<a name="l00042"></a>00042     {
+<a name="l00043"></a>00043         <span class="keyword">struct </span>_timeb timebuffer;
+<a name="l00044"></a>00044 <span class="preprocessor">        #if _MSC_VER &lt; 1400</span>
+<a name="l00045"></a>00045 <span class="preprocessor"></span>            _ftime( &amp;timebuffer );
+<a name="l00046"></a>00046 <span class="preprocessor">        #else</span>
+<a name="l00047"></a>00047 <span class="preprocessor"></span>            <span class="comment">// MSVC 2005+</span>
+<a name="l00048"></a>00048             _ftime_s( &amp;timebuffer );
+<a name="l00049"></a>00049 <span class="preprocessor">        #endif</span>
+<a name="l00050"></a>00050 <span class="preprocessor"></span>        t-&gt;tv_sec = (long)timebuffer.time;
+<a name="l00051"></a>00051         t-&gt;tv_usec = 1000 * timebuffer.millitm;
+<a name="l00052"></a>00052     }
+<a name="l00053"></a>00053 <span class="preprocessor">#else</span>
+<a name="l00054"></a>00054 <span class="preprocessor"></span><span class="preprocessor">    #include &lt;sys/time.h&gt;</span>
+<a name="l00055"></a>00055 <span class="preprocessor">#endif</span>
+<a name="l00056"></a>00056 <span class="preprocessor"></span>
+<a name="l00057"></a>00057 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
 <a name="l00058"></a>00058 
-<a name="l00059"></a><a class="code" href="utils_8hpp.html#a0412adea509416f7429c4616189f3b2d">00059</a> <span class="keywordtype">float</span> <a class="code" href="utils_8cpp.html#a0412adea509416f7429c4616189f3b2d">frand</a>(<span class="keywordtype">float</span> lower,<span class="keywordtype">float</span> upper)
+<a name="l00059"></a><a class="code" href="utils_8hpp.html#a1287a1eb9d39297d5f181e01acc9de18">00059</a> <span class="keywordtype">double</span> <a class="code" href="utils_8cpp.html#a1287a1eb9d39297d5f181e01acc9de18">get_time_in_seconds</a>()
 <a name="l00060"></a>00060 {
-<a name="l00061"></a>00061     <span class="keywordflow">return</span> lower + rand()*(upper-lower)/RAND_MAX;
-<a name="l00062"></a>00062 }
-<a name="l00063"></a>00063 
-<a name="l00064"></a><a class="code" href="utils_8hpp.html#a65c8240826e3afda1e1f23f22502b299">00064</a> <span class="keywordtype">double</span> <a class="code" href="utils_8cpp.html#a65c8240826e3afda1e1f23f22502b299">hypot2</a>(<span class="keywordtype">double</span> x,<span class="keywordtype">double</span> y) 
-<a name="l00065"></a>00065 { 
-<a name="l00066"></a>00066     <span class="keywordflow">return</span> sqrt(x*x+y*y); 
-<a name="l00067"></a>00067 }
-<a name="l00068"></a>00068 
-<a name="l00069"></a><a class="code" href="utils_8hpp.html#a0e00877e5543b3ab016f0c7c36538f51">00069</a> <span class="keywordtype">double</span> <a class="code" href="utils_8cpp.html#a0e00877e5543b3ab016f0c7c36538f51">hypot3</a>(<span class="keywordtype">double</span> x,<span class="keywordtype">double</span> y,<span class="keywordtype">double</span> z) 
-<a name="l00070"></a>00070 { 
-<a name="l00071"></a>00071     <span class="keywordflow">return</span> sqrt(x*x+y*y+z*z); 
-<a name="l00072"></a>00072 }
-<a name="l00073"></a>00073 
-<a name="l00074"></a><a class="code" href="utils_8hpp.html#a592eba465b872c42f20a5b10333e8d5e">00074</a> <span class="keywordtype">float</span>* <a class="code" href="utils_8cpp.html#a592eba465b872c42f20a5b10333e8d5e">vtk_at</a>(<span class="keywordtype">float</span>* origin,<span class="keywordtype">int</span> x,<span class="keywordtype">int</span> y,<span class="keywordtype">int</span> z,<span class="keywordtype">int</span> X,<span class="keywordtype">int</span> Y)
-<a name="l00075"></a>00075 {
-<a name="l00076"></a>00076     <span class="comment">// single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z</span>
-<a name="l00077"></a>00077     <span class="keywordflow">return</span> origin + x + X*(y + Y*z);
+<a name="l00061"></a>00061     <span class="keyword">struct </span>timeval tod_record;
+<a name="l00062"></a>00062     gettimeofday(&amp;tod_record, 0);
+<a name="l00063"></a>00063     <span class="keywordflow">return</span> double(tod_record.tv_sec) + double(tod_record.tv_usec) / 1.0e6;
+<a name="l00064"></a>00064 }
+<a name="l00065"></a>00065 
+<a name="l00066"></a>00066 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00067"></a>00067 
+<a name="l00068"></a><a class="code" href="utils_8hpp.html#a0412adea509416f7429c4616189f3b2d">00068</a> <span class="keywordtype">float</span> <a class="code" href="utils_8cpp.html#a0412adea509416f7429c4616189f3b2d">frand</a>(<span class="keywordtype">float</span> lower,<span class="keywordtype">float</span> upper)
+<a name="l00069"></a>00069 {
+<a name="l00070"></a>00070     <span class="keywordflow">return</span> lower + rand()*(upper-lower)/RAND_MAX;
+<a name="l00071"></a>00071 }
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00074"></a>00074 
+<a name="l00075"></a><a class="code" href="utils_8hpp.html#a65c8240826e3afda1e1f23f22502b299">00075</a> <span class="keywordtype">double</span> <a class="code" href="utils_8cpp.html#a65c8240826e3afda1e1f23f22502b299">hypot2</a>(<span class="keywordtype">double</span> x,<span class="keywordtype">double</span> y) 
+<a name="l00076"></a>00076 { 
+<a name="l00077"></a>00077     <span class="keywordflow">return</span> sqrt(x*x+y*y); 
 <a name="l00078"></a>00078 }
 <a name="l00079"></a>00079 
-<a name="l00080"></a><a class="code" href="utils_8cpp.html#a0d8bda915f51d8d074abbca6bcb0e565">00080</a> <span class="keyword">template</span> &lt;&gt; <span class="keywordtype">bool</span> <a class="code" href="utils_8cpp.html#a0d8bda915f51d8d074abbca6bcb0e565">from_string&lt;string&gt;</a> (<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s,<span class="keywordtype">string</span>&amp; val) 
-<a name="l00081"></a>00081 { 
-<a name="l00082"></a>00082     val = s;
-<a name="l00083"></a>00083     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00084"></a>00084 } 
-<a name="l00085"></a>00085 
-<a name="l00086"></a><a class="code" href="utils_8hpp.html#a54e70f3db47ad353d663a7c3e428c4cd">00086</a> <span class="keywordtype">string</span> <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(<span class="keywordtype">int</span> i)
-<a name="l00087"></a>00087 { 
-<a name="l00088"></a>00088     <span class="keywordflow">if</span>(i&lt;26)
-<a name="l00089"></a>00089         <span class="keywordflow">return</span> string(1,<span class="charliteral">&#39;a&#39;</span>+i); 
-<a name="l00090"></a>00090     <span class="keywordflow">else</span> <span class="keywordflow">if</span>(i&lt;26*27)
-<a name="l00091"></a>00091         <span class="keywordflow">return</span> <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i/26-1)+<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i%26);
-<a name="l00092"></a>00092     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;GetChemicalName: out of range&quot;</span>);
+<a name="l00080"></a>00080 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00081"></a>00081 
+<a name="l00082"></a><a class="code" href="utils_8hpp.html#a0e00877e5543b3ab016f0c7c36538f51">00082</a> <span class="keywordtype">double</span> <a class="code" href="utils_8cpp.html#a0e00877e5543b3ab016f0c7c36538f51">hypot3</a>(<span class="keywordtype">double</span> x,<span class="keywordtype">double</span> y,<span class="keywordtype">double</span> z) 
+<a name="l00083"></a>00083 { 
+<a name="l00084"></a>00084     <span class="keywordflow">return</span> sqrt(x*x+y*y+z*z); 
+<a name="l00085"></a>00085 }
+<a name="l00086"></a>00086 
+<a name="l00087"></a>00087 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00088"></a>00088 
+<a name="l00089"></a><a class="code" href="utils_8hpp.html#a592eba465b872c42f20a5b10333e8d5e">00089</a> <span class="keywordtype">float</span>* <a class="code" href="utils_8cpp.html#a592eba465b872c42f20a5b10333e8d5e">vtk_at</a>(<span class="keywordtype">float</span>* origin,<span class="keywordtype">int</span> x,<span class="keywordtype">int</span> y,<span class="keywordtype">int</span> z,<span class="keywordtype">int</span> X,<span class="keywordtype">int</span> Y)
+<a name="l00090"></a>00090 {
+<a name="l00091"></a>00091     <span class="comment">// single-component vtkImageData scalars are stored as: float,float,... for consecutive x, then y, then z</span>
+<a name="l00092"></a>00092     <span class="keywordflow">return</span> origin + x + X*(y + Y*z);
 <a name="l00093"></a>00093 }
 <a name="l00094"></a>00094 
-<a name="l00095"></a><a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">00095</a> <span class="keywordtype">int</span> <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
-<a name="l00096"></a>00096 {
-<a name="l00097"></a>00097     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;26*27;i++)
-<a name="l00098"></a>00098         <span class="keywordflow">if</span>(s==<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i))
-<a name="l00099"></a>00099             <span class="keywordflow">return</span> i;
-<a name="l00100"></a>00100     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;IndexFromChemicalName: unrecognised chemical name: &quot;</span>+s);
-<a name="l00101"></a>00101 }
+<a name="l00095"></a>00095 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00096"></a>00096 
+<a name="l00097"></a><a class="code" href="utils_8cpp.html#a0d8bda915f51d8d074abbca6bcb0e565">00097</a> <span class="keyword">template</span> &lt;&gt; <span class="keywordtype">bool</span> <a class="code" href="utils_8cpp.html#a0d8bda915f51d8d074abbca6bcb0e565">from_string&lt;string&gt;</a> (<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s,<span class="keywordtype">string</span>&amp; val) 
+<a name="l00098"></a>00098 { 
+<a name="l00099"></a>00099     val = s;
+<a name="l00100"></a>00100     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00101"></a>00101 } 
 <a name="l00102"></a>00102 
-<a name="l00103"></a>00103 <span class="comment">// read a multiline string, strip leading whitespace where shared by all lines</span>
-<a name="l00104"></a><a class="code" href="utils_8hpp.html#a8eeed212012b17ef6842c7818f02f522">00104</a> <span class="keywordtype">string</span> <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* s)
-<a name="l00105"></a>00105 {
-<a name="l00106"></a>00106     vector&lt;string&gt; vs;
-<a name="l00107"></a>00107     istringstream iss(s);
-<a name="l00108"></a>00108     <span class="keywordtype">string</span> item;
-<a name="l00109"></a>00109     <span class="keywordtype">int</span> minLeadingWhitespace = INT_MAX,tailtrim = 0;
-<a name="l00110"></a>00110     <span class="keywordflow">while</span>(getline(iss, item, <span class="charliteral">&#39;\n&#39;</span>))
-<a name="l00111"></a>00111     {
-<a name="l00112"></a>00112         <span class="keywordtype">int</span> leadingWhitespace = (int)item.find_first_not_of(<span class="stringliteral">&quot; \t&quot;</span>);
-<a name="l00113"></a>00113         <span class="keywordflow">if</span>(leadingWhitespace!=string::npos)
-<a name="l00114"></a>00114         {
-<a name="l00115"></a>00115             minLeadingWhitespace = min(minLeadingWhitespace,leadingWhitespace);
-<a name="l00116"></a>00116             vs.push_back(item);
-<a name="l00117"></a>00117             tailtrim=0;
-<a name="l00118"></a>00118         }
-<a name="l00119"></a>00119         <span class="keywordflow">else</span>
-<a name="l00120"></a>00120         {
-<a name="l00121"></a>00121             <span class="keywordflow">if</span>(!vs.empty()) 
-<a name="l00122"></a>00122                 vs.push_back(<span class="stringliteral">&quot;\n&quot;</span>);
-<a name="l00123"></a>00123             <span class="comment">// (lines with all-whitespace don&#39;t contribute to minLeadingWhitespace)</span>
-<a name="l00124"></a>00124             tailtrim++;
-<a name="l00125"></a>00125         }
-<a name="l00126"></a>00126     }
-<a name="l00127"></a>00127     ostringstream oss;
-<a name="l00128"></a>00128     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)vs.size()-tailtrim;i++)
-<a name="l00129"></a>00129     {
-<a name="l00130"></a>00130         <span class="keywordflow">if</span>(minLeadingWhitespace &lt; (<span class="keywordtype">int</span>)vs[i].size())
-<a name="l00131"></a>00131             oss &lt;&lt; vs[i].substr(minLeadingWhitespace);
-<a name="l00132"></a>00132         <span class="keywordflow">if</span>(i &lt; (<span class="keywordtype">int</span>)vs.size()-tailtrim-1)
-<a name="l00133"></a>00133             oss &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00134"></a>00134     }
-<a name="l00135"></a>00135     <span class="keywordflow">return</span> oss.str();
-<a name="l00136"></a>00136 }
+<a name="l00103"></a>00103 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00104"></a>00104 
+<a name="l00105"></a><a class="code" href="utils_8hpp.html#a54e70f3db47ad353d663a7c3e428c4cd">00105</a> <span class="keywordtype">string</span> <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(<span class="keywordtype">int</span> i)
+<a name="l00106"></a>00106 { 
+<a name="l00107"></a>00107     <span class="keywordflow">if</span>(i&lt;26)
+<a name="l00108"></a>00108         <span class="keywordflow">return</span> string(1,<span class="charliteral">&#39;a&#39;</span>+i); 
+<a name="l00109"></a>00109     <span class="keywordflow">else</span> <span class="keywordflow">if</span>(i&lt;26*27)
+<a name="l00110"></a>00110         <span class="keywordflow">return</span> <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i/26-1)+<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i%26);
+<a name="l00111"></a>00111     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;GetChemicalName: out of range&quot;</span>);
+<a name="l00112"></a>00112 }
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00115"></a>00115 
+<a name="l00116"></a><a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">00116</a> <span class="keywordtype">int</span> <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
+<a name="l00117"></a>00117 {
+<a name="l00118"></a>00118     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;26*27;i++)
+<a name="l00119"></a>00119         <span class="keywordflow">if</span>(s==<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i))
+<a name="l00120"></a>00120             <span class="keywordflow">return</span> i;
+<a name="l00121"></a>00121     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;IndexFromChemicalName: unrecognised chemical name: &quot;</span>+s);
+<a name="l00122"></a>00122 }
+<a name="l00123"></a>00123 
+<a name="l00124"></a>00124 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00125"></a>00125 
+<a name="l00126"></a>00126 <span class="comment">// read a multiline string, strip leading whitespace where shared by all lines</span>
+<a name="l00127"></a><a class="code" href="utils_8hpp.html#a8eeed212012b17ef6842c7818f02f522">00127</a> <span class="keywordtype">string</span> <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* s)
+<a name="l00128"></a>00128 {
+<a name="l00129"></a>00129     vector&lt;string&gt; vs;
+<a name="l00130"></a>00130     istringstream iss(s);
+<a name="l00131"></a>00131     <span class="keywordtype">string</span> item;
+<a name="l00132"></a>00132     <span class="keywordtype">int</span> minLeadingWhitespace = INT_MAX,tailtrim = 0;
+<a name="l00133"></a>00133     <span class="keywordflow">while</span>(getline(iss, item, <span class="charliteral">&#39;\n&#39;</span>))
+<a name="l00134"></a>00134     {
+<a name="l00135"></a>00135         <span class="keywordtype">int</span> leadingWhitespace = (int)item.find_first_not_of(<span class="stringliteral">&quot; \t&quot;</span>);
+<a name="l00136"></a>00136         <span class="keywordflow">if</span>(leadingWhitespace!=string::npos)
+<a name="l00137"></a>00137         {
+<a name="l00138"></a>00138             minLeadingWhitespace = min(minLeadingWhitespace,leadingWhitespace);
+<a name="l00139"></a>00139             vs.push_back(item);
+<a name="l00140"></a>00140             tailtrim=0;
+<a name="l00141"></a>00141         }
+<a name="l00142"></a>00142         <span class="keywordflow">else</span>
+<a name="l00143"></a>00143         {
+<a name="l00144"></a>00144             <span class="keywordflow">if</span>(!vs.empty()) 
+<a name="l00145"></a>00145                 vs.push_back(<span class="stringliteral">&quot;\n&quot;</span>);
+<a name="l00146"></a>00146             <span class="comment">// (lines with all-whitespace don&#39;t contribute to minLeadingWhitespace)</span>
+<a name="l00147"></a>00147             tailtrim++;
+<a name="l00148"></a>00148         }
+<a name="l00149"></a>00149     }
+<a name="l00150"></a>00150     ostringstream oss;
+<a name="l00151"></a>00151     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)vs.size()-tailtrim;i++)
+<a name="l00152"></a>00152     {
+<a name="l00153"></a>00153         <span class="keywordflow">if</span>(minLeadingWhitespace &lt; (<span class="keywordtype">int</span>)vs[i].size())
+<a name="l00154"></a>00154             oss &lt;&lt; vs[i].substr(minLeadingWhitespace);
+<a name="l00155"></a>00155         <span class="keywordflow">if</span>(i &lt; (<span class="keywordtype">int</span>)vs.size()-tailtrim-1)
+<a name="l00156"></a>00156             oss &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
+<a name="l00157"></a>00157     }
+<a name="l00158"></a>00158     <span class="keywordflow">return</span> oss.str();
+<a name="l00159"></a>00159 }
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00162"></a>00162 
+<a name="l00163"></a><a class="code" href="utils_8hpp.html#aa5175019d20c35ad2ed7566bd7513c19">00163</a> <span class="keywordtype">void</span> <a class="code" href="utils_8cpp.html#aa5175019d20c35ad2ed7566bd7513c19" title="Interpolate between two RGB colors, first converting to HSV and converting the result back to RGB...">InterpolateInHSV</a>(<span class="keyword">const</span> <span class="keywordtype">float</span> r1,<span class="keyword">const</span> <span class="keywordtype">float</span> g1,<span class="keyword">const</span> <span class="keywordtype">float</span> b1,<span class="keyword">const</span> <span class="keywordtype">float</span> r2,<span class="keyword">const</span> <span class="keywordtype">float</span> g2,<span class="keyword">const</span> <span class="keywordtype">float</span> b2,<span class="keyword">const</span> <span class="keywordtype">float</span> u,<span class="keywordtype">float</span>&amp; r,<span class="keywordtype">float</span>&amp; g,<span class="keywordtype">float</span>&amp; b)
+<a name="l00164"></a>00164 {
+<a name="l00165"></a>00165     <span class="keywordtype">float</span> h1,s1,v1,h2,s2,v2;
+<a name="l00166"></a>00166     vtkMath::RGBToHSV(r1,g1,b1,&amp;h1,&amp;s1,&amp;v1);
+<a name="l00167"></a>00167     vtkMath::RGBToHSV(r2,g2,b2,&amp;h2,&amp;s2,&amp;v2);
+<a name="l00168"></a>00168     vtkMath::HSVToRGB(h1+(h2-h1)*u,s1+(s2-s1)*u,v1+(v2-v1)*u,&amp;r,&amp;g,&amp;b);
+<a name="l00169"></a>00169 }
+<a name="l00170"></a>00170 
+<a name="l00171"></a>00171 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

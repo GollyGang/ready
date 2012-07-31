@@ -14,6 +14,8 @@ var searchData=
   ['blankimage',['BlankImage',['../classAbstractRD.html#a15ee19303ed2801df202ac29c6ea3534',1,'AbstractRD::BlankImage()'],['../classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0',1,'ImageRD::BlankImage()'],['../classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91',1,'MeshRD::BlankImage()'],['../classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34',1,'OpenCLImageRD::BlankImage()'],['../classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e',1,'OpenCLMeshRD::BlankImage()']]],
   ['block_5fsize',['block_size',['../classFullKernelOpenCLImageRD.html#ad49c0662612b8a198860d212afb75ab1',1,'FullKernelOpenCLImageRD']]],
   ['block_5fsize_5flabel',['block_size_label',['../InfoPanel_8cpp.html#a35021f1f9df3867cb007729783d3c987',1,'InfoPanel.cpp']]],
+  ['brush',['BRUSH',['../classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4ca185a2aa8e290376b90a7a4017d0775d7',1,'MyFrame::BRUSH()'],['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ae24daf0234d06276c8961d3acf28c098',1,'ID::Brush()']]],
+  ['brush_5fcursor',['brush_cursor',['../classMyFrame.html#a7c142f3f370721b63d285c8bdaf85b76',1,'MyFrame']]],
   ['buffer',['buffer',['../classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415',1,'GrayScottMeshRD']]],
   ['buffer_5fimages',['buffer_images',['../classGrayScottImageRD.html#a56c534592723311d74e2b4563fef4a76',1,'GrayScottImageRD']]],
   ['buffers',['buffers',['../classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508',1,'OpenCL_MixIn']]],

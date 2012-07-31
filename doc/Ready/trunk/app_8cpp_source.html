@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -212,51 +212,55 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00108"></a>00108     <span class="comment">// now set global readydir for use elsewhere</span>
 <a name="l00109"></a>00109     <a class="code" href="prefs_8cpp.html#aa3af5b468230e51f15091c9f1410b2c4">readydir</a> = wxFileName::GetCwd();
 <a name="l00110"></a>00110     <span class="keywordflow">if</span> (<a class="code" href="prefs_8cpp.html#aa3af5b468230e51f15091c9f1410b2c4">readydir</a>.Last() != wxFILE_SEP_PATH) <a class="code" href="prefs_8cpp.html#aa3af5b468230e51f15091c9f1410b2c4">readydir</a> += wxFILE_SEP_PATH;
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112     currframe = <span class="keyword">new</span> <a class="code" href="classMyFrame.html" title="The wxFrame-derived top-level window for the Ready GUI.">MyFrame</a>(_(<span class="stringliteral">&quot;Ready&quot;</span>));
-<a name="l00113"></a>00113     
-<a name="l00114"></a>00114     <span class="comment">// prefs file has now been loaded</span>
-<a name="l00115"></a>00115     <span class="keywordflow">if</span> (<a class="code" href="prefs_8cpp.html#a8ae3f893c3d94492fdf3191dbd5c89f5">maximize</a>) currframe-&gt;Maximize(<span class="keyword">true</span>);
-<a name="l00116"></a>00116     currframe-&gt;Show(<span class="keyword">true</span>);
-<a name="l00117"></a>00117     SetTopWindow(currframe);
-<a name="l00118"></a>00118    
-<a name="l00119"></a>00119     <span class="comment">// argc is &gt; 1 if command line has one or more pattern files</span>
-<a name="l00120"></a>00120     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> n = 1; n &lt; argc; n++) {
-<a name="l00121"></a>00121         wxFileName filename(argv[n]);
-<a name="l00122"></a>00122         <span class="comment">// convert given path to a full path if not one already; this allows users</span>
-<a name="l00123"></a>00123         <span class="comment">// to do things like &quot;../ready foo.vti&quot; from within Patterns folder</span>
-<a name="l00124"></a>00124         <span class="keywordflow">if</span> (!filename.IsAbsolute()) filename = initdir + argv[n];
-<a name="l00125"></a>00125         currframe-&gt;OpenFile(filename.GetFullPath());
-<a name="l00126"></a>00126     }
-<a name="l00127"></a>00127 
-<a name="l00128"></a>00128     <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00129"></a>00129 }
-<a name="l00130"></a>00130 <span class="comment"></span>
-<a name="l00131"></a>00131 <span class="comment">/*! \mainpage </span>
-<a name="l00132"></a>00132 <span class="comment"> *</span>
-<a name="l00133"></a>00133 <span class="comment"> * The links above can be used to explore the classes and source code files.</span>
-<a name="l00134"></a>00134 <span class="comment"> *</span>
-<a name="l00135"></a>00135 <span class="comment"> * \section main_classes_sec Important base classes:</span>
+<a name="l00111"></a>00111     
+<a name="l00112"></a>00112     ::wxInitAllImageHandlers(); <span class="comment">// make sure we can handle all sorts of images</span>
+<a name="l00113"></a>00113 
+<a name="l00114"></a>00114     currframe = <span class="keyword">new</span> <a class="code" href="classMyFrame.html" title="The wxFrame-derived top-level window for the Ready GUI.">MyFrame</a>(_(<span class="stringliteral">&quot;Ready&quot;</span>));
+<a name="l00115"></a>00115     
+<a name="l00116"></a>00116     <span class="comment">// prefs file has now been loaded</span>
+<a name="l00117"></a>00117     <span class="keywordflow">if</span> (<a class="code" href="prefs_8cpp.html#a8ae3f893c3d94492fdf3191dbd5c89f5">maximize</a>) currframe-&gt;Maximize(<span class="keyword">true</span>);
+<a name="l00118"></a>00118     currframe-&gt;Show(<span class="keyword">true</span>);
+<a name="l00119"></a>00119     SetTopWindow(currframe);
+<a name="l00120"></a>00120    
+<a name="l00121"></a>00121     <span class="comment">// argc is &gt; 1 if command line has one or more pattern files</span>
+<a name="l00122"></a>00122     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> n = 1; n &lt; argc; n++) {
+<a name="l00123"></a>00123         wxFileName filename(argv[n]);
+<a name="l00124"></a>00124         <span class="comment">// convert given path to a full path if not one already; this allows users</span>
+<a name="l00125"></a>00125         <span class="comment">// to do things like &quot;../ready foo.vti&quot; from within Patterns folder</span>
+<a name="l00126"></a>00126         <span class="keywordflow">if</span> (!filename.IsAbsolute()) filename = initdir + argv[n];
+<a name="l00127"></a>00127         currframe-&gt;OpenFile(filename.GetFullPath());
+<a name="l00128"></a>00128     }
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130     <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00131"></a>00131 }
+<a name="l00132"></a>00132 
+<a name="l00133"></a>00133 <span class="comment">// homepage for doxygen docs:</span>
+<a name="l00134"></a>00134 <span class="comment"></span>
+<a name="l00135"></a>00135 <span class="comment">/*! \mainpage </span>
 <a name="l00136"></a>00136 <span class="comment"> *</span>
-<a name="l00137"></a>00137 <span class="comment"> *  * AbstractRD - the base class for all our reaction-diffusion implementations</span>
-<a name="l00138"></a>00138 <span class="comment"> *  * XML_Object - many classes can be serialized to/from XML files</span>
-<a name="l00139"></a>00139 <span class="comment"> *  * MyFrame is the top-level window for the GUI</span>
+<a name="l00137"></a>00137 <span class="comment"> * The links above can be used to explore the classes and source code files.</span>
+<a name="l00138"></a>00138 <span class="comment"> *</span>
+<a name="l00139"></a>00139 <span class="comment"> * \section main_classes_sec Important base classes:</span>
 <a name="l00140"></a>00140 <span class="comment"> *</span>
-<a name="l00141"></a>00141 <span class="comment"> * \section external_sec External source code:</span>
-<a name="l00142"></a>00142 <span class="comment"> *</span>
-<a name="l00143"></a>00143 <span class="comment"> *  * &lt;a href=&quot;http://www.vtk.org/doc/nightly/html/classes.html&quot;&gt;VTK&lt;/a&gt;</span>
-<a name="l00144"></a>00144 <span class="comment"> *  * &lt;a href=&quot;http://docs.wxwidgets.org/trunk/classes.html&quot;&gt;wxWidgets&lt;/a&gt;</span>
-<a name="l00145"></a>00145 <span class="comment"> *</span>
-<a name="l00146"></a>00146 <span class="comment"> * \section homepage_sec Homepage: </span>
-<a name="l00147"></a>00147 <span class="comment"> *</span>
-<a name="l00148"></a>00148 <span class="comment"> * &lt;http://code.google.com/p/reaction-diffusion/&gt;</span>
+<a name="l00141"></a>00141 <span class="comment"> *  * AbstractRD - the base class for all our reaction-diffusion implementations</span>
+<a name="l00142"></a>00142 <span class="comment"> *  * XML_Object - many classes can be serialized to/from XML files</span>
+<a name="l00143"></a>00143 <span class="comment"> *  * MyFrame is the top-level window for the GUI</span>
+<a name="l00144"></a>00144 <span class="comment"> *</span>
+<a name="l00145"></a>00145 <span class="comment"> * \section external_sec External source code:</span>
+<a name="l00146"></a>00146 <span class="comment"> *</span>
+<a name="l00147"></a>00147 <span class="comment"> *  * &lt;a href=&quot;http://www.vtk.org/doc/nightly/html/classes.html&quot;&gt;VTK&lt;/a&gt;</span>
+<a name="l00148"></a>00148 <span class="comment"> *  * &lt;a href=&quot;http://docs.wxwidgets.org/trunk/classes.html&quot;&gt;wxWidgets&lt;/a&gt;</span>
 <a name="l00149"></a>00149 <span class="comment"> *</span>
-<a name="l00150"></a>00150 <span class="comment"> */</span>
+<a name="l00150"></a>00150 <span class="comment"> * \section homepage_sec Homepage: </span>
+<a name="l00151"></a>00151 <span class="comment"> *</span>
+<a name="l00152"></a>00152 <span class="comment"> * &lt;http://code.google.com/p/reaction-diffusion/&gt;</span>
+<a name="l00153"></a>00153 <span class="comment"> *</span>
+<a name="l00154"></a>00154 <span class="comment"> */</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

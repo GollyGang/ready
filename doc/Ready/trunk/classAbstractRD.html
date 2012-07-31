@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -96,6 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a>  </div>
@@ -131,6 +132,10 @@ Inheritance diagram for AbstractRD:</div>
 
 <p><a href="classAbstractRD-members.html">List of all members.</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">We only allow undo for paint actions.  <a href="structAbstractRD_1_1PaintAction.html#details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad8b9cf3e0212bdc64f12b8d220e73425"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425">AbstractRD</a> ()</td></tr>
@@ -212,11 +217,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab2a503fcd628baf0fb763ce626ecfe31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 2D plane as a vtkImageData.  <a href="#ab2a503fcd628baf0fb763ce626ecfe31"></a><br/></td></tr>
 <tr class="memitem:ad06725e8898ba2e16772cda74368a0ed"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ad06725e8898ba2e16772cda74368a0ed">GetArenaDimensionality</a> () const =0</td></tr>
 <tr class="memdesc:ad06725e8898ba2e16772cda74368a0ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retreive the dimensionality of the system volume, irrespective of the cells within it.  <a href="#ad06725e8898ba2e16772cda74368a0ed"></a><br/></td></tr>
+<tr class="memitem:ab75a4b52c0d5e60ed8ed0cb327d67547"><td class="memItemLeft" align="right" valign="top">virtual float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ab75a4b52c0d5e60ed8ed0cb327d67547">GetValue</a> (float x, float y, float z, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)=0</td></tr>
+<tr class="memdesc:ab75a4b52c0d5e60ed8ed0cb327d67547"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the value at a given location.  <a href="#ab75a4b52c0d5e60ed8ed0cb327d67547"></a><br/></td></tr>
+<tr class="memitem:afd217f732253e037a69c757fe52897b1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#afd217f732253e037a69c757fe52897b1">SetValue</a> (float x, float y, float z, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)=0</td></tr>
+<tr class="memdesc:afd217f732253e037a69c757fe52897b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value at a given location.  <a href="#afd217f732253e037a69c757fe52897b1"></a><br/></td></tr>
+<tr class="memitem:abd4333a3a20ef4435f4bf2125a6e0d50"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#abd4333a3a20ef4435f4bf2125a6e0d50">SetValuesInRadius</a> (float x, float y, float z, float r, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)=0</td></tr>
+<tr class="memdesc:abd4333a3a20ef4435f4bf2125a6e0d50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.  <a href="#abd4333a3a20ef4435f4bf2125a6e0d50"></a><br/></td></tr>
+<tr class="memitem:a0a9deeb64ed0d3b69e5e70de5a7b9ff5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a0a9deeb64ed0d3b69e5e70de5a7b9ff5">CanUndo</a> () const </td></tr>
+<tr class="memdesc:a0a9deeb64ed0d3b69e5e70de5a7b9ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is anything to undo.  <a href="#a0a9deeb64ed0d3b69e5e70de5a7b9ff5"></a><br/></td></tr>
+<tr class="memitem:a45c7dc3120973f42eaea81707696aa86"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a45c7dc3120973f42eaea81707696aa86">CanRedo</a> () const </td></tr>
+<tr class="memdesc:a45c7dc3120973f42eaea81707696aa86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is anything to redo.  <a href="#a45c7dc3120973f42eaea81707696aa86"></a><br/></td></tr>
+<tr class="memitem:a707d80d40943af43dc47d33986c2f6ed"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed">Undo</a> ()</td></tr>
+<tr class="memdesc:a707d80d40943af43dc47d33986c2f6ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewind all actions until the previous undo point.  <a href="#a707d80d40943af43dc47d33986c2f6ed"></a><br/></td></tr>
+<tr class="memitem:a7ec454f94a1d43e5c0139e3ee50f0cbe"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe">Redo</a> ()</td></tr>
+<tr class="memdesc:a7ec454f94a1d43e5c0139e3ee50f0cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redo all actions until the next undo point.  <a href="#a7ec454f94a1d43e5c0139e3ee50f0cbe"></a><br/></td></tr>
+<tr class="memitem:af5d9b53e7d329351ef2b5b0f108f01bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#af5d9b53e7d329351ef2b5b0f108f01bc">SetUndoPoint</a> ()</td></tr>
+<tr class="memdesc:af5d9b53e7d329351ef2b5b0f108f01bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block.  <a href="#af5d9b53e7d329351ef2b5b0f108f01bc"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a6353d2e211e79a2d0d883cbe8719801b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a6353d2e211e79a2d0d883cbe8719801b">InternalUpdate</a> (int n_steps)=0</td></tr>
-<tr class="memdesc:a6353d2e211e79a2d0d883cbe8719801b"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#a6353d2e211e79a2d0d883cbe8719801b"></a><br/></td></tr>
+<tr class="memdesc:a6353d2e211e79a2d0d883cbe8719801b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advance the RD system by n timesteps.  <a href="#a6353d2e211e79a2d0d883cbe8719801b"></a><br/></td></tr>
 <tr class="memitem:a079b3af2b7537aee71ba7c1b77218c54"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">ClearInitialPatternGenerator</a> ()</td></tr>
+<tr class="memitem:a494f0a1753a8fb729327ed65873cd510"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a494f0a1753a8fb729327ed65873cd510">FlipPaintAction</a> (<a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a> &amp;cca)=0</td></tr>
+<tr class="memitem:aff3b271917b720fcdcc4faebfcaaf016"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#aff3b271917b720fcdcc4faebfcaaf016">StorePaintAction</a> (int iChemical, int iCell, float old_val)</td></tr>
+<tr class="memdesc:aff3b271917b720fcdcc4faebfcaaf016"><td class="mdescLeft">&#160;</td><td class="mdescRight">&lt;&lt; Undo/redo this paint action.  <a href="#aff3b271917b720fcdcc4faebfcaaf016"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:ab22830afbc4e94b9f9cde3334a6bf858"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ab22830afbc4e94b9f9cde3334a6bf858">rule_name</a></td></tr>
@@ -232,6 +256,7 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:abbf06675d6f5342317203a85cdff0fec"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#abbf06675d6f5342317203a85cdff0fec">is_modified</a></td></tr>
 <tr class="memitem:ada7a0672e610d7fbdecc41ebbaf04899"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#ada7a0672e610d7fbdecc41ebbaf04899">wrap</a></td></tr>
 <tr class="memdesc:ada7a0672e610d7fbdecc41ebbaf04899"><td class="mdescLeft">&#160;</td><td class="mdescRight">should the data wrap-around or have a boundary?  <a href="#ada7a0672e610d7fbdecc41ebbaf04899"></a><br/></td></tr>
+<tr class="memitem:a81242589c372ea1ac84a6800059a5682"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAbstractRD.html#a81242589c372ea1ac84a6800059a5682">undo_stack</a></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Abstract base class for all reaction-diffusion systems. </p>
@@ -252,7 +277,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00027">27</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00030">30</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -270,7 +295,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00037">37</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00049">49</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -302,7 +327,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a49c870bdbf13801f04885fc07871e54a">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00110">110</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00122">122</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -324,6 +349,46 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a45c7dc3120973f42eaea81707696aa86"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classAbstractRD.html#a45c7dc3120973f42eaea81707696aa86">AbstractRD::CanRedo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Returns true if there is anything to redo. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00347">347</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0a9deeb64ed0d3b69e5e70de5a7b9ff5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classAbstractRD.html#a0a9deeb64ed0d3b69e5e70de5a7b9ff5">AbstractRD::CanUndo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Returns true if there is anything to undo. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00340">340</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a079b3af2b7537aee71ba7c1b77218c54"></a>
 <div class="memitem">
 <div class="memproto">
@@ -338,7 +403,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00044">44</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00056">56</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -358,7 +423,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Create a generator suitable for Gray-Scott, so that new patterns can start working immediately. </p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00276">276</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00288">288</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -378,7 +443,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#aa58d5daf08867d213fb0c207be705efb">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#a86e8ad661e54b3c84500d628f44c4163">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00126">126</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00138">138</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -399,7 +464,26 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#adbd2de7bb25c22726c328359da0df589">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#aec2be8f7fe2f9d2b7122398ea9b988b1">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00118">118</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00130">130</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a494f0a1753a8fb729327ed65873cd510"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classAbstractRD.html#a494f0a1753a8fb729327ed65873cd510">AbstractRD::FlipPaintAction</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a> &amp;&#160;</td>
+          <td class="paramname"><em>cca</em></td><td>)</td>
+          <td><code> [protected, pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implemented in <a class="el" href="classImageRD.html#a15a8921a4dc9ca5ab807be2e90a807d6">ImageRD</a>, and <a class="el" href="classMeshRD.html#ac31f13c9311735171ef42c03a844ed71">MeshRD</a>.</p>
 
 </div>
 </div>
@@ -521,7 +605,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a3b6904e036b2233f0e0b8d06f29401c8">FormulaOpenCLImageRD</a>, <a class="el" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">FullKernelOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">FormulaOpenCLMeshRD</a>, and <a class="el" href="classFullKernelOpenCLMeshRD.html#a162a4a8d4a79d71e57cd2c6b3c49f617">FullKernelOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00233">233</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00245">245</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -733,7 +817,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00079">79</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00091">91</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -752,7 +836,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00086">86</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00098">98</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -771,7 +855,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00093">93</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00105">105</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -790,7 +874,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00100">100</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00112">112</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -849,6 +933,49 @@ Protected Attributes</h2></td></tr>
 <p>How many timesteps have we advanced since being initialized? </p>
 
 <p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00058">58</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab75a4b52c0d5e60ed8ed0cb327d67547"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual float <a class="el" href="classAbstractRD.html#ab75a4b52c0d5e60ed8ed0cb327d67547">AbstractRD::GetValue</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Retrieve the value at a given location. </p>
+
+<p>Implemented in <a class="el" href="classMeshRD.html#a93a42775bc5ad5f78333d0ee7aff99a3">MeshRD</a>, and <a class="el" href="classImageRD.html#aa0d9faad5cafc72f8330914c8559b793">ImageRD</a>.</p>
 
 </div>
 </div>
@@ -1057,7 +1184,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#ad15c313f1449f02e319b52a920ad5695">FormulaOpenCLImageRD</a>, <a class="el" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">FullKernelOpenCLImageRD</a>, <a class="el" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1">FormulaOpenCLMeshRD</a>, and <a class="el" href="classFullKernelOpenCLMeshRD.html#aa47a0c34eaf69110b4198ea2a95f8eb4">FullKernelOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00174">174</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00186">186</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1105,9 +1232,9 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>advance the RD system by n timesteps </p>
+<p>Advance the RD system by n timesteps. </p>
 
-<p>Implemented in <a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">MeshRD</a>, <a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">OpenCLMeshRD</a>, <a class="el" href="classGrayScottImageRD.html#a16c871d8849a539857bf7773e02ae20c">GrayScottImageRD</a>, <a class="el" href="classOpenCLImageRD.html#a4740537884f5b8d7e544d9a0689c11a5">OpenCLImageRD</a>, and <a class="el" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9">GrayScottMeshRD</a>.</p>
+<p>Implemented in <a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">MeshRD</a>, <a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">OpenCLMeshRD</a>, <a class="el" href="classOpenCLImageRD.html#a4740537884f5b8d7e544d9a0689c11a5">OpenCLImageRD</a>, <a class="el" href="classGrayScottImageRD.html#a16c871d8849a539857bf7773e02ae20c">GrayScottImageRD</a>, and <a class="el" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9">GrayScottMeshRD</a>.</p>
 
 </div>
 </div>
@@ -1146,7 +1273,29 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00150">150</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00162">162</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7ec454f94a1d43e5c0139e3ee50f0cbe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe">AbstractRD::Redo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Redo all actions until the next undo point. </p>
+
+<p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#ae75ee196a6205e478cc0de0c87b16610">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#ab74269b8f441a8fe561c46f29337908f">OpenCLImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00381">381</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1293,7 +1442,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00071">71</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00083">83</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1349,7 +1498,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00167">167</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00179">179</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1370,7 +1519,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Changes the system's formula. The kernel will be reloaded on the next update step. </p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00053">53</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00065">65</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1389,7 +1538,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00160">160</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00172">172</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1439,7 +1588,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a0c43f70ab42de350d85d96128126fe77">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#af32068c86345eb3a8e589f6980aa8760">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00134">134</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00146">146</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1619,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classFormulaOpenCLImageRD.html#a553764a8c5314b678dfa2a3081b3d744">FormulaOpenCLImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#ad8a2e9d1c9a2ee31f127b414862e5b9d">OpenCLMeshRD</a>, and <a class="el" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">FormulaOpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00142">142</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00154">154</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1489,7 +1638,131 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00063">63</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00075">75</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af5d9b53e7d329351ef2b5b0f108f01bc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAbstractRD.html#af5d9b53e7d329351ef2b5b0f108f01bc">AbstractRD::SetUndoPoint</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00354">354</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afd217f732253e037a69c757fe52897b1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classAbstractRD.html#afd217f732253e037a69c757fe52897b1">AbstractRD::SetValue</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value at a given location. </p>
+
+<p>Implemented in <a class="el" href="classMeshRD.html#ad6092c5c5283a64faf0bfd09e8323086">MeshRD</a>, <a class="el" href="classImageRD.html#a284a43eee4d9e9c1e8f331796b6802d6">ImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#ae96ef70adb11db1c1111c05b2c8a250a">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#a67093fd83881018877970bc9721a2ca6">OpenCLImageRD</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abd4333a3a20ef4435f4bf2125a6e0d50"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classAbstractRD.html#abd4333a3a20ef4435f4bf2125a6e0d50">AbstractRD::SetValuesInRadius</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [pure virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box. </p>
+
+<p>Implemented in <a class="el" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2">MeshRD</a>, <a class="el" href="classImageRD.html#a13ee9311409cd9f7885137be6483acf7">ImageRD</a>, <a class="el" href="classOpenCLMeshRD.html#aa5f5d3a30a19fe5643909d1bb9543793">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#a0d2fb4692b4fa576a7f2b209f56a48b9">OpenCLImageRD</a>.</p>
 
 </div>
 </div>
@@ -1514,6 +1787,44 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aff3b271917b720fcdcc4faebfcaaf016"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAbstractRD.html#aff3b271917b720fcdcc4faebfcaaf016">AbstractRD::StorePaintAction</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iChemical</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iCell</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>old_val</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>&lt;&lt; Undo/redo this paint action. </p>
+<p>Implementations call this when performing undo-able paint actions. </p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00399">399</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a1f8ac307cb768147fcef9ebfffe0a637"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1534,6 +1845,28 @@ Protected Attributes</h2></td></tr>
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#a5e16eb5ca7640418eca7339634cdfb2b">OpenCLImageRD</a>.</p>
 
 <p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00063">63</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a707d80d40943af43dc47d33986c2f6ed"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed">AbstractRD::Undo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Rewind all actions until the previous undo point. </p>
+
+<p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#a2c7f65f4469a014233cff41117a4c3cf">OpenCLMeshRD</a>, and <a class="el" href="classOpenCLImageRD.html#ab2f28d1ce7b1da3bd50e1ce94f58311b">OpenCLImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="AbstractRD_8cpp_source.html#l00363">363</a> of file <a class="el" href="AbstractRD_8cpp_source.html">AbstractRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1570,7 +1903,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00151">151</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00157">157</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1585,7 +1918,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00164">164</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00170">170</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1600,7 +1933,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00161">161</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00167">167</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1615,7 +1948,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00155">155</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00161">161</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1630,7 +1963,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00165">165</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00171">171</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1645,7 +1978,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00153">153</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00159">159</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1660,7 +1993,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00162">162</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00168">168</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1675,7 +2008,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00157">157</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00163">163</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1690,7 +2023,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00151">151</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00157">157</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1705,7 +2038,22 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00159">159</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00165">165</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a81242589c372ea1ac84a6800059a5682"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a>&gt; <a class="el" href="classAbstractRD.html#a81242589c372ea1ac84a6800059a5682">AbstractRD::undo_stack</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00181">181</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1722,7 +2070,7 @@ Protected Attributes</h2></td></tr>
 
 <p>should the data wrap-around or have a boundary? </p>
 
-<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00167">167</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="AbstractRD_8hpp_source.html#l00173">173</a> of file <a class="el" href="AbstractRD_8hpp_source.html">AbstractRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1734,7 +2082,7 @@ Protected Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

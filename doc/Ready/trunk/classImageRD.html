@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -154,18 +154,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5cd7d20c52b71cce60dc71c9ee488b53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 3D object as a vtkPolyData.  <a href="#a5cd7d20c52b71cce60dc71c9ee488b53"></a><br/></td></tr>
 <tr class="memitem:a1083d6cbb93bd6fc16c488bf7db2f568"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a1083d6cbb93bd6fc16c488bf7db2f568">GetAs2DImage</a> (vtkImageData *out, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings) const </td></tr>
 <tr class="memdesc:a1083d6cbb93bd6fc16c488bf7db2f568"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 2D plane as a vtkImageData.  <a href="#a1083d6cbb93bd6fc16c488bf7db2f568"></a><br/></td></tr>
+<tr class="memitem:aa0d9faad5cafc72f8330914c8559b793"><td class="memItemLeft" align="right" valign="top">virtual float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#aa0d9faad5cafc72f8330914c8559b793">GetValue</a> (float x, float y, float z, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:aa0d9faad5cafc72f8330914c8559b793"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the value at a given location.  <a href="#aa0d9faad5cafc72f8330914c8559b793"></a><br/></td></tr>
+<tr class="memitem:a284a43eee4d9e9c1e8f331796b6802d6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a284a43eee4d9e9c1e8f331796b6802d6">SetValue</a> (float x, float y, float z, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:a284a43eee4d9e9c1e8f331796b6802d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value at a given location.  <a href="#a284a43eee4d9e9c1e8f331796b6802d6"></a><br/></td></tr>
+<tr class="memitem:a13ee9311409cd9f7885137be6483acf7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a13ee9311409cd9f7885137be6483acf7">SetValuesInRadius</a> (float x, float y, float z, float r, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:a13ee9311409cd9f7885137be6483acf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.  <a href="#a13ee9311409cd9f7885137be6483acf7"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a25f0c8e1b88575fc14308b7c392757ef"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a25f0c8e1b88575fc14308b7c392757ef">GetFileExtensionStatic</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a5cbe2215bc54992c5c91b965ef376dcc"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a5cbe2215bc54992c5c91b965ef376dcc">GetArenaDimensionality</a> () const </td></tr>
-<tr class="memdesc:a5cbe2215bc54992c5c91b965ef376dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retreive the dimensionality of the system volume, irrespective of the cells within it.  <a href="#a5cbe2215bc54992c5c91b965ef376dcc"></a><br/></td></tr>
 <tr class="memitem:a6244057215a86492e80df2039e859e7b"><td class="memItemLeft" align="right" valign="top">vtkSmartPointer&lt; vtkImageData &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a6244057215a86492e80df2039e859e7b">GetImage</a> () const </td></tr>
+<tr class="memdesc:a6244057215a86492e80df2039e859e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">spatial separation for rendering multiple chemicals (currently only used in 2D)  <a href="#a6244057215a86492e80df2039e859e7b"></a><br/></td></tr>
 <tr class="memitem:a4deec153ec3cbc34f6936c9a45688122"><td class="memItemLeft" align="right" valign="top">vtkImageData *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a4deec153ec3cbc34f6936c9a45688122">GetImage</a> (int iChemical) const </td></tr>
 <tr class="memitem:ac496af879f4ae78d25403be495de8c45"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#ac496af879f4ae78d25403be495de8c45">AllocateImages</a> (int x, int y, int z, int nc)</td></tr>
 <tr class="memdesc:ac496af879f4ae78d25403be495de8c45"><td class="mdescLeft">&#160;</td><td class="mdescRight">use to change the dimensions or the number of chemicals  <a href="#ac496af879f4ae78d25403be495de8c45"></a><br/></td></tr>
 <tr class="memitem:a5787d806e02714685277a1cca21f77e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a5787d806e02714685277a1cca21f77e1">DeallocateImages</a> ()</td></tr>
+<tr class="memitem:a5cbe2215bc54992c5c91b965ef376dcc"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a5cbe2215bc54992c5c91b965ef376dcc">GetArenaDimensionality</a> () const </td></tr>
+<tr class="memdesc:a5cbe2215bc54992c5c91b965ef376dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retreive the dimensionality of the system volume, irrespective of the cells within it.  <a href="#a5cbe2215bc54992c5c91b965ef376dcc"></a><br/></td></tr>
+<tr class="memitem:a15a8921a4dc9ca5ab807be2e90a807d6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a15a8921a4dc9ca5ab807be2e90a807d6">FlipPaintAction</a> (<a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a> &amp;cca)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-static-methods"></a>
 Static Protected Member Functions</h2></td></tr>
 <tr class="memitem:aff86f7467e47e211e54f4d1783c90a60"><td class="memItemLeft" align="right" valign="top">static vtkImageData *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#aff86f7467e47e211e54f4d1783c90a60">AllocateVTKImage</a> (int x, int y, int z)</td></tr>
@@ -174,6 +182,8 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:adba4679bca0840937c0837bf2e7d787d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; vtkImageData * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#adba4679bca0840937c0837bf2e7d787d">images</a></td></tr>
 <tr class="memdesc:adba4679bca0840937c0837bf2e7d787d"><td class="mdescLeft">&#160;</td><td class="mdescRight">one for each chemical  <a href="#adba4679bca0840937c0837bf2e7d787d"></a><br/></td></tr>
 <tr class="memitem:a8df1b398168acbeaa5edf06f8ff4cc97"><td class="memItemLeft" align="right" valign="top">vtkImageData *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97">starting_pattern</a></td></tr>
+<tr class="memitem:a27e645d5f8c117a466d28497fdb2c391"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#a27e645d5f8c117a466d28497fdb2c391">xgap</a></td></tr>
+<tr class="memitem:adb8cb7567259fd3c14f9e35f4e12a985"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#adb8cb7567259fd3c14f9e35f4e12a985">ygap</a></td></tr>
 <tr><td colspan="2"><h2><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
 <tr class="memitem:ad11e59b6578af83c6fd2cc81a6412bf6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classImageRD.html#ad11e59b6578af83c6fd2cc81a6412bf6">InitializeVTKPipeline_1D</a> (vtkRenderer *pRenderer, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
@@ -201,7 +211,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00086">86</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00088">88</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +229,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00093">93</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00095">95</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -280,9 +290,9 @@ Private Member Functions</h2></td></tr>
 
 <p>use to change the dimensions or the number of chemicals </p>
 
-<p>Reimplemented in <a class="el" href="classGrayScottImageRD.html#ac0ece4290035af9c4b04f60aaca4be0b">GrayScottImageRD</a>, and <a class="el" href="classOpenCLImageRD.html#a2b45e9256c9412d3b57b49fb87df4cf6">OpenCLImageRD</a>.</p>
+<p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#a2b45e9256c9412d3b57b49fb87df4cf6">OpenCLImageRD</a>, and <a class="el" href="classGrayScottImageRD.html#ac0ece4290035af9c4b04f60aaca4be0b">GrayScottImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00206">206</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00210">210</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -317,7 +327,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00218">218</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00223">223</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -339,7 +349,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00272">272</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00277">277</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +370,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#aa84aaabe35569bcfafd50ea8c0f36352">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00164">164</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00166">166</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -378,7 +388,28 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00101">101</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00103">103</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a15a8921a4dc9ca5ab807be2e90a807d6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classImageRD.html#a15a8921a4dc9ca5ab807be2e90a807d6">ImageRD::FlipPaintAction</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a> &amp;&#160;</td>
+          <td class="paramname"><em>cca</em></td><td>)</td>
+          <td><code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Implements <a class="el" href="classAbstractRD.html#a494f0a1753a8fb729327ed65873cd510">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l01218">1218</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -400,7 +431,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#a5236712e492efc30a0870a912a53676e">OpenCLImageRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00233">233</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00238">238</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -422,7 +453,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#ad06725e8898ba2e16772cda74368a0ed">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00112">112</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00114">114</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -455,7 +486,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#ab2a503fcd628baf0fb763ce626ecfe31">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l01013">1013</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l01005">1005</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -488,7 +519,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a7a5c43082919d90e393bdfd9cf2948e5">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00899">899</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00891">891</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -544,7 +575,9 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00152">152</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>spatial separation for rendering multiple chemicals (currently only used in 2D) </p>
+
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00154">154</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -563,7 +596,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00145">145</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00147">147</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -583,7 +616,52 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a89bff1670ebf193394493a4f81ec49c1">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00890">890</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00882">882</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa0d9faad5cafc72f8330914c8559b793"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float <a class="el" href="classImageRD.html#aa0d9faad5cafc72f8330914c8559b793">ImageRD::GetValue</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Retrieve the value at a given location. </p>
+
+<p>Implements <a class="el" href="classAbstractRD.html#ab75a4b52c0d5e60ed8ed0cb327d67547">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l01087">1087</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -603,7 +681,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa569d2908a67a0946652e0b518abad52">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00124">124</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00126">126</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -623,7 +701,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#abdbeb388c5d50fe586edb59266b9b3eb">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00131">131</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00133">133</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +721,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a3e207e17ccdf980501c20b4f3153877d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00138">138</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00140">140</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -694,7 +772,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a9fba6f8368f4317934ccdbdfa185c44b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00296">296</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00303">303</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -723,7 +801,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00311">311</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00319">319</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -752,7 +830,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00448">448</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00453">453</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -781,7 +859,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00651">651</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00664">664</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -818,7 +896,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa3b511ef22685dc79c26380b6c454f8f">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00861">861</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00853">853</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -849,7 +927,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a77c2f176da53d7c5b3dbb322a8910d68">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00989">989</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00981">981</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -869,7 +947,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aec9f3320b27e8f79891ca02da04bcf7f">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00854">854</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00846">846</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -906,7 +984,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#af51917604735dca12ed3f57d51116fb5">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00869">869</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00861">861</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -947,7 +1025,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00883">883</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00875">875</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -968,7 +1046,119 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a2e9794397c5b55bc2220392bd6b8cd57">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00876">876</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00868">868</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a284a43eee4d9e9c1e8f331796b6802d6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classImageRD.html#a284a43eee4d9e9c1e8f331796b6802d6">ImageRD::SetValue</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value at a given location. </p>
+
+<p>Implements <a class="el" href="classAbstractRD.html#afd217f732253e037a69c757fe52897b1">AbstractRD</a>.</p>
+
+<p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#a67093fd83881018877970bc9721a2ca6">OpenCLImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l01123">1123</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a13ee9311409cd9f7885137be6483acf7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classImageRD.html#a13ee9311409cd9f7885137be6483acf7">ImageRD::SetValuesInRadius</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box. </p>
+
+<p>Implements <a class="el" href="classAbstractRD.html#abd4333a3a20ef4435f4bf2125a6e0d50">AbstractRD</a>.</p>
+
+<p>Reimplemented in <a class="el" href="classOpenCLImageRD.html#a0d2fb4692b4fa576a7f2b209f56a48b9">OpenCLImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l01163">1163</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -991,7 +1181,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa365a78f2c1773ee94d70503d2068c87">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00284">284</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8cpp_source.html#l00290">290</a> of file <a class="el" href="ImageRD_8cpp_source.html">ImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -1009,7 +1199,7 @@ Private Member Functions</h2></td></tr>
 
 <p>one for each chemical </p>
 
-<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00067">67</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00071">71</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1024,7 +1214,37 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00070">70</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00074">74</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a27e645d5f8c117a466d28497fdb2c391"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classImageRD.html#a27e645d5f8c117a466d28497fdb2c391">ImageRD::xgap</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00076">76</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adb8cb7567259fd3c14f9e35f4e12a985"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classImageRD.html#adb8cb7567259fd3c14f9e35f4e12a985">ImageRD::ygap</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="ImageRD_8hpp_source.html#l00076">76</a> of file <a class="el" href="ImageRD_8hpp_source.html">ImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1036,7 +1256,7 @@ Private Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

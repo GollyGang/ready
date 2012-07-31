@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -126,313 +126,401 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00022"></a>00022 <span class="comment">// STL:</span>
 <a name="l00023"></a>00023 <span class="keyword">using namespace </span>std;
 <a name="l00024"></a>00024 
-<a name="l00025"></a>00025 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00026"></a>00026 
-<a name="l00027"></a><a class="code" href="classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425">00027</a> <a class="code" href="classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425">AbstractRD::AbstractRD</a>()
-<a name="l00028"></a>00028 {
-<a name="l00029"></a>00029     this-&gt;timesteps_taken = 0;
-<a name="l00030"></a>00030     this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00031"></a>00031     this-&gt;is_modified = <span class="keyword">false</span>;
-<a name="l00032"></a>00032     this-&gt;wrap = <span class="keyword">true</span>;
-<a name="l00033"></a>00033 }
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00025"></a>00025 <span class="comment">// SSE:</span>
+<a name="l00026"></a>00026 <span class="preprocessor">#include &lt;xmmintrin.h&gt;</span>
+<a name="l00027"></a>00027 
+<a name="l00028"></a>00028 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00029"></a>00029 
+<a name="l00030"></a><a class="code" href="classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425">00030</a> <a class="code" href="classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425">AbstractRD::AbstractRD</a>()
+<a name="l00031"></a>00031 {
+<a name="l00032"></a>00032     this-&gt;timesteps_taken = 0;
+<a name="l00033"></a>00033     this-&gt;need_reload_formula = <span class="keyword">true</span>;
+<a name="l00034"></a>00034     this-&gt;is_modified = <span class="keyword">false</span>;
+<a name="l00035"></a>00035     this-&gt;wrap = <span class="keyword">true</span>;
 <a name="l00036"></a>00036 
-<a name="l00037"></a><a class="code" href="classAbstractRD.html#a08440b8e0cfecfd1dd919f96b637577e">00037</a> <a class="code" href="classAbstractRD.html#a08440b8e0cfecfd1dd919f96b637577e">AbstractRD::~AbstractRD</a>()
-<a name="l00038"></a>00038 {
-<a name="l00039"></a>00039     this-&gt;ClearInitialPatternGenerator();
-<a name="l00040"></a>00040 }
-<a name="l00041"></a>00041 
-<a name="l00042"></a>00042 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00043"></a>00043 
-<a name="l00044"></a><a class="code" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">00044</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">AbstractRD::ClearInitialPatternGenerator</a>()
-<a name="l00045"></a>00045 {
-<a name="l00046"></a>00046     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iOverlay=0;iOverlay&lt;(int)this-&gt;initial_pattern_generator.size();iOverlay++)
-<a name="l00047"></a>00047         <span class="keyword">delete</span> this-&gt;initial_pattern_generator[iOverlay];
-<a name="l00048"></a>00048     this-&gt;initial_pattern_generator.clear();
-<a name="l00049"></a>00049 }
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00052"></a>00052 
-<a name="l00053"></a><a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880">00053</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880" title="Changes the system&#39;s formula. The kernel will be reloaded on the next update step.">AbstractRD::SetFormula</a>(<span class="keywordtype">string</span> s)
-<a name="l00054"></a>00054 {
-<a name="l00055"></a>00055     <span class="keywordflow">if</span>(s != this-&gt;formula)
-<a name="l00056"></a>00056         this-&gt;need_reload_formula = <span class="keyword">true</span>;
-<a name="l00057"></a>00057     this-&gt;formula = s;
-<a name="l00058"></a>00058     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00059"></a>00059 }
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00037"></a>00037 <span class="preprocessor">    #if defined(USE_SSE)</span>
+<a name="l00038"></a>00038 <span class="preprocessor"></span>        <span class="comment">// disable accurate handling of denormals and zeros, for speed</span>
+<a name="l00039"></a>00039 <span class="preprocessor">        #if (defined(__i386__) || defined(__x64_64__) || defined(__amd64__) || defined(_M_X64) || defined(_M_IX86))</span>
+<a name="l00040"></a>00040 <span class="preprocessor"></span>         <span class="keywordtype">int</span> oldMXCSR = _mm_getcsr(); <span class="comment">//read the old MXCSR setting</span>
+<a name="l00041"></a>00041          <span class="keywordtype">int</span> newMXCSR = oldMXCSR | 0x8040; <span class="comment">// set DAZ and FZ bits</span>
+<a name="l00042"></a>00042          _mm_setcsr( newMXCSR ); <span class="comment">//write the new MXCSR setting to the MXCSR</span>
+<a name="l00043"></a>00043 <span class="preprocessor">        #endif</span>
+<a name="l00044"></a>00044 <span class="preprocessor"></span><span class="preprocessor">    #endif // (USE_SSE)</span>
+<a name="l00045"></a>00045 <span class="preprocessor"></span>}
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00048"></a>00048 
+<a name="l00049"></a><a class="code" href="classAbstractRD.html#a08440b8e0cfecfd1dd919f96b637577e">00049</a> <a class="code" href="classAbstractRD.html#a08440b8e0cfecfd1dd919f96b637577e">AbstractRD::~AbstractRD</a>()
+<a name="l00050"></a>00050 {
+<a name="l00051"></a>00051     this-&gt;ClearInitialPatternGenerator();
+<a name="l00052"></a>00052 }
+<a name="l00053"></a>00053 
+<a name="l00054"></a>00054 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00055"></a>00055 
+<a name="l00056"></a><a class="code" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">00056</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">AbstractRD::ClearInitialPatternGenerator</a>()
+<a name="l00057"></a>00057 {
+<a name="l00058"></a>00058     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iOverlay=0;iOverlay&lt;(int)this-&gt;initial_pattern_generator.size();iOverlay++)
+<a name="l00059"></a>00059         <span class="keyword">delete</span> this-&gt;initial_pattern_generator[iOverlay];
+<a name="l00060"></a>00060     this-&gt;initial_pattern_generator.clear();
+<a name="l00061"></a>00061 }
 <a name="l00062"></a>00062 
-<a name="l00063"></a><a class="code" href="classAbstractRD.html#a37127318d60d79fe6e5346ef959accca">00063</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a37127318d60d79fe6e5346ef959accca">AbstractRD::SetRuleName</a>(std::string s)
-<a name="l00064"></a>00064 {
-<a name="l00065"></a>00065     this-&gt;rule_name = s;
-<a name="l00066"></a>00066     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00067"></a>00067 }
-<a name="l00068"></a>00068 
-<a name="l00069"></a>00069 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00070"></a>00070 
-<a name="l00071"></a><a class="code" href="classAbstractRD.html#af91476d37a280ad96303911124d3f8d7">00071</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#af91476d37a280ad96303911124d3f8d7">AbstractRD::SetDescription</a>(std::string s)
-<a name="l00072"></a>00072 {
-<a name="l00073"></a>00073     this-&gt;description = s;
-<a name="l00074"></a>00074     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00075"></a>00075 }
-<a name="l00076"></a>00076 
-<a name="l00077"></a>00077 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00078"></a>00078 
-<a name="l00079"></a><a class="code" href="classAbstractRD.html#ad8018c59e0b6df5a301f4995dc2385a5">00079</a> <span class="keywordtype">int</span> <a class="code" href="classAbstractRD.html#ad8018c59e0b6df5a301f4995dc2385a5">AbstractRD::GetNumberOfParameters</a>()<span class="keyword"> const</span>
-<a name="l00080"></a>00080 <span class="keyword"></span>{
-<a name="l00081"></a>00081     <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)this-&gt;parameters.size();
-<a name="l00082"></a>00082 }
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00085"></a>00085 
-<a name="l00086"></a><a class="code" href="classAbstractRD.html#a968c99e9b085eedeea0490a6a95e64ae">00086</a> std::string <a class="code" href="classAbstractRD.html#a968c99e9b085eedeea0490a6a95e64ae">AbstractRD::GetParameterName</a>(<span class="keywordtype">int</span> iParam)<span class="keyword"> const</span>
-<a name="l00087"></a>00087 <span class="keyword"></span>{
-<a name="l00088"></a>00088     <span class="keywordflow">return</span> this-&gt;parameters[iParam].first;
-<a name="l00089"></a>00089 }
+<a name="l00063"></a>00063 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00064"></a>00064 
+<a name="l00065"></a><a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880">00065</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880" title="Changes the system&#39;s formula. The kernel will be reloaded on the next update step.">AbstractRD::SetFormula</a>(<span class="keywordtype">string</span> s)
+<a name="l00066"></a>00066 {
+<a name="l00067"></a>00067     <span class="keywordflow">if</span>(s != this-&gt;formula)
+<a name="l00068"></a>00068         this-&gt;need_reload_formula = <span class="keyword">true</span>;
+<a name="l00069"></a>00069     this-&gt;formula = s;
+<a name="l00070"></a>00070     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00071"></a>00071 }
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00074"></a>00074 
+<a name="l00075"></a><a class="code" href="classAbstractRD.html#a37127318d60d79fe6e5346ef959accca">00075</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a37127318d60d79fe6e5346ef959accca">AbstractRD::SetRuleName</a>(std::string s)
+<a name="l00076"></a>00076 {
+<a name="l00077"></a>00077     this-&gt;rule_name = s;
+<a name="l00078"></a>00078     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00079"></a>00079 }
+<a name="l00080"></a>00080 
+<a name="l00081"></a>00081 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00082"></a>00082 
+<a name="l00083"></a><a class="code" href="classAbstractRD.html#af91476d37a280ad96303911124d3f8d7">00083</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#af91476d37a280ad96303911124d3f8d7">AbstractRD::SetDescription</a>(std::string s)
+<a name="l00084"></a>00084 {
+<a name="l00085"></a>00085     this-&gt;description = s;
+<a name="l00086"></a>00086     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00087"></a>00087 }
+<a name="l00088"></a>00088 
+<a name="l00089"></a>00089 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00090"></a>00090 
-<a name="l00091"></a>00091 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00092"></a>00092 
-<a name="l00093"></a><a class="code" href="classAbstractRD.html#a9aef6228cde9ced1b14e4f0d5841b3fb">00093</a> <span class="keywordtype">float</span> <a class="code" href="classAbstractRD.html#a9aef6228cde9ced1b14e4f0d5841b3fb">AbstractRD::GetParameterValue</a>(<span class="keywordtype">int</span> iParam)<span class="keyword"> const</span>
-<a name="l00094"></a>00094 <span class="keyword"></span>{
-<a name="l00095"></a>00095     <span class="keywordflow">return</span> this-&gt;parameters[iParam].second;
-<a name="l00096"></a>00096 }
+<a name="l00091"></a><a class="code" href="classAbstractRD.html#ad8018c59e0b6df5a301f4995dc2385a5">00091</a> <span class="keywordtype">int</span> <a class="code" href="classAbstractRD.html#ad8018c59e0b6df5a301f4995dc2385a5">AbstractRD::GetNumberOfParameters</a>()<span class="keyword"> const</span>
+<a name="l00092"></a>00092 <span class="keyword"></span>{
+<a name="l00093"></a>00093     <span class="keywordflow">return</span> (<span class="keywordtype">int</span>)this-&gt;parameters.size();
+<a name="l00094"></a>00094 }
+<a name="l00095"></a>00095 
+<a name="l00096"></a>00096 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00097"></a>00097 
-<a name="l00098"></a>00098 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00099"></a>00099 
-<a name="l00100"></a><a class="code" href="classAbstractRD.html#ad5e22f67392a013f509a7f48a3f54b80">00100</a> <span class="keywordtype">float</span> <a class="code" href="classAbstractRD.html#ad5e22f67392a013f509a7f48a3f54b80">AbstractRD::GetParameterValueByName</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const</span>
-<a name="l00101"></a>00101 <span class="keyword"></span>{
-<a name="l00102"></a>00102     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iParam=0;iParam&lt;(int)this-&gt;parameters.size();iParam++)
-<a name="l00103"></a>00103         <span class="keywordflow">if</span>(this-&gt;parameters[iParam].first == name)
-<a name="l00104"></a>00104             <span class="keywordflow">return</span> this-&gt;parameters[iParam].second;
-<a name="l00105"></a>00105     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;ImageRD::GetParameterValueByName : parameter name not found: &quot;</span>+name);
-<a name="l00106"></a>00106 }
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00098"></a><a class="code" href="classAbstractRD.html#a968c99e9b085eedeea0490a6a95e64ae">00098</a> std::string <a class="code" href="classAbstractRD.html#a968c99e9b085eedeea0490a6a95e64ae">AbstractRD::GetParameterName</a>(<span class="keywordtype">int</span> iParam)<span class="keyword"> const</span>
+<a name="l00099"></a>00099 <span class="keyword"></span>{
+<a name="l00100"></a>00100     <span class="keywordflow">return</span> this-&gt;parameters[iParam].first;
+<a name="l00101"></a>00101 }
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00104"></a>00104 
+<a name="l00105"></a><a class="code" href="classAbstractRD.html#a9aef6228cde9ced1b14e4f0d5841b3fb">00105</a> <span class="keywordtype">float</span> <a class="code" href="classAbstractRD.html#a9aef6228cde9ced1b14e4f0d5841b3fb">AbstractRD::GetParameterValue</a>(<span class="keywordtype">int</span> iParam)<span class="keyword"> const</span>
+<a name="l00106"></a>00106 <span class="keyword"></span>{
+<a name="l00107"></a>00107     <span class="keywordflow">return</span> this-&gt;parameters[iParam].second;
+<a name="l00108"></a>00108 }
 <a name="l00109"></a>00109 
-<a name="l00110"></a><a class="code" href="classAbstractRD.html#abef0fac4cc1d8426a37ebef49e172998">00110</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87">AbstractRD::AddParameter</a>(<span class="keyword">const</span> std::string&amp; name,<span class="keywordtype">float</span> val)
-<a name="l00111"></a>00111 {
-<a name="l00112"></a>00112     this-&gt;parameters.push_back(make_pair(name,val));
-<a name="l00113"></a>00113     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00114"></a>00114 }
-<a name="l00115"></a>00115 
-<a name="l00116"></a>00116 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00117"></a>00117 
-<a name="l00118"></a><a class="code" href="classAbstractRD.html#a96fc8fae8ac3fbcedd12f77117d2239c">00118</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a9377f837fdf3eb370dd4d06d34dd1e29">AbstractRD::DeleteParameter</a>(<span class="keywordtype">int</span> iParam)
-<a name="l00119"></a>00119 {
-<a name="l00120"></a>00120     this-&gt;parameters.erase(this-&gt;parameters.begin()+iParam);
-<a name="l00121"></a>00121     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00122"></a>00122 }
-<a name="l00123"></a>00123 
-<a name="l00124"></a>00124 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00125"></a>00125 
-<a name="l00126"></a><a class="code" href="classAbstractRD.html#af535ed6290815c65e33d2cee5398c3d7">00126</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#af535ed6290815c65e33d2cee5398c3d7">AbstractRD::DeleteAllParameters</a>()
-<a name="l00127"></a>00127 {
-<a name="l00128"></a>00128     this-&gt;parameters.clear();
-<a name="l00129"></a>00129     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00130"></a>00130 }
-<a name="l00131"></a>00131 
-<a name="l00132"></a>00132 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00133"></a>00133 
-<a name="l00134"></a><a class="code" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">00134</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">AbstractRD::SetParameterName</a>(<span class="keywordtype">int</span> iParam,<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
-<a name="l00135"></a>00135 {
-<a name="l00136"></a>00136     this-&gt;parameters[iParam].first = s;
-<a name="l00137"></a>00137     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00138"></a>00138 }
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00141"></a>00141 
-<a name="l00142"></a><a class="code" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">00142</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">AbstractRD::SetParameterValue</a>(<span class="keywordtype">int</span> iParam,<span class="keywordtype">float</span> val)
-<a name="l00143"></a>00143 {
-<a name="l00144"></a>00144     this-&gt;parameters[iParam].second = val;
-<a name="l00145"></a>00145     this-&gt;is_modified = <span class="keyword">true</span>;
-<a name="l00146"></a>00146 }
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00149"></a>00149 
-<a name="l00150"></a><a class="code" href="classAbstractRD.html#a7bffde59b2ce710ded44fca88dfa602a">00150</a> <span class="keywordtype">bool</span> <a class="code" href="classAbstractRD.html#a7bffde59b2ce710ded44fca88dfa602a">AbstractRD::IsParameter</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name)<span class="keyword"> const</span>
-<a name="l00151"></a>00151 <span class="keyword"></span>{
-<a name="l00152"></a>00152     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;parameters.size();i++)
-<a name="l00153"></a>00153         <span class="keywordflow">if</span>(this-&gt;parameters[i].first == name)
-<a name="l00154"></a>00154             <span class="keywordflow">return</span> <span class="keyword">true</span>;
-<a name="l00155"></a>00155     <span class="keywordflow">return</span> <span class="keyword">false</span>;
-<a name="l00156"></a>00156 }
-<a name="l00157"></a>00157 
-<a name="l00158"></a>00158 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00110"></a>00110 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00111"></a>00111 
+<a name="l00112"></a><a class="code" href="classAbstractRD.html#ad5e22f67392a013f509a7f48a3f54b80">00112</a> <span class="keywordtype">float</span> <a class="code" href="classAbstractRD.html#ad5e22f67392a013f509a7f48a3f54b80">AbstractRD::GetParameterValueByName</a>(<span class="keyword">const</span> std::string&amp; name)<span class="keyword"> const</span>
+<a name="l00113"></a>00113 <span class="keyword"></span>{
+<a name="l00114"></a>00114     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iParam=0;iParam&lt;(int)this-&gt;parameters.size();iParam++)
+<a name="l00115"></a>00115         <span class="keywordflow">if</span>(this-&gt;parameters[iParam].first == name)
+<a name="l00116"></a>00116             <span class="keywordflow">return</span> this-&gt;parameters[iParam].second;
+<a name="l00117"></a>00117     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;ImageRD::GetParameterValueByName : parameter name not found: &quot;</span>+name);
+<a name="l00118"></a>00118 }
+<a name="l00119"></a>00119 
+<a name="l00120"></a>00120 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00121"></a>00121 
+<a name="l00122"></a><a class="code" href="classAbstractRD.html#abef0fac4cc1d8426a37ebef49e172998">00122</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87">AbstractRD::AddParameter</a>(<span class="keyword">const</span> std::string&amp; name,<span class="keywordtype">float</span> val)
+<a name="l00123"></a>00123 {
+<a name="l00124"></a>00124     this-&gt;parameters.push_back(make_pair(name,val));
+<a name="l00125"></a>00125     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00126"></a>00126 }
+<a name="l00127"></a>00127 
+<a name="l00128"></a>00128 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00129"></a>00129 
+<a name="l00130"></a><a class="code" href="classAbstractRD.html#a96fc8fae8ac3fbcedd12f77117d2239c">00130</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a9377f837fdf3eb370dd4d06d34dd1e29">AbstractRD::DeleteParameter</a>(<span class="keywordtype">int</span> iParam)
+<a name="l00131"></a>00131 {
+<a name="l00132"></a>00132     this-&gt;parameters.erase(this-&gt;parameters.begin()+iParam);
+<a name="l00133"></a>00133     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00134"></a>00134 }
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00137"></a>00137 
+<a name="l00138"></a><a class="code" href="classAbstractRD.html#af535ed6290815c65e33d2cee5398c3d7">00138</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#af535ed6290815c65e33d2cee5398c3d7">AbstractRD::DeleteAllParameters</a>()
+<a name="l00139"></a>00139 {
+<a name="l00140"></a>00140     this-&gt;parameters.clear();
+<a name="l00141"></a>00141     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00142"></a>00142 }
+<a name="l00143"></a>00143 
+<a name="l00144"></a>00144 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00145"></a>00145 
+<a name="l00146"></a><a class="code" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">00146</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">AbstractRD::SetParameterName</a>(<span class="keywordtype">int</span> iParam,<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
+<a name="l00147"></a>00147 {
+<a name="l00148"></a>00148     this-&gt;parameters[iParam].first = s;
+<a name="l00149"></a>00149     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00150"></a>00150 }
+<a name="l00151"></a>00151 
+<a name="l00152"></a>00152 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00153"></a>00153 
+<a name="l00154"></a><a class="code" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">00154</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">AbstractRD::SetParameterValue</a>(<span class="keywordtype">int</span> iParam,<span class="keywordtype">float</span> val)
+<a name="l00155"></a>00155 {
+<a name="l00156"></a>00156     this-&gt;parameters[iParam].second = val;
+<a name="l00157"></a>00157     this-&gt;is_modified = <span class="keyword">true</span>;
+<a name="l00158"></a>00158 }
 <a name="l00159"></a>00159 
-<a name="l00160"></a><a class="code" href="classAbstractRD.html#a6bcf10c119c33cde1604bdc33a19a8e9">00160</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a6bcf10c119c33cde1604bdc33a19a8e9">AbstractRD::SetModified</a>(<span class="keywordtype">bool</span> m)
-<a name="l00161"></a>00161 {
-<a name="l00162"></a>00162     this-&gt;is_modified = m;
-<a name="l00163"></a>00163 }
-<a name="l00164"></a>00164 
-<a name="l00165"></a>00165 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00166"></a>00166 
-<a name="l00167"></a><a class="code" href="classAbstractRD.html#a1ac0701d5f1d0ce7a65ce08f19d4d6e7">00167</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a1ac0701d5f1d0ce7a65ce08f19d4d6e7">AbstractRD::SetFilename</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
-<a name="l00168"></a>00168 {
-<a name="l00169"></a>00169     this-&gt;filename = s;
-<a name="l00170"></a>00170 }
+<a name="l00160"></a>00160 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00161"></a>00161 
+<a name="l00162"></a><a class="code" href="classAbstractRD.html#a7bffde59b2ce710ded44fca88dfa602a">00162</a> <span class="keywordtype">bool</span> <a class="code" href="classAbstractRD.html#a7bffde59b2ce710ded44fca88dfa602a">AbstractRD::IsParameter</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; name)<span class="keyword"> const</span>
+<a name="l00163"></a>00163 <span class="keyword"></span>{
+<a name="l00164"></a>00164     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;parameters.size();i++)
+<a name="l00165"></a>00165         <span class="keywordflow">if</span>(this-&gt;parameters[i].first == name)
+<a name="l00166"></a>00166             <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00167"></a>00167     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00168"></a>00168 }
+<a name="l00169"></a>00169 
+<a name="l00170"></a>00170 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00171"></a>00171 
-<a name="l00172"></a>00172 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00173"></a>00173 
-<a name="l00174"></a><a class="code" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">00174</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d" title="Load this pattern from an RD element.">AbstractRD::InitializeFromXML</a>(vtkXMLDataElement* rd,<span class="keywordtype">bool</span>&amp; warn_to_update)
-<a name="l00175"></a>00175 {
-<a name="l00176"></a>00176     <span class="keywordtype">string</span> str;
-<a name="l00177"></a>00177     <span class="keyword">const</span> <span class="keywordtype">char</span> *s;
-<a name="l00178"></a>00178     <span class="keywordtype">float</span> f;
-<a name="l00179"></a>00179     <span class="keywordtype">int</span> i;
-<a name="l00180"></a>00180 
-<a name="l00181"></a>00181     <span class="comment">// check whether we should warn the user that they need to update Ready</span>
-<a name="l00182"></a>00182     {
-<a name="l00183"></a>00183         <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(rd,<span class="stringliteral">&quot;format_version&quot;</span>,i);
-<a name="l00184"></a>00184         warn_to_update = (i&gt;2);
-<a name="l00185"></a>00185         <span class="comment">// (we will still proceed and try to read the file but it might fail or give poor results)</span>
-<a name="l00186"></a>00186     }
-<a name="l00187"></a>00187 
-<a name="l00188"></a>00188     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
-<a name="l00189"></a>00189     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found in file&quot;</span>);
-<a name="l00190"></a>00190 
-<a name="l00191"></a>00191     <span class="comment">// rule_name:</span>
-<a name="l00192"></a>00192     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(rule,<span class="stringliteral">&quot;name&quot;</span>,str);
-<a name="l00193"></a>00193     this-&gt;SetRuleName(str);
-<a name="l00194"></a>00194 
-<a name="l00195"></a>00195     <span class="comment">// wrap-around</span>
-<a name="l00196"></a>00196     s = rule-&gt;GetAttribute(<span class="stringliteral">&quot;wrap&quot;</span>);
-<a name="l00197"></a>00197     <span class="keywordflow">if</span>(!s) this-&gt;wrap = <span class="keyword">true</span>;
-<a name="l00198"></a>00198     <span class="keywordflow">else</span> this-&gt;wrap = (string(s)==<span class="stringliteral">&quot;1&quot;</span>);
+<a name="l00172"></a><a class="code" href="classAbstractRD.html#a6bcf10c119c33cde1604bdc33a19a8e9">00172</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a6bcf10c119c33cde1604bdc33a19a8e9">AbstractRD::SetModified</a>(<span class="keywordtype">bool</span> m)
+<a name="l00173"></a>00173 {
+<a name="l00174"></a>00174     this-&gt;is_modified = m;
+<a name="l00175"></a>00175 }
+<a name="l00176"></a>00176 
+<a name="l00177"></a>00177 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00178"></a>00178 
+<a name="l00179"></a><a class="code" href="classAbstractRD.html#a1ac0701d5f1d0ce7a65ce08f19d4d6e7">00179</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a1ac0701d5f1d0ce7a65ce08f19d4d6e7">AbstractRD::SetFilename</a>(<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
+<a name="l00180"></a>00180 {
+<a name="l00181"></a>00181     this-&gt;filename = s;
+<a name="l00182"></a>00182 }
+<a name="l00183"></a>00183 
+<a name="l00184"></a>00184 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00185"></a>00185 
+<a name="l00186"></a><a class="code" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">00186</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d" title="Load this pattern from an RD element.">AbstractRD::InitializeFromXML</a>(vtkXMLDataElement* rd,<span class="keywordtype">bool</span>&amp; warn_to_update)
+<a name="l00187"></a>00187 {
+<a name="l00188"></a>00188     <span class="keywordtype">string</span> str;
+<a name="l00189"></a>00189     <span class="keyword">const</span> <span class="keywordtype">char</span> *s;
+<a name="l00190"></a>00190     <span class="keywordtype">float</span> f;
+<a name="l00191"></a>00191     <span class="keywordtype">int</span> i;
+<a name="l00192"></a>00192 
+<a name="l00193"></a>00193     <span class="comment">// check whether we should warn the user that they need to update Ready</span>
+<a name="l00194"></a>00194     {
+<a name="l00195"></a>00195         <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(rd,<span class="stringliteral">&quot;format_version&quot;</span>,i);
+<a name="l00196"></a>00196         warn_to_update = (i&gt;2);
+<a name="l00197"></a>00197         <span class="comment">// (we will still proceed and try to read the file but it might fail or give poor results)</span>
+<a name="l00198"></a>00198     }
 <a name="l00199"></a>00199 
-<a name="l00200"></a>00200     <span class="comment">// parameters:</span>
-<a name="l00201"></a>00201     this-&gt;DeleteAllParameters();
-<a name="l00202"></a>00202     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;rule-&gt;GetNumberOfNestedElements();i++)
-<a name="l00203"></a>00203     {
-<a name="l00204"></a>00204         vtkSmartPointer&lt;vtkXMLDataElement&gt; node = rule-&gt;GetNestedElement(i);
-<a name="l00205"></a>00205         <span class="keywordflow">if</span>(<span class="keywordtype">string</span>(node-&gt;GetName())!=<span class="stringliteral">&quot;param&quot;</span>) <span class="keywordflow">continue</span>;
-<a name="l00206"></a>00206         <span class="keywordtype">string</span> name;
-<a name="l00207"></a>00207         s = node-&gt;GetAttribute(<span class="stringliteral">&quot;name&quot;</span>);
-<a name="l00208"></a>00208         <span class="keywordflow">if</span>(!s) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Failed to read param attribute: name&quot;</span>);
-<a name="l00209"></a>00209         name = <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(s);
-<a name="l00210"></a>00210         s = node-&gt;GetCharacterData();
-<a name="l00211"></a>00211         <span class="keywordflow">if</span>(!s || !<a class="code" href="utils_8hpp.html#a49577a9b6151e7593a58f0d3bf8ae7e4">from_string</a>(s,f)) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Failed to read param value&quot;</span>);
-<a name="l00212"></a>00212         this-&gt;<a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87">AddParameter</a>(name,f);
-<a name="l00213"></a>00213     }
-<a name="l00214"></a>00214 
-<a name="l00215"></a>00215     <span class="comment">// description:</span>
-<a name="l00216"></a>00216     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_description = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;description&quot;</span>);
-<a name="l00217"></a>00217     <span class="keywordflow">if</span>(!xml_description) this-&gt;SetDescription(<span class="stringliteral">&quot;&quot;</span>); <span class="comment">// optional, default is empty string</span>
-<a name="l00218"></a>00218     <span class="keywordflow">else</span> this-&gt;SetDescription(<a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(xml_description-&gt;GetCharacterData()));
-<a name="l00219"></a>00219 
-<a name="l00220"></a>00220     <span class="comment">// initial_pattern_generator:</span>
-<a name="l00221"></a>00221     this-&gt;ClearInitialPatternGenerator();
-<a name="l00222"></a>00222     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_initial_pattern_generator = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;initial_pattern_generator&quot;</span>);
-<a name="l00223"></a>00223     <span class="keywordflow">if</span>(xml_initial_pattern_generator) <span class="comment">// optional, default is none</span>
-<a name="l00224"></a>00224     {
-<a name="l00225"></a>00225         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;xml_initial_pattern_generator-&gt;GetNumberOfNestedElements();i++)
-<a name="l00226"></a>00226              this-&gt;initial_pattern_generator.push_back(<span class="keyword">new</span> <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(xml_initial_pattern_generator-&gt;GetNestedElement(i)));
-<a name="l00227"></a>00227     }
-<a name="l00228"></a>00228 }
-<a name="l00229"></a>00229 
-<a name="l00230"></a>00230 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00200"></a>00200     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
+<a name="l00201"></a>00201     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found in file&quot;</span>);
+<a name="l00202"></a>00202 
+<a name="l00203"></a>00203     <span class="comment">// rule_name:</span>
+<a name="l00204"></a>00204     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(rule,<span class="stringliteral">&quot;name&quot;</span>,str);
+<a name="l00205"></a>00205     this-&gt;SetRuleName(str);
+<a name="l00206"></a>00206 
+<a name="l00207"></a>00207     <span class="comment">// wrap-around</span>
+<a name="l00208"></a>00208     s = rule-&gt;GetAttribute(<span class="stringliteral">&quot;wrap&quot;</span>);
+<a name="l00209"></a>00209     <span class="keywordflow">if</span>(!s) this-&gt;wrap = <span class="keyword">true</span>;
+<a name="l00210"></a>00210     <span class="keywordflow">else</span> this-&gt;wrap = (string(s)==<span class="stringliteral">&quot;1&quot;</span>);
+<a name="l00211"></a>00211 
+<a name="l00212"></a>00212     <span class="comment">// parameters:</span>
+<a name="l00213"></a>00213     this-&gt;DeleteAllParameters();
+<a name="l00214"></a>00214     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;rule-&gt;GetNumberOfNestedElements();i++)
+<a name="l00215"></a>00215     {
+<a name="l00216"></a>00216         vtkSmartPointer&lt;vtkXMLDataElement&gt; node = rule-&gt;GetNestedElement(i);
+<a name="l00217"></a>00217         <span class="keywordflow">if</span>(<span class="keywordtype">string</span>(node-&gt;GetName())!=<span class="stringliteral">&quot;param&quot;</span>) <span class="keywordflow">continue</span>;
+<a name="l00218"></a>00218         <span class="keywordtype">string</span> name;
+<a name="l00219"></a>00219         s = node-&gt;GetAttribute(<span class="stringliteral">&quot;name&quot;</span>);
+<a name="l00220"></a>00220         <span class="keywordflow">if</span>(!s) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Failed to read param attribute: name&quot;</span>);
+<a name="l00221"></a>00221         name = <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(s);
+<a name="l00222"></a>00222         s = node-&gt;GetCharacterData();
+<a name="l00223"></a>00223         <span class="keywordflow">if</span>(!s || !<a class="code" href="utils_8hpp.html#a49577a9b6151e7593a58f0d3bf8ae7e4">from_string</a>(s,f)) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Failed to read param value&quot;</span>);
+<a name="l00224"></a>00224         this-&gt;<a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7755c932c23e416eff7e29e82276dc87">AddParameter</a>(name,f);
+<a name="l00225"></a>00225     }
+<a name="l00226"></a>00226 
+<a name="l00227"></a>00227     <span class="comment">// description:</span>
+<a name="l00228"></a>00228     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_description = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;description&quot;</span>);
+<a name="l00229"></a>00229     <span class="keywordflow">if</span>(!xml_description) this-&gt;SetDescription(<span class="stringliteral">&quot;&quot;</span>); <span class="comment">// optional, default is empty string</span>
+<a name="l00230"></a>00230     <span class="keywordflow">else</span> this-&gt;SetDescription(<a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(xml_description-&gt;GetCharacterData()));
 <a name="l00231"></a>00231 
-<a name="l00232"></a>00232 <span class="comment">// TODO: ImageRD could inherit from XML_Object (but as VTKFile element, not RD element!)</span>
-<a name="l00233"></a><a class="code" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">00233</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b" title="Retrieve an RD element for this pattern, suitable for saving to file.">AbstractRD::GetAsXML</a>()<span class="keyword"> const</span>
-<a name="l00234"></a>00234 <span class="keyword"></span>{
-<a name="l00235"></a>00235     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00236"></a>00236     rd-&gt;SetName(<span class="stringliteral">&quot;RD&quot;</span>);
-<a name="l00237"></a>00237     rd-&gt;SetIntAttribute(<span class="stringliteral">&quot;format_version&quot;</span>,2);
-<a name="l00238"></a>00238     <span class="comment">// (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) </span>
-<a name="l00239"></a>00239 
-<a name="l00240"></a>00240     <span class="comment">// description</span>
-<a name="l00241"></a>00241     vtkSmartPointer&lt;vtkXMLDataElement&gt; description = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00242"></a>00242     description-&gt;SetName(<span class="stringliteral">&quot;description&quot;</span>);
-<a name="l00243"></a>00243     description-&gt;SetCharacterData(this-&gt;GetDescription().c_str(),(<span class="keywordtype">int</span>)this-&gt;GetDescription().length());
-<a name="l00244"></a>00244     rd-&gt;AddNestedElement(description);
-<a name="l00245"></a>00245 
-<a name="l00246"></a>00246     <span class="comment">// rule</span>
-<a name="l00247"></a>00247     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00248"></a>00248     rule-&gt;SetName(<span class="stringliteral">&quot;rule&quot;</span>);
-<a name="l00249"></a>00249     rule-&gt;SetAttribute(<span class="stringliteral">&quot;name&quot;</span>,this-&gt;GetRuleName().c_str());
-<a name="l00250"></a>00250     rule-&gt;SetAttribute(<span class="stringliteral">&quot;type&quot;</span>,this-&gt;GetRuleType().c_str());
-<a name="l00251"></a>00251     <span class="keywordflow">if</span>(this-&gt;HasEditableWrapOption())
-<a name="l00252"></a>00252         rule-&gt;SetIntAttribute(<span class="stringliteral">&quot;wrap&quot;</span>,this-&gt;GetWrap()?1:0);
-<a name="l00253"></a>00253     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;this-&gt;GetNumberOfParameters();i++)    <span class="comment">// parameters</span>
-<a name="l00254"></a>00254     {
-<a name="l00255"></a>00255         vtkSmartPointer&lt;vtkXMLDataElement&gt; param = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00256"></a>00256         param-&gt;SetName(<span class="stringliteral">&quot;param&quot;</span>);
-<a name="l00257"></a>00257         param-&gt;SetAttribute(<span class="stringliteral">&quot;name&quot;</span>,this-&gt;GetParameterName(i).c_str());
-<a name="l00258"></a>00258         <span class="keywordtype">string</span> s = <a class="code" href="utils_8hpp.html#a3a3e9d4cf73114c8e5198225ca65269e">to_string</a>(this-&gt;GetParameterValue(i));
-<a name="l00259"></a>00259         param-&gt;SetCharacterData(s.c_str(),(int)s.length());
-<a name="l00260"></a>00260         rule-&gt;AddNestedElement(param);
-<a name="l00261"></a>00261     }
-<a name="l00262"></a>00262     rd-&gt;AddNestedElement(rule);
-<a name="l00263"></a>00263 
-<a name="l00264"></a>00264     <span class="comment">// initial pattern generator</span>
-<a name="l00265"></a>00265     vtkSmartPointer&lt;vtkXMLDataElement&gt; initial_pattern_generator = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00266"></a>00266     initial_pattern_generator-&gt;SetName(<span class="stringliteral">&quot;initial_pattern_generator&quot;</span>);
-<a name="l00267"></a>00267     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;initial_pattern_generator.size();i++)
-<a name="l00268"></a>00268         initial_pattern_generator-&gt;AddNestedElement(this-&gt;initial_pattern_generator[i]-&gt;GetAsXML());
-<a name="l00269"></a>00269     rd-&gt;AddNestedElement(initial_pattern_generator);
-<a name="l00270"></a>00270 
-<a name="l00271"></a>00271     <span class="keywordflow">return</span> rd;
-<a name="l00272"></a>00272 }
-<a name="l00273"></a>00273 
-<a name="l00274"></a>00274 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00232"></a>00232     <span class="comment">// initial_pattern_generator:</span>
+<a name="l00233"></a>00233     this-&gt;ClearInitialPatternGenerator();
+<a name="l00234"></a>00234     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_initial_pattern_generator = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;initial_pattern_generator&quot;</span>);
+<a name="l00235"></a>00235     <span class="keywordflow">if</span>(xml_initial_pattern_generator) <span class="comment">// optional, default is none</span>
+<a name="l00236"></a>00236     {
+<a name="l00237"></a>00237         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;xml_initial_pattern_generator-&gt;GetNumberOfNestedElements();i++)
+<a name="l00238"></a>00238              this-&gt;initial_pattern_generator.push_back(<span class="keyword">new</span> <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(xml_initial_pattern_generator-&gt;GetNestedElement(i)));
+<a name="l00239"></a>00239     }
+<a name="l00240"></a>00240 }
+<a name="l00241"></a>00241 
+<a name="l00242"></a>00242 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00243"></a>00243 
+<a name="l00244"></a>00244 <span class="comment">// TODO: ImageRD could inherit from XML_Object (but as VTKFile element, not RD element!)</span>
+<a name="l00245"></a><a class="code" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">00245</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b" title="Retrieve an RD element for this pattern, suitable for saving to file.">AbstractRD::GetAsXML</a>()<span class="keyword"> const</span>
+<a name="l00246"></a>00246 <span class="keyword"></span>{
+<a name="l00247"></a>00247     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00248"></a>00248     rd-&gt;SetName(<span class="stringliteral">&quot;RD&quot;</span>);
+<a name="l00249"></a>00249     rd-&gt;SetIntAttribute(<span class="stringliteral">&quot;format_version&quot;</span>,2);
+<a name="l00250"></a>00250     <span class="comment">// (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) </span>
+<a name="l00251"></a>00251 
+<a name="l00252"></a>00252     <span class="comment">// description</span>
+<a name="l00253"></a>00253     vtkSmartPointer&lt;vtkXMLDataElement&gt; description = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00254"></a>00254     description-&gt;SetName(<span class="stringliteral">&quot;description&quot;</span>);
+<a name="l00255"></a>00255     description-&gt;SetCharacterData(this-&gt;GetDescription().c_str(),(<span class="keywordtype">int</span>)this-&gt;GetDescription().length());
+<a name="l00256"></a>00256     rd-&gt;AddNestedElement(description);
+<a name="l00257"></a>00257 
+<a name="l00258"></a>00258     <span class="comment">// rule</span>
+<a name="l00259"></a>00259     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00260"></a>00260     rule-&gt;SetName(<span class="stringliteral">&quot;rule&quot;</span>);
+<a name="l00261"></a>00261     rule-&gt;SetAttribute(<span class="stringliteral">&quot;name&quot;</span>,this-&gt;GetRuleName().c_str());
+<a name="l00262"></a>00262     rule-&gt;SetAttribute(<span class="stringliteral">&quot;type&quot;</span>,this-&gt;GetRuleType().c_str());
+<a name="l00263"></a>00263     <span class="keywordflow">if</span>(this-&gt;HasEditableWrapOption())
+<a name="l00264"></a>00264         rule-&gt;SetIntAttribute(<span class="stringliteral">&quot;wrap&quot;</span>,this-&gt;GetWrap()?1:0);
+<a name="l00265"></a>00265     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;this-&gt;GetNumberOfParameters();i++)    <span class="comment">// parameters</span>
+<a name="l00266"></a>00266     {
+<a name="l00267"></a>00267         vtkSmartPointer&lt;vtkXMLDataElement&gt; param = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00268"></a>00268         param-&gt;SetName(<span class="stringliteral">&quot;param&quot;</span>);
+<a name="l00269"></a>00269         param-&gt;SetAttribute(<span class="stringliteral">&quot;name&quot;</span>,this-&gt;GetParameterName(i).c_str());
+<a name="l00270"></a>00270         <span class="keywordtype">string</span> s = <a class="code" href="utils_8hpp.html#a3a3e9d4cf73114c8e5198225ca65269e">to_string</a>(this-&gt;GetParameterValue(i));
+<a name="l00271"></a>00271         param-&gt;SetCharacterData(s.c_str(),(int)s.length());
+<a name="l00272"></a>00272         rule-&gt;AddNestedElement(param);
+<a name="l00273"></a>00273     }
+<a name="l00274"></a>00274     rd-&gt;AddNestedElement(rule);
 <a name="l00275"></a>00275 
-<a name="l00276"></a><a class="code" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc">00276</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc" title="Create a generator suitable for Gray-Scott, so that new patterns can start working immediately...">AbstractRD::CreateDefaultInitialPatternGenerator</a>()
-<a name="l00277"></a>00277 {
-<a name="l00278"></a>00278     this-&gt;ClearInitialPatternGenerator();
-<a name="l00279"></a>00279     <span class="comment">// this is ungainly, will need to improve later when we allow the user to edit the IPG through the Info Pane</span>
-<a name="l00280"></a>00280     vtkSmartPointer&lt;vtkXMLDataElement&gt; ow = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00281"></a>00281     ow-&gt;SetName(<span class="stringliteral">&quot;overwrite&quot;</span>);
-<a name="l00282"></a>00282     vtkSmartPointer&lt;vtkXMLDataElement&gt; c1 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00283"></a>00283     c1-&gt;SetName(<span class="stringliteral">&quot;constant&quot;</span>);
-<a name="l00284"></a>00284     c1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;value&quot;</span>,1.0);
-<a name="l00285"></a>00285     vtkSmartPointer&lt;vtkXMLDataElement&gt; ew = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00286"></a>00286     ew-&gt;SetName(<span class="stringliteral">&quot;everywhere&quot;</span>);
+<a name="l00276"></a>00276     <span class="comment">// initial pattern generator</span>
+<a name="l00277"></a>00277     vtkSmartPointer&lt;vtkXMLDataElement&gt; initial_pattern_generator = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00278"></a>00278     initial_pattern_generator-&gt;SetName(<span class="stringliteral">&quot;initial_pattern_generator&quot;</span>);
+<a name="l00279"></a>00279     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;initial_pattern_generator.size();i++)
+<a name="l00280"></a>00280         initial_pattern_generator-&gt;AddNestedElement(this-&gt;initial_pattern_generator[i]-&gt;GetAsXML());
+<a name="l00281"></a>00281     rd-&gt;AddNestedElement(initial_pattern_generator);
+<a name="l00282"></a>00282 
+<a name="l00283"></a>00283     <span class="keywordflow">return</span> rd;
+<a name="l00284"></a>00284 }
+<a name="l00285"></a>00285 
+<a name="l00286"></a>00286 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00287"></a>00287 
-<a name="l00288"></a>00288     vtkSmartPointer&lt;vtkXMLDataElement&gt; ov1 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00289"></a>00289     ov1-&gt;SetName(<span class="stringliteral">&quot;overlay&quot;</span>);
-<a name="l00290"></a>00290     ov1-&gt;SetAttribute(<span class="stringliteral">&quot;chemical&quot;</span>,<span class="stringliteral">&quot;a&quot;</span>);
-<a name="l00291"></a>00291     ov1-&gt;AddNestedElement(ow);
-<a name="l00292"></a>00292     ov1-&gt;AddNestedElement(c1);
-<a name="l00293"></a>00293     ov1-&gt;AddNestedElement(ew);
-<a name="l00294"></a>00294     this-&gt;initial_pattern_generator.push_back(<span class="keyword">new</span> <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(ov1));
-<a name="l00295"></a>00295 
-<a name="l00296"></a>00296     vtkSmartPointer&lt;vtkXMLDataElement&gt; wn = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00297"></a>00297     wn-&gt;SetName(<span class="stringliteral">&quot;white_noise&quot;</span>);
-<a name="l00298"></a>00298     wn-&gt;SetFloatAttribute(<span class="stringliteral">&quot;low&quot;</span>,0.0);
-<a name="l00299"></a>00299     wn-&gt;SetFloatAttribute(<span class="stringliteral">&quot;high&quot;</span>,1.0);
-<a name="l00300"></a>00300     vtkSmartPointer&lt;vtkXMLDataElement&gt; p1 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00301"></a>00301     p1-&gt;SetName(<span class="stringliteral">&quot;point3D&quot;</span>);
-<a name="l00302"></a>00302     p1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;x&quot;</span>,0.5);
-<a name="l00303"></a>00303     p1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;y&quot;</span>,0);
-<a name="l00304"></a>00304     p1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;z&quot;</span>,0);
-<a name="l00305"></a>00305     vtkSmartPointer&lt;vtkXMLDataElement&gt; p2 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00306"></a>00306     p2-&gt;SetName(<span class="stringliteral">&quot;point3D&quot;</span>);
-<a name="l00307"></a>00307     p2-&gt;SetFloatAttribute(<span class="stringliteral">&quot;x&quot;</span>,1.0);
-<a name="l00308"></a>00308     p2-&gt;SetFloatAttribute(<span class="stringliteral">&quot;y&quot;</span>,1.0);
-<a name="l00309"></a>00309     p2-&gt;SetFloatAttribute(<span class="stringliteral">&quot;z&quot;</span>,1.0);
-<a name="l00310"></a>00310     vtkSmartPointer&lt;vtkXMLDataElement&gt; r = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00311"></a>00311     r-&gt;SetName(<span class="stringliteral">&quot;rectangle&quot;</span>);
-<a name="l00312"></a>00312     r-&gt;AddNestedElement(p1);
-<a name="l00313"></a>00313     r-&gt;AddNestedElement(p2);
-<a name="l00314"></a>00314     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;GetNumberOfChemicals();iChem++)
-<a name="l00315"></a>00315     {
-<a name="l00316"></a>00316         vtkSmartPointer&lt;vtkXMLDataElement&gt; ov = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00317"></a>00317         ov-&gt;SetName(<span class="stringliteral">&quot;overlay&quot;</span>);
-<a name="l00318"></a>00318         ov-&gt;SetAttribute(<span class="stringliteral">&quot;chemical&quot;</span>,<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str());
-<a name="l00319"></a>00319         ov-&gt;AddNestedElement(ow);
-<a name="l00320"></a>00320         ov-&gt;AddNestedElement(wn);
-<a name="l00321"></a>00321         ov-&gt;AddNestedElement(r);
-<a name="l00322"></a>00322         this-&gt;initial_pattern_generator.push_back(<span class="keyword">new</span> <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(ov));
-<a name="l00323"></a>00323     }
-<a name="l00324"></a>00324 }
-<a name="l00325"></a>00325 
-<a name="l00326"></a>00326 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00288"></a><a class="code" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc">00288</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc" title="Create a generator suitable for Gray-Scott, so that new patterns can start working immediately...">AbstractRD::CreateDefaultInitialPatternGenerator</a>()
+<a name="l00289"></a>00289 {
+<a name="l00290"></a>00290     this-&gt;ClearInitialPatternGenerator();
+<a name="l00291"></a>00291     <span class="comment">// this is ungainly, will need to improve later when we allow the user to edit the IPG through the Info Pane</span>
+<a name="l00292"></a>00292     vtkSmartPointer&lt;vtkXMLDataElement&gt; ow = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00293"></a>00293     ow-&gt;SetName(<span class="stringliteral">&quot;overwrite&quot;</span>);
+<a name="l00294"></a>00294     vtkSmartPointer&lt;vtkXMLDataElement&gt; c1 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00295"></a>00295     c1-&gt;SetName(<span class="stringliteral">&quot;constant&quot;</span>);
+<a name="l00296"></a>00296     c1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;value&quot;</span>,1.0);
+<a name="l00297"></a>00297     vtkSmartPointer&lt;vtkXMLDataElement&gt; ew = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00298"></a>00298     ew-&gt;SetName(<span class="stringliteral">&quot;everywhere&quot;</span>);
+<a name="l00299"></a>00299 
+<a name="l00300"></a>00300     vtkSmartPointer&lt;vtkXMLDataElement&gt; ov1 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00301"></a>00301     ov1-&gt;SetName(<span class="stringliteral">&quot;overlay&quot;</span>);
+<a name="l00302"></a>00302     ov1-&gt;SetAttribute(<span class="stringliteral">&quot;chemical&quot;</span>,<span class="stringliteral">&quot;a&quot;</span>);
+<a name="l00303"></a>00303     ov1-&gt;AddNestedElement(ow);
+<a name="l00304"></a>00304     ov1-&gt;AddNestedElement(c1);
+<a name="l00305"></a>00305     ov1-&gt;AddNestedElement(ew);
+<a name="l00306"></a>00306     this-&gt;initial_pattern_generator.push_back(<span class="keyword">new</span> <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(ov1));
+<a name="l00307"></a>00307 
+<a name="l00308"></a>00308     vtkSmartPointer&lt;vtkXMLDataElement&gt; wn = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00309"></a>00309     wn-&gt;SetName(<span class="stringliteral">&quot;white_noise&quot;</span>);
+<a name="l00310"></a>00310     wn-&gt;SetFloatAttribute(<span class="stringliteral">&quot;low&quot;</span>,0.0);
+<a name="l00311"></a>00311     wn-&gt;SetFloatAttribute(<span class="stringliteral">&quot;high&quot;</span>,1.0);
+<a name="l00312"></a>00312     vtkSmartPointer&lt;vtkXMLDataElement&gt; p1 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00313"></a>00313     p1-&gt;SetName(<span class="stringliteral">&quot;point3D&quot;</span>);
+<a name="l00314"></a>00314     p1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;x&quot;</span>,0.5);
+<a name="l00315"></a>00315     p1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;y&quot;</span>,0);
+<a name="l00316"></a>00316     p1-&gt;SetFloatAttribute(<span class="stringliteral">&quot;z&quot;</span>,0);
+<a name="l00317"></a>00317     vtkSmartPointer&lt;vtkXMLDataElement&gt; p2 = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00318"></a>00318     p2-&gt;SetName(<span class="stringliteral">&quot;point3D&quot;</span>);
+<a name="l00319"></a>00319     p2-&gt;SetFloatAttribute(<span class="stringliteral">&quot;x&quot;</span>,1.0);
+<a name="l00320"></a>00320     p2-&gt;SetFloatAttribute(<span class="stringliteral">&quot;y&quot;</span>,1.0);
+<a name="l00321"></a>00321     p2-&gt;SetFloatAttribute(<span class="stringliteral">&quot;z&quot;</span>,1.0);
+<a name="l00322"></a>00322     vtkSmartPointer&lt;vtkXMLDataElement&gt; r = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00323"></a>00323     r-&gt;SetName(<span class="stringliteral">&quot;rectangle&quot;</span>);
+<a name="l00324"></a>00324     r-&gt;AddNestedElement(p1);
+<a name="l00325"></a>00325     r-&gt;AddNestedElement(p2);
+<a name="l00326"></a>00326     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;GetNumberOfChemicals();iChem++)
+<a name="l00327"></a>00327     {
+<a name="l00328"></a>00328         vtkSmartPointer&lt;vtkXMLDataElement&gt; ov = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00329"></a>00329         ov-&gt;SetName(<span class="stringliteral">&quot;overlay&quot;</span>);
+<a name="l00330"></a>00330         ov-&gt;SetAttribute(<span class="stringliteral">&quot;chemical&quot;</span>,<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str());
+<a name="l00331"></a>00331         ov-&gt;AddNestedElement(ow);
+<a name="l00332"></a>00332         ov-&gt;AddNestedElement(wn);
+<a name="l00333"></a>00333         ov-&gt;AddNestedElement(r);
+<a name="l00334"></a>00334         this-&gt;initial_pattern_generator.push_back(<span class="keyword">new</span> <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>(ov));
+<a name="l00335"></a>00335     }
+<a name="l00336"></a>00336 }
+<a name="l00337"></a>00337 
+<a name="l00338"></a>00338 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00339"></a>00339 
+<a name="l00340"></a><a class="code" href="classAbstractRD.html#a0a9deeb64ed0d3b69e5e70de5a7b9ff5">00340</a> <span class="keywordtype">bool</span> <a class="code" href="classAbstractRD.html#a0a9deeb64ed0d3b69e5e70de5a7b9ff5" title="Returns true if there is anything to undo.">AbstractRD::CanUndo</a>()<span class="keyword"> const</span>
+<a name="l00341"></a>00341 <span class="keyword"></span>{
+<a name="l00342"></a>00342     <span class="keywordflow">return</span> !this-&gt;undo_stack.empty() &amp;&amp; this-&gt;undo_stack.front().done;
+<a name="l00343"></a>00343 }
+<a name="l00344"></a>00344 
+<a name="l00345"></a>00345 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00346"></a>00346 
+<a name="l00347"></a><a class="code" href="classAbstractRD.html#a45c7dc3120973f42eaea81707696aa86">00347</a> <span class="keywordtype">bool</span> <a class="code" href="classAbstractRD.html#a45c7dc3120973f42eaea81707696aa86" title="Returns true if there is anything to redo.">AbstractRD::CanRedo</a>()<span class="keyword"> const</span>
+<a name="l00348"></a>00348 <span class="keyword"></span>{
+<a name="l00349"></a>00349     <span class="keywordflow">return</span> !this-&gt;undo_stack.empty() &amp;&amp; !this-&gt;undo_stack.back().done;
+<a name="l00350"></a>00350 }
+<a name="l00351"></a>00351 
+<a name="l00352"></a>00352 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00353"></a>00353 
+<a name="l00354"></a><a class="code" href="classAbstractRD.html#af5d9b53e7d329351ef2b5b0f108f01bc">00354</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#af5d9b53e7d329351ef2b5b0f108f01bc" title="Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block...">AbstractRD::SetUndoPoint</a>()
+<a name="l00355"></a>00355 {
+<a name="l00356"></a>00356     <span class="comment">// paint events are treated as a block until (e.g.) mouse up calls this function</span>
+<a name="l00357"></a>00357     <span class="keywordflow">if</span>(!this-&gt;undo_stack.empty())
+<a name="l00358"></a>00358         this-&gt;undo_stack.back().last_of_group = <span class="keyword">true</span>;
+<a name="l00359"></a>00359 }
+<a name="l00360"></a>00360 
+<a name="l00361"></a>00361 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00362"></a>00362 
+<a name="l00363"></a><a class="code" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed">00363</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed" title="Rewind all actions until the previous undo point.">AbstractRD::Undo</a>()
+<a name="l00364"></a>00364 {
+<a name="l00365"></a>00365     <span class="keywordflow">if</span>(!this-&gt;CanUndo()) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;AbstractRD::Undo() : attempt to undo when undo not possible&quot;</span>);
+<a name="l00366"></a>00366 
+<a name="l00367"></a>00367     <span class="comment">// find the last done paint action, undo backwards from there until the previous last_of_group (exclusive)</span>
+<a name="l00368"></a>00368     vector&lt;PaintAction&gt;::reverse_iterator rit;
+<a name="l00369"></a>00369     <span class="keywordflow">for</span>(rit=this-&gt;undo_stack.rbegin();!rit-&gt;done;rit++); <span class="comment">// skip over actions that have already been undone</span>
+<a name="l00370"></a>00370     <span class="keywordflow">while</span>(<span class="keyword">true</span>)
+<a name="l00371"></a>00371     {
+<a name="l00372"></a>00372         this-&gt;FlipPaintAction(*rit);
+<a name="l00373"></a>00373         rit++;
+<a name="l00374"></a>00374         <span class="keywordflow">if</span>(rit==this-&gt;undo_stack.rend() || rit-&gt;last_of_group)
+<a name="l00375"></a>00375             <span class="keywordflow">break</span>;
+<a name="l00376"></a>00376     }
+<a name="l00377"></a>00377 }
+<a name="l00378"></a>00378 
+<a name="l00379"></a>00379 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00380"></a>00380 
+<a name="l00381"></a><a class="code" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe">00381</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe" title="Redo all actions until the next undo point.">AbstractRD::Redo</a>()
+<a name="l00382"></a>00382 {
+<a name="l00383"></a>00383     <span class="keywordflow">if</span>(!this-&gt;CanRedo()) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;AbstractRD::Redo() : attempt to redo when redo not possible&quot;</span>);
+<a name="l00384"></a>00384 
+<a name="l00385"></a>00385     <span class="comment">// find the first undone paint action, redo forwards from there until the next last_of_group (inclusive)</span>
+<a name="l00386"></a>00386     vector&lt;PaintAction&gt;::iterator it;
+<a name="l00387"></a>00387     <span class="keywordflow">for</span>(it=this-&gt;undo_stack.begin();it-&gt;done;it++); <span class="comment">// skip over actions that have already been done</span>
+<a name="l00388"></a>00388     <span class="keywordflow">do</span>
+<a name="l00389"></a>00389     {
+<a name="l00390"></a>00390         this-&gt;FlipPaintAction(*it);
+<a name="l00391"></a>00391         <span class="keywordflow">if</span>(it-&gt;last_of_group) 
+<a name="l00392"></a>00392             <span class="keywordflow">break</span>;
+<a name="l00393"></a>00393         it++;
+<a name="l00394"></a>00394     } <span class="keywordflow">while</span>(it!=this-&gt;undo_stack.end());
+<a name="l00395"></a>00395 }
+<a name="l00396"></a>00396 
+<a name="l00397"></a>00397 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00398"></a>00398 
+<a name="l00399"></a><a class="code" href="classAbstractRD.html#aff3b271917b720fcdcc4faebfcaaf016">00399</a> <span class="keywordtype">void</span> <a class="code" href="classAbstractRD.html#aff3b271917b720fcdcc4faebfcaaf016" title="&lt;&lt; Undo/redo this paint action.">AbstractRD::StorePaintAction</a>(<span class="keywordtype">int</span> iChemical,<span class="keywordtype">int</span> iCell,<span class="keywordtype">float</span> old_val)
+<a name="l00400"></a>00400 {
+<a name="l00401"></a>00401     <span class="comment">// forget all stored undone actions</span>
+<a name="l00402"></a>00402     <span class="keywordflow">while</span>(!this-&gt;undo_stack.empty() &amp;&amp; !this-&gt;undo_stack.back().done)
+<a name="l00403"></a>00403         this-&gt;undo_stack.pop_back();
+<a name="l00404"></a>00404     <span class="comment">// add the new paint action</span>
+<a name="l00405"></a>00405     <a class="code" href="structAbstractRD_1_1PaintAction.html" title="We only allow undo for paint actions.">PaintAction</a> pa;
+<a name="l00406"></a>00406     pa.<a class="code" href="structAbstractRD_1_1PaintAction.html#a4d65cd2ad9005a1313572f3ae2830fa1">iCell</a> = iCell;
+<a name="l00407"></a>00407     pa.<a class="code" href="structAbstractRD_1_1PaintAction.html#ab4c915f3abd6d44726f238730aea6543">iChemical</a> = iChemical;
+<a name="l00408"></a>00408     pa.<a class="code" href="structAbstractRD_1_1PaintAction.html#a47b986ec9cf333bc0a5690ae286646d8">val</a> = old_val; <span class="comment">// (the cell itself stores the new val, we just need the old one)</span>
+<a name="l00409"></a>00409     pa.<a class="code" href="structAbstractRD_1_1PaintAction.html#a0249e81cc7f51b031d8460b54935c774">done</a> = <span class="keyword">true</span>;
+<a name="l00410"></a>00410     pa.<a class="code" href="structAbstractRD_1_1PaintAction.html#af8178bec040f89919afd7e18d20cb9e8">last_of_group</a> = <span class="keyword">false</span>;
+<a name="l00411"></a>00411     this-&gt;undo_stack.push_back(pa);
+<a name="l00412"></a>00412 }
+<a name="l00413"></a>00413 
+<a name="l00414"></a>00414 <span class="comment">// ---------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

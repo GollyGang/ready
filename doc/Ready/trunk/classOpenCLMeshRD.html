@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -142,13 +142,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a784148e1b4b6694f70e9f898c4a87b44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throws std::runtime_error with information if the formula doesn't work.  <a href="#a784148e1b4b6694f70e9f898c4a87b44"></a><br/></td></tr>
 <tr class="memitem:a639a6822e36b5ed7709941707924a55c"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a639a6822e36b5ed7709941707924a55c">GetKernel</a> () const </td></tr>
 <tr class="memdesc:a639a6822e36b5ed7709941707924a55c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full OpenCL kernel (if available, else the empty string).  <a href="#a639a6822e36b5ed7709941707924a55c"></a><br/></td></tr>
+<tr class="memitem:ae96ef70adb11db1c1111c05b2c8a250a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#ae96ef70adb11db1c1111c05b2c8a250a">SetValue</a> (float x, float y, float z, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:ae96ef70adb11db1c1111c05b2c8a250a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value at a given location.  <a href="#ae96ef70adb11db1c1111c05b2c8a250a"></a><br/></td></tr>
+<tr class="memitem:aa5f5d3a30a19fe5643909d1bb9543793"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#aa5f5d3a30a19fe5643909d1bb9543793">SetValuesInRadius</a> (float x, float y, float z, float r, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:aa5f5d3a30a19fe5643909d1bb9543793"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.  <a href="#aa5f5d3a30a19fe5643909d1bb9543793"></a><br/></td></tr>
+<tr class="memitem:a2c7f65f4469a014233cff41117a4c3cf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a2c7f65f4469a014233cff41117a4c3cf">Undo</a> ()</td></tr>
+<tr class="memdesc:a2c7f65f4469a014233cff41117a4c3cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewind all actions until the previous undo point.  <a href="#a2c7f65f4469a014233cff41117a4c3cf"></a><br/></td></tr>
+<tr class="memitem:ae75ee196a6205e478cc0de0c87b16610"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#ae75ee196a6205e478cc0de0c87b16610">Redo</a> ()</td></tr>
+<tr class="memdesc:ae75ee196a6205e478cc0de0c87b16610"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redo all actions until the next undo point.  <a href="#ae75ee196a6205e478cc0de0c87b16610"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3f804403758cabc9447cd549a9b5a53e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">InternalUpdate</a> (int n_steps)</td></tr>
 <tr class="memdesc:a3f804403758cabc9447cd549a9b5a53e"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#a3f804403758cabc9447cd549a9b5a53e"></a><br/></td></tr>
 <tr class="memitem:a5affab3bf27a6a237476014a62c01ecd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">ReloadKernelIfNeeded</a> ()</td></tr>
 <tr class="memitem:a73c82e4bb80dcb8a307812f2bc1c129d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">CreateOpenCLBuffers</a> ()</td></tr>
-<tr class="memitem:a2f3d61ad3a701892732157ee689164ab"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">WriteToOpenCLBuffers</a> ()</td></tr>
+<tr class="memitem:af0fa718e880cd8ace9c77bdb78da07ac"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#af0fa718e880cd8ace9c77bdb78da07ac">WriteToOpenCLBuffersIfNeeded</a> ()</td></tr>
 <tr class="memitem:a02059787f6d3b34b84edfb8402a6735a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">ReadFromOpenCLBuffers</a> ()</td></tr>
 <tr class="memitem:aa34d1d56b52cb1e21a52aeb26f4af8d9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">ReleaseOpenCLBuffers</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pri-attribs"></a>
@@ -258,7 +266,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00285">285</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00286">286</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +287,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00262">262</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00263">263</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -299,7 +307,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00185">185</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00182">182</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +372,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classMeshRD.html#aea439a0c84c616efb787cce88a64e51c">MeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00277">277</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00278">278</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -451,7 +459,29 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00248">248</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00249">249</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae75ee196a6205e478cc0de0c87b16610"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#ae75ee196a6205e478cc0de0c87b16610">OpenCLMeshRD::Redo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Redo all actions until the next undo point. </p>
+
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00327">327</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -471,7 +501,7 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00293">293</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00294">294</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +521,7 @@ Private Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00133">133</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00134">134</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -561,6 +591,114 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ae96ef70adb11db1c1111c05b2c8a250a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#ae96ef70adb11db1c1111c05b2c8a250a">OpenCLMeshRD::SetValue</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value at a given location. </p>
+
+<p>Reimplemented from <a class="el" href="classMeshRD.html#ad6092c5c5283a64faf0bfd09e8323086">MeshRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00303">303</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa5f5d3a30a19fe5643909d1bb9543793"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#aa5f5d3a30a19fe5643909d1bb9543793">OpenCLMeshRD::SetValuesInRadius</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box. </p>
+
+<p>Reimplemented from <a class="el" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2">MeshRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00311">311</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a784148e1b4b6694f70e9f898c4a87b44"></a>
 <div class="memitem">
 <div class="memproto">
@@ -580,16 +718,38 @@ Private Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a1f8ac307cb768147fcef9ebfffe0a637">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00270">270</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00271">271</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2f3d61ad3a701892732157ee689164ab"></a>
+<a class="anchor" id="a2c7f65f4469a014233cff41117a4c3cf"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">OpenCLMeshRD::WriteToOpenCLBuffers</a> </td>
+          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#a2c7f65f4469a014233cff41117a4c3cf">OpenCLMeshRD::Undo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Rewind all actions until the previous undo point. </p>
+
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00319">319</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af0fa718e880cd8ace9c77bdb78da07ac"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLMeshRD.html#af0fa718e880cd8ace9c77bdb78da07ac">OpenCLMeshRD::WriteToOpenCLBuffersIfNeeded</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [protected, virtual]</code></td>
@@ -598,9 +758,9 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Implements <a class="el" href="classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0">OpenCL_MixIn</a>.</p>
+<p>Implements <a class="el" href="classOpenCL__MixIn.html#ac0b554b0a226df5b766d2fb6cdb0b7e5">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00220">220</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8cpp_source.html#l00217">217</a> of file <a class="el" href="OpenCLMeshRD_8cpp_source.html">OpenCLMeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -616,7 +776,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00063">63</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00069">69</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -631,7 +791,7 @@ Private Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00064">64</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLMeshRD_8hpp_source.html#l00070">70</a> of file <a class="el" href="OpenCLMeshRD_8hpp_source.html">OpenCLMeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -643,7 +803,7 @@ Private Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

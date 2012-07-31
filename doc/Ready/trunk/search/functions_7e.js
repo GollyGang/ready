@@ -8,6 +8,7 @@ var searchData=
   ['_7egrayscottimagerd',['~GrayScottImageRD',['../classGrayScottImageRD.html#afae05508c18948e41bab4300837912c2',1,'GrayScottImageRD']]],
   ['_7egrayscottmeshrd',['~GrayScottMeshRD',['../classGrayScottMeshRD.html#a7f544018d384fe4fe868e107f4c2eded',1,'GrayScottMeshRD']]],
   ['_7eimagerd',['~ImageRD',['../classImageRD.html#a388870afb32f96a69d9780dec3d54f02',1,'ImageRD']]],
+  ['_7eipainthandler',['~IPaintHandler',['../classIPaintHandler.html#adc322cf730ed434a961b2e771378afa1',1,'IPaintHandler']]],
   ['_7ekeycomboctrl',['~KeyComboCtrl',['../classKeyComboCtrl.html#afd6909afdc6623542b44a8b784729f8f',1,'KeyComboCtrl']]],
   ['_7elineargradient',['~LinearGradient',['../classLinearGradient.html#a44eae4784c0f7c2f20011c0fc01ae591',1,'LinearGradient']]],
   ['_7elinereader',['~linereader',['../classlinereader.html#a6866e7f6874a47ba10f92cdc5b8332ba',1,'linereader']]],

@@ -11,6 +11,7 @@ var searchData=
   ['recordframe',['RecordFrame',['../classMyFrame.html#ab85937d2dd40e771a900c367dda30085',1,'MyFrame']]],
   ['recordingdialog',['RecordingDialog',['../classRecordingDialog.html#a6aea8add1e0da9cb26e8219a5110dd1a',1,'RecordingDialog']]],
   ['rectangle',['Rectangle',['../classRectangle.html#a89135f9b37443c7ae6621fccb49a17b4',1,'Rectangle']]],
+  ['redo',['Redo',['../classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe',1,'AbstractRD::Redo()'],['../classOpenCLImageRD.html#ab74269b8f441a8fe561c46f29337908f',1,'OpenCLImageRD::Redo()'],['../classOpenCLMeshRD.html#ae75ee196a6205e478cc0de0c87b16610',1,'OpenCLMeshRD::Redo()']]],
   ['releaseopenclbuffers',['ReleaseOpenCLBuffers',['../classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9',1,'OpenCL_MixIn::ReleaseOpenCLBuffers()'],['../classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9',1,'OpenCLMeshRD::ReleaseOpenCLBuffers()']]],
   ['reloadcontextifneeded',['ReloadContextIfNeeded',['../classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c',1,'OpenCL_MixIn']]],
   ['reloadkernelifneeded',['ReloadKernelIfNeeded',['../classOpenCL__MixIn.html#ae662a2ff58829e5e79dee44b44aa0011',1,'OpenCL_MixIn::ReloadKernelIfNeeded()'],['../classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a',1,'OpenCLImageRD::ReloadKernelIfNeeded()'],['../classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd',1,'OpenCLMeshRD::ReloadKernelIfNeeded()']]],
@@ -20,5 +21,7 @@ var searchData=
   ['resetposition',['ResetPosition',['../classInfoPanel.html#ad84a456bdb801d1c0f425d6f35e10a24',1,'InfoPanel']]],
   ['resetscrollpos',['ResetScrollPos',['../classHtmlInfo.html#af3ef1b27ebccdc1b3430170b32399e07',1,'HtmlInfo']]],
   ['restorescrollpos',['RestoreScrollPos',['../classHtmlInfo.html#a86d23b06f9adfff1753c9fdd36adc48b',1,'HtmlInfo']]],
-  ['restorestartingpattern',['RestoreStartingPattern',['../classAbstractRD.html#aa3b511ef22685dc79c26380b6c454f8f',1,'AbstractRD::RestoreStartingPattern()'],['../classImageRD.html#a87da400e21de530cd83ba9aff345a57d',1,'ImageRD::RestoreStartingPattern()'],['../classMeshRD.html#a7a70b84fc183252bd4bae27999bcc9e1',1,'MeshRD::RestoreStartingPattern()']]]
+  ['restorestartingpattern',['RestoreStartingPattern',['../classAbstractRD.html#aa3b511ef22685dc79c26380b6c454f8f',1,'AbstractRD::RestoreStartingPattern()'],['../classImageRD.html#a87da400e21de530cd83ba9aff345a57d',1,'ImageRD::RestoreStartingPattern()'],['../classMeshRD.html#a7a70b84fc183252bd4bae27999bcc9e1',1,'MeshRD::RestoreStartingPattern()']]],
+  ['rightmousedown',['RightMouseDown',['../classMyFrame.html#a22dbe4a2c263d6270c887d31b0c82ce1',1,'MyFrame::RightMouseDown()'],['../classIPaintHandler.html#ae698e31df39f40f14092cb9c2f92ec9f',1,'IPaintHandler::RightMouseDown()']]],
+  ['rightmouseup',['RightMouseUp',['../classMyFrame.html#a29a43a43ca04de27d35b33e2d9f0ed5d',1,'MyFrame::RightMouseUp()'],['../classIPaintHandler.html#a84221976bb145414aa9ee6f24d0645d5',1,'IPaintHandler::RightMouseUp()']]]
 ];

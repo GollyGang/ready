@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -185,13 +185,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00081"></a><a class="code" href="classXML__Object.html#a4d2ccbb4acb2ec35d1dc499c9fa7e94a">00081</a>         <a class="code" href="classXML__Object.html#a4d2ccbb4acb2ec35d1dc499c9fa7e94a">XML_Object</a>(<span class="keyword">const</span> vtkXMLDataElement* node) {}
 <a name="l00082"></a>00082         <span class="keyword">virtual</span> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classXML__Object.html#aa595163ff07b0c5812fe53e8826b29b9">GetAsXML</a>() <span class="keyword">const</span> =0;
 <a name="l00083"></a>00083 };
-<a name="l00084"></a>00084 
-<a name="l00085"></a>00085 <span class="preprocessor">#endif</span>
+<a name="l00084"></a>00084 <span class="comment"></span>
+<a name="l00085"></a>00085 <span class="comment">/// Interpolate between two RGB colors, first converting to HSV and converting the result back to RGB</span>
+<a name="l00086"></a>00086 <span class="comment"></span><span class="keywordtype">void</span> <a class="code" href="utils_8cpp.html#aa5175019d20c35ad2ed7566bd7513c19" title="Interpolate between two RGB colors, first converting to HSV and converting the result back to RGB...">InterpolateInHSV</a>(<span class="keyword">const</span> <span class="keywordtype">float</span> r1,<span class="keyword">const</span> <span class="keywordtype">float</span> g1,<span class="keyword">const</span> <span class="keywordtype">float</span> b1,<span class="keyword">const</span> <span class="keywordtype">float</span> r2,<span class="keyword">const</span> <span class="keywordtype">float</span> g2,<span class="keyword">const</span> <span class="keywordtype">float</span> b2,<span class="keyword">const</span> <span class="keywordtype">float</span> u,<span class="keywordtype">float</span>&amp; r,<span class="keywordtype">float</span>&amp; g,<span class="keywordtype">float</span>&amp; b);
+<a name="l00087"></a>00087 
+<a name="l00088"></a>00088 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

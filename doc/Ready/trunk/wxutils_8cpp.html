@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -120,6 +120,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a26f50e4eb3544de269fffd2cf13ced86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#a26f50e4eb3544de269fffd2cf13ced86">Beep</a> ()</td></tr>
 <tr class="memitem:a37c6ea79ade1a5890ed965004f74cfc4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#a37c6ea79ade1a5890ed965004f74cfc4">GetString</a> (const wxString &amp;title, const wxString &amp;prompt, const wxString &amp;instring, wxString &amp;outstring, const wxPoint &amp;pos, const wxSize &amp;size)</td></tr>
 <tr class="memitem:a7b7b5d21b602054b9bfae6b43212a699"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#a7b7b5d21b602054b9bfae6b43212a699">GetInteger</a> (const wxString &amp;title, const wxString &amp;prompt, int inval, int minval, int maxval, int *outval, const wxPoint &amp;pos, const wxSize &amp;size)</td></tr>
+<tr class="memitem:aa06489641002f4077a9a4b2ef0d90bb7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#aa06489641002f4077a9a4b2ef0d90bb7">GetFloat</a> (const wxString &amp;title, const wxString &amp;prompt, float inval, float *outval, const wxPoint &amp;pos, const wxSize &amp;size)</td></tr>
 <tr class="memitem:a76758ad632040bc87bae5d58aa9358de"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#a76758ad632040bc87bae5d58aa9358de">IsHTMLFile</a> (const wxString &amp;filename)</td></tr>
 <tr class="memitem:aa390352c0253eff8ca804e20566a4ce6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#aa390352c0253eff8ca804e20566a4ce6">IsTextFile</a> (const wxString &amp;filename)</td></tr>
 <tr class="memitem:aba71c60bf2fbed7083e7f571655e41f7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="wxutils_8cpp.html#aba71c60bf2fbed7083e7f571655e41f7">SaveChanges</a> (const wxString &amp;query, const wxString &amp;msg)</td></tr>
@@ -160,7 +161,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00161">161</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00178">178</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -179,7 +180,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00177">177</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00194">194</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -227,7 +228,60 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00195">195</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00212">212</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa06489641002f4077a9a4b2ef0d90bb7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="wxutils_8hpp.html#a8965fddb3e943750ffb3dba81c628f03">GetFloat</a> </td>
+          <td>(</td>
+          <td class="paramtype">const wxString &amp;&#160;</td>
+          <td class="paramname"><em>title</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const wxString &amp;&#160;</td>
+          <td class="paramname"><em>prompt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>inval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>outval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const wxPoint &amp;&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const wxSize &amp;&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00107">107</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -364,7 +418,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00107">107</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00124">124</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -383,7 +437,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00118">118</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00135">135</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -431,7 +485,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00134">134</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="wxutils_8cpp_source.html#l00151">151</a> of file <a class="el" href="wxutils_8cpp_source.html">wxutils.cpp</a>.</p>
 
 </div>
 </div>
@@ -458,7 +512,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

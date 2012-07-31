@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -183,110 +183,107 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00079"></a>00079     kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work\n&quot;</span>;
 <a name="l00080"></a>00080     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;NC;i++)
 <a name="l00081"></a>00081         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;laplacian_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; *= 4.0f;\n&quot;</span>;
-<a name="l00082"></a>00082     kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// avoid denormals\n&quot;</span>;
-<a name="l00083"></a>00083     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;NC;i++)
-<a name="l00084"></a>00084         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;laplacian_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; += 1e-6f;\n&quot;</span>;
-<a name="l00085"></a>00085     <span class="comment">// the parameters (assume all float for now)</span>
-<a name="l00086"></a>00086     kernel_source &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// parameters:\n&quot;</span>;
-<a name="l00087"></a>00087     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>.size();i++)
-<a name="l00088"></a>00088         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;float &quot;</span> &lt;&lt; this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>[i].first &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>[i].second &lt;&lt; <span class="stringliteral">&quot;f;\n&quot;</span>;
-<a name="l00089"></a>00089     <span class="comment">// the update step</span>
-<a name="l00090"></a>00090     kernel_source &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// update step:\n&quot;</span>;
+<a name="l00082"></a>00082     <span class="comment">// the parameters (assume all float for now)</span>
+<a name="l00083"></a>00083     kernel_source &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// parameters:\n&quot;</span>;
+<a name="l00084"></a>00084     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>.size();i++)
+<a name="l00085"></a>00085         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;float &quot;</span> &lt;&lt; this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>[i].first &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>[i].second &lt;&lt; <span class="stringliteral">&quot;f;\n&quot;</span>;
+<a name="l00086"></a>00086     <span class="comment">// the update step</span>
+<a name="l00087"></a>00087     kernel_source &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// update step:\n&quot;</span>;
+<a name="l00088"></a>00088     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;NC;i++)
+<a name="l00089"></a>00089         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;float delta_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; = 0.0f;\n&quot;</span>;
+<a name="l00090"></a>00090     kernel_source &lt;&lt; f &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
 <a name="l00091"></a>00091     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;NC;i++)
-<a name="l00092"></a>00092         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;float delta_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; = 0.0f;\n&quot;</span>;
-<a name="l00093"></a>00093     kernel_source &lt;&lt; f &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;
-<a name="l00094"></a>00094     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;NC;i++)
-<a name="l00095"></a>00095         kernel_source &lt;&lt; indent &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot;_out[x] = &quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; + timestep * delta_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot;;\n&quot;</span>;
-<a name="l00096"></a>00096     kernel_source &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;
-<a name="l00097"></a>00097     <span class="keywordflow">return</span> kernel_source.str();
-<a name="l00098"></a>00098 }
-<a name="l00099"></a>00099 
-<a name="l00100"></a>00100 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00101"></a>00101 
-<a name="l00102"></a><a class="code" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1">00102</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1" title="Load this pattern from an RD element.">FormulaOpenCLMeshRD::InitializeFromXML</a>(vtkXMLDataElement *rd, <span class="keywordtype">bool</span> &amp;warn_to_update)
-<a name="l00103"></a>00103 {
-<a name="l00104"></a>00104     <a class="code" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1" title="Load this pattern from an RD element.">OpenCLMeshRD::InitializeFromXML</a>(rd,warn_to_update);
+<a name="l00092"></a>00092         kernel_source &lt;&lt; indent &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot;_out[x] = &quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; + timestep * delta_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot;;\n&quot;</span>;
+<a name="l00093"></a>00093     kernel_source &lt;&lt; <span class="stringliteral">&quot;}\n&quot;</span>;
+<a name="l00094"></a>00094     <span class="keywordflow">return</span> kernel_source.str();
+<a name="l00095"></a>00095 }
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00098"></a>00098 
+<a name="l00099"></a><a class="code" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1">00099</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1" title="Load this pattern from an RD element.">FormulaOpenCLMeshRD::InitializeFromXML</a>(vtkXMLDataElement *rd, <span class="keywordtype">bool</span> &amp;warn_to_update)
+<a name="l00100"></a>00100 {
+<a name="l00101"></a>00101     <a class="code" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1" title="Load this pattern from an RD element.">OpenCLMeshRD::InitializeFromXML</a>(rd,warn_to_update);
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
+<a name="l00104"></a>00104     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found in file&quot;</span>);
 <a name="l00105"></a>00105 
-<a name="l00106"></a>00106     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
-<a name="l00107"></a>00107     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found in file&quot;</span>);
-<a name="l00108"></a>00108 
-<a name="l00109"></a>00109     <span class="comment">// formula:</span>
-<a name="l00110"></a>00110     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_formula = rule-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;formula&quot;</span>);
-<a name="l00111"></a>00111     <span class="keywordflow">if</span>(!xml_formula) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;formula node not found in file&quot;</span>);
+<a name="l00106"></a>00106     <span class="comment">// formula:</span>
+<a name="l00107"></a>00107     vtkSmartPointer&lt;vtkXMLDataElement&gt; xml_formula = rule-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;formula&quot;</span>);
+<a name="l00108"></a>00108     <span class="keywordflow">if</span>(!xml_formula) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;formula node not found in file&quot;</span>);
+<a name="l00109"></a>00109 
+<a name="l00110"></a>00110     <span class="comment">// number_of_chemicals:</span>
+<a name="l00111"></a>00111     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_formula,<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;<a class="code" href="classAbstractRD.html#a9448a66a1ea9dd6d56cfa25767ca85e8">n_chemicals</a>);
 <a name="l00112"></a>00112 
-<a name="l00113"></a>00113     <span class="comment">// number_of_chemicals:</span>
-<a name="l00114"></a>00114     <a class="code" href="utils_8hpp.html#adbd7ea497b29fd429a261f9bd9a2c704">read_required_attribute</a>(xml_formula,<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;<a class="code" href="classAbstractRD.html#a9448a66a1ea9dd6d56cfa25767ca85e8">n_chemicals</a>);
-<a name="l00115"></a>00115 
-<a name="l00116"></a>00116     <span class="keywordtype">string</span> <a class="code" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a> = <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(xml_formula-&gt;GetCharacterData());
-<a name="l00117"></a>00117     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44" title="Throws std::runtime_error with information if the formula doesn&#39;t work.">TestFormula</a>(formula); <span class="comment">// will throw on error</span>
-<a name="l00118"></a>00118     this-&gt;<a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880" title="Changes the system&#39;s formula. The kernel will be reloaded on the next update step.">SetFormula</a>(formula); <span class="comment">// (won&#39;t throw yet)</span>
-<a name="l00119"></a>00119 }
-<a name="l00120"></a>00120 
-<a name="l00121"></a>00121 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00122"></a>00122 
-<a name="l00123"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">00123</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4" title="Retrieve an RD element for this pattern, suitable for saving to file.">FormulaOpenCLMeshRD::GetAsXML</a>()<span class="keyword"> const</span>
-<a name="l00124"></a>00124 <span class="keyword"></span>{
-<a name="l00125"></a>00125     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = <a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4" title="Retrieve an RD element for this pattern, suitable for saving to file.">OpenCLMeshRD::GetAsXML</a>();
+<a name="l00113"></a>00113     <span class="keywordtype">string</span> <a class="code" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a> = <a class="code" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c" title="Read a multiline string, outputting whitespace-trimmed lines.">trim_multiline_string</a>(xml_formula-&gt;GetCharacterData());
+<a name="l00114"></a>00114     this-&gt;<a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44" title="Throws std::runtime_error with information if the formula doesn&#39;t work.">TestFormula</a>(formula); <span class="comment">// will throw on error</span>
+<a name="l00115"></a>00115     this-&gt;<a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880" title="Changes the system&#39;s formula. The kernel will be reloaded on the next update step.">SetFormula</a>(formula); <span class="comment">// (won&#39;t throw yet)</span>
+<a name="l00116"></a>00116 }
+<a name="l00117"></a>00117 
+<a name="l00118"></a>00118 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00119"></a>00119 
+<a name="l00120"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">00120</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4" title="Retrieve an RD element for this pattern, suitable for saving to file.">FormulaOpenCLMeshRD::GetAsXML</a>()<span class="keyword"> const</span>
+<a name="l00121"></a>00121 <span class="keyword"></span>{
+<a name="l00122"></a>00122     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = <a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4" title="Retrieve an RD element for this pattern, suitable for saving to file.">OpenCLMeshRD::GetAsXML</a>();
+<a name="l00123"></a>00123 
+<a name="l00124"></a>00124     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
+<a name="l00125"></a>00125     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found&quot;</span>);
 <a name="l00126"></a>00126 
-<a name="l00127"></a>00127     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
-<a name="l00128"></a>00128     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found&quot;</span>);
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130     <span class="comment">// formula</span>
-<a name="l00131"></a>00131     vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a> = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
-<a name="l00132"></a>00132     formula-&gt;SetName(<span class="stringliteral">&quot;formula&quot;</span>);
-<a name="l00133"></a>00133     formula-&gt;SetIntAttribute(<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>());
-<a name="l00134"></a>00134     formula-&gt;SetCharacterData(this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().c_str(),(<span class="keywordtype">int</span>)this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().length());
-<a name="l00135"></a>00135     rule-&gt;AddNestedElement(formula);
+<a name="l00127"></a>00127     <span class="comment">// formula</span>
+<a name="l00128"></a>00128     vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a> = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
+<a name="l00129"></a>00129     formula-&gt;SetName(<span class="stringliteral">&quot;formula&quot;</span>);
+<a name="l00130"></a>00130     formula-&gt;SetIntAttribute(<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>());
+<a name="l00131"></a>00131     formula-&gt;SetCharacterData(this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().c_str(),(<span class="keywordtype">int</span>)this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().length());
+<a name="l00132"></a>00132     rule-&gt;AddNestedElement(formula);
+<a name="l00133"></a>00133 
+<a name="l00134"></a>00134     <span class="keywordflow">return</span> rd;
+<a name="l00135"></a>00135 }
 <a name="l00136"></a>00136 
-<a name="l00137"></a>00137     <span class="keywordflow">return</span> rd;
-<a name="l00138"></a>00138 }
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00141"></a>00141 
-<a name="l00142"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">00142</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">FormulaOpenCLMeshRD::SetParameterValue</a>(<span class="keywordtype">int</span> iParam,<span class="keywordtype">float</span> val)
-<a name="l00143"></a>00143 {
-<a name="l00144"></a>00144     <a class="code" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">AbstractRD::SetParameterValue</a>(iParam,val);
-<a name="l00145"></a>00145     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
-<a name="l00146"></a>00146 }
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00149"></a>00149 
-<a name="l00150"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">00150</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">FormulaOpenCLMeshRD::SetParameterName</a>(<span class="keywordtype">int</span> iParam,<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
-<a name="l00151"></a>00151 {
-<a name="l00152"></a>00152     <a class="code" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">AbstractRD::SetParameterName</a>(iParam,s);
-<a name="l00153"></a>00153     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
-<a name="l00154"></a>00154 }
-<a name="l00155"></a>00155 
-<a name="l00156"></a>00156 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00157"></a>00157 
-<a name="l00158"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">00158</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">FormulaOpenCLMeshRD::AddParameter</a>(<span class="keyword">const</span> std::string&amp; name,<span class="keywordtype">float</span> val)
-<a name="l00159"></a>00159 {
-<a name="l00160"></a>00160     <a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">AbstractRD::AddParameter</a>(name,val);
-<a name="l00161"></a>00161     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
-<a name="l00162"></a>00162 }
-<a name="l00163"></a>00163 
-<a name="l00164"></a>00164 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00165"></a>00165 
-<a name="l00166"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">00166</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">FormulaOpenCLMeshRD::DeleteParameter</a>(<span class="keywordtype">int</span> iParam)
-<a name="l00167"></a>00167 {
-<a name="l00168"></a>00168     <a class="code" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">AbstractRD::DeleteParameter</a>(iParam);
-<a name="l00169"></a>00169     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
-<a name="l00170"></a>00170 }
-<a name="l00171"></a>00171 
-<a name="l00172"></a>00172 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00173"></a>00173 
-<a name="l00174"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">00174</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">FormulaOpenCLMeshRD::DeleteAllParameters</a>()
-<a name="l00175"></a>00175 {
-<a name="l00176"></a>00176     <a class="code" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">AbstractRD::DeleteAllParameters</a>();
-<a name="l00177"></a>00177     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
-<a name="l00178"></a>00178 }
-<a name="l00179"></a>00179 
-<a name="l00180"></a>00180 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00137"></a>00137 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00138"></a>00138 
+<a name="l00139"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">00139</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">FormulaOpenCLMeshRD::SetParameterValue</a>(<span class="keywordtype">int</span> iParam,<span class="keywordtype">float</span> val)
+<a name="l00140"></a>00140 {
+<a name="l00141"></a>00141     <a class="code" href="classFormulaOpenCLMeshRD.html#a8a593ce65f6a336d19885eec4269d611">AbstractRD::SetParameterValue</a>(iParam,val);
+<a name="l00142"></a>00142     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00143"></a>00143 }
+<a name="l00144"></a>00144 
+<a name="l00145"></a>00145 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00146"></a>00146 
+<a name="l00147"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">00147</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">FormulaOpenCLMeshRD::SetParameterName</a>(<span class="keywordtype">int</span> iParam,<span class="keyword">const</span> <span class="keywordtype">string</span>&amp; s)
+<a name="l00148"></a>00148 {
+<a name="l00149"></a>00149     <a class="code" href="classFormulaOpenCLMeshRD.html#a855eb017a6c8202306189081046106f3">AbstractRD::SetParameterName</a>(iParam,s);
+<a name="l00150"></a>00150     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00151"></a>00151 }
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00154"></a>00154 
+<a name="l00155"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">00155</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">FormulaOpenCLMeshRD::AddParameter</a>(<span class="keyword">const</span> std::string&amp; name,<span class="keywordtype">float</span> val)
+<a name="l00156"></a>00156 {
+<a name="l00157"></a>00157     <a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">AbstractRD::AddParameter</a>(name,val);
+<a name="l00158"></a>00158     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00159"></a>00159 }
+<a name="l00160"></a>00160 
+<a name="l00161"></a>00161 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00162"></a>00162 
+<a name="l00163"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">00163</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">FormulaOpenCLMeshRD::DeleteParameter</a>(<span class="keywordtype">int</span> iParam)
+<a name="l00164"></a>00164 {
+<a name="l00165"></a>00165     <a class="code" href="classFormulaOpenCLMeshRD.html#a3666b9e142c8af2d9798c1709a8786e0">AbstractRD::DeleteParameter</a>(iParam);
+<a name="l00166"></a>00166     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00167"></a>00167 }
+<a name="l00168"></a>00168 
+<a name="l00169"></a>00169 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00170"></a>00170 
+<a name="l00171"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">00171</a> <span class="keywordtype">void</span> <a class="code" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">FormulaOpenCLMeshRD::DeleteAllParameters</a>()
+<a name="l00172"></a>00172 {
+<a name="l00173"></a>00173     <a class="code" href="classFormulaOpenCLMeshRD.html#a363bba1185481196b4d138321f8ee344">AbstractRD::DeleteAllParameters</a>();
+<a name="l00174"></a>00174     this-&gt;<a class="code" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a> = <span class="keyword">true</span>;
+<a name="l00175"></a>00175 }
+<a name="l00176"></a>00176 
+<a name="l00177"></a>00177 <span class="comment">// -------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

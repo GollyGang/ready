@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -134,16 +134,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5e16eb5ca7640418eca7339634cdfb2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throws std::runtime_error with information if the formula doesn't work.  <a href="#a5e16eb5ca7640418eca7339634cdfb2b"></a><br/></td></tr>
 <tr class="memitem:a31a6a8577a8daf5a8839747554fe7420"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a31a6a8577a8daf5a8839747554fe7420">GetKernel</a> () const </td></tr>
 <tr class="memdesc:a31a6a8577a8daf5a8839747554fe7420"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the full OpenCL kernel (if available, else the empty string).  <a href="#a31a6a8577a8daf5a8839747554fe7420"></a><br/></td></tr>
+<tr class="memitem:a67093fd83881018877970bc9721a2ca6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a67093fd83881018877970bc9721a2ca6">SetValue</a> (float x, float y, float z, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:a67093fd83881018877970bc9721a2ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value at a given location.  <a href="#a67093fd83881018877970bc9721a2ca6"></a><br/></td></tr>
+<tr class="memitem:a0d2fb4692b4fa576a7f2b209f56a48b9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a0d2fb4692b4fa576a7f2b209f56a48b9">SetValuesInRadius</a> (float x, float y, float z, float r, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
+<tr class="memdesc:a0d2fb4692b4fa576a7f2b209f56a48b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.  <a href="#a0d2fb4692b4fa576a7f2b209f56a48b9"></a><br/></td></tr>
+<tr class="memitem:ab2f28d1ce7b1da3bd50e1ce94f58311b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#ab2f28d1ce7b1da3bd50e1ce94f58311b">Undo</a> ()</td></tr>
+<tr class="memdesc:ab2f28d1ce7b1da3bd50e1ce94f58311b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewind all actions until the previous undo point.  <a href="#ab2f28d1ce7b1da3bd50e1ce94f58311b"></a><br/></td></tr>
+<tr class="memitem:ab74269b8f441a8fe561c46f29337908f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#ab74269b8f441a8fe561c46f29337908f">Redo</a> ()</td></tr>
+<tr class="memdesc:ab74269b8f441a8fe561c46f29337908f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redo all actions until the next undo point.  <a href="#ab74269b8f441a8fe561c46f29337908f"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:aa84aaabe35569bcfafd50ea8c0f36352"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#aa84aaabe35569bcfafd50ea8c0f36352">CopyFromImage</a> (vtkImageData *im)</td></tr>
 <tr class="memitem:a2b45e9256c9412d3b57b49fb87df4cf6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a2b45e9256c9412d3b57b49fb87df4cf6">AllocateImages</a> (int x, int y, int z, int nc)</td></tr>
 <tr class="memdesc:a2b45e9256c9412d3b57b49fb87df4cf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">use to change the dimensions or the number of chemicals  <a href="#a2b45e9256c9412d3b57b49fb87df4cf6"></a><br/></td></tr>
 <tr class="memitem:a4740537884f5b8d7e544d9a0689c11a5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a4740537884f5b8d7e544d9a0689c11a5">InternalUpdate</a> (int n_steps)</td></tr>
-<tr class="memdesc:a4740537884f5b8d7e544d9a0689c11a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#a4740537884f5b8d7e544d9a0689c11a5"></a><br/></td></tr>
+<tr class="memdesc:a4740537884f5b8d7e544d9a0689c11a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advance the RD system by n timesteps.  <a href="#a4740537884f5b8d7e544d9a0689c11a5"></a><br/></td></tr>
 <tr class="memitem:a8af8f615bc238a4493d86368d47f621a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a8af8f615bc238a4493d86368d47f621a">ReloadKernelIfNeeded</a> ()</td></tr>
 <tr class="memitem:a4548ce92403d8765c6bd42e584df9ce2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a4548ce92403d8765c6bd42e584df9ce2">CreateOpenCLBuffers</a> ()</td></tr>
-<tr class="memitem:abcd5e979e5af088561f1601ef91669e8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#abcd5e979e5af088561f1601ef91669e8">WriteToOpenCLBuffers</a> ()</td></tr>
+<tr class="memitem:a21ee57d6237f583f5f47b04012dc7ae2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#a21ee57d6237f583f5f47b04012dc7ae2">WriteToOpenCLBuffersIfNeeded</a> ()</td></tr>
 <tr class="memitem:ab0e9644914548bce785cf766e0aa0f40"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOpenCLImageRD.html#ab0e9644914548bce785cf766e0aa0f40">ReadFromOpenCLBuffers</a> ()</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
@@ -283,7 +291,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a2ccc9b27cd3680e56f05fd9dad2a1a76">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00093">93</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00089">89</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -366,11 +374,11 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>advance the RD system by n timesteps </p>
+<p>Advance the RD system by n timesteps. </p>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a6353d2e211e79a2d0d883cbe8719801b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00169">169</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00170">170</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -390,7 +398,29 @@ Protected Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a8342ea34c3d1d359f85f5606729441f0">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00200">200</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00202">202</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab74269b8f441a8fe561c46f29337908f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#ab74269b8f441a8fe561c46f29337908f">OpenCLImageRD::Redo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Redo all actions until the next undo point. </p>
+
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00247">247</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -414,6 +444,114 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a67093fd83881018877970bc9721a2ca6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#a67093fd83881018877970bc9721a2ca6">OpenCLImageRD::SetValue</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value at a given location. </p>
+
+<p>Reimplemented from <a class="el" href="classImageRD.html#a284a43eee4d9e9c1e8f331796b6802d6">ImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00223">223</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0d2fb4692b4fa576a7f2b209f56a48b9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#a0d2fb4692b4fa576a7f2b209f56a48b9">OpenCLImageRD::SetValuesInRadius</a> </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
+          <td class="paramname"><em>render_settings</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box. </p>
+
+<p>Reimplemented from <a class="el" href="classImageRD.html#a13ee9311409cd9f7885137be6483acf7">ImageRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00231">231</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a5e16eb5ca7640418eca7339634cdfb2b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -433,16 +571,38 @@ Protected Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a1f8ac307cb768147fcef9ebfffe0a637">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00214">214</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00216">216</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="abcd5e979e5af088561f1601ef91669e8"></a>
+<a class="anchor" id="ab2f28d1ce7b1da3bd50e1ce94f58311b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#abcd5e979e5af088561f1601ef91669e8">OpenCLImageRD::WriteToOpenCLBuffers</a> </td>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#ab2f28d1ce7b1da3bd50e1ce94f58311b">OpenCLImageRD::Undo</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Rewind all actions until the previous undo point. </p>
+
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00239">239</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a21ee57d6237f583f5f47b04012dc7ae2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classOpenCLImageRD.html#a21ee57d6237f583f5f47b04012dc7ae2">OpenCLImageRD::WriteToOpenCLBuffersIfNeeded</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td><code> [protected, virtual]</code></td>
@@ -451,9 +611,9 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Implements <a class="el" href="classOpenCL__MixIn.html#a1c5b9547ee99df7afc391c86028403f0">OpenCL_MixIn</a>.</p>
+<p>Implements <a class="el" href="classOpenCL__MixIn.html#ac0b554b0a226df5b766d2fb6cdb0b7e5">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00117">117</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="OpenCLImageRD_8cpp_source.html#l00113">113</a> of file <a class="el" href="OpenCLImageRD_8cpp_source.html">OpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +625,7 @@ Protected Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

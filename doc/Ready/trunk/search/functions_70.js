@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['panename',['PaneName',['../frame_8cpp.html#adb2d02d23949d250b57d1b3e00210c70',1,'frame.cpp']]],
+  ['panename',['PaneName',['../frame_8cpp.html#a95eac21faf5fc712c40ed6a2a98cca6c',1,'frame.cpp']]],
   ['parameter',['Parameter',['../classParameter.html#ac4bebcb6f564c3b250a584a9d80e4b19',1,'Parameter']]],
   ['parameterdialog',['ParameterDialog',['../classParameterDialog.html#aed0943774f8a2ab0827e366ee23e377d',1,'ParameterDialog']]],
   ['patternspanel',['PatternsPanel',['../classPatternsPanel.html#a73e08a53c9354c2dbc222c7d086275c2',1,'PatternsPanel']]],

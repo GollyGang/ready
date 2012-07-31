@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -109,6 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;stdlib.h&gt;</code><br/>
 <code>#include &lt;math.h&gt;</code><br/>
 <code>#include &lt;limits.h&gt;</code><br/>
+<code>#include &lt;vtkMath.h&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
 <code>#include &lt;sys/time.h&gt;</code><br/>
 </div>
@@ -128,6 +129,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a68e90099fe736c151fdf42384c533550"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a> (const string &amp;s)</td></tr>
 <tr class="memitem:a75e5c80de9908b2489395ca1ce32a09c"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#a75e5c80de9908b2489395ca1ce32a09c">trim_multiline_string</a> (const char *s)</td></tr>
 <tr class="memdesc:a75e5c80de9908b2489395ca1ce32a09c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a multiline string, outputting whitespace-trimmed lines.  <a href="#a75e5c80de9908b2489395ca1ce32a09c"></a><br/></td></tr>
+<tr class="memitem:aa5175019d20c35ad2ed7566bd7513c19"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utils_8cpp.html#aa5175019d20c35ad2ed7566bd7513c19">InterpolateInHSV</a> (const float r1, const float g1, const float b1, const float r2, const float g2, const float b2, const float u, float &amp;r, float &amp;g, float &amp;b)</td></tr>
+<tr class="memdesc:aa5175019d20c35ad2ed7566bd7513c19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolate between two RGB colors, first converting to HSV and converting the result back to RGB.  <a href="#aa5175019d20c35ad2ed7566bd7513c19"></a><br/></td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
 <a class="anchor" id="a0412adea509416f7429c4616189f3b2d"></a>
@@ -155,7 +158,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00059">59</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00068">68</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -186,7 +189,7 @@ template&lt;&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00080">80</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00097">97</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -204,7 +207,7 @@ template&lt;&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00052">52</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00059">59</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -225,7 +228,7 @@ template&lt;&gt; </div>
 
 <p>a, b, c, ... z, aa, ab, ... </p>
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00086">86</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00105">105</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -254,7 +257,7 @@ template&lt;&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00064">64</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00075">75</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +292,7 @@ template&lt;&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00069">69</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00082">82</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +311,86 @@ template&lt;&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00095">95</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00116">116</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa5175019d20c35ad2ed7566bd7513c19"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="utils_8hpp.html#aa5175019d20c35ad2ed7566bd7513c19">InterpolateInHSV</a> </td>
+          <td>(</td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>r1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>g1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>b1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>r2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>g2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>b2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const float&#160;</td>
+          <td class="paramname"><em>u</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float &amp;&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float &amp;&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float &amp;&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Interpolate between two RGB colors, first converting to HSV and converting the result back to RGB. </p>
+
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00163">163</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -329,7 +411,7 @@ template&lt;&gt; </div>
 
 <p>Read a multiline string, outputting whitespace-trimmed lines. </p>
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00104">104</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00127">127</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +464,7 @@ template&lt;&gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00074">74</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
+<p>Definition at line <a class="el" href="utils_8cpp_source.html#l00089">89</a> of file <a class="el" href="utils_8cpp_source.html">utils.cpp</a>.</p>
 
 </div>
 </div>
@@ -390,7 +472,7 @@ template&lt;&gt; </div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

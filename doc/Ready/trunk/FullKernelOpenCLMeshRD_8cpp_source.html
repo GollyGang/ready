@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -180,21 +180,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00076"></a>00076     vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classOpenCL__MixIn.html#ab48363dfed5b16c93bbea7244039ab19">kernel</a> = vtkSmartPointer&lt;vtkXMLDataElement&gt;::New();
 <a name="l00077"></a>00077     kernel-&gt;SetName(<span class="stringliteral">&quot;kernel&quot;</span>);
 <a name="l00078"></a>00078     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;number_of_chemicals&quot;</span>,this-&gt;<a class="code" href="classAbstractRD.html#a1af68c913b7bdf6b344b15dc46415646">GetNumberOfChemicals</a>());
-<a name="l00079"></a>00079     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_x&quot;</span>,1);
-<a name="l00080"></a>00080     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_y&quot;</span>,1);
-<a name="l00081"></a>00081     kernel-&gt;SetIntAttribute(<span class="stringliteral">&quot;block_size_z&quot;</span>,1);
-<a name="l00082"></a>00082     kernel-&gt;SetCharacterData(this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().c_str(),(<span class="keywordtype">int</span>)this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().length());
-<a name="l00083"></a>00083     rule-&gt;AddNestedElement(kernel);
+<a name="l00079"></a>00079     kernel-&gt;SetCharacterData(this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().c_str(),(<span class="keywordtype">int</span>)this-&gt;<a class="code" href="classAbstractRD.html#a0bdce58dce0010ad86ad2cbd9ffcdb77" title="The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that driv...">GetFormula</a>().length());
+<a name="l00080"></a>00080     rule-&gt;AddNestedElement(kernel);
+<a name="l00081"></a>00081 
+<a name="l00082"></a>00082     <span class="keywordflow">return</span> rd;
+<a name="l00083"></a>00083 }
 <a name="l00084"></a>00084 
-<a name="l00085"></a>00085     <span class="keywordflow">return</span> rd;
-<a name="l00086"></a>00086 }
-<a name="l00087"></a>00087 
-<a name="l00088"></a>00088 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
+<a name="l00085"></a>00085 <span class="comment">// ---------------------------------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -151,29 +151,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00047"></a>00047         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a784148e1b4b6694f70e9f898c4a87b44" title="Throws std::runtime_error with information if the formula doesn&#39;t work.">TestFormula</a>(std::string program_string);
 <a name="l00048"></a><a class="code" href="classOpenCLMeshRD.html#a639a6822e36b5ed7709941707924a55c">00048</a>         <span class="keyword">virtual</span> std::string <a class="code" href="classOpenCLMeshRD.html#a639a6822e36b5ed7709941707924a55c" title="Return the full OpenCL kernel (if available, else the empty string).">GetKernel</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> this-&gt;<a class="code" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">AssembleKernelSourceFromFormula</a>(this-&gt;<a class="code" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a>); } 
 <a name="l00049"></a>00049 
-<a name="l00050"></a>00050     <span class="keyword">protected</span>:
-<a name="l00051"></a>00051 
-<a name="l00052"></a>00052         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e" title="advance the RD system by n timesteps">InternalUpdate</a>(<span class="keywordtype">int</span> n_steps);
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">ReloadKernelIfNeeded</a>();
+<a name="l00050"></a>00050         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#ae96ef70adb11db1c1111c05b2c8a250a" title="Set the value at a given location.">SetValue</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keywordtype">float</span> val,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
+<a name="l00051"></a>00051         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#aa5f5d3a30a19fe5643909d1bb9543793" title="Set the value of all cells within radius r of a given location. The radius is expressed as a proporti...">SetValuesInRadius</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keywordtype">float</span> r,<span class="keywordtype">float</span> val,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings);
+<a name="l00052"></a>00052 
+<a name="l00053"></a>00053         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a2c7f65f4469a014233cff41117a4c3cf" title="Rewind all actions until the previous undo point.">Undo</a>();
+<a name="l00054"></a>00054         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#ae75ee196a6205e478cc0de0c87b16610" title="Redo all actions until the next undo point.">Redo</a>();
 <a name="l00055"></a>00055 
-<a name="l00056"></a>00056         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">CreateOpenCLBuffers</a>();
-<a name="l00057"></a>00057         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a2f3d61ad3a701892732157ee689164ab">WriteToOpenCLBuffers</a>();
-<a name="l00058"></a>00058         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">ReadFromOpenCLBuffers</a>();
-<a name="l00059"></a>00059         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">ReleaseOpenCLBuffers</a>();
-<a name="l00060"></a>00060 
-<a name="l00061"></a>00061     <span class="keyword">private</span>:
-<a name="l00062"></a>00062 
-<a name="l00063"></a><a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">00063</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a> <a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a>;
-<a name="l00064"></a><a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">00064</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a> <a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a>;
-<a name="l00065"></a>00065 };
+<a name="l00056"></a>00056     <span class="keyword">protected</span>:
+<a name="l00057"></a>00057 
+<a name="l00058"></a>00058         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e" title="advance the RD system by n timesteps">InternalUpdate</a>(<span class="keywordtype">int</span> n_steps);
+<a name="l00059"></a>00059 
+<a name="l00060"></a>00060         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a5affab3bf27a6a237476014a62c01ecd">ReloadKernelIfNeeded</a>();
+<a name="l00061"></a>00061 
+<a name="l00062"></a>00062         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a73c82e4bb80dcb8a307812f2bc1c129d">CreateOpenCLBuffers</a>();
+<a name="l00063"></a>00063         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#af0fa718e880cd8ace9c77bdb78da07ac">WriteToOpenCLBuffersIfNeeded</a>();
+<a name="l00064"></a>00064         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#a02059787f6d3b34b84edfb8402a6735a">ReadFromOpenCLBuffers</a>();
+<a name="l00065"></a>00065         <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classOpenCLMeshRD.html#aa34d1d56b52cb1e21a52aeb26f4af8d9">ReleaseOpenCLBuffers</a>();
 <a name="l00066"></a>00066 
-<a name="l00067"></a>00067 <span class="preprocessor">#endif</span>
+<a name="l00067"></a>00067     <span class="keyword">private</span>:
+<a name="l00068"></a>00068 
+<a name="l00069"></a><a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">00069</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a> <a class="code" href="classOpenCLMeshRD.html#a9395118c63a8fbe709c77eda83c93b79">clBuffer_cell_neighbor_indices</a>;
+<a name="l00070"></a><a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">00070</a>         <a class="code" href="OpenCL__Dyn__Load_8h.html#af2141916ad9655073b9810d7bc71494d">cl_mem</a> <a class="code" href="classOpenCLMeshRD.html#ad10e86d478e34932212fafe5a87f7ff5">clBuffer_cell_neighbor_weights</a>;
+<a name="l00071"></a>00071 };
+<a name="l00072"></a>00072 
+<a name="l00073"></a>00073 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

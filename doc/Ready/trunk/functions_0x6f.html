@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -84,6 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
+      <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_eval.html"><span>Enumerator</span></a></li>
     </ul>
   </div>
@@ -173,6 +174,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>OnChangeActiveChemical()
 : <a class="el" href="classMyFrame.html#a47f01b7eaaec08a2b57cbbab61c11327">MyFrame</a>
 </li>
+<li>OnChangeCurrentColor()
+: <a class="el" href="classMyFrame.html#a6428f219489dc6a278221a14cf0cd795">MyFrame</a>
+</li>
 <li>OnChangeFolder()
 : <a class="el" href="classRecordingDialog.html#ab423f8552cfb4ffbfbd0d05b9318054b">RecordingDialog</a>
 </li>
@@ -255,14 +259,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>OnKeyDown()
 : <a class="el" href="classMyFrame.html#ac0457b9e23e582141215c35e5d42d97c">MyFrame</a>
+, <a class="el" href="classInteractorStylePainter.html#a471cd7b00c83364fd30c5625e027f232">InteractorStylePainter</a>
 , <a class="el" href="classKeyComboCtrl.html#a4b5954f97910a9b40bcacf98f6a86503">KeyComboCtrl</a>
 , <a class="el" href="classwxVTKRenderWindowInteractor.html#a2560dd32dcd063e46096df3209a21a4a">wxVTKRenderWindowInteractor</a>
 </li>
 <li>OnKeyUp()
-: <a class="el" href="classwxVTKRenderWindowInteractor.html#a39bc125d3a6b53b8e67cf43fbd3460ed">wxVTKRenderWindowInteractor</a>
+: <a class="el" href="classInteractorStylePainter.html#a2f1015f9aae9fee9740606424390c6f9">InteractorStylePainter</a>
+, <a class="el" href="classwxVTKRenderWindowInteractor.html#a39bc125d3a6b53b8e67cf43fbd3460ed">wxVTKRenderWindowInteractor</a>
 </li>
 <li>OnLeave()
 : <a class="el" href="classwxVTKRenderWindowInteractor.html#a8e96fcd8b16fb69df624ee26601ca6e4">wxVTKRenderWindowInteractor</a>
+</li>
+<li>OnLeftButtonDown()
+: <a class="el" href="classInteractorStylePainter.html#ac98ff4e49606698299f3634c804f1bbf">InteractorStylePainter</a>
+</li>
+<li>OnLeftButtonUp()
+: <a class="el" href="classInteractorStylePainter.html#a625b1fb1a4db373387f3e33a5e61e0d7">InteractorStylePainter</a>
 </li>
 <li>OnLinkClicked()
 : <a class="el" href="classHtmlView.html#a533f451655f4560ad5fa23fba448995f">HtmlView</a>
@@ -282,6 +294,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>OnMouseMotion()
 : <a class="el" href="classHtmlView.html#a620ef97a6ea41fc43162b8a49bcf569b">HtmlView</a>
 , <a class="el" href="classHtmlInfo.html#a1db6f2590f79b6afc7c09db6faff1174">HtmlInfo</a>
+</li>
+<li>OnMouseMove()
+: <a class="el" href="classInteractorStylePainter.html#afb5adabec2febe7a5f091e4abd9910a3">InteractorStylePainter</a>
 </li>
 <li>OnMouseWheel()
 : <a class="el" href="classwxVTKRenderWindowInteractor.html#aca87671956a5660b4780bbb0935c2e12">wxVTKRenderWindowInteractor</a>
@@ -322,6 +337,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>OnQuit()
 : <a class="el" href="classMyFrame.html#a9e6c4824efad3aa9f4c3a3025a616e2d">MyFrame</a>
 </li>
+<li>OnRecordFrames()
+: <a class="el" href="classMyFrame.html#a7d7e5f90144d2673603071d8af6e291c">MyFrame</a>
+</li>
+<li>OnRedo()
+: <a class="el" href="classMyFrame.html#a65b4b5ca13e8530d79ca95319abd063b">MyFrame</a>
+</li>
 <li>OnReloadFromDisk()
 : <a class="el" href="classMyFrame.html#a8ea505e7020bdb7a997d29f61113be0a">MyFrame</a>
 </li>
@@ -330,6 +351,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </li>
 <li>OnRestoreDefaultPerspective()
 : <a class="el" href="classMyFrame.html#a56f2c479de5f3c59ffb2bc1e2cb78bc7">MyFrame</a>
+</li>
+<li>OnRightButtonDown()
+: <a class="el" href="classInteractorStylePainter.html#aa34ccafa77c0d3ed05c0765518df359f">InteractorStylePainter</a>
+</li>
+<li>OnRightButtonUp()
+: <a class="el" href="classInteractorStylePainter.html#afb43b2f67299133e6bc102b2903dd473">InteractorStylePainter</a>
 </li>
 <li>OnRunFaster()
 : <a class="el" href="classMyFrame.html#ab1fd5daf722d8dffba0efa6e197b42d2">MyFrame</a>
@@ -349,27 +376,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>OnSelectAll()
 : <a class="el" href="classMyFrame.html#a23a6bc0797a79648a27a18c5ecb6bb7d">MyFrame</a>
 </li>
+<li>OnSelectBrushTool()
+: <a class="el" href="classMyFrame.html#a04d44874b316b00b2f2041f12d6fe7be">MyFrame</a>
+</li>
 <li>OnSelectOpenCLDevice()
 : <a class="el" href="classMyFrame.html#afa0f14ee2bdd4f9fb69d66315e056384">MyFrame</a>
 </li>
+<li>OnSelectPencilTool()
+: <a class="el" href="classMyFrame.html#aadbb91db7e448c5b23dde23ba3a86af1">MyFrame</a>
+</li>
+<li>OnSelectPickerTool()
+: <a class="el" href="classMyFrame.html#ac846c6c7f57c78fd095842aa759f75bf">MyFrame</a>
+</li>
+<li>OnSelectPointerTool()
+: <a class="el" href="classMyFrame.html#a5e0206ac1b74b61a2471d2d8f685859d">MyFrame</a>
+</li>
 <li>OnSize()
 : <a class="el" href="classMyFrame.html#ade1ee7abd7620c01deeafaee1c75a79d">MyFrame</a>
-, <a class="el" href="classwxVTKRenderWindowInteractor.html#a56926dcdd2a0686b698fa6d8df037063">wxVTKRenderWindowInteractor</a>
-, <a class="el" href="classHtmlInfo.html#a685e67af2cf46f4a4f9e2ffea72014d1">HtmlInfo</a>
 , <a class="el" href="classHtmlView.html#a979f9d6003daca478289ca41ffaf8823">HtmlView</a>
+, <a class="el" href="classHtmlInfo.html#a685e67af2cf46f4a4f9e2ffea72014d1">HtmlInfo</a>
+, <a class="el" href="classwxVTKRenderWindowInteractor.html#a56926dcdd2a0686b698fa6d8df037063">wxVTKRenderWindowInteractor</a>
 </li>
 <li>OnSmallerButton()
 : <a class="el" href="classInfoPanel.html#a9974cf6e1f32b7ea4732b6581c1aea1b">InfoPanel</a>
 , <a class="el" href="classHelpPanel.html#a1dfe4adab08fa7a0e1d307948a8bd6eb">HelpPanel</a>
 </li>
-<li>OnStartRecording()
-: <a class="el" href="classMyFrame.html#a29a86cbaf1242cbbc8853a532c631480">MyFrame</a>
-</li>
 <li>OnStep()
 : <a class="el" href="classMyFrame.html#a6ef220dbc111e7954d43a079c7a0ef31">MyFrame</a>
-</li>
-<li>OnStopRecording()
-: <a class="el" href="classMyFrame.html#a3490771b8abfdcba16a1122e83d720c7">MyFrame</a>
 </li>
 <li>OnTimer()
 : <a class="el" href="classwxVTKRenderWindowInteractor.html#a5c2ed810df3c0546ebd96a690c659db8">wxVTKRenderWindowInteractor</a>
@@ -383,6 +416,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>OnTreeSelChanged()
 : <a class="el" href="classPatternsPanel.html#a3cc70051d8cd88b29d21d04243c8e4c1">PatternsPanel</a>
 </li>
+<li>OnUndo()
+: <a class="el" href="classMyFrame.html#a6022c54366d0d192a5ecca9f5549c2fd">MyFrame</a>
+</li>
 <li>OnUpdateAddParameter()
 : <a class="el" href="classMyFrame.html#a7773545349511c08a616604aebbdf346">MyFrame</a>
 </li>
@@ -392,20 +428,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>OnUpdatePaste()
 : <a class="el" href="classMyFrame.html#ac12aa086bdab2c68f62c9b52f819f88c">MyFrame</a>
 </li>
+<li>OnUpdateRecordFrames()
+: <a class="el" href="classMyFrame.html#a3dc917ffed9fdb983dd91ddbc2744b97">MyFrame</a>
+</li>
+<li>OnUpdateRedo()
+: <a class="el" href="classMyFrame.html#ae1791aa8fa1912ec61167253d0546e2b">MyFrame</a>
+</li>
 <li>OnUpdateReset()
 : <a class="el" href="classMyFrame.html#a3e48390dfa340659c39155d9f7a0285c">MyFrame</a>
 </li>
 <li>OnUpdateRunStop()
 : <a class="el" href="classMyFrame.html#ad413507c0c9ddd8aedebfbb2bc86b8f8">MyFrame</a>
 </li>
-<li>OnUpdateStartRecording()
-: <a class="el" href="classMyFrame.html#a6fd41e5d2c29122469bec56d2e4a13cd">MyFrame</a>
+<li>OnUpdateSelectBrushTool()
+: <a class="el" href="classMyFrame.html#a0b33ead8fd62fc5bf06356e76c3aa5ac">MyFrame</a>
+</li>
+<li>OnUpdateSelectPencilTool()
+: <a class="el" href="classMyFrame.html#ac3e387954bf2ec236bf98f6529415cc4">MyFrame</a>
+</li>
+<li>OnUpdateSelectPickerTool()
+: <a class="el" href="classMyFrame.html#afe3bf1b5ddca83b4b9f00de2ded1f27d">MyFrame</a>
+</li>
+<li>OnUpdateSelectPointerTool()
+: <a class="el" href="classMyFrame.html#ac7e47f16b714af68d6eb77f980e37a8a">MyFrame</a>
 </li>
 <li>OnUpdateStep()
 : <a class="el" href="classMyFrame.html#a6ddede5bb58b853a17e7635a17e2612b">MyFrame</a>
 </li>
-<li>OnUpdateStopRecording()
-: <a class="el" href="classMyFrame.html#aa7324fd8ad78e980bf6583446bc701d0">MyFrame</a>
+<li>OnUpdateUndo()
+: <a class="el" href="classMyFrame.html#aa441da3286da275203e1ce6b40c775a3">MyFrame</a>
 </li>
 <li>OnUpdateViewFullKernel()
 : <a class="el" href="classMyFrame.html#a2358f0157edc9791ff6a3803c93e56b3">MyFrame</a>
@@ -444,8 +495,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classMyFrame.html#aad11d3b14d33f240778eacb7862b18f7">MyFrame</a>
 </li>
 <li>operator=()
-: <a class="el" href="classImageRD.html#a1e4be1feaeb23fdf52205439133642e9">ImageRD</a>
-, <a class="el" href="classMeshRD.html#af33bafd3a07ba890ffd65d99a2c493fb">MeshRD</a>
+: <a class="el" href="classMeshRD.html#af33bafd3a07ba890ffd65d99a2c493fb">MeshRD</a>
+, <a class="el" href="classImageRD.html#a1e4be1feaeb23fdf52205439133642e9">ImageRD</a>
 </li>
 <li>origin
 : <a class="el" href="struct__cl__buffer__region.html#ad3b41b7ad499abfc0d0621791af8a50c">_cl_buffer_region</a>
@@ -467,7 +518,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:49 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

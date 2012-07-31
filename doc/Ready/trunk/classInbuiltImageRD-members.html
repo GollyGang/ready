@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -105,6 +105,8 @@ This is the complete list of members for <a class="el" href="classInbuiltImageRD
   <tr class="memlist"><td><a class="el" href="classImageRD.html#ac496af879f4ae78d25403be495de8c45">AllocateImages</a>(int x, int y, int z, int nc)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected, virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#aff86f7467e47e211e54f4d1783c90a60">AllocateVTKImage</a>(int x, int y, int z)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected, static]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0">BlankImage</a>()</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a45c7dc3120973f42eaea81707696aa86">CanRedo</a>() const </td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a0a9deeb64ed0d3b69e5e70de5a7b9ff5">CanUndo</a>() const </td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a079b3af2b7537aee71ba7c1b77218c54">ClearInitialPatternGenerator</a>()</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a7f4d538f7c74d6f6ec6e70c4cc4236f4">CopyFromImage</a>(vtkImageData *im)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a3da00130c9bded5c65b891307486cecc">CreateDefaultInitialPatternGenerator</a>()</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td></td></tr>
@@ -113,6 +115,7 @@ This is the complete list of members for <a class="el" href="classInbuiltImageRD
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a96fc8fae8ac3fbcedd12f77117d2239c">DeleteParameter</a>(int iParam)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#ab77fb3229fe145d8e49be4bb4bf223f0">description</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#acb8e6b64b80df97fb751ac5c70598225">filename</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classImageRD.html#a15a8921a4dc9ca5ab807be2e90a807d6">FlipPaintAction</a>(PaintAction &amp;cca)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected, virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#ad1315e99af6900fbb7fd620e4827fda3">GenerateInitialPattern</a>()</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a5cbe2215bc54992c5c91b965ef376dcc">GetArenaDimensionality</a>() const </td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected, virtual]</code></td></tr>
@@ -139,6 +142,7 @@ This is the complete list of members for <a class="el" href="classInbuiltImageRD
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a977cf3ff44048b54f2fdafe270b02075">GetRuleName</a>() const </td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classInbuiltImageRD.html#a1da0578a5fa2153052b478d18e5ef99c">GetRuleType</a>() const </td><td><a class="el" href="classInbuiltImageRD.html">InbuiltImageRD</a></td><td><code> [inline, virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a934c6964a64b86f963133f45f81bf776">GetTimestepsTaken</a>() const </td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [inline]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classImageRD.html#aa0d9faad5cafc72f8330914c8559b793">GetValue</a>(float x, float y, float z, const Properties &amp;render_settings)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#aa45cc64b022645f39de10d16c1504843">GetWrap</a>() const </td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [inline]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#aaa8eb8acca12da94b99c7687b2dc3514">GetX</a>() const </td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a891c105ef84708c4e968f409c57edfa9">GetY</a>() const </td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
@@ -160,6 +164,7 @@ This is the complete list of members for <a class="el" href="classInbuiltImageRD
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a9448a66a1ea9dd6d56cfa25767ca85e8">n_chemicals</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a0d31cf29f6ec8d3b197ec1002f152244">need_reload_formula</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a7ec454f94a1d43e5c0139e3ee50f0cbe">Redo</a>()</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a87da400e21de530cd83ba9aff345a57d">RestoreStartingPattern</a>()</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#ab22830afbc4e94b9f9cde3334a6bf858">rule_name</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a028dcdf21770403484968c23e0ac4bc6">SaveFile</a>(const char *filename, const Properties &amp;render_settings) const </td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
@@ -177,19 +182,27 @@ This is the complete list of members for <a class="el" href="classInbuiltImageRD
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">SetParameterName</a>(int iParam, const std::string &amp;s)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">SetParameterValue</a>(int iParam, float val)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a37127318d60d79fe6e5346ef959accca">SetRuleName</a>(std::string s)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#af5d9b53e7d329351ef2b5b0f108f01bc">SetUndoPoint</a>()</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td></td></tr>
+  <tr class="memlist"><td><a class="el" href="classImageRD.html#a284a43eee4d9e9c1e8f331796b6802d6">SetValue</a>(float x, float y, float z, float val, const Properties &amp;render_settings)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classImageRD.html#a13ee9311409cd9f7885137be6483acf7">SetValuesInRadius</a>(float x, float y, float z, float r, float val, const Properties &amp;render_settings)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a6c84ba80931357453e8d4c71335062a8">SetWrap</a>(bool w)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [inline, virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97">starting_pattern</a></td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#aff3b271917b720fcdcc4faebfcaaf016">StorePaintAction</a>(int iChemical, int iCell, float old_val)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a1f8ac307cb768147fcef9ebfffe0a637">TestFormula</a>(std::string program_string)</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [inline, virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#ace6b78e1b817bc7a78dbee416aafebcf">timesteps_taken</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a707d80d40943af43dc47d33986c2f6ed">Undo</a>()</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [virtual]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a81242589c372ea1ac84a6800059a5682">undo_stack</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a6ca70515b0210ce9311b340076e4ed5d">Update</a>(int n_steps)</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#ada7a0672e610d7fbdecc41ebbaf04899">wrap</a></td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classImageRD.html#a27e645d5f8c117a466d28497fdb2c391">xgap</a></td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected]</code></td></tr>
+  <tr class="memlist"><td><a class="el" href="classImageRD.html#adb8cb7567259fd3c14f9e35f4e12a985">ygap</a></td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [protected]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classAbstractRD.html#a08440b8e0cfecfd1dd919f96b637577e">~AbstractRD</a>()</td><td><a class="el" href="classAbstractRD.html">AbstractRD</a></td><td><code> [virtual]</code></td></tr>
   <tr class="memlist"><td><a class="el" href="classImageRD.html#a388870afb32f96a69d9780dec3d54f02">~ImageRD</a>()</td><td><a class="el" href="classImageRD.html">ImageRD</a></td><td><code> [virtual]</code></td></tr>
 </table></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:59 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

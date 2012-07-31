@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">0.4</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -137,165 +137,166 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00033"></a>00033     this-&gt;iPlatform = <a class="code" href="prefs_8cpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>;
 <a name="l00034"></a>00034     this-&gt;iDevice = <a class="code" href="prefs_8cpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>;
 <a name="l00035"></a>00035     this-&gt;need_reload_context = <span class="keyword">true</span>;
-<a name="l00036"></a>00036     this-&gt;kernel_function_name = <span class="stringliteral">&quot;rd_compute&quot;</span>;
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038     <span class="comment">// initialise the opencl things to null in case we fail to create them</span>
-<a name="l00039"></a>00039     this-&gt;device_id = NULL;
-<a name="l00040"></a>00040     this-&gt;context = NULL;
-<a name="l00041"></a>00041     this-&gt;command_queue = NULL;
-<a name="l00042"></a>00042     this-&gt;kernel = NULL;
-<a name="l00043"></a>00043     this-&gt;program = NULL;
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>()!= <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
-<a name="l00046"></a>00046         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Failed to load dynamic library for OpenCL&quot;</span>);
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048     this-&gt;iCurrentBuffer = 0;
-<a name="l00049"></a>00049 }
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 <span class="comment">// ---------------------------------------------------------------------------</span>
-<a name="l00052"></a>00052 
-<a name="l00053"></a><a class="code" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">00053</a> <a class="code" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">OpenCL_MixIn::~OpenCL_MixIn</a>()
-<a name="l00054"></a>00054 {
-<a name="l00055"></a>00055     <a class="code" href="OpenCL__Dyn__Load_8c.html#abf435123ea6d639983f64184c4853d8e">clFlush</a>(this-&gt;command_queue);
-<a name="l00056"></a>00056     <a class="code" href="OpenCL__Dyn__Load_8c.html#a7198d8746ae336a873b58acb15ddf538">clFinish</a>(this-&gt;command_queue);
-<a name="l00057"></a>00057     <a class="code" href="OpenCL__Dyn__Load_8c.html#a31e1aec3a1298cd204366f69ba59cd4f">clReleaseKernel</a>(this-&gt;kernel);
-<a name="l00058"></a>00058     <a class="code" href="OpenCL__Dyn__Load_8c.html#a83710d3f3618caba8ab31151ce665256">clReleaseProgram</a>(this-&gt;program);
-<a name="l00059"></a>00059     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;2;i++)
-<a name="l00060"></a>00060         <span class="keywordflow">for</span>(vector&lt;cl_mem&gt;::const_iterator it = this-&gt;buffers[i].begin();it!=this-&gt;buffers[i].end();it++)
-<a name="l00061"></a>00061             <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(*it);
-<a name="l00062"></a>00062     <a class="code" href="OpenCL__Dyn__Load_8c.html#af5bb3a411cc10d423a3bd74e87b621b7">clReleaseCommandQueue</a>(this-&gt;command_queue);
-<a name="l00063"></a>00063     <a class="code" href="OpenCL__Dyn__Load_8c.html#a3b6505b12bbcf9efb1d9da1b2a4ee80a">clReleaseContext</a>(this-&gt;context);
-<a name="l00064"></a>00064 }
-<a name="l00065"></a>00065 
-<a name="l00066"></a>00066 <span class="comment">// ---------------------------------------------------------------------------</span>
-<a name="l00067"></a>00067 
-<a name="l00068"></a><a class="code" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">00068</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">OpenCL_MixIn::SetPlatform</a>(<span class="keywordtype">int</span> i)
-<a name="l00069"></a>00069 {
-<a name="l00070"></a>00070     <span class="keywordflow">if</span>(i != this-&gt;iPlatform)
-<a name="l00071"></a>00071         this-&gt;need_reload_context = <span class="keyword">true</span>;
-<a name="l00072"></a>00072     this-&gt;iPlatform = i;
-<a name="l00073"></a>00073 }
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075 <span class="comment">// ---------------------------------------------------------------------------</span>
-<a name="l00076"></a>00076 
-<a name="l00077"></a><a class="code" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">00077</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">OpenCL_MixIn::SetDevice</a>(<span class="keywordtype">int</span> i)
-<a name="l00078"></a>00078 {
-<a name="l00079"></a>00079     <span class="keywordflow">if</span>(i != this-&gt;iDevice)
-<a name="l00080"></a>00080         this-&gt;need_reload_context = <span class="keyword">true</span>;
-<a name="l00081"></a>00081     this-&gt;iDevice = i;
-<a name="l00082"></a>00082 }
-<a name="l00083"></a>00083 
-<a name="l00084"></a>00084 <span class="comment">// ---------------------------------------------------------------------------</span>
-<a name="l00085"></a>00085 
-<a name="l00086"></a><a class="code" href="classOpenCL__MixIn.html#a4d05c1a685daf20e6e7d65b5e5f8aa5c">00086</a> <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a4d05c1a685daf20e6e7d65b5e5f8aa5c">OpenCL_MixIn::GetPlatform</a>()<span class="keyword"> const</span>
-<a name="l00087"></a>00087 <span class="keyword"></span>{
-<a name="l00088"></a>00088     <span class="keywordflow">return</span> this-&gt;iPlatform;
-<a name="l00089"></a>00089 }
-<a name="l00090"></a>00090 
-<a name="l00091"></a>00091 <span class="comment">// ---------------------------------------------------------------------------</span>
-<a name="l00092"></a>00092 
-<a name="l00093"></a><a class="code" href="classOpenCL__MixIn.html#ab3835f8b807cf6ef62093010d2f25374">00093</a> <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#ab3835f8b807cf6ef62093010d2f25374">OpenCL_MixIn::GetDevice</a>()<span class="keyword"> const</span>
-<a name="l00094"></a>00094 <span class="keyword"></span>{
-<a name="l00095"></a>00095     <span class="keywordflow">return</span> this-&gt;iDevice;
-<a name="l00096"></a>00096 }
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098 <span class="comment">// ---------------------------------------------------------------------------</span>
-<a name="l00099"></a>00099 
-<a name="l00100"></a><a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">00100</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">OpenCL_MixIn::ReloadContextIfNeeded</a>()
-<a name="l00101"></a>00101 {
-<a name="l00102"></a>00102     <span class="keywordflow">if</span>(!this-&gt;need_reload_context) <span class="keywordflow">return</span>;
-<a name="l00103"></a>00103 
-<a name="l00104"></a>00104     cl_int ret;
-<a name="l00105"></a>00105 
-<a name="l00106"></a>00106     <span class="comment">// retrieve our chosen platform</span>
-<a name="l00107"></a>00107     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platform_id;
-<a name="l00108"></a>00108     {
-<a name="l00109"></a>00109         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_PLATFORMS = 10;
-<a name="l00110"></a>00110         <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
-<a name="l00111"></a>00111         cl_uint num_platforms;
-<a name="l00112"></a>00112         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
-<a name="l00113"></a>00113         <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a> || num_platforms==0)
-<a name="l00114"></a>00114         {
-<a name="l00115"></a>00115             <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;No OpenCL platforms available&quot;</span>);
-<a name="l00116"></a>00116             <span class="comment">// currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn&#39;t work</span>
-<a name="l00117"></a>00117         }
-<a name="l00118"></a>00118         <span class="keywordflow">if</span>(this-&gt;iPlatform &gt;= (<span class="keywordtype">int</span>)num_platforms)
-<a name="l00119"></a>00119             <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : too few platforms available&quot;</span>);
-<a name="l00120"></a>00120         platform_id = platforms_available[this-&gt;iPlatform];
-<a name="l00121"></a>00121     }
-<a name="l00122"></a>00122 
-<a name="l00123"></a>00123     <span class="comment">// retrieve our chosen device</span>
-<a name="l00124"></a>00124     {
-<a name="l00125"></a>00125         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_DEVICES = 10;
-<a name="l00126"></a>00126         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
-<a name="l00127"></a>00127         cl_uint num_devices;
-<a name="l00128"></a>00128         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platform_id,<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,devices_available,&amp;num_devices);
-<a name="l00129"></a>00129         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : Failed to retrieve device IDs: &quot;</span>);
-<a name="l00130"></a>00130         <span class="keywordflow">if</span>(this-&gt;iDevice &gt;= (<span class="keywordtype">int</span>)num_devices)
-<a name="l00131"></a>00131             <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : too few devices available&quot;</span>);
-<a name="l00132"></a>00132         this-&gt;device_id = devices_available[this-&gt;iDevice];
-<a name="l00133"></a>00133     }
-<a name="l00134"></a>00134 
-<a name="l00135"></a>00135     <span class="comment">// create the context</span>
-<a name="l00136"></a>00136     <a class="code" href="OpenCL__Dyn__Load_8c.html#a3b6505b12bbcf9efb1d9da1b2a4ee80a">clReleaseContext</a>(this-&gt;context);
-<a name="l00137"></a>00137     this-&gt;context = <a class="code" href="OpenCL__Dyn__Load_8c.html#ab9d06f9de2657f769f20b90332551bb5">clCreateContext</a>(NULL,1,&amp;this-&gt;device_id,NULL,NULL,&amp;ret);
-<a name="l00138"></a>00138     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : Failed to create context: &quot;</span>);
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140     <span class="comment">// create the command queue</span>
-<a name="l00141"></a>00141     <a class="code" href="OpenCL__Dyn__Load_8c.html#af5bb3a411cc10d423a3bd74e87b621b7">clReleaseCommandQueue</a>(this-&gt;command_queue);
-<a name="l00142"></a>00142     this-&gt;command_queue = <a class="code" href="OpenCL__Dyn__Load_8c.html#af1cf33961a134ecf53e20a200dae9bfe">clCreateCommandQueue</a>(this-&gt;context,this-&gt;device_id,0,&amp;ret);
-<a name="l00143"></a>00143     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : Failed to create command queue: &quot;</span>);
-<a name="l00144"></a>00144 
-<a name="l00145"></a>00145     this-&gt;need_reload_context = <span class="keyword">false</span>;
-<a name="l00146"></a>00146 }
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148 <span class="comment">// -------------------------------------------------------------------------</span>
-<a name="l00149"></a>00149 
-<a name="l00150"></a><a class="code" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870">00150</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870" title="Test a kernel string for errors on the current device.">OpenCL_MixIn::TestKernel</a>(std::string kernel_source)
-<a name="l00151"></a>00151 {
-<a name="l00152"></a>00152     this-&gt;need_reload_context = <span class="keyword">true</span>;
-<a name="l00153"></a>00153     this-&gt;ReloadContextIfNeeded();
-<a name="l00154"></a>00154 
-<a name="l00155"></a>00155     cl_int ret;
-<a name="l00156"></a>00156 
-<a name="l00157"></a>00157     <span class="comment">// create the program</span>
-<a name="l00158"></a>00158     <span class="keyword">const</span> <span class="keywordtype">char</span> *source = kernel_source.c_str();
-<a name="l00159"></a>00159     <span class="keywordtype">size_t</span> source_size = kernel_source.length();
-<a name="l00160"></a>00160     <a class="code" href="OpenCL__Dyn__Load_8h.html#a3d78b43bff66a3135ffcba6eb9b2f1b9">cl_program</a> temp_program = <a class="code" href="OpenCL__Dyn__Load_8c.html#a5a1dcaa0b7c2972a3fd03f4498cd514b">clCreateProgramWithSource</a>(this-&gt;context,1,&amp;source,&amp;source_size,&amp;ret);
-<a name="l00161"></a>00161     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::TestKernel : Failed to create program with source: &quot;</span>);
-<a name="l00162"></a>00162 
-<a name="l00163"></a>00163     <span class="comment">// build the program</span>
-<a name="l00164"></a>00164     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#affc3163962636065253cd39f2a1b41e8">clBuildProgram</a>(temp_program,1,&amp;this-&gt;device_id,NULL,NULL,NULL);
-<a name="l00165"></a>00165     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
-<a name="l00166"></a>00166     {
-<a name="l00167"></a>00167         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_BUILD_LOG = 10000;
-<a name="l00168"></a>00168         <span class="keywordtype">char</span> build_log[MAX_BUILD_LOG];
-<a name="l00169"></a>00169         <span class="keywordtype">size_t</span> build_log_length;
-<a name="l00170"></a>00170         cl_int ret2 = <a class="code" href="OpenCL__Dyn__Load_8c.html#a7915d7ee78c4b2a722fbeba391bfbabc">clGetProgramBuildInfo</a>(temp_program,this-&gt;device_id,<a class="code" href="OpenCL__Dyn__Load_8h.html#a627bc679c4b66fb24eb4b7bb41380304">CL_PROGRAM_BUILD_LOG</a>,MAX_BUILD_LOG,build_log,&amp;build_log_length);
-<a name="l00171"></a>00171         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret2,<span class="stringliteral">&quot;OpenCL_MixIn::TestKernel : retrieving program build log failed: &quot;</span>);
-<a name="l00172"></a>00172         { ofstream out(<span class="stringliteral">&quot;kernel.txt&quot;</span>); out &lt;&lt; kernel_source; }
-<a name="l00173"></a>00173         ostringstream oss;
-<a name="l00174"></a>00174         oss &lt;&lt; <span class="stringliteral">&quot;OpenCL_MixIn::TestKernel : build failed: (kernel saved as kernel.txt)\n\n&quot;</span> &lt;&lt; build_log;
-<a name="l00175"></a>00175         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,oss.str().c_str());
-<a name="l00176"></a>00176     }
-<a name="l00177"></a>00177     <a class="code" href="OpenCL__Dyn__Load_8c.html#a83710d3f3618caba8ab31151ce665256">clReleaseProgram</a>(temp_program);
-<a name="l00178"></a>00178 }
-<a name="l00179"></a>00179 
-<a name="l00180"></a>00180 <span class="comment">// -----------------------------------------------------------------------</span>
-<a name="l00181"></a>00181 
-<a name="l00182"></a><a class="code" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">00182</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">OpenCL_MixIn::ReleaseOpenCLBuffers</a>()
-<a name="l00183"></a>00183 {
-<a name="l00184"></a>00184     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;2;i++)
-<a name="l00185"></a>00185         <span class="keywordflow">for</span>(vector&lt;cl_mem&gt;::const_iterator it = this-&gt;buffers[i].begin();it!=this-&gt;buffers[i].end();it++)
-<a name="l00186"></a>00186             <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(*it);
-<a name="l00187"></a>00187 }
-<a name="l00188"></a>00188 
-<a name="l00189"></a>00189 <span class="comment">// -----------------------------------------------------------------------</span>
+<a name="l00036"></a>00036     this-&gt;need_write_to_opencl_buffers = <span class="keyword">true</span>;
+<a name="l00037"></a>00037     this-&gt;kernel_function_name = <span class="stringliteral">&quot;rd_compute&quot;</span>;
+<a name="l00038"></a>00038 
+<a name="l00039"></a>00039     <span class="comment">// initialise the opencl things to null in case we fail to create them</span>
+<a name="l00040"></a>00040     this-&gt;device_id = NULL;
+<a name="l00041"></a>00041     this-&gt;context = NULL;
+<a name="l00042"></a>00042     this-&gt;command_queue = NULL;
+<a name="l00043"></a>00043     this-&gt;kernel = NULL;
+<a name="l00044"></a>00044     this-&gt;program = NULL;
+<a name="l00045"></a>00045 
+<a name="l00046"></a>00046     <span class="keywordflow">if</span>(<a class="code" href="namespaceOpenCL__utils.html#ae700cf383e4108a3a77440aeaedbb18b" title="Links OpenCL dynamically (if appropriate for this OS).">LinkOpenCL</a>()!= <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00047"></a>00047         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Failed to load dynamic library for OpenCL&quot;</span>);
+<a name="l00048"></a>00048 
+<a name="l00049"></a>00049     this-&gt;iCurrentBuffer = 0;
+<a name="l00050"></a>00050 }
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 <span class="comment">// ---------------------------------------------------------------------------</span>
+<a name="l00053"></a>00053 
+<a name="l00054"></a><a class="code" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">00054</a> <a class="code" href="classOpenCL__MixIn.html#a4e9faf6b3087799987d0551f740e2cef">OpenCL_MixIn::~OpenCL_MixIn</a>()
+<a name="l00055"></a>00055 {
+<a name="l00056"></a>00056     <a class="code" href="OpenCL__Dyn__Load_8c.html#abf435123ea6d639983f64184c4853d8e">clFlush</a>(this-&gt;command_queue);
+<a name="l00057"></a>00057     <a class="code" href="OpenCL__Dyn__Load_8c.html#a7198d8746ae336a873b58acb15ddf538">clFinish</a>(this-&gt;command_queue);
+<a name="l00058"></a>00058     <a class="code" href="OpenCL__Dyn__Load_8c.html#a31e1aec3a1298cd204366f69ba59cd4f">clReleaseKernel</a>(this-&gt;kernel);
+<a name="l00059"></a>00059     <a class="code" href="OpenCL__Dyn__Load_8c.html#a83710d3f3618caba8ab31151ce665256">clReleaseProgram</a>(this-&gt;program);
+<a name="l00060"></a>00060     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;2;i++)
+<a name="l00061"></a>00061         <span class="keywordflow">for</span>(vector&lt;cl_mem&gt;::const_iterator it = this-&gt;buffers[i].begin();it!=this-&gt;buffers[i].end();it++)
+<a name="l00062"></a>00062             <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(*it);
+<a name="l00063"></a>00063     <a class="code" href="OpenCL__Dyn__Load_8c.html#af5bb3a411cc10d423a3bd74e87b621b7">clReleaseCommandQueue</a>(this-&gt;command_queue);
+<a name="l00064"></a>00064     <a class="code" href="OpenCL__Dyn__Load_8c.html#a3b6505b12bbcf9efb1d9da1b2a4ee80a">clReleaseContext</a>(this-&gt;context);
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 <span class="comment">// ---------------------------------------------------------------------------</span>
+<a name="l00068"></a>00068 
+<a name="l00069"></a><a class="code" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">00069</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#aaec65d3cb1d6bca590c377df36ad229a">OpenCL_MixIn::SetPlatform</a>(<span class="keywordtype">int</span> i)
+<a name="l00070"></a>00070 {
+<a name="l00071"></a>00071     <span class="keywordflow">if</span>(i != this-&gt;iPlatform)
+<a name="l00072"></a>00072         this-&gt;need_reload_context = <span class="keyword">true</span>;
+<a name="l00073"></a>00073     this-&gt;iPlatform = i;
+<a name="l00074"></a>00074 }
+<a name="l00075"></a>00075 
+<a name="l00076"></a>00076 <span class="comment">// ---------------------------------------------------------------------------</span>
+<a name="l00077"></a>00077 
+<a name="l00078"></a><a class="code" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">00078</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#adb3a6ccfecf048fd02e1bbbf285ba8d0">OpenCL_MixIn::SetDevice</a>(<span class="keywordtype">int</span> i)
+<a name="l00079"></a>00079 {
+<a name="l00080"></a>00080     <span class="keywordflow">if</span>(i != this-&gt;iDevice)
+<a name="l00081"></a>00081         this-&gt;need_reload_context = <span class="keyword">true</span>;
+<a name="l00082"></a>00082     this-&gt;iDevice = i;
+<a name="l00083"></a>00083 }
+<a name="l00084"></a>00084 
+<a name="l00085"></a>00085 <span class="comment">// ---------------------------------------------------------------------------</span>
+<a name="l00086"></a>00086 
+<a name="l00087"></a><a class="code" href="classOpenCL__MixIn.html#a4d05c1a685daf20e6e7d65b5e5f8aa5c">00087</a> <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#a4d05c1a685daf20e6e7d65b5e5f8aa5c">OpenCL_MixIn::GetPlatform</a>()<span class="keyword"> const</span>
+<a name="l00088"></a>00088 <span class="keyword"></span>{
+<a name="l00089"></a>00089     <span class="keywordflow">return</span> this-&gt;iPlatform;
+<a name="l00090"></a>00090 }
+<a name="l00091"></a>00091 
+<a name="l00092"></a>00092 <span class="comment">// ---------------------------------------------------------------------------</span>
+<a name="l00093"></a>00093 
+<a name="l00094"></a><a class="code" href="classOpenCL__MixIn.html#ab3835f8b807cf6ef62093010d2f25374">00094</a> <span class="keywordtype">int</span> <a class="code" href="classOpenCL__MixIn.html#ab3835f8b807cf6ef62093010d2f25374">OpenCL_MixIn::GetDevice</a>()<span class="keyword"> const</span>
+<a name="l00095"></a>00095 <span class="keyword"></span>{
+<a name="l00096"></a>00096     <span class="keywordflow">return</span> this-&gt;iDevice;
+<a name="l00097"></a>00097 }
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099 <span class="comment">// ---------------------------------------------------------------------------</span>
+<a name="l00100"></a>00100 
+<a name="l00101"></a><a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">00101</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a4b774e983ba77397dba64e633606149c">OpenCL_MixIn::ReloadContextIfNeeded</a>()
+<a name="l00102"></a>00102 {
+<a name="l00103"></a>00103     <span class="keywordflow">if</span>(!this-&gt;need_reload_context) <span class="keywordflow">return</span>;
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105     cl_int ret;
+<a name="l00106"></a>00106 
+<a name="l00107"></a>00107     <span class="comment">// retrieve our chosen platform</span>
+<a name="l00108"></a>00108     <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platform_id;
+<a name="l00109"></a>00109     {
+<a name="l00110"></a>00110         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_PLATFORMS = 10;
+<a name="l00111"></a>00111         <a class="code" href="OpenCL__Dyn__Load_8h.html#a1fab4aa5ddfe126400d064cd07fe93bc">cl_platform_id</a> platforms_available[MAX_PLATFORMS];
+<a name="l00112"></a>00112         cl_uint num_platforms;
+<a name="l00113"></a>00113         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#a8a52c088240e5f0260ea15a5ece965b4">clGetPlatformIDs</a>(MAX_PLATFORMS,platforms_available,&amp;num_platforms);
+<a name="l00114"></a>00114         <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a> || num_platforms==0)
+<a name="l00115"></a>00115         {
+<a name="l00116"></a>00116             <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;No OpenCL platforms available&quot;</span>);
+<a name="l00117"></a>00117             <span class="comment">// currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn&#39;t work</span>
+<a name="l00118"></a>00118         }
+<a name="l00119"></a>00119         <span class="keywordflow">if</span>(this-&gt;iPlatform &gt;= (<span class="keywordtype">int</span>)num_platforms)
+<a name="l00120"></a>00120             <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : too few platforms available&quot;</span>);
+<a name="l00121"></a>00121         platform_id = platforms_available[this-&gt;iPlatform];
+<a name="l00122"></a>00122     }
+<a name="l00123"></a>00123 
+<a name="l00124"></a>00124     <span class="comment">// retrieve our chosen device</span>
+<a name="l00125"></a>00125     {
+<a name="l00126"></a>00126         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_DEVICES = 10;
+<a name="l00127"></a>00127         <a class="code" href="OpenCL__Dyn__Load_8h.html#abf58c686ce1c1e363fc1c219416bae3b">cl_device_id</a> devices_available[MAX_DEVICES];
+<a name="l00128"></a>00128         cl_uint num_devices;
+<a name="l00129"></a>00129         ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#ac76b8a82c7f68abace0966c343542dba">clGetDeviceIDs</a>(platform_id,<a class="code" href="OpenCL__Dyn__Load_8h.html#a81feb1010af3cd5d4db85050388bb0e2">CL_DEVICE_TYPE_ALL</a>,MAX_DEVICES,devices_available,&amp;num_devices);
+<a name="l00130"></a>00130         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : Failed to retrieve device IDs: &quot;</span>);
+<a name="l00131"></a>00131         <span class="keywordflow">if</span>(this-&gt;iDevice &gt;= (<span class="keywordtype">int</span>)num_devices)
+<a name="l00132"></a>00132             <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : too few devices available&quot;</span>);
+<a name="l00133"></a>00133         this-&gt;device_id = devices_available[this-&gt;iDevice];
+<a name="l00134"></a>00134     }
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136     <span class="comment">// create the context</span>
+<a name="l00137"></a>00137     <a class="code" href="OpenCL__Dyn__Load_8c.html#a3b6505b12bbcf9efb1d9da1b2a4ee80a">clReleaseContext</a>(this-&gt;context);
+<a name="l00138"></a>00138     this-&gt;context = <a class="code" href="OpenCL__Dyn__Load_8c.html#ab9d06f9de2657f769f20b90332551bb5">clCreateContext</a>(NULL,1,&amp;this-&gt;device_id,NULL,NULL,&amp;ret);
+<a name="l00139"></a>00139     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : Failed to create context: &quot;</span>);
+<a name="l00140"></a>00140 
+<a name="l00141"></a>00141     <span class="comment">// create the command queue</span>
+<a name="l00142"></a>00142     <a class="code" href="OpenCL__Dyn__Load_8c.html#af5bb3a411cc10d423a3bd74e87b621b7">clReleaseCommandQueue</a>(this-&gt;command_queue);
+<a name="l00143"></a>00143     this-&gt;command_queue = <a class="code" href="OpenCL__Dyn__Load_8c.html#af1cf33961a134ecf53e20a200dae9bfe">clCreateCommandQueue</a>(this-&gt;context,this-&gt;device_id,0,&amp;ret);
+<a name="l00144"></a>00144     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::ReloadContextIfNeeded : Failed to create command queue: &quot;</span>);
+<a name="l00145"></a>00145 
+<a name="l00146"></a>00146     this-&gt;need_reload_context = <span class="keyword">false</span>;
+<a name="l00147"></a>00147 }
+<a name="l00148"></a>00148 
+<a name="l00149"></a>00149 <span class="comment">// -------------------------------------------------------------------------</span>
+<a name="l00150"></a>00150 
+<a name="l00151"></a><a class="code" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870">00151</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#add01f335ebf6b2cdc56466aa29991870" title="Test a kernel string for errors on the current device.">OpenCL_MixIn::TestKernel</a>(std::string kernel_source)
+<a name="l00152"></a>00152 {
+<a name="l00153"></a>00153     this-&gt;need_reload_context = <span class="keyword">true</span>;
+<a name="l00154"></a>00154     this-&gt;ReloadContextIfNeeded();
+<a name="l00155"></a>00155 
+<a name="l00156"></a>00156     cl_int ret;
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158     <span class="comment">// create the program</span>
+<a name="l00159"></a>00159     <span class="keyword">const</span> <span class="keywordtype">char</span> *source = kernel_source.c_str();
+<a name="l00160"></a>00160     <span class="keywordtype">size_t</span> source_size = kernel_source.length();
+<a name="l00161"></a>00161     <a class="code" href="OpenCL__Dyn__Load_8h.html#a3d78b43bff66a3135ffcba6eb9b2f1b9">cl_program</a> temp_program = <a class="code" href="OpenCL__Dyn__Load_8c.html#a5a1dcaa0b7c2972a3fd03f4498cd514b">clCreateProgramWithSource</a>(this-&gt;context,1,&amp;source,&amp;source_size,&amp;ret);
+<a name="l00162"></a>00162     <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,<span class="stringliteral">&quot;OpenCL_MixIn::TestKernel : Failed to create program with source: &quot;</span>);
+<a name="l00163"></a>00163 
+<a name="l00164"></a>00164     <span class="comment">// build the program</span>
+<a name="l00165"></a>00165     ret = <a class="code" href="OpenCL__Dyn__Load_8c.html#affc3163962636065253cd39f2a1b41e8">clBuildProgram</a>(temp_program,1,&amp;this-&gt;device_id,<span class="stringliteral">&quot;-cl-denorms-are-zero -cl-fast-relaxed-math&quot;</span>,NULL,NULL);
+<a name="l00166"></a>00166     <span class="keywordflow">if</span>(ret != <a class="code" href="OpenCL__Dyn__Load_8h.html#a945238394cd7f518e7196ec80ea74594">CL_SUCCESS</a>)
+<a name="l00167"></a>00167     {
+<a name="l00168"></a>00168         <span class="keyword">const</span> <span class="keywordtype">int</span> MAX_BUILD_LOG = 10000;
+<a name="l00169"></a>00169         <span class="keywordtype">char</span> build_log[MAX_BUILD_LOG];
+<a name="l00170"></a>00170         <span class="keywordtype">size_t</span> build_log_length;
+<a name="l00171"></a>00171         cl_int ret2 = <a class="code" href="OpenCL__Dyn__Load_8c.html#a7915d7ee78c4b2a722fbeba391bfbabc">clGetProgramBuildInfo</a>(temp_program,this-&gt;device_id,<a class="code" href="OpenCL__Dyn__Load_8h.html#a627bc679c4b66fb24eb4b7bb41380304">CL_PROGRAM_BUILD_LOG</a>,MAX_BUILD_LOG,build_log,&amp;build_log_length);
+<a name="l00172"></a>00172         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret2,<span class="stringliteral">&quot;OpenCL_MixIn::TestKernel : retrieving program build log failed: &quot;</span>);
+<a name="l00173"></a>00173         { ofstream out(<span class="stringliteral">&quot;kernel.txt&quot;</span>); out &lt;&lt; kernel_source; }
+<a name="l00174"></a>00174         ostringstream oss;
+<a name="l00175"></a>00175         oss &lt;&lt; <span class="stringliteral">&quot;OpenCL_MixIn::TestKernel : build failed: (kernel saved as kernel.txt)\n\n&quot;</span> &lt;&lt; build_log;
+<a name="l00176"></a>00176         <a class="code" href="namespaceOpenCL__utils.html#aca2d887beaf12449556f5f9239b1c308" title="Throws a std::runtime_error with a descriptive message of the OpenCL error code.">throwOnError</a>(ret,oss.str().c_str());
+<a name="l00177"></a>00177     }
+<a name="l00178"></a>00178     <a class="code" href="OpenCL__Dyn__Load_8c.html#a83710d3f3618caba8ab31151ce665256">clReleaseProgram</a>(temp_program);
+<a name="l00179"></a>00179 }
+<a name="l00180"></a>00180 
+<a name="l00181"></a>00181 <span class="comment">// -----------------------------------------------------------------------</span>
+<a name="l00182"></a>00182 
+<a name="l00183"></a><a class="code" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">00183</a> <span class="keywordtype">void</span> <a class="code" href="classOpenCL__MixIn.html#a2133bd4a3de7d30703d778bc607163e9">OpenCL_MixIn::ReleaseOpenCLBuffers</a>()
+<a name="l00184"></a>00184 {
+<a name="l00185"></a>00185     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;2;i++)
+<a name="l00186"></a>00186         <span class="keywordflow">for</span>(vector&lt;cl_mem&gt;::const_iterator it = this-&gt;buffers[i].begin();it!=this-&gt;buffers[i].end();it++)
+<a name="l00187"></a>00187             <a class="code" href="OpenCL__Dyn__Load_8c.html#a5604a9fb19b04189b065491373d248f1">clReleaseMemObject</a>(*it);
+<a name="l00188"></a>00188 }
+<a name="l00189"></a>00189 
+<a name="l00190"></a>00190 <span class="comment">// -----------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 14 2012 12:19:58 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

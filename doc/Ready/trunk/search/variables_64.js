@@ -9,5 +9,6 @@ var searchData=
   ['device_5fid',['device_id',['../classOpenCL__MixIn.html#a8c223af5850cf7a2b859974b4a30514a',1,'OpenCL_MixIn']]],
   ['diffusion_5fcoefficient',['diffusion_coefficient',['../structTNeighbor.html#a1d2035a8a801dd6493a323decd091cda',1,'TNeighbor']]],
   ['dimensions_5flabel',['dimensions_label',['../InfoPanel_8cpp.html#a5c5406a0ea11ce7c4907131288ebfd38',1,'InfoPanel.cpp']]],
-  ['do_5fone_5frender',['do_one_render',['../classMyFrame.html#a7c888fce42729570a9c56a1c969069b4',1,'MyFrame']]]
+  ['do_5fone_5frender',['do_one_render',['../classMyFrame.html#a7c888fce42729570a9c56a1c969069b4',1,'MyFrame']]],
+  ['done',['done',['../structAbstractRD_1_1PaintAction.html#a0249e81cc7f51b031d8460b54935c774',1,'AbstractRD::PaintAction']]]
 ];
