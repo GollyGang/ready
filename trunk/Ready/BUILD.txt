@@ -108,6 +108,9 @@ C) Build Ready:
     E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/lib/Win32/OpenCL.lib
  - Set OPENCL_INCLUDE_DIRS to e.g.
     E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/inc
+ - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and 
+   similar. Change all occurences of /MD (if any) to /MT, and /MDd to 
+   /MTd. This ensures that the C runtime is statically-linked.
  - Configure, generate, quit.
  - Build Ready:
     nmake
