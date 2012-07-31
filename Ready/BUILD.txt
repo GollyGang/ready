@@ -146,7 +146,7 @@ B) Build wxWidgets (if your repository doesn't provide a recent enough
 cd wxWidgets
 mkdir build-gtk
 cd build-gtk
-../configure --with-gtk --disable-shared --enable-unicode --with-opengl
+../configure --with-gtk --disable-shared --enable-unicode --with-opengl --with-zlib=builtin --with-libpng=builtin --with-libjpeg=builtin --with-libtiff=builtin
 make
 sudo make install
 
