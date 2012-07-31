@@ -156,6 +156,12 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
                     float da = D_a * dda - aval*bval*bval + F*(1-aval);
                     float db = D_b * ddb + aval*bval*bval - (F+k)*bval;
 
+                    #if !defined( USE_SSE )
+                        // avoid denormals manually
+                        da += 1e-10f;
+                        db += 1e-10f;
+                    #endif
+
                     // apply the change
                     *vtk_at(new_a,x,y,z,X,Y) = aval + timestep * da;
                     *vtk_at(new_b,x,y,z,X,Y) = bval + timestep * db;

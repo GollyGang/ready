@@ -282,14 +282,18 @@ foreach( var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE
   string( REGEX REPLACE "/MD" "/MT" ${var} "${${var}}" )
 endforeach()
 
-# enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
-if(MSVC)
-  add_definitions(/fp:fast)
-  if(NOT CMAKE_CL_64) # avoid warning on x64, which always comes with SSE2
-    add_definitions(/arch:SSE2)
+set( USE_SSE "YES" )
+if( USE_SSE )
+  # enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
+  if( MSVC )
+    add_definitions( /fp:fast )
+    if( NOT CMAKE_CL_64 ) # avoid warning on x64, which always comes with SSE2
+      add_definitions( /arch:SSE2 )
+    endif()
+  else()
+    add_definitions( -msse2 -ffast-math )
   endif()
-else()
-  add_definitions(-msse2 -ffast-math)
+  add_definitions( -DUSE_SSE )
 endif()
 
 if( APPLE )
@@ -339,11 +343,11 @@ if( MSVC_IDE )
 endif()
 
 # avoid security warnings
-if(MSVC)
-  add_definitions(/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
+if( MSVC )
+  add_definitions( /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS )
 endif()
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if( CMAKE_COMPILER_IS_GNUCXX )
   list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )  # strip release binary, for smaller file size
 endif()
 
@@ -380,6 +384,15 @@ elseif( UNIX )
   else()
     set( CPACK_SYSTEM_NAME "Linux-32bit" )  
   endif()
+elseif( WIN32)
+  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+    set( CPACK_SYSTEM_NAME "Windows-64bit" )  
+  else()
+    set( CPACK_SYSTEM_NAME "Windows-32bit" )  
+  endif()
+endif()
+if( NOT USE_SSE )
+  set( CPACK_SYSTEM_NAME "${CPACK_SYSTEM_NAME}-noSSE" )
 endif()
 set( CPACK_GENERATOR "ZIP" )
 set( CPACK_PACKAGE_VERSION "${READY_VERSION}" )

@@ -90,94 +90,95 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
     {
         report << "No OpenCL platforms available";
         // currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn't work
-        return report.str();
     }
-
-    report << "Found " << num_platforms << " platform(s):\n";
-
-    for(unsigned int iPlatform=0;iPlatform<num_platforms;iPlatform++)
+    else
     {
-        report << "Platform " << iPlatform+1 << ":\n";
-        const size_t MAX_INFO_LENGTH = 1000;
-        char info[MAX_INFO_LENGTH];
-        size_t info_length;
-        for(cl_platform_info i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
+        report << "Found " << num_platforms << " platform(s):\n";
+
+        for(unsigned int iPlatform=0;iPlatform<num_platforms;iPlatform++)
         {
-            clGetPlatformInfo(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&info_length);
-            report << GetPlatformInfoIdAsString(i) << " : " << info << "\n";
+            report << "Platform " << iPlatform+1 << ":\n";
+            const size_t MAX_INFO_LENGTH = 1000;
+            char info[MAX_INFO_LENGTH];
+            size_t info_length;
+            for(cl_platform_info i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
+            {
+                clGetPlatformInfo(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&info_length);
+                report << GetPlatformInfoIdAsString(i) << " : " << info << "\n";
+            }
+
+            const size_t MAX_DEVICES = 10;
+            cl_device_id devices_available[MAX_DEVICES];
+            cl_uint num_devices;
+            clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
+            report << "\nFound " << num_devices << " device(s) on this platform.\n";
+
+            const int N_CHAR_RETURNING_IDS = 6;
+            cl_device_info charReturningIds[N_CHAR_RETURNING_IDS] = {CL_DEVICE_EXTENSIONS,CL_DEVICE_NAME,CL_DEVICE_PROFILE,CL_DEVICE_VENDOR,
+                CL_DEVICE_VERSION,CL_DRIVER_VERSION};
+            const int N_UINT_RETURNING_IDS = 13;
+            cl_device_info uintReturningIds[N_UINT_RETURNING_IDS] = {CL_DEVICE_ADDRESS_BITS,CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE,CL_DEVICE_MAX_CLOCK_FREQUENCY,
+                CL_DEVICE_MAX_COMPUTE_UNITS,CL_DEVICE_MAX_CONSTANT_ARGS,CL_DEVICE_MAX_READ_IMAGE_ARGS,CL_DEVICE_MAX_SAMPLERS,CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
+                CL_DEVICE_MAX_WRITE_IMAGE_ARGS,CL_DEVICE_MEM_BASE_ADDR_ALIGN,CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE,CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT,
+                CL_DEVICE_VENDOR_ID};
+            const int N_BOOL_RETURNING_IDS = 5;
+            cl_device_info boolReturningIds[N_BOOL_RETURNING_IDS] = {CL_DEVICE_AVAILABLE,CL_DEVICE_COMPILER_AVAILABLE,CL_DEVICE_ENDIAN_LITTLE,CL_DEVICE_ERROR_CORRECTION_SUPPORT,
+                CL_DEVICE_IMAGE_SUPPORT};
+            const int N_ULONG_RETURNING_IDS = 5;
+            cl_device_info ulongReturningIds[N_ULONG_RETURNING_IDS] = {CL_DEVICE_GLOBAL_MEM_CACHE_SIZE,CL_DEVICE_GLOBAL_MEM_SIZE,CL_DEVICE_LOCAL_MEM_SIZE,CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE,
+                CL_DEVICE_MAX_MEM_ALLOC_SIZE};
+            const int N_SIZET_RETURNING_IDS = 8;
+            cl_device_info sizetReturningIds[N_SIZET_RETURNING_IDS] = {CL_DEVICE_IMAGE2D_MAX_HEIGHT,CL_DEVICE_IMAGE2D_MAX_WIDTH,CL_DEVICE_IMAGE3D_MAX_DEPTH,CL_DEVICE_IMAGE3D_MAX_HEIGHT,
+                CL_DEVICE_IMAGE3D_MAX_WIDTH,CL_DEVICE_MAX_PARAMETER_SIZE,CL_DEVICE_MAX_WORK_GROUP_SIZE,CL_DEVICE_PROFILING_TIMER_RESOLUTION};
+
+            cl_uint uint_value;
+            cl_bool bool_value;
+            cl_ulong ulong_value;
+            size_t sizet_value;
+            for(unsigned int iDevice=0;iDevice<num_devices;iDevice++)
+            {
+                report << "Device " << iDevice+1 << ":\n";
+                for(int i=0;i<N_CHAR_RETURNING_IDS;i++)
+                {
+                    clGetDeviceInfo(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,&info_length);
+                    report << GetDeviceInfoIdAsString(charReturningIds[i]) << " : " << info << "\n";
+                }
+                for(int i=0;i<N_UINT_RETURNING_IDS;i++)
+                {
+                    clGetDeviceInfo(devices_available[iDevice],uintReturningIds[i],sizeof(uint_value),&uint_value,&info_length);
+                    report << GetDeviceInfoIdAsString(uintReturningIds[i]) << " : " << uint_value << "\n";
+                }
+                for(int i=0;i<N_BOOL_RETURNING_IDS;i++)
+                {
+                    clGetDeviceInfo(devices_available[iDevice],boolReturningIds[i],sizeof(bool_value),&bool_value,&info_length);
+                    report << GetDeviceInfoIdAsString(boolReturningIds[i]) << " : " << (bool_value?"yes":"no") << "\n";
+                }
+                for(int i=0;i<N_ULONG_RETURNING_IDS;i++)
+                {
+                    clGetDeviceInfo(devices_available[iDevice],ulongReturningIds[i],sizeof(ulong_value),&ulong_value,&info_length);
+                    report << GetDeviceInfoIdAsString(ulongReturningIds[i]) << " : " << ulong_value << "\n";
+                }
+                for(int i=0;i<N_SIZET_RETURNING_IDS;i++)
+                {
+                    clGetDeviceInfo(devices_available[iDevice],sizetReturningIds[i],sizeof(sizet_value),&sizet_value,&info_length);
+                    report << GetDeviceInfoIdAsString(sizetReturningIds[i]) << " : " << sizet_value << "\n";
+                }
+                // CL_DEVICE_MAX_WORK_ITEM_SIZES:
+                size_t dim[3];
+                clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_MAX_WORK_ITEM_SIZES,sizeof(dim),dim,&info_length);
+                report << GetDeviceInfoIdAsString(CL_DEVICE_MAX_WORK_ITEM_SIZES) << " : " << dim[0] << ", " << dim[1] << ", " << dim[2] << "\n";
+                // CL_DEVICE_TYPE:
+                cl_device_type device_type;
+                clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_TYPE,sizeof(device_type),&device_type,&info_length);
+                ostringstream oss;
+                if(device_type&CL_DEVICE_TYPE_CPU) oss << "CPU";
+                if(device_type&CL_DEVICE_TYPE_GPU) { if(!oss.str().empty()) { oss << " & "; } oss << "GPU"; }
+                if(device_type&CL_DEVICE_TYPE_ACCELERATOR) { if(!oss.str().empty()) { oss << " & "; } oss << "ACCELERATOR"; }
+                if(device_type&CL_DEVICE_TYPE_DEFAULT) { if(!oss.str().empty()) { oss << " & "; } oss << "DEFAULT"; }
+                report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
+            }
+            report << "\n";
         }
-
-        const size_t MAX_DEVICES = 10;
-        cl_device_id devices_available[MAX_DEVICES];
-        cl_uint num_devices;
-        clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
-        report << "\nFound " << num_devices << " device(s) on this platform.\n";
-
-        const int N_CHAR_RETURNING_IDS = 6;
-        cl_device_info charReturningIds[N_CHAR_RETURNING_IDS] = {CL_DEVICE_EXTENSIONS,CL_DEVICE_NAME,CL_DEVICE_PROFILE,CL_DEVICE_VENDOR,
-            CL_DEVICE_VERSION,CL_DRIVER_VERSION};
-        const int N_UINT_RETURNING_IDS = 13;
-        cl_device_info uintReturningIds[N_UINT_RETURNING_IDS] = {CL_DEVICE_ADDRESS_BITS,CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE,CL_DEVICE_MAX_CLOCK_FREQUENCY,
-            CL_DEVICE_MAX_COMPUTE_UNITS,CL_DEVICE_MAX_CONSTANT_ARGS,CL_DEVICE_MAX_READ_IMAGE_ARGS,CL_DEVICE_MAX_SAMPLERS,CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS,
-            CL_DEVICE_MAX_WRITE_IMAGE_ARGS,CL_DEVICE_MEM_BASE_ADDR_ALIGN,CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE,CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT,
-            CL_DEVICE_VENDOR_ID};
-        const int N_BOOL_RETURNING_IDS = 5;
-        cl_device_info boolReturningIds[N_BOOL_RETURNING_IDS] = {CL_DEVICE_AVAILABLE,CL_DEVICE_COMPILER_AVAILABLE,CL_DEVICE_ENDIAN_LITTLE,CL_DEVICE_ERROR_CORRECTION_SUPPORT,
-            CL_DEVICE_IMAGE_SUPPORT};
-        const int N_ULONG_RETURNING_IDS = 5;
-        cl_device_info ulongReturningIds[N_ULONG_RETURNING_IDS] = {CL_DEVICE_GLOBAL_MEM_CACHE_SIZE,CL_DEVICE_GLOBAL_MEM_SIZE,CL_DEVICE_LOCAL_MEM_SIZE,CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE,
-            CL_DEVICE_MAX_MEM_ALLOC_SIZE};
-        const int N_SIZET_RETURNING_IDS = 8;
-        cl_device_info sizetReturningIds[N_SIZET_RETURNING_IDS] = {CL_DEVICE_IMAGE2D_MAX_HEIGHT,CL_DEVICE_IMAGE2D_MAX_WIDTH,CL_DEVICE_IMAGE3D_MAX_DEPTH,CL_DEVICE_IMAGE3D_MAX_HEIGHT,
-            CL_DEVICE_IMAGE3D_MAX_WIDTH,CL_DEVICE_MAX_PARAMETER_SIZE,CL_DEVICE_MAX_WORK_GROUP_SIZE,CL_DEVICE_PROFILING_TIMER_RESOLUTION};
-
-        cl_uint uint_value;
-        cl_bool bool_value;
-        cl_ulong ulong_value;
-        size_t sizet_value;
-        for(unsigned int iDevice=0;iDevice<num_devices;iDevice++)
-        {
-            report << "Device " << iDevice+1 << ":\n";
-            for(int i=0;i<N_CHAR_RETURNING_IDS;i++)
-            {
-                clGetDeviceInfo(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,&info_length);
-                report << GetDeviceInfoIdAsString(charReturningIds[i]) << " : " << info << "\n";
-            }
-            for(int i=0;i<N_UINT_RETURNING_IDS;i++)
-            {
-                clGetDeviceInfo(devices_available[iDevice],uintReturningIds[i],sizeof(uint_value),&uint_value,&info_length);
-                report << GetDeviceInfoIdAsString(uintReturningIds[i]) << " : " << uint_value << "\n";
-            }
-            for(int i=0;i<N_BOOL_RETURNING_IDS;i++)
-            {
-                clGetDeviceInfo(devices_available[iDevice],boolReturningIds[i],sizeof(bool_value),&bool_value,&info_length);
-                report << GetDeviceInfoIdAsString(boolReturningIds[i]) << " : " << (bool_value?"yes":"no") << "\n";
-            }
-            for(int i=0;i<N_ULONG_RETURNING_IDS;i++)
-            {
-                clGetDeviceInfo(devices_available[iDevice],ulongReturningIds[i],sizeof(ulong_value),&ulong_value,&info_length);
-                report << GetDeviceInfoIdAsString(ulongReturningIds[i]) << " : " << ulong_value << "\n";
-            }
-            for(int i=0;i<N_SIZET_RETURNING_IDS;i++)
-            {
-                clGetDeviceInfo(devices_available[iDevice],sizetReturningIds[i],sizeof(sizet_value),&sizet_value,&info_length);
-                report << GetDeviceInfoIdAsString(sizetReturningIds[i]) << " : " << sizet_value << "\n";
-            }
-            // CL_DEVICE_MAX_WORK_ITEM_SIZES:
-            size_t dim[3];
-            clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_MAX_WORK_ITEM_SIZES,sizeof(dim),dim,&info_length);
-            report << GetDeviceInfoIdAsString(CL_DEVICE_MAX_WORK_ITEM_SIZES) << " : " << dim[0] << ", " << dim[1] << ", " << dim[2] << "\n";
-            // CL_DEVICE_TYPE:
-            cl_device_type device_type;
-            clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_TYPE,sizeof(device_type),&device_type,&info_length);
-            ostringstream oss;
-            if(device_type&CL_DEVICE_TYPE_CPU) oss << "CPU";
-            if(device_type&CL_DEVICE_TYPE_GPU) { if(!oss.str().empty()) { oss << " & "; } oss << "GPU"; }
-            if(device_type&CL_DEVICE_TYPE_ACCELERATOR) { if(!oss.str().empty()) { oss << " & "; } oss << "ACCELERATOR"; }
-            if(device_type&CL_DEVICE_TYPE_DEFAULT) { if(!oss.str().empty()) { oss << " & "; } oss << "DEFAULT"; }
-            report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
-        }
-        report << "\n";
     }
 
     // bonus feature: report CPU capabilities
