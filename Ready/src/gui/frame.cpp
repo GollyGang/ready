@@ -306,7 +306,7 @@ void MyFrame::InitializeMenus()
     wxMenuBar *menuBar = new wxMenuBar();
     {   // file menu:
         wxMenu *menu = new wxMenu;
-        menu->Append(wxID_NEW, _("New Pattern") + GetAccelerator(DO_NEWPATT), _("Create a new pattern"));
+        menu->Append(wxID_NEW, _("New Pattern...") + GetAccelerator(DO_NEWPATT), _("Create a new pattern"));
         menu->AppendSeparator();
         menu->Append(wxID_OPEN, _("Open Pattern...") + GetAccelerator(DO_OPENPATT), _("Choose a pattern file to open"));
         menu->Append(ID::OpenRecent, _("Open Recent"), patternSubMenu);
@@ -428,8 +428,8 @@ void MyFrame::InitializeToolbars()
 
     {   // file menu items
         this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
-        this->file_toolbar->AddTool(wxID_NEW,_("New Pattern"),wxBitmap(this->icons_folder + _T("document-new.png"),wxBITMAP_TYPE_PNG),
-            _("New Pattern"));
+        this->file_toolbar->AddTool(wxID_NEW,_("New Pattern..."),wxBitmap(this->icons_folder + _T("document-new.png"),wxBITMAP_TYPE_PNG),
+            _("New Pattern..."));
         this->file_toolbar->AddTool(wxID_OPEN,_("Open Pattern..."),wxBitmap(this->icons_folder + _T("document-open.png"),wxBITMAP_TYPE_PNG),
             _("Open Pattern..."));
         this->file_toolbar->AddTool(ID::ReloadFromDisk,_("Reload from disk"),wxBitmap(this->icons_folder + _T("document-revert.png"),wxBITMAP_TYPE_PNG),
@@ -1460,6 +1460,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)")  };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
+        #ifdef __WXMAC__
+            // increase dlg height so we see all choices without having to scroll
+            dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+        #endif
         if(dlg.ShowModal()!=wxID_OK) return;
         sel = dlg.GetSelection();
     }
@@ -1518,6 +1522,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     divs = div_choices[dlg.GetSelection()];
                 }
@@ -1548,6 +1556,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",x_choices[i],y_choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the resolution:"),_("Torus tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     nx = x_choices[dlg.GetSelection()];
                     ny = y_choices[dlg.GetSelection()];
@@ -1576,6 +1588,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d points - approximately %d cells",choices[i],choices[i]*6);
                     wxSingleChoiceDialog dlg(this,_("Select the number of points:"),_("Tetrahedral mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     npts = choices[dlg.GetSelection()];
                 }
@@ -1604,6 +1620,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Triangular mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     n = choices[dlg.GetSelection()];
                 }
@@ -1634,6 +1654,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Hexagonal mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     n = choices[dlg.GetSelection()];
                 }
@@ -1664,6 +1688,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Rhombille mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     n = choices[dlg.GetSelection()];
                 }
@@ -1694,6 +1722,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     divs = div_choices[dlg.GetSelection()];
                 }
@@ -1724,6 +1756,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
+                    #ifdef __WXMAC__
+                        // increase dlg height so we see all choices without having to scroll
+                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+                    #endif
                     if(dlg.ShowModal()!=wxID_OK) return;
                     divs = div_choices[dlg.GetSelection()];
                 }
@@ -3376,7 +3412,10 @@ void MyFrame::OnUpdateRedo(wxUpdateUIEvent& event)
 void MyFrame::OnChangeCurrentColor(wxCommandEvent& event)
 {
     if(GetFloat(_("Enter a new value to paint with:"),_("Value:"),
-        this->current_paint_value,&this->current_paint_value))
-        this->UpdateToolbars();}
+        this->current_paint_value,&this->current_paint_value,wxDefaultPosition,
+        // need wider dialog to avoid title being truncated on Mac
+        wxSize(300,wxDefaultCoord)))
+        this->UpdateToolbars();
+}
 
 // ---------------------------------------------------------------------
