@@ -89,17 +89,17 @@ using namespace std;
 
 // ---------------------------------------------------------------------
 
-const char* PaneName(int id)
+wxString PaneName(int id)
 {
     switch(id)
     {
-        case ID::FileToolbar:   return "FileToolbar";
-        case ID::ActionToolbar: return "ActionToolbar";
-        case ID::PaintToolbar:  return "PaintToolbar";
-        case ID::PatternsPane:  return "PatternsPane";
-        case ID::InfoPane:      return "InfoPane";
-        case ID::HelpPane:      return "HelpPane";
-        case ID::CanvasPane:    return "CanvasPane";
+        case ID::FileToolbar:   return _T("FileToolbar");
+        case ID::ActionToolbar: return _T("ActionToolbar");
+        case ID::PaintToolbar:  return _T("PaintToolbar");
+        case ID::PatternsPane:  return _T("PatternsPane");
+        case ID::InfoPane:      return _T("InfoPane");
+        case ID::HelpPane:      return _T("HelpPane");
+        case ID::CanvasPane:    return _T("CanvasPane");
         default:                throw runtime_error("PaneName : unlisted ID");
     }
 }
