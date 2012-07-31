@@ -21,10 +21,10 @@ class vtkUnstructuredGrid;
 /// Methods for generating meshes from scratch.
 namespace MeshGenerators 
 {
-    /// Subdivides an icosahedron to get a sphere covered with triangles.
+    /// Subdivides an icosahedron to get a sphere evenly covered with triangles.
     void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
 
-    /// Applies the Delaunay algorith to scattered points to get a mesh of tetrahedra.
+    /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.
     void GetTetrahedralMesh(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
 
     /// Subdivides a torus with quadrilaterals.
