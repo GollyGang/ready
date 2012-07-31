@@ -286,9 +286,12 @@ set( USE_SSE "YES" )
 if( USE_SSE )
   # enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
   if( MSVC )
-    add_definitions( /fp:fast )
-    if( NOT CMAKE_CL_64 ) # avoid warning on x64, which always comes with SSE2
-      add_definitions( /arch:SSE2 )
+    if( CMAKE_CL_64 )
+      set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /fp:fast" )
+      set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast" )
+    else() # avoid warning on x64, which always comes with SSE2
+      set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2 /fp:fast" )
+      set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2 /fp:fast" )
     endif()
   else()
     add_definitions( -msse2 -ffast-math )
