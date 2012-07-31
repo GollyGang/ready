@@ -21,6 +21,7 @@ before 0.5 release:
 - allow block size to be changed for formula rules on images
 - add timesteps_per_render to action toolbar
 - set scene rotating by a setting in the start recording dialog box, or for general use?
+- mouse wheel sensitivity option
 
 before 0.x release:
 - toggle between single channel painting and multi-channel painting. Sometimes we want to paint just in channels

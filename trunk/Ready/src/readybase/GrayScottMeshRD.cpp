@@ -100,6 +100,11 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
             // Gray-Scott update step:
             da = D_a * dda - aval*bval*bval + F*(1-aval);
             db = D_b * ddb + aval*bval*bval - (F+k)*bval;
+            #if !defined( USE_SSE )
+                // avoid denormals manually
+                da += 1e-10f;
+                db += 1e-10f;
+            #endif
             // apply the step:
             target_a->SetValue(iCell,aval + timestep*da );
             target_b->SetValue(iCell,bval + timestep*db );
