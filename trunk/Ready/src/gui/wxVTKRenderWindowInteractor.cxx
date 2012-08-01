@@ -38,8 +38,10 @@
 #endif
 
 #if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
-  // AKT: ControlDown has been changed to mean Command key down
-  #define ControlDown RawControlDown
+  // AKT: ControlDown has been changed to mean Command key down,
+  // but best NOT to redefine ControlDown to RawControlDown because
+  // that would prevent people using command-click to roll.
+  // #define ControlDown RawControlDown
 #endif
 
 #ifdef __WXMAC__
@@ -730,8 +732,12 @@ void wxVTKRenderWindowInteractor::OnButtonUp(wxMouseEvent &event)
   //wxEVT_COMMAND_RIGHT_CLICK
   if (!Enabled || (ActiveButton != (event.GetEventType()-1))) 
   {
-    ActiveButton = wxEVT_NULL;  // AKT
-    return;
+    #ifdef __WXCOCOA__
+      // AKT: do not return here because it causes bugs if user ctrl-clicked,
+      // presumably because such a click can be treated as a right-button click
+    #else
+      return;
+    #endif
   }
 
   // See report by Shang Mu / Kerry Loux on wxVTK mailing list
@@ -788,7 +794,7 @@ void wxVTKRenderWindowInteractor::OnMouseWheel(wxMouseEvent& event)
 // Mouse wheel was only added after VTK 4.4 (I think...)
 #if VTK_MAJOR_VERSION > 4 || (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 4)
   // new style
-  //Set vtk event information ... The numebr of wheel rotations is stored in
+  //Set vtk event information ... The number of wheel rotations is stored in
   //the x varible.  y varible is zero
   SetEventInformationFlipY(event.GetX() , event.GetY(), 
                            event.ControlDown(), event.ShiftDown(), '\0', 0, NULL);
