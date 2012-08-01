@@ -729,12 +729,13 @@ void wxVTKRenderWindowInteractor::OnButtonUp(wxMouseEvent &event)
   //In wxWindows 2.4 and later: better use of wxMOUSE_BTN_RIGHT or 
   //wxEVT_COMMAND_RIGHT_CLICK
   if (!Enabled || (ActiveButton != (event.GetEventType()-1))) 
-    {
+  {
+    ActiveButton = wxEVT_NULL;  // AKT
     return;
-    }
+  }
 
   // See report by Shang Mu / Kerry Loux on wxVTK mailing list
-    this->SetFocus();
+  this->SetFocus();
 
 #if VTK_MAJOR_VERSION > 4 || (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0)
   SetEventInformationFlipY(event.GetX(), event.GetY(), 
@@ -774,7 +775,7 @@ void wxVTKRenderWindowInteractor::OnButtonUp(wxMouseEvent &event)
       event.GetX(), Size[1] - event.GetY() - 1);
 #endif
   }
-  //if the ActiveButton is realeased, then release mouse capture
+  //if the ActiveButton is released, then release mouse capture
   if ((ActiveButton != wxEVT_NULL) && WX_USE_X_CAPTURE && UseCaptureMouse)
   {
     ReleaseMouse();
