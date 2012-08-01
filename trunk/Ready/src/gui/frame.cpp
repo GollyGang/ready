@@ -2323,7 +2323,6 @@ void MyFrame::EnableAllMenus(bool enable)
         }
         #ifdef __WXOSX_COCOA__
             // enable/disable items in app menu
-            // AKT TODO!!! they fail to disable due to wxOSX-Cocoa bug
             mbar->Enable(wxID_ABOUT, enable);
             mbar->Enable(wxID_PREFERENCES, enable);
             mbar->Enable(wxID_EXIT, enable);
