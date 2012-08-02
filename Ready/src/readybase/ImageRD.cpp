@@ -659,10 +659,15 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
         vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
 
+    // get the image scalars name from the first array
+    prearrange_fields->Update();
+    const char *scalars_array_name = prearrange_fields->GetOutput()->GetCellData()->GetArray(0)->GetName();
+    // (always "ImageScalars" but this seems to help loading-in saved-reloaded images, for some reason)
+
     // mark the new cell data array as the active attribute
     vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
     assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
-    assign_attribute->Assign("ImageScalars", vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+    assign_attribute->Assign(scalars_array_name, vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
 
     vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
     merge_datasets->SetGeometryConnection(pad->GetOutputPort());
