@@ -3082,8 +3082,9 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     if(!this->is_recording)
     {
         bool default_to_2D_data = (this->system->GetArenaDimensionality()==2);
+        bool is_2D_data_available = (this->system->GetArenaDimensionality()!=3);
 
-        RecordingDialog dlg(this,default_to_2D_data);
+        RecordingDialog dlg(this,is_2D_data_available,default_to_2D_data);
         if(dlg.ShowModal()!=wxID_OK) return;
         this->recording_prefix = dlg.recording_prefix;
         this->recording_extension = dlg.recording_extension;

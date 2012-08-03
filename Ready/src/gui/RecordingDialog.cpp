@@ -25,7 +25,7 @@ using namespace std;
 
 // -----------------------------------------------------------------------------------------------
 
-RecordingDialog::RecordingDialog(wxWindow *parent,bool default_is_2D_data) 
+RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available,bool default_is_2D_data) 
     : wxDialog(parent,wxID_ANY,_("Recording settings"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     // create the controls
@@ -35,7 +35,8 @@ RecordingDialog::RecordingDialog(wxWindow *parent,bool default_is_2D_data)
     wxStaticText* source_label = new wxStaticText(this, wxID_STATIC, _("Image source:"));
     this->source_combo = new wxComboBox(this,wxID_ANY);
     this->source_combo->AppendString(_("current view"));
-    this->source_combo->AppendString(_("2D data"));
+    if(is_2D_data_available)
+        this->source_combo->AppendString(_("2D data"));
     this->source_combo->SetSelection(default_is_2D_data?1:0);
 
     wxStaticText* folder_label = new wxStaticText(this, wxID_STATIC, _("Save frames here: (will overwrite)"));
