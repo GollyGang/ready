@@ -23,7 +23,8 @@
 
 // VTK:
 class vtkImageData;
-class vtkImageWrapPad;
+class vtkAssignAttribute;
+class vtkRearrangeFields;
 
 /// Base class for image-based systems.
 class ImageRD : public AbstractRD
@@ -90,6 +91,10 @@ class ImageRD : public AbstractRD
         virtual int GetArenaDimensionality() const;
 
         virtual void FlipPaintAction(PaintAction& cca);
+
+        // some saved handles into the pipeline, for manual updated to workaround a named arrays problem
+        vtkAssignAttribute *assign_attribute_filter;
+        vtkRearrangeFields *rearrange_fields_filter;
 
     private:
 

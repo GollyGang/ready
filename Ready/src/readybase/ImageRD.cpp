@@ -296,12 +296,24 @@ void ImageRD::Update(int n_steps)
 
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
         this->images[ic]->Modified();
+
+    if(this->rearrange_fields_filter && this->assign_attribute_filter)
+    {
+        // manually update the rendering pipeline to allow for changing array names
+        // TODO: this step shouldn't be necessary
+        this->rearrange_fields_filter->Update();
+        assign_attribute_filter->Assign(this->rearrange_fields_filter->GetOutput()->GetCellData()->GetArray(0)->GetName(), 
+            vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+    }
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings)
 {
+    this->rearrange_fields_filter = NULL;
+    this->assign_attribute_filter = NULL;
+
     switch(this->GetArenaDimensionality())
     {
         // TODO: merge the dimensionalities (often want one/more slices from lower dimensionalities)
@@ -644,7 +656,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     mapper->ImmediateModeRenderingOn();
 
     vtkImageData *image = this->GetImage(iActiveChemical);
-    image->Modified();
     int *extent = image->GetExtent();
 
     // we first convert the image from point data to cell data, to match the users expectations
@@ -662,12 +673,15 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     // get the image scalars name from the first array
     prearrange_fields->Update();
     const char *scalars_array_name = prearrange_fields->GetOutput()->GetCellData()->GetArray(0)->GetName();
-    // (always "ImageScalars" but this seems to help loading-in saved-reloaded images, for some reason)
 
     // mark the new cell data array as the active attribute
     vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
     assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
     assign_attribute->Assign(scalars_array_name, vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+
+    // save the filters so we can perform a manual update step on the pipeline in Update() (TODO: work out how to do this properly)
+    this->rearrange_fields_filter = prearrange_fields;
+    this->assign_attribute_filter = assign_attribute;
 
     vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
     merge_datasets->SetGeometryConnection(pad->GetOutputPort());
