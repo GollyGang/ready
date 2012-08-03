@@ -4,9 +4,6 @@ UI annoyances:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - can floating panes go behind main window?
 
-before 0.4 release:
-- blank image on save/reload on 3d images
-
 before 0.5 release:
   
 - drawing issues: 

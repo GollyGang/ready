@@ -29,7 +29,7 @@ class RecordingDialog : public wxDialog
 {
     public:
 
-        RecordingDialog(wxWindow *parent,bool default_is_2D_data);
+        RecordingDialog(wxWindow *parent,bool is_2D_data_available,bool default_is_2D_data);
 
         virtual bool TransferDataFromWindow();  // called when user hits OK
     
