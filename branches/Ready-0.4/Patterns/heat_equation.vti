@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+    
+  <RD format_version="1">
+      
+    <description>
+        The &lt;a href="http://en.wikipedia.org/wiki/Heat_equation"&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.
+    </description>
+    
+    <rule type="formula" name="Heat equation" wrap="0">
+      <param name="timestep"> 0.1 </param>
+      <formula number_of_chemicals="1">
+        delta_a = laplacian_a;
+      </formula>
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+        <overlay chemical="a">
+            <overwrite />
+            <white_noise low="0.8" high="1" />
+            <rectangle>
+                <point3D x="0.2" y="0.3" z="0" />
+                <point3D x="0.3" y="0.6" z="1" />
+            </rectangle>
+            <rectangle>
+                <point3D x="0.4" y="0.5" z="0" />
+                <point3D x="0.8" y="0.9" z="1" />
+            </rectangle>
+        </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+        <vertical_scale_2D value="40" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 63 0 0">
+      <PointData Scalars="Scalars_">
+        <DataArray type="Float32" Name="Scalars_" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+  </AppendedData>
+  
+</VTKFile>

@@ -1,0 +1,101 @@
+<html>
+<title>What is reaction-diffusion?</title>
+<body>
+
+<p>
+<h3>What is reaction-diffusion?</h3>
+
+<a href="http://en.wikipedia.org/wiki/Alan_Turing">Alan Turing</a> published a paper in 1952 called <a href="http://en.wikipedia.org/wiki/The_chemical_basis_of_morphogenesis">The Chemical Basis of Morphogenesis</a>. He showed how chemicals (morphogens) could diffuse through living tissue and drive development in embryos and plants. The key result is that <i>instabilities</i> can arise and form static patterns.
+<p>
+The timeline below gives some idea of the development of the key ideas.
+
+<p>
+<h4>Before Turing</h4>
+
+<p>
+Open <a href="open:Patterns/heat_equation.vti">heat_equation.vti</a> (click on this link) and set it running. Scroll down in the Info Pane to see the formula: <p>
+<center><tt>
+delta_a = laplacian_a;
+</tt></center>
+<p>
+This says that the rate of change of chemical a is equal to the <a href="http://en.wikipedia.org/wiki/Laplace_operator">Laplacian</a> of chemical a. This means that any location that is lower than its neighbors will increase, and any location that is higher than its neighbors will decrease. This equation describes how heat will spread out in a solid or how ink would diffuse through a liquid.
+<p>
+<table cellpadding="20"><tr><td width="5%"></td><td bgcolor="#FFFFD0" width="95%">
+<center><b><i>How is the Laplacian computed?</i></b></center>
+<p>
+We compute the Laplacian of each chemical at each location by <a href="http://en.wikipedia.org/wiki/Finite_difference">finite differencing</a> with a <i>stencil</i> of radius 1.
+<p>
+In 1D this means that for a string of values:
+<p>
+<center><table border="1" cellpadding="4">
+<tr><td>...</td><td>A</sub></td><td>B</td><td>C</td><td>...</td></tr>
+</table></center>
+<p>
+the Laplacian at B will be given by: A + C - 2B.
+<p>
+In 2D, for a cell C surround by 4 neighbors N, S, E, W the <a href="http://en.wikipedia.org/wiki/Five-point_stencil">five-point stencil</a> gives a Laplacian of: N + S + E + W - 4C.
+<p>
+In general, we use a <a href="http://en.wikipedia.org/wiki/Discrete_Laplace_operator#Graph_Laplacians">graph Laplacian</a>, which is equal to the sum of <tt>(P-centre)</tt> for each neighbor <i>P</i>.
+<p>
+On meshes, the neighbors are defined to be any cell that shares a vertex with the central cell.
+</td></tr></table>
+<p>
+Having computed the rate of change of the chemical at each location, we then apply the <a href="http://en.wikipedia.org/wiki/Euler_method">Euler method</a> to estimate the new value at some point in the future. Knowing the current value <tt>a</tt> and the rate of change <tt>delta_a</tt> gives:
+<p>
+<center><tt>
+new_a = a + timestep * delta_a
+</tt></center>
+<p>
+Here, <i>timestep</i> is a value that determines how accurate the resulting simulation will be - smaller values will give more accurate solutions but take longer to compute because more steps are needed to get to the same place. You can change the timestep in our heat equation by scrolling down in the Info Pane to 'timestep' and editing the value. If you set it to much larger than 0.2 then the values quickly diverge, due to numerical instabilities. In general it is important to check that any witnessed behaviour is genuine and not an artefact of a timestep that is too large.
+<p>
+There are alternatives to the Euler method that allow for larger timesteps (e.g. <a href="http://en.wikipedia.org/wiki/Runge-Kutta_method">Runge-Kutta</a>) but we haven't implemented them yet.
+<p>
+<table cellpadding="20"><tr><td width="5%"></td><td bgcolor="#FFFFD0" width="95%">
+<center><b><i>Extra chemicals</i></b></center>
+<p>
+Have a look at <a href="open:Patterns/heat_equation_interpolation.vti">heat_equation_interpolation.vti</a>. This is the same heat equation as we saw above, but with an extra chemical <i>b</i>. The heat equation applies to chemical <i>a</i> but only in those places where the pattern was originally zero. This has the effect of 'locking-in' certain values and forcing the other values to reach an equilibrium with them.
+</td></tr></table>
+<p>
+<h4>Turing (1952)</h4>
+
+<p>
+Now open <a href="open:Patterns/turing.vti">turing.vti</a>. This system has two chemicals (a and b) which are shown side by side. The formula is more complicated:
+<p>
+<tt>
+&nbsp;&nbsp;&nbsp;&nbsp;delta_a = k * (16.0f - a * b) + D_a * laplacian_a;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;delta_b = max( -b, k * (a * b - b - 12.0f) + D_b * laplacian_b );
+</tt>
+<p>
+Here <tt>k</tt>, <tt>D_a</tt> and <tt>D_b</tt> are <i>parameters</i>, and can be edited in the Info Pane to give different behavior. 
+<p>
+Set the system running. After a while, spots appear.
+<p>
+To see the same system in one dimension, scroll down in the Info Pane to "Dimensions" and edit to set it to 64 x 1 x 1. The line graph shows chemical a in a brighter color. Soon a pattern of peaks and troughs appears, in the same way as the 2D system. In 3D (try 32 x 32 x 32) we get blobs appearing. 
+<p>
+Turing suggested that this behavior of forming a regular pattern of spots is the sort of thing that might be used in nature by plants and animals wanting to direct their own growth (morphogenesis) or for the patterns on the skins of leopards, for example. While plausible, no evidence of this was found. I think it is fair to say that for many years the theory was poorly regarded amongst biologists, especially after <a href="http://en.wikipedia.org/wiki/Hedgehog_signaling_pathway">a different mechanism</a> was found to drive certain well-known examples of morphogenesis. It was only in 2006 that the <a href="http://phylogenous.wordpress.com/2010/12/01/alan-turings-reaction-diffusion-model-simplification-of-the-complex/">first evidence</a> for Turing's reaction-diffusion in biology was found, in the even placement of hair follicles on the skin of mice. Other systems have <a href="http://www.nature.com/ng/journal/vaop/ncurrent/full/ng.1090.html">since</a> been found.
+<p>
+Also look at <a href="open:Patterns/turing_noisy.vti">turing_noisy.vti</a>. Here we've used a third chemical <i>c</i> to add noise to the system. This shows how the patterns are robust to such interference.
+<p>
+<h4>After Turing</h4>
+<p>
+After the concept of reaction-diffusion was identified, many other systems have been discovered that fit into the general scheme and show interesting phenomena. A partial list is shown below. 
+<p>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Ginzburg%E2%80%93Landau_theory">Ginsburg-Landau theory</a> (1950) describes superconductivity. Our pattern <a href="open:Patterns/complex_Ginsburg-Landau.vti">complex_Ginsburg-Landau.vti</a> shows a reaction-diffusion setting of a form of their equation.
+<li><a href="http://en.wikipedia.org/wiki/Belousov%E2%80%93Zhabotinsky_reaction">Belousov-Zhabotinsky reaction</a> (1951-1968). A Russian chemist noticed a very peculiar <i>oscillating</i> chemical reaction. The <a href="http://en.wikipedia.org/wiki/Brusselator">Brusselator</a>, <a href="http://en.wikipedia.org/wiki/Oregonator">Oregonator</a> and <a href="http://hopf.chem.brandeis.edu/yanglingfa/pattern/le/index.html">Brandeisator</a> are mathematical models of such systems.
+<li><a href="http://en.wikipedia.org/wiki/FitzHugh%E2%80%93Nagumo_model">FitzHugh-Nagumo</a> (1961-1962) A simplification of the <a href="http://en.wikipedia.org/wiki/Hodgkin%E2%80%93Huxley_model">Hodgkin-Huxley</a> model of firing neurons. Patterns: <a href="open:Patterns/FitzHugh-Nagumo/tip-splitting.vti">tip-splitting.vti</a>, <a href="open:Patterns/FitzHugh-Nagumo/spiral_turbulence.vti">spiral_turbulence.vti</a>, <a href="open:Patterns/FitzHugh-Nagumo/pulsate.vti">pulsate.vti</a> and <a href="open:Patterns/FitzHugh-Nagumo/squid_axon.vti">squid_axon.vti</a>.
+<li>Schlogl (1972) : A one-chemical system - open <a href="open:Patterns/schlogl.vti">schlogl.vti</a>
+<li><a href="http://mrob.com/pub/comp/xmorphia/">Gray-Scott</a> (1983-1993) Many of our patterns are based on this rule.
+</ul>
+<p>
+<h4>Writing new rules</h4>
+<p>
+As a first step, try changing the parameters of some of the rules. This can give very different behavior. Read <a href="http://mrob.com/pub/comp/xmorphia/">Robert Munafo's pages</a> about Gray-Scott, for example, and try out some of the parameters he discusses on <a href="open:Patterns/grayscott_demo.vti">grayscott_demo.vti</a>.
+<p>
+Ready also allows you to reprogram rules completely. For formula and kernel rules, hit 'edit' next to the formula/kernel and then see what effect your change has. Some changes will cause an error when you try to run or step forward but this just shows you a message box saying what went wrong.
+<p>
+For more details, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/grayscott_demo.vti">example</a>). The format is documented <a href="formats.html">here</a>, specifically the <a href="formats.html#formula">formula</a> and <a href="formats.html#kernel">kernel</a> sections.
+<p>
+If you come up with interesting patterns then please share them with the world! The best patterns submitted to us will be included in the next release of Ready - see our <a href="credits.html#competition">pattern competition</a>.
+</body>
+</html>

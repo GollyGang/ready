@@ -1,0 +1,112 @@
+<html>
+<title>Ready Help: File Menu</title>
+<body>
+
+<p>
+<h3>File Menu</h3>
+
+<p>
+<font size=+1><b>New Pattern...</b></font><a name="File_NewPattern"></a>
+
+<p>
+Creates a new pattern. Can create a 1D, 2D or 3D image, or a sphere or other mesh.
+
+<p>
+<font size=+1><b>Open Pattern...</b></font>
+
+<p>
+Opens the standard file browser so you can select a .vti or .vtu file.
+
+<p>
+<font size=+1><b>Open Recent</b></font>
+
+<p>
+This submenu lets you open a recently loaded pattern file.
+The most recent file is always at the top.
+The maximum number of pattern files remembered is determined by a setting
+(initially 20) which you can change in <a href="prefs:file">Preferences > File</a>.
+
+<p>
+<font size=+1><b>Reload from Disk</b></font><a name="File_ReloadFromDisk"></a>
+
+<p>
+Reloads the current pattern from disk.
+
+<p>
+<font size=+1><b>Import Mesh...</b></font><a name="File_ImportMesh"></a>
+
+<p>
+Imports an OBJ, VTU or VTP file as a mesh to run reaction-diffusion systems on. 
+E.g. the surface of a zebra shape.
+
+<p>
+<font size=+1><b>Export Mesh...</b></font><a name="File_ExportMesh"></a>
+
+<p>
+Exports the current mesh (surface mesh, contoured volume image or 2D displacement-mapped 
+surface) as OBJ or VTP.
+
+<p>
+<font size=+1><b>Export Image...</b></font><a name="File_ExportImage"></a>
+
+<p>
+Exports the current image (slice or 2D system) as PNG or JPEG.
+
+<p>
+<font size=+1><b>Save Pattern...</b></font>
+
+<p>
+Opens the standard file saving dialog so you can save the current pattern
+in a .vti or .vtu file.
+
+<p>
+<font size=+1><b>Save Screenshot...</b></font>
+
+<p>
+Opens a dialog so you can save a screenshot of the current view
+in a .png or .jpg file.
+
+<p>
+<font size=+1><b>Start Recording...</b></font><a name="File_StartRecording"></a>
+
+<p>
+Starts saving out images (one every timesteps_per_render) to disk, either from the 2D data
+or from the current view. A dialog box asks for the target folder and filename construction.
+
+<p>
+<font size=+1><b>Stop Recording</b></font><a name="File_StopRecording"></a>
+
+<p>
+Stops saving out images.
+
+<p>
+<font size=+1><b>Add My Patterns...</b></font>
+
+<p>
+Lets you choose a folder (presumably one containing .vti/.vtu files) which is
+then added to the Patterns pane.
+
+<a name="prefs"></a>
+<p>
+<font size=+1><b>Preferences...</b></font>
+
+<p>
+Opens the <a href="prefs:">Preferences</a> dialog so you can change various settings.
+[On a Mac, this item is in the application menu.]
+All your settings are stored in a file called ReadyPrefs.  This file is initially
+saved in a user-specific data directory:
+<p>
+<dd>
+<table cellpadding="10" border="1">
+<tr><td>On Linux:</td><td>~/.ready/</td></tr>
+<tr><td>On Mac:</td><td>~/Library/Application Support/Ready/</td></tr>
+<tr><td>On Windows XP:</td><td>C:\Documents and Settings\<i>username</i>\Application Data\Ready\</td></tr>
+<tr><td>On Windows 7:</td><td>C:\Users\<i>username</i>\AppData\Roaming\Ready\</td></tr>
+</table>
+</dd>
+<p>
+You might prefer to move ReadyPrefs into the same folder as the application.
+This allows multiple copies of Ready to have their own set of preferences.
+
+</body>
+</html>
