@@ -57,6 +57,7 @@ For 64-bit builds:
 - select the 64-bit generators in CMake
 - use the 64-bit version of OpenCL.lib
 - c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
+  (vc_x64_lib with wxWidgets 2.9.4 or later)
 
 ================ Windows, using the command-line =====================
 
@@ -122,6 +123,7 @@ For 64-bit builds:
 - use the 64-bit Visual Studio command prompt
 - use the 64-bit version of OpenCL.lib
 - c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
+  (vc_x64_lib with wxWidgets 2.9.4 or later)
 
 =========================== Linux =================================
 
