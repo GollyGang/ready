@@ -79,6 +79,7 @@
  
  #if wxCHECK_VERSION(2, 9, 0)
   // thanks to: http://thomasfischer.biz/?p=382
+  #include <gtk/gtk.h>
   #include <wx/gtk/private/win_gtk.h>
   #define piz(wxwin) WX_PIZZA((wxwin)->m_wxwindow)
   #define GetXWindow(wxwin) (wxwin)->m_wxwindow ? \
