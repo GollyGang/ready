@@ -41,4 +41,10 @@ namespace MeshGenerators
 
     /// Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).
     void GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems);
+
+    /// Make a 2D Delaunay triangulation from a random set of points
+    void GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems);
+
+    /// Make a 2D Voronoi mesh from a random set of points
+    void GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems);
 }
