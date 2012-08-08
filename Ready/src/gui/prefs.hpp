@@ -76,6 +76,7 @@ extern wxMenu* patternSubMenu;   // submenu of recent pattern files
 extern int numpatterns;          // current number of recent pattern files
 extern int maxpatterns;          // maximum number of recent pattern files
 extern bool repaint_to_erase;    // whether painting over the current color reverts to low
+extern int current_brush_size;
 
 // Keyboard shortcuts:
 
@@ -124,6 +125,9 @@ typedef enum
     DO_PATTERNS,                 // show patterns pane
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
+    DO_BRUSHSMALL,               // select small brush
+    DO_BRUSHMEDIUM,              // select medium brush
+    DO_BRUSHLARGE,               // select large brush
     DO_OPENCL,                   // show OpenCL diagnostics...
     DO_ACTIONTOOLBAR,            // show action toolbar
     DO_FILETOOLBAR,              // show file toolbar

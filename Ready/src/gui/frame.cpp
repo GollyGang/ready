@@ -144,6 +144,12 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Brush, MyFrame::OnUpdateSelectBrushTool)
     EVT_MENU(ID::Picker, MyFrame::OnSelectPickerTool)
     EVT_UPDATE_UI(ID::Picker, MyFrame::OnUpdateSelectPickerTool)
+    EVT_MENU(ID::BrushSizeSmall, MyFrame::OnBrushSizeSmall)
+    EVT_UPDATE_UI(ID::BrushSizeSmall, MyFrame::OnUpdateBrushSizeSmall)
+    EVT_MENU(ID::BrushSizeMedium, MyFrame::OnBrushSizeMedium)
+    EVT_UPDATE_UI(ID::BrushSizeMedium, MyFrame::OnUpdateBrushSizeMedium)
+    EVT_MENU(ID::BrushSizeLarge, MyFrame::OnBrushSizeLarge)
+    EVT_UPDATE_UI(ID::BrushSizeLarge, MyFrame::OnUpdateBrushSizeLarge)
     // view menu
     EVT_MENU(ID::FullScreen, MyFrame::OnFullScreen)
     EVT_MENU(ID::FitPattern, MyFrame::OnFitPattern)
@@ -208,6 +214,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ANY, MyFrame::OnOpenRecent)
 END_EVENT_TABLE()
 
+// ---------------------------------------------------------------------
+
 const char* MyFrame::opencl_not_available_message = 
 	"This file requires OpenCL, which has not been detected on your system.\n\n"
 	"OpenCL allows Ready to take advantage of the many-core architectures on\n"
@@ -219,6 +227,8 @@ const char* MyFrame::opencl_not_available_message =
 	"You can load the files in the 'CPU-only' folder, which don't use OpenCL. Or\n"
 	"use File > New Pattern or File > Import Mesh to make new examples.";
 						
+const float MyFrame::brush_sizes[] = {0.02f,0.05f,0.1f};
+
 // ---------------------------------------------------------------------
 
 // constructor
@@ -350,6 +360,12 @@ void MyFrame::InitializeMenus()
         menu->AppendRadioItem(ID::Pencil, _("Select Pencil") + GetAccelerator(DO_PENCIL), _("Select pencil tool"));
         menu->AppendRadioItem(ID::Brush, _("Select Brush") + GetAccelerator(DO_BRUSH), _("Select brush tool"));
         menu->AppendRadioItem(ID::Picker, _("Select Color Picker") + GetAccelerator(DO_PICKER), _("Select color picker tool"));
+        menu->AppendSeparator();
+        wxMenu* brush_size_menu = new wxMenu;
+        brush_size_menu->AppendCheckItem(ID::BrushSizeSmall,_("Small") + GetAccelerator(DO_BRUSHSMALL),_("Select the small brush"));
+        brush_size_menu->AppendCheckItem(ID::BrushSizeMedium,_("Medium") + GetAccelerator(DO_BRUSHMEDIUM),_("Select the medium brush"));
+        brush_size_menu->AppendCheckItem(ID::BrushSizeLarge,_("Large") + GetAccelerator(DO_BRUSHLARGE),_("Select the large brush"));
+        menu->AppendSubMenu(brush_size_menu,_("Brush Size"),_("Choose the size of brush"));
         menuBar->Append(menu, _("&Edit"));
     }
     {   // view menu:
@@ -2379,6 +2395,9 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Pencil,                    DO_PENCIL);
         SetAccelerator(mbar, ID::Brush,                     DO_BRUSH);
         SetAccelerator(mbar, ID::Picker,                    DO_PICKER);
+        SetAccelerator(mbar, ID::BrushSizeSmall,            DO_BRUSHSMALL);
+        SetAccelerator(mbar, ID::BrushSizeMedium,           DO_BRUSHMEDIUM);
+        SetAccelerator(mbar, ID::BrushSizeLarge,            DO_BRUSHLARGE);
         
         // view menu
         SetAccelerator(mbar, ID::FullScreen,                DO_FULLSCREEN);
@@ -2452,6 +2471,9 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_PENCIL:         cmdid = ID::Pencil; break;
         case DO_BRUSH:          cmdid = ID::Brush; break;
         case DO_PICKER:         cmdid = ID::Picker; break;
+        case DO_BRUSHSMALL:     cmdid = ID::BrushSizeSmall; break;
+        case DO_BRUSHMEDIUM:    cmdid = ID::BrushSizeMedium; break;
+        case DO_BRUSHLARGE:     cmdid = ID::BrushSizeLarge; break;
         
         // View menu
         case DO_FULLSCREEN:     cmdid = ID::FullScreen; break;
@@ -3241,8 +3263,8 @@ void MyFrame::LeftMouseDown(int x, int y)
             break;
             case BRUSH:
             {
-                float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
-                this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
+                this->system->SetValuesInRadius(p[0],p[1],p[2],this->brush_sizes[current_brush_size],
+                    this->current_paint_value,this->render_settings);
                 this->pVTKWindow->Refresh();
             }
             break;
@@ -3331,8 +3353,8 @@ void MyFrame::MouseMove(int x, int y)
             break;
             case BRUSH:
             {
-                float brush_size = 0.02f; // proportion of the diagonal of the bounding box TODO: make a user option
-                this->system->SetValuesInRadius(p[0],p[1],p[2],brush_size,this->current_paint_value,this->render_settings);
+                this->system->SetValuesInRadius(p[0],p[1],p[2],this->brush_sizes[current_brush_size],
+                    this->current_paint_value,this->render_settings);
                 this->pVTKWindow->Refresh();
             }
             break;
@@ -3416,6 +3438,48 @@ void MyFrame::OnChangeCurrentColor(wxCommandEvent& event)
         // need wider dialog to avoid title being truncated on Mac
         wxSize(300,wxDefaultCoord)))
         this->UpdateToolbars();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnBrushSizeSmall(wxCommandEvent& event)
+{
+    current_brush_size = 0;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateBrushSizeSmall(wxUpdateUIEvent& event)
+{
+    event.Check(current_brush_size==0);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnBrushSizeMedium(wxCommandEvent& event)
+{
+    current_brush_size = 1;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateBrushSizeMedium(wxUpdateUIEvent& event)
+{
+    event.Check(current_brush_size==1);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnBrushSizeLarge(wxCommandEvent& event)
+{
+    current_brush_size = 2;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateBrushSizeLarge(wxUpdateUIEvent& event)
+{
+    event.Check(current_brush_size==2);
 }
 
 // ---------------------------------------------------------------------

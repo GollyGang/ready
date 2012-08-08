@@ -52,6 +52,9 @@ namespace ID
         Pencil,
         Brush,
         Picker,
+        BrushSizeSmall,
+        BrushSizeMedium,
+        BrushSizeLarge,
         
         // view menu
         FullScreen,
