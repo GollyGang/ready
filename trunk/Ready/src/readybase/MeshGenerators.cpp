@@ -33,6 +33,8 @@
 #include <vtkDelaunay2D.h>
 #include <vtkDelaunay3D.h>
 #include <vtkCellArray.h>
+#include <vtkTriangle.h>
+#include <vtkGenericCell.h>
 
 // STL:
 #include <vector>
@@ -556,8 +558,6 @@ void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,
 
 void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
 {
-    // TODO: finish this bit
-    /*
     // make a 2D mesh of voronoi cells from a point cloud
     vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
     // first make a delaunay triangular mesh
@@ -577,13 +577,39 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         del->SetInput(poly);
         del->Update();
         poly->DeepCopy(del->GetOutput());
+        poly->BuildLinks();
     }
 
     // then make polygons from the circumcenters of the neighboring triangles of each vertex
-    poly->BuildLinks();
+
+    // points: the circumcenter of each tri
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
-    pts->SetNumberOfPoints(n_points);
+    pts->SetNumberOfPoints(poly->GetNumberOfCells());
+    double center[3],p1[3],p2[3],p3[3];
+    vtkSmartPointer<vtkGenericCell> cell = vtkSmartPointer<vtkGenericCell>::New();
+    for(vtkIdType i=0;i<poly->GetNumberOfCells();i++)
+    {
+        poly->GetCell(i,cell);
+        vtkIdType pt1 = cell->GetPointId(0);
+        vtkIdType pt2 = cell->GetPointId(1);
+        vtkIdType pt3 = cell->GetPointId(2);
+        poly->GetPoint(pt1,p1);
+        poly->GetPoint(pt2,p2);
+        poly->GetPoint(pt3,p3);
+        vtkTriangle::Circumcircle(p1,p2,p3,center);
+        pts->SetPoint(i,center);
+    }
+    // polys: join the circumcenters of each neighboring tri of each point (if >2)
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+    for(vtkIdType i=0;i<poly->GetNumberOfPoints();i++)
+    {
+        poly->GetPointCells(i,ids);
+        if(ids->GetNumberOfIds()<=2) continue;
+        cells->InsertNextCell(ids->GetNumberOfIds());
+        for(vtkIdType j=0;j<ids->GetNumberOfIds();j++)
+            cells->InsertCellPoint(ids->GetId(j));
+    }
 
     mesh->SetPoints(pts);
     mesh->SetCells(VTK_POLYGON,cells);
@@ -597,7 +623,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         scalars->SetName(GetChemicalName(iChem).c_str());
         scalars->FillComponent(0,0.0f);
         mesh->GetCellData()->AddArray(scalars);
-    }*/
+    }
 }
 
 // ---------------------------------------------------------------------
