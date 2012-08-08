@@ -30,6 +30,7 @@
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkCellData.h>
+#include <vtkDelaunay2D.h>
 #include <vtkDelaunay3D.h>
 #include <vtkCellArray.h>
 
@@ -514,6 +515,89 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
         scalars->FillComponent(0,0.0f);
         mesh->GetCellData()->AddArray(scalars);
     }
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
+{
+    // make a 2D mesh by delaunay triangulation on a point cloud
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    pts->SetNumberOfPoints(n_points);
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+    for(vtkIdType i=0;i<(vtkIdType)n_points;i++)
+    {
+        pts->SetPoint(i,vtkMath::Random(),vtkMath::Random(),0);
+        cells->InsertNextCell(1);
+        cells->InsertCellPoint(i);
+    }
+    vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+    poly->SetPoints(pts);
+    poly->SetPolys(cells);
+    vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
+    del->SetInput(poly);
+    del->Update();
+    mesh->SetPoints(del->GetOutput()->GetPoints());
+    mesh->SetCells(VTK_POLYGON,del->GetOutput()->GetPolys());
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
+{
+    // TODO: finish this bit
+    /*
+    // make a 2D mesh of voronoi cells from a point cloud
+    vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+    // first make a delaunay triangular mesh
+    {
+        vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+        pts->SetNumberOfPoints(n_points);
+        vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+        for(vtkIdType i=0;i<(vtkIdType)n_points;i++)
+        {
+            pts->SetPoint(i,vtkMath::Random(),vtkMath::Random(),0);
+            cells->InsertNextCell(1);
+            cells->InsertCellPoint(i);
+        }
+        poly->SetPoints(pts);
+        poly->SetPolys(cells);
+        vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
+        del->SetInput(poly);
+        del->Update();
+        poly->DeepCopy(del->GetOutput());
+    }
+
+    // then make polygons from the circumcenters of the neighboring triangles of each vertex
+    poly->BuildLinks();
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    pts->SetNumberOfPoints(n_points);
+    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+
+    mesh->SetPoints(pts);
+    mesh->SetCells(VTK_POLYGON,cells);
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }*/
 }
 
 // ---------------------------------------------------------------------

@@ -1468,18 +1468,18 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     // ask user what type of dataset to generate:
+    enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TetraMesh, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D };
     int sel;
     {
-        const int N_CHOICES = 11;
+        const int N_CHOICES = 13;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh"),
-            _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)")  };
+            _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
+            _("Random 2D Delaunay tiling"), _("Random 2D Voronoi tiling") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
-        #ifdef __WXMAC__
-            // increase dlg height so we see all choices without having to scroll
-            dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-        #endif
+        // increase dlg height so we see all choices without having to scroll
+        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
         if(dlg.ShowModal()!=wxID_OK) return;
         sel = dlg.GetSelection();
     }
@@ -1488,7 +1488,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     {
         switch(sel)
         {
-            case 0: // 1D image
+            case Image1D:
             {
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
@@ -1501,7 +1501,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
                 break;
             }
-            case 1: // 2D image
+            case Image2D:
             {
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
@@ -1514,7 +1514,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
                 break;
             }
-            case 2: // 3D image
+            case Image3D:
             {
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
@@ -1527,7 +1527,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
                 break;
             }
-            case 3: // geodesic sphere
+            case GeoSphere:
             {
                 int divs;
                 {
@@ -1559,7 +1559,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 break;
             }
-            case 4: // torus
+            case Torus:
             {
                 int nx,ny;
                 {
@@ -1593,7 +1593,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 break;
             }
-            case 5: // tetrahedral mesh
+            case TetraMesh:
             {
                 int npts;
                 {
@@ -1624,7 +1624,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
                 break;
             }
-            case 6: // triangular mesh
+            case TriMesh:
             {
                 int n;
                 {
@@ -1658,7 +1658,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
-            case 7: // hexagonal mesh
+            case HexMesh:
             {
                 int n;
                 {
@@ -1692,7 +1692,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
-            case 8: // rhombille tiling
+            case Rhombille:
             {
                 int n;
                 {
@@ -1726,7 +1726,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
-            case 9: // Penrose rhombi tiling
+            case PenroseP3:
             {
                 int divs;
                 {
@@ -1760,7 +1760,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
-            case 10: // Penrose darts and kites tiling
+            case PenroseP2:
             {
                 int divs;
                 {
@@ -1793,6 +1793,40 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 wxMessageBox(_("There's a problem with rendering concave polygons in OpenGL, so the display might be slightly corrupted."));
+                break;
+            }
+            case Del2D:
+            {
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetRandomDelaunay2D(200,mesh,2); // TODO: user can change n_points
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+				else
+					mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                break;
+            }
+            case Vor2D:
+            {
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetRandomVoronoi2D(200,mesh,2); // TODO: user can change n_points
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+				else
+					mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
             default:
