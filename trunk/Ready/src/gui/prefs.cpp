@@ -99,6 +99,7 @@ wxString texteditor;             // path of user's preferred text editor
 wxMenu* patternSubMenu = NULL;   // submenu of recent pattern files
 int numpatterns = 0;             // current number of recent pattern files
 int maxpatterns = 20;            // maximum number of recent pattern files (1..MAX_RECENT)
+int current_brush_size = 1;      // small, medium or large brush
 
 // local (ie. non-exported) globals:
 
@@ -337,6 +338,9 @@ const char* GetActionName(action_id action)
         case DO_PENCIL:         return "Select Pencil Tool";
         case DO_BRUSH:          return "Select Brush Tool";
         case DO_PICKER:         return "Select Color Picker Tool";
+        case DO_BRUSHSMALL:     return "Select Small Brush";
+        case DO_BRUSHMEDIUM:    return "Select Medium Brush";
+        case DO_BRUSHLARGE:     return "Select Large Brush";
         // View menu
         case DO_FULLSCREEN:     return "Full Screen";
         case DO_FIT:            return "Fit Pattern";
@@ -917,6 +921,7 @@ void SavePrefs()
     fprintf(f, "text_dlg_ht=%d\n", textdlght);
     fprintf(f, "show_tips=%d\n", showtips ? 1 : 0);
     fprintf(f, "repaint_to_erase=%d\n", repaint_to_erase ? 1 : 0);
+    fprintf(f, "current_brush_size=%d\n", current_brush_size);
     fprintf(f, "allow_beep=%d\n", allowbeep ? 1 : 0);
     fprintf(f, "ask_on_new=%d\n", askonnew ? 1 : 0);
     fprintf(f, "ask_on_load=%d\n", askonload ? 1 : 0);
@@ -1228,6 +1233,9 @@ void GetPrefs()
 
         } else if (strcmp(keyword, "show_tips") == 0)   { showtips = value[0] == '1';
         } else if (strcmp(keyword, "repaint_to_erase") == 0)  { repaint_to_erase = value[0] == '1';
+        } else if (strcmp(keyword, "current_brush_size") == 0) { 
+            sscanf(value, "%d", &current_brush_size);
+            current_brush_size = std::min(2,std::max(0,current_brush_size));
         } else if (strcmp(keyword, "allow_beep") == 0)  { allowbeep = value[0] == '1';
         } else if (strcmp(keyword, "ask_on_new") == 0)  { askonnew = value[0] == '1';
         } else if (strcmp(keyword, "ask_on_load") == 0) { askonload = value[0] == '1';

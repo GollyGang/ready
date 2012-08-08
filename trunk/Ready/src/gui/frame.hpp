@@ -125,6 +125,12 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnUpdateSelectBrushTool(wxUpdateUIEvent& event);
         void OnSelectPickerTool(wxCommandEvent& event);
         void OnUpdateSelectPickerTool(wxUpdateUIEvent& event);
+        void OnBrushSizeSmall(wxCommandEvent& event);
+        void OnUpdateBrushSizeSmall(wxUpdateUIEvent& event);
+        void OnBrushSizeMedium(wxCommandEvent& event);
+        void OnUpdateBrushSizeMedium(wxUpdateUIEvent& event);
+        void OnBrushSizeLarge(wxCommandEvent& event);
+        void OnUpdateBrushSizeLarge(wxUpdateUIEvent& event);
 
         // View menu
         void OnFullScreen(wxCommandEvent& event);
@@ -247,6 +253,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool left_mouse_is_down,right_mouse_is_down;
         wxString icons_folder;
         bool erasing;
+        static const float brush_sizes[3];
 
         DECLARE_EVENT_TABLE()
 };
