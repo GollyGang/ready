@@ -1475,11 +1475,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Tetrahedral mesh"), _("Triangular mesh"), _("Hexagonal mesh"),
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
-            _("Random 2D Delaunay tiling"), _("Random 2D Voronoi tiling") };
+            _("Random 2D Delaunay mesh"), _("Random 2D Voronoi mesh") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
-        // increase dlg height so we see all choices without having to scroll
-        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
+        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
         if(dlg.ShowModal()!=wxID_OK) return;
         sel = dlg.GetSelection();
     }
@@ -1538,10 +1537,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     divs = div_choices[dlg.GetSelection()];
                 }
@@ -1572,10 +1568,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",x_choices[i],y_choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the resolution:"),_("Torus tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     nx = x_choices[dlg.GetSelection()];
                     ny = y_choices[dlg.GetSelection()];
@@ -1602,12 +1595,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d points - approximately %d cells",choices[i],choices[i]*6);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of points:"),_("Tetrahedral mesh options"),N_CHOICES,div_descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Tetrahedral mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     npts = choices[dlg.GetSelection()];
                 }
@@ -1636,10 +1626,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Triangular mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     n = choices[dlg.GetSelection()];
                 }
@@ -1670,10 +1657,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Hexagonal mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     n = choices[dlg.GetSelection()];
                 }
@@ -1704,10 +1688,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Rhombille mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     n = choices[dlg.GetSelection()];
                 }
@@ -1738,10 +1719,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     divs = div_choices[dlg.GetSelection()];
                 }
@@ -1772,10 +1750,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
-                    #ifdef __WXMAC__
-                        // increase dlg height so we see all choices without having to scroll
-                        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20);
-                    #endif
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
                     divs = div_choices[dlg.GetSelection()];
                 }
@@ -1797,8 +1772,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case Del2D:
             {
+                int npts;
+                {
+                    const int N_CHOICES=5;
+                    int choices[N_CHOICES] = {1000,2000,5000,10000,20000};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%d cells",choices[i]*2); // (rough approximation)
+                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Delaunay mesh options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(1); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    npts = choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomDelaunay2D(200,mesh,2); // TODO: user can change n_points
+                MeshGenerators::GetRandomDelaunay2D(npts,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
@@ -1814,8 +1802,21 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             }
             case Vor2D:
             {
+                int npts;
+                {
+                    const int N_CHOICES=5;
+                    int choices[N_CHOICES] = {1000,2000,10000,20000,50000};
+                    wxString div_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        div_descriptions[i] = wxString::Format("%d cells",choices[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Voronoi mesh options"),N_CHOICES,div_descriptions);
+                    dlg.SetSelection(1); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    npts = choices[dlg.GetSelection()];
+                }
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomVoronoi2D(200,mesh,2); // TODO: user can change n_points
+                MeshGenerators::GetRandomVoronoi2D(npts,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);

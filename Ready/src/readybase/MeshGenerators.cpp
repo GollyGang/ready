@@ -559,7 +559,7 @@ void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,
 void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
 {
     // make a 2D mesh of voronoi cells from a point cloud
-    vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+    vtkSmartPointer<vtkPolyData> old_poly = vtkSmartPointer<vtkPolyData>::New();
     // first make a delaunay triangular mesh
     {
         vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
@@ -571,48 +571,73 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
             cells->InsertNextCell(1);
             cells->InsertCellPoint(i);
         }
-        poly->SetPoints(pts);
-        poly->SetPolys(cells);
+        old_poly->SetPoints(pts);
+        old_poly->SetPolys(cells);
         vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
-        del->SetInput(poly);
+        del->SetInput(old_poly);
         del->Update();
-        poly->DeepCopy(del->GetOutput());
-        poly->BuildLinks();
+        old_poly->DeepCopy(del->GetOutput());
+        old_poly->BuildLinks();
     }
 
     // then make polygons from the circumcenters of the neighboring triangles of each vertex
 
     // points: the circumcenter of each tri
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
-    pts->SetNumberOfPoints(poly->GetNumberOfCells());
-    double center[3],p1[3],p2[3],p3[3];
+    pts->SetNumberOfPoints(old_poly->GetNumberOfCells());
+    double center[3]={0,0,0},p1[3],p2[3],p3[3];
     vtkSmartPointer<vtkGenericCell> cell = vtkSmartPointer<vtkGenericCell>::New();
-    for(vtkIdType i=0;i<poly->GetNumberOfCells();i++)
+    for(vtkIdType i=0;i<old_poly->GetNumberOfCells();i++)
     {
-        poly->GetCell(i,cell);
+        old_poly->GetCell(i,cell);
         vtkIdType pt1 = cell->GetPointId(0);
         vtkIdType pt2 = cell->GetPointId(1);
         vtkIdType pt3 = cell->GetPointId(2);
-        poly->GetPoint(pt1,p1);
-        poly->GetPoint(pt2,p2);
-        poly->GetPoint(pt3,p3);
+        old_poly->GetPoint(pt1,p1);
+        old_poly->GetPoint(pt2,p2);
+        old_poly->GetPoint(pt3,p3);
+        //vtkTriangle::TriangleCenter(p1,p2,p3,center); // (interesting effect)
         vtkTriangle::Circumcircle(p1,p2,p3,center);
+        center[0] = min(1.0,max(0.0,center[0])); // don't want great stretched tris
+        center[1] = min(1.0,max(0.0,center[1])); // don't want great stretched tris
         pts->SetPoint(i,center);
     }
     // polys: join the circumcenters of each neighboring tri of each point (if >2)
-    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
-    for(vtkIdType i=0;i<poly->GetNumberOfPoints();i++)
+    vtkSmartPointer<vtkCellArray> new_cells = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkIdList> cell_ids = vtkSmartPointer<vtkIdList>::New();
+    for(vtkIdType i=0;i<old_poly->GetNumberOfPoints();i++)
     {
-        poly->GetPointCells(i,ids);
-        if(ids->GetNumberOfIds()<=2) continue;
-        cells->InsertNextCell(ids->GetNumberOfIds());
-        for(vtkIdType j=0;j<ids->GetNumberOfIds();j++)
-            cells->InsertCellPoint(ids->GetId(j));
+        old_poly->GetPointCells(i,cell_ids);
+        if(cell_ids->GetNumberOfIds()<=2) continue;
+        new_cells->InsertNextCell(cell_ids->GetNumberOfIds());
+        int iCurrentCell = 0;
+        vector<bool> seen(cell_ids->GetNumberOfIds(),false);
+        seen[0]=true;
+        new_cells->InsertCellPoint(cell_ids->GetId(iCurrentCell));
+        for(vtkIdType j=1;j<cell_ids->GetNumberOfIds();j++)
+        {
+            // find a cell in the list that is a neighbor of iCurrentCell and not yet seen
+            for(vtkIdType k=0;k<cell_ids->GetNumberOfIds();k++)
+            {
+                if(seen[k]) continue;
+                vtkSmartPointer<vtkIdList> cell_pts = vtkSmartPointer<vtkIdList>::New();
+                old_poly->GetCellPoints(cell_ids->GetId(iCurrentCell),cell_pts);
+                vtkSmartPointer<vtkIdList> cell_pts2 = vtkSmartPointer<vtkIdList>::New();
+                old_poly->GetCellPoints(cell_ids->GetId(k),cell_pts2);
+                cell_pts->IntersectWith(cell_pts2);
+                if(cell_pts->GetNumberOfIds()==2)
+                {
+                    iCurrentCell = k;
+                    seen[k] = true;
+                    break;
+                }
+            }
+            new_cells->InsertCellPoint(cell_ids->GetId(iCurrentCell));
+        }
     }
 
     mesh->SetPoints(pts);
-    mesh->SetCells(VTK_POLYGON,cells);
+    mesh->SetCells(VTK_POLYGON,new_cells);
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
