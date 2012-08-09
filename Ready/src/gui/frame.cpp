@@ -781,12 +781,14 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
         wxAuiPaneInfo &helppane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
         wxAuiPaneInfo &filepane = this->aui_mgr.GetPane(PaneName(ID::FileToolbar));
         wxAuiPaneInfo &actionpane = this->aui_mgr.GetPane(PaneName(ID::ActionToolbar));
+        wxAuiPaneInfo &paintpane = this->aui_mgr.GetPane(PaneName(ID::PaintToolbar));
         
         if (pattpane.IsOk() && pattpane.IsShown()) pattpane.Show(false);
         if (infopane.IsOk() && infopane.IsShown()) infopane.Show(false);
         if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
         if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
         if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
+        if (paintpane.IsOk() && paintpane.IsShown()) paintpane.Show(false);
         
         // ensure the render window sees keyboard shortcuts
         this->pVTKWindow->SetFocus();
