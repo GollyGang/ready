@@ -40,6 +40,9 @@
 #include <vector>
 using namespace std;
 
+// stdlib:
+#include <math.h>
+
 // ---------------------------------------------------------------------
 
 void MeshGenerators::GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid *mesh,int n_chems)
@@ -524,12 +527,13 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
 void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
 {
     // make a 2D mesh by delaunay triangulation on a point cloud
+    float side = sqrt((float)n_points); // spread enough for <pixel> access
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     pts->SetNumberOfPoints(n_points);
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
     for(vtkIdType i=0;i<(vtkIdType)n_points;i++)
     {
-        pts->SetPoint(i,vtkMath::Random(),vtkMath::Random(),0);
+        pts->SetPoint(i,vtkMath::Random()*side,vtkMath::Random()*side,0);
         cells->InsertNextCell(1);
         cells->InsertCellPoint(i);
     }
@@ -560,6 +564,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
 {
     // make a 2D mesh of voronoi cells from a point cloud
     vtkSmartPointer<vtkPolyData> old_poly = vtkSmartPointer<vtkPolyData>::New();
+    double side = sqrt((double)n_points); // spread enough for <pixel> access
     // first make a delaunay triangular mesh
     {
         vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
@@ -567,7 +572,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
         for(vtkIdType i=0;i<(vtkIdType)n_points;i++)
         {
-            pts->SetPoint(i,vtkMath::Random(),vtkMath::Random(),0);
+            pts->SetPoint(i,vtkMath::Random()*side,vtkMath::Random()*side,0);
             cells->InsertNextCell(1);
             cells->InsertCellPoint(i);
         }
@@ -598,8 +603,9 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         old_poly->GetPoint(pt3,p3);
         //vtkTriangle::TriangleCenter(p1,p2,p3,center); // (interesting effect)
         vtkTriangle::Circumcircle(p1,p2,p3,center);
-        center[0] = min(1.0,max(0.0,center[0])); // don't want great stretched tris
-        center[1] = min(1.0,max(0.0,center[1])); // don't want great stretched tris
+        // don't want great stretched tris
+        center[0] = min(side,max(0.0,center[0])); 
+        center[1] = min(side,max(0.0,center[1]));
         pts->SetPoint(i,center);
     }
     // polys: join the circumcenters of each neighboring tri of each point (if >2)
