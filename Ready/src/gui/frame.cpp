@@ -775,21 +775,12 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
         restorestatus = statusbar && statusbar->IsShown();
         if (restorestatus) statusbar->Hide();
 
-        // hide all currently shown panes
-        wxAuiPaneInfo &pattpane = this->aui_mgr.GetPane(PaneName(ID::PatternsPane));
-        wxAuiPaneInfo &infopane = this->aui_mgr.GetPane(PaneName(ID::InfoPane));
-        wxAuiPaneInfo &helppane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
-        wxAuiPaneInfo &filepane = this->aui_mgr.GetPane(PaneName(ID::FileToolbar));
-        wxAuiPaneInfo &actionpane = this->aui_mgr.GetPane(PaneName(ID::ActionToolbar));
-        wxAuiPaneInfo &paintpane = this->aui_mgr.GetPane(PaneName(ID::PaintToolbar));
-        
-        if (pattpane.IsOk() && pattpane.IsShown()) pattpane.Show(false);
-        if (infopane.IsOk() && infopane.IsShown()) infopane.Show(false);
-        if (helppane.IsOk() && helppane.IsShown()) helppane.Show(false);
-        if (filepane.IsOk() && filepane.IsShown()) filepane.Show(false);
-        if (actionpane.IsOk() && actionpane.IsShown()) actionpane.Show(false);
-        if (paintpane.IsOk() && paintpane.IsShown()) paintpane.Show(false);
-        
+        // hide all currently shown panes (except the canvas pane)
+        wxAuiPaneInfoArray panes = this->aui_mgr.GetAllPanes();
+        for(int i=0;i<panes.Count();i++)
+            if(panes[i].name != PaneName(ID::CanvasPane))
+                this->aui_mgr.GetPane(panes[i].name).Hide();
+
         // ensure the render window sees keyboard shortcuts
         this->pVTKWindow->SetFocus();
 
