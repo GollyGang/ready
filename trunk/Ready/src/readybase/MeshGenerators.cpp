@@ -563,6 +563,7 @@ void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,
 void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
 {
     // make a 2D mesh of voronoi cells from a point cloud
+
     vtkSmartPointer<vtkPolyData> old_poly = vtkSmartPointer<vtkPolyData>::New();
     double side = sqrt((double)n_points); // spread enough for <pixel> access
     // first make a delaunay triangular mesh
@@ -601,11 +602,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         old_poly->GetPoint(pt1,p1);
         old_poly->GetPoint(pt2,p2);
         old_poly->GetPoint(pt3,p3);
-        //vtkTriangle::TriangleCenter(p1,p2,p3,center); // (interesting effect)
         vtkTriangle::Circumcircle(p1,p2,p3,center);
-        // don't want great stretched tris
-        center[0] = min(side,max(0.0,center[0])); 
-        center[1] = min(side,max(0.0,center[1]));
         pts->SetPoint(i,center);
     }
     // polys: join the circumcenters of each neighboring tri of each point (if >2)
@@ -615,31 +612,50 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
     {
         old_poly->GetPointCells(i,cell_ids);
         if(cell_ids->GetNumberOfIds()<=2) continue;
-        new_cells->InsertNextCell(cell_ids->GetNumberOfIds());
-        int iCurrentCell = 0;
-        vector<bool> seen(cell_ids->GetNumberOfIds(),false);
-        seen[0]=true;
-        new_cells->InsertCellPoint(cell_ids->GetId(iCurrentCell));
-        for(vtkIdType j=1;j<cell_ids->GetNumberOfIds();j++)
+        // collect the points
+        vector<vtkIdType> pt_ids;
         {
-            // find a cell in the list that is a neighbor of iCurrentCell and not yet seen
-            for(vtkIdType k=0;k<cell_ids->GetNumberOfIds();k++)
+            const int N_POINTS = cell_ids->GetNumberOfIds();
+            int iCurrentCell = 0;
+            vector<bool> seen(N_POINTS,false);
+            pt_ids.push_back(cell_ids->GetId(iCurrentCell));
+            seen[0]=true;
+            vtkSmartPointer<vtkIdList> cell_pts = vtkSmartPointer<vtkIdList>::New();
+            vtkSmartPointer<vtkIdList> cell_pts2 = vtkSmartPointer<vtkIdList>::New();
+            for(vtkIdType j=1;j<N_POINTS;j++)
             {
-                if(seen[k]) continue;
-                vtkSmartPointer<vtkIdList> cell_pts = vtkSmartPointer<vtkIdList>::New();
-                old_poly->GetCellPoints(cell_ids->GetId(iCurrentCell),cell_pts);
-                vtkSmartPointer<vtkIdList> cell_pts2 = vtkSmartPointer<vtkIdList>::New();
-                old_poly->GetCellPoints(cell_ids->GetId(k),cell_pts2);
-                cell_pts->IntersectWith(cell_pts2);
-                if(cell_pts->GetNumberOfIds()==2)
+                // find a cell in the list that is a neighbor of iCurrentCell and not yet seen
+                for(vtkIdType k=0;k<N_POINTS;k++)
                 {
-                    iCurrentCell = k;
-                    seen[k] = true;
-                    break;
+                    if(seen[k]) continue;
+                    old_poly->GetCellPoints(cell_ids->GetId(iCurrentCell),cell_pts);
+                    old_poly->GetCellPoints(cell_ids->GetId(k),cell_pts2);
+                    cell_pts->IntersectWith(cell_pts2);
+                    if(cell_pts->GetNumberOfIds()==2) // (input mesh is only triangles)
+                    {
+                        pt_ids.push_back(cell_ids->GetId(k));
+                        seen[k] = true;
+                        iCurrentCell = k;
+                        break;
+                    }
                 }
             }
-            new_cells->InsertCellPoint(cell_ids->GetId(iCurrentCell));
         }
+        // check if all the points are within the original area (don't want the external stretched ones)
+        bool is_ok = true;
+        for(vector<vtkIdType>::const_iterator it=pt_ids.begin();it!=pt_ids.end();it++)
+        {
+            double p[3];
+            pts->GetPoint(*it,p);
+            if(p[0]<0 || p[0]>side || p[1]<0 || p[1]>side)
+            {
+                is_ok = false;
+                break;
+            }
+        }
+        if(!is_ok) continue;
+        // add the cell to the mesh
+        new_cells->InsertNextCell((vtkIdType)pt_ids.size(),&pt_ids[0]);
     }
 
     mesh->SetPoints(pts);
