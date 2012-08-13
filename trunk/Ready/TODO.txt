@@ -6,7 +6,6 @@ UI annoyances:
 
 before 0.5 release:
   
-- bug: drawing on penrose mesh fails on some platforms?
 - current color button should be replaced by spectrum slider plus value indicators?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
