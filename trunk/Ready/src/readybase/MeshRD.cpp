@@ -49,6 +49,7 @@
 #include <vtkContourFilter.h>
 #include <vtkAssignAttribute.h>
 #include <vtkReverseSense.h>
+#include <vtkGenericCell.h>
 
 // STL:
 #include <stdexcept>
@@ -635,9 +636,10 @@ float MeshRD::GetValue(float x,float y,float z,const Properties& render_settings
 {
     this->CreateCellLocatorIfNeeded();
 
-    double p[3]={x,y,z};
-    vtkIdType iCell = this->cell_locator->FindCell(p);
-
+    double p[3]={x,y,z},cp[3],dist2;
+    vtkIdType iCell,subId;
+    this->cell_locator->FindClosestPoint(p,cp,iCell,subId,dist2);
+    
     if(iCell<0)
         return 0.0f;
 
@@ -651,9 +653,10 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
 {
     this->CreateCellLocatorIfNeeded();
 
-    double p[3]={x,y,z};
-    vtkIdType iCell = this->cell_locator->FindCell(p);
-
+    double p[3]={x,y,z},cp[3],dist2;
+    vtkIdType iCell,subId;
+    this->cell_locator->FindClosestPoint(p,cp,iCell,subId,dist2);
+    
     if(iCell<0)
         return;
 
