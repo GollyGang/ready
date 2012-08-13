@@ -35,6 +35,7 @@
 #include <vtkCellArray.h>
 #include <vtkTriangle.h>
 #include <vtkGenericCell.h>
+#include <vtkCleanPolyData.h>
 
 // STL:
 #include <vector>
@@ -658,8 +659,16 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         new_cells->InsertNextCell((vtkIdType)pt_ids.size(),&pt_ids[0]);
     }
 
-    mesh->SetPoints(pts);
-    mesh->SetCells(VTK_POLYGON,new_cells);
+    // remove unused points (they affect the bounding box)
+    vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+    poly->SetPoints(pts);
+    poly->SetPolys(new_cells);
+    vtkSmartPointer<vtkCleanPolyData> clean = vtkSmartPointer<vtkCleanPolyData>::New();
+    clean->SetInput(poly);
+    clean->PointMergingOff();
+    clean->Update();
+    mesh->SetPoints(clean->GetOutput()->GetPoints());
+    mesh->SetCells(VTK_POLYGON,clean->GetOutput()->GetPolys());
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
