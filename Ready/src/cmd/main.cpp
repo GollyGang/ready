@@ -22,33 +22,15 @@ using namespace std;
 // stdlib:
 #include <stdlib.h>
 
-// VTK:
-#include <vtkSmartPointer.h>
-#include <vtkXMLGenericDataObjectReader.h>
-#include <vtkImageData.h>
-#include <vtkPointData.h>
-
 // readybase:
-#include <AbstractRD.hpp>
-#include <OpenCL_utils.hpp>
-#include <IO_XML.hpp>
+#include <SystemFactory.hpp>
 #include <Properties.hpp>
-#include <GrayScottImageRD.hpp>
-#include <FormulaOpenCLImageRD.hpp>
-#include <FullKernelOpenCLImageRD.hpp>
-#include <GrayScottMeshRD.hpp>
-#include <FormulaOpenCLMeshRD.hpp>
-#include <FullKernelOpenCLMeshRD.hpp>
+#include <OpenCL_utils.hpp>
+#include <AbstractRD.hpp>
 
 // -------------------------------------------------------------------------------------------------------------
 
 void InitializeDefaultRenderSettings(Properties &render_settings);
-void ReadFromFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                  AbstractRD *&system,Properties &render_settings);
-void ReadFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                           AbstractRD *&system,Properties &render_settings);
-void ReadFromUnstructuredGridFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                  AbstractRD *&system,Properties &render_settings);
 
 // -------------------------------------------------------------------------------------------------------------
 /*
@@ -63,7 +45,7 @@ int main(int argc,char *argv[])
 {
     if(argc!=3)
     {
-        cout << "A command-line utility to run Ready patterns without the GUI.\n\nUsage:\n\n" << argv[0] << " <input_file> <output_file>\n";
+        cout << "A command-line utility to run Ready patterns without the GUI.\nUsage:   " << argv[0] << " <input_file> <output_file>\n";
         return EXIT_FAILURE;
     }
 
@@ -78,173 +60,32 @@ int main(int argc,char *argv[])
     Properties render_settings("render_settings");
     InitializeDefaultRenderSettings(render_settings);
 
-    // read the file
     AbstractRD *system;
-    cout << "Loading file...\n";
-    try {
-        ReadFromFile(argv[1],is_opencl_available,opencl_platform,opencl_device,system,render_settings);
-    }
-    catch(const exception& e)
+    try 
     {
-        cout << "Error loading file:\n" << e.what() << "\n";
-        return EXIT_FAILURE;
-    }
+        // read the file
+        cout << "Loading file...\n";
+        bool warn_to_update;
+        system = SystemFactory::CreateFromFile(argv[1],is_opencl_available,opencl_platform,opencl_device,render_settings,warn_to_update);
+        if(warn_to_update)
+            cout << "This pattern was created with a newer version of Ready. You should update your copy.\n";
 
-    // do something with the file
-    cout << "Running the simulation for 1000 steps...\n";
-    try {
+        // do something with the file
+        cout << "Running the simulation for 1000 steps...\n";
         system->Update(1000); // TODO: command-line option
-    }
-    catch(const exception& e)
-    {
-        cout << "Error running simulation:\n" << e.what() << "\n";
-        return EXIT_FAILURE;
-    }
 
-    // save something out
-    cout << "Saving file...\n";
-    try {
+        // save something out
+        cout << "Saving file...\n";
         system->SaveFile(argv[2],render_settings);
     }
     catch(const exception& e)
     {
-        cout << "Error saving file:\n" << e.what() << "\n";
+        cout << "Error:\n" << e.what() << "\n";
         return EXIT_FAILURE;
     }
 
     delete system;
-}
-
-// -------------------------------------------------------------------------------------------------------------
-
-void ReadFromFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                  AbstractRD *&system,Properties &render_settings)
-{
-    // TODO: code duplication in these Read*() functions from frame.cpp, should merge
-    vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
-    bool parallel;
-    int data_type = generic_reader->ReadOutputType(filename,parallel);
-    switch(data_type)
-    {
-        case VTK_IMAGE_DATA: 
-            ReadFromImageDataFile(filename,is_opencl_available,opencl_platform,opencl_device,
-                                  system,render_settings); 
-            break;
-        case VTK_UNSTRUCTURED_GRID: 
-            ReadFromUnstructuredGridFile(filename,is_opencl_available,opencl_platform,opencl_device,
-                                         system,render_settings); 
-            break;
-        default: 
-            throw runtime_error("Unsupported data type or file read error");
-    }
-}
-
-// -------------------------------------------------------------------------------------------------------------
-
-void ReadFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                           AbstractRD *&system,Properties &render_settings)
-{
-    vtkSmartPointer<RD_XMLImageReader> reader = vtkSmartPointer<RD_XMLImageReader>::New();
-    reader->SetFileName(filename);
-    reader->Update();
-    vtkImageData *image = reader->GetOutput();
-
-    string type = reader->GetType();
-    string name = reader->GetName();
-
-    ImageRD* image_system;
-    if(type=="inbuilt")
-    {
-        if(name=="Gray-Scott")
-            image_system = new GrayScottImageRD();
-        else 
-            throw runtime_error("Unsupported inbuilt implementation: "+name);
-    }
-    else if(type=="formula")
-    {
-        if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
-        image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
-    }
-    else if(type=="kernel")
-    {
-        if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
-        image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device);
-    }
-    else throw runtime_error("Unsupported rule type: "+type);
-    bool warn_to_update;
-    image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
-    if(warn_to_update)
-        cout << "(This file is from a more recent version of Ready. You should download a newer version.)\n";
-
-    // render settings
-    vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");
-    if(xml_render_settings) // optional
-        render_settings.OverwriteFromXML(xml_render_settings);
-
-    int dim[3];
-    image->GetDimensions(dim);
-    int nc = image->GetNumberOfScalarComponents() * image->GetPointData()->GetNumberOfArrays();
-    image_system->SetDimensions(dim[0],dim[1],dim[2]);
-    image_system->SetNumberOfChemicals(nc);
-    if(reader->ShouldGenerateInitialPatternWhenLoading())
-        image_system->GenerateInitialPattern();
-    else
-        image_system->CopyFromImage(image);
-    system = image_system;
-}
-
-// -------------------------------------------------------------------------------------------------------------
-
-void ReadFromUnstructuredGridFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                  AbstractRD *&system,Properties &render_settings)
-{
-    vtkSmartPointer<RD_XMLUnstructuredGridReader> reader = vtkSmartPointer<RD_XMLUnstructuredGridReader>::New();
-    reader->SetFileName(filename);
-    reader->Update();
-    vtkUnstructuredGrid *ugrid = reader->GetOutput();
-
-    string type = reader->GetType();
-    string name = reader->GetName();
-
-    MeshRD* mesh_system;
-    if(type=="inbuilt")
-    {
-        if(name=="Gray-Scott")
-            mesh_system = new GrayScottMeshRD();
-        else 
-            throw runtime_error("Unsupported inbuilt implementation: "+name);
-    }
-    else if(type=="formula")
-    {
-        if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
-        mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-    }
-    else if(type=="kernel")
-    {
-        if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
-        mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device);
-    }
-    else throw runtime_error("Unsupported rule type: "+type);
-
-    bool warn_to_update;
-    mesh_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
-    if(warn_to_update)
-        cout << "(This file is from a more recent version of Ready. You should download a newer version.)\n";
-
-    mesh_system->CopyFromMesh(ugrid);
-    // render settings
-    vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");
-    if(xml_render_settings) // optional
-        render_settings.OverwriteFromXML(xml_render_settings);
-
-    if(reader->ShouldGenerateInitialPatternWhenLoading())
-        mesh_system->GenerateInitialPattern();
-
-    system = mesh_system;
+    return EXIT_SUCCESS;
 }
 
 // -------------------------------------------------------------------------------------------------------------

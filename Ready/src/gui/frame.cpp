@@ -29,16 +29,15 @@
 #include "RecordingDialog.hpp"
 
 // readybase:
-#include "utils.hpp"
-#include "GrayScottImageRD.hpp"
-#include "OpenCL_utils.hpp"
-#include "IO_XML.hpp"
-#include "GrayScottMeshRD.hpp"
-#include "FormulaOpenCLImageRD.hpp"
-#include "FullKernelOpenCLImageRD.hpp"
-#include "FormulaOpenCLMeshRD.hpp"
-#include "FullKernelOpenCLMeshRD.hpp"
-#include "MeshGenerators.hpp"
+#include <utils.hpp>
+#include <OpenCL_utils.hpp>
+#include <IO_XML.hpp>
+#include <GrayScottImageRD.hpp>
+#include <GrayScottMeshRD.hpp>
+#include <FormulaOpenCLImageRD.hpp>
+#include <FormulaOpenCLMeshRD.hpp>
+#include <MeshGenerators.hpp>
+#include <SystemFactory.hpp>
 
 // local resources:
 #include "appicon16.xpm"
@@ -60,22 +59,20 @@
 using namespace std;
 
 // VTK:
+#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtkPNGWriter.h>
 #include <vtkJPEGWriter.h>
 #include <vtkSmartPointer.h>
-#include <vtkXMLPolyDataReader.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkPolyData.h>
-#include <vtkOBJReader.h>
-#include <vtkCellArray.h>
-#include <vtkXMLPolyDataWriter.h>
-#include <vtkTriangleFilter.h>
-#include <vtkPointData.h>
 #include <vtkRendererCollection.h>
-#include <vtkXMLGenericDataObjectReader.h>
-#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkXMLPolyDataReader.h>
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkOBJReader.h>
+#include <vtkPolyData.h>
 #include <vtkCellPicker.h>
+#include <vtkPointData.h>
+#include <vtkCellArray.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -1555,10 +1552,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     const int N_CHOICES=4;
                     int x_choices[N_CHOICES] = {100,160,200,500};
                     int y_choices[N_CHOICES] = {125,200,250,625};
-                    int cells[N_CHOICES] = {12500,32000,50000,312500};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",x_choices[i],y_choices[i],cells[i]);
+                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",x_choices[i],y_choices[i],x_choices[i]*y_choices[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the resolution:"),_("Torus tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1909,116 +1905,11 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     // load pattern file
     bool warn_to_update = false;
     AbstractRD *target_system = NULL;
+    Properties previous_render_settings = this->render_settings;
     try
     {
-        // get the VTK data type from the file
-        vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
-        bool parallel;
-        int data_type = generic_reader->ReadOutputType(path.mb_str(),parallel);
-
-        if( data_type == VTK_IMAGE_DATA )
-        {
-            vtkSmartPointer<RD_XMLImageReader> reader = vtkSmartPointer<RD_XMLImageReader>::New();
-            reader->SetFileName(path.mb_str());
-            reader->Update();
-            vtkImageData *image = reader->GetOutput();
-
-            string type = reader->GetType();
-            string name = reader->GetName();
-
-            ImageRD* image_system;
-            if(type=="inbuilt")
-            {
-                if(name=="Gray-Scott")
-                    image_system = new GrayScottImageRD();
-                else 
-                    throw runtime_error("Unsupported inbuilt implementation: "+name);
-            }
-            else if(type=="formula")
-            {
-                if(!this->is_opencl_available) 
-                    throw runtime_error(this->opencl_not_available_message);
-                image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
-            }
-            else if(type=="kernel")
-            {
-                if(!this->is_opencl_available) 
-                    throw runtime_error(this->opencl_not_available_message);
-                image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device);
-            }
-            else throw runtime_error("Unsupported rule type: "+type);
-            image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
-
-            // render settings
-            this->InitializeDefaultRenderSettings();
-            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");
-            if(xml_render_settings) // optional
-                this->render_settings.OverwriteFromXML(xml_render_settings);
-
-            int dim[3];
-            image->GetDimensions(dim);
-            int nc = image->GetNumberOfScalarComponents() * image->GetPointData()->GetNumberOfArrays();
-            image_system->SetDimensions(dim[0],dim[1],dim[2]);
-            image_system->SetNumberOfChemicals(nc);
-            if(reader->ShouldGenerateInitialPatternWhenLoading())
-                image_system->GenerateInitialPattern();
-            else
-                image_system->CopyFromImage(image);
-            target_system = image_system;
-        }
-        else if( data_type == VTK_UNSTRUCTURED_GRID )
-        {
-            vtkSmartPointer<RD_XMLUnstructuredGridReader> reader = vtkSmartPointer<RD_XMLUnstructuredGridReader>::New();
-            reader->SetFileName(path.mb_str());
-            reader->Update();
-            vtkUnstructuredGrid *ugrid = reader->GetOutput();
-
-            string type = reader->GetType();
-            string name = reader->GetName();
-
-            MeshRD* mesh_system;
-            if(type=="inbuilt")
-            {
-                if(name=="Gray-Scott")
-                    mesh_system = new GrayScottMeshRD();
-                else 
-                    throw runtime_error("Unsupported inbuilt implementation: "+name);
-            }
-            else if(type=="formula")
-            {
-                if(!this->is_opencl_available) 
-                    throw runtime_error(this->opencl_not_available_message);
-                mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-            }
-            else if(type=="kernel")
-            {
-                if(!this->is_opencl_available) 
-                    throw runtime_error(this->opencl_not_available_message);
-                mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device);
-            }
-            else throw runtime_error("Unsupported rule type: "+type);
-
-            mesh_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
-            mesh_system->CopyFromMesh(ugrid);
-            // render settings
-            this->InitializeDefaultRenderSettings();
-            vtkSmartPointer<vtkXMLDataElement> xml_render_settings = reader->GetRDElement()->FindNestedElementWithName("render_settings");
-            if(xml_render_settings) // optional
-                this->render_settings.OverwriteFromXML(xml_render_settings);
-
-            if(reader->ShouldGenerateInitialPatternWhenLoading())
-                mesh_system->GenerateInitialPattern();
-
-            target_system = mesh_system;
-        }
-        else
-        {
-            ostringstream oss;
-            oss << "Unsupported data type: " << data_type;
-            throw runtime_error(oss.str());
-        }
-        target_system->SetFilename(string(path.mb_str())); // TODO: display filetitle only (user option?)
-        target_system->SetModified(false);
+        this->InitializeDefaultRenderSettings();
+        target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(target_system);
     }
     catch(const exception& e)
@@ -2029,6 +1920,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         message += wxString(e.what(),wxConvUTF8);
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
         delete target_system;
+        this->render_settings = previous_render_settings;
         return;
     }
     catch(...)
@@ -2038,6 +1930,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         message += _("Failed to open file.");
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
         delete target_system;
+        this->render_settings = previous_render_settings;
         return;
     }
     wxEndBusyCursor();
@@ -2046,7 +1939,6 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
         wxMessageBox("This file is from a more recent version of Ready. For best results you should download a newer version.");
         // TODO: allow user to stop this message from appearing every time
     }
-    this->system->SetFilename(string(path.mb_str()));
 }
 
 // ---------------------------------------------------------------------
