@@ -32,6 +32,7 @@ else()
   # Linux binaries are usually all lowercase
   set( APP_NAME ready )
 endif()
+set( CMD_NAME rdy ) # command-line version
 
 #-------------------------------------------source files----------------------------------------------
 
@@ -74,6 +75,10 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/RecordingDialog.hpp              src/gui/RecordingDialog.cpp
 )
 include_directories( src/gui )
+
+set( CMD_SOURCES      # code used for the command-line version
+  src/cmd/main.cpp
+)
 
 set( RESOURCES
   resources/ready.rc
@@ -311,15 +316,16 @@ endif()
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
 
-add_executable( ${APP_NAME}
-   ${GUI_EXECUTABLE}
-   ${GUI_SOURCES}
-   ${RESOURCES} 
-)
+add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
+add_executable( ${CMD_NAME} ${BASE_SOURCES} ${CMD_SOURCES} )
 
 target_link_libraries( ${APP_NAME}
   readybase
   ${wxWidgets_LIBRARIES} 
+  vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid
+)
+target_link_libraries( ${CMD_NAME}
+  readybase
   vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid
 )
 
@@ -343,6 +349,7 @@ endif()
 # http://stackoverflow.com/questions/543203/cmake-runtime-output-directory-on-windows
 if( MSVC_IDE )
   set_target_properties( ${APP_NAME} PROPERTIES PREFIX "../" )
+  set_target_properties( ${CMD_NAME} PROPERTIES PREFIX "../" )
 endif()
 
 # avoid security warnings
@@ -369,10 +376,10 @@ endif()
 #----------------------------------------install------------------------------------------------
 
 # put Ready in the root of the installation folder instead of in "bin"
-install( TARGETS ${APP_NAME} DESTINATION "." )
+install( TARGETS ${APP_NAME} DESTINATION "." )      # (add ${CMD_NAME} if we want to distribute the command-line version too)
 
 # install our source files, resource files, pattern file, help files and text files
-foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${RESOURCES} ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
+foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${CMD_SOURCES} ${RESOURCES} ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
   get_filename_component( path_name "${source_file}" PATH )
   install( FILES "${source_file}" DESTINATION ${path_name} )
 endforeach()
