@@ -86,7 +86,7 @@ int main(int argc,char *argv[])
     }
     catch(const exception& e)
     {
-        cout << "Error loading file:\n" << e.what();
+        cout << "Error loading file:\n" << e.what() << "\n";
         return EXIT_FAILURE;
     }
 
@@ -97,7 +97,7 @@ int main(int argc,char *argv[])
     }
     catch(const exception& e)
     {
-        cout << "Error running simulation:\n" << e.what();
+        cout << "Error running simulation:\n" << e.what() << "\n";
         return EXIT_FAILURE;
     }
 
@@ -108,7 +108,7 @@ int main(int argc,char *argv[])
     }
     catch(const exception& e)
     {
-        cout << "Error saving file:\n" << e.what();
+        cout << "Error saving file:\n" << e.what() << "\n";
         return EXIT_FAILURE;
     }
 
