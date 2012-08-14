@@ -88,6 +88,8 @@ using namespace std;
 ImageRD::ImageRD() : xgap(5.0),ygap(3.0)
 {
     this->starting_pattern = vtkImageData::New();
+    this->assign_attribute_filter = NULL;
+    this->rearrange_fields_filter = NULL;
 }
 
 // ---------------------------------------------------------------------

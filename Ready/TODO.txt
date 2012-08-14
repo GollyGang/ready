@@ -4,6 +4,17 @@ UI annoyances:
 - need some way to refresh the Patterns Pane, other than collapse/expand on the folders?
 - can floating panes go behind main window?
 
+Big picture issues:
+- Embrace n-state cellular automata, by supporting ints? Not really our core mission as conceived 
+  (don't want to compete with Golly) but no software supports polygonal and tetrahedral meshes like 
+  we do, as far as I know.
+- Dan Wills enquired whether could use readybase as a back-end engine to Houdini. In general this 
+  could be an awesome way to reach more users - appear as a Houdini/Blender plugin, for example. 
+  I've added a command-line version of Ready, just to demonstrate the possibilities.
+- Would love an Android version but OpenCL isn't supported. Renderscript Compute seems to be the 
+  thing but kernels are compiled at build time, which isn't what we want. Could work as a pattern 
+  viewer, allowing users to finger paint. NDK is another possibility.
+
 before 0.5 release:
   
 - current color button should be replaced by spectrum slider plus value indicators?
