@@ -477,14 +477,13 @@ void MeshRD::ComputeCellNeighbors()
         {
             case VERTEX_NEIGHBORS: // neighbors share a vertex
             {
+                vtkSmartPointer<vtkIdList> vertIds = vtkSmartPointer<vtkIdList>::New();
+                vertIds->SetNumberOfIds(1);
                 for(vtkIdType iPt=0;iPt<npts;iPt++)
                 {
-                    vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
-                    edgeIds->SetNumberOfIds(1);
-                    edgeIds->SetId(0,ptIds->GetId(iPt));
-                    this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
-                    int nNeighbors = cellIds->GetNumberOfIds();
-                    for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                    vertIds->SetId(0,ptIds->GetId(iPt));
+                    this->mesh->GetCellNeighbors(iCell,vertIds,cellIds);
+                    for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                     {
                         nbor.iNeighbor = cellIds->GetId(iNeighbor);
                         switch(diffusion_type)
@@ -503,15 +502,14 @@ void MeshRD::ComputeCellNeighbors()
                 {
                     case VTK_POLYGON: // a 2D face, neighbors share an edge
                     {
+                        vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
+                        edgeIds->SetNumberOfIds(2);
                         for(vtkIdType iPt=0;iPt<npts;iPt++)
                         {
-                            vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
-                            edgeIds->SetNumberOfIds(2);
                             edgeIds->SetId(0,ptIds->GetId(iPt));
                             edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
                             this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
-                            int nNeighbors = cellIds->GetNumberOfIds();
-                            for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                            for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                             {
                                 nbor.iNeighbor = cellIds->GetId(iNeighbor);
                                 switch(diffusion_type)
@@ -526,16 +524,15 @@ void MeshRD::ComputeCellNeighbors()
                     break;
                     case VTK_TETRA: // a 3D tetrahedral cell, neighbors share a triangular face
                     {
+                        vtkSmartPointer<vtkIdList> faceIds = vtkSmartPointer<vtkIdList>::New();
+                        faceIds->SetNumberOfIds(3);
                         for(vtkIdType iPt=0;iPt<npts;iPt++)
                         {
-                            vtkSmartPointer<vtkIdList> faceIds = vtkSmartPointer<vtkIdList>::New();
-                            faceIds->SetNumberOfIds(3);
                             faceIds->SetId(0,ptIds->GetId(iPt));
                             faceIds->SetId(1,ptIds->GetId((iPt+1)%npts));
                             faceIds->SetId(2,ptIds->GetId((iPt+2)%npts));
                             this->mesh->GetCellNeighbors(iCell,faceIds,cellIds);
-                            int nNeighbors = cellIds->GetNumberOfIds();
-                            for(vtkIdType iNeighbor=0;iNeighbor<nNeighbors;iNeighbor++)
+                            for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                             {
                                 nbor.iNeighbor = cellIds->GetId(iNeighbor);
                                 switch(diffusion_type)
