@@ -63,6 +63,7 @@ class MeshRD : public AbstractRD
 
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
+        virtual bool Is2DImageAvailable() const { return false; }
 
         virtual int GetArenaDimensionality() const;
 
