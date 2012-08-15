@@ -22,7 +22,7 @@
             // count neighbors
             int n1=0;
             int offset = x * max_neighbors;
-            for(int i=0;i &lt; max_neighbors;i++)
+            for(int i=0;i&lt;max_neighbors;i++)
             {
                 if(neighbor_weights[offset+i]&lt;0.0001f) 
                     continue; // not a neighbor
@@ -31,9 +31,9 @@
             }
             // update step
             int a = round(a_in[x]);
-            if( a==0 &amp;&amp; (n1==4 || n1==5) )
+            if(a==0 &amp;&amp; (n1==4 || n1==5))
                 a_out[x] = 1.0f; // B45
-            else if(a==1 &amp;&amp; (n1==3 || n1==4) )
+            else if(a==1 &amp;&amp; (n1==3 || n1==4))
                 a_out[x] = 1.0f; // S34
             else
                 a_out[x] = 0.0f;

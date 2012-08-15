@@ -23,33 +23,33 @@
             {
                 if(neighbor_weights[offset+i]&lt;0.0001f) 
                     continue; // not a neighbor
-                float y = a_in[neighbor_indices[offset+i]];
-                if(y&gt;0.5f &amp;&amp; y&lt;1.5f) 
-                    n1++;
-                else if(y&gt;1.5f &amp;&amp; y&lt;2.5f) 
-                    n2++;
-                else if(y&gt;2.5f &amp;&amp; y&lt;3.5f) 
-                    n3++;
+                int y = round(a_in[neighbor_indices[offset+i]]);
+                if(y==1) n1++;
+                else if(y==2) n2++;
+                else if(y==3) n3++;
             }
             // update step:
-            float a = a_in[x];
-            a_out[x] = 0.0f; // unless changed below
-            if(a&gt;-0.5f &amp;&amp; a&lt;0.5f) // 0: background
+            int a = round(a_in[x]);
+            if(a==0)   // (background)
             {
                 if(n1&gt;0 &amp;&amp; n2&gt;0) 
                     a_out[x] = 3.0f;
                 else if(n1&gt;0 &amp;&amp; n3&gt;=2) 
                     a_out[x] = 1.0f;
+                else
+                    a_out[x] = 0.0f;
             }
-            else if(a&gt;0.5f &amp;&amp; a&lt;1.5f) // 1: head
+            else if(a==1)   // (head)
             {
                 if(n3&gt;0)
                     a_out[x] = 2.0f;
                 else
                     a_out[x] = 1.0f;
             }
-            else if(a&gt;1.5f &amp;&amp; a&lt;2.5f) // 2: tail
+            else if(a==2)   // (tail)
                 a_out[x] = 3.0f;
+            else
+                a_out[x] = 0.0f;
         }
       </kernel>
       

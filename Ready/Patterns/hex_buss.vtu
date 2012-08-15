@@ -18,7 +18,7 @@
             // count neighbors of each type
             int n1=0,n2=0;
             int offset = x * max_neighbors;
-            for( int i=0; i&lt;max_neighbors; i++ )
+            for(int i=0;i&lt;max_neighbors;i++)
             {
                 if(neighbor_weights[offset+i]&lt;0.0001f) 
                     continue; // not a neighbor
