@@ -97,6 +97,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnImportMesh(wxCommandEvent& event);
         void OnExportMesh(wxCommandEvent& event);
         void OnExportImage(wxCommandEvent& event);
+        void OnUpdateExportImage(wxUpdateUIEvent& event);
         void OnQuit(wxCommandEvent& event);
 
         // Open Recent submenu
