@@ -494,6 +494,7 @@ void MeshRD::ComputeCellNeighbors()
                         add_if_new(neighbors,nbor);
                     }
                 }
+                // TODO: ensure that cells are in cyclic order? (would help with supporting rules such as Hex-B2oS2m34)
             }
             break;
             case CELL_NEIGHBORS: // neighbors share an edge/face
@@ -508,7 +509,7 @@ void MeshRD::ComputeCellNeighbors()
                         {
                             edgeIds->SetId(0,ptIds->GetId(iPt));
                             edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
-                            this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds);
+                            this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds); // usually only 1 but could be more for non-manifold meshes
                             for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                             {
                                 nbor.iNeighbor = cellIds->GetId(iNeighbor);
@@ -531,7 +532,7 @@ void MeshRD::ComputeCellNeighbors()
                             faceIds->SetId(0,ptIds->GetId(iPt));
                             faceIds->SetId(1,ptIds->GetId((iPt+1)%npts));
                             faceIds->SetId(2,ptIds->GetId((iPt+2)%npts));
-                            this->mesh->GetCellNeighbors(iCell,faceIds,cellIds);
+                            this->mesh->GetCellNeighbors(iCell,faceIds,cellIds); // usually only 1 but could be more for non-manifold meshes
                             for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                             {
                                 nbor.iNeighbor = cellIds->GetId(iNeighbor);
