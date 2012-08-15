@@ -19,17 +19,24 @@ Nick Owens and Susan Stepney&lt;/a&gt;.
                 const int max_neighbors) 
         {
             const int x = get_global_id(0);
-            // compute the neighbor sum
-            float sum = 0.0f;
+            // count neighbors
+            int n1=0;
             int offset = x * max_neighbors;
-            for(int i=0;i &lt; max_neighbors;i++)
-                sum += a_in[neighbor_indices[offset+i]]
-                       * step(0.001f,neighbor_weights[offset+i]);
-            // update:
-            float a = a_in[x];
-            a_out[x] = 
-                step(-0.5f,-a)*step(2.5f,sum)*step(-3.5f,-sum)   // B3
-                + step(0.5f,a)*step(1.5f,sum)*step(-3.5f,-sum);  // S23
+            for(int i=0;i&lt;max_neighbors;i++)
+            {
+                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                    continue; // not a neighbor
+                int y = round(a_in[neighbor_indices[offset+i]]);
+                if(y==1) n1++;
+            }
+            // update step:
+            int a = round(a_in[x]);
+            if(a==0 &amp;&amp; n1==3)
+                a_out[x] = 1.0f; // B3
+            else if(a==1 &amp;&amp; (n1==2 || n1==3))
+                a_out[x] = 1.0f; // S23
+            else
+                a_out[x] = 0.0f;
         }
       </kernel>
       
