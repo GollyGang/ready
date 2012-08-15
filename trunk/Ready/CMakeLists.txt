@@ -121,6 +121,7 @@ set( PATTERN_FILES
   Patterns/heat_equation_interpolation.vti
   Patterns/complex_Ginsburg-Landau.vti
   Patterns/wave_equation.vti
+  Patterns/hex_buss.vtu
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
@@ -316,19 +317,15 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
+target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
 
+# create command-line utility
+add_executable( ${CMD_NAME} ${CMD_SOURCES} )
+target_link_libraries( ${CMD_NAME} readybase )
+
+# create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
-add_executable( ${CMD_NAME} ${BASE_SOURCES} ${CMD_SOURCES} )
-
-target_link_libraries( ${APP_NAME}
-  readybase
-  ${wxWidgets_LIBRARIES} 
-  vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid
-)
-target_link_libraries( ${CMD_NAME}
-  readybase
-  vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid
-)
+target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
