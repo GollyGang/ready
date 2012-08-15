@@ -122,6 +122,7 @@ set( PATTERN_FILES
   Patterns/complex_Ginsburg-Landau.vti
   Patterns/wave_equation.vti
   Patterns/hex_buss.vtu
+  Patterns/tri_life.vtu
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti

@@ -16,23 +16,19 @@
         {
             const int x = get_global_id(0);
             // count neighbors of each type
-            int n1=0,n2=0,n3=0;
+            int n1=0,n2=0;
             int offset = x * max_neighbors;
-            for(int i=0;i &lt; max_neighbors;i++)
+            for( int i=0; i&lt;max_neighbors; i++ )
             {
                 if(neighbor_weights[offset+i]&lt;0.0001f) 
                     continue; // not a neighbor
-                float y = a_in[neighbor_indices[offset+i]];
-                if(y&gt;0.5f &amp;&amp; y&lt;1.5f) 
-                    n1++;
-                else if(y&gt;1.5f &amp;&amp; y&lt;2.5f) 
-                    n2++;
-                else if(y&gt;2.5f &amp;&amp; y&lt;3.5f) 
-                    n3++;
+                int y = round(a_in[neighbor_indices[offset+i]]);
+                if(y==1) n1++;
+                else if(y==2) n2++;
             }
             // update step
-            float a = a_in[x];
-            if(n1==0 &amp;&amp; n2==1 &amp;&amp; a&gt;-0.5f &amp;&amp; a&lt;0.5f)
+            int a = round(a_in[x]);
+            if(n1==0 &amp;&amp; n2==1 &amp;&amp; a==0)
                 a_out[x] = 2.0f;
             else if(n1==1 &amp;&amp; n2==1)
                 a_out[x] = 1.0f;
