@@ -28,16 +28,11 @@
             }
             // update step
             int a = round(a_in[x]);
-            if(n1==0 &amp;&amp; n2==1 &amp;&amp; a==0)
-                a_out[x] = 2.0f;
-            else if(n1==1 &amp;&amp; n2==1)
-                a_out[x] = 1.0f;
-            else if(n2==2)
-                a_out[x] = 1.0f;
-            else if(n2==3)
-                a_out[x] = 2.0f;
-            else
-                a_out[x] = 0.0f;
+            if(n1==0 &amp;&amp; n2==1 &amp;&amp; a==0)  a_out[x] = 2.0f;
+            else if(n1==1 &amp;&amp; n2==1)     a_out[x] = 1.0f;
+            else if(n2==2)              a_out[x] = 1.0f;
+            else if(n2==3)              a_out[x] = 2.0f;
+            else                        a_out[x] = 0.0f;
         }
       </kernel>
       
