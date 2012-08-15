@@ -116,6 +116,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::ImportMesh, MyFrame::OnImportMesh)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
     EVT_MENU(ID::ExportImage, MyFrame::OnExportImage)
+    EVT_UPDATE_UI(ID::ExportImage, MyFrame::OnUpdateExportImage)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
     EVT_MENU(ID::RecordFrames, MyFrame::OnRecordFrames)
     EVT_UPDATE_UI(ID::RecordFrames, MyFrame::OnUpdateRecordFrames)
@@ -2989,6 +2990,13 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     writer->Write();
 
     // TODO: merge with OnSaveScreenshot
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateExportImage(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->Is2DImageAvailable());
 }
 
 // ---------------------------------------------------------------------
