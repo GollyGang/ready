@@ -625,7 +625,7 @@ int MeshRD::GetArenaDimensionality() const
 
 void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) const
 {
-    // TODO
+    throw runtime_error("MeshRD::GetAs2DImage() : no 2D image available");
 }
 
 // ---------------------------------------------------------------------
