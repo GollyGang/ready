@@ -219,7 +219,9 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
         this->cell_locator = NULL;
     }
 
-    this->ComputeCellNeighbors();
+    this->ComputeCellNeighbors(VERTEX_NEIGHBORS,1,EQUAL);
+    // TODO: allow these parameters to be specified as file options
+
 }
 
 // ---------------------------------------------------------------------
@@ -438,7 +440,7 @@ void MeshRD::RestoreStartingPattern()
 
 // ---------------------------------------------------------------------
 
-struct TNeighbor { vtkIdType iNeighbor; float diffusion_coefficient; };
+struct TNeighbor { vtkIdType iNeighbor; float weight; };
 
 void add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
 {
@@ -450,17 +452,19 @@ void add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::ComputeCellNeighbors()
+void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type)
 {
-    enum TNeighborhood { CELL_NEIGHBORS, VERTEX_NEIGHBORS };
-    enum TDiffusionCoefficient { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE };
-    // TODO: when these possibilities have settled down, allow them to be specified as file options
+    // TODO: for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as possible
+    //       (if mesh if non-manifold (edges not used exactly twice, or verts with non-edge-connected cells) then order
+    //        won't mean much but that's ok)
+    
+    if(weight_type!=EQUAL)
+        throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
+    if(range!=1)
+        throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported range");
 
-    TNeighborhood neighborhood_type = VERTEX_NEIGHBORS;
-    TDiffusionCoefficient diffusion_type = EQUAL;
-
-    if(diffusion_type==BOUNDARY_SIZE && neighborhood_type!=CELL_NEIGHBORS)
-        throw runtime_error("MeshRD::ComputeCellNeighbors : BOUNDARY_SIZE diffusion only works with CELL_NEIGHBORS neighborhood");
+    if(!this->mesh->IsHomogeneous())
+        throw runtime_error("MeshRD::ComputeCellNeighbors : mixed cell types not supported");
 
     vtkSmartPointer<vtkIdList> ptIds = vtkSmartPointer<vtkIdList>::New();
     vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
@@ -477,6 +481,7 @@ void MeshRD::ComputeCellNeighbors()
         {
             case VERTEX_NEIGHBORS: // neighbors share a vertex
             {
+                // TODO: enforce cyclical order as far as possible (if 2D manifold)
                 vtkSmartPointer<vtkIdList> vertIds = vtkSmartPointer<vtkIdList>::New();
                 vertIds->SetNumberOfIds(1);
                 for(vtkIdType iPt=0;iPt<npts;iPt++)
@@ -486,85 +491,72 @@ void MeshRD::ComputeCellNeighbors()
                     for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                     {
                         nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                        switch(diffusion_type)
+                        switch(weight_type)
                         {
-                            case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
-                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
+                            case EQUAL: nbor.weight = 1.0f; break;
+                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
                         }
                         add_if_new(neighbors,nbor);
                     }
                 }
-                // TODO: ensure that cells are in cyclic order? (would help with supporting rules such as Hex-B2oS2m34)
             }
             break;
-            case CELL_NEIGHBORS: // neighbors share an edge/face
+            case EDGE_NEIGHBORS: // neighbors share an edge
             {
-                switch(this->mesh->GetCellType(iCell))
+                // TODO: enforce cyclical order as far as possible (if 2D manifold)
+                vtkCell* pCell = this->mesh->GetCell(iCell);
+                for(int iEdge=0;iEdge<pCell->GetNumberOfEdges();iEdge++)
                 {
-                    case VTK_POLYGON: // a 2D face, neighbors share an edge
+                    vtkIdList *vertIds = pCell->GetEdge(iEdge)->GetPointIds();
+                    this->mesh->GetCellNeighbors(iCell,vertIds,cellIds);
+                    for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                     {
-                        vtkSmartPointer<vtkIdList> edgeIds = vtkSmartPointer<vtkIdList>::New();
-                        edgeIds->SetNumberOfIds(2);
-                        for(vtkIdType iPt=0;iPt<npts;iPt++)
+                        nbor.iNeighbor = cellIds->GetId(iNeighbor);
+                        switch(weight_type)
                         {
-                            edgeIds->SetId(0,ptIds->GetId(iPt));
-                            edgeIds->SetId(1,ptIds->GetId((iPt+1)%npts));
-                            this->mesh->GetCellNeighbors(iCell,edgeIds,cellIds); // usually only 1 but could be more for non-manifold meshes
-                            for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
-                            {
-                                nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                                switch(diffusion_type)
-                                {
-                                    case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
-                                    default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
-                                }
-                                add_if_new(neighbors,nbor);
-                            }
+                            case EQUAL: nbor.weight = 1.0f; break;
+                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
                         }
+                        add_if_new(neighbors,nbor);
                     }
-                    break;
-                    case VTK_TETRA: // a 3D tetrahedral cell, neighbors share a triangular face
-                    {
-                        vtkSmartPointer<vtkIdList> faceIds = vtkSmartPointer<vtkIdList>::New();
-                        faceIds->SetNumberOfIds(3);
-                        for(vtkIdType iPt=0;iPt<npts;iPt++)
-                        {
-                            faceIds->SetId(0,ptIds->GetId(iPt));
-                            faceIds->SetId(1,ptIds->GetId((iPt+1)%npts));
-                            faceIds->SetId(2,ptIds->GetId((iPt+2)%npts));
-                            this->mesh->GetCellNeighbors(iCell,faceIds,cellIds); // usually only 1 but could be more for non-manifold meshes
-                            for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
-                            {
-                                nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                                switch(diffusion_type)
-                                {
-                                    case EQUAL: nbor.diffusion_coefficient = 1.0f; break;
-                                    default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported diffusion type");
-                                }
-                                add_if_new(neighbors,nbor);
-                            }
-                        }
-                    }
-                    break;
-                    default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported cell type");
                 }
             }        
             break;
+            case FACE_NEIGHBORS:
+            {
+                // (there's no natural order for the neighbors of 3D cells)
+                vtkCell* pCell = this->mesh->GetCell(iCell);
+                for(int iEdge=0;iEdge<pCell->GetNumberOfFaces();iEdge++)
+                {
+                    vtkIdList *vertIds = pCell->GetFace(iEdge)->GetPointIds();
+                    this->mesh->GetCellNeighbors(iCell,vertIds,cellIds);
+                    for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
+                    {
+                        nbor.iNeighbor = cellIds->GetId(iNeighbor);
+                        switch(weight_type)
+                        {
+                            case EQUAL: nbor.weight = 1.0f; break;
+                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
+                        }
+                        add_if_new(neighbors,nbor);
+                    }
+                }
+            }
+            break;
             default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported neighborhood type");
         }
-        // normalize the diffusion coefficients for this cell
-        float coeff_sum=0.0f;
+        // normalize the weights for this cell
+        float weight_sum=0.0f;
         for(int iN=0;iN<(int)neighbors.size();iN++)
-            coeff_sum += neighbors[iN].diffusion_coefficient;
-        coeff_sum = max(coeff_sum,1e-5f); // avoid div0
+            weight_sum += neighbors[iN].weight;
+        weight_sum = max(weight_sum,1e-5f); // avoid div0
         for(int iN=0;iN<(int)neighbors.size();iN++)
-            neighbors[iN].diffusion_coefficient /= coeff_sum;
+            neighbors[iN].weight /= weight_sum;
         // store this list of neighbors
         cell_neighbors.push_back(neighbors);
         if((int)neighbors.size()>this->max_neighbors)
             this->max_neighbors = (int)neighbors.size();
     }
-    // N.B. we don't intend to support cells of mixed dimensionality in one mesh
 
     // copy data to plain arrays
     if(this->cell_neighbor_indices) delete []this->cell_neighbor_indices;
@@ -577,7 +569,7 @@ void MeshRD::ComputeCellNeighbors()
         {
             int k = i*this->max_neighbors + j;
             this->cell_neighbor_indices[k] = cell_neighbors[i][j].iNeighbor;
-            this->cell_neighbor_weights[k] = cell_neighbors[i][j].diffusion_coefficient;
+            this->cell_neighbor_weights[k] = cell_neighbors[i][j].weight;
         }
         // fill any remaining slots with iCell,0.0
         for(int j=(int)cell_neighbors[i].size();j<max_neighbors;j++)

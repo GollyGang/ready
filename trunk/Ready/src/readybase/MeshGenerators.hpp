@@ -24,9 +24,6 @@ namespace MeshGenerators
     /// Subdivides an icosahedron to get a sphere evenly covered with triangles.
     void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
 
-    /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.
-    void GetTetrahedralMesh(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
-
     /// Subdivides a torus with quadrilaterals.
     void GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
 
@@ -47,4 +44,7 @@ namespace MeshGenerators
 
     /// Make a 2D Voronoi mesh from a random set of points
     void GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems);
+
+    /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.
+    void GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
 }
