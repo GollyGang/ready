@@ -81,38 +81,6 @@ void MeshGenerators::GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid *m
 
 // ---------------------------------------------------------------------
 
-void MeshGenerators::GetTetrahedralMesh(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
-{
-    // TODO: we could make any number of shapes here but we need a more general mechanism, 
-    // e.g. input a closed surface, scatter points inside, tetrahedralize
-
-    // make a tetrahedral mesh by delaunay tetrahedralization on a point cloud
-    vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
-    pts->SetNumberOfPoints(n_points);
-    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-    transform->Scale(200,100,100); // just to make it a bit more interesting we stretch the points in one direction
-    vtkSmartPointer<vtkTransformPolyDataFilter> trans = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-    trans->SetTransform(transform);
-    trans->SetInputConnection(pts->GetOutputPort());
-    vtkSmartPointer<vtkDelaunay3D> del = vtkSmartPointer<vtkDelaunay3D>::New();
-    del->SetInputConnection(trans->GetOutputPort());
-    del->Update();
-    mesh->DeepCopy(del->GetOutput());
-
-    // allocate the chemicals arrays
-    for(int iChem=0;iChem<n_chems;iChem++)
-    {
-        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
-        scalars->SetNumberOfComponents(1);
-        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
-        scalars->SetName(GetChemicalName(iChem).c_str());
-        scalars->FillComponent(0,0.0f);
-        mesh->GetCellData()->AddArray(scalars);
-    }
-}
-
-// ---------------------------------------------------------------------
-
 void MeshGenerators::GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems)
 {
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
@@ -669,6 +637,38 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
     clean->Update();
     mesh->SetPoints(clean->GetOutput()->GetPoints());
     mesh->SetCells(VTK_POLYGON,clean->GetOutput()->GetPolys());
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid *mesh,int n_chems)
+{
+    // TODO: we could make any number of shapes here but we need a more general mechanism, 
+    // e.g. input a closed surface, scatter points inside, tetrahedralize
+
+    // make a tetrahedral mesh by delaunay tetrahedralization on a point cloud
+    vtkSmartPointer<vtkPointSource> pts = vtkSmartPointer<vtkPointSource>::New();
+    pts->SetNumberOfPoints(n_points);
+    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+    transform->Scale(200,100,100); // just to make it a bit more interesting we stretch the points in one direction
+    vtkSmartPointer<vtkTransformPolyDataFilter> trans = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+    trans->SetTransform(transform);
+    trans->SetInputConnection(pts->GetOutputPort());
+    vtkSmartPointer<vtkDelaunay3D> del = vtkSmartPointer<vtkDelaunay3D>::New();
+    del->SetInputConnection(trans->GetOutputPort());
+    del->Update();
+    mesh->DeepCopy(del->GetOutput());
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)

@@ -73,8 +73,20 @@ class MeshRD : public AbstractRD
 
     protected:
 
+        enum TNeighborhood { VERTEX_NEIGHBORS=0, EDGE_NEIGHBORS=1, FACE_NEIGHBORS=2 }; // minimum dimensionality of shared geometry
+        // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
+        enum TWeight { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE, RANGE, VERTEX_NEIGHBORS_RANGE, EDGE_NEIGHBORS_RANGE, FACE_NEIGHBORS_RANGE };
+        // (not intending to support all of these options immediately, but here for thought)
+        // EQUAL: all weights are 1
+        // EUCLIDEAN_DISTANCE: weights are scaled by the distance to each cell centroid
+        // BOUNDARY_SIZE: weights are scaled by the length/area of the shared geometry between two neighbors
+        // RANGE: weight is minimum TNeighborhood steps to get from central cell
+        // VERTEX_NEIGHBORS_RANGE: weight is minimum vertex-neighbors steps to get from central cell
+        // EDGE_NEIGHBORS_RANGE: weight is minimum edge-neighbors steps to get from central cell
+        // FACE_NEIGHBORS_RANGE: weight is minimum face-neighbors steps to get from central cell
+
         /// work out which cells are neighbors of each other
-        void ComputeCellNeighbors();
+        void ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type);
 
         /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps) =0;
