@@ -36,6 +36,7 @@
 #include <vtkTriangle.h>
 #include <vtkGenericCell.h>
 #include <vtkCleanPolyData.h>
+#include <vtkAppendFilter.h>
 
 // STL:
 #include <vector>
@@ -669,6 +670,130 @@ void MeshGenerators::GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid *mesh,
     del->SetInputConnection(trans->GetOutputPort());
     del->Update();
     mesh->DeepCopy(del->GetOutput());
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems)
+{
+    // a truncated octahedron
+    const float coords[24][3] = { 
+        {0,1,2}, {0,-1,2}, {0,1,-2}, {0,-1,-2},   // 0,1,2,3
+        {0,2,1}, {0,-2,1}, {0,2,-1}, {0,-2,-1},   // 4,5,6,7
+        {1,0,2}, {-1,0,2}, {1,0,-2}, {-1,0,-2},   // 8,9,10,11
+        {1,2,0}, {-1,2,0}, {1,-2,0}, {-1,-2,0},   // 12,13,14,15
+        {2,0,1}, {-2,0,1}, {2,0,-1}, {-2,0,-1},   // 16,17,18,19
+        {2,1,0}, {-2,1,0}, {2,-1,0}, {-2,-1,0} }; // 20,21,22,23
+    const int hex_faces[8][6] = { 
+        {0,8,16,20,12,4}, {2,6,12,20,18,10}, 
+        {1,5,14,22,16,8}, {3,10,18,22,14,7}, 
+        {0,4,13,21,17,9}, {2,11,19,21,13,6},
+        {1,9,17,23,15,5}, {3,7,15,23,19,11} }; // xyz positive or negative: +++, ++-, +-+, +--, -++, -+-, --+, ---
+    const int square_faces[6][4] = { 
+        {16,22,18,20}, {17,21,19,23}, {4,12,6,13},
+        {5,15,7,14}, {0,9,1,8}, {2,10,3,11} }; // x=2, x=-2, y=2, y=-2, z=2, z=-2
+
+    // stack them in a grid, merging duplicated vertices
+    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    append->MergePointsOn();
+    for(int z=0;z<side*2-1;z++)
+    {
+        for(int y=0;y<side-z%2;y++)
+        {
+            for(int x=0;x<side-z%2;x++)
+            {
+                vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                vector<vtkIdType> pointIds,faceStream;
+                vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+                for(int i=0;i<24;i++) 
+                    pointIds.push_back(points->InsertNextPoint( coords[i][0]+x*4+(z%2)*2, 
+                        coords[i][1]+y*4+(z%2)*2, coords[i][2]+z*2)); // body-centred
+                for(int i=0;i<8;i++) {
+                    faceStream.push_back(6);
+                    for(int j=0;j<6;j++)
+                        faceStream.push_back(hex_faces[i][j]);
+                }
+                for(int i=0;i<6;i++) {
+                    faceStream.push_back(4);
+                    for(int j=0;j<4;j++)
+                        faceStream.push_back(square_faces[i][j]);
+                }
+                ug->InsertNextCell(VTK_POLYHEDRON,24,&pointIds.front(),14,&faceStream.front());
+                ug->SetPoints(points);
+                append->AddInput(ug);
+            }
+        }
+    }
+    append->Update();
+    mesh->DeepCopy(append->GetOutput());
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems)
+{
+    // a rhombic dodecahedron
+    const float coords[14][3] = { 
+        {-2,0,0},{2,0,0},{0,-2,0},{0,2,0},{0,0,-2},{0,0,2}, // 0,1,2,3,4,5,
+        {-1,-1,-1},{-1,-1,1},{-1,1,-1},{-1,1,1}, // 6,7,8,9
+        {1,-1,-1},{1,-1,1},{1,1,-1},{1,1,1} // 10,11,12,13
+    };
+    const int faces[12][4] = { 
+        {0,7,5,9},{9,5,13,3},{13,5,11,1},{5,7,2,11},
+        {0,6,2,7},{0,9,3,8},{0,8,4,6},{2,6,4,10},
+        {3,12,4,8},{1,10,4,12},{1,11,2,10},{1,12,3,13}
+    };
+
+    // stack them in a grid, merging duplicated vertices
+    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    append->MergePointsOn();
+    for(int z=0;z<side*2;z++)
+    {
+        for(int y=0;y<side;y++)
+        {
+            for(int x=0;x<side*2;x++)
+            {
+                vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                vector<vtkIdType> pointIds,faceStream;
+                vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+                for(int i=0;i<14;i++) 
+                    pointIds.push_back(points->InsertNextPoint( coords[i][0]+x*2+(z%2)*2, 
+                        coords[i][1]+y*4+(x%2)*2, coords[i][2]+z*2)); // face-centred
+                for(int i=0;i<12;i++) {
+                    faceStream.push_back(4);
+                    for(int j=0;j<4;j++)
+                        faceStream.push_back(faces[i][j]);
+                }
+                ug->InsertNextCell(VTK_POLYHEDRON,14,&pointIds.front(),12,&faceStream.front());
+                ug->SetPoints(points);
+                append->AddInput(ug);
+            }
+        }
+    }
+    append->Update();
+    mesh->DeepCopy(append->GetOutput());
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)

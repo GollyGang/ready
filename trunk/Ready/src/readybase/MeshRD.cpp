@@ -228,6 +228,21 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 
 void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings)
 {
+    // DEBUG: hijack
+    if(false)
+    {
+        vtkDataSetMapper *mapper = vtkDataSetMapper::New();
+        mapper->SetInput(this->mesh);
+        vtkActor *actor = vtkActor::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(1,0.5,0.6);
+        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+        actor->SetBackfaceProperty(bfprop);
+        bfprop->SetColor(0.3,0.3,0.3);
+        pRenderer->AddActor(actor);
+        return;
+    }
+
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
     float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
@@ -309,7 +324,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
         pRenderer->AddActor(actor);
     }
-    else if(this->mesh->GetCellType(0)==VTK_TETRA)
+    else
     {
         // show a contour
         vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
@@ -343,9 +358,20 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         bfprop->SetSpecular(0.1);
         actor->PickableOff();
         pRenderer->AddActor(actor);
+
+        // add a wireframe actor
+        if(false) // TODO: an option?
+        {
+            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+            mapper->ImmediateModeRenderingOn();
+            mapper->SetInput(this->mesh);
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetRepresentationToWireframe();
+            actor->GetProperty()->SetColor(0,0,0);
+            pRenderer->AddActor(actor);
+        }
     }
-    else
-        throw runtime_error("MeshRD::InitializeRenderPipeline : unsupported cell type");
 
     // add a slice
     if(slice_3D)

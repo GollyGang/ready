@@ -15,9 +15,13 @@ Big picture issues:
 
 before 0.5 release:
   
+- bug: single-cell meshes can't run with OpenCL
+- VTK bug: saving polyhedral cells outputs malformed XML
+- better way to show shape of dataset (show_
+- use_image_interpolation=false on 3d-cell meshes should show >contour cells, as in 3D image
+- expose neighborhood type (vert/edge/face-neighbors) as a file option
 - for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as
-  possible (if mesh if non-manifold (edges not used exactly twice, or verts with non-edge-connected 
-  cells) then order won't mean much but that's ok)
+  possible
 
 - current color button should be replaced by spectrum slider plus value indicators?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?

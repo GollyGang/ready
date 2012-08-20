@@ -47,4 +47,10 @@ namespace MeshGenerators
 
     /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.
     void GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
+
+    /// Make a honeycomb from truncated octahedra.
+    void GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems);
+
+    /// Make a honeycomb from rhombic dodecahedra.
+    void GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems);
 }
