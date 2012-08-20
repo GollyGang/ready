@@ -1459,14 +1459,16 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     // ask user what type of dataset to generate:
-    enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D };
+    enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
+        BodyCentredCubic, FaceCentredCubic }; // TODO: tetrahedral grid (different kinds)
     int sel;
     {
-        const int N_CHOICES = 13;
+        const int N_CHOICES = 15;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Triangular mesh"), _("Hexagonal mesh"),
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
-            _("Random 2D Delaunay mesh"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay mesh"), };
+            _("Random 2D Delaunay mesh"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay mesh"), 
+            _("Body-centred cubic honeycomb"), _("Face-centred cubic honeycomb") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1801,7 +1803,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d points - approximately %d cells",choices[i],choices[i]*6);
-                    wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Tetrahedral mesh options"),N_CHOICES,div_descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Delaunay mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
@@ -1820,6 +1822,72 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
                 break;
             }
+            case BodyCentredCubic:
+            {
+                int side;
+                {
+                    const int N_CHOICES=3;
+                    int choices[N_CHOICES] = {5,10,20};
+                    int cells[N_CHOICES] = {189,1729,14859};
+                    wxString descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Body-centred cubic mesh options"),N_CHOICES,descriptions);
+                    dlg.SetSelection(0); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    side = choices[dlg.GetSelection()];
+                }
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetBodyCentredCubicHoneycomb(side,mesh,2);
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+				else
+					mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(true);
+                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                break;
+            }
+            break;
+            case FaceCentredCubic:
+            {
+                int side;
+                {
+                    const int N_CHOICES=3;
+                    int choices[N_CHOICES] = {5,10,20};
+                    int cells[N_CHOICES] = {500,4000,32000};
+                    wxString descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Face-centred cubic mesh options"),N_CHOICES,descriptions);
+                    dlg.SetSelection(0); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    side = choices[dlg.GetSelection()];
+                }
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2);
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+				else
+					mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(true);
+                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                break;
+            }
+            break;
             default:
             {
                 wxMessageBox(_("Not currently supported"));
