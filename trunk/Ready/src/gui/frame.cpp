@@ -2864,8 +2864,6 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
     */
 
-    // for now we give the mesh an inbuilt rule (Gray-Scott) but this should be different
-
 	MeshRD *mesh_sys;
     if(mesh_filename.EndsWith(_T("vtp")))
     {

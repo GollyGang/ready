@@ -582,6 +582,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
         cell_neighbors.push_back(neighbors);
         if((int)neighbors.size()>this->max_neighbors)
             this->max_neighbors = (int)neighbors.size();
+        this->max_neighbors = max(1,this->max_neighbors); // avoid error in case of unconnected cells or single cell
     }
 
     // copy data to plain arrays
