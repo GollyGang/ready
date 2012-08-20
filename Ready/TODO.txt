@@ -15,7 +15,7 @@ Big picture issues:
 
 before 0.5 release:
   
-- bug: single-cell meshes can't run with OpenCL
+- bug: contouring polyhedral cells gives inconsistent normals
 - VTK bug: saving polyhedral cells outputs malformed XML
 - better way to show shape of dataset (show_
 - use_image_interpolation=false on 3d-cell meshes should show >contour cells, as in 3D image
