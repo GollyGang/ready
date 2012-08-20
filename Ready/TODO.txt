@@ -15,9 +15,8 @@ Big picture issues:
 
 before 0.5 release:
   
-- bug: contouring polyhedral cells gives inconsistent normals
 - VTK bug: saving polyhedral cells outputs malformed XML
-- better way to show shape of dataset (show_
+- better way to show shape of dataset for 3d cells (show_outline?) 
 - use_image_interpolation=false on 3d-cell meshes should show >contour cells, as in 3D image
 - expose neighborhood type (vert/edge/face-neighbors) as a file option
 - for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as
