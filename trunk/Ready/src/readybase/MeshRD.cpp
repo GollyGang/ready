@@ -50,6 +50,7 @@
 #include <vtkAssignAttribute.h>
 #include <vtkReverseSense.h>
 #include <vtkGenericCell.h>
+#include <vtkPolyDataNormals.h>
 
 // STL:
 #include <stdexcept>
@@ -335,10 +336,8 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
         surface->SetInputConnection(to_point_data->GetOutputPort());
         surface->SetValue(0,contour_level);
-        vtkSmartPointer<vtkReverseSense> reverse = vtkSmartPointer<vtkReverseSense>::New();
-        reverse->SetInputConnection(surface->GetOutputPort());
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(reverse->GetOutputPort());
+        mapper->SetInputConnection(surface->GetOutputPort());
         mapper->ImmediateModeRenderingOn();
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
@@ -350,12 +349,12 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         actor->GetProperty()->SetSpecularPower(3);
         if(use_wireframe)
             actor->GetProperty()->SetRepresentationToWireframe();
-        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+        /*vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
         actor->SetBackfaceProperty(bfprop);
         bfprop->SetColor(0.3,0.3,0.3);
         bfprop->SetAmbient(0.3);
         bfprop->SetDiffuse(0.6);
-        bfprop->SetSpecular(0.1);
+        bfprop->SetSpecular(0.1);*/ // TODO: re-enable this if can get working
         actor->PickableOff();
         pRenderer->AddActor(actor);
 
