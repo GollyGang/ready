@@ -386,10 +386,11 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
+    actor->SetTexture(texture);
     if(show_cell_edges)
         actor->GetProperty()->EdgeVisibilityOn();
     actor->GetProperty()->SetEdgeColor(0,0,0);
-    actor->SetTexture(texture);
+    actor->GetProperty()->LightingOff();
     pRenderer->AddActor(actor);
 
     // also add a scalar bar to show how the colors correspond to values
@@ -508,11 +509,12 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
 
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
+        actor->SetPosition(offset);
+        actor->SetTexture(texture);
         if(show_cell_edges)
             actor->GetProperty()->EdgeVisibilityOn();
         actor->GetProperty()->SetEdgeColor(0,0,0);
-        actor->SetPosition(offset);
-        actor->SetTexture(texture);
+        actor->GetProperty()->LightingOff();
         pRenderer->AddActor(actor);
 
         if(show_displacement_mapped_surface)
