@@ -39,7 +39,6 @@
 #include <vtkIdList.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkDataSetMapper.h>
-#include <vtkTetra.h>
 #include <vtkCellArray.h>
 #include <vtkGeometryFilter.h>
 #include <vtkCutter.h>
@@ -50,7 +49,6 @@
 #include <vtkAssignAttribute.h>
 #include <vtkReverseSense.h>
 #include <vtkGenericCell.h>
-#include <vtkPolyDataNormals.h>
 
 // STL:
 #include <stdexcept>
