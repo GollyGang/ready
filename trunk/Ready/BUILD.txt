@@ -1,6 +1,6 @@
 Dependencies: 
 0) CMake: www.cmake.org
-1) VTK (5.8+): www.vtk.org
+1) VTK (5.10+): www.vtk.org
 2) wxWidgets (2.9.2+): www.wxwidgets.org
 3) any OpenCL SDK.
 
