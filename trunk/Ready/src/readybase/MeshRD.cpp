@@ -50,6 +50,7 @@
 #include <vtkReverseSense.h>
 #include <vtkGenericCell.h>
 #include <vtkThreshold.h>
+#include <vtkDataSetSurfaceFilter.h>
 
 // STL:
 #include <stdexcept>
@@ -628,11 +629,12 @@ int MeshRD::GetNumberOfCells() const
 
 void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) const
 {
-    vtkSmartPointer<vtkGeometryFilter> geom = vtkSmartPointer<vtkGeometryFilter>::New();
+    vtkSmartPointer<vtkDataSetSurfaceFilter> geom = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
     geom->SetInput(this->mesh);
     geom->Update();
     out->DeepCopy(geom->GetOutput());
     // 2D meshes will get returned unchanged, meshes with 3D cells will have their outer surface returned
+    // TODO: output contour instead for polyhedral cells
 }
 
 // ---------------------------------------------------------------------
