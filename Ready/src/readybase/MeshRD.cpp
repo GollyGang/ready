@@ -354,7 +354,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         bfprop->SetColor(0.3,0.3,0.3);
         bfprop->SetAmbient(0.3);
         bfprop->SetDiffuse(0.6);
-        bfprop->SetSpecular(0.1);*/ // TODO: re-enable this if can get working
+        bfprop->SetSpecular(0.1);*/ // TODO: re-enable this if can get correct normals
         actor->PickableOff();
         pRenderer->AddActor(actor);
     }
@@ -376,6 +376,9 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             actor->GetProperty()->EdgeVisibilityOn();
             actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
         }
+        if(use_wireframe)
+            actor->GetProperty()->SetRepresentationToWireframe();
+        actor->PickableOff();
         pRenderer->AddActor(actor);
     }
 
