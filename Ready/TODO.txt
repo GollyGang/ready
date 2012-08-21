@@ -16,7 +16,6 @@ Big picture issues:
 before 0.5 release:
 
 - File > Export Mesh should do sensible things on polyhedral meshes  
-- better way to show shape of dataset for 3d cells (show_outline? transparency?) 
 - expose neighborhood type (vert/edge/face-neighbors) as a file option
 - for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as
   possible
