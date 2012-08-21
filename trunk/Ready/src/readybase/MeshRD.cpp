@@ -118,6 +118,7 @@ void MeshRD::SaveFile(const char* filename,const Properties& render_settings) co
     iw->SetSystem(this);
     iw->SetRenderSettings(&render_settings);
     iw->SetFileName(filename);
+    iw->SetDataModeToBinary(); // workaround for http://www.vtk.org/Bug/view.php?id=13382
     iw->SetInput(this->mesh);
     iw->Write();
 }
