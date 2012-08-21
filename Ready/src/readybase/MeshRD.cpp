@@ -49,6 +49,7 @@
 #include <vtkAssignAttribute.h>
 #include <vtkReverseSense.h>
 #include <vtkGenericCell.h>
+#include <vtkThreshold.h>
 
 // STL:
 #include <stdexcept>
@@ -324,7 +325,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
         pRenderer->AddActor(actor);
     }
-    else
+    else if(use_image_interpolation)
     {
         // show a contour
         vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
@@ -356,19 +357,26 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         bfprop->SetSpecular(0.1);*/ // TODO: re-enable this if can get working
         actor->PickableOff();
         pRenderer->AddActor(actor);
-
-        // add a wireframe actor
-        if(false) // TODO: an option?
+    }
+    else // visualise the cells
+    {
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInput(this->mesh);
+        assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+        vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
+        threshold->SetInputConnection(assign_attribute->GetOutputPort());
+        threshold->ThresholdByUpper(contour_level);
+        vtkDataSetMapper *mapper = vtkDataSetMapper::New();
+        mapper->SetInputConnection(threshold->GetOutputPort());
+        mapper->SetLookupTable(lut);
+        vtkActor *actor = vtkActor::New();
+        actor->SetMapper(mapper);
+        if(show_cell_edges)
         {
-            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-            mapper->ImmediateModeRenderingOn();
-            mapper->SetInput(this->mesh);
-            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-            actor->SetMapper(mapper);
-            actor->GetProperty()->SetRepresentationToWireframe();
-            actor->GetProperty()->SetColor(0,0,0);
-            pRenderer->AddActor(actor);
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
         }
+        pRenderer->AddActor(actor);
     }
 
     // add a slice
