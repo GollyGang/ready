@@ -230,21 +230,6 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 
 void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings)
 {
-    // DEBUG: hijack
-    if(false)
-    {
-        vtkDataSetMapper *mapper = vtkDataSetMapper::New();
-        mapper->SetInput(this->mesh);
-        vtkActor *actor = vtkActor::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(1,0.5,0.6);
-        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
-        actor->SetBackfaceProperty(bfprop);
-        bfprop->SetColor(0.3,0.3,0.3);
-        pRenderer->AddActor(actor);
-        return;
-    }
-
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
     float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
@@ -367,10 +352,10 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
         threshold->SetInputConnection(assign_attribute->GetOutputPort());
         threshold->ThresholdByUpper(contour_level);
-        vtkDataSetMapper *mapper = vtkDataSetMapper::New();
+        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
         mapper->SetInputConnection(threshold->GetOutputPort());
         mapper->SetLookupTable(lut);
-        vtkActor *actor = vtkActor::New();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         if(show_cell_edges)
         {
@@ -629,12 +614,44 @@ int MeshRD::GetNumberOfCells() const
 
 void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) const
 {
-    vtkSmartPointer<vtkDataSetSurfaceFilter> geom = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-    geom->SetInput(this->mesh);
-    geom->Update();
-    out->DeepCopy(geom->GetOutput());
+    bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
+    string activeChemical = render_settings.GetProperty("active_chemical").GetChemical();
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+
     // 2D meshes will get returned unchanged, meshes with 3D cells will have their outer surface returned
-    // TODO: output contour instead for polyhedral cells
+    if(this->mesh->GetCellType(0)==VTK_POLYGON)
+    {
+        vtkSmartPointer<vtkDataSetSurfaceFilter> geom = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+        geom->SetInput(this->mesh);
+        geom->Update();
+        out->DeepCopy(geom->GetOutput());
+    }
+    else if(use_image_interpolation)
+    {
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInput(this->mesh);
+        assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+        vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+        to_point_data->SetInputConnection(assign_attribute->GetOutputPort());
+        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+        surface->SetInputConnection(to_point_data->GetOutputPort());
+        surface->SetValue(0,contour_level);
+        surface->Update();
+        out->DeepCopy(surface->GetOutput());
+    }
+    else
+    {
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInput(this->mesh);
+        assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+        vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
+        threshold->SetInputConnection(assign_attribute->GetOutputPort());
+        threshold->ThresholdByUpper(contour_level);
+        vtkSmartPointer<vtkDataSetSurfaceFilter> geom = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+        geom->SetInputConnection(threshold->GetOutputPort());
+        geom->Update();
+        out->DeepCopy(geom->GetOutput());
+    }
 }
 
 // ---------------------------------------------------------------------
