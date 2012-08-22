@@ -120,6 +120,7 @@ set( PATTERN_FILES
   Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
   Patterns/complex_Ginsburg-Landau.vti
+  Patterns/complex_Ginsburg-Landau_magnitude.vti
   Patterns/wave_equation.vti
   Patterns/hex_buss.vtu
   Patterns/tri_life.vtu
