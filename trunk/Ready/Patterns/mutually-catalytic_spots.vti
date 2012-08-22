@@ -33,7 +33,7 @@
         delta_b = diff_ab * laplacian_b + a*b*b - (F1+k1-d*b_feed)*b;
         delta_c = 2.0f * diff_cd * laplacian_c - c*d*d + F2*(1.0f-c);
         delta_d = diff_cd * laplacian_d + c*d*d - (F2+k2-step(0.15f,b)*d_feed)*d;
-        delta_e = (2.0f*b+d*2.0f-e)/timestep;
+        e = 2.0f*b + d*2.0f;
       </formula>
       
     </rule>
