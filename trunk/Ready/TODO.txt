@@ -15,6 +15,10 @@ Big picture issues:
 
 before 0.5 release:
 
+- way to expand mesh grids where possible?
+- progress indicator for mesh generators
+- documentation bug: can change the size of any pattern
+
 - expose neighborhood type (vert/edge/face-neighbors) as a file option
 - for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as
   possible

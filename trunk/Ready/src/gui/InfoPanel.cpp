@@ -407,8 +407,8 @@ void InfoPanel::Update(const AbstractRD* const system)
             contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
     }
 
-    contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%d x %d x %d"),
-                                        vtkMath::Round(system->GetX()),vtkMath::Round(system->GetY()),vtkMath::Round(system->GetZ())),
+    contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
+                                        FormatFloat(system->GetX(),3),FormatFloat(system->GetY(),3),FormatFloat(system->GetZ(),3)),
                                         system->HasEditableDimensions());
 
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
