@@ -276,6 +276,7 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML() const
     // initial pattern generator
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
     initial_pattern_generator->SetName("initial_pattern_generator");
+    initial_pattern_generator->SetAttribute("apply_when_loading","false"); // TODO: provide user option to save blank image with this as true
     for(int i=0;i<(int)this->initial_pattern_generator.size();i++)
         initial_pattern_generator->AddNestedElement(this->initial_pattern_generator[i]->GetAsXML());
     rd->AddNestedElement(initial_pattern_generator);
