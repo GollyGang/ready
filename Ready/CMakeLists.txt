@@ -378,7 +378,7 @@ endif()
 # put Ready in the root of the installation folder instead of in "bin"
 install( TARGETS ${APP_NAME} DESTINATION "." )      # (add ${CMD_NAME} if we want to distribute the command-line version too)
 
-# install our source files, resource files, pattern file, help files and text files
+# install our source files, resource files, pattern files, help files and text files
 foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${CMD_SOURCES} ${RESOURCES} ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
   get_filename_component( path_name "${source_file}" PATH )
   install( FILES "${source_file}" DESTINATION ${path_name} )
