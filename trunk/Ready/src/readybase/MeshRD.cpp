@@ -618,7 +618,7 @@ void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) cons
     string activeChemical = render_settings.GetProperty("active_chemical").GetChemical();
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
 
-    // 2D meshes will get returned unchanged, meshes with 3D cells will have their outer surface returned
+    // 2D meshes will get returned unchanged, meshes with 3D cells will have their contour returned
     if(this->mesh->GetCellType(0)==VTK_POLYGON)
     {
         vtkSmartPointer<vtkDataSetSurfaceFilter> geom = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();

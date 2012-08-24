@@ -20,6 +20,7 @@ before 0.5 release:
 - documentation bug: can change the size of any pattern
 - document meaning of dimensions, especially for meshes
 - way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
+- way to switch between inbuilt, formula and kernel
 
 - 3D images should show cell color when use_image_interpolation=false
 - expose neighborhood type (vert/edge/face-neighbors) as a file option
