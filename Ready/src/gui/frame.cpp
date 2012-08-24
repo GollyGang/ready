@@ -1483,6 +1483,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case Image1D:
             {
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating image..."));
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
 					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
@@ -1497,6 +1498,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case Image2D:
             {
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating image..."));
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
 					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
@@ -1511,6 +1513,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             case Image3D:
             {
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating image..."));
 				ImageRD *image_sys;
 				if(this->is_opencl_available)
 					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
@@ -1538,6 +1541,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     divs = div_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetGeodesicSphere(divs,mesh,2);
                 MeshRD *mesh_sys;
@@ -1569,6 +1573,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     ny = y_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetTorus(nx,ny,mesh,2);
                 MeshRD *mesh_sys;
@@ -1599,6 +1604,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     n = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetTriangularMesh(n,n,mesh,2);
                 MeshRD *mesh_sys;
@@ -1631,6 +1637,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     n = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetHexagonalMesh(n,n,mesh,2);
                 MeshRD *mesh_sys;
@@ -1663,6 +1670,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     n = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetRhombilleTiling(n,n,mesh,2);
                 MeshRD *mesh_sys;
@@ -1695,6 +1703,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     divs = div_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetPenroseTiling(divs,0,mesh,2);
                 MeshRD *mesh_sys;
@@ -1727,6 +1736,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     divs = div_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetPenroseTiling(divs,1,mesh,2);
                 MeshRD *mesh_sys;
@@ -1759,6 +1769,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     npts = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetRandomDelaunay2D(npts,mesh,2);
                 MeshRD *mesh_sys;
@@ -1790,6 +1801,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     npts = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetRandomVoronoi2D(npts,mesh,2);
                 MeshRD *mesh_sys;
@@ -1821,6 +1833,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     npts = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetRandomDelaunay3D(npts,mesh,2);
                 MeshRD *mesh_sys;
@@ -1851,6 +1864,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     side = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetBodyCentredCubicHoneycomb(side,mesh,2);
                 MeshRD *mesh_sys;
@@ -1885,6 +1899,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     side = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2);
                 MeshRD *mesh_sys;
@@ -1923,6 +1938,8 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         return;
     }
     
+    wxBusyCursor busy;
+    this->SetStatusText(_("Generating data values..."));
 	sys->CreateDefaultInitialPatternGenerator();
 	sys->GenerateInitialPattern();
 	this->SetCurrentRDSystem(sys);
@@ -1930,6 +1947,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     this->system->SetFilename("untitled");
     this->system->SetModified(false);
     this->UpdateWindows();
+    this->SetStatusText(_("Ready"));
 }
 
 // ---------------------------------------------------------------------
