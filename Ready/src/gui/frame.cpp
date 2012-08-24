@@ -1529,8 +1529,8 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int divs;
                 {
-                    const int N_CHOICES=9;
-                    int div_choices[N_CHOICES] = {2,3,4,5,6,7,8,9,10};
+                    const int N_CHOICES = 6;
+                    int div_choices[N_CHOICES] = {2,3,4,5,6,7};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
@@ -1559,7 +1559,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int nx,ny;
                 {
-                    const int N_CHOICES=4;
+                    const int N_CHOICES = 4;
                     int x_choices[N_CHOICES] = {100,160,200,500};
                     int y_choices[N_CHOICES] = {125,200,250,625};
                     wxString div_descriptions[N_CHOICES];
@@ -1591,7 +1591,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int n;
                 {
-                    const int N_CHOICES=5;
+                    const int N_CHOICES = 5;
                     int choices[N_CHOICES] = {30,50,100,200,500};
                     int cells[N_CHOICES] = {1682,4802,19602,79202,498002};
                     wxString div_descriptions[N_CHOICES];
@@ -1616,7 +1616,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(n<100);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
@@ -1624,7 +1624,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int n;
                 {
-                    const int N_CHOICES=4;
+                    const int N_CHOICES = 4;
                     int choices[N_CHOICES] = {100,150,200,500};
                     int cells[N_CHOICES] = {3185,7326,13068,82668};
                     wxString div_descriptions[N_CHOICES];
@@ -1649,7 +1649,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(n<200);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
@@ -1657,7 +1657,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int n;
                 {
-                    const int N_CHOICES=5;
+                    const int N_CHOICES = 5;
                     int choices[N_CHOICES] = {50,75,100,150,200};
                     int cells[N_CHOICES] = {2304,5367,9555,21978,39204};
                     wxString div_descriptions[N_CHOICES];
@@ -1682,7 +1682,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(n<100);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
@@ -1690,7 +1690,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int divs;
                 {
-                    const int N_CHOICES=8;
+                    const int N_CHOICES = 8;
                     int div_choices[N_CHOICES] = {5,7,8,9,10,11,12,13};
                     int cells[N_CHOICES] = {430,3010,7920,20800,54560,143010,374680,981370};
                     wxString div_descriptions[N_CHOICES];
@@ -1723,7 +1723,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int divs;
                 {
-                    const int N_CHOICES=8;
+                    const int N_CHOICES = 8;
                     int div_choices[N_CHOICES] = {5,6,7,8,9,10,11,12};
                     int cells[N_CHOICES] = {705,1855,4885,12845,33705,88355,231515,606445};
                     wxString div_descriptions[N_CHOICES];
@@ -1757,7 +1757,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int npts;
                 {
-                    const int N_CHOICES=5;
+                    const int N_CHOICES = 5;
                     int choices[N_CHOICES] = {1000,2000,5000,10000,20000};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
@@ -1789,7 +1789,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int npts;
                 {
-                    const int N_CHOICES=5;
+                    const int N_CHOICES = 5;
                     int choices[N_CHOICES] = {1000,2000,10000,20000,50000};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
@@ -1821,7 +1821,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int npts;
                 {
-                    const int N_CHOICES=5;
+                    const int N_CHOICES = 5;
                     int choices[N_CHOICES] = {500,1000,1500,2000,5000};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
@@ -1851,7 +1851,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int side;
                 {
-                    const int N_CHOICES=3;
+                    const int N_CHOICES = 3;
                     int choices[N_CHOICES] = {5,10,20};
                     int cells[N_CHOICES] = {189,1729,14859};
                     wxString descriptions[N_CHOICES];
@@ -1886,7 +1886,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int side;
                 {
-                    const int N_CHOICES=3;
+                    const int N_CHOICES = 3;
                     int choices[N_CHOICES] = {5,10,20};
                     int cells[N_CHOICES] = {500,4000,32000};
                     wxString descriptions[N_CHOICES];
