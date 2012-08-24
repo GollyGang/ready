@@ -1690,9 +1690,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int divs;
                 {
-                    const int N_CHOICES=5;
-                    int div_choices[N_CHOICES] = {5,7,8,9,10};
-                    int cells[N_CHOICES] = {430,3010,7920,20800,54560};
+                    const int N_CHOICES=8;
+                    int div_choices[N_CHOICES] = {5,7,8,9,10,11,12,13};
+                    int cells[N_CHOICES] = {430,3010,7920,20800,54560,143010,374680,981370};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
@@ -1715,7 +1715,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(divs<9);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
@@ -1723,9 +1723,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 int divs;
                 {
-                    const int N_CHOICES=5;
-                    int div_choices[N_CHOICES] = {5,6,7,8,9};
-                    int cells[N_CHOICES] = {705,1855,4885,12845,33705};
+                    const int N_CHOICES=8;
+                    int div_choices[N_CHOICES] = {5,6,7,8,9,10,11,12};
+                    int cells[N_CHOICES] = {705,1855,4885,12845,33705,88355,231515,606445};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
@@ -1748,7 +1748,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(divs<8);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 wxMessageBox(_("There's a problem with rendering concave polygons in OpenGL, so the display might be slightly corrupted."));
                 break;
@@ -1781,7 +1781,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(npts<5000);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }
@@ -1813,7 +1813,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(npts<10000);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
                 break;
             }

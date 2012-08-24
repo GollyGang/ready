@@ -323,17 +323,41 @@ void MeshGenerators::GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,in
 
 // ---------------------------------------------------------------------
 
-/// A two-dimensional triangle, used in MeshRD::GetPenroseRhombiTiling().
+/// A two-dimensional triangle, used in MeshRD::GetPenroseTiling().
 struct Tri {
-    double ax,ay,bx,by,cx,cy;
-    Tri(double ax2,double ay2,double bx2,double by2,double cx2,double cy2)
-        : ax(ax2), ay(ay2), bx(bx2), by(by2), cx(cx2), cy(cy2) {}
+    double p[3][2];  /// Coordinates of corners A, B and C.
+    int index[3];    /// Index of corners A, B and C in the points structure.
+    Tri(double ax,double ay,int iA,double bx,double by,int iB,double cx,double cy,int iC) {
+        p[0][0] = ax; p[0][1] = ay; index[0] = iA;
+        p[1][0] = bx; p[1][1] = by; index[1] = iB;
+        p[2][0] = cx; p[2][1] = cy; index[2] = iC;
+    }
 };
 
-/// The indices of a triangle, used in MeshRD::GetPenroseRhombiTiling().
-struct TriIndices {
-    double ind[3];
-};
+typedef map<pair<int,int>,int> TPairIndex; /// For accessing an int by an ordered pair of ints.
+
+/// Insert a new point between the points, unless one already exists.
+int SplitEdge(const Tri &tri,int i1,int i2,double &x, double &y,TPairIndex &edge_splits,vtkPoints* pts)
+{
+    const double goldenRatio = (1.0 + sqrt(5.0)) / 2.0;
+
+    x = tri.p[i1][0] + (tri.p[i2][0] - tri.p[i1][0]) / goldenRatio;
+    y = tri.p[i1][1] + (tri.p[i2][1] - tri.p[i1][1]) / goldenRatio;
+    // (x,y is closer to point 2 than point 1)
+
+    pair<int,int> edge(tri.index[i1],tri.index[i2]);
+    TPairIndex::const_iterator found = edge_splits.find(edge);
+    if(found!=edge_splits.end())
+    {
+        return found->second;
+    }
+    else
+    {
+        int iP = pts->InsertNextPoint(x,y,0);
+        edge_splits[edge] = iP; 
+        return iP;
+    }
+}
 
 void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems)
 {
@@ -346,22 +370,34 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
     vector<Tri> red_tris[2],blue_tris[2]; // each list has two buffers
     int iCurrentBuffer = 0;
 
-    double goldenRatio = (1.0 + sqrt(5.0)) / 2.0;
+    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+
+    TPairIndex edge_splits; // given a pair of point indices, what is the index of the point made by splitting that edge?
 
     // start with 10 red triangles in a wheel, to get a nice circular shape (with 5-fold rotational symmetry)
     // (any correctly-tiled starting pattern will work too)
-    double angle_step = 2.0 * 3.1415926535 / 10.0;
+    const int NT = 10;
+    const double angle_step = 2.0 * 3.1415926535 / NT;
+    const double goldenRatio = (1.0 + sqrt(5.0)) / 2.0;
     const double scale = pow( goldenRatio, n_subdivisions );
-    for(int i=0;i<10;i++)
+    pts->InsertNextPoint(0,0,0);
+    for(int i=0;i<NT;i++)
     {
-        double angle1 = angle_step * (i + i%2);
-        double angle2 = angle_step * (i + 1 - i%2);
+        pts->InsertNextPoint(scale*cos(angle_step*i),scale*sin(angle_step*i),0);
+        int i1 = (i + i%2) % NT;
+        int i2 = (i + 1 - i%2) % NT;
+        double angle1 = angle_step * i1;
+        double angle2 = angle_step * i2;
+        double p1[3] = { scale*cos(angle1), scale*sin(angle1), 0 };
+        double p2[3] = { scale*cos(angle2), scale*sin(angle2), 0 };
         switch(type) {
             default:
-            case RHOMBI: red_tris[iCurrentBuffer].push_back(Tri(0,0,scale*cos(angle1),scale*sin(angle1),
-                             scale*cos(angle2),scale*sin(angle2))); break;
-            case DARTS_AND_KITES: red_tris[iCurrentBuffer].push_back(Tri(scale*cos(angle1),scale*sin(angle1),0,0,
-                                      scale*cos(angle2),scale*sin(angle2))); break;
+            case RHOMBI: 
+                red_tris[iCurrentBuffer].push_back(Tri(0,0,0,p1[0],p1[1],1+i1,p2[0],p2[1],1+i2)); 
+                break;
+            case DARTS_AND_KITES: 
+                red_tris[iCurrentBuffer].push_back(Tri(p1[0],p1[1],1+i1,0,0,0,p2[0],p2[1],1+i2)); 
+                break;
         }
     }
 
@@ -379,20 +415,21 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
             {
                 default:
                 case RHOMBI:
-                    px = it->ax + (it->bx - it->ax) / goldenRatio;
-                    py = it->ay + (it->by - it->ay) / goldenRatio;
-                    red_tris[iTargetBuffer].push_back(Tri(it->cx,it->cy,px,py,it->bx,it->by));
-                    blue_tris[iTargetBuffer].push_back(Tri(px,py,it->cx,it->cy,it->ax,it->ay));
+                {
+                    int iP = SplitEdge(*it,0,1,px,py,edge_splits,pts); // split A and B to get a new point P
+                    red_tris[iTargetBuffer].push_back(Tri(it->p[2][0],it->p[2][1],it->index[2],px,py,iP,it->p[1][0],it->p[1][1],it->index[1]));
+                    blue_tris[iTargetBuffer].push_back(Tri(px,py,iP,it->p[2][0],it->p[2][1],it->index[2],it->p[0][0],it->p[0][1],it->index[0]));
                     break;
+                }
                 case DARTS_AND_KITES:
-                    qx = it->ax + (it->bx - it->ax) / goldenRatio;
-                    qy = it->ay + (it->by - it->ay) / goldenRatio;
-                    rx = it->bx + (it->cx - it->bx) / goldenRatio;
-                    ry = it->by + (it->cy - it->by) / goldenRatio;
-                    blue_tris[iTargetBuffer].push_back(Tri(rx,ry,qx,qy,it->bx,it->by));
-                    red_tris[iTargetBuffer].push_back(Tri(qx,qy,it->ax,it->ay,rx,ry));
-                    red_tris[iTargetBuffer].push_back(Tri(it->cx,it->cy,it->ax,it->ay,rx,ry));
+                {
+                    int iQ = SplitEdge(*it,0,1,qx,qy,edge_splits,pts); // split A and B to get point Q
+                    int iR = SplitEdge(*it,1,2,rx,ry,edge_splits,pts); // split B and C to get point R
+                    blue_tris[iTargetBuffer].push_back(Tri(rx,ry,iR,qx,qy,iQ,it->p[1][0],it->p[1][1],it->index[1]));
+                    red_tris[iTargetBuffer].push_back(Tri(qx,qy,iQ,it->p[0][0],it->p[0][1],it->index[0],rx,ry,iR));
+                    red_tris[iTargetBuffer].push_back(Tri(it->p[2][0],it->p[2][1],it->index[2],it->p[0][0],it->p[0][1],it->index[0],rx,ry,iR));
                     break;
+                }
             }
         }
         // subdivide the blue triangles
@@ -402,79 +439,53 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
             {
                 default:
                 case RHOMBI:
-                    qx = it->bx + (it->ax - it->bx) / goldenRatio;
-                    qy = it->by + (it->ay - it->by) / goldenRatio;
-                    rx = it->bx + (it->cx - it->bx) / goldenRatio;
-                    ry = it->by + (it->cy - it->by) / goldenRatio;
-                    red_tris[iTargetBuffer].push_back(Tri(rx,ry,qx,qy,it->ax,it->ay));
-                    blue_tris[iTargetBuffer].push_back(Tri(rx,ry,it->cx,it->cy,it->ax,it->ay));
-                    blue_tris[iTargetBuffer].push_back(Tri(qx,qy,rx,ry,it->bx,it->by));
+                {
+                    int iQ = SplitEdge(*it,1,0,qx,qy,edge_splits,pts); // split B and A to get point Q
+                    int iR = SplitEdge(*it,1,2,rx,ry,edge_splits,pts); // split B and C to get point R
+                    red_tris[iTargetBuffer].push_back(Tri(rx,ry,iR,qx,qy,iQ,it->p[0][0],it->p[0][1],it->index[0]));
+                    blue_tris[iTargetBuffer].push_back(Tri(rx,ry,iR,it->p[2][0],it->p[2][1],it->index[2],it->p[0][0],it->p[0][1],it->index[0]));
+                    blue_tris[iTargetBuffer].push_back(Tri(qx,qy,iQ,rx,ry,iR,it->p[1][0],it->p[1][1],it->index[1]));
                     break;
+                }
                 case DARTS_AND_KITES:
-                    px = it->cx + (it->ax - it->cx) / goldenRatio;
-                    py = it->cy + (it->ay - it->cy) / goldenRatio;
-                    blue_tris[iTargetBuffer].push_back(Tri(it->bx,it->by,px,py,it->ax,it->ay));
-                    red_tris[iTargetBuffer].push_back(Tri(px,py,it->cx,it->cy,it->bx,it->by));
+                {
+                    int iP = SplitEdge(*it,2,0,px,py,edge_splits,pts); // split C and A to get point P
+                    blue_tris[iTargetBuffer].push_back(Tri(it->p[1][0],it->p[1][1],it->index[1],px,py,iP,it->p[0][0],it->p[0][1],it->index[0]));
+                    red_tris[iTargetBuffer].push_back(Tri(px,py,iP,it->p[2][0],it->p[2][1],it->index[2],it->p[1][0],it->p[1][1],it->index[1]));
                     break;
+                }
             }
         }
         iCurrentBuffer = iTargetBuffer;
     }
 
-    vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
+    // merge triangles that have abutting open edges into quads
     vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-
-    // merge coincident vertices and merge abutting triangles into quads
-    double tol = hypot2(red_tris[iCurrentBuffer][0].ax-red_tris[iCurrentBuffer][0].bx,red_tris[iCurrentBuffer][0].ay-red_tris[iCurrentBuffer][0].by)/100.0;
-    vector<pair<double,double> > verts;
-    vector<TriIndices> tris;
-    vector<Tri> all_tris(red_tris[iCurrentBuffer]);
-    all_tris.insert(all_tris.end(),blue_tris[iCurrentBuffer].begin(),blue_tris[iCurrentBuffer].end());
-    for(vector<Tri>::const_iterator it = all_tris.begin();it!=all_tris.end();it++)
     {
-        TriIndices tri;
-        for(int i=0;i<3;i++)
+        vector<Tri> all_tris(red_tris[iCurrentBuffer]);
+        all_tris.insert(all_tris.end(),blue_tris[iCurrentBuffer].begin(),blue_tris[iCurrentBuffer].end());
+        TPairIndex half_quads; // for each open edge, what is the index of its triangle?
+        TPairIndex::const_iterator found;
+        for(int iTri = 0; iTri<(int)all_tris.size(); iTri++)
         {
-            switch(i)
+            // is this the other half of a triangle we've seen previously?
+            pair<int,int> edge(all_tris[iTri].index[1],all_tris[iTri].index[2]);
+            found = half_quads.find(edge);
+            if(found!=half_quads.end())
             {
-                case 0: px = it->ax; py = it->ay; break;
-                case 1: px = it->bx; py = it->by; break;
-                case 2: px = it->cx; py = it->cy; break;
-            }
-            // have we seen px,py before?
-            int iPt;
-            bool found = false;
-            for(int j=0;j<(int)verts.size();j++)
-            {
-                if(hypot2(verts[j].first-px,verts[j].second-py) < tol)
-                {
-                    iPt = j;
-                    found = true;
-                    break;
-                }
-            }
-            if(!found)
-            {
-                verts.push_back(make_pair(px,py));
-                pts->InsertNextPoint(px,py,0);
-                iPt = (int)verts.size()-1;
-            }
-            tri.ind[i] = iPt;
-        }
-        // is this the other half of a triangle we've seen previously?
-        for(vector<TriIndices>::const_iterator it2 = tris.begin();it2!=tris.end();it2++)
-        {
-            if( (it2->ind[1] == tri.ind[1] && it2->ind[2] == tri.ind[2]) || (it2->ind[2] == tri.ind[1] && it2->ind[1] == tri.ind[2]) )
-            {
+                // output a quad (no need to store the triangle)
                 cells->InsertNextCell(4);
-                cells->InsertCellPoint(tri.ind[0]);
-                cells->InsertCellPoint(tri.ind[1]);
-                cells->InsertCellPoint(it2->ind[0]);
-                cells->InsertCellPoint(tri.ind[2]);
+                cells->InsertCellPoint(all_tris[iTri].index[0]);
+                cells->InsertCellPoint(all_tris[iTri].index[1]);
+                cells->InsertCellPoint(all_tris[found->second].index[0]);
+                cells->InsertCellPoint(all_tris[iTri].index[2]);
+            }
+            else
+            {
+                // this triangle has not yet found its other half so store it for later
+                half_quads[edge] = iTri;
             }
         }
-        // go ahead and add the tri now
-        tris.push_back(tri);
     }
     
     mesh->SetPoints(pts);
