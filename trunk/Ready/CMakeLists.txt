@@ -115,6 +115,7 @@ set( PATTERN_FILES
   Patterns/penrose_life.vtu
   Patterns/penrose_life_oscillators.vtu
   Patterns/penrose_goucher_glider.vtu
+  Patterns/penrose_imai_glider_B2SC4.vtu
   Patterns/bunny.vtu
   Patterns/horse.vtu
   Patterns/lion.vtu
