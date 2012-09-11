@@ -4,19 +4,39 @@
   
     <description>
       Conway's Game of Life, implemented on a torus. 
-      
-      Our implementation uses the OpenCL function step(edge,x) which returns 1 if x>edge, else 0.
     </description>
     
-    <rule name="B3/S23" type="formula">
-    
-      <param name="timestep"> 1 </param>
-      
-      <formula number_of_chemicals="1">
-        delta_a = step(1.25f,laplacian_a)*step(-1.75f,-laplacian_a) -
-                  step(3.25f,-laplacian_a) - step(0.5f,a)*step(-2.25f,laplacian_a);
-        delta_a += step(0.5f,a)-a; // round output to nearest of 0 or 1
-      </formula>
+    <rule type="kernel" name="B3/S23">
+        
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(
+                __global float* a_in,
+                __global float* a_out,
+                __global int* neighbor_indices,
+                __global float* neighbor_weights,
+                const int max_neighbors) 
+        {
+            const int x = get_global_id(0);
+            // count neighbors
+            int n1=0;
+            int offset = x * max_neighbors;
+            for(int i=0;i&lt;max_neighbors;i++)
+            {
+                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                    continue; // not a neighbor
+                int y = round(a_in[neighbor_indices[offset+i]]);
+                if(y==1) n1++;
+            }
+            // update step:
+            int a = round(a_in[x]);
+            if(a==0 &amp;&amp; n1==3)
+                a_out[x] = 1.0f; // B3
+            else if(a==1 &amp;&amp; (n1==2 || n1==3))
+                a_out[x] = 1.0f; // S23
+            else
+                a_out[x] = 0.0f;
+        }
+      </kernel>
       
     </rule>
     

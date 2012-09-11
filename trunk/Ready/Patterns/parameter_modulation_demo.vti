@@ -16,7 +16,6 @@
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = D_b * laplacian_b + a*b*b - (F+k-c*0.005f)*b;
-        delta_c = 0.0f;
       </formula>
       
     </rule>

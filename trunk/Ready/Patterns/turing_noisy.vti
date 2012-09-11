@@ -17,7 +17,7 @@
       <formula number_of_chemicals="3">
           delta_a = k * (16.0f - a * b) + D_a * laplacian_a;
           delta_b = max( -b, k * (a * b - b - 12.0f) + c + c + D_b * laplacian_b );
-          delta_c = (fmod(c+laplacian_c,1)-c)/timestep; // randomness [-1,1]
+          c = fmod(c+laplacian_c,1); // randomness [-1,1]
       </formula>
       
     </rule>
