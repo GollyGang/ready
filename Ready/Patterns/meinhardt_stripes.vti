@@ -22,7 +22,6 @@
         delta_c = 0.01f * a * a * e * f + 0.01f * b * b * d - c * k_c;
         delta_d = (a - d) * k_de + diff2 * laplacian_d;
         delta_e = (b - e) * k_de + diff2 * laplacian_e;
-        delta_f = 0.0f;
       </formula>
       
     </rule>

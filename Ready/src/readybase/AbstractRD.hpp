@@ -189,7 +189,7 @@ class AbstractRD
 
         void ClearInitialPatternGenerator();
 
-        virtual void FlipPaintAction(PaintAction& cca) =0; /// << Undo/redo this paint action.
+        virtual void FlipPaintAction(PaintAction& cca) =0; ///< Undo/redo this paint action.
         void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.
 };
 

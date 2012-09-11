@@ -24,7 +24,7 @@
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a) + c*noise;
         delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
-        delta_c = (fmod(c+laplacian_c,1)-c)/timestep; // randomness [-1,1]
+        c = fmod(c+laplacian_c,1); // randomness [-1,1]
       </formula>
       
     </rule>

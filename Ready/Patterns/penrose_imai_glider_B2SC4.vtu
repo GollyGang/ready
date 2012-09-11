@@ -52,15 +52,7 @@
         <white_noise low="0" high="4">
           
         </white_noise>
-        <rectangle>
-          <point3D x="0.5" y="0" z="0">
-            
-          </point3D>
-          <point3D x="1" y="1" z="1">
-            
-          </point3D>
-          
-        </rectangle>
+        <everywhere />
         
       </overlay>
       
