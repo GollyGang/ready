@@ -699,7 +699,7 @@ void MeshGenerators::GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid *mesh,
 void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems)
 {
     // a truncated octahedron
-    const float coords[24][3] = { 
+    const double coords[24][3] = { 
         {0,1,2}, {0,-1,2}, {0,1,-2}, {0,-1,-2},   // 0,1,2,3
         {0,2,1}, {0,-2,1}, {0,2,-1}, {0,-2,-1},   // 4,5,6,7
         {1,0,2}, {-1,0,2}, {1,0,-2}, {-1,0,-2},   // 8,9,10,11
@@ -766,7 +766,7 @@ void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
 void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems)
 {
     // a rhombic dodecahedron
-    const float coords[14][3] = { 
+    const double coords[14][3] = { 
         {-2,0,0},{2,0,0},{0,-2,0},{0,2,0},{0,0,-2},{0,0,2}, // 0,1,2,3,4,5,
         {-1,-1,-1},{-1,-1,1},{-1,1,-1},{-1,1,1}, // 6,7,8,9
         {1,-1,-1},{1,-1,1},{1,1,-1},{1,1,1} // 10,11,12,13
@@ -823,9 +823,9 @@ void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
 void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_chems)
 {
     // a triakis truncated tetrahedron: 16 points, 4 hexagonal faces, 12 triangular faces
-    const float RR2 = 1.0f / sqrt(2.0f); // reciprocal of root 2
-    const float third = 1.0f / 3.0f;
-    const float coords[16][3] = { 
+    const double RR2 = 1.0 / sqrt(2.0); // reciprocal of root 2
+    const double third = 1.0 / 3.0;
+    const double coords[16][3] = { 
         //{-1,0,-RR2}, {1,0,-RR2}, {0,-1,RR2}, {0,1,RR2},          // (tips of the original tetrahedron)
         {-2*third,0,-2*third*RR2}, {2*third,0,-2*third*RR2},       // 0, 1
         {0,-2*third,2*third*RR2}, {0,2*third,2*third*RR2},         // 2, 3 (centroids of the snipped-off tetrahedra)
@@ -855,8 +855,8 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
                 vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
                 for(int i=0;i<16;i++) 
                 {
-                    float offset[3] = { x*(1+third), y*(1+third), (z/2)*RR2*(1+third) + (z%2)*2*third*RR2 };
-                    float mx=0.0f,my=0.0f;
+                    double offset[3] = { x*(1+third), y*(1+third), (z/2)*RR2*(1+third) + (z%2)*2*third*RR2 };
+                    double mx=0.0,my=0.0;
                     if((z/2)%2)
                     {
                         mx = 2*third;
