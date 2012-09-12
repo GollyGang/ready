@@ -1460,15 +1460,16 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     // ask user what type of dataset to generate:
     enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
-        BodyCentredCubic, FaceCentredCubic }; // TODO: tetrahedral grid (different kinds)
+        BodyCentredCubic, FaceCentredCubic, Diamond }; // TODO: tetrahedral grid (different kinds)
     int sel;
     {
-        const int N_CHOICES = 15;
+        const int N_CHOICES = 16;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Triangular mesh"), _("Hexagonal mesh"),
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
-            _("Random 2D Delaunay mesh"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay mesh"), 
-            _("Body-centred cubic honeycomb"), _("Face-centred cubic honeycomb") };
+            _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay mesh (tetrahedra)"), 
+            _("Body-centred cubic honeycomb (truncated octahedra)"), _("Face-centred cubic honeycomb (rhombic dodecahedra)"), 
+            _("Diamond lattice cells (triakis truncated tetrahedra)") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1902,6 +1903,41 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2);
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+				else
+					mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(true);
+                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                break;
+            }
+            break;
+            case Diamond:
+            {
+                int side;
+                {
+                    const int N_CHOICES = 3;
+                    int choices[N_CHOICES] = {5,10,20};
+                    int cells[N_CHOICES] = {250,2000,16000};
+                    wxString descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Diamond lattice cells options"),N_CHOICES,descriptions);
+                    dlg.SetSelection(0); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) return;
+                    side = choices[dlg.GetSelection()];
+                }
+                wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetDiamondCells(side,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
 					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);

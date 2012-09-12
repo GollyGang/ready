@@ -53,4 +53,7 @@ namespace MeshGenerators
 
     /// Make a honeycomb from rhombic dodecahedra.
     void GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems);
+
+    /// Make triakis truncated tetrahedra - the Voronoi cells of the carbon atoms in a diamond lattice.
+    void GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_chems);
 }
