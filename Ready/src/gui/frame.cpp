@@ -1467,9 +1467,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Triangular mesh"), _("Hexagonal mesh"),
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
-            _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay mesh (tetrahedra)"), 
+            _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay honeycomb (tetrahedra)"), 
             _("Body-centred cubic honeycomb (truncated octahedra)"), _("Face-centred cubic honeycomb (rhombic dodecahedra)"), 
-            _("Diamond lattice cells (triakis truncated tetrahedra)") };
+            _("Diamond honeycomb (triakis truncated tetrahedra)") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1763,7 +1763,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d cells",choices[i]*2); // (rough approximation)
-                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Delaunay mesh options"),N_CHOICES,div_descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Delaunay 2D mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
@@ -1795,7 +1795,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d cells",choices[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Voronoi mesh options"),N_CHOICES,div_descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Voronoi 2D mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
@@ -1827,7 +1827,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         div_descriptions[i] = wxString::Format("%d points - approximately %d cells",choices[i],choices[i]*6);
-                    wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Delaunay mesh options"),N_CHOICES,div_descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Delaunay 3D mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
@@ -1858,7 +1858,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Body-centred cubic mesh options"),N_CHOICES,descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Body-centred cubic honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
@@ -1893,7 +1893,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Face-centred cubic mesh options"),N_CHOICES,descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Face-centred cubic honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
@@ -1928,7 +1928,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxString descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
                         descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Diamond lattice cells options"),N_CHOICES,descriptions);
+                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Diamond honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) return;
