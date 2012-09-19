@@ -32,6 +32,7 @@ class vtkImageData;
 // STL:
 #include <string>
 #include <vector>
+#include <map>
 
 /// Abstract base class for all reaction-diffusion systems.
 class AbstractRD
@@ -154,7 +155,23 @@ class AbstractRD
         virtual void Redo();  ///< Redo all actions until the next undo point.
         void SetUndoPoint();  ///< Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block.
 
-    protected:
+    protected: // typedefs
+
+        enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
+        // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
+
+        enum TWeight { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE, RANGE, VERTEX_NEIGHBORS_RANGE, 
+            EDGE_NEIGHBORS_RANGE, FACE_NEIGHBORS_RANGE };
+        // (not intending to support all of these options immediately, but here for thought)
+        // EQUAL: all weights are 1
+        // EUCLIDEAN_DISTANCE: weights are scaled by the distance to each cell centroid
+        // BOUNDARY_SIZE: weights are scaled by the length/area of the shared geometry between two neighbors
+        // RANGE: weight is minimum TNeighborhood steps to get from central cell
+        // VERTEX_NEIGHBORS_RANGE: weight is minimum vertex-neighbors steps to get from central cell
+        // EDGE_NEIGHBORS_RANGE: weight is minimum edge-neighbors steps to get from central cell
+        // FACE_NEIGHBORS_RANGE: weight is minimum face-neighbors steps to get from central cell
+
+    protected: // variables
 
         std::string rule_name, description;
 
@@ -182,7 +199,17 @@ class AbstractRD
         };
         std::vector<PaintAction> undo_stack;
 
-    protected:
+        TNeighborhood neighborhood_type;
+        int neighborhood_range;
+        TWeight neighborhood_weight_type;
+
+        std::map<TNeighborhood,std::string> canonical_neighborhood_type_identifiers;
+        std::map<std::string,TNeighborhood> recognized_neighborhood_type_identifiers;
+
+        std::map<TWeight,std::string> canonical_neighborhood_weight_identifiers;
+        std::map<std::string,TWeight> recognized_neighborhood_weight_identifiers;
+
+    protected: // functions
 
         /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;

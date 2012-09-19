@@ -132,10 +132,15 @@ in <a href="edit:Patterns/munafo-uskate.vti">munafo-uskate.vti</a> for an exampl
 <p>
 Attributes:
 <ul><li><tt>type</tt> (required) : "inbuilt" or "formula" or "kernel".
-<li><tt>name</tt> (required) : The name of this rule. If type="inbuilt" then name must match one of the inbuilt rules
-(currently just "Gray-Scott").
-<li><tt>wrap</tt> (optional) : "1" if the data should wrap around to make a toroidal topology (where applicable), 
-or "0" if the data should have a boundary. Default: "1".
+<li><tt>name</tt> (required) : The name of this rule. If type="inbuilt" then name must match one of 
+the inbuilt rules (currently just "Gray-Scott").
+<li><tt>wrap</tt> (optional) : "1" if the data should wrap around, or "0" if the data should have a 
+boundary. Currently only affects images, not meshes. Default: "1".
+<li><tt>neighborhood_type</tt> (optional) : "vertex" for vertex-neighbors, "edge" for edge-neighbors 
+or "face" for face-neighbors. Currently only affect meshes with kernel rules. Default: "vertex".
+<li><tt>neighborhood_range</tt> (optional) : integer range for the cell neighborhood. Currently only 
+"1" is supported. Default: "1".
+<li><tt>neighborhood_weight</tt> (optional) : Currently only "equal" is supported. Default: "equal".
 </ul>
 <p>Contains:
 <ul>

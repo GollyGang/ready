@@ -221,9 +221,8 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
         this->cell_locator = NULL;
     }
 
-    this->ComputeCellNeighbors(VERTEX_NEIGHBORS,1,EQUAL);
-    // TODO: allow these parameters to be specified as file options
-
+    this->ComputeCellNeighbors(this->neighborhood_type,this->neighborhood_range,
+        this->neighborhood_weight_type);
 }
 
 // ---------------------------------------------------------------------
@@ -475,8 +474,8 @@ void add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
 
 void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type)
 {
-    // TODO: for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as possible
-    //       (if mesh if non-manifold (edges not used exactly twice, or verts with non-edge-connected cells) then order
+    // TODO: for 2D cells, ensure that vertex-neighbors are in cyclic order as far as possible
+    //       (if mesh is non-manifold (edges not used exactly twice, or verts with non-edge-connected cells) then order
     //        won't mean much but that's ok)
     
     if(weight_type!=EQUAL)
@@ -524,7 +523,6 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
             break;
             case EDGE_NEIGHBORS: // neighbors share an edge
             {
-                // TODO: enforce cyclical order as far as possible (if 2D manifold)
                 vtkCell* pCell = this->mesh->GetCell(iCell);
                 for(int iEdge=0;iEdge<pCell->GetNumberOfEdges();iEdge++)
                 {
@@ -545,7 +543,6 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
             break;
             case FACE_NEIGHBORS:
             {
-                // (there's no natural order for the neighbors of 3D cells)
                 vtkCell* pCell = this->mesh->GetCell(iCell);
                 for(int iEdge=0;iEdge<pCell->GetNumberOfFaces();iEdge++)
                 {
