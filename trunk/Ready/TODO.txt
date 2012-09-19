@@ -7,33 +7,39 @@ UI annoyances:
 Big picture issues:
 - Dan Wills enquired whether could use readybase as a back-end engine to Houdini. In general this 
   could be an awesome way to reach more users - appear as a Houdini/Blender plugin, for example. 
-  I've added a command-line version of Ready, just to demonstrate the possibilities.
+  I've added "rdy", a command-line version of Ready, just to demonstrate the possibilities.
 - Would love an Android version but OpenCL isn't supported. Renderscript Compute seems to be the 
   thing but kernels are compiled at build time, which isn't what we want. Could work as a pattern 
-  viewer, allowing users to finger paint. NDK is another possibility.
+  viewer, allowing users to finger paint. NDK is another possibility. Maybe OpenGL ES, with a 
+  shader - fits in with WebGL Playground idea below.
 - Scripting support
 
 before 0.5 release:
 
-- way to expand mesh grids where possible?
-- progress indicator for mesh generators
+- way to expand mesh grids where possible? not sure how
+- progress indicator for mesh generators?
 - documentation bug: can change the size of any pattern
 - document meaning of dimensions, especially for meshes
 - way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
 - way to switch between inbuilt, formula and kernel
 
-- 3D images should show cell color when use_image_interpolation=false
-- expose neighborhood type (vert/edge/face-neighbors) as a file option
-- for 2D cells, ensure that neighbors are in cyclic order (for rules such as Hex-B2oS2m34) as far as
-  possible
+- 3D images should show cell color when use_image_interpolation=false, to match behavior we like in
+  meshes
 
+- support more values for neighborhood_range and neighborhood_weight
+- support neighborhood specifiers on images
+- show neighborhood_type, neighborhood_range and neighborhood_weight in the Info Panel, even if 
+  can't yet change them
+- document neighborhood_type changes, when more mature
+- have Laplacians defined by neighborhood specifiers? Original idea was:
+- Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
+  5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
+  used a boundary-size weighting. Robert recommends an unequal 9pt stencil for square grids.
+  
 - current color button should be replaced by spectrum slider plus value indicators?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - relax power of 2 size requirement (only a speed benefit)
-- Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
-  5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
-  used a boundary-size weighting. Robert recommends an unequal 9pt stencil for square grids.
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - allow block size to be changed for formula rules on images
 - add timesteps_per_render to action toolbar
@@ -59,6 +65,7 @@ before 0.x release:
 - 2D slices as slice through 3D volume (if available, else whole image) =>
   1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
+- for 2D mesh cells with neighborhood_type="vertex", ensure that neighbors are in cyclic order
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?

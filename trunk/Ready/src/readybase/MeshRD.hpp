@@ -71,19 +71,7 @@ class MeshRD : public AbstractRD
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
 
-    protected:
-
-        enum TNeighborhood { VERTEX_NEIGHBORS=0, EDGE_NEIGHBORS=1, FACE_NEIGHBORS=2 }; // minimum dimensionality of shared geometry
-        // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
-        enum TWeight { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE, RANGE, VERTEX_NEIGHBORS_RANGE, EDGE_NEIGHBORS_RANGE, FACE_NEIGHBORS_RANGE };
-        // (not intending to support all of these options immediately, but here for thought)
-        // EQUAL: all weights are 1
-        // EUCLIDEAN_DISTANCE: weights are scaled by the distance to each cell centroid
-        // BOUNDARY_SIZE: weights are scaled by the length/area of the shared geometry between two neighbors
-        // RANGE: weight is minimum TNeighborhood steps to get from central cell
-        // VERTEX_NEIGHBORS_RANGE: weight is minimum vertex-neighbors steps to get from central cell
-        // EDGE_NEIGHBORS_RANGE: weight is minimum edge-neighbors steps to get from central cell
-        // FACE_NEIGHBORS_RANGE: weight is minimum face-neighbors steps to get from central cell
+    protected: // functions
 
         /// work out which cells are neighbors of each other
         void ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type);
@@ -95,7 +83,7 @@ class MeshRD : public AbstractRD
 
         virtual void FlipPaintAction(PaintAction& cca);
 
-    protected:
+    protected: // variables
 
         vtkUnstructuredGrid* mesh;             ///< the cell data contains a named array for each chemical ('a', 'b', etc.)
         vtkUnstructuredGrid* starting_pattern; ///< we save the starting pattern, to allow the user to reset

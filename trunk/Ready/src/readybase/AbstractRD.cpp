@@ -34,6 +34,10 @@ AbstractRD::AbstractRD()
     this->is_modified = false;
     this->wrap = true;
 
+    this->neighborhood_type = VERTEX_NEIGHBORS;
+    this->neighborhood_range = 1;
+    this->neighborhood_weight_type = EQUAL;
+
     #if defined(USE_SSE)
         // disable accurate handling of denormals and zeros, for speed
         #if (defined(__i386__) || defined(__x64_64__) || defined(__amd64__) || defined(_M_X64) || defined(_M_IX86))
@@ -42,6 +46,15 @@ AbstractRD::AbstractRD()
          _mm_setcsr( newMXCSR ); //write the new MXCSR setting to the MXCSR
         #endif
     #endif // (USE_SSE)
+
+    this->canonical_neighborhood_type_identifiers[VERTEX_NEIGHBORS] = "vertex";
+    this->canonical_neighborhood_type_identifiers[EDGE_NEIGHBORS] = "edge";
+    this->canonical_neighborhood_type_identifiers[FACE_NEIGHBORS] = "face";
+    for(map<TNeighborhood,string>::const_iterator it = this->canonical_neighborhood_type_identifiers.begin();it != this->canonical_neighborhood_type_identifiers.end();it++)
+        this->recognized_neighborhood_type_identifiers[it->second] = it->first;
+    this->canonical_neighborhood_weight_identifiers[EQUAL] = "equal";
+    for(map<TWeight,string>::const_iterator it = this->canonical_neighborhood_weight_identifiers.begin();it != this->canonical_neighborhood_weight_identifiers.end();it++)
+        this->recognized_neighborhood_weight_identifiers[it->second] = it->first;
 }
 
 // ---------------------------------------------------------------------
@@ -193,7 +206,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     // check whether we should warn the user that they need to update Ready
     {
         read_required_attribute(rd,"format_version",i);
-        warn_to_update = (i>2);
+        warn_to_update = (i>3);
         // (we will still proceed and try to read the file but it might fail or give poor results)
     }
 
@@ -208,6 +221,31 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     s = rule->GetAttribute("wrap");
     if(!s) this->wrap = true;
     else this->wrap = (string(s)=="1");
+
+    // neighborhood specifiers
+
+    s = rule->GetAttribute("neighborhood_type");
+    if(!s) this->neighborhood_type = VERTEX_NEIGHBORS;
+    else if(this->recognized_neighborhood_type_identifiers.find(s)==this->recognized_neighborhood_type_identifiers.end())
+        throw runtime_error("Unrecognized neighborhood_type");
+    else this->neighborhood_type = this->recognized_neighborhood_type_identifiers[s];
+
+    s = rule->GetAttribute("neighborhood_range");
+    if(!s) this->neighborhood_range = 1;
+    else {
+        istringstream iss(s);
+        iss >> this->neighborhood_range;
+    }
+    if(neighborhood_range!=1)
+        throw runtime_error("Unsupported neighborhood range");
+
+    s = rule->GetAttribute("neighborhood_weight");
+    if(!s) this->neighborhood_weight_type = EQUAL;
+    else if(this->recognized_neighborhood_weight_identifiers.find(s)==this->recognized_neighborhood_weight_identifiers.end())
+        throw runtime_error("Unrecognized neighborhood_weight");
+    else this->neighborhood_weight_type = this->recognized_neighborhood_weight_identifiers[s];
+    if(neighborhood_weight_type!=EQUAL)
+        throw runtime_error("Unsupported neighborhood weight type");
 
     // parameters:
     this->DeleteAllParameters();
@@ -246,7 +284,7 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML() const
 {
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
-    rd->SetIntAttribute("format_version",2);
+    rd->SetIntAttribute("format_version",3);
     // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
 
     // description
@@ -262,6 +300,9 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML() const
     rule->SetAttribute("type",this->GetRuleType().c_str());
     if(this->HasEditableWrapOption())
         rule->SetIntAttribute("wrap",this->GetWrap()?1:0);
+    rule->SetAttribute("neighborhood_type",this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second.c_str());
+    rule->SetIntAttribute("neighborhood_range",this->neighborhood_range);
+    rule->SetAttribute("neighborhood_weight",this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second.c_str());
     for(int i=0;i<this->GetNumberOfParameters();i++)    // parameters
     {
         vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();
