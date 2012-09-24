@@ -16,7 +16,7 @@ Big picture issues:
 
 before 0.5 release:
 
-- way to expand mesh grids where possible? not sure how
+- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap too
 - progress indicator for mesh generators?
 - documentation bug: can change the size of any pattern
 - document meaning of dimensions, especially for meshes
@@ -65,7 +65,6 @@ before 0.x release:
 - 2D slices as slice through 3D volume (if available, else whole image) =>
   1D slice as line through 2D slice (if available, else whole image)
 - implement suggested_running_speed (tu/s) instead of timesteps_per_render
-- for 2D mesh cells with neighborhood_type="vertex", ensure that neighbors are in cyclic order
 
 before 1.0 release:
 - use_image_interpolation=false should give city blocks in the displacement-mapped surface?
