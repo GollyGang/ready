@@ -470,14 +470,24 @@ void add_if_new(vector<TNeighbor>& neighbors,TNeighbor neighbor)
     neighbors.push_back(neighbor);
 }
 
+bool IsEdgeNeighbor(vtkUnstructuredGrid *grid,vtkIdType iCell1,vtkIdType iCell2)
+{
+    vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
+    vtkCell* pCell = grid->GetCell(iCell1);
+    for(int iEdge=0;iEdge<pCell->GetNumberOfEdges();iEdge++)
+    {
+        vtkIdList *vertIds = pCell->GetEdge(iEdge)->GetPointIds();
+        grid->GetCellNeighbors(iCell1,vertIds,cellIds);
+        if(cellIds->IsId(iCell2)>=0)
+            return true;
+    }
+    return false;
+}
+
 // ---------------------------------------------------------------------
 
 void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type)
 {
-    // TODO: for 2D cells, ensure that vertex-neighbors are in cyclic order as far as possible
-    //       (if mesh is non-manifold (edges not used exactly twice, or verts with non-edge-connected cells) then order
-    //        won't mean much but that's ok)
-    
     if(weight_type!=EQUAL)
         throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
     if(range!=1)
@@ -501,9 +511,30 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
         {
             case VERTEX_NEIGHBORS: // neighbors share a vertex
             {
-                // TODO: enforce cyclical order as far as possible (if 2D manifold)
                 vtkSmartPointer<vtkIdList> vertIds = vtkSmartPointer<vtkIdList>::New();
                 vertIds->SetNumberOfIds(1);
+                // first try to add neighbors that are also edge-neighbors of the previously added cell
+                size_t n_previously;
+                do {
+                    n_previously = neighbors.size();
+                    for(vtkIdType iPt=0;iPt<npts;iPt++)
+                    {
+                        vertIds->SetId(0,ptIds->GetId(iPt));
+                        this->mesh->GetCellNeighbors(iCell,vertIds,cellIds);
+                        for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
+                        {
+                            nbor.iNeighbor = cellIds->GetId(iNeighbor);
+                            switch(weight_type)
+                            {
+                                case EQUAL: nbor.weight = 1.0f; break;
+                                default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
+                            }
+                            if(neighbors.empty() || IsEdgeNeighbor(this->mesh,neighbors.back().iNeighbor,nbor.iNeighbor))
+                                add_if_new(neighbors,nbor);
+                        }
+                    }
+                } while(neighbors.size() > n_previously);
+                // add any remaining neighbors (in case mesh is non-manifold)
                 for(vtkIdType iPt=0;iPt<npts;iPt++)
                 {
                     vertIds->SetId(0,ptIds->GetId(iPt));

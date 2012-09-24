@@ -157,18 +157,18 @@ void MeshGenerators::GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,i
             {
                 cells->InsertNextCell(3);
                 cells->InsertCellPoint(y*nx+x);
-                cells->InsertCellPoint((y-1)*nx+x+1);
                 cells->InsertCellPoint((y-1)*nx+x);
+                cells->InsertCellPoint((y-1)*nx+x+1);
                 cells->InsertNextCell(3);
                 cells->InsertCellPoint(y*nx+x);
-                cells->InsertCellPoint(y*nx+x+1);
                 cells->InsertCellPoint((y-1)*nx+x+1);
+                cells->InsertCellPoint(y*nx+x+1);
                 if(y<ny-1)
                 {
                     cells->InsertNextCell(3);
                     cells->InsertCellPoint(y*nx+x);
-                    cells->InsertCellPoint((y+1)*nx+x);
                     cells->InsertCellPoint((y+1)*nx+x+1);
+                    cells->InsertCellPoint((y+1)*nx+x);
                     cells->InsertNextCell(3);
                     cells->InsertCellPoint(y*nx+x);
                     cells->InsertCellPoint(y*nx+x+1);
