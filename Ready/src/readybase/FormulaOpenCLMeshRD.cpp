@@ -40,8 +40,8 @@ FormulaOpenCLMeshRD::FormulaOpenCLMeshRD(int opencl_platform,int opencl_device)
     this->AddParameter("k",0.06f);
     this->AddParameter("F",0.035f);
     this->SetFormula("\
-    delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
-    delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;\n");
+delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
+delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;");
 }
 
 // -------------------------------------------------------------------------
