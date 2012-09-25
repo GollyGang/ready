@@ -289,8 +289,13 @@ MyFrame::MyFrame(const wxString& title)
         this->OpenFile(initfile);
     } else {
         // create new pattern
-        wxCommandEvent cmdevent(wxID_NEW);
-        OnNewPattern(cmdevent);
+        this->InitializeDefaultRenderSettings();
+        GrayScottImageRD *s = new GrayScottImageRD();
+        s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
+        s->SetModified(false);
+        s->SetFilename("untitled");
+        s->GenerateInitialPattern();
+        this->SetCurrentRDSystem(s);
     }
 }
 
@@ -1444,20 +1449,8 @@ void MyFrame::SaveFile(const wxString& path)
 
 void MyFrame::OnNewPattern(wxCommandEvent& event)
 {
-    this->InitializeDefaultRenderSettings();
-    if(this->system == NULL) {
-        // initial call from MyFrame::MyFrame
-        GrayScottImageRD *s = new GrayScottImageRD();
-        s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
-        s->SetModified(false);
-        s->SetFilename("untitled");
-        s->GenerateInitialPattern();
-        this->SetCurrentRDSystem(s);
-        return;
-    }
-
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-
+    
     // ask user what type of dataset to generate:
     enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
         BodyCentredCubic, FaceCentredCubic, Diamond }; // TODO: tetrahedral grid (different kinds)
@@ -1476,6 +1469,12 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         if(dlg.ShowModal()!=wxID_OK) return;
         sel = dlg.GetSelection();
     }
+
+    // we'll need to restore current render settings if user decides not to create a new pattern
+    // or some sort of error occurs
+    Properties previous_render_settings = this->render_settings;
+    
+    this->InitializeDefaultRenderSettings();
     AbstractRD *sys;
     try 
     {
@@ -1538,7 +1537,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     divs = div_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1569,7 +1571,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the resolution:"),_("Torus tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     nx = x_choices[dlg.GetSelection()];
                     ny = y_choices[dlg.GetSelection()];
                 }
@@ -1601,7 +1606,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Triangular mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     n = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1634,7 +1642,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Hexagonal mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     n = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1667,7 +1678,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Rhombille mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     n = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1700,7 +1714,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     divs = div_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1733,7 +1750,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(2); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     divs = div_choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1766,7 +1786,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Delaunay 2D mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     npts = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1798,7 +1821,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Voronoi 2D mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     npts = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1830,7 +1856,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Delaunay 3D mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     npts = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1861,7 +1890,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Body-centred cubic honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     side = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1896,7 +1928,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Face-centred cubic honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     side = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1931,7 +1966,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Diamond honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) return;
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
                     side = choices[dlg.GetSelection()];
                 }
                 wxBusyCursor busy;
@@ -1956,6 +1994,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             default:
             {
                 wxMessageBox(_("Not currently supported"));
+                this->render_settings = previous_render_settings;
                 return;
             }
         }
@@ -1965,12 +2004,14 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         wxString message = _("Failed to create new pattern. Error:\n\n");
         message += wxString(e.what(),wxConvUTF8);
         MonospaceMessageBox(message,_("Error creating new pattern"),wxART_ERROR);
+        this->render_settings = previous_render_settings;
         return;
     }
     catch(...)
     {
         wxString message = _("Failed to create new pattern.");
         MonospaceMessageBox(message,_("Error creating pattern"),wxART_ERROR);
+        this->render_settings = previous_render_settings;
         return;
     }
     
