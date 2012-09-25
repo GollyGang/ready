@@ -44,8 +44,6 @@ class MeshRD : public AbstractRD
 
         virtual bool HasEditableFormula() const { return true; }
 
-        virtual std::string GetRuleType() const { return "formula"; } // TODO
-
         virtual std::string GetFileExtension() const { return MeshRD::GetFileExtensionStatic(); }
         static std::string GetFileExtensionStatic() { return "vtu"; }
         
