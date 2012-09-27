@@ -444,11 +444,13 @@ class LinearGradient : public BaseFill
             float rel_y = y/system->GetY();
             float rel_z = z/system->GetZ();
             // project this point onto the linear gradient axis
-            return this->val1 + (this->val2-this->val1) 
-                * ( (rel_x-this->p1->x)*(this->p2->x-this->p1->x) 
-                  + (rel_y-this->p1->y)*(this->p2->y-this->p1->y) 
-                  + (rel_z-this->p1->z)*(this->p2->z-this->p1->z) )
-                / hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z) ;
+            float blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
+            float bx = (this->p2->x-this->p1->x) / blen;
+            float by = (this->p2->y-this->p1->y) / blen;
+            float bz = (this->p2->z-this->p1->z) / blen;
+            float dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
+            float u = dp / blen; // [0,1]
+            return this->val1 + (this->val2-this->val1) * u;
         }
 
     protected:
