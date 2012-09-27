@@ -5,7 +5,7 @@
         Wave equation. Here 'a' stores the value, 'b' stores the rate of change.
         
         The wave equation says that the second derivative (the rate of change of the rate of change)
-        is proportional to the Laplacian of the value. Compare with the heat equation, where it is
+        is proportional to the Laplacian of the value. Compare with the &lt;a href=&quot;open:Patterns/heat_equation.vti&quot;&gt;heat equation&lt;/a&gt;, where it is
         the first derivative (the rate of change) that is proportional to the Laplacian.
     </description>
 
