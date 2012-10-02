@@ -50,8 +50,6 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
 {
     const string indent = "    ";
     const int NC = this->GetNumberOfChemicals();
-    const int NDIRS = 6;
-    const string dir[NDIRS]={"left","right","up","down","fore","back"};
 
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
@@ -66,57 +64,369 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             kernel_source << ",";
     }
     // output the first part of the body
-    kernel_source << ")\n{\n\
-    const int x = get_global_id(0);\n\
-    const int y = get_global_id(1);\n\
-    const int z = get_global_id(2);\n\
-    const int X = get_global_size(0);\n\
-    const int Y = get_global_size(1);\n\
-    const int Z = get_global_size(2);\n\
-    const int i_here = X*(Y*z + y) + x;\n\n";
+    kernel_source << ")\n{\n" <<
+        indent << "const int x = get_global_id(0);\n" << 
+        indent << "const int y = get_global_id(1);\n" <<
+        indent << "const int z = get_global_id(2);\n" <<
+        indent << "const int X = get_global_size(0);\n" <<
+        indent << "const int Y = get_global_size(1);\n" <<
+        indent << "const int Z = get_global_size(2);\n" <<
+        indent << "const int i_here = X*(Y*z + y) + x;\n\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << "float4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[i_here];\n"; // "float4 a = a_in[i_here];"
-    // output the Laplacian part of the body
-    kernel_source << "\n\
-    // compute the Laplacians of each chemical\n";
-    if(this->wrap)
-        kernel_source << "\
-    const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n\
-    const int xp1 = ((x+1) & (X-1));\n\
-    const int ym1 = ((y-1+Y) & (Y-1));\n\
-    const int yp1 = ((y+1) & (Y-1));\n\
-    const int zm1 = ((z-1+Z) & (Z-1));\n\
-    const int zp1 = ((z+1) & (Z-1));\n";
-    else
-        kernel_source << "\
-    const int xm1 = max(0,x-1);\n\
-    const int ym1 = max(0,y-1);\n\
-    const int zm1 = max(0,z-1);\n\
-    const int xp1 = min(X-1,x+1);\n\
-    const int yp1 = min(Y-1,y+1);\n\
-    const int zp1 = min(Z-1,z+1);\n";
-    kernel_source << "\
-    const int i_left =  X*(Y*z + y) + xm1;\n\
-    const int i_right = X*(Y*z + y) + xp1;\n\
-    const int i_up =    X*(Y*z + ym1) + x;\n\
-    const int i_down =  X*(Y*z + yp1) + x;\n\
-    const int i_fore =  X*(Y*zm1 + y) + x;\n\
-    const int i_back =  X*(Y*zp1 + y) + x;\n";
-    for(int iC=0;iC<NC;iC++)
-        for(int iDir=0;iDir<NDIRS;iDir++)
-            kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
-    for(int iC=0;iC<NC;iC++)
+    if(this->neighborhood_type==FACE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1) // neighborhood_weight not relevant
     {
-        kernel_source << indent << "float4 laplacian_" << GetChemicalName(iC) << " = (float4)(" << GetChemicalName(iC) << "_up.x + " 
-            << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_down.x + " << GetChemicalName(iC) << "_left.w + " 
-            << GetChemicalName(iC) << "_fore.x + " << GetChemicalName(iC) << "_back.x,\n";
-        kernel_source << indent << GetChemicalName(iC) << "_up.y + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) 
-            << "_down.y + " << GetChemicalName(iC) << ".x + " << GetChemicalName(iC) << "_fore.y + " << GetChemicalName(iC) << "_back.y,\n";
-        kernel_source << indent << GetChemicalName(iC) << "_up.z + " << GetChemicalName(iC) << ".w + " << GetChemicalName(iC) 
-            << "_down.z + " << GetChemicalName(iC) << ".y + " << GetChemicalName(iC) << "_fore.z + " << GetChemicalName(iC) << "_back.z,\n";
-        kernel_source << indent << GetChemicalName(iC) << "_up.w + " << GetChemicalName(iC) << "_right.x + " << GetChemicalName(iC) 
-            << "_down.w + " << GetChemicalName(iC) << ".z + " << GetChemicalName(iC) << "_fore.w + " << GetChemicalName(iC) 
-            << "_back.w) - 6.0f*" << GetChemicalName(iC) << ";\n";
+        const int NDIRS = 6;
+        const string dir[NDIRS]={"left","right","up","down","fore","back"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// 3D 7-point stencil: [ [ 0,0,0; 0,1,0; 0,0,0 ], [0,1,0; 1,-6,1; 0,1,0 ], [ 0,0,0; 0,1,0; 0,0,0 ] ]\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n" << 
+                indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
+                indent << "const int yp1 = ((y+1) & (Y-1));\n" <<
+                indent << "const int zm1 = ((z-1+Z) & (Z-1));\n" <<
+                indent << "const int zp1 = ((z+1) & (Z-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int zm1 = max(0,z-1);\n" <<
+                indent << "const int xp1 = min(X-1,x+1);\n" <<
+                indent << "const int yp1 = min(Y-1,y+1);\n" <<
+                indent << "const int zp1 = min(Z-1,z+1);\n";
+        kernel_source <<
+            indent << "const int i_left =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_right = X*(Y*z + y) + xp1;\n" <<
+            indent << "const int i_up =    X*(Y*z + ym1) + x;\n" <<
+            indent << "const int i_down =  X*(Y*z + yp1) + x;\n" <<
+            indent << "const int i_fore =  X*(Y*zm1 + y) + x;\n" <<
+            indent << "const int i_back =  X*(Y*zp1 + y) + x;\n";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+                chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w + " << chem << "_fore.x + " << chem << "_back.x,\n";
+            kernel_source << indent << 
+                chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x + " << chem << "_fore.y + " << chem << "_back.y,\n";
+            kernel_source << indent << 
+                chem << "_up.z + " << chem << ".w + " << chem << "_down.z + " << chem << ".y + " << chem << "_fore.z + " << chem << "_back.z,\n";
+            kernel_source << indent << 
+                chem << "_up.w + " << chem << "_right.x + " << chem << "_down.w + " << chem << ".z + " << chem << "_fore.w + " << chem << "_back.w) - 6.0f*" << chem << ";\n";
+        } 
+        //                 (x y z w)                               up
+        //       (x y z w) [x y z w] (x y z w)        =     left    .   right      (plus fore and back in the 3rd dimension)
+        //                 (x y z w)                              down
+    }
+    else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1) // neighborhood_weight not relevant
+    {
+        const int NDIRS = 4;
+        const string dir[NDIRS]={"left","right","up","down"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// (2D 5-point stencil)\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n" <<
+                indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
+                indent << "const int yp1 = ((y+1) & (Y-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int xp1 = min(X-1,x+1);\n" <<
+                indent << "const int yp1 = min(Y-1,y+1);\n";
+        kernel_source <<
+            indent << "const int i_left =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_right = X*(Y*z + y) + xp1;\n" <<
+            indent << "const int i_up =    X*(Y*z + ym1) + x;\n" <<
+            indent << "const int i_down =  X*(Y*z + yp1) + x;";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)("
+                << chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w,\n";
+            kernel_source << indent <<
+                chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x,\n";
+            kernel_source << indent << 
+                chem << "_up.z + " << chem << ".w + " << chem << "_down.z + " << chem << ".y,\n";
+            kernel_source << indent << 
+                chem << "_up.w + " << chem << "_right.x + " << chem << "_down.w + " << chem << ".z) - 4.0f*" << chem << ";\n";
+        }
+        //                 (x y z w)                               up
+        //       (x y z w) [x y z w] (x y z w)        =     left    .   right
+        //                 (x y z w)                              down
+    }
+    else if(this->GetArenaDimensionality()==1 && this->neighborhood_range==1) // neighborhood_type and neighborhood_weight not relevant
+    {
+        const int NDIRS = 2;
+        const string dir[NDIRS]={"left","right"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// (1D 3-point stencil: [1,-2,1] )\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n";
+        kernel_source <<
+            indent << "const int i_left =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_right = X*(Y*z + y) + xp1;\n";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)("
+                << chem << ".y + " << chem << "_left.w,\n";
+            kernel_source << indent <<
+                chem << ".z + " << chem << ".x,\n";
+            kernel_source << indent << 
+                chem << ".w + " << chem << ".y,\n";
+            kernel_source << indent << 
+                chem << "_right.x + " << chem << ".z) - 2.0f*" << chem << ";\n";
+        }
+        //       (x y z w) [x y z w] (x y z w)        =     left    .   right
+    }
+    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
+    {
+        const int NDIRS = 8;
+        const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// (2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6 )\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n" <<
+                indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
+                indent << "const int yp1 = ((y+1) & (Y-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int xp1 = min(X-1,x+1);\n" <<
+                indent << "const int yp1 = min(Y-1,y+1);\n";
+        kernel_source <<
+            indent << "const int i_n =  X*(Y*z + ym1) + x;\n" <<
+            indent << "const int i_ne = X*(Y*z + ym1) + xp1;\n" <<
+            indent << "const int i_e =  X*(Y*z + y) + xp1;\n" <<
+            indent << "const int i_se = X*(Y*z + yp1) + xp1;\n" <<
+            indent << "const int i_s =  X*(Y*z + yp1) + x;\n" <<
+            indent << "const int i_sw = X*(Y*z + yp1) + xm1;\n" <<
+            indent << "const int i_w =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_nw = X*(Y*z + ym1) + xm1;\n";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            const float K2 = 1.0f/6.0f;
+            const float K1 = 2.0f/3.0f;
+            const float K3 = 10.0f/3.0f;
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+                chem << "_n.x*" << K1 << " + " << chem << "_n.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_s.y*" << K2 << " + " 
+                << chem << "_s.x*" << K1 << " + " << chem << "_sw.w*" << K2 << " + " << chem << "_w.w*" << K1 << " + " << chem << "_nw.w*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.y*" << K1 << " + " << chem << "_n.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_s.z*" << K2 << " + " 
+                << chem << "_s.y*" << K1 << " + " << chem << "_s.x*" << K2 << " + " << chem << ".x*" << K1 << " + " << chem << "_n.x*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.z*" << K1 << " + " << chem << "_n.w*" << K2 << " + " << chem << ".w*" << K1 << " + " << chem << "_s.w*" << K2 << " + " 
+                << chem << "_s.z*" << K1 << " + " << chem << "_s.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_n.y*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.w*" << K1 << " + " << chem << "_ne.x*" << K2 << " + " << chem << "_e.x*" << K1 << " + " << chem << "_se.x*" << K2 << " + " 
+                << chem << "_s.w*" << K1 << " + " << chem << "_s.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_n.z*" << K2 << "" <<
+                    ") - " << chem << "*" << K3 << ";\n";
+        }
+        //       (x y z w) (x y z w) (x y z w)           nw   n   ne
+        //       (x y z w) [x y z w] (x y z w)    =       w   .   e
+        //       (x y z w) (x y z w) (x y z w)           sw   s   se
+    } 
+    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1 && this->neighborhood_weight_type==EQUAL)
+    {
+        const int NDIRS = 8;
+        const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// (2D equal-weighted 9-point stencil: [ 1,1,1; 1,-8,1; 1,1,1 ] / 2 )\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n" <<
+                indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
+                indent << "const int yp1 = ((y+1) & (Y-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int xp1 = min(X-1,x+1);\n" <<
+                indent << "const int yp1 = min(Y-1,y+1);\n";
+        kernel_source <<
+            indent << "const int i_n =  X*(Y*z + ym1) + x;\n" <<
+            indent << "const int i_ne = X*(Y*z + ym1) + xp1;\n" <<
+            indent << "const int i_e =  X*(Y*z + y) + xp1;\n" <<
+            indent << "const int i_se = X*(Y*z + yp1) + xp1;\n" <<
+            indent << "const int i_s =  X*(Y*z + yp1) + x;\n" <<
+            indent << "const int i_sw = X*(Y*z + yp1) + xm1;\n" <<
+            indent << "const int i_w =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_nw = X*(Y*z + ym1) + xm1;\n";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+                chem << "_n.x + " << chem << "_n.y + " << chem << ".y + " << chem << "_s.y + " << chem << "_s.x + " << chem << "_sw.w + " << chem << "_w.w + " << chem << "_nw.w,\n";
+            kernel_source << indent << 
+                chem << "_n.y + " << chem << "_n.z + " << chem << ".z + " << chem << "_s.z + " << chem << "_s.y + " << chem << "_s.x + " << chem << ".x + " << chem << "_n.x,\n";
+            kernel_source << indent << 
+                chem << "_n.z + " << chem << "_n.w + " << chem << ".w + " << chem << "_s.w + " << chem << "_s.z + " << chem << "_s.y + " << chem << ".y + " << chem << "_n.y,\n";
+            kernel_source << indent << 
+                chem << "_n.w + " << chem << "_ne.x + " << chem << "_e.x + " << chem << "_se.x + " << chem << "_s.w + " << chem << "_s.z + " << chem << ".z + " << chem << "_n.z" <<
+                    ")*0.5f - 4.0f*" << chem << ";\n";
+        }
+        //       (x y z w) (x y z w) (x y z w)           nw   n   ne
+        //       (x y z w) [x y z w] (x y z w)    =       w   .   e
+        //       (x y z w) (x y z w) (x y z w)           sw   s   se
+    } 
+    else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
+    {
+        // TODO: 19-point stencil (Doyle, Mantel & Barkley 1997)
+        throw runtime_error("not yet implemented");
+        const int NDIRS = 8;
+        const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// (2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6 )\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n" <<
+                indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
+                indent << "const int yp1 = ((y+1) & (Y-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int xp1 = min(X-1,x+1);\n" <<
+                indent << "const int yp1 = min(Y-1,y+1);\n";
+        kernel_source <<
+            indent << "const int i_n =  X*(Y*z + ym1) + x;\n" <<
+            indent << "const int i_ne = X*(Y*z + ym1) + xp1;\n" <<
+            indent << "const int i_e =  X*(Y*z + y) + xp1;\n" <<
+            indent << "const int i_se = X*(Y*z + yp1) + xp1;\n" <<
+            indent << "const int i_s =  X*(Y*z + yp1) + x;\n" <<
+            indent << "const int i_sw = X*(Y*z + yp1) + xm1;\n" <<
+            indent << "const int i_w =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_nw = X*(Y*z + ym1) + xm1;\n";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            const float K2 = 1.0f/6.0f;
+            const float K1 = 2.0f/3.0f;
+            const float K3 = 10.0f/3.0f;
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+                chem << "_n.x*" << K1 << " + " << chem << "_n.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_s.y*" << K2 << " + " 
+                << chem << "_s.x*" << K1 << " + " << chem << "_sw.w*" << K2 << " + " << chem << "_w.w*" << K1 << " + " << chem << "_nw.w*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.y*" << K1 << " + " << chem << "_n.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_s.z*" << K2 << " + " 
+                << chem << "_s.y*" << K1 << " + " << chem << "_s.x*" << K2 << " + " << chem << ".x*" << K1 << " + " << chem << "_n.x*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.z*" << K1 << " + " << chem << "_n.w*" << K2 << " + " << chem << ".w*" << K1 << " + " << chem << "_s.w*" << K2 << " + " 
+                << chem << "_s.z*" << K1 << " + " << chem << "_s.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_n.y*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.w*" << K1 << " + " << chem << "_ne.x*" << K2 << " + " << chem << "_e.x*" << K1 << " + " << chem << "_se.x*" << K2 << " + " 
+                << chem << "_s.w*" << K1 << " + " << chem << "_s.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_n.z*" << K2 << "" <<
+                    ") - " << chem << "*" << K3 << ";\n";
+        }
+        //       (x y z w) (x y z w) (x y z w)           nw   n   ne
+        //       (x y z w) [x y z w] (x y z w)    =       w   .   e
+        //       (x y z w) (x y z w) (x y z w)           sw   s   se
+    } 
+    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
+    {
+        // TODO: 27-point stencil (O'Reilly and Beck 2006)
+        throw runtime_error("not yet implemented");
+        const int NDIRS = 8;
+        const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
+        // output the Laplacian part of the body
+        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+        kernel_source << indent << "// (2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6 )\n";
+        if(this->wrap)
+            kernel_source <<
+                indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = ((x+1) & (X-1));\n" <<
+                indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
+                indent << "const int yp1 = ((y+1) & (Y-1));\n";
+        else
+            kernel_source <<
+                indent << "const int xm1 = max(0,x-1);\n" <<
+                indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int xp1 = min(X-1,x+1);\n" <<
+                indent << "const int yp1 = min(Y-1,y+1);\n";
+        kernel_source <<
+            indent << "const int i_n =  X*(Y*z + ym1) + x;\n" <<
+            indent << "const int i_ne = X*(Y*z + ym1) + xp1;\n" <<
+            indent << "const int i_e =  X*(Y*z + y) + xp1;\n" <<
+            indent << "const int i_se = X*(Y*z + yp1) + xp1;\n" <<
+            indent << "const int i_s =  X*(Y*z + yp1) + x;\n" <<
+            indent << "const int i_sw = X*(Y*z + yp1) + xm1;\n" <<
+            indent << "const int i_w =  X*(Y*z + y) + xm1;\n" <<
+            indent << "const int i_nw = X*(Y*z + ym1) + xm1;\n";
+        for(int iC=0;iC<NC;iC++)
+            for(int iDir=0;iDir<NDIRS;iDir++)
+                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
+        for(int iC=0;iC<NC;iC++)
+        {
+            const float K2 = 1.0f/6.0f;
+            const float K1 = 2.0f/3.0f;
+            const float K3 = 10.0f/3.0f;
+            string chem = GetChemicalName(iC);
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+                chem << "_n.x*" << K1 << " + " << chem << "_n.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_s.y*" << K2 << " + " 
+                << chem << "_s.x*" << K1 << " + " << chem << "_sw.w*" << K2 << " + " << chem << "_w.w*" << K1 << " + " << chem << "_nw.w*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.y*" << K1 << " + " << chem << "_n.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_s.z*" << K2 << " + " 
+                << chem << "_s.y*" << K1 << " + " << chem << "_s.x*" << K2 << " + " << chem << ".x*" << K1 << " + " << chem << "_n.x*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.z*" << K1 << " + " << chem << "_n.w*" << K2 << " + " << chem << ".w*" << K1 << " + " << chem << "_s.w*" << K2 << " + " 
+                << chem << "_s.z*" << K1 << " + " << chem << "_s.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_n.y*" << K2 << ",\n";
+            kernel_source << indent << 
+                chem << "_n.w*" << K1 << " + " << chem << "_ne.x*" << K2 << " + " << chem << "_e.x*" << K1 << " + " << chem << "_se.x*" << K2 << " + " 
+                << chem << "_s.w*" << K1 << " + " << chem << "_s.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_n.z*" << K2 << "" <<
+                    ") - " << chem << "*" << K3 << ";\n";
+        }
+        //       (x y z w) (x y z w) (x y z w)           nw   n   ne
+        //       (x y z w) [x y z w] (x y z w)    =       w   .   e
+        //       (x y z w) (x y z w) (x y z w)           sw   s   se
+    } 
+    else
+    {
+        ostringstream oss;
+        oss << "FormulaOpenCLImageRD::AssembleKernelSourceFromFormula : unsupported neighborhood options:\n";
+        oss << "type=" << this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second << ",\n";
+        oss << "dim=" << this->GetArenaDimensionality() << ",\n";
+        oss << "range=" << this->neighborhood_range << ",\n";
+        oss << "weights=" << this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second;
+        throw runtime_error(oss.str().c_str());
     }
     kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)
@@ -157,7 +467,7 @@ void FormulaOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_t
     read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
 
     string formula = trim_multiline_string(xml_formula->GetCharacterData());
-    this->TestFormula(formula); // will throw on error
+    //this->TestFormula(formula); // will throw on error
     this->SetFormula(formula); // (won't throw yet)
 }
 

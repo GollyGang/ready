@@ -34,6 +34,9 @@ class MeshRD : public AbstractRD
         MeshRD();
         virtual ~MeshRD();
 
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
+        virtual void SaveFile(const char* filename,const Properties& render_settings) const;
+
         virtual void Update(int n_steps);
 
         virtual float GetX() const;
@@ -48,8 +51,6 @@ class MeshRD : public AbstractRD
         static std::string GetFileExtensionStatic() { return "vtu"; }
         
         virtual int GetNumberOfCells() const;
-
-        virtual void SaveFile(const char* filename,const Properties& render_settings) const;
 
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
