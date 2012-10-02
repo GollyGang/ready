@@ -53,6 +53,7 @@ AbstractRD::AbstractRD()
     for(map<TNeighborhood,string>::const_iterator it = this->canonical_neighborhood_type_identifiers.begin();it != this->canonical_neighborhood_type_identifiers.end();it++)
         this->recognized_neighborhood_type_identifiers[it->second] = it->first;
     this->canonical_neighborhood_weight_identifiers[EQUAL] = "equal";
+    this->canonical_neighborhood_weight_identifiers[LAPLACIAN] = "laplacian";
     for(map<TWeight,string>::const_iterator it = this->canonical_neighborhood_weight_identifiers.begin();it != this->canonical_neighborhood_weight_identifiers.end();it++)
         this->recognized_neighborhood_weight_identifiers[it->second] = it->first;
 }
@@ -239,13 +240,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     if(neighborhood_range!=1)
         throw runtime_error("Unsupported neighborhood range");
 
-    s = rule->GetAttribute("neighborhood_weight");
-    if(!s) this->neighborhood_weight_type = EQUAL;
-    else if(this->recognized_neighborhood_weight_identifiers.find(s)==this->recognized_neighborhood_weight_identifiers.end())
-        throw runtime_error("Unrecognized neighborhood_weight");
-    else this->neighborhood_weight_type = this->recognized_neighborhood_weight_identifiers[s];
-    if(neighborhood_weight_type!=EQUAL)
-        throw runtime_error("Unsupported neighborhood weight type");
+    // (neighborhood_weight parsed in subclasses)
 
     // parameters:
     this->DeleteAllParameters();

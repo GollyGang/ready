@@ -34,6 +34,7 @@ class ImageRD : public AbstractRD
         ImageRD();
         virtual ~ImageRD();
 
+        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         virtual void SaveFile(const char* filename,const Properties& render_settings) const;
 
         virtual void Update(int n_steps);

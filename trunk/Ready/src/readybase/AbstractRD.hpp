@@ -161,7 +161,7 @@ class AbstractRD
         // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
 
         enum TWeight { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE, RANGE, VERTEX_NEIGHBORS_RANGE, 
-            EDGE_NEIGHBORS_RANGE, FACE_NEIGHBORS_RANGE };
+            EDGE_NEIGHBORS_RANGE, FACE_NEIGHBORS_RANGE, LAPLACIAN };
         // (not intending to support all of these options immediately, but here for thought)
         // EQUAL: all weights are 1
         // EUCLIDEAN_DISTANCE: weights are scaled by the distance to each cell centroid
@@ -170,6 +170,7 @@ class AbstractRD
         // VERTEX_NEIGHBORS_RANGE: weight is minimum vertex-neighbors steps to get from central cell
         // EDGE_NEIGHBORS_RANGE: weight is minimum edge-neighbors steps to get from central cell
         // FACE_NEIGHBORS_RANGE: weight is minimum face-neighbors steps to get from central cell
+        // LAPLACIAN: weights are as needed for the best Laplacian approximation for the neighborhood (e.g. nine-point stencil)
 
     protected: // variables
 
