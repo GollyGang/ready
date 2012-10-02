@@ -425,25 +425,21 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
         for(int iC=0;iC<NC;iC++)
         {
-            const float K2 = 1.0f/6.0f;
-            const float K1 = 2.0f/3.0f;
-            const float K3 = 10.0f/3.0f;
+            const float K1 = 88.0f/26.0f; // centre
+            const float K2 = 6.0f/26.0f; // face-neighbors
+            const float K3 = 3.0f/26.0f; // edge-neighbors
+            const float K4 = 2.0f/26.0f; // corner-neighbors
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
-                chem << "_n.x*" << K1 << " + " << chem << "_n.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_s.y*" << K2 << " + " 
-                << chem << "_s.x*" << K1 << " + " << chem << "_sw.w*" << K2 << " + " << chem << "_w.w*" << K1 << " + " << chem << "_nw.w*" << K2 << ",\n";
-            kernel_source << indent << 
-                chem << "_n.y*" << K1 << " + " << chem << "_n.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_s.z*" << K2 << " + " 
-                << chem << "_s.y*" << K1 << " + " << chem << "_s.x*" << K2 << " + " << chem << ".x*" << K1 << " + " << chem << "_n.x*" << K2 << ",\n";
-            kernel_source << indent << 
-                chem << "_n.z*" << K1 << " + " << chem << "_n.w*" << K2 << " + " << chem << ".w*" << K1 << " + " << chem << "_s.w*" << K2 << " + " 
-                << chem << "_s.z*" << K1 << " + " << chem << "_s.y*" << K2 << " + " << chem << ".y*" << K1 << " + " << chem << "_n.y*" << K2 << ",\n";
-            kernel_source << indent << 
-                chem << "_n.w*" << K1 << " + " << chem << "_ne.x*" << K2 << " + " << chem << "_e.x*" << K1 << " + " << chem << "_se.x*" << K2 << " + " 
-                << chem << "_s.w*" << K1 << " + " << chem << "_s.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_n.z*" << K2 << "" <<
-                    ") - " << chem << "*" << K3 << ";\n";
+            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << indent << indent;
+            // first for x (of x,y,z,w)
+            // first collect the 6 face-neighbors:
+            kernel_source << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " << 
+                chem << "_s.x + " << chem << "_w.w + " << chem << "_u.x) * " << K2 << " +\n";
+            // then collect the 12 edge-neighbors
+            kernel_source << "(" << chem << "
+            // then collect the 8 corner-neighbors
         }
-        //            down                                                                 up
+        //            down                              here                              up
         //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dnw   dn  dne      nw   n   ne     unw   un  une
         //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
         //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dsw   ds  dse      sw   s   se     usw   us  use
