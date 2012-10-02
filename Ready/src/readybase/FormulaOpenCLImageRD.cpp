@@ -129,7 +129,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         const string dir[NDIRS]={"left","right","up","down"};
         // output the Laplacian part of the body
         kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// (2D 5-point stencil)\n";
+        kernel_source << indent << "// 2D 5-point stencil: [ 0,1,0; 1,-4,1; 0,1,0 ]\n";
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
@@ -172,7 +172,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         const string dir[NDIRS]={"left","right"};
         // output the Laplacian part of the body
         kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// (1D 3-point stencil: [1,-2,1] )\n";
+        kernel_source << indent << "// 1D 3-point stencil: [ 1,-2,1 ]\n";
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
@@ -207,7 +207,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
         // output the Laplacian part of the body
         kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// (2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6 )\n";
+        kernel_source << indent << "// 2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6\n";
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
@@ -262,7 +262,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
         // output the Laplacian part of the body
         kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// (2D equal-weighted 9-point stencil: [ 1,1,1; 1,-8,1; 1,1,1 ] / 2 )\n";
+        kernel_source << indent << "// 2D equal-weighted 9-point stencil: [ 1,1,1; 1,-8,1; 1,1,1 ] / 2\n";
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
@@ -306,13 +306,15 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     } 
     else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
     {
-        // TODO: 19-point stencil (Doyle, Mantel & Barkley 1997)
+        // 19-point stencil, following: 
+        // Dowle, Mantel & Barkley (1997) "Fast simulations of waves in three-dimensional excitable media"
+        // Int. J. Bifurcation and Chaos, 7(11): 2529-2545.
         throw runtime_error("not yet implemented");
         const int NDIRS = 8;
         const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
         // output the Laplacian part of the body
         kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// (2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6 )\n";
+        kernel_source << indent << "// 3D 19-point stencil: [ [ 0,1,0; 1,2,1; 0,1,0 ], [ 1,2,1; 2,-24,2; 1,2,1 ], [ 0,1,0; 1,2,1; 0,1,0 ] ] / 6\n";
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
@@ -357,31 +359,40 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 << chem << "_s.w*" << K1 << " + " << chem << "_s.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_n.z*" << K2 << "" <<
                     ") - " << chem << "*" << K3 << ";\n";
         }
-        //       (x y z w) (x y z w) (x y z w)           nw   n   ne
-        //       (x y z w) [x y z w] (x y z w)    =       w   .   e
-        //       (x y z w) (x y z w) (x y z w)           sw   s   se
+        //              down                                                              up
+        //            (x y z w)             (x y z w) (x y z w) (x y z w)             (x y z w)                        dn            nw   n   ne          un     
+        //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
+        //            (x y z w)             (x y z w) (x y z w) (x y z w)             (x y z w)                        ds            sw   s   se          us     
     } 
     else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
     {
-        // TODO: 27-point stencil (O'Reilly and Beck 2006)
+        // 27-point stencil, following:
+        // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions"
+        // Int. J. Num. Meth. Eng. 
+        // (Equation 22)
         throw runtime_error("not yet implemented");
-        const int NDIRS = 8;
-        const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
+        const int NDIRS = 26;
+        const string dir[NDIRS]={"n","ne","e","se","s","sw","w","d","dnw","dn","dne","de","dse","ds","dsw","dw","dnw",
+            "u","un","une","ue","use","us","usw","uw","unw"};
         // output the Laplacian part of the body
         kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// (2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6 )\n";
+        kernel_source << indent << "// 3D 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26\n";
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = ((x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
                 indent << "const int xp1 = ((x+1) & (X-1));\n" <<
                 indent << "const int ym1 = ((y-1+Y) & (Y-1));\n" <<
                 indent << "const int yp1 = ((y+1) & (Y-1));\n";
+                indent << "const int zm1 = ((z-1+Z) & (Z-1));\n" <<
+                indent << "const int zp1 = ((z+1) & (Z-1));\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,x-1);\n" <<
                 indent << "const int ym1 = max(0,y-1);\n" <<
+                indent << "const int zm1 = max(0,z-1);\n" <<
                 indent << "const int xp1 = min(X-1,x+1);\n" <<
                 indent << "const int yp1 = min(Y-1,y+1);\n";
+                indent << "const int zp1 = min(Z-1,z+1);\n";
         kernel_source <<
             indent << "const int i_n =  X*(Y*z + ym1) + x;\n" <<
             indent << "const int i_ne = X*(Y*z + ym1) + xp1;\n" <<
@@ -391,6 +402,24 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int i_sw = X*(Y*z + yp1) + xm1;\n" <<
             indent << "const int i_w =  X*(Y*z + y) + xm1;\n" <<
             indent << "const int i_nw = X*(Y*z + ym1) + xm1;\n";
+            indent << "const int i_d =  X*(Y*zm1 + ym1) + x;\n" <<
+            indent << "const int i_dn =  X*(Y*zm1 + ym1) + x;\n" <<
+            indent << "const int i_dne = X*(Y*zm1 + ym1) + xp1;\n" <<
+            indent << "const int i_de =  X*(Y*zm1 + y) + xp1;\n" <<
+            indent << "const int i_dse = X*(Y*zm1 + yp1) + xp1;\n" <<
+            indent << "const int i_ds =  X*(Y*zm1 + yp1) + x;\n" <<
+            indent << "const int i_dsw = X*(Y*zm1 + yp1) + xm1;\n" <<
+            indent << "const int i_dw =  X*(Y*zm1 + y) + xm1;\n" <<
+            indent << "const int i_dnw = X*(Y*zm1 + ym1) + xm1;\n";
+            indent << "const int i_u =  X*(Y*zp1 + ym1) + x;\n" <<
+            indent << "const int i_un =  X*(Y*zp1 + ym1) + x;\n" <<
+            indent << "const int i_une = X*(Y*zp1 + ym1) + xp1;\n" <<
+            indent << "const int i_ue =  X*(Y*zp1 + y) + xp1;\n" <<
+            indent << "const int i_use = X*(Y*zp1 + yp1) + xp1;\n" <<
+            indent << "const int i_us =  X*(Y*zp1 + yp1) + x;\n" <<
+            indent << "const int i_usw = X*(Y*zp1 + yp1) + xm1;\n" <<
+            indent << "const int i_uw =  X*(Y*zp1 + y) + xm1;\n" <<
+            indent << "const int i_unw = X*(Y*zp1 + ym1) + xm1;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
                 kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[i_" << dir[iDir] << "];\n";
@@ -414,9 +443,10 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 << chem << "_s.w*" << K1 << " + " << chem << "_s.z*" << K2 << " + " << chem << ".z*" << K1 << " + " << chem << "_n.z*" << K2 << "" <<
                     ") - " << chem << "*" << K3 << ";\n";
         }
-        //       (x y z w) (x y z w) (x y z w)           nw   n   ne
-        //       (x y z w) [x y z w] (x y z w)    =       w   .   e
-        //       (x y z w) (x y z w) (x y z w)           sw   s   se
+        //            down                                                                 up
+        //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dnw   dn  dne      nw   n   ne     unw   un  une
+        //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
+        //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dsw   ds  dse      sw   s   se     usw   us  use
     } 
     else
     {
