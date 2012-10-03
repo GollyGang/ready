@@ -155,6 +155,10 @@ class AbstractRD
         virtual void Redo();  ///< Redo all actions until the next undo point.
         void SetUndoPoint();  ///< Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block.
 
+        std::string GetNeighborhoodType() const;
+        int GetNeighborhoodRange() const;
+        std::string GetNeighborhoodWeight() const;
+
     protected: // typedefs
 
         enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };

@@ -453,3 +453,24 @@ void AbstractRD::StorePaintAction(int iChemical,int iCell,float old_val)
 }
 
 // ---------------------------------------------------------------------
+
+std::string AbstractRD::GetNeighborhoodType() const
+{
+    return this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second;
+}
+
+// ---------------------------------------------------------------------
+
+int AbstractRD::GetNeighborhoodRange() const
+{
+    return this->neighborhood_range;
+}
+
+// ---------------------------------------------------------------------
+
+std::string AbstractRD::GetNeighborhoodWeight() const
+{
+    return this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second;
+}
+
+// ---------------------------------------------------------------------
