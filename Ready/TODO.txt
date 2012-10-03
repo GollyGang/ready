@@ -16,9 +16,11 @@ Big picture issues:
 
 before 0.5 release:
 
+- add Help files for Info Panel, etc.?
+- lots of patterns: Robert's, examples from File > New Pattern
+
 - way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap too
 - progress indicator for mesh generators?
-- documentation bug: can change the size of any pattern
 - document meaning of dimensions, especially for meshes
 - way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
 - way to switch between inbuilt, formula and kernel
@@ -26,15 +28,8 @@ before 0.5 release:
 - 3D images should show cell color when use_image_interpolation=false, to match behavior we like in
   meshes
 
-- support more values for neighborhood_range and neighborhood_weight
-- support neighborhood specifiers on images
 - show neighborhood_type, neighborhood_range and neighborhood_weight in the Info Panel, even if 
   can't yet change them
-- document neighborhood_type changes, when more mature
-- have Laplacians defined by neighborhood specifiers? Original idea was:
-- Control over how the Laplacians are defined, on images and meshes. e.g. on images we usually use a 
-  5pt stencil but sometimes want a 9pt stencil with equal weighting (e.g. for GoL). On meshes, Turk 
-  used a boundary-size weighting. Robert recommends an unequal 9pt stencil for square grids.
   
 - current color button should be replaced by spectrum slider plus value indicators?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?

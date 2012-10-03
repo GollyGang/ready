@@ -84,24 +84,6 @@ MeshRD::~MeshRD()
 
 // ---------------------------------------------------------------------
 
-void MeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to_update)
-{
-    AbstractRD::InitializeFromXML(rd,warn_to_update);
-
-    vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
-    if(!rule) throw runtime_error("rule node not found in file");
-
-    const char *s = rule->GetAttribute("neighborhood_weight");
-    if(!s) this->neighborhood_weight_type = EQUAL; // images default to Laplacian weights, meshes to equal weights
-    else if(this->recognized_neighborhood_weight_identifiers.find(s)==this->recognized_neighborhood_weight_identifiers.end())
-        throw runtime_error("Unrecognized neighborhood_weight");
-    else this->neighborhood_weight_type = this->recognized_neighborhood_weight_identifiers[s];
-    if(neighborhood_weight_type!=EQUAL)
-        throw runtime_error("Unsupported neighborhood weight type");
-}
-
-// ---------------------------------------------------------------------
-
 void MeshRD::Update(int n_steps)
 {
     this->undo_stack.clear();
@@ -506,11 +488,9 @@ bool IsEdgeNeighbor(vtkUnstructuredGrid *grid,vtkIdType iCell1,vtkIdType iCell2)
 
 void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type)
 {
-    if(weight_type!=EQUAL)
-        throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
+    // TODO: for now we treat LAPLACIAN weights the same as EQUAL weights, not sure what to do with this on arbitrary meshes
     if(range!=1)
         throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported range");
-
     if(!this->mesh->IsHomogeneous())
         throw runtime_error("MeshRD::ComputeCellNeighbors : mixed cell types not supported");
 
@@ -545,6 +525,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                             switch(weight_type)
                             {
                                 case EQUAL: nbor.weight = 1.0f; break;
+                                case LAPLACIAN: nbor.weight = 1.0f; break;
                                 default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
                             }
                             if(neighbors.empty() || IsEdgeNeighbor(this->mesh,neighbors.back().iNeighbor,nbor.iNeighbor))
@@ -563,6 +544,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                         switch(weight_type)
                         {
                             case EQUAL: nbor.weight = 1.0f; break;
+                            case LAPLACIAN: nbor.weight = 1.0f; break;
                             default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
                         }
                         add_if_new(neighbors,nbor);
@@ -583,6 +565,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                         switch(weight_type)
                         {
                             case EQUAL: nbor.weight = 1.0f; break;
+                            case LAPLACIAN: nbor.weight = 1.0f; break;
                             default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
                         }
                         add_if_new(neighbors,nbor);
@@ -603,6 +586,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                         switch(weight_type)
                         {
                             case EQUAL: nbor.weight = 1.0f; break;
+                            case LAPLACIAN: nbor.weight = 1.0f; break;
                             default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
                         }
                         add_if_new(neighbors,nbor);
