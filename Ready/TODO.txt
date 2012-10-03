@@ -19,7 +19,8 @@ before 0.5 release:
 - add Help files for Info Panel, etc.?
 - lots of patterns: Robert's, examples from File > New Pattern
 
-- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap too
+- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap 
+   too, on polyhedral meshes
 - progress indicator for mesh generators?
 - document meaning of dimensions, especially for meshes
 - way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
@@ -28,8 +29,7 @@ before 0.5 release:
 - 3D images should show cell color when use_image_interpolation=false, to match behavior we like in
   meshes
 
-- show neighborhood_type, neighborhood_range and neighborhood_weight in the Info Panel, even if 
-  can't yet change them
+- support neighborhood_type and neighborhood_weight on inbuilt rules
   
 - current color button should be replaced by spectrum slider plus value indicators?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?

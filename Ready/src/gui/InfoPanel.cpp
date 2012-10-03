@@ -52,6 +52,9 @@ const wxString dimensions_label = _("Dimensions");
 const wxString block_size_label = _("Block size");
 const wxString number_of_cells_label = _("Number of cells");
 const wxString wrap_label = _("Toroidal wrap-around");
+const wxString neighborhood_type_label = _("Neighborhood");
+const wxString neighborhood_range_label = _("Neighborhood range");
+const wxString neighborhood_weight_label = _("Neighborhood weight");
 
 // -----------------------------------------------------------------------------
 
@@ -411,6 +414,13 @@ void InfoPanel::Update(const AbstractRD* const system)
         contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
                                         FormatFloat(system->GetX(),3),FormatFloat(system->GetY(),3),FormatFloat(system->GetZ(),3)),
                                         system->HasEditableDimensions());
+    else
+        contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
+                                        system->GetNumberOfCells()),false);
+
+    contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system->GetNeighborhoodType()+"-neighbors", false);
+    contents += AppendRow(neighborhood_range_label, neighborhood_range_label, wxString::Format(wxT("%d"),system->GetNeighborhoodRange()), false);
+    contents += AppendRow(neighborhood_weight_label, neighborhood_weight_label, system->GetNeighborhoodWeight(), false);
 
     /* bit technical, leave as a file-only option
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
@@ -419,9 +429,6 @@ void InfoPanel::Update(const AbstractRD* const system)
                                             
     if(system->HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
-
-    contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
-                                        system->GetNumberOfCells()),false);
 
     contents += _T("</table>");
 
