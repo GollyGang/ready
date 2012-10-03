@@ -407,13 +407,15 @@ void InfoPanel::Update(const AbstractRD* const system)
             contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
     }
 
-    contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
+    if(system->HasEditableDimensions())
+        contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
                                         FormatFloat(system->GetX(),3),FormatFloat(system->GetY(),3),FormatFloat(system->GetZ(),3)),
                                         system->HasEditableDimensions());
 
+    /* bit technical, leave as a file-only option
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                         system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
-                                        system->HasEditableBlockSize());
+                                        system->HasEditableBlockSize());*/
                                             
     if(system->HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);

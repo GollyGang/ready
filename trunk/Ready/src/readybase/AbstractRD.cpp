@@ -240,7 +240,11 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     if(neighborhood_range!=1)
         throw runtime_error("Unsupported neighborhood range");
 
-    // (neighborhood_weight parsed in subclasses)
+    s = rule->GetAttribute("neighborhood_weight");
+    if(!s) this->neighborhood_weight_type = LAPLACIAN;
+    else if(this->recognized_neighborhood_weight_identifiers.find(s)==this->recognized_neighborhood_weight_identifiers.end())
+        throw runtime_error("Unrecognized neighborhood_weight");
+    else this->neighborhood_weight_type = this->recognized_neighborhood_weight_identifiers[s];
 
     // parameters:
     this->DeleteAllParameters();

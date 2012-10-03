@@ -137,10 +137,17 @@ the inbuilt rules (currently just "Gray-Scott").
 <li><tt>wrap</tt> (optional) : "1" if the data should wrap around, or "0" if the data should have a 
 boundary. Currently only affects images, not meshes. Default: "1".
 <li><tt>neighborhood_type</tt> (optional) : "vertex" for vertex-neighbors, "edge" for edge-neighbors 
-or "face" for face-neighbors. Currently only affect meshes with kernel rules. Default: "vertex".
+or "face" for face-neighbors. Default: "vertex".
 <li><tt>neighborhood_range</tt> (optional) : integer range for the cell neighborhood. Currently only 
 "1" is supported. Default: "1".
-<li><tt>neighborhood_weight</tt> (optional) : Currently only "equal" is supported. Default: "equal".
+<li><tt>neighborhood_weight</tt> (optional) : "laplacian" for standard weights for computing diffusion,
+"equal" for all weights equal. Default: "laplacian". Examples: For a 3D image with vertex-neighbors and laplacian
+weights, the standard 27-point stencil will be used. For a 3D image with edge-neighbors and laplacian
+weights, the standard 19-point stencil will be used. For a 3D image with face-neighbors and laplacian
+weights, the standard 7-point stencil will be used. For a 2D image with vertex-neighbors and laplacian
+weights, the standard 9-point stencil will be used. For a 2D image with edge-neighbors and laplacian
+weights, the standard 5-point stencil will be used. For a 1D image the standard 3-point stencil is
+always used.
 </ul>
 <p>Contains:
 <ul>
