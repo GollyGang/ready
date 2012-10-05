@@ -108,6 +108,7 @@ set( PATTERN_FILES
   Patterns/grayscott_parameter_map.vti
   Patterns/grayscott_lesmes_noisy.vti
   Patterns/grayscott_noisy_solitons_mitosis.vti
+  Patterns/grayscott_pearson1993.vti
   Patterns/mutually-catalytic_spots.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti
