@@ -129,6 +129,7 @@ set( PATTERN_FILES
   Patterns/hex_B2oS2m34_gliders.vtu
   Patterns/oregonator.vti
   Patterns/larger-than-life.vti
+  Patterns/smoothlife_smoothglider.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
