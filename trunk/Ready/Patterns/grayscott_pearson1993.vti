@@ -8,7 +8,12 @@
       Change the parameters k and F to explore the systems that John Pearson described. The supplied 
       settings (k=0.06, F=0.04) correspond to his picture 'theta' in Fig. 2.
       
-      Ready uses 'a' and 'b' for the chemical names, instead of 'U' and 'V'.
+      In this pattern we include the delta_x parameter, which determines the scale of the simulation. 
+      In other patterns we often merge this value into the diffusion coefficients, for simplicity. 
+      See the formula below for how this is done.
+      
+      Ready uses 'a' and 'b' for the chemical names, instead of 'U' and 'V'. Apart from that we're
+      following Pearson's work as closely as possible.
     </description>
     
     <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
