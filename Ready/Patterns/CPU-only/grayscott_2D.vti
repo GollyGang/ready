@@ -4,7 +4,7 @@
   <RD format_version="1">
       
     <description>
-        Self-replicating spots in two dimensions.  This examples uses an inbuilt implementation
+        Self-replicating spots in two dimensions.  This example uses an inbuilt implementation
         (currently only Gray-Scott is available) and so the formula cannot be edited.
     </description>
     
