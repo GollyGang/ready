@@ -3,7 +3,7 @@
   <RD format_version="1">
       
     <description>
-        The Gray-Scott rule in three dimensions. This examples uses an inbuilt implementation
+        The Gray-Scott rule in three dimensions. This example uses an inbuilt implementation
         (currently only Gray-Scott is available) and so the formula cannot be edited.
     </description>
       
