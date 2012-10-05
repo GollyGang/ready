@@ -5,26 +5,32 @@
     <description>
         Larger than Life, by &lt;a href=&quot;http://www.csun.edu/~kme52026/thesis.html&quot;&gt;Kellie Michele Evans&lt;/a&gt;.
         
+        The parameter R controls the distance over which the neighbor count is taken. The two
+        ranges [b1,b2] and [s1,s2] define the allowed number of neighbors for birth and survival, 
+        respectively. 
+        
         More examples at the &lt;a href=&quot;http://www.mirekw.com/ca/rullex_lgtl.html&quot;&gt;CA rules lexicon&lt;/a&gt;.
     </description>
 
-    <rule type="kernel" name="LTL test">
+    <rule type="kernel" name="Larger-than-Life">
     
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float* a_in,__global float* a_out) 
         {
+            //--------------------------------------
+            const int R = 5;    // range
+            const int b1 = 34;  // birth1
+            const int b2 = 45;  // birth2
+            const int s1 = 34;  // survival1
+            const int s2 = 58;  // survival2
+            //--------------------------------------
+            
             const int x = get_global_id(0);
             const int y = get_global_id(1);
             const int z = get_global_id(2);
             const int X = get_global_size(0);
             const int Y = get_global_size(1);
             const int i_here = X*(Y*z + y) + x;
-            
-            const int R = 5;    // range
-            const int b1 = 34;  // birth1
-            const int b2 = 45;  // birth2
-            const int s1 = 34;  // survival1
-            const int s2 = 58;  // survival2
             
             int n = 0;   // number of live neighbors
             for(int sx=x-R; sx&lt;=x+R; sx++)
