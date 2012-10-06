@@ -5,7 +5,7 @@
     <description>
         The smoothglider, a parameter set of SmoothLife. Compare with Larger-than-Life.
         
-        This is work in progress, not sure if this implementation is at all correct.
+        Still not working as expected.
     </description>
 
     <rule type="kernel" name="SmoothLife">
@@ -30,6 +30,7 @@
             // area of annulus:
             const float PI = 3.14159265358979f;
             const float AREA_OUTER = PI * (ra2 - rb2);
+            const float AREA_INNER = PI * rb2;
             
             const int x = get_global_id(0);
             const int y = get_global_id(1);
@@ -38,23 +39,27 @@
             const int Y = get_global_size(1);
             const int i_here = X*(Y*z + y) + x;
             
-            // how full is the annulus?
-            float outf = 0.0f;
+            // how full are the annulus and inner disk?
+            float outf = 0.0f, inf = 0.0f;
             for(int dx=-ra; dx&lt;=ra; dx++)
             {
                 for(int dy=-ra; dy&lt;=ra; dy++)
                 {
                     float r2 = dx*dx + dy*dy;
-                    if(r2 &gt; ra2 || r2 &lt; rb2) continue; // outside annulus
+                    if(r2 &gt; ra2) continue; // outside
                     int tx = (x+dx+X) &amp; (X-1); // wrap
                     int ty = (y+dy+Y) &amp; (Y-1); // wrap
-                    outf += a_in[ X*(Y*z+ty)+tx ];
+					if(r2 &lt; rb2)
+						inf += a_in[ X*(Y*z+ty)+tx ];
+					else
+						outf += a_in[ X*(Y*z+ty)+tx ];
                     // TODO: anti-aliasing
                 }
             }
             outf /= AREA_OUTER; // normalize by area
-            
-            int in = round(a_in[i_here]); // current state from a single pixel
+            inf /= AREA_INNER; // normalize by area
+			
+            int in = round(inf); // current state given by inner fullness
             
             int out = 0;
             if(in==0 &amp;&amp; outf&gt;b1 &amp;&amp; outf&lt;b2)
@@ -70,7 +75,7 @@
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0" high="0.8" />  <!-- a bit sensitive to this -->
+        <white_noise low="0" high="1" />
         <everywhere />
       </overlay>
     </initial_pattern_generator>
@@ -84,6 +89,7 @@
     </render_settings>
     
   </RD>
+  
   <ImageData WholeExtent="0 511 0 511 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 511 0 511 0 0">
     <PointData>
