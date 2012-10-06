@@ -49,16 +49,16 @@
                     if(r2 &gt; ra2) continue; // outside
                     int tx = (x+dx+X) &amp; (X-1); // wrap
                     int ty = (y+dy+Y) &amp; (Y-1); // wrap
-					if(r2 &lt; rb2)
-						inf += a_in[ X*(Y*z+ty)+tx ];
-					else
-						outf += a_in[ X*(Y*z+ty)+tx ];
+                    if(r2 &lt; rb2)
+                        inf += a_in[ X*(Y*z+ty)+tx ];
+                    else
+                        outf += a_in[ X*(Y*z+ty)+tx ];
                     // TODO: anti-aliasing
                 }
             }
             outf /= AREA_OUTER; // normalize by area
             inf /= AREA_INNER; // normalize by area
-			
+            
             int in = round(inf); // current state given by inner fullness
             
             int out = 0;
