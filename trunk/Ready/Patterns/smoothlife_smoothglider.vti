@@ -5,7 +5,7 @@
     <description>
         The smoothglider, a parameter set of SmoothLife. Compare with Larger-than-Life.
         
-        Still not working as expected.
+        This version uses discrete time stepping.
     </description>
 
     <rule type="kernel" name="SmoothLife">
@@ -75,7 +75,7 @@
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0" high="1" />
+        <white_noise low="0" high="0.75" /> <!-- very sensitive to this -->
         <everywhere />
       </overlay>
     </initial_pattern_generator>
