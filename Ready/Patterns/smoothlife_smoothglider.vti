@@ -83,7 +83,6 @@
                 for(int dy=-ra; dy&lt;=ra; dy++)
                 {
                     float r = sqrt((float)(dx*dx + dy*dy));
-                    //if(r &gt; ra+0.5f) continue; // outside
                     int tx = (x+dx+X) &amp; (X-1); // wrap
                     int ty = (y+dy+Y) &amp; (Y-1); // wrap
                     float val = a_in[ X*(Y*z+ty)+tx ]; 
