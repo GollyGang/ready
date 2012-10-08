@@ -130,6 +130,7 @@ set( PATTERN_FILES
   Patterns/oregonator.vti
   Patterns/larger-than-life.vti
   Patterns/smoothlife_smoothglider.vti
+  Patterns/smoothlife_smoothlifeL.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
