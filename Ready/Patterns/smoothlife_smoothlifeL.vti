@@ -8,6 +8,9 @@
         
         This version uses smooth time stepping. Anti-aliasing and a smooth transition
         function are used to enable the size of the kernel to be as small as possible.
+        
+        We don't see the same glider with smooth time stepping but there are lots
+        of interesting things to find.
     </description>
 
     <rule type="kernel" name="SmoothLifeL">
@@ -21,8 +24,8 @@
         __constant float b2 = 0.336f;        // birth2
         __constant float s1 = 0.365f;        // survival1
         __constant float s2 = 0.549f;        // survival2
-        __constant float alpha_n = 0.028f;   // sigmoid width for outer fullness
-        __constant float alpha_m = 0.147f;   // sigmoid width for inner fullness
+        __constant float alpha_n = 0.028f;   // outer sigmoid
+        __constant float alpha_m = 0.147f;   // inner sigmoid
         __constant float dt = 0.1f;          // timestep
         // ---------------------------------------------
         
@@ -89,12 +92,13 @@
                                 * ramp_step(r,rb,1.0f);
                 }
             }
-            outf /= AREA_OUTER; // normalize by area
-            inf /= AREA_INNER; // normalize by area
+            // normalize the fullnesses by area
+            outf /= AREA_OUTER;
+            inf /= AREA_INNER;
             
             // smooth time stepping:
-            a_out[i_here] = a_in[i_here] 
-                + dt * (2.0f*s(outf,inf)-1.0f) * a_in[i_here];
+            a_out[i_here] = clamp( a_in[i_here] 
+                + dt * (2.0f*s(outf,inf)-1.0f), 0.0f, 1.0f );
         }
       </kernel>
       
