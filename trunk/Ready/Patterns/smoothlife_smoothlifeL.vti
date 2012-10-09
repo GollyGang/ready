@@ -7,8 +7,14 @@
         &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;PDF&lt;/a&gt;,
         &lt;a href=&quot;http://sourceforge.net/projects/smoothlife/&quot;&gt;software&lt;/a&gt;.
         
-        This version uses smooth time stepping. Anti-aliasing and a smooth transition
-        function are used to enable the size of the kernel to be as small as possible.
+        This version uses smooth time stepping - the timestep can be made smaller without changing 
+        the behavior of the rule. Anti-aliasing and a smooth transition function are used to enable 
+        the size of the kernel to be as small as possible, for speed.
+        
+        In SmoothLifeL (with smooth time stepping), the glider is a bit different to the one seen 
+        with discrete time stepping (smoothglider). It is an important open question whether there 
+        is a smooth time stepping rule that supports the same glider as the discrete time stepping 
+        one.
     </description>
 
     <rule type="kernel" name="SmoothLifeL">
