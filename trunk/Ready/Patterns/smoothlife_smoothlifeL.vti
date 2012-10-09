@@ -107,8 +107,15 @@
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0" high="0.75" />
+        <white_noise low="0" high="1" />
         <everywhere />
+      </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="0.3" />
+        <circle radius="0.1"> <point3d x="0.4" y="0.3" z="0.5" /> </circle>
+        <circle radius="0.1"> <point3d x="0.7" y="0.6" z="0.5" /> </circle>
+        <circle radius="0.1"> <point3d x="0.3" y="0.8" z="0.5" /> </circle>
       </overlay>
     </initial_pattern_generator>
     
