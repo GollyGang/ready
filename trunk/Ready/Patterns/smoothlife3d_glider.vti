@@ -30,7 +30,6 @@
         __constant float alpha_m = 0.140f;   // inner sigmoid
         __constant float dt = 0.101f;        // timestep
         // ---------------------------------------------
-        __constant float PI = 3.14159265358979f;
         
         // the logistic function is used as a smooth step function
         float sigma1(float x,float a,float alpha) 
@@ -80,6 +79,7 @@
             
             // how full are the outer shell and inner sphere?
             float outf = 0.0f, inf = 0.0f;
+            float volume_out = 0.0f, volume_in = 0.0f;
             for(int dx=-ra; dx&lt;=ra; dx++)
             {
                 for(int dy=-ra; dy&lt;=ra; dy++)
@@ -91,20 +91,22 @@
                         int ty = (y+dy+Y) &amp; (Y-1); // wrap
                         int tz = (z+dz+Z) &amp; (Z-1); // wrap
                         float val = a_in[ X*(Y*tz+ty)+tx ]; 
-                        // add val, with anti-aliasing:
-                        inf  += val * ramp_step(-r,-rb,1.0f);
-                        outf += val * ramp_step(-r,-ra,1.0f) 
+                        // compute the weights:
+                        float k_in = ramp_step(-r,-rb,1.0f);
+                        float k_out = ramp_step(-r,-ra,1.0f) 
                                     * ramp_step(r,rb,1.0f);
+                        // add val, with anti-aliasing:
+                        inf  += val * k_in;
+                        outf += val * k_out;
+                        // also sum the weights:
+                        volume_in += k_in;
+                        volume_out += k_out;
                     }
                 }
             }
-            // normalize by volume
-            const float VOL_OUTER = (4.0f/3.0f) * PI * 
-                                     (ra*ra*ra - rb*rb*rb);
-            const float VOL_INNER = (4.0f/3.0f) * PI * 
-                                     rb * rb * rb;
-            outf /= VOL_OUTER;
-            inf /= VOL_INNER;
+            // normalize:
+            inf /= volume_in;
+            outf /= volume_out;
             
             // smooth time stepping:
             a_out[i_here] = clamp( a_in[i_here] +
