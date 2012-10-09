@@ -4,13 +4,11 @@
   
     <description>
         SmoothLifeL, a parameter set of SmoothLife, by Stephan Rafler.
-        &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;(PDF)&lt;/a&gt;
+        &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;PDF&lt;/a&gt;,
+        &lt;a href=&quot;http://sourceforge.net/projects/smoothlife/&quot;&gt;software&lt;/a&gt;.
         
         This version uses smooth time stepping. Anti-aliasing and a smooth transition
         function are used to enable the size of the kernel to be as small as possible.
-        
-        We don't see the same glider with smooth time stepping but there are lots
-        of interesting things to find.
     </description>
 
     <rule type="kernel" name="SmoothLifeL">
@@ -98,7 +96,8 @@
             
             // smooth time stepping:
             a_out[i_here] = clamp( a_in[i_here] 
-                + dt * (2.0f*s(outf,inf)-1.0f), 0.0f, 1.0f );
+                + dt * (2.0f*s(outf,inf)-1.0f), 
+                0.0f, 1.0f );
         }
       </kernel>
       
@@ -124,7 +123,7 @@
       <color_high r="1" g="0.5" b="0" />
       <show_color_scale value="true" />
       <show_displacement_mapped_surface value="false" />
-      <timesteps_per_render value="1" />
+      <timesteps_per_render value="8" />
     </render_settings>
     
   </RD>
