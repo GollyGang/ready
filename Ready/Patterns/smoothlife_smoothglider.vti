@@ -77,9 +77,9 @@
             
             // how full are the annulus and inner disk?
             float outf = 0.0f, inf = 0.0f;
-            for(int dx=-ra; dx&lt;=ra; dx++)
+            for(int dy=-ra; dy&lt;=ra; dy++)
             {
-                for(int dy=-ra; dy&lt;=ra; dy++)
+                for(int dx=-ra; dx&lt;=ra; dx++)
                 {
                     float r = sqrt((float)(dx*dx + dy*dy));
                     int tx = (x+dx+X) &amp; (X-1); // wrap
