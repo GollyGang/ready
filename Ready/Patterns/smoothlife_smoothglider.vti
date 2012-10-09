@@ -4,7 +4,8 @@
   
     <description>
         The smoothglider, a parameter set of SmoothLife, by Stephan Rafler.
-        &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;(PDF)&lt;/a&gt;
+        &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;PDF&lt;/a&gt;,
+        &lt;a href=&quot;http://sourceforge.net/projects/smoothlife/&quot;&gt;software&lt;/a&gt;.
         
         SmoothLife was designed as a continuous version of Conway's Game of Life.
         The glider is capable of travelling in any direction, and is similar in
