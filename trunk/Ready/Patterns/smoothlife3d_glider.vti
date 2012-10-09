@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        SmoothLife, by Stephan Rafler.
+        &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;PDF&lt;/a&gt;,
+        &lt;a href=&quot;http://sourceforge.net/projects/smoothlife/&quot;&gt;software&lt;/a&gt;.
+        
+        This version uses smooth time stepping - the timestep can be made smaller without changing 
+        the behavior of the rule. Anti-aliasing and a smooth transition function are used to enable 
+        the size of the kernel to be as small as possible, for speed.
+        
+        This is the first 3D glider that Stephan discovered.
+        
+        Not yet working.
+    </description>
+
+    <rule type="kernel" name="SmoothLifeL">
+    
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        // ---------------------------------------------
+        __constant float ra = 12.2f;         // outer radius
+        __constant float rr = 3.0f;          // ratio of radii
+        __constant float b1 = 0.180f;        // birth1
+        __constant float b2 = 0.202f;        // birth2
+        __constant float s1 = 0.118f;        // survival1
+        __constant float s2 = 0.285f;        // survival2
+        __constant float alpha_n = 0.028f;   // outer sigmoid
+        __constant float alpha_m = 0.140f;   // inner sigmoid
+        __constant float dt = 0.101f;        // timestep
+        // ---------------------------------------------
+        __constant float PI = 3.14159265358979f;
+        
+        // the logistic function is used as a smooth step function
+        float sigma1(float x,float a,float alpha) 
+        { 
+            return 1.0f / ( 1.0f + exp( -(x-a)*4.0f/alpha ) );
+        }
+        
+        float sigma2(float x,float a,float b,float alpha)
+        {
+            return sigma1(x,a,alpha) 
+                * ( 1.0f-sigma1(x,b,alpha) );
+        }
+        
+        float sigma_m(float x,float y,float m,float alpha)
+        {
+            return x * ( 1.0f-sigma1(m,0.5f,alpha) ) 
+                + y * sigma1(m,0.5f,alpha);
+        }
+        
+        // the transition function
+        // (n = outer fullness, m = inner fullness)
+        float s(float n,float m)
+        {
+            // (same as for smoothglider)
+            return sigma2( n, sigma_m(b1,s1,m,alpha_m), 
+                sigma_m(b2,s2,m,alpha_m), alpha_n );
+        }
+        
+        // a step function with a linear ramp 
+        float ramp_step(float x,float a,float ea)
+        {
+            return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
+        }
+
+        __kernel void rd_compute(__global float* a_in,
+                                 __global float* a_out) 
+        {
+            const float rb = ra/rr; // inner radius
+            
+            const int x = get_global_id(0);
+            const int y = get_global_id(1);
+            const int z = get_global_id(2);
+            const int X = get_global_size(0);
+            const int Y = get_global_size(1);
+            const int Z = get_global_size(2);
+            const int i_here = X*(Y*z + y) + x;
+            
+            // how full are the outer shell and inner sphere?
+            float outf = 0.0f, inf = 0.0f;
+            for(int dx=-ra; dx&lt;=ra; dx++)
+            {
+                for(int dy=-ra; dy&lt;=ra; dy++)
+                {
+                    for(int dz=-ra; dz&lt;=ra; dz++)
+                    {
+                        float r = sqrt((float)(dx*dx + dy*dy + dz*dz));
+                        int tx = (x+dx+X) &amp; (X-1); // wrap
+                        int ty = (y+dy+Y) &amp; (Y-1); // wrap
+                        int tz = (z+dz+Z) &amp; (Z-1); // wrap
+                        float val = a_in[ X*(Y*tz+ty)+tx ]; 
+                        // add val, with anti-aliasing:
+                        inf  += val * ramp_step(-r,-rb,1.0f);
+                        outf += val * ramp_step(-r,-ra,1.0f) 
+                                    * ramp_step(r,rb,1.0f);
+                    }
+                }
+            }
+            // normalize by volume
+            const float VOL_OUTER = (4.0f/3.0f) * PI * 
+                                     (ra*ra*ra - rb*rb*rb);
+            const float VOL_INNER = (4.0f/3.0f) * PI * 
+                                     rb * rb * rb;
+            outf /= VOL_OUTER;
+            inf /= VOL_INNER;
+            
+            // smooth time stepping:
+            a_out[i_here] = clamp( a_in[i_here] +
+                dt * (2.0f*s(outf,inf)-1.0f), 
+                0.0f, 1.0f );
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="0.3" />
+        <circle radius="0.2"> <point3d x="0.4" y="0.3" z="0.5" /> </circle>
+        <circle radius="0.2"> <point3d x="0.7" y="0.6" z="0.5" /> </circle>
+        <circle radius="0.2"> <point3d x="0.3" y="0.8" z="0.5" /> </circle>
+      </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0.7" high="1" />
+        <circle radius="0.2"> <point3d x="0.4" y="0.3" z="0.7" /> </circle>
+        <circle radius="0.2"> <point3d x="0.7" y="0.6" z="0.2" /> </circle>
+        <circle radius="0.2"> <point3d x="0.3" y="0.8" z="0.6" /> </circle>
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="1" />
+      <color_high r="1" g="0.5" b="0" />
+      <show_color_scale value="true" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="1" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 31 0 31 0 31" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 31 0 31 0 31">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        BAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+
+</VTKFile>
