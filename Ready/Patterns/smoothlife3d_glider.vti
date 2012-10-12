@@ -18,7 +18,7 @@
 
     <rule type="kernel" name="SmoothLifeL">
     
-      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+      <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
         // ---------------------------------------------
         __constant float ra = 12.2f;         // outer radius
         __constant float rr = 3.0f;          // ratio of radii
@@ -32,18 +32,18 @@
         // ---------------------------------------------
         
         // the logistic function is used as a smooth step function
-        float sigma1(float x,float a,float alpha) 
+        float4 sigma1(float4 x,float4 a,float alpha) 
         { 
             return 1.0f / ( 1.0f + exp( -(x-a)*4.0f/alpha ) );
         }
         
-        float sigma2(float x,float a,float b,float alpha)
+        float4 sigma2(float4 x,float4 a,float4 b,float alpha)
         {
             return sigma1(x,a,alpha) 
                 * ( 1.0f-sigma1(x,b,alpha) );
         }
         
-        float sigma_m(float x,float y,float m,float alpha)
+        float4 sigma_m(float x,float y,float4 m,float alpha)
         {
             return x * ( 1.0f-sigma1(m,0.5f,alpha) ) 
                 + y * sigma1(m,0.5f,alpha);
@@ -51,9 +51,8 @@
         
         // the transition function
         // (n = outer fullness, m = inner fullness)
-        float s(float n,float m)
+        float4 s(float4 n,float4 m)
         {
-            // (same as for smoothglider)
             return sigma2( n, sigma_m(b1,s1,m,alpha_m), 
                 sigma_m(b2,s2,m,alpha_m), alpha_n );
         }
@@ -64,22 +63,25 @@
             return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
         }
 
-        __kernel void rd_compute(__global float* a_in,
-                                 __global float* a_out) 
+        __kernel void rd_compute(__global float4* a_in,
+                                 __global float4* a_out) 
         {
             const float rb = ra/rr; // inner radius
             
-            const int x = get_global_id(0);
-            const int y = get_global_id(1);
-            const int z = get_global_id(2);
-            const int X = get_global_size(0);
-            const int Y = get_global_size(1);
-            const int Z = get_global_size(2);
-            const int i_here = X*(Y*z + y) + x;
+            // block IDs
+            const int bx = get_global_id(0);
+            const int by = get_global_id(1);
+            const int bz = get_global_id(2);
+            const int BX = get_global_size(0);
+            const int BY = get_global_size(1);
+            const int BZ = get_global_size(2);
+            const int i_here = BX*(BY*bz + by) + bx;
             
             // how full are the outer shell and inner sphere?
-            float outf = 0.0f, inf = 0.0f;
+            float4 outf = 0.0f, inf = 0.0f;
             float volume_out = 0.0f, volume_in = 0.0f;
+            float4 val; // (we process 4 floats at once, in 4x1x1 blocks)
+            // (if you want a version that processes single floats, see the svn)
             for(int dz=-ra; dz&lt;=ra; dz++)
             {
                 for(int dy=-ra; dy&lt;=ra; dy++)
@@ -87,10 +89,31 @@
                     for(int dx=-ra; dx&lt;=ra; dx++)
                     {
                         float r = sqrt((float)(dx*dx + dy*dy + dz*dz));
-                        int tx = (x+dx+X) &amp; (X-1); // wrap
-                        int ty = (y+dy+Y) &amp; (Y-1); // wrap
-                        int tz = (z+dz+Z) &amp; (Z-1); // wrap
-                        float val = a_in[ X*(Y*tz+ty)+tx ]; 
+                        // retrieve the float4's we need
+                        int shift = (BX+dx)%4; // (avoid taking modulus of negatives)
+                        int dbx = (dx-shift)/4;
+                        int tx1 = (bx+dbx+BX)   &amp; (BX-1); // wrap
+                        int tx2 = (bx+dbx+1+BX) &amp; (BX-1); // wrap
+                        int ty =  (by+dy+BY)    &amp; (BY-1); // wrap
+                        int tz =  (bz+dz+BZ)    &amp; (BZ-1); // wrap
+                        float4 block1 = a_in[ BX*(BY*tz+ty)+tx1 ]; 
+                        float4 block2 = a_in[ BX*(BY*tz+ty)+tx2 ]; 
+                        // swizzle to get the single float4 we need for this sample
+                        switch(shift)
+                        {
+                            case 0: 
+                                val = block1; 
+                                break;
+                            case 1:
+                                val = (float4)(block1.y,block1.z,block1.w,block2.x); 
+                                break;
+                            case 2:
+                                val = (float4)(block1.z,block1.w,block2.x,block2.y); 
+                                break;
+                            case 3:
+                                val = (float4)(block1.w,block2.x,block2.y,block2.z); 
+                                break;
+                        }
                         // compute the weights:
                         float k_in = ramp_step(-r,-rb,1.0f);
                         float k_out = ramp_step(-r,-ra,1.0f) 
@@ -120,22 +143,14 @@
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0" high="1" />
+        <white_noise low="0" high="0.6" />
         <everywhere />
       </overlay>
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0" high="0.3" />
-        <circle radius="0.2"> <point3d x="0.4" y="0.3" z="0.5" /> </circle>
-        <circle radius="0.2"> <point3d x="0.7" y="0.6" z="0.5" /> </circle>
-        <circle radius="0.2"> <point3d x="0.3" y="0.8" z="0.5" /> </circle>
-      </overlay>
-      <overlay chemical="a">
-        <overwrite />
-        <white_noise low="0.7" high="1" />
-        <circle radius="0.2"> <point3d x="0.4" y="0.3" z="0.7" /> </circle>
-        <circle radius="0.2"> <point3d x="0.7" y="0.6" z="0.2" /> </circle>
-        <circle radius="0.2"> <point3d x="0.3" y="0.8" z="0.6" /> </circle>
+        <constant value="1" />
+        <circle radius="0.15"> <point3d x="0.2" y="0.5" z="0.1" /> </circle>
+        <circle radius="0.15"> <point3d x="0.9" y="0.2" z="0.6" /> </circle>
       </overlay>
     </initial_pattern_generator>
     
@@ -145,15 +160,18 @@
       <show_color_scale value="true" />
       <show_displacement_mapped_surface value="false" />
       <timesteps_per_render value="1" />
+      <slice_3D_axis value="y" />
+      <slice_3D_position value="0.5" />
+      <contour_level value="0.6" />
     </render_settings>
     
   </RD>
   
-  <ImageData WholeExtent="0 31 0 31 0 31" Origin="0 0 0" Spacing="1 1 1">
-  <Piece Extent="0 31 0 31 0 31">
+  <ImageData WholeExtent="0 63 0 63 0 63" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 63 0 63 0 63">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
-        BAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+        IAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
     </PointData>
     <CellData>
