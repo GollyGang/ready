@@ -148,7 +148,7 @@
       <overlay chemical="a">
         <overwrite />
         <white_noise low="0.9" high="1" />
-        <circle radius="0.3"> <point3d x="0.5" y="0.5" z="0.2" /> </circle>
+        <circle radius="0.3"> <point3d x="0.5" y="0.5" z="0.8" /> </circle>
       </overlay>
     </initial_pattern_generator>
     
