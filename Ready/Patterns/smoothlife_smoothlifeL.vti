@@ -19,7 +19,7 @@
 
     <rule type="kernel" name="SmoothLifeL">
     
-      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+      <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
         // ---------------------------------------------
         // SmoothLifeL (smooth time stepping 2D)
         __constant float ra = 10.0f;         // outer radius
@@ -32,21 +32,20 @@
         __constant float alpha_m = 0.147f;   // inner sigmoid
         __constant float dt = 0.1f;          // timestep
         // ---------------------------------------------
-        __constant float PI = 3.14159265358979f;
         
         // the logistic function is used as a smooth step function
-        float sigma1(float x,float a,float alpha) 
+        float4 sigma1(float4 x,float4 a,float alpha) 
         { 
             return 1.0f / ( 1.0f + exp( -(x-a)*4.0f/alpha ) );
         }
         
-        float sigma2(float x,float a,float b,float alpha)
+        float4 sigma2(float4 x,float4 a,float4 b,float alpha)
         {
             return sigma1(x,a,alpha) 
                 * ( 1.0f-sigma1(x,b,alpha) );
         }
         
-        float sigma_m(float x,float y,float m,float alpha)
+        float4 sigma_m(float4 x,float4 y,float4 m,float alpha)
         {
             return x * ( 1.0f-sigma1(m,0.5f,alpha) ) 
                 + y * sigma1(m,0.5f,alpha);
@@ -54,7 +53,7 @@
         
         // the transition function
         // (n = outer fullness, m = inner fullness)
-        float s(float n,float m)
+        float4 s(float4 n,float4 m)
         {
             // (different to that for smoothglider)
             return sigma_m( sigma2(n,b1,b2,alpha_n), 
@@ -67,39 +66,66 @@
             return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
         }
 
-        __kernel void rd_compute(__global float* a_in,
-                                 __global float* a_out) 
+        __kernel void rd_compute(__global float4* a_in,
+                                 __global float4* a_out) 
         {
             const float rb = ra/rr; // inner radius
             
-            const int x = get_global_id(0);
-            const int y = get_global_id(1);
-            const int z = get_global_id(2);
-            const int X = get_global_size(0);
-            const int Y = get_global_size(1);
-            const int i_here = X*(Y*z + y) + x;
+            // block IDS
+            const int bx = get_global_id(0);
+            const int by = get_global_id(1);
+            const int bz = get_global_id(2);
+            const int BX = get_global_size(0);
+            const int BY = get_global_size(1);
+            const int i_here = BX*(BY*bz + by) + bx;
             
             // how full are the annulus and inner disk?
-            float outf = 0.0f, inf = 0.0f;
+            float4 outf = 0.0f, inf = 0.0f;
+            float area_in = 0.0f, area_out = 0.0f;
+            float4 val; // (we process 4 floats at once, in 4x1x1 blocks)
+            // (if you want a version that processes single floats, see the svn)
             for(int dy=-ra; dy&lt;=ra; dy++)
             {
                 for(int dx=-ra; dx&lt;=ra; dx++)
                 {
-                    float r = sqrt((float)(dx*dx + dy*dy));
-                    int tx = (x+dx+X) &amp; (X-1); // wrap
-                    int ty = (y+dy+Y) &amp; (Y-1); // wrap
-                    float val = a_in[ X*(Y*z+ty)+tx ]; 
+                    float r = sqrt((float)(dx*dx + dy*dy)); // same for all 4
+                    // retrieve the float4's we need
+                    int shift = (BX+dx)%4; // (avoid taking modulus of negatives)
+                    int dbx = (dx-shift)/4;
+                    int tx1 = (bx+dbx+BX)   &amp; (BX-1); // wrap
+                    int tx2 = (bx+dbx+1+BX) &amp; (BX-1); // wrap
+                    int ty =  (by+dy+BY)    &amp; (BY-1); // wrap
+                    float4 block1 = a_in[ BX*(BY*bz+ty)+tx1 ]; 
+                    float4 block2 = a_in[ BX*(BY*bz+ty)+tx2 ]; 
+                    // swizzle to get the single float4 we need for this sample
+                    switch(shift)
+                    {
+                        case 0: 
+                            val = block1; 
+                            break;
+                        case 1:
+                            val = (float4)(block1.y,block1.z,block1.w,block2.x); 
+                            break;
+                        case 2:
+                            val = (float4)(block1.z,block1.w,block2.x,block2.y); 
+                            break;
+                        case 3:
+                            val = (float4)(block1.w,block2.x,block2.y,block2.z); 
+                            break;
+                    }
                     // add val, with anti-aliasing:
-                    inf  += val * ramp_step(-r,-rb,1.0f);
-                    outf += val * ramp_step(-r,-ra,1.0f) 
+                    float k_in = ramp_step(-r,-rb,1.0f);
+                    inf  += val * k_in;
+                    area_in += k_in;
+                    float k_out = ramp_step(-r,-ra,1.0f) 
                                 * ramp_step(r,rb,1.0f);
+                    outf += val * k_out;
+                    area_out += k_out;
                 }
             }
-            // normalize by area
-            const float AREA_OUTER = PI * (ra*ra - rb*rb);
-            const float AREA_INNER = PI * rb * rb;
-            outf /= AREA_OUTER;
-            inf /= AREA_INNER;
+            // normalize
+            inf /= area_in;
+            outf /= area_out;
             
             // smooth time stepping:
             a_out[i_here] = clamp( a_in[i_here] +
@@ -126,8 +152,8 @@
     </initial_pattern_generator>
     
     <render_settings>
-      <color_low r="0" g="0" b="1" />
-      <color_high r="1" g="0.5" b="0" />
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
       <show_color_scale value="true" />
       <show_displacement_mapped_surface value="false" />
       <timesteps_per_render value="8" />
