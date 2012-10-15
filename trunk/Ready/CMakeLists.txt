@@ -132,6 +132,7 @@ set( PATTERN_FILES
   Patterns/smoothlife_smoothglider.vti
   Patterns/smoothlife_smoothlifeL.vti
   Patterns/smoothlife3d_glider.vti
+  Patterns/purwins_glider3d.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
