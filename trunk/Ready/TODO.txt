@@ -16,32 +16,30 @@ Big picture issues:
 
 before 0.5 release:
 
+1) clarify computed frames per second, suppress when iteration is too short, display percentage of time spent rendering?
+2) way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
+3) way to switch between inbuilt, formula and kernel
+
 - support neighborhood_type and neighborhood_weight on inbuilt rules
-  
-- add Help files for Info Panel, etc.?
-- lots of patterns: Robert's, examples from File > New Pattern
-
-- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap 
-   too, on polyhedral meshes. Needed for images too, to expand a dataset without deleting the data.
-- progress indicator for mesh generators?
-- way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
-- way to switch between inbuilt, formula and kernel
-
+- add some more 2d and 3d u-skate gliders
 - 3D images should show cell color when use_image_interpolation=false, to match behavior we like in
   meshes
+- add timesteps_per_render to action toolbar
 
+before 0.x release:
+
+- use FFT for speed?
+- add Help files for Info Panel, etc.?
+- progress indicator for mesh generators?
+- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap 
+   too, on polyhedral meshes. Needed for images too, to expand a dataset without deleting the data.
 - add spectrum slider to change current paint color?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
-- relax power of 2 size requirement? (only a speed benefit) but some kernels use this too
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
-- add timesteps_per_render to action toolbar
 - set scene rotating by a setting in the start recording dialog box, or for general use?
-- mouse wheel sensitivity option
-
-- clarify computed frames per second, suppress when iteration is too short, display percentage of time spent rendering?
-
-before 0.x release:
+- mouse wheel sensitivity option?
+- relax power of 2 size requirement? (only a speed benefit) but some kernels use this too
 - toggle between single channel painting and multi-channel painting. Sometimes we want to paint just in channels
   a and b, though, for example, which is trickier.
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
