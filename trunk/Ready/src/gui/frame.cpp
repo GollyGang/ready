@@ -234,7 +234,7 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(false),
-       smoothed_timesteps_per_second(0.0),
+       speed_data_available(false),
        i_timesteps_per_second_buffer(0),
        time_at_last_render(0),
        fullscreen(false),
@@ -781,7 +781,7 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
 
         // hide all currently shown panes (except the canvas pane)
         wxAuiPaneInfoArray panes = this->aui_mgr.GetAllPanes();
-        for(int i=0;i<panes.Count();i++)
+        for(size_t i=0;i<panes.Count();i++)
             if(panes[i].name != PaneName(ID::CanvasPane))
                 this->aui_mgr.GetPane(panes[i].name).Hide();
 
@@ -958,6 +958,8 @@ void MyFrame::SetCurrentRDSystem(AbstractRD* sys)
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(iChem));
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
     this->is_running = false;
+    this->i_timesteps_per_second_buffer = 0;
+    this->speed_data_available = false;
     this->info_panel->ResetPosition();
     this->UpdateWindows();
 }
@@ -1247,6 +1249,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
                 if(smoothed_cfps > this->smoothed_timesteps_per_second)
                     this->percentage_spent_rendering = 100.0 - 100.0 * this->smoothed_timesteps_per_second / smoothed_cfps;
                 this->i_timesteps_per_second_buffer = 0;
+                this->speed_data_available = true;
             }
 
             if(this->is_recording)
@@ -1258,6 +1261,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             if (do_one_render) {
                 // user selected Step by N so stop now
                 this->is_running = false;
+                this->speed_data_available = false;
                 this->SetStatusBarText();
                 this->UpdateToolbars();
             } else {
@@ -1281,11 +1285,14 @@ void MyFrame::SetStatusBarText()
     if(this->is_running) txt << _("Running.");
     else txt << _("Stopped.");
     txt << _(" Timesteps: ") << this->system->GetTimestepsTaken();
-    txt << wxString::Format(_T("  -   %.0f"),this->smoothed_timesteps_per_second)
-        << _(" timesteps per second");
-    txt << _T("   ( ") 
-        << wxString::Format(_T("%.1f"),this->percentage_spent_rendering)
-        << _("% of time spent rendering )");
+    if(this->speed_data_available)
+    {
+        txt << wxString::Format(_T("  -   %.0f"),this->smoothed_timesteps_per_second)
+            << _(" timesteps per second");
+        txt << _T("   ( ") 
+            << wxString::Format(_T("%.1f"),this->percentage_spent_rendering)
+            << _("% of time spent rendering )");
+    }
     SetStatusText(txt);
 }
 
