@@ -234,8 +234,9 @@ MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
        pVTKWindow(NULL),system(NULL),
        is_running(false),
-       frames_per_second(0.0),
-       million_cell_generations_per_second(0.0),
+       smoothed_timesteps_per_second(0.0),
+       i_timesteps_per_second_buffer(0),
+       time_at_last_render(0),
        fullscreen(false),
        render_settings("render_settings"),
        is_recording(false),
@@ -1027,7 +1028,7 @@ void MyFrame::OnStep(wxCommandEvent& event)
             // instead we let OnIdle do the stepping, but stop at next render
             this->is_running = true;
             steps_since_last_render = 0;
-            accumulated_time = 0.0;
+            this->computation_time_since_last_render = 0.0;
             do_one_render = true;
         }
     }
@@ -1076,7 +1077,7 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
             // pattern files, but really we could choose any small number > 0
         }
         steps_since_last_render = 0;
-        accumulated_time = 0.0;
+        this->computation_time_since_last_render = 0.0;
         do_one_render = false;
     }
 }
@@ -1222,16 +1223,31 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             }
         }
         
-        accumulated_time += time_diff;
+        this->computation_time_since_last_render += time_diff;
         steps_since_last_render += temp_steps;
         
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
             int n_cells = this->system->GetNumberOfCells();
-            if (accumulated_time == 0.0)
-                accumulated_time = 0.000001;  // unlikely, but play safe
-            this->frames_per_second = steps_since_last_render / accumulated_time;
-            this->million_cell_generations_per_second = this->frames_per_second * n_cells / 1e6;
+            if (this->computation_time_since_last_render == 0.0)
+                this->computation_time_since_last_render = 0.000001;  // unlikely, but play safe
+            double time_since_last_render = time_before - this->time_at_last_render;
+            this->time_at_last_render = time_before;
+            this->timesteps_per_second_buffer[this->i_timesteps_per_second_buffer] = steps_since_last_render / time_since_last_render;
+            this->computed_frames_per_second_buffer[this->i_timesteps_per_second_buffer] = steps_since_last_render / this->computation_time_since_last_render;
+            this->i_timesteps_per_second_buffer++;
+            if(this->i_timesteps_per_second_buffer==10)
+            {
+                this->smoothed_timesteps_per_second = 0.0;
+                double smoothed_cfps = 0.0;
+                for(int i=0;i<10;i++) {
+                    this->smoothed_timesteps_per_second += this->timesteps_per_second_buffer[i]/10.0;
+                    smoothed_cfps += this->computed_frames_per_second_buffer[i]/10.0;
+                }
+                if(smoothed_cfps > this->smoothed_timesteps_per_second)
+                    this->percentage_spent_rendering = 100.0 - 100.0 * this->smoothed_timesteps_per_second / smoothed_cfps;
+                this->i_timesteps_per_second_buffer = 0;
+            }
 
             if(this->is_recording)
                 this->RecordFrame();
@@ -1247,7 +1263,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             } else {
                 // keep simulating
                 steps_since_last_render = 0;
-                accumulated_time = 0.0;
+                this->computation_time_since_last_render = 0.0;
             }
         }
         
@@ -1265,14 +1281,11 @@ void MyFrame::SetStatusBarText()
     if(this->is_running) txt << _("Running.");
     else txt << _("Stopped.");
     txt << _(" Timesteps: ") << this->system->GetTimestepsTaken();
-    txt << _T("   (") << wxString::Format(_T("%.0f"),this->frames_per_second)
-        << _(" computed frames per second, ")
-        << wxString::Format(_T("%.0f"),this->million_cell_generations_per_second)
-        << _T(" mcgs)");
-    /* DEBUG
-    txt << wxString::Format(_T("  num_steps=%d"), num_steps)
-        << wxString::Format(_T("  tpr=%d"), this->render_settings.GetProperty("timesteps_per_render").GetInt());
-    */
+    txt << wxString::Format(_T("  -   %.0f"),this->smoothed_timesteps_per_second)
+        << _(" timesteps per second");
+    txt << _T("   ( ") 
+        << wxString::Format(_T("%.1f"),this->percentage_spent_rendering)
+        << _("% of time spent rendering )");
     SetStatusText(txt);
 }
 
