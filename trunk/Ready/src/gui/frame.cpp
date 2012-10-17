@@ -472,6 +472,10 @@ void MyFrame::InitializeToolbars()
         //    _("Start Recording..."),wxITEM_CHECK);
         this->action_toolbar->AddTool(ID::Slower,_("Run Slower"),wxBitmap(this->icons_folder + _T("media-seek-backward.png"),wxBITMAP_TYPE_PNG),
             _("Run Slower"));
+        wxStaticText *st = new wxStaticText(this->action_toolbar,ID::TimestepsPerRender,
+            wxString::Format(_(" %d "),MAX_TIMESTEPS_PER_RENDER),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
+        st->SetToolTip(_("Timesteps per render"));
+        this->action_toolbar->AddControl(st,_("Timesteps per render"));
         this->action_toolbar->AddTool(ID::Faster,_("Run Faster"),wxBitmap(this->icons_folder + _T("media-seek-forward.png"),wxBITMAP_TYPE_PNG),
             _("Run Faster"));
         this->action_toolbar->AddTool(ID::Reset, _("Reset"),wxBitmap(this->icons_folder + _T("media-skip-backward_modified.png"),wxBITMAP_TYPE_PNG),
@@ -492,7 +496,8 @@ void MyFrame::InitializeToolbars()
             _("Brush (right-click to pick color)"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
-        wxStaticText *st = new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_("  1.000000  "),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
+        wxStaticText *st = new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_(" 0.00000E+000 "), // allow enough space for %6g
+            wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
         st->SetToolTip(_("Current value to paint with"));
         this->paint_toolbar->AddControl(st,_("Color"));
         wxImage im(22,22);
@@ -1114,7 +1119,9 @@ void MyFrame::UpdateToolbars()
     this->action_toolbar->FindTool(ID::RunStop)->SetLabel( 
         this->is_running ? _("Stop")
                          : _("Run") );
-    this->paint_toolbar->FindControl(ID::CurrentValueText)->SetLabel( wxString::Format(_T("%f"),
+    this->action_toolbar->FindControl(ID::TimestepsPerRender)->SetLabel( wxString::Format(_T("%d"),
+        this->render_settings.GetProperty("timesteps_per_render").GetInt()) );
+    this->paint_toolbar->FindControl(ID::CurrentValueText)->SetLabel( wxString::Format(_T("%.6g"),
         this->current_paint_value) );
     // update the color swatch with the current color
     wxImage im(22,22);
@@ -2943,6 +2950,7 @@ void MyFrame::OnRunFaster(wxCommandEvent& event)
     // check for overflow, or if beyond limit used in OnChangeRunningSpeed
     if (prop.GetInt() <= 0 || prop.GetInt() > MAX_TIMESTEPS_PER_RENDER) prop.SetInt(MAX_TIMESTEPS_PER_RENDER);
     this->UpdateInfoPane();
+    this->UpdateToolbars();
 }
 
 // ---------------------------------------------------------------------
@@ -2954,6 +2962,7 @@ void MyFrame::OnRunSlower(wxCommandEvent& event)
     // don't let timesteps_per_render get to 0 otherwise OnRunFaster can't double it
     if (prop.GetInt() < 1) prop.SetInt(1);
     this->UpdateInfoPane();
+    this->UpdateToolbars();
 }
 
 // ---------------------------------------------------------------------
