@@ -227,11 +227,13 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         // following are used when running a simulation:
         bool is_running;
-        double frames_per_second, million_cell_generations_per_second;
         int num_steps;
         int steps_since_last_render;
-        double accumulated_time;
+        double computation_time_since_last_render, computed_frames_per_second_buffer[10];
+        double time_at_last_render, percentage_spent_rendering;
+        double smoothed_timesteps_per_second,timesteps_per_second_buffer[10];
         bool do_one_render;
+        int i_timesteps_per_second_buffer;
 
         // used when recording frames to disk
         bool is_recording,record_data_image;

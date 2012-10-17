@@ -16,9 +16,8 @@ Big picture issues:
 
 before 0.5 release:
 
-1) clarify computed frames per second, suppress when iteration is too short, display percentage of time spent rendering?
-2) way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
-3) way to switch between inbuilt, formula and kernel
+1) way to save the pattern as blank, with apply_when_loading="true" - File > Save Advanced... ?
+2) way to switch between inbuilt, formula and kernel
 
 - support neighborhood_type and neighborhood_weight on inbuilt rules
 - add some more 2d and 3d u-skate gliders
