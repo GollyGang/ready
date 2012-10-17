@@ -113,6 +113,7 @@ namespace ID
         BiggerButton,
 
         // Toolbars:
+        TimestepsPerRender,
         CurrentValueText,
         CurrentValueColor,
     }; 

@@ -23,7 +23,6 @@ before 0.5 release:
 - add some more 2d and 3d u-skate gliders
 - 3D images should show cell color when use_image_interpolation=false, to match behavior we like in
   meshes
-- add timesteps_per_render to action toolbar
 
 before 0.x release:
 
