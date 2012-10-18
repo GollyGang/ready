@@ -173,7 +173,7 @@ set( OTHER_FILES
   resources/Icons/22px/document-save.png
   resources/Icons/22px/document-revert.png
   resources/Icons/22px/media-playback-start_green.png
-  resources/Icons/22px/media-playback-pause_green.png
+  resources/Icons/22px/media-playback-pause_red.png
   resources/Icons/22px/media-seek-forward.png
   resources/Icons/22px/media-seek-backward.png
   resources/Icons/22px/media-skip-backward_modified.png
@@ -190,7 +190,7 @@ set( OTHER_FILES
   resources/Icons/32px/document-save.png
   resources/Icons/32px/document-revert.png
   resources/Icons/32px/media-playback-start_green.png
-  resources/Icons/32px/media-playback-pause_green.png
+  resources/Icons/32px/media-playback-pause_red.png
   resources/Icons/32px/media-seek-forward.png
   resources/Icons/32px/media-seek-backward.png
   resources/Icons/32px/media-skip-backward_modified.png
