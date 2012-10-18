@@ -458,6 +458,7 @@ void MyFrame::InitializeToolbars()
             _("Save Pattern..."));
         this->file_toolbar->AddTool(ID::Screenshot,_("Save Screenshot..."),wxBitmap(this->icons_folder + _T("camera-photo.png"),wxBITMAP_TYPE_PNG),
             _("Save Screenshot..."));
+
         this->file_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->file_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::FileToolbar))
             .Position(0).Caption(_("File tools")));
@@ -471,17 +472,18 @@ void MyFrame::InitializeToolbars()
         //this->action_toolbar->AddTool(ID::RecordFrames,_("Start Recording..."),wxBitmap(this->icons_folder + _T("media-record.png"),wxBITMAP_TYPE_PNG),
         //    _("Start Recording..."),wxITEM_CHECK);
         this->action_toolbar->AddTool(ID::Slower,_("Run Slower"),wxBitmap(this->icons_folder + _T("media-seek-backward.png"),wxBITMAP_TYPE_PNG),
-            _("Run Slower"));
+            _("Run Slower (render more often)"));
         wxStaticText *st = new wxStaticText(this->action_toolbar,ID::TimestepsPerRender,
             wxString::Format(_(" %d "),MAX_TIMESTEPS_PER_RENDER),wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
         st->SetToolTip(_("Timesteps per render"));
         this->action_toolbar->AddControl(st,_("Timesteps per render"));
         this->action_toolbar->AddTool(ID::Faster,_("Run Faster"),wxBitmap(this->icons_folder + _T("media-seek-forward.png"),wxBITMAP_TYPE_PNG),
-            _("Run Faster"));
+            _("Run Faster (render less often)"));
         this->action_toolbar->AddTool(ID::Reset, _("Reset"),wxBitmap(this->icons_folder + _T("media-skip-backward_modified.png"),wxBITMAP_TYPE_PNG),
             _("Reset"));
         this->action_toolbar->AddTool(ID::GenerateInitialPattern,_("Generate Initial Pattern"),wxBitmap(this->icons_folder + _T("system-run.png"),wxBITMAP_TYPE_PNG),
             _("Generate Initial Pattern"));
+
         this->action_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->action_toolbar,wxAuiPaneInfo().ToolbarPane().Top()
             .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
@@ -496,15 +498,16 @@ void MyFrame::InitializeToolbars()
             _("Brush (right-click to pick color)"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Picker,_("Color picker"),wxBitmap(this->icons_folder + _T("color-picker.png"),wxBITMAP_TYPE_PNG),
             _("Color picker"),wxITEM_RADIO);
-        wxStaticText *st = new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_(" 0.00000E+000 "), // allow enough space for %6g
-            wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
-        st->SetToolTip(_("Current value to paint with"));
-        this->paint_toolbar->AddControl(st,_("Color"));
         wxImage im(22,22);
         im.SetRGB(wxRect(0,0,22,22),255,0,0);
         wxBitmapButton *cb = new wxBitmapButton(this->paint_toolbar,ID::CurrentValueColor,wxBitmap(im));
         cb->SetToolTip(_("Color of the current paint value. Click to change the value."));
         this->paint_toolbar->AddControl(cb,_("Color"));
+        wxStaticText *st = new wxStaticText(this->paint_toolbar,ID::CurrentValueText,_(" 0.00000E+000 "), // allow enough space for %6g
+            wxDefaultPosition,wxDefaultSize,wxALIGN_CENTRE_HORIZONTAL);
+        st->SetToolTip(_("Current value to paint with"));
+        this->paint_toolbar->AddControl(st,_("Color"));
+
         this->paint_toolbar->SetToolBorderPadding(toolbar_padding);
         this->aui_mgr.AddPane(this->paint_toolbar,wxAuiPaneInfo().ToolbarPane().Top().Name(PaneName(ID::PaintToolbar))
             .Position(2).Caption(_("Paint tools")));
@@ -1110,7 +1113,7 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 void MyFrame::UpdateToolbars()
 {
     this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
-        this->is_running ? wxBitmap(this->icons_folder + _T("media-playback-pause_green.png"),wxBITMAP_TYPE_PNG)
+        this->is_running ? wxBitmap(this->icons_folder + _T("media-playback-pause_red.png"),wxBITMAP_TYPE_PNG)
                          : wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG) );
     
     this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
