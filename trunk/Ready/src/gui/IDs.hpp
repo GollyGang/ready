@@ -46,6 +46,7 @@ namespace ID
         ImportMesh,
         ExportMesh,
         ExportImage,
+        SaveCompact,
 
         // edit menu
         Pointer,

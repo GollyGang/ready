@@ -89,6 +89,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnOpenPattern(wxCommandEvent& event);
         void OnReloadFromDisk(wxCommandEvent& event);
         void OnSavePattern(wxCommandEvent& event);
+        void OnSaveCompact(wxCommandEvent& event);
         void OnScreenshot(wxCommandEvent& event);
         void OnRecordFrames(wxCommandEvent& event);
         void OnUpdateRecordFrames(wxUpdateUIEvent& event);

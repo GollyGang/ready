@@ -113,6 +113,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_OPEN, MyFrame::OnOpenPattern)
     EVT_MENU(ID::ReloadFromDisk, MyFrame::OnReloadFromDisk)
     EVT_MENU(wxID_SAVE, MyFrame::OnSavePattern)
+    EVT_MENU(ID::SaveCompact, MyFrame::OnSaveCompact)
     EVT_MENU(ID::ImportMesh, MyFrame::OnImportMesh)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
     EVT_MENU(ID::ExportImage, MyFrame::OnExportImage)
@@ -331,8 +332,9 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::ExportImage, _("Export Image...") + GetAccelerator(DO_EXPORTIMAGE), _("Export the image"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
-        menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
+        menu->Append(ID::SaveCompact, _("Save Compact...") + GetAccelerator(DO_SAVECOMPACT), _("Save the current system with no data but with the initial pattern generator turned on"));
         menu->AppendSeparator();
+        menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
         menu->AppendCheckItem(ID::RecordFrames, _("Start Recording...") + GetAccelerator(DO_RECORDFRAMES), _("Record frames as images to disk"));
         menu->AppendSeparator();
         menu->Append(ID::AddMyPatterns, _("Add My Patterns...") + GetAccelerator(DO_ADDPATTS), _("Add chosen folder to patterns pane"));
@@ -2507,6 +2509,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::ExportMesh,                DO_EXPORTMESH);
         SetAccelerator(mbar, ID::ExportImage,               DO_EXPORTIMAGE);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
+        SetAccelerator(mbar, ID::SaveCompact,               DO_SAVECOMPACT);
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
         SetAccelerator(mbar, ID::RecordFrames,              DO_RECORDFRAMES);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
@@ -2581,6 +2584,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_EXPORTMESH:     cmdid = ID::ExportMesh; break;
         case DO_EXPORTIMAGE:    cmdid = ID::ExportImage; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
+        case DO_SAVECOMPACT:    cmdid = ID::SaveCompact; break;
         case DO_SCREENSHOT:     cmdid = ID::Screenshot; break;
         case DO_RECORDFRAMES:   cmdid = ID::RecordFrames; break;
         case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
@@ -3615,6 +3619,13 @@ void MyFrame::OnBrushSizeLarge(wxCommandEvent& event)
 void MyFrame::OnUpdateBrushSizeLarge(wxUpdateUIEvent& event)
 {
     event.Check(current_brush_size==2);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnSaveCompact(wxCommandEvent& event)
+{
+    wxMessageBox(_("Not yet implemented."));
 }
 
 // ---------------------------------------------------------------------

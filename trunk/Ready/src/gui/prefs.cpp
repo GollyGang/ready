@@ -321,6 +321,7 @@ const char* GetActionName(action_id action)
         case DO_EXPORTMESH:     return "Export Mesh...";
         case DO_EXPORTIMAGE:    return "Export Image...";
         case DO_SAVE:           return "Save Pattern...";
+        case DO_SAVECOMPACT:    return "Save Compact...";
         case DO_SCREENSHOT:     return "Save Screenshot...";
         case DO_RECORDFRAMES:   return "Start Recording...";
         case DO_ADDPATTS:       return "Add My Patterns...";
