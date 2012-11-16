@@ -702,6 +702,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         surface->SetInputConnection(to_point_data->GetOutputPort());
         surface->SetValue(0,contour_level);
         mapper->SetInputConnection(surface->GetOutputPort());
+        mapper->ScalarVisibilityOff();
     }
     else
     {
@@ -718,7 +719,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 
         mapper->SetInputConnection(geometry->GetOutputPort());
     }
-    mapper->ScalarVisibilityOff();
 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
