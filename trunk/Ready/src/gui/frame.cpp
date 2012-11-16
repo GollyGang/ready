@@ -332,7 +332,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::ExportImage, _("Export Image...") + GetAccelerator(DO_EXPORTIMAGE), _("Export the image"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
-        menu->Append(ID::SaveCompact, _("Save Compact...") + GetAccelerator(DO_SAVECOMPACT), _("Blanks the image and saves with the initial pattern generator set to apply when the file is loaded"));
+        menu->Append(ID::SaveCompact, _("Save Compact...") + GetAccelerator(DO_SAVECOMPACT), _("Blank the image and save with the initial pattern generator set to apply when the file is loaded"));
         menu->AppendSeparator();
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
         menu->AppendCheckItem(ID::RecordFrames, _("Start Recording...") + GetAccelerator(DO_RECORDFRAMES), _("Record frames as images to disk"));
