@@ -114,11 +114,13 @@ void MeshRD::SetNumberOfChemicals(int n)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::SaveFile(const char* filename,const Properties& render_settings) const
+void MeshRD::SaveFile(const char* filename,const Properties& render_settings,bool generate_initial_pattern_when_loading) const
 {
     vtkSmartPointer<RD_XMLUnstructuredGridWriter> iw = vtkSmartPointer<RD_XMLUnstructuredGridWriter>::New();
     iw->SetSystem(this);
     iw->SetRenderSettings(&render_settings);
+    if(generate_initial_pattern_when_loading)
+        iw->GenerateInitialPatternWhenLoading();
     iw->SetFileName(filename);
     iw->SetDataModeToBinary(); // workaround for http://www.vtk.org/Bug/view.php?id=13382
     iw->SetInput(this->mesh);

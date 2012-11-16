@@ -26,7 +26,7 @@ class FormulaOpenCLMeshRD : public OpenCLMeshRD
         FormulaOpenCLMeshRD(int opencl_platform,int opencl_device);
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
 
         virtual std::string GetRuleType() const { return "formula"; }
 

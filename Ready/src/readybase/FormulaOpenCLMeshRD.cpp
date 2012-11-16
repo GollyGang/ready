@@ -117,9 +117,9 @@ void FormulaOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to
 
 // -------------------------------------------------------------------------
 
-vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLMeshRD::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLMeshRD::GetAsXML(bool generate_initial_pattern_when_loading) const
 {
-    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLMeshRD::GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLMeshRD::GetAsXML(generate_initial_pattern_when_loading);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");

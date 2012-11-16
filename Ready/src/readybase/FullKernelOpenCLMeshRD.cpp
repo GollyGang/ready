@@ -66,9 +66,9 @@ void FullKernelOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn
 
 // ---------------------------------------------------------------------------------------------------------
 
-vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML(bool generate_initial_pattern_when_loading) const
 {
-    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLMeshRD::GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLMeshRD::GetAsXML(generate_initial_pattern_when_loading);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");

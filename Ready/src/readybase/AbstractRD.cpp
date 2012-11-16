@@ -279,7 +279,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
 // ---------------------------------------------------------------------
 
 // TODO: ImageRD could inherit from XML_Object (but as VTKFile element, not RD element!)
-vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pattern_when_loading) const
 {
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
@@ -316,7 +316,7 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML() const
     // initial pattern generator
     vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = vtkSmartPointer<vtkXMLDataElement>::New();
     initial_pattern_generator->SetName("initial_pattern_generator");
-    initial_pattern_generator->SetAttribute("apply_when_loading","false"); // TODO: provide user option to save blank image with this as true
+    initial_pattern_generator->SetAttribute("apply_when_loading",generate_initial_pattern_when_loading?"true":"false");
     for(int i=0;i<(int)this->initial_pattern_generator.size();i++)
         initial_pattern_generator->AddNestedElement(this->initial_pattern_generator[i]->GetAsXML());
     rd->AddNestedElement(initial_pattern_generator);

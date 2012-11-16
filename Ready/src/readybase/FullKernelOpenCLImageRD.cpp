@@ -72,9 +72,9 @@ void FullKernelOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &war
 
 // ---------------------------------------------------------------------------------------------------------
 
-vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML(bool generate_initial_pattern_when_loading) const
 {
-    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML(generate_initial_pattern_when_loading);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");

@@ -959,7 +959,7 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
 
 // ---------------------------------------------------------------------
 
-void ImageRD::SaveFile(const char* filename,const Properties& render_settings) const
+void ImageRD::SaveFile(const char* filename,const Properties& render_settings,bool generate_initial_pattern_when_loading) const
 {
     // convert the image to named arrays
     vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
@@ -976,6 +976,8 @@ void ImageRD::SaveFile(const char* filename,const Properties& render_settings) c
     vtkSmartPointer<RD_XMLImageWriter> iw = vtkSmartPointer<RD_XMLImageWriter>::New();
     iw->SetSystem(this);
     iw->SetRenderSettings(&render_settings);
+    if(generate_initial_pattern_when_loading)
+        iw->GenerateInitialPatternWhenLoading();
     iw->SetFileName(filename);
     iw->SetDataModeToBinary(); // (to match MeshRD::SaveFile())
     iw->SetInput(im);
