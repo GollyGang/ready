@@ -568,9 +568,9 @@ void FormulaOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_t
 
 // -------------------------------------------------------------------------
 
-vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML() const
+vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML(bool generate_initial_pattern_when_loading) const
 {
-    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> rd = OpenCLImageRD::GetAsXML(generate_initial_pattern_when_loading);
 
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");

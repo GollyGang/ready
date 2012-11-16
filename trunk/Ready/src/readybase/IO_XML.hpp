@@ -82,10 +82,11 @@ class RD_XMLImageWriter : public vtkXMLImageDataWriter
 
         void SetSystem(const ImageRD* rd_system);
         void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
+        void GenerateInitialPatternWhenLoading() { this->generate_initial_pattern_when_loading = true; }
 
     protected:  
 
-        RD_XMLImageWriter() : system(NULL) {} 
+        RD_XMLImageWriter() : system(NULL), generate_initial_pattern_when_loading(false) {} 
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
 
@@ -95,6 +96,7 @@ class RD_XMLImageWriter : public vtkXMLImageDataWriter
 
         const ImageRD* system;
         const Properties* render_settings;
+        bool generate_initial_pattern_when_loading;
 };
 
 // ---------------------------------------------------------------------
@@ -109,10 +111,11 @@ class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
 
         void SetSystem(const MeshRD* rd_system);
         void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
+        void GenerateInitialPatternWhenLoading() { this->generate_initial_pattern_when_loading = true; }
 
     protected:  
 
-        RD_XMLUnstructuredGridWriter() : system(NULL) {} 
+        RD_XMLUnstructuredGridWriter() : system(NULL), generate_initial_pattern_when_loading(false) {} 
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
 
@@ -122,6 +125,7 @@ class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
 
         const MeshRD* system;
         const Properties* render_settings;
+        bool generate_initial_pattern_when_loading;
 };
 
 // -------------------------------------------------------------------

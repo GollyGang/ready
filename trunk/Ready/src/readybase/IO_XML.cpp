@@ -145,7 +145,7 @@ void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system)
 
 int RD_XMLImageWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 {
-    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML(this->generate_initial_pattern_when_loading);
     xml->AddNestedElement(this->render_settings->GetAsXML());
     xml->PrintXML(os,indent);
     return vtkXMLImageDataWriter::WritePrimaryElement(os,indent);
@@ -162,7 +162,7 @@ void RD_XMLUnstructuredGridWriter::SetSystem(const MeshRD* rd_system)
 
 int RD_XMLUnstructuredGridWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 {
-    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML();
+    vtkSmartPointer<vtkXMLDataElement> xml = this->system->GetAsXML(this->generate_initial_pattern_when_loading);
     xml->AddNestedElement(this->render_settings->GetAsXML());
     xml->PrintXML(os,indent);
     return vtkXMLUnstructuredGridWriter::WritePrimaryElement(os,indent);

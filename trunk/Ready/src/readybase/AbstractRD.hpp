@@ -45,7 +45,7 @@ class AbstractRD
         /// Load this pattern from an RD element.
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
         /// Retrieve an RD element for this pattern, suitable for saving to file.
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
 
         /// Called to progress the simulation by N steps.
         virtual void Update(int n_steps) =0;
@@ -98,7 +98,8 @@ class AbstractRD
         bool IsModified() const { return this->is_modified; }
         void SetModified(bool m);
 
-        virtual void SaveFile(const char* filename,const Properties& render_settings) const =0;
+        virtual void SaveFile(const char* filename,const Properties& render_settings,
+            bool generate_initial_pattern_when_loading) const =0;
         std::string GetFilename() const { return this->filename; }
         void SetFilename(const std::string& s);
 

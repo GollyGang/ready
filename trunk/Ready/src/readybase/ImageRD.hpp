@@ -34,7 +34,8 @@ class ImageRD : public AbstractRD
         ImageRD();
         virtual ~ImageRD();
 
-        virtual void SaveFile(const char* filename,const Properties& render_settings) const;
+        virtual void SaveFile(const char* filename,const Properties& render_settings,
+            bool generate_initial_pattern_when_loading) const;
 
         virtual void Update(int n_steps);
 

@@ -76,7 +76,7 @@ int main(int argc,char *argv[])
 
         // save something out
         cout << "Saving file...\n";
-        system->SaveFile(argv[2],render_settings);
+        system->SaveFile(argv[2],render_settings,false);
     }
     catch(const exception& e)
     {

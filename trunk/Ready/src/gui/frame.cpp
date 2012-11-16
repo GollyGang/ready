@@ -332,7 +332,7 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::ExportImage, _("Export Image...") + GetAccelerator(DO_EXPORTIMAGE), _("Export the image"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
-        menu->Append(ID::SaveCompact, _("Save Compact...") + GetAccelerator(DO_SAVECOMPACT), _("Save the current system with no data but with the initial pattern generator turned on"));
+        menu->Append(ID::SaveCompact, _("Save Compact...") + GetAccelerator(DO_SAVECOMPACT), _("Blanks the image and saves with the initial pattern generator set to apply when the file is loaded"));
         menu->AppendSeparator();
         menu->Append(ID::Screenshot, _("Save Screenshot...") + GetAccelerator(DO_SCREENSHOT), _("Save a screenshot of the current view"));
         menu->AppendCheckItem(ID::RecordFrames, _("Start Recording...") + GetAccelerator(DO_RECORDFRAMES), _("Record frames as images to disk"));
@@ -1469,7 +1469,7 @@ void MyFrame::SaveFile(const wxString& path)
 {
     wxBusyCursor busy;
 
-    this->system->SaveFile(path.mb_str(),this->render_settings);
+    this->system->SaveFile(path.mb_str(),this->render_settings,false);
 
     AddRecentPattern(path);
     this->system->SetFilename(string(path.mb_str()));
@@ -3625,7 +3625,16 @@ void MyFrame::OnUpdateBrushSizeLarge(wxUpdateUIEvent& event)
 
 void MyFrame::OnSaveCompact(wxCommandEvent& event)
 {
-    wxMessageBox(_("Not yet implemented."));
+    wxString filename = SavePatternDialog();
+    if(filename.empty()) return;
+
+    wxBusyCursor busy;
+
+    // TODO: might be preferable to not adopt the saved file
+    this->system->BlankImage();
+    this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    this->is_running = false;
+    this->UpdateWindows();
 }
 
 // ---------------------------------------------------------------------
