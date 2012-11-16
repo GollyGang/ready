@@ -36,7 +36,7 @@ AbstractRD::AbstractRD()
 
     this->neighborhood_type = VERTEX_NEIGHBORS;
     this->neighborhood_range = 1;
-    this->neighborhood_weight_type = EQUAL;
+    this->neighborhood_weight_type = LAPLACIAN;
 
     #if defined(USE_SSE)
         // disable accurate handling of denormals and zeros, for speed
