@@ -113,10 +113,6 @@ set( PATTERN_FILES
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti
   Patterns/life_torus.vtu
-  Patterns/penrose_life.vtu
-  Patterns/penrose_life_oscillators.vtu
-  Patterns/penrose_goucher_glider.vtu
-  Patterns/penrose_imai_glider_B2SC4.vtu
   Patterns/bunny.vtu
   Patterns/horse.vtu
   Patterns/lion.vtu
@@ -142,6 +138,11 @@ set( PATTERN_FILES
   Patterns/FitzHugh-Nagumo/pulsate.vti 
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
+  Patterns/PenroseTilings/life.vtu
+  Patterns/PenroseTilings/life_oscillators.vtu
+  Patterns/PenroseTilings/goucher_glider.vtu
+  Patterns/PenroseTilings/imai_glider_B2SC4.vtu
+  Patterns/PenroseTilings/goucher_loops.vtu
 )
 
 set( HELP_FILES
