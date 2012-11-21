@@ -95,20 +95,14 @@ set( RESOURCES
 include_directories( resources )
 
 set( PATTERN_FILES
-  Patterns/grayscott_demo.vti 
-  Patterns/meinhardt_stripes.vti 
-  Patterns/schlogl.vti 
+  Patterns/Meinhardt_stripes.vti 
+  Patterns/Schlogl.vti 
   Patterns/heat_equation.vti 
-  Patterns/turing.vti
-  Patterns/turing_noisy.vti
+  Patterns/Turing.vti
+  Patterns/Turing_noisy.vti
   Patterns/kernel_test.vti 
-  Patterns/conway_life.vti 
-  Patterns/bays_3D.vti
-  Patterns/munafo-uskate.vti
-  Patterns/grayscott_parameter_map.vti
-  Patterns/grayscott_lesmes_noisy.vti
-  Patterns/grayscott_noisy_solitons_mitosis.vti
-  Patterns/grayscott_pearson1993.vti
+  Patterns/Conway_life.vti 
+  Patterns/Bays_3D.vti
   Patterns/mutually-catalytic_spots.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti
@@ -120,7 +114,7 @@ set( PATTERN_FILES
   Patterns/complex_Ginsburg-Landau.vti
   Patterns/complex_Ginsburg-Landau_magnitude.vti
   Patterns/wave_equation.vti
-  Patterns/hex_buss.vtu
+  Patterns/Buss_hex.vtu
   Patterns/tri_life.vtu
   Patterns/hex_B2oS2m34_gliders.vtu
   Patterns/oregonator.vti
@@ -128,8 +122,8 @@ set( PATTERN_FILES
   Patterns/smoothlife_smoothglider.vti
   Patterns/smoothlife_smoothlifeL.vti
   Patterns/smoothlife3d_glider.vti
-  Patterns/purwins_glider3d.vti
-  Patterns/purwins_glider.vti
+  Patterns/Purwins_glider3d.vti
+  Patterns/Purwins_glider.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
@@ -138,11 +132,19 @@ set( PATTERN_FILES
   Patterns/FitzHugh-Nagumo/pulsate.vti 
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
+  Patterns/Gray-Scott/Lesmes_noisy.vti
+  Patterns/Gray-Scott/noisy_solitons_mitosis.vti
+  Patterns/Gray-Scott/parameter-map.vti
+  Patterns/Gray-Scott/Pearson1993.vti
+  Patterns/Gray-Scott/self-replicating_spots.vti 
+  Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti
+  Patterns/Gray-Scott/U-Skate/Munafo_glider.vti
+  Patterns/Gray-Scott/U-Skate/o-ring_2D.vti
   Patterns/PenroseTilings/life.vtu
   Patterns/PenroseTilings/life_oscillators.vtu
-  Patterns/PenroseTilings/goucher_glider.vtu
-  Patterns/PenroseTilings/imai_glider_B2SC4.vtu
-  Patterns/PenroseTilings/goucher_loops.vtu
+  Patterns/PenroseTilings/Goucher_glider.vtu
+  Patterns/PenroseTilings/Imai_glider_B2SC4.vtu
+  Patterns/PenroseTilings/Goucher_loops.vtu
 )
 
 set( HELP_FILES

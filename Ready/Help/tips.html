@@ -23,11 +23,11 @@ size using the dimensions control in the Info Pane. If you want the same behavio
 of the parameters must be altered. Some examples:
     <ul>
     <li>With 
-    <a href="open:Patterns\grayscott_pearson1993.vti">grayscott_pearson1993.vti</a> there is an explicit
+    <a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a> there is an explicit
     parameter for scale, delta_x, which is used in the formula. If you double the size of the pattern 
     (to 512x512x1), you can set delta_x to half (0.004883) to get the same pattern. For numerical 
     stability at the new size, change timestep to 0.3.
-    <li>There is no explicit delta_x in <a href="open:Patterns\munafo-uskate.vti">munafo-uskate.vti</a>, 
+    <li>There is no explicit delta_x in <a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a>, 
     which is common way to write things as we don't often need it. Here you can double the size of the
     pattern (to 256x128x1) as long as you <i>quadruple</i> the diffusion parameters D_a and D_b to 
     0.656 and 0.328 respectively. And again a smaller timestep (e.g. 0.5) will be needed.

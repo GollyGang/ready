@@ -59,7 +59,7 @@ Have a look at <a href="open:Patterns/heat_equation_interpolation.vti">heat_equa
 <h4>Turing (1952)</h4>
 
 <p>
-Now open <a href="open:Patterns/turing.vti">turing.vti</a>. This system has two chemicals (a and b) which are shown side by side. The formula is more complicated:
+Now open <a href="open:Patterns/Turing.vti">Turing.vti</a>. This system has two chemicals (a and b) which are shown side by side. The formula is more complicated:
 <p>
 <tt>
 &nbsp;&nbsp;&nbsp;&nbsp;delta_a = k * (16.0f - a * b) + D_a * laplacian_a;<br>
@@ -74,7 +74,7 @@ To see the same system in one dimension, scroll down in the Info Pane to "Dimens
 <p>
 Turing suggested that this behavior of forming a regular pattern of spots is the sort of thing that might be used in nature by plants and animals wanting to direct their own growth (morphogenesis) or for the patterns on the skins of leopards, for example. While plausible, no evidence of this was found. I think it is fair to say that for many years the theory was poorly regarded amongst biologists, especially after <a href="http://en.wikipedia.org/wiki/Hedgehog_signaling_pathway">a different mechanism</a> was found to drive certain well-known examples of morphogenesis. It was only in 2006 that the <a href="http://phylogenous.wordpress.com/2010/12/01/alan-turings-reaction-diffusion-model-simplification-of-the-complex/">first evidence</a> for Turing's reaction-diffusion in biology was found, in the even placement of hair follicles on the skin of mice. Other systems have <a href="http://www.nature.com/ng/journal/vaop/ncurrent/full/ng.1090.html">since</a> been found.
 <p>
-Also look at <a href="open:Patterns/turing_noisy.vti">turing_noisy.vti</a>. Here we've used a third chemical <i>c</i> to add noise to the system. This shows how the patterns are robust to such interference.
+Also look at <a href="open:Patterns/Turing_noisy.vti">Turing_noisy.vti</a>. Here we've used a third chemical <i>c</i> to add noise to the system. This shows how the patterns are robust to such interference.
 <p>
 <h4>After Turing</h4>
 <p>
@@ -84,19 +84,19 @@ After the concept of reaction-diffusion was identified, many other systems have 
 <li><a href="http://en.wikipedia.org/wiki/Ginzburg%E2%80%93Landau_theory">Ginsburg-Landau theory</a> (1950) describes superconductivity. Our pattern <a href="open:Patterns/complex_Ginsburg-Landau.vti">complex_Ginsburg-Landau.vti</a> shows a reaction-diffusion setting of a form of their equation.
 <li><a href="http://en.wikipedia.org/wiki/Belousov%E2%80%93Zhabotinsky_reaction">Belousov-Zhabotinsky reaction</a> (1951-1968). A Russian chemist noticed a very peculiar <i>oscillating</i> chemical reaction. The <a href="http://en.wikipedia.org/wiki/Brusselator">Brusselator</a>, <a href="http://en.wikipedia.org/wiki/Oregonator">Oregonator</a> and <a href="http://hopf.chem.brandeis.edu/yanglingfa/pattern/le/index.html">Brandeisator</a> are mathematical models of such systems. Patterns: <a href="open:Patterns/oregonator.vti">oregonator.vti</a>.
 <li><a href="http://en.wikipedia.org/wiki/FitzHugh%E2%80%93Nagumo_model">FitzHugh-Nagumo</a> (1961-1962) A simplification of the <a href="http://en.wikipedia.org/wiki/Hodgkin%E2%80%93Huxley_model">Hodgkin-Huxley</a> model of firing neurons. Patterns: <a href="open:Patterns/FitzHugh-Nagumo/tip-splitting.vti">tip-splitting.vti</a>, <a href="open:Patterns/FitzHugh-Nagumo/spiral_turbulence.vti">spiral_turbulence.vti</a>, <a href="open:Patterns/FitzHugh-Nagumo/pulsate.vti">pulsate.vti</a> and <a href="open:Patterns/FitzHugh-Nagumo/squid_axon.vti">squid_axon.vti</a>.
-<li>Schlogl (1972) : A one-chemical system - open <a href="open:Patterns/schlogl.vti">schlogl.vti</a>.
-<li><a href="http://mrob.com/pub/comp/xmorphia/">Gray-Scott</a> (1983-1993) Many of our patterns are based on this rule. Start with: <a href="open:Patterns/grayscott_pearson1993.vti">grayscott_pearson1993.vti</a>.
+<li>Schlogl (1972) : A one-chemical system - open <a href="open:Patterns/Schlogl.vti">Schlogl.vti</a>.
+<li><a href="http://mrob.com/pub/comp/xmorphia/">Gray-Scott</a> (1983-1993) Many of our patterns are based on this rule. Start with: <a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a>.
 </ul>
 <p>
 <h4>Writing new rules</h4>
 <p>
-As a first step, try changing the parameters of some of the rules. This can give very different behavior. Read <a href="http://mrob.com/pub/comp/xmorphia/">Robert Munafo's pages</a> about Gray-Scott, for example, and try out some of the parameters he discusses on <a href="open:Patterns/grayscott_demo.vti">grayscott_demo.vti</a>.
+As a first step, try changing the parameters of some of the rules. This can give very different behavior. Read <a href="http://mrob.com/pub/comp/xmorphia/">Robert Munafo's pages</a> about Gray-Scott, for example, and try out some of the parameters he discusses on <a href="open:Patterns/Gray-Scott/self-replicating_spots.vti">Gray-Scott/self-replicating_spots.vti</a>.
 <p>
 Ready also allows you to reprogram rules completely. For formula and kernel rules, hit 'edit' next to the formula/kernel and then see what effect your change has. Some changes will cause an error when you try to run or step forward but this just shows you a message box saying what went wrong.
 <p>
 To understand how the formula is used, try Action > <a href="action.html#Action_ViewFullKernel">View Full Kernel</a> to see the OpenCL kernel code that is assembled. This code is assembled from the parameters of the rule, such as the number of chemicals and the neighborhood type. Any formula rule can be converted to a kernel rule by using Action > <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a>. 
 <p>
-For more details, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/grayscott_demo.vti">example</a>). The format is documented <a href="formats.html">here</a>, specifically the <a href="formats.html#formula">formula</a> and <a href="formats.html#kernel">kernel</a> sections.
+For more details, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/Gray-Scott/self-replicating_spots.vti">example</a>). The format is documented <a href="formats.html">here</a>, specifically the <a href="formats.html#formula">formula</a> and <a href="formats.html#kernel">kernel</a> sections.
 <p>
 If you come up with interesting patterns then please share them with the world! The best patterns submitted to us will be included in the next release of Ready - see our <a href="credits.html#competition">pattern competition</a>.
 </body>
