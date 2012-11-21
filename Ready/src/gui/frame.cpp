@@ -1640,7 +1640,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     int cells[N_CHOICES] = {1682,4802,19602,79202,498002};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
+                        div_descriptions[i] = wxString::Format("%d cells",cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Triangular mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(1); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1676,7 +1676,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     int cells[N_CHOICES] = {3185,7326,13068,82668};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
+                        div_descriptions[i] = wxString::Format("%d cells",cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Hexagonal mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1712,7 +1712,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     int cells[N_CHOICES] = {2304,5367,9555,21978,39204};
                     wxString div_descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",choices[i],choices[i],cells[i]);
+                        div_descriptions[i] = wxString::Format("%d cells",cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Rhombille mesh options"),N_CHOICES,div_descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1924,7 +1924,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     int cells[N_CHOICES] = {189,1729,14859};
                     wxString descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
+                        descriptions[i] = wxString::Format("%d cells",cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Body-centred cubic honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1962,7 +1962,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     int cells[N_CHOICES] = {500,4000,32000};
                     wxString descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
+                        descriptions[i] = wxString::Format("%d cells",cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Face-centred cubic honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -2000,7 +2000,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                     int cells[N_CHOICES] = {250,2000,16000};
                     wxString descriptions[N_CHOICES];
                     for(int i=0;i<N_CHOICES;i++)
-                        descriptions[i] = wxString::Format("%dx%dx%d - %d cells",choices[i],choices[i],choices[i],cells[i]);
+                        descriptions[i] = wxString::Format("%d cells",cells[i]);
                     wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Diamond honeycomb options"),N_CHOICES,descriptions);
                     dlg.SetSelection(0); // default selection
                     dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
