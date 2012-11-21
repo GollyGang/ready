@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+
+  <RD format_version="3">
+  
+    <description>
+        An O-ring with one or a few dots moves slowly forwards. Without dots it is a stable static
+        structure.
+        &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/uskate-world.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/uskate-world.html&lt;/a&gt;
+    </description>
+    
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    
+      <param name="timestep">    1       </param>
+      <param name="D_a">         0.164   </param>
+      <param name="D_b">         0.082   </param>
+      <param name="k">           0.06093 </param>
+      <param name="F">           0.062   </param>
+      
+      <formula number_of_chemicals="2">
+        delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
+        delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+    
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="0.5" />
+        <everywhere />
+      </overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="0.3" />
+        <everywhere />
+      </overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="0" />
+        <circle radius="0.15">
+            <point3d x="0.5" y="0.5" z="0.5" />
+        </circle>
+      </overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="0.3" />
+        <circle radius="0.08">
+            <point3d x="0.5" y="0.5" z="0.5" />
+        </circle>
+      </overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="0" />
+        <circle radius="0.04">
+            <point3d x="0.5" y="0.5" z="0.5" />
+        </circle>
+        <circle radius="0.04">
+            <point3d x="0.3" y="0.7" z="0.5" />
+        </circle>
+        <circle radius="0.04">
+            <point3d x="0.26" y="0.5" z="0.5" />
+        </circle>
+      </overlay>
+      
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="1" g="0" b="0" />
+      <color_high r="1" g="0" b="1" />
+      <show_color_scale value="false" />
+      <show_multiple_chemicals value="false" />
+      <active_chemical value="b" />
+      <low value="0" />
+      <high value="0.45" />
+      <contour_level value="0.25" />
+      <slice_3D_axis value="z" />
+      <slice_3D_position value="0.05" />
+      <timesteps_per_render value="1000" />
+      <show_displacement_mapped_surface value="false" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 63 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

@@ -723,9 +723,9 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     actor->SetMapper(mapper);
     actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
     actor->GetProperty()->SetAmbient(0.1);
-    actor->GetProperty()->SetDiffuse(0.7);
-    actor->GetProperty()->SetSpecular(0.2);
-    actor->GetProperty()->SetSpecularPower(3);
+    actor->GetProperty()->SetDiffuse(0.5);
+    actor->GetProperty()->SetSpecular(0.4);
+    actor->GetProperty()->SetSpecularPower(10);
     if(use_wireframe)
         actor->GetProperty()->SetRepresentationToWireframe();
     if(show_cell_edges && !use_image_interpolation)
@@ -735,10 +735,11 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     }
     vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
     actor->SetBackfaceProperty(bfprop);
-    bfprop->SetColor(0.3,0.3,0.3);
-    bfprop->SetAmbient(0.3);
-    bfprop->SetDiffuse(0.6);
-    bfprop->SetSpecular(0.1);
+    bfprop->SetColor(0.7,0.6,0.55);
+    bfprop->SetAmbient(0.1);
+    bfprop->SetDiffuse(0.5);
+    bfprop->SetSpecular(0.4);
+    bfprop->SetSpecularPower(10);
 
     // add the actor to the renderer's scene
     actor->PickableOff(); // not sure about this - sometimes it is nice to paint on the contoured surface too, for 3d sculpting
