@@ -1,6 +1,7 @@
 var searchData=
 [
   ['warning',['Warning',['../wxutils_8cpp.html#ad496c0028843186f55032174260d2732',1,'Warning(const wxString &amp;msg):&#160;wxutils.cpp'],['../wxutils_8hpp.html#ad496c0028843186f55032174260d2732',1,'Warning(const wxString &amp;msg):&#160;wxutils.cpp']]],
+  ['weight',['weight',['../structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7',1,'TNeighbor']]],
   ['whitenoise',['WhiteNoise',['../classWhiteNoise.html',1,'WhiteNoise'],['../classWhiteNoise.html#a7674ad6d774612df096156bea6070375',1,'WhiteNoise::WhiteNoise()']]],
   ['wireframe',['Wireframe',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ac939d32eac9bad1c9c238c92526f6143',1,'ID']]],
   ['wrap',['wrap',['../classAbstractRD.html#ada7a0672e610d7fbdecc41ebbaf04899',1,'AbstractRD']]],

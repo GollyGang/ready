@@ -16,7 +16,6 @@ var searchData=
   ['maxint',['maxint',['../classIntegerDialog.html#a3b905637fcb4edd78bfaa2df57532b18',1,'IntegerDialog']]],
   ['maxpatterns',['maxpatterns',['../prefs_8cpp.html#af74247065dccdcbc74c5e1b8dc09e01c',1,'maxpatterns():&#160;prefs.cpp'],['../prefs_8hpp.html#af74247065dccdcbc74c5e1b8dc09e01c',1,'maxpatterns():&#160;prefs.cpp']]],
   ['mesh',['mesh',['../classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644',1,'MeshRD']]],
-  ['million_5fcell_5fgenerations_5fper_5fsecond',['million_cell_generations_per_second',['../classMyFrame.html#a55a8b53a73aa2c3704f0e9ff7cc8fe7a',1,'MyFrame']]],
   ['minfontsize',['minfontsize',['../prefs_8hpp.html#ab9bb4307b077f19442247557845c3535',1,'prefs.hpp']]],
   ['minint',['minint',['../classIntegerDialog.html#aa240524023db6960f14bb19d77dda901',1,'IntegerDialog']]],
   ['minmainht',['minmainht',['../prefs_8cpp.html#ad39746c614087b9de8d0dbc68bc14816',1,'prefs.cpp']]],

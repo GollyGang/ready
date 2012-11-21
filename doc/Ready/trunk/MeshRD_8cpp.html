@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -126,7 +126,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;vtkIdList.h&gt;</code><br/>
 <code>#include &lt;vtkUnstructuredGrid.h&gt;</code><br/>
 <code>#include &lt;vtkDataSetMapper.h&gt;</code><br/>
-<code>#include &lt;vtkTetra.h&gt;</code><br/>
 <code>#include &lt;vtkCellArray.h&gt;</code><br/>
 <code>#include &lt;vtkGeometryFilter.h&gt;</code><br/>
 <code>#include &lt;vtkCutter.h&gt;</code><br/>
@@ -136,6 +135,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;vtkContourFilter.h&gt;</code><br/>
 <code>#include &lt;vtkAssignAttribute.h&gt;</code><br/>
 <code>#include &lt;vtkReverseSense.h&gt;</code><br/>
+<code>#include &lt;vtkGenericCell.h&gt;</code><br/>
+<code>#include &lt;vtkThreshold.h&gt;</code><br/>
+<code>#include &lt;vtkDataSetSurfaceFilter.h&gt;</code><br/>
 <code>#include &lt;stdexcept&gt;</code><br/>
 </div>
 <p><a href="MeshRD_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -146,6 +148,7 @@ Classes</h2></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a2426cbdddf15cb6f38564d84adae0501"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a> (vector&lt; <a class="el" href="structTNeighbor.html">TNeighbor</a> &gt; &amp;neighbors, <a class="el" href="structTNeighbor.html">TNeighbor</a> neighbor)</td></tr>
+<tr class="memitem:a811a4dadb2f27233d2d36d6ced6fc6cf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MeshRD_8cpp.html#a811a4dadb2f27233d2d36d6ced6fc6cf">IsEdgeNeighbor</a> (vtkUnstructuredGrid *grid, vtkIdType iCell1, vtkIdType iCell2)</td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
 <a class="anchor" id="a2426cbdddf15cb6f38564d84adae0501"></a>
@@ -173,7 +176,42 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00442">442</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00467">467</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a811a4dadb2f27233d2d36d6ced6fc6cf"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="MeshRD_8cpp.html#a811a4dadb2f27233d2d36d6ced6fc6cf">IsEdgeNeighbor</a> </td>
+          <td>(</td>
+          <td class="paramtype">vtkUnstructuredGrid *&#160;</td>
+          <td class="paramname"><em>grid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vtkIdType&#160;</td>
+          <td class="paramname"><em>iCell1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vtkIdType&#160;</td>
+          <td class="paramname"><em>iCell2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00475">475</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -181,7 +219,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

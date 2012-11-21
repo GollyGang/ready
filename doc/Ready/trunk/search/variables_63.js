@@ -1,6 +1,8 @@
 var searchData=
 [
   ['c',['c',['../classCircle.html#abaac03542a55d0112b0fa670dd30338d',1,'Circle']]],
+  ['canonical_5fneighborhood_5ftype_5fidentifiers',['canonical_neighborhood_type_identifiers',['../classAbstractRD.html#a8ec96708a6f0c2ee2842d9b9425e022a',1,'AbstractRD']]],
+  ['canonical_5fneighborhood_5fweight_5fidentifiers',['canonical_neighborhood_weight_identifiers',['../classAbstractRD.html#a13880c848379515536e828a97fd6231b',1,'AbstractRD']]],
   ['canreload',['canreload',['../classHtmlView.html#a12450519cd8dce10b29e1d0e66b56f84',1,'HtmlView']]],
   ['cell_5flocator',['cell_locator',['../classMeshRD.html#a180cc9116edd98a0453cb89e9c39efff',1,'MeshRD']]],
   ['cell_5fneighbor_5findices',['cell_neighbor_indices',['../classMeshRD.html#a3e7eed75884e6c8bcb237df5f25a1275',1,'MeshRD']]],
@@ -82,17 +84,18 @@ var searchData=
   ['clunloadcompiler',['clUnloadCompiler',['../OpenCL__Dyn__Load_8c.html#ae5a2543f88569b6bbfa54eedf9ca5f92',1,'clUnloadCompiler():&#160;OpenCL_Dyn_Load.c'],['../OpenCL__Dyn__Load_8h.html#ae5a2543f88569b6bbfa54eedf9ca5f92',1,'clUnloadCompiler():&#160;OpenCL_Dyn_Load.c']]],
   ['clwaitforevents',['clWaitForEvents',['../OpenCL__Dyn__Load_8c.html#a58059be2fba102659143bd9c58e53058',1,'clWaitForEvents():&#160;OpenCL_Dyn_Load.c'],['../OpenCL__Dyn__Load_8h.html#a58059be2fba102659143bd9c58e53058',1,'clWaitForEvents():&#160;OpenCL_Dyn_Load.c']]],
   ['command_5fqueue',['command_queue',['../classOpenCL__MixIn.html#ab9832b33bf38cbdab481647991e2de15',1,'OpenCL_MixIn']]],
+  ['computation_5ftime_5fsince_5flast_5frender',['computation_time_since_last_render',['../classMyFrame.html#ac9cd4ccc9820e86a900c396c1b1f8344',1,'MyFrame']]],
+  ['computed_5fframes_5fper_5fsecond_5fbuffer',['computed_frames_per_second_buffer',['../classMyFrame.html#ad64cf8e65dc41834df47428c6e1670d3',1,'MyFrame']]],
   ['contbutt',['contbutt',['../classHelpPanel.html#aa16c68c225917e619c6e93bb7768f258',1,'HelpPanel']]],
   ['context',['context',['../classOpenCL__MixIn.html#a7afb13f03befcb61bce28b85f7c2dc57',1,'OpenCL_MixIn']]],
   ['cr',['CR',['../prefs_8cpp.html#a984744e7980d3a3646a27dbb40871365',1,'prefs.cpp']]],
   ['created',['Created',['../classwxVTKRenderWindowInteractor.html#a305f711fa4c8004357caeaed32e4ec32',1,'wxVTKRenderWindowInteractor']]],
+  ['current_5fbrush_5fsize',['current_brush_size',['../prefs_8cpp.html#ae204d3ec12d9c681259496320dfe1e00',1,'current_brush_size():&#160;prefs.cpp'],['../prefs_8hpp.html#ae204d3ec12d9c681259496320dfe1e00',1,'current_brush_size():&#160;prefs.cpp']]],
   ['current_5fpaint_5fvalue',['current_paint_value',['../classMyFrame.html#a42bc27e5bddc2edb0b0f5b33515a8846',1,'MyFrame']]],
   ['currentcursor',['CurrentCursor',['../classMyFrame.html#a669096a31d1757214f08a296f4691a38',1,'MyFrame']]],
   ['currframe',['currframe',['../classMyApp.html#a41d92eb91e01037a0265b86bef4e910a',1,'MyApp']]],
   ['currkey',['currkey',['../prefs_8cpp.html#aaacf1a77c10b6c97201e93054bf86843',1,'prefs.cpp']]],
   ['currmods',['currmods',['../prefs_8cpp.html#a76d947d833846c69306f2bee3a6f9b9f',1,'prefs.cpp']]],
   ['currpage',['currpage',['../prefs_8cpp.html#aad818288638918d0901b9d818c0ff852',1,'prefs.cpp']]],
-  ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'currversion():&#160;prefs.cpp'],['../prefs_8hpp.html#af6fe256936340f78df9e04549496d809',1,'currversion():&#160;prefs.cpp']]],
-  ['cx',['cx',['../structTri.html#a67db4aca10a65afd99a4188918bcf446',1,'Tri']]],
-  ['cy',['cy',['../structTri.html#af330fd997de95791b22150a6075856db',1,'Tri']]]
+  ['currversion',['currversion',['../prefs_8cpp.html#af6fe256936340f78df9e04549496d809',1,'currversion():&#160;prefs.cpp'],['../prefs_8hpp.html#af6fe256936340f78df9e04549496d809',1,'currversion():&#160;prefs.cpp']]]
 ];

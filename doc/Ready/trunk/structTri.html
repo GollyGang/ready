@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -103,67 +103,83 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>A two-dimensional triangle, used in MeshRD::GetPenroseRhombiTiling().  
+<p>A two-dimensional triangle, used in <a class="el" href="namespaceMeshGenerators.html#af2bb69dc1c3a600123649b5e2f7b76f4" title="Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).">MeshRD::GetPenroseTiling()</a>.  
  <a href="structTri.html#details">More...</a></p>
 
 <p><a href="structTri-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2ee7ee67b6a57b734cb40e539469ca7e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#a2ee7ee67b6a57b734cb40e539469ca7e">Tri</a> (double ax2, double ay2, double bx2, double by2, double cx2, double cy2)</td></tr>
+<tr class="memitem:a342df7ff81fb7b90be8a031f947d3dbb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#a342df7ff81fb7b90be8a031f947d3dbb">Tri</a> (double ax, double ay, int iA, double bx, double by, int iB, double cx, double cy, int iC)</td></tr>
+<tr class="memdesc:a342df7ff81fb7b90be8a031f947d3dbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Index of corners A, B and C in the points structure.  <a href="#a342df7ff81fb7b90be8a031f947d3dbb"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a33f4dd72d19b2bf1f6b3e4c1b4eccdd3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#a33f4dd72d19b2bf1f6b3e4c1b4eccdd3">ax</a></td></tr>
-<tr class="memitem:a8ebb57399125cce54f42601e1f85af35"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#a8ebb57399125cce54f42601e1f85af35">ay</a></td></tr>
-<tr class="memitem:a6788d0a7dc0332ad74caffe90f4fc7b8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#a6788d0a7dc0332ad74caffe90f4fc7b8">bx</a></td></tr>
-<tr class="memitem:afe4677e191f5fb8c279eccfaa63c879e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#afe4677e191f5fb8c279eccfaa63c879e">by</a></td></tr>
-<tr class="memitem:a67db4aca10a65afd99a4188918bcf446"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#a67db4aca10a65afd99a4188918bcf446">cx</a></td></tr>
-<tr class="memitem:af330fd997de95791b22150a6075856db"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#af330fd997de95791b22150a6075856db">cy</a></td></tr>
+<tr class="memitem:ad4828e10223c8c17ef13793e235134db"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#ad4828e10223c8c17ef13793e235134db">p</a> [3][2]</td></tr>
+<tr class="memitem:ad48c6cb3168e6f8224865b0f526c5c17"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html#ad48c6cb3168e6f8224865b0f526c5c17">index</a> [3]</td></tr>
+<tr class="memdesc:ad48c6cb3168e6f8224865b0f526c5c17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinates of corners A, B and C.  <a href="#ad48c6cb3168e6f8224865b0f526c5c17"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>A two-dimensional triangle, used in MeshRD::GetPenroseRhombiTiling(). </p>
+<div class="textblock"><p>A two-dimensional triangle, used in <a class="el" href="namespaceMeshGenerators.html#af2bb69dc1c3a600123649b5e2f7b76f4" title="Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).">MeshRD::GetPenroseTiling()</a>. </p>
 
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00351">351</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00327">327</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a2ee7ee67b6a57b734cb40e539469ca7e"></a>
+<a class="anchor" id="a342df7ff81fb7b90be8a031f947d3dbb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structTri.html#a2ee7ee67b6a57b734cb40e539469ca7e">Tri::Tri</a> </td>
+          <td class="memname"><a class="el" href="structTri.html#a342df7ff81fb7b90be8a031f947d3dbb">Tri::Tri</a> </td>
           <td>(</td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>ax2</em>, </td>
+          <td class="paramname"><em>ax</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>ay2</em>, </td>
+          <td class="paramname"><em>ay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iA</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>bx2</em>, </td>
+          <td class="paramname"><em>bx</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>by2</em>, </td>
+          <td class="paramname"><em>by</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iB</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>cx2</em>, </td>
+          <td class="paramname"><em>cx</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>cy2</em>&#160;</td>
+          <td class="paramname"><em>cy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iC</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -174,98 +190,42 @@ Public Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00353">353</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
+<p>Index of corners A, B and C in the points structure. </p>
+
+<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00330">330</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
 
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a33f4dd72d19b2bf1f6b3e4c1b4eccdd3"></a>
+<a class="anchor" id="ad48c6cb3168e6f8224865b0f526c5c17"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="structTri.html#a33f4dd72d19b2bf1f6b3e4c1b4eccdd3">Tri::ax</a></td>
+          <td class="memname">int <a class="el" href="structTri.html#ad48c6cb3168e6f8224865b0f526c5c17">Tri::index</a>[3]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00352">352</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
+<p>Coordinates of corners A, B and C. </p>
+
+<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00329">329</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8ebb57399125cce54f42601e1f85af35"></a>
+<a class="anchor" id="ad4828e10223c8c17ef13793e235134db"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double <a class="el" href="structTri.html#a8ebb57399125cce54f42601e1f85af35">Tri::ay</a></td>
+          <td class="memname">double <a class="el" href="structTri.html#ad4828e10223c8c17ef13793e235134db">Tri::p</a>[3][2]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00352">352</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a6788d0a7dc0332ad74caffe90f4fc7b8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="structTri.html#a6788d0a7dc0332ad74caffe90f4fc7b8">Tri::bx</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00352">352</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="afe4677e191f5fb8c279eccfaa63c879e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="structTri.html#afe4677e191f5fb8c279eccfaa63c879e">Tri::by</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00352">352</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a67db4aca10a65afd99a4188918bcf446"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="structTri.html#a67db4aca10a65afd99a4188918bcf446">Tri::cx</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00352">352</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af330fd997de95791b22150a6075856db"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="structTri.html#af330fd997de95791b22150a6075856db">Tri::cy</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00352">352</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00328">328</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
 
 </div>
 </div>
@@ -276,7 +236,7 @@ Public Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

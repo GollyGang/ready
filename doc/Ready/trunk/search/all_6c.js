@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['laplacian',['LAPLACIAN',['../classAbstractRD.html#a81fd5371f651c3cf9e2d7251db538e47a0ac3a6f13fde335e3ca528717e7dceed',1,'AbstractRD']]],
   ['last_5fof_5fgroup',['last_of_group',['../structAbstractRD_1_1PaintAction.html#af8178bec040f89919afd7e18d20cb9e8',1,'AbstractRD::PaintAction']]],
   ['lastchar',['lastchar',['../classlinereader.html#ad9f0f6be5a6cc6f3a335fe992cdcad14',1,'linereader']]],
   ['left_5fmouse_5fis_5fdown',['left_mouse_is_down',['../classMyFrame.html#a1737956b39c1e33f4bfa7a3da815f85b',1,'MyFrame']]],

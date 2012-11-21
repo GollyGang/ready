@@ -5,7 +5,9 @@ var searchData=
   ['textdlght',['textdlght',['../prefs_8cpp.html#a0b9937fefba071008390e6e3149bdb11',1,'textdlght():&#160;prefs.cpp'],['../prefs_8hpp.html#a0b9937fefba071008390e6e3149bdb11',1,'textdlght():&#160;prefs.cpp']]],
   ['textdlgwd',['textdlgwd',['../prefs_8cpp.html#a3fe8c36e5972115938dc8a7abc55be62',1,'textdlgwd():&#160;prefs.cpp'],['../prefs_8hpp.html#a3fe8c36e5972115938dc8a7abc55be62',1,'textdlgwd():&#160;prefs.cpp']]],
   ['texteditor',['texteditor',['../prefs_8cpp.html#a3a8c57e4e1beb747c341e067dc8869bf',1,'texteditor():&#160;prefs.cpp'],['../prefs_8hpp.html#a3a8c57e4e1beb747c341e067dc8869bf',1,'texteditor():&#160;prefs.cpp']]],
+  ['time_5fat_5flast_5frender',['time_at_last_render',['../classMyFrame.html#a4f34f9ca6e7adef1784a4f7b2ebe1187',1,'MyFrame']]],
   ['timer',['timer',['../classwxVTKRenderWindowInteractor.html#a1fb60ba60b5d6976df532f7d90a10ad8',1,'wxVTKRenderWindowInteractor']]],
+  ['timesteps_5fper_5fsecond_5fbuffer',['timesteps_per_second_buffer',['../classMyFrame.html#a4804341c0ce6f00a088e876106b3e00d',1,'MyFrame']]],
   ['timesteps_5ftaken',['timesteps_taken',['../classAbstractRD.html#ace6b78e1b817bc7a78dbee416aafebcf',1,'AbstractRD']]],
   ['type',['type',['../classProperty.html#ae32de355c67dc4dd0119a18979f766da',1,'Property']]]
 ];

@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -131,6 +131,7 @@ Inheritance diagram for MeshRD:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a68cf2323732499b29f26d19bd938fa08"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a68cf2323732499b29f26d19bd938fa08">MeshRD</a> ()</td></tr>
 <tr class="memitem:af85b79f7d878cdfc7dc5fefe17d5bd3d"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#af85b79f7d878cdfc7dc5fefe17d5bd3d">~MeshRD</a> ()</td></tr>
+<tr class="memitem:a913fa39007a4a913180dcbfea1bab50d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a913fa39007a4a913180dcbfea1bab50d">SaveFile</a> (const char *<a class="el" href="classAbstractRD.html#acb8e6b64b80df97fb751ac5c70598225">filename</a>, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings, bool generate_initial_pattern_when_loading) const </td></tr>
 <tr class="memitem:a4666502a974d7df82f2b1cd3bfbdad96"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96">Update</a> (int n_steps)</td></tr>
 <tr class="memdesc:a4666502a974d7df82f2b1cd3bfbdad96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called to progress the simulation by N steps.  <a href="#a4666502a974d7df82f2b1cd3bfbdad96"></a><br/></td></tr>
 <tr class="memitem:aac659a9f809c080c5eb6a60974eaa554"><td class="memItemLeft" align="right" valign="top">virtual float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#aac659a9f809c080c5eb6a60974eaa554">GetX</a> () const </td></tr>
@@ -139,11 +140,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a777f0b9e9f19d1b40e45f38430b6c6fb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">SetNumberOfChemicals</a> (int n)</td></tr>
 <tr class="memitem:a5b64cad228c7ffeacf6a0a581ecdcc32"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a5b64cad228c7ffeacf6a0a581ecdcc32">HasEditableFormula</a> () const </td></tr>
 <tr class="memdesc:a5b64cad228c7ffeacf6a0a581ecdcc32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some implementations (e.g. inbuilt ones) cannot have their formula edited.  <a href="#a5b64cad228c7ffeacf6a0a581ecdcc32"></a><br/></td></tr>
-<tr class="memitem:a5f62de46848365e6d77e6ea1b7cc23d6"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a5f62de46848365e6d77e6ea1b7cc23d6">GetRuleType</a> () const </td></tr>
-<tr class="memdesc:a5f62de46848365e6d77e6ea1b7cc23d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#a5f62de46848365e6d77e6ea1b7cc23d6"></a><br/></td></tr>
 <tr class="memitem:a89f3cbe0ca2ff655963d3c10e9adfab3"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a89f3cbe0ca2ff655963d3c10e9adfab3">GetFileExtension</a> () const </td></tr>
 <tr class="memitem:a6e378152095384c328d3531a2c5b372f"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a6e378152095384c328d3531a2c5b372f">GetNumberOfCells</a> () const </td></tr>
-<tr class="memitem:ab9f7b46d789bcc4547031322019d496f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ab9f7b46d789bcc4547031322019d496f">SaveFile</a> (const char *<a class="el" href="classAbstractRD.html#acb8e6b64b80df97fb751ac5c70598225">filename</a>, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings) const </td></tr>
 <tr class="memitem:aea439a0c84c616efb787cce88a64e51c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#aea439a0c84c616efb787cce88a64e51c">GenerateInitialPattern</a> ()</td></tr>
 <tr class="memitem:ad20d6bc116d28e97b42f4718e6ab6c91"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">BlankImage</a> ()</td></tr>
 <tr class="memitem:a86710329396780b3bf7a6f92e975cdb5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">CopyFromMesh</a> (vtkUnstructuredGrid *mesh2)</td></tr>
@@ -154,6 +152,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abbde7ed1c4d85e77709af43b52dc7ba5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 3D object as a vtkPolyData.  <a href="#abbde7ed1c4d85e77709af43b52dc7ba5"></a><br/></td></tr>
 <tr class="memitem:af034d39dd6300828b40dbd0b878ca044"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044">GetAs2DImage</a> (vtkImageData *out, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings) const </td></tr>
 <tr class="memdesc:af034d39dd6300828b40dbd0b878ca044"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the current 2D plane as a vtkImageData.  <a href="#af034d39dd6300828b40dbd0b878ca044"></a><br/></td></tr>
+<tr class="memitem:ae383e08d3f121fd6bd4debb9b33caa68"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ae383e08d3f121fd6bd4debb9b33caa68">Is2DImageAvailable</a> () const </td></tr>
+<tr class="memdesc:ae383e08d3f121fd6bd4debb9b33caa68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether <a class="el" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044" title="Retrieve the current 2D plane as a vtkImageData.">GetAs2DImage()</a> can be called.  <a href="#ae383e08d3f121fd6bd4debb9b33caa68"></a><br/></td></tr>
 <tr class="memitem:a47b5e474c1b4db50c65e70ed6e3b4ba6"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a47b5e474c1b4db50c65e70ed6e3b4ba6">GetArenaDimensionality</a> () const </td></tr>
 <tr class="memdesc:a47b5e474c1b4db50c65e70ed6e3b4ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retreive the dimensionality of the system volume, irrespective of the cells within it.  <a href="#a47b5e474c1b4db50c65e70ed6e3b4ba6"></a><br/></td></tr>
 <tr class="memitem:a93a42775bc5ad5f78333d0ee7aff99a3"><td class="memItemLeft" align="right" valign="top">virtual float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a93a42775bc5ad5f78333d0ee7aff99a3">GetValue</a> (float x, float y, float z, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
@@ -162,17 +162,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ad6092c5c5283a64faf0bfd09e8323086"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value at a given location.  <a href="#ad6092c5c5283a64faf0bfd09e8323086"></a><br/></td></tr>
 <tr class="memitem:af69b6e49a8613f8821ba125a32ac93a2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2">SetValuesInRadius</a> (float x, float y, float z, float r, float val, const <a class="el" href="classProperties.html">Properties</a> &amp;render_settings)</td></tr>
 <tr class="memdesc:af69b6e49a8613f8821ba125a32ac93a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.  <a href="#af69b6e49a8613f8821ba125a32ac93a2"></a><br/></td></tr>
+<tr class="memitem:a825cbe9153f2c3555e9721e816152e09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a825cbe9153f2c3555e9721e816152e09">GetMesh</a> (vtkUnstructuredGrid *<a class="el" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644">mesh</a>) const </td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad1178941b77bfe772e967e199863a8fd"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ad1178941b77bfe772e967e199863a8fd">GetFileExtensionStatic</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:ab15aad595216b39164e30aa3d1dc42c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ab15aad595216b39164e30aa3d1dc42c6">ComputeCellNeighbors</a> ()</td></tr>
-<tr class="memdesc:ab15aad595216b39164e30aa3d1dc42c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">work out which cells are neighbors of each other  <a href="#ab15aad595216b39164e30aa3d1dc42c6"></a><br/></td></tr>
+<tr class="memitem:af760a68f419979bf235c984a59ce24fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#af760a68f419979bf235c984a59ce24fb">ComputeCellNeighbors</a> (<a class="el" href="classAbstractRD.html#ac56f4b9cc6c45da4b8fb1f908127a559">TNeighborhood</a> <a class="el" href="classAbstractRD.html#a24ff2eadeb818e0f14e5e0c0e1742a65">neighborhood_type</a>, int range, <a class="el" href="classAbstractRD.html#a81fd5371f651c3cf9e2d7251db538e47">TWeight</a> weight_type)</td></tr>
+<tr class="memdesc:af760a68f419979bf235c984a59ce24fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">work out which cells are neighbors of each other  <a href="#af760a68f419979bf235c984a59ce24fb"></a><br/></td></tr>
 <tr class="memitem:af20c1842abfb4b21ab60bc9448037216"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#af20c1842abfb4b21ab60bc9448037216">InternalUpdate</a> (int n_steps)=0</td></tr>
 <tr class="memdesc:af20c1842abfb4b21ab60bc9448037216"><td class="mdescLeft">&#160;</td><td class="mdescRight">advance the RD system by n timesteps  <a href="#af20c1842abfb4b21ab60bc9448037216"></a><br/></td></tr>
 <tr class="memitem:a547cc071fdb4eb7dd0b87bd875488485"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#a547cc071fdb4eb7dd0b87bd875488485">CreateCellLocatorIfNeeded</a> ()</td></tr>
 <tr class="memitem:ac31f13c9311735171ef42c03a844ed71"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ac31f13c9311735171ef42c03a844ed71">FlipPaintAction</a> (<a class="el" href="structAbstractRD_1_1PaintAction.html">PaintAction</a> &amp;cca)</td></tr>
+<tr class="memdesc:ac31f13c9311735171ef42c03a844ed71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undo/redo this paint action.  <a href="#ac31f13c9311735171ef42c03a844ed71"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:ac8f9e4f26890164cb27542c21a6ac644"><td class="memItemLeft" align="right" valign="top">vtkUnstructuredGrid *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMeshRD.html#ac8f9e4f26890164cb27542c21a6ac644">mesh</a></td></tr>
@@ -210,7 +212,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00059">59</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00061">61</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -228,7 +230,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00070">70</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00072">72</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -268,19 +270,36 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00175">175</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00180">180</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab15aad595216b39164e30aa3d1dc42c6"></a>
+<a class="anchor" id="af760a68f419979bf235c984a59ce24fb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classMeshRD.html#ab15aad595216b39164e30aa3d1dc42c6">MeshRD::ComputeCellNeighbors</a> </td>
+          <td class="memname">void <a class="el" href="classMeshRD.html#af760a68f419979bf235c984a59ce24fb">MeshRD::ComputeCellNeighbors</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [protected]</code></td>
+          <td class="paramtype"><a class="el" href="classAbstractRD.html#ac56f4b9cc6c45da4b8fb1f908127a559">TNeighborhood</a>&#160;</td>
+          <td class="paramname"><em>neighborhood_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>range</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classAbstractRD.html#a81fd5371f651c3cf9e2d7251db538e47">TWeight</a>&#160;</td>
+          <td class="paramname"><em>weight_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [protected]</code></td>
         </tr>
       </table>
 </div>
@@ -288,7 +307,7 @@ Private Member Functions</h2></td></tr>
 
 <p>work out which cells are neighbors of each other </p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00452">452</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00491">491</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -309,7 +328,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGrayScottMeshRD.html#a8b54c1b8d5d39e6ec5bc19913245f0a8">GrayScottMeshRD</a>, and <a class="el" href="classOpenCLMeshRD.html#a58070b870e1a6aa593157aad15c9d32c">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00209">209</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00214">214</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -327,7 +346,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00705">705</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00787">787</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -346,9 +365,11 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Undo/redo this paint action. </p>
+
 <p>Implements <a class="el" href="classAbstractRD.html#a494f0a1753a8fb729327ed65873cd510">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00717">717</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00799">799</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -370,7 +391,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#a86c56c6ad5224dfc6b9535b0d41a6fa7">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00127">127</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00132">132</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -392,7 +413,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#ad06725e8898ba2e16772cda74368a0ed">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00613">613</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00691">691</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +446,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#ab2a503fcd628baf0fb763ce626ecfe31">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00627">627</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00705">705</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -458,7 +479,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a7a5c43082919d90e393bdfd9cf2948e5">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00602">602</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00647">647</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -478,7 +499,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a7c7bb16083029c258a1cc4b39a2f0504">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00049">49</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00050">50</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -496,7 +517,26 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00050">50</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00051">51</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a825cbe9153f2c3555e9721e816152e09"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classMeshRD.html#a825cbe9153f2c3555e9721e816152e09">MeshRD::GetMesh</a> </td>
+          <td>(</td>
+          <td class="paramtype">vtkUnstructuredGrid *&#160;</td>
+          <td class="paramname"><em>mesh</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00811">811</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -516,31 +556,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a89bff1670ebf193394493a4f81ec49c1">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00595">595</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a5f62de46848365e6d77e6ea1b7cc23d6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::string <a class="el" href="classMeshRD.html#a5f62de46848365e6d77e6ea1b7cc23d6">MeshRD::GetRuleType</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const<code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Returns e.g. "inbuilt", "formula", "kernel", as in the XML. </p>
-
-<p>Implements <a class="el" href="classAbstractRD.html#a6f3719fcbeaae0ac22c6de2af086f078">AbstractRD</a>.</p>
-
-<p>Reimplemented in <a class="el" href="classFormulaOpenCLMeshRD.html#ac889d885056a20510e6bb7b828080fe1">FormulaOpenCLMeshRD</a>, <a class="el" href="classFullKernelOpenCLMeshRD.html#a26da17c8cb1d25a0aaf870babf66d880">FullKernelOpenCLMeshRD</a>, and <a class="el" href="classInbuiltMeshRD.html#a54f5bdf2608da9af703c5225dda9f434">InbuiltMeshRD</a>.</p>
-
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00047">47</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00640">640</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -585,7 +601,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#ab75a4b52c0d5e60ed8ed0cb327d67547">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00634">634</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00712">712</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +621,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa569d2908a67a0946652e0b518abad52">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00188">188</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00193">193</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +641,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#abdbeb388c5d50fe586edb59266b9b3eb">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00195">195</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00200">200</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -645,7 +661,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a3e207e17ccdf980501c20b4f3153877d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00202">202</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00207">207</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +685,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#a57b894f349817078b1158fa06174fd2e">OpenCLMeshRD</a>, and <a class="el" href="classInbuiltMeshRD.html#abe3b6f792509af5e8bb13e79a7258edd">InbuiltMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00045">45</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00048">48</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -700,7 +716,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a9fba6f8368f4317934ccdbdfa185c44b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00226">226</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00232">232</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -724,6 +740,28 @@ Private Member Functions</h2></td></tr>
 <p>Implements <a class="el" href="classAbstractRD.html#a6353d2e211e79a2d0d883cbe8719801b">AbstractRD</a>.</p>
 
 <p>Implemented in <a class="el" href="classOpenCLMeshRD.html#a3f804403758cabc9447cd549a9b5a53e">OpenCLMeshRD</a>, and <a class="el" href="classGrayScottMeshRD.html#a7fd076c5fef1473d3a27087a7e899ec9">GrayScottMeshRD</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae383e08d3f121fd6bd4debb9b33caa68"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool <a class="el" href="classMeshRD.html#ae383e08d3f121fd6bd4debb9b33caa68">MeshRD::Is2DImageAvailable</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Indicates whether <a class="el" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044" title="Retrieve the current 2D plane as a vtkImageData.">GetAs2DImage()</a> can be called. </p>
+
+<p>Implements <a class="el" href="classAbstractRD.html#ac810e1532f4f14fc8449850678ff46c5">AbstractRD</a>.</p>
+
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00065">65</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -760,16 +798,16 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa3b511ef22685dc79c26380b6c454f8f">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00432">432</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00457">457</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab9f7b46d789bcc4547031322019d496f"></a>
+<a class="anchor" id="a913fa39007a4a913180dcbfea1bab50d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classMeshRD.html#ab9f7b46d789bcc4547031322019d496f">MeshRD::SaveFile</a> </td>
+          <td class="memname">void <a class="el" href="classMeshRD.html#a913fa39007a4a913180dcbfea1bab50d">MeshRD::SaveFile</a> </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>filename</em>, </td>
@@ -778,7 +816,13 @@ Private Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classProperties.html">Properties</a> &amp;&#160;</td>
-          <td class="paramname"><em>render_settings</em>&#160;</td>
+          <td class="paramname"><em>render_settings</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>generate_initial_pattern_when_loading</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -789,9 +833,9 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Implements <a class="el" href="classAbstractRD.html#a77c2f176da53d7c5b3dbb322a8910d68">AbstractRD</a>.</p>
+<p>Implements <a class="el" href="classAbstractRD.html#a82243e893a7e528cb809524eb8512052">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00115">115</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00117">117</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -811,7 +855,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aec9f3320b27e8f79891ca02da04bcf7f">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00425">425</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00450">450</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -834,7 +878,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classGrayScottMeshRD.html#af9737ef0e3853da16b4fd985f7eed065">GrayScottMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00097">97</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00099">99</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -887,7 +931,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#ae96ef70adb11db1c1111c05b2c8a250a">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00650">650</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00730">730</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -946,7 +990,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classOpenCLMeshRD.html#aa5f5d3a30a19fe5643909d1bb9543793">OpenCLMeshRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00669">669</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00751">751</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -969,7 +1013,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#aa365a78f2c1773ee94d70503d2068c87">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00085">85</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8cpp_source.html#l00087">87</a> of file <a class="el" href="MeshRD_8cpp_source.html">MeshRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -987,7 +1031,7 @@ Private Member Functions</h2></td></tr>
 
 <p>Returns a cell <a class="el" href="namespaceID.html" title="IDs for the controls and the menu commands.">ID</a> when given a 3D location. </p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00094">94</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00096">96</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1004,7 +1048,7 @@ Private Member Functions</h2></td></tr>
 
 <p>index of each neighbor of a cell </p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00091">91</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00093">93</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1021,7 +1065,7 @@ Private Member Functions</h2></td></tr>
 
 <p>diffusion coefficient between each cell and a neighbor </p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00092">92</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00094">94</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1036,7 +1080,7 @@ Private Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00090">90</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00092">92</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1053,7 +1097,7 @@ Private Member Functions</h2></td></tr>
 
 <p>the cell data contains a named array for each chemical ('a', 'b', etc.) </p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00087">87</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00089">89</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1070,7 +1114,7 @@ Private Member Functions</h2></td></tr>
 
 <p>we save the starting pattern, to allow the user to reset </p>
 
-<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00088">88</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="MeshRD_8hpp_source.html#l00090">90</a> of file <a class="el" href="MeshRD_8hpp_source.html">MeshRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -1082,7 +1126,7 @@ Private Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

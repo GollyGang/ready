@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['p',['p',['../structTri.html#ad4828e10223c8c17ef13793e235134db',1,'Tri']]],
   ['p1',['p1',['../classLinearGradient.html#a52061b8a5eedbc925d02fca6a45cc531',1,'LinearGradient::p1()'],['../classRadialGradient.html#a267feb58862b273e9c7897aa9b1876aa',1,'RadialGradient::p1()']]],
   ['p2',['p2',['../classLinearGradient.html#adf1a370f8c9ba5904a163d5b66aa7b7d',1,'LinearGradient::p2()'],['../classRadialGradient.html#a68c5ac30042542baa0bc9bd2927088b1',1,'RadialGradient::p2()']]],
   ['paint_5fhandler',['paint_handler',['../classInteractorStylePainter.html#a317130b8fedd15de6f2c98c1b346345c',1,'InteractorStylePainter']]],
@@ -7,7 +8,7 @@ var searchData=
   ['paintaction',['PaintAction',['../structAbstractRD_1_1PaintAction.html',1,'AbstractRD']]],
   ['painttoolbar',['PaintToolbar',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ab57a5598d943754ea49cc0d0c06fb1ad',1,'ID']]],
   ['panel',['panel',['../classHtmlView.html#a17159a122f613e34d245a54a7923c738',1,'HtmlView::panel()'],['../classHtmlInfo.html#a537802be5db2f91a49dd0d5ef630e66f',1,'HtmlInfo::panel()']]],
-  ['panename',['PaneName',['../frame_8cpp.html#a95eac21faf5fc712c40ed6a2a98cca6c',1,'frame.cpp']]],
+  ['panename',['PaneName',['../frame_8cpp.html#adb2d02d23949d250b57d1b3e00210c70',1,'frame.cpp']]],
   ['parameter',['Parameter',['../classParameter.html',1,'Parameter'],['../classParameter.html#ac4bebcb6f564c3b250a584a9d80e4b19',1,'Parameter::Parameter()']]],
   ['parameter_5fname',['parameter_name',['../classParameter.html#a8a73bbce84b28531b7e911c4099d362c',1,'Parameter']]],
   ['parameterdialog',['ParameterDialog',['../classParameterDialog.html',1,'ParameterDialog'],['../classParameterDialog.html#aed0943774f8a2ab0827e366ee23e377d',1,'ParameterDialog::ParameterDialog()']]],
@@ -24,6 +25,7 @@ var searchData=
   ['patternsubmenu',['patternSubMenu',['../prefs_8cpp.html#ae5246b1632294beb0e04a2942722d304',1,'patternSubMenu():&#160;prefs.cpp'],['../prefs_8hpp.html#ae5246b1632294beb0e04a2942722d304',1,'patternSubMenu():&#160;prefs.cpp']]],
   ['pencil',['PENCIL',['../classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4ca3bb24ca1d2d856112c57bdc28078af6c',1,'MyFrame::PENCIL()'],['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a50ced129035b6c2b8f8936dbb30aadf1',1,'ID::Pencil()']]],
   ['pencil_5fcursor',['pencil_cursor',['../classMyFrame.html#aff1fc5b7526d5993a0058c805b3b8586',1,'MyFrame']]],
+  ['percentage_5fspent_5frendering',['percentage_spent_rendering',['../classMyFrame.html#aa3c3b3fd94c2611fe0efc776cf2ef02a',1,'MyFrame']]],
   ['picker',['PICKER',['../classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4caec77662436bd649b60156cfd54044efc',1,'MyFrame::PICKER()'],['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994add376319784974c1c1dccfcc6a7b9a15',1,'ID::Picker()']]],
   ['picker_5fcursor',['picker_cursor',['../classMyFrame.html#a73ccf8ae71b4257dbbd01186bec8e5f6',1,'MyFrame']]],
   ['pixel',['Pixel',['../classPixel.html',1,'Pixel'],['../classPixel.html#a0d659391f0ac77fef64ceec7a49b286e',1,'Pixel::Pixel()']]],

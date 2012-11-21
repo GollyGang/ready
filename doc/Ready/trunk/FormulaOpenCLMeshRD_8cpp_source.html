@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -144,8 +144,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00040"></a>00040     this-&gt;<a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">AddParameter</a>(<span class="stringliteral">&quot;k&quot;</span>,0.06f);
 <a name="l00041"></a>00041     this-&gt;<a class="code" href="classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9">AddParameter</a>(<span class="stringliteral">&quot;F&quot;</span>,0.035f);
 <a name="l00042"></a>00042     this-&gt;<a class="code" href="classAbstractRD.html#a39f16d952fea98afd72ae0ab43b27880" title="Changes the system&#39;s formula. The kernel will be reloaded on the next update step.">SetFormula</a>(<span class="stringliteral">&quot;\</span>
-<a name="l00043"></a>00043 <span class="stringliteral">    delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\</span>
-<a name="l00044"></a>00044 <span class="stringliteral">    delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;\n&quot;</span>);
+<a name="l00043"></a>00043 <span class="stringliteral">delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\</span>
+<a name="l00044"></a>00044 <span class="stringliteral">delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;&quot;</span>);
 <a name="l00045"></a>00045 }
 <a name="l00046"></a>00046 
 <a name="l00047"></a>00047 <span class="comment">// -------------------------------------------------------------------------</span>
@@ -182,7 +182,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00078"></a>00078         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;laplacian_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; -= &quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot;;\n&quot;</span>;
 <a name="l00079"></a>00079     kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work\n&quot;</span>;
 <a name="l00080"></a>00080     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;NC;i++)
-<a name="l00081"></a>00081         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;laplacian_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; *= 4.0f;\n&quot;</span>;
+<a name="l00081"></a>00081         kernel_source &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;laplacian_&quot;</span> &lt;&lt; <a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i) &lt;&lt; <span class="stringliteral">&quot; *= 4.0f;\n&quot;</span>; <span class="comment">// TODO: not sure about 3D meshes</span>
 <a name="l00082"></a>00082     <span class="comment">// the parameters (assume all float for now)</span>
 <a name="l00083"></a>00083     kernel_source &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span> &lt;&lt; indent &lt;&lt; <span class="stringliteral">&quot;// parameters:\n&quot;</span>;
 <a name="l00084"></a>00084     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;(int)this-&gt;<a class="code" href="classAbstractRD.html#ae1fd46bedfac01a8991db4bcbc87e526">parameters</a>.size();i++)
@@ -221,9 +221,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00117"></a>00117 
 <a name="l00118"></a>00118 <span class="comment">// -------------------------------------------------------------------------</span>
 <a name="l00119"></a>00119 
-<a name="l00120"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">00120</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4" title="Retrieve an RD element for this pattern, suitable for saving to file.">FormulaOpenCLMeshRD::GetAsXML</a>()<span class="keyword"> const</span>
+<a name="l00120"></a><a class="code" href="classFormulaOpenCLMeshRD.html#a2c88deba784d04e6313e0123215ef3f5">00120</a> vtkSmartPointer&lt;vtkXMLDataElement&gt; <a class="code" href="classFormulaOpenCLMeshRD.html#a2c88deba784d04e6313e0123215ef3f5" title="Retrieve an RD element for this pattern, suitable for saving to file.">FormulaOpenCLMeshRD::GetAsXML</a>(<span class="keywordtype">bool</span> generate_initial_pattern_when_loading)<span class="keyword"> const</span>
 <a name="l00121"></a>00121 <span class="keyword"></span>{
-<a name="l00122"></a>00122     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = <a class="code" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4" title="Retrieve an RD element for this pattern, suitable for saving to file.">OpenCLMeshRD::GetAsXML</a>();
+<a name="l00122"></a>00122     vtkSmartPointer&lt;vtkXMLDataElement&gt; rd = <a class="code" href="classFormulaOpenCLMeshRD.html#a2c88deba784d04e6313e0123215ef3f5" title="Retrieve an RD element for this pattern, suitable for saving to file.">OpenCLMeshRD::GetAsXML</a>(generate_initial_pattern_when_loading);
 <a name="l00123"></a>00123 
 <a name="l00124"></a>00124     vtkSmartPointer&lt;vtkXMLDataElement&gt; rule = rd-&gt;FindNestedElementWithName(<span class="stringliteral">&quot;rule&quot;</span>);
 <a name="l00125"></a>00125     <span class="keywordflow">if</span>(!rule) <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;rule node not found&quot;</span>);
@@ -283,7 +283,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

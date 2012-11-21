@@ -6,6 +6,7 @@ var searchData=
   ['clearallpatterns',['ClearAllPatterns',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a706737e76be11ecaa9546057bf8216c3',1,'ID']]],
   ['clearmissingpatterns',['ClearMissingPatterns',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a62c752cf096291b16dd60eaa26527904',1,'ID']]],
   ['contentsbutton',['ContentsButton',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ae2b5adc66eb22cb8306a4d8e7203ad0c',1,'ID']]],
+  ['converttofullkernel',['ConvertToFullKernel',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a11b874d75641259615cf2d0beb2dac7b',1,'ID']]],
   ['currentvaluecolor',['CurrentValueColor',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a5e5ac16e3607358287fb5e7525468e3d',1,'ID']]],
   ['currentvaluetext',['CurrentValueText',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a486b11824fdf1c02e710a7060aa37db9',1,'ID']]]
 ];

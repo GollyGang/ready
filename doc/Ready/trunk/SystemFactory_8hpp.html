@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Ready: TriIndices Struct Reference</title>
+<title>Ready: readybase/SystemFactory.hpp File Reference</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -50,8 +50,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li><a href="dirs.html"><span>Directories</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -73,10 +73,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -93,52 +91,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+  <div id="nav-path" class="navpath">
+    <ul>
+      <li class="navelem"><a class="el" href="dir_0040a7c0767aebbbf130a75c5b0c0b7b.html">readybase</a>      </li>
+    </ul>
+  </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Public Attributes</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">TriIndices Struct Reference</div>  </div>
+<div class="title">SystemFactory.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>The indices of a triangle, used in MeshRD::GetPenroseRhombiTiling().  
- <a href="structTriIndices.html#details">More...</a></p>
-
-<p><a href="structTriIndices-members.html">List of all members.</a></p>
+<p><a href="SystemFactory_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a7cc99617e4e4a1c85c6093556087f025"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTriIndices.html#a7cc99617e4e4a1c85c6093556087f025">ind</a> [3]</td></tr>
+<tr><td colspan="2"><h2><a name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespaceSystemFactory"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceSystemFactory.html">SystemFactory</a></td></tr>
+<tr class="memdesc:namespaceSystemFactory"><td class="mdescLeft">&#160;</td><td class="mdescRight">Methods for creating RD systems when we don't know their type. <br/></td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a0db259c431dbb7dddbb63b5d43bf0b26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classAbstractRD.html">AbstractRD</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceSystemFactory.html#a0db259c431dbb7dddbb63b5d43bf0b26">SystemFactory::CreateFromFile</a> (const char *filename, bool is_opencl_available, int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>, <a class="el" href="classProperties.html">Properties</a> &amp;render_settings, bool &amp;warn_to_update)</td></tr>
+<tr class="memdesc:a0db259c431dbb7dddbb63b5d43bf0b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load an RD system from file and create the appropriate AbstractRD-derived instance. (User is responsible for deletion.)  <a href="#a0db259c431dbb7dddbb63b5d43bf0b26"></a><br/></td></tr>
 </table>
-<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>The indices of a triangle, used in MeshRD::GetPenroseRhombiTiling(). </p>
-
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00358">358</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
-</div><hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a7cc99617e4e4a1c85c6093556087f025"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="structTriIndices.html#a7cc99617e4e4a1c85c6093556087f025">TriIndices::ind</a>[3]</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00359">359</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>readybase/<a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a></li>
-</ul>
 </div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

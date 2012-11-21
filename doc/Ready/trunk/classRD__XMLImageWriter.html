@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -118,6 +118,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad18f4078070b155fef444014d214cde1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#ad18f4078070b155fef444014d214cde1">vtkTypeMacro</a> (<a class="el" href="classRD__XMLImageWriter.html">RD_XMLImageWriter</a>, vtkXMLImageDataWriter)</td></tr>
 <tr class="memitem:af232e49faf21fa65e0bbdbd21557fcba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#af232e49faf21fa65e0bbdbd21557fcba">SetSystem</a> (const <a class="el" href="classImageRD.html">ImageRD</a> *rd_system)</td></tr>
 <tr class="memitem:af3117562cd172e5fb0951ce401c5782a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#af3117562cd172e5fb0951ce401c5782a">SetRenderSettings</a> (const <a class="el" href="classProperties.html">Properties</a> *settings)</td></tr>
+<tr class="memitem:a75e5212bf0f65218ede3fa58e4d9e161"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#a75e5212bf0f65218ede3fa58e4d9e161">GenerateInitialPatternWhenLoading</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a53a29a5c6b7d1890ca8769d4122634ca"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classRD__XMLImageWriter.html">RD_XMLImageWriter</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#a53a29a5c6b7d1890ca8769d4122634ca">New</a> ()</td></tr>
@@ -133,6 +134,7 @@ Static Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a266bcb01f93565b76d5e32daf6790983"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classImageRD.html">ImageRD</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#a266bcb01f93565b76d5e32daf6790983">system</a></td></tr>
 <tr class="memitem:a2efeaa425121cd3598df5ed378cd75d6"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classProperties.html">Properties</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#a2efeaa425121cd3598df5ed378cd75d6">render_settings</a></td></tr>
+<tr class="memitem:aba46ba2d07b0e375e168b68d2230e384"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLImageWriter.html#aba46ba2d07b0e375e168b68d2230e384">generate_initial_pattern_when_loading</a></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Used to write vtkImageData to XML, with an added RD section containing rule information. </p>
@@ -153,7 +155,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00088">88</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00089">89</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -172,6 +174,24 @@ Protected Attributes</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a75e5212bf0f65218ede3fa58e4d9e161"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classRD__XMLImageWriter.html#a75e5212bf0f65218ede3fa58e4d9e161">RD_XMLImageWriter::GenerateInitialPatternWhenLoading</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00085">85</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -286,6 +306,21 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="aba46ba2d07b0e375e168b68d2230e384"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classRD__XMLImageWriter.html#aba46ba2d07b0e375e168b68d2230e384">RD_XMLImageWriter::generate_initial_pattern_when_loading</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00099">99</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a2efeaa425121cd3598df5ed378cd75d6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -297,7 +332,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00097">97</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00098">98</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +347,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00096">96</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00097">97</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -324,7 +359,7 @@ Protected Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -115,16 +115,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;<a class="el" href="vtk__pipeline_8hpp_source.html">vtk_pipeline.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="dialogs_8hpp_source.html">dialogs.hpp</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="RecordingDialog_8hpp_source.html">RecordingDialog.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="utils_8hpp_source.html">utils.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="GrayScottImageRD_8hpp_source.html">GrayScottImageRD.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="OpenCL__utils_8hpp_source.html">OpenCL_utils.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="GrayScottMeshRD_8hpp_source.html">GrayScottMeshRD.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="FormulaOpenCLImageRD_8hpp_source.html">FormulaOpenCLImageRD.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="FormulaOpenCLMeshRD_8hpp_source.html">FormulaOpenCLMeshRD.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="FullKernelOpenCLMeshRD_8hpp_source.html">FullKernelOpenCLMeshRD.hpp</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="MeshGenerators_8hpp_source.html">MeshGenerators.hpp</a>&quot;</code><br/>
+<code>#include &lt;<a class="el" href="utils_8hpp_source.html">utils.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="OpenCL__utils_8hpp_source.html">OpenCL_utils.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="GrayScottImageRD_8hpp_source.html">GrayScottImageRD.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="GrayScottMeshRD_8hpp_source.html">GrayScottMeshRD.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="FormulaOpenCLImageRD_8hpp_source.html">FormulaOpenCLImageRD.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="FormulaOpenCLMeshRD_8hpp_source.html">FormulaOpenCLMeshRD.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="FullKernelOpenCLMeshRD_8hpp_source.html">FullKernelOpenCLMeshRD.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="MeshGenerators_8hpp_source.html">MeshGenerators.hpp</a>&gt;</code><br/>
+<code>#include &lt;<a class="el" href="SystemFactory_8hpp_source.html">SystemFactory.hpp</a>&gt;</code><br/>
 <code>#include &quot;appicon16.xpm&quot;</code><br/>
 <code>#include &lt;wx/filename.h&gt;</code><br/>
 <code>#include &lt;wx/dir.h&gt;</code><br/>
@@ -132,36 +133,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;<a class="el" href="wxVTKRenderWindowInteractor_8h_source.html">wxVTKRenderWindowInteractor.h</a>&quot;</code><br/>
 <code>#include &lt;string&gt;</code><br/>
 <code>#include &lt;algorithm&gt;</code><br/>
+<code>#include &lt;vtkInteractorStyleTrackballCamera.h&gt;</code><br/>
 <code>#include &lt;vtkWindowToImageFilter.h&gt;</code><br/>
 <code>#include &lt;vtkPNGWriter.h&gt;</code><br/>
 <code>#include &lt;vtkJPEGWriter.h&gt;</code><br/>
 <code>#include &lt;vtkSmartPointer.h&gt;</code><br/>
-<code>#include &lt;vtkXMLPolyDataReader.h&gt;</code><br/>
-<code>#include &lt;vtkUnstructuredGrid.h&gt;</code><br/>
-<code>#include &lt;vtkPolyData.h&gt;</code><br/>
-<code>#include &lt;vtkOBJReader.h&gt;</code><br/>
-<code>#include &lt;vtkCellArray.h&gt;</code><br/>
-<code>#include &lt;vtkXMLPolyDataWriter.h&gt;</code><br/>
-<code>#include &lt;vtkTriangleFilter.h&gt;</code><br/>
-<code>#include &lt;vtkPointData.h&gt;</code><br/>
 <code>#include &lt;vtkRendererCollection.h&gt;</code><br/>
-<code>#include &lt;vtkXMLGenericDataObjectReader.h&gt;</code><br/>
-<code>#include &lt;vtkInteractorStyleTrackballCamera.h&gt;</code><br/>
+<code>#include &lt;vtkXMLPolyDataReader.h&gt;</code><br/>
+<code>#include &lt;vtkXMLPolyDataWriter.h&gt;</code><br/>
+<code>#include &lt;vtkUnstructuredGrid.h&gt;</code><br/>
+<code>#include &lt;vtkOBJReader.h&gt;</code><br/>
+<code>#include &lt;vtkPolyData.h&gt;</code><br/>
 <code>#include &lt;vtkCellPicker.h&gt;</code><br/>
+<code>#include &lt;vtkPointData.h&gt;</code><br/>
+<code>#include &lt;vtkCellArray.h&gt;</code><br/>
 </div>
 <p><a href="frame_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a95eac21faf5fc712c40ed6a2a98cca6c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="frame_8cpp.html#a95eac21faf5fc712c40ed6a2a98cca6c">PaneName</a> (int id)</td></tr>
+<tr class="memitem:adb2d02d23949d250b57d1b3e00210c70"><td class="memItemLeft" align="right" valign="top">wxString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="frame_8cpp.html#adb2d02d23949d250b57d1b3e00210c70">PaneName</a> (int id)</td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
-<a class="anchor" id="a95eac21faf5fc712c40ed6a2a98cca6c"></a>
+<a class="anchor" id="adb2d02d23949d250b57d1b3e00210c70"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* <a class="el" href="frame_8cpp.html#a95eac21faf5fc712c40ed6a2a98cca6c">PaneName</a> </td>
+          <td class="memname">wxString <a class="el" href="frame_8cpp.html#adb2d02d23949d250b57d1b3e00210c70">PaneName</a> </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
@@ -171,7 +170,7 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00092">92</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
+<p>Definition at line <a class="el" href="frame_8cpp_source.html#l00091">91</a> of file <a class="el" href="frame_8cpp_source.html">frame.cpp</a>.</p>
 
 </div>
 </div>
@@ -179,7 +178,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab15e1ceefd9761efb2bdeeedca1b8d22"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLImageRD.html#ab15e1ceefd9761efb2bdeeedca1b8d22">FormulaOpenCLImageRD</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
 <tr class="memitem:ad15c313f1449f02e319b52a920ad5695"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLImageRD.html#ad15c313f1449f02e319b52a920ad5695">InitializeFromXML</a> (vtkXMLDataElement *rd, bool &amp;warn_to_update)</td></tr>
 <tr class="memdesc:ad15c313f1449f02e319b52a920ad5695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load this pattern from an RD element.  <a href="#ad15c313f1449f02e319b52a920ad5695"></a><br/></td></tr>
-<tr class="memitem:a3b6904e036b2233f0e0b8d06f29401c8"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
-&lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLImageRD.html#a3b6904e036b2233f0e0b8d06f29401c8">GetAsXML</a> () const </td></tr>
-<tr class="memdesc:a3b6904e036b2233f0e0b8d06f29401c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a3b6904e036b2233f0e0b8d06f29401c8"></a><br/></td></tr>
+<tr class="memitem:a348c4eb3bc33f6a3bd16847468b114cc"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
+&lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLImageRD.html#a348c4eb3bc33f6a3bd16847468b114cc">GetAsXML</a> (bool generate_initial_pattern_when_loading) const </td></tr>
+<tr class="memdesc:a348c4eb3bc33f6a3bd16847468b114cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a348c4eb3bc33f6a3bd16847468b114cc"></a><br/></td></tr>
 <tr class="memitem:a568b117415a8709ab349c3538ec85c0b"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLImageRD.html#a568b117415a8709ab349c3538ec85c0b">GetRuleType</a> () const </td></tr>
 <tr class="memdesc:a568b117415a8709ab349c3538ec85c0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#a568b117415a8709ab349c3538ec85c0b"></a><br/></td></tr>
 <tr class="memitem:a7c73fcc8f1969201d280357ac41fd409"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLImageRD.html#a7c73fcc8f1969201d280357ac41fd409">GetBlockSizeX</a> () const </td></tr>
@@ -205,7 +205,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#abef0fac4cc1d8426a37ebef49e172998">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00201">201</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00606">606</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -246,7 +246,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#af535ed6290815c65e33d2cee5398c3d7">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00217">217</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00622">622</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,18 +267,19 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a96fc8fae8ac3fbcedd12f77117d2239c">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00209">209</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00614">614</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3b6904e036b2233f0e0b8d06f29401c8"></a>
+<a class="anchor" id="a348c4eb3bc33f6a3bd16847468b114cc"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">vtkSmartPointer&lt; vtkXMLDataElement &gt; <a class="el" href="classFormulaOpenCLImageRD.html#a3b6904e036b2233f0e0b8d06f29401c8">FormulaOpenCLImageRD::GetAsXML</a> </td>
+          <td class="memname">vtkSmartPointer&lt; vtkXMLDataElement &gt; <a class="el" href="classFormulaOpenCLImageRD.html#a348c4eb3bc33f6a3bd16847468b114cc">FormulaOpenCLImageRD::GetAsXML</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>generate_initial_pattern_when_loading</em></td><td>)</td>
           <td> const<code> [virtual]</code></td>
         </tr>
       </table>
@@ -287,9 +288,9 @@ Public Member Functions</h2></td></tr>
 
 <p>Retrieve an RD element for this pattern, suitable for saving to file. </p>
 
-<p>Reimplemented from <a class="el" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">AbstractRD</a>.</p>
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#aa4fa71d104747e6845c6e2da9bd725ba">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00166">166</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00571">571</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +387,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00145">145</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00550">550</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +418,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#ab7ae2af183b1d3641ff386cb9631b17e">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00193">193</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00598">598</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -448,7 +449,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a8ea48695b8ee59e6932828d111d54521">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00185">185</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00590">590</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -469,7 +470,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a6c84ba80931357453e8d4c71335062a8">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00225">225</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html#l00630">630</a> of file <a class="el" href="FormulaOpenCLImageRD_8cpp_source.html">FormulaOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -481,7 +482,7 @@ Public Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -143,697 +143,786 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00039"></a>00039 <span class="preprocessor">#include &lt;vtkIdList.h&gt;</span>
 <a name="l00040"></a>00040 <span class="preprocessor">#include &lt;vtkUnstructuredGrid.h&gt;</span>
 <a name="l00041"></a>00041 <span class="preprocessor">#include &lt;vtkDataSetMapper.h&gt;</span>
-<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;vtkTetra.h&gt;</span>
-<a name="l00043"></a>00043 <span class="preprocessor">#include &lt;vtkCellArray.h&gt;</span>
-<a name="l00044"></a>00044 <span class="preprocessor">#include &lt;vtkGeometryFilter.h&gt;</span>
-<a name="l00045"></a>00045 <span class="preprocessor">#include &lt;vtkCutter.h&gt;</span>
-<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;vtkPlane.h&gt;</span>
-<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;vtkCellDataToPointData.h&gt;</span>
-<a name="l00048"></a>00048 <span class="preprocessor">#include &lt;vtkCellLocator.h&gt;</span>
-<a name="l00049"></a>00049 <span class="preprocessor">#include &lt;vtkContourFilter.h&gt;</span>
-<a name="l00050"></a>00050 <span class="preprocessor">#include &lt;vtkAssignAttribute.h&gt;</span>
-<a name="l00051"></a>00051 <span class="preprocessor">#include &lt;vtkReverseSense.h&gt;</span>
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053 <span class="comment">// STL:</span>
-<a name="l00054"></a>00054 <span class="preprocessor">#include &lt;stdexcept&gt;</span>
-<a name="l00055"></a>00055 <span class="keyword">using namespace </span>std;
-<a name="l00056"></a>00056 
-<a name="l00057"></a>00057 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00042"></a>00042 <span class="preprocessor">#include &lt;vtkCellArray.h&gt;</span>
+<a name="l00043"></a>00043 <span class="preprocessor">#include &lt;vtkGeometryFilter.h&gt;</span>
+<a name="l00044"></a>00044 <span class="preprocessor">#include &lt;vtkCutter.h&gt;</span>
+<a name="l00045"></a>00045 <span class="preprocessor">#include &lt;vtkPlane.h&gt;</span>
+<a name="l00046"></a>00046 <span class="preprocessor">#include &lt;vtkCellDataToPointData.h&gt;</span>
+<a name="l00047"></a>00047 <span class="preprocessor">#include &lt;vtkCellLocator.h&gt;</span>
+<a name="l00048"></a>00048 <span class="preprocessor">#include &lt;vtkContourFilter.h&gt;</span>
+<a name="l00049"></a>00049 <span class="preprocessor">#include &lt;vtkAssignAttribute.h&gt;</span>
+<a name="l00050"></a>00050 <span class="preprocessor">#include &lt;vtkReverseSense.h&gt;</span>
+<a name="l00051"></a>00051 <span class="preprocessor">#include &lt;vtkGenericCell.h&gt;</span>
+<a name="l00052"></a>00052 <span class="preprocessor">#include &lt;vtkThreshold.h&gt;</span>
+<a name="l00053"></a>00053 <span class="preprocessor">#include &lt;vtkDataSetSurfaceFilter.h&gt;</span>
+<a name="l00054"></a>00054 
+<a name="l00055"></a>00055 <span class="comment">// STL:</span>
+<a name="l00056"></a>00056 <span class="preprocessor">#include &lt;stdexcept&gt;</span>
+<a name="l00057"></a>00057 <span class="keyword">using namespace </span>std;
 <a name="l00058"></a>00058 
-<a name="l00059"></a><a class="code" href="classMeshRD.html#a68cf2323732499b29f26d19bd938fa08">00059</a> <a class="code" href="classMeshRD.html#a68cf2323732499b29f26d19bd938fa08">MeshRD::MeshRD</a>()
-<a name="l00060"></a>00060 {
-<a name="l00061"></a>00061     this-&gt;starting_pattern = vtkUnstructuredGrid::New();
-<a name="l00062"></a>00062     this-&gt;mesh = vtkUnstructuredGrid::New();
-<a name="l00063"></a>00063     this-&gt;cell_neighbor_indices = NULL;
-<a name="l00064"></a>00064     this-&gt;cell_neighbor_weights = NULL;
-<a name="l00065"></a>00065     this-&gt;cell_locator = NULL;
-<a name="l00066"></a>00066 }
-<a name="l00067"></a>00067 
-<a name="l00068"></a>00068 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00059"></a>00059 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00060"></a>00060 
+<a name="l00061"></a><a class="code" href="classMeshRD.html#a68cf2323732499b29f26d19bd938fa08">00061</a> <a class="code" href="classMeshRD.html#a68cf2323732499b29f26d19bd938fa08">MeshRD::MeshRD</a>()
+<a name="l00062"></a>00062 {
+<a name="l00063"></a>00063     this-&gt;starting_pattern = vtkUnstructuredGrid::New();
+<a name="l00064"></a>00064     this-&gt;mesh = vtkUnstructuredGrid::New();
+<a name="l00065"></a>00065     this-&gt;cell_neighbor_indices = NULL;
+<a name="l00066"></a>00066     this-&gt;cell_neighbor_weights = NULL;
+<a name="l00067"></a>00067     this-&gt;cell_locator = NULL;
+<a name="l00068"></a>00068 }
 <a name="l00069"></a>00069 
-<a name="l00070"></a><a class="code" href="classMeshRD.html#af85b79f7d878cdfc7dc5fefe17d5bd3d">00070</a> <a class="code" href="classMeshRD.html#af85b79f7d878cdfc7dc5fefe17d5bd3d">MeshRD::~MeshRD</a>()
-<a name="l00071"></a>00071 {
-<a name="l00072"></a>00072     <span class="keyword">delete</span> []this-&gt;cell_neighbor_indices;
-<a name="l00073"></a>00073     <span class="keyword">delete</span> []this-&gt;cell_neighbor_weights;
-<a name="l00074"></a>00074 
-<a name="l00075"></a>00075     this-&gt;mesh-&gt;Delete();
-<a name="l00076"></a>00076     this-&gt;starting_pattern-&gt;Delete();
-<a name="l00077"></a>00077     this-&gt;n_chemicals = 0;
-<a name="l00078"></a>00078 
-<a name="l00079"></a>00079     <span class="keywordflow">if</span>(this-&gt;cell_locator)
-<a name="l00080"></a>00080         this-&gt;cell_locator-&gt;Delete();
-<a name="l00081"></a>00081 }
-<a name="l00082"></a>00082 
-<a name="l00083"></a>00083 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00070"></a>00070 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00071"></a>00071 
+<a name="l00072"></a><a class="code" href="classMeshRD.html#af85b79f7d878cdfc7dc5fefe17d5bd3d">00072</a> <a class="code" href="classMeshRD.html#af85b79f7d878cdfc7dc5fefe17d5bd3d">MeshRD::~MeshRD</a>()
+<a name="l00073"></a>00073 {
+<a name="l00074"></a>00074     <span class="keyword">delete</span> []this-&gt;cell_neighbor_indices;
+<a name="l00075"></a>00075     <span class="keyword">delete</span> []this-&gt;cell_neighbor_weights;
+<a name="l00076"></a>00076 
+<a name="l00077"></a>00077     this-&gt;mesh-&gt;Delete();
+<a name="l00078"></a>00078     this-&gt;starting_pattern-&gt;Delete();
+<a name="l00079"></a>00079     this-&gt;n_chemicals = 0;
+<a name="l00080"></a>00080 
+<a name="l00081"></a>00081     <span class="keywordflow">if</span>(this-&gt;cell_locator)
+<a name="l00082"></a>00082         this-&gt;cell_locator-&gt;Delete();
+<a name="l00083"></a>00083 }
 <a name="l00084"></a>00084 
-<a name="l00085"></a><a class="code" href="classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96">00085</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96" title="Called to progress the simulation by N steps.">MeshRD::Update</a>(<span class="keywordtype">int</span> n_steps)
-<a name="l00086"></a>00086 {
-<a name="l00087"></a>00087     this-&gt;undo_stack.clear();
-<a name="l00088"></a>00088     this-&gt;InternalUpdate(n_steps);
-<a name="l00089"></a>00089 
-<a name="l00090"></a>00090     this-&gt;timesteps_taken += n_steps;
+<a name="l00085"></a>00085 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00086"></a>00086 
+<a name="l00087"></a><a class="code" href="classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96">00087</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a4666502a974d7df82f2b1cd3bfbdad96" title="Called to progress the simulation by N steps.">MeshRD::Update</a>(<span class="keywordtype">int</span> n_steps)
+<a name="l00088"></a>00088 {
+<a name="l00089"></a>00089     this-&gt;undo_stack.clear();
+<a name="l00090"></a>00090     this-&gt;InternalUpdate(n_steps);
 <a name="l00091"></a>00091 
-<a name="l00092"></a>00092     this-&gt;mesh-&gt;Modified();
-<a name="l00093"></a>00093 }
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00092"></a>00092     this-&gt;timesteps_taken += n_steps;
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094     this-&gt;mesh-&gt;Modified();
+<a name="l00095"></a>00095 }
 <a name="l00096"></a>00096 
-<a name="l00097"></a><a class="code" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">00097</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">MeshRD::SetNumberOfChemicals</a>(<span class="keywordtype">int</span> n)
-<a name="l00098"></a>00098 {
-<a name="l00099"></a>00099     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;n_chemicals;iChem++)
-<a name="l00100"></a>00100         this-&gt;mesh-&gt;GetCellData()-&gt;RemoveArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str());
-<a name="l00101"></a>00101     this-&gt;n_chemicals = n;
-<a name="l00102"></a>00102     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;n_chemicals;iChem++)
-<a name="l00103"></a>00103     {
-<a name="l00104"></a>00104         vtkSmartPointer&lt;vtkFloatArray&gt; scalars = vtkSmartPointer&lt;vtkFloatArray&gt;::New();
-<a name="l00105"></a>00105         scalars-&gt;SetNumberOfComponents(1);
-<a name="l00106"></a>00106         scalars-&gt;SetNumberOfTuples(this-&gt;mesh-&gt;GetNumberOfCells());
-<a name="l00107"></a>00107         scalars-&gt;SetName(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str());
-<a name="l00108"></a>00108         scalars-&gt;FillComponent(0,0.0f);
-<a name="l00109"></a>00109         this-&gt;mesh-&gt;GetCellData()-&gt;AddArray(scalars);
-<a name="l00110"></a>00110     }
-<a name="l00111"></a>00111 }
-<a name="l00112"></a>00112 
-<a name="l00113"></a>00113 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00097"></a>00097 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00098"></a>00098 
+<a name="l00099"></a><a class="code" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">00099</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a777f0b9e9f19d1b40e45f38430b6c6fb">MeshRD::SetNumberOfChemicals</a>(<span class="keywordtype">int</span> n)
+<a name="l00100"></a>00100 {
+<a name="l00101"></a>00101     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;n_chemicals;iChem++)
+<a name="l00102"></a>00102         this-&gt;mesh-&gt;GetCellData()-&gt;RemoveArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str());
+<a name="l00103"></a>00103     this-&gt;n_chemicals = n;
+<a name="l00104"></a>00104     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;n_chemicals;iChem++)
+<a name="l00105"></a>00105     {
+<a name="l00106"></a>00106         vtkSmartPointer&lt;vtkFloatArray&gt; scalars = vtkSmartPointer&lt;vtkFloatArray&gt;::New();
+<a name="l00107"></a>00107         scalars-&gt;SetNumberOfComponents(1);
+<a name="l00108"></a>00108         scalars-&gt;SetNumberOfTuples(this-&gt;mesh-&gt;GetNumberOfCells());
+<a name="l00109"></a>00109         scalars-&gt;SetName(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str());
+<a name="l00110"></a>00110         scalars-&gt;FillComponent(0,0.0f);
+<a name="l00111"></a>00111         this-&gt;mesh-&gt;GetCellData()-&gt;AddArray(scalars);
+<a name="l00112"></a>00112     }
+<a name="l00113"></a>00113 }
 <a name="l00114"></a>00114 
-<a name="l00115"></a><a class="code" href="classMeshRD.html#ab9f7b46d789bcc4547031322019d496f">00115</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ab9f7b46d789bcc4547031322019d496f">MeshRD::SaveFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)<span class="keyword"> const</span>
-<a name="l00116"></a>00116 <span class="keyword"></span>{
-<a name="l00117"></a>00117     vtkSmartPointer&lt;RD_XMLUnstructuredGridWriter&gt; iw = vtkSmartPointer&lt;RD_XMLUnstructuredGridWriter&gt;::New();
-<a name="l00118"></a>00118     iw-&gt;SetSystem(<span class="keyword">this</span>);
-<a name="l00119"></a>00119     iw-&gt;SetRenderSettings(&amp;render_settings);
-<a name="l00120"></a>00120     iw-&gt;SetFileName(filename);
-<a name="l00121"></a>00121     iw-&gt;SetInput(this-&gt;mesh);
-<a name="l00122"></a>00122     iw-&gt;Write();
-<a name="l00123"></a>00123 }
-<a name="l00124"></a>00124 
-<a name="l00125"></a>00125 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00126"></a>00126 
-<a name="l00127"></a><a class="code" href="classMeshRD.html#aea439a0c84c616efb787cce88a64e51c">00127</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a8b6dde37a380581b5c30d1d5f912f183">MeshRD::GenerateInitialPattern</a>()
-<a name="l00128"></a>00128 {
-<a name="l00129"></a>00129     this-&gt;BlankImage();
-<a name="l00130"></a>00130 
-<a name="l00131"></a>00131     vtkIdType npts,*pts;
-<a name="l00132"></a>00132     <span class="keywordtype">float</span> cp[3];
-<a name="l00133"></a>00133     vtkFloatingPointType *bounds = this-&gt;mesh-&gt;GetBounds();
-<a name="l00134"></a>00134     <span class="keywordflow">for</span>(vtkIdType iCell=0;iCell&lt;this-&gt;mesh-&gt;GetNumberOfCells();iCell++)
-<a name="l00135"></a>00135     {
-<a name="l00136"></a>00136         this-&gt;mesh-&gt;GetCellPoints(iCell,npts,pts);
-<a name="l00137"></a>00137         <span class="comment">// get a point at the centre of the cell (need a location to sample the overlays)</span>
-<a name="l00138"></a>00138         cp[0]=cp[1]=cp[2]=0.0f;
-<a name="l00139"></a>00139         <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
-<a name="l00140"></a>00140             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> xyz=0;xyz&lt;3;xyz++)
-<a name="l00141"></a>00141                 cp[xyz] += this-&gt;mesh-&gt;GetPoint(pts[iPt])[xyz]-bounds[xyz*2+0];
-<a name="l00142"></a>00142         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> xyz=0;xyz&lt;3;xyz++)
-<a name="l00143"></a>00143             cp[xyz] /= npts;
-<a name="l00144"></a>00144         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iOverlay=0;iOverlay&lt;(int)this-&gt;initial_pattern_generator.size();iOverlay++)
-<a name="l00145"></a>00145         {
-<a name="l00146"></a>00146             <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>* overlay = this-&gt;initial_pattern_generator[iOverlay];
-<a name="l00147"></a>00147 
-<a name="l00148"></a>00148             <span class="keywordtype">int</span> iC = overlay-&gt;<a class="code" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">GetTargetChemical</a>();
-<a name="l00149"></a>00149             <span class="keywordflow">if</span>(iC&lt;0 || iC&gt;=this-&gt;GetNumberOfChemicals())
-<a name="l00150"></a>00150                 <span class="keywordflow">continue</span>; <span class="comment">// best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)</span>
-<a name="l00151"></a>00151                 <span class="comment">//throw runtime_error(&quot;Overlay: chemical out of range: &quot;+GetChemicalName(iC));</span>
+<a name="l00115"></a>00115 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00116"></a>00116 
+<a name="l00117"></a><a class="code" href="classMeshRD.html#a913fa39007a4a913180dcbfea1bab50d">00117</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a913fa39007a4a913180dcbfea1bab50d">MeshRD::SaveFile</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings,<span class="keywordtype">bool</span> generate_initial_pattern_when_loading)<span class="keyword"> const</span>
+<a name="l00118"></a>00118 <span class="keyword"></span>{
+<a name="l00119"></a>00119     vtkSmartPointer&lt;RD_XMLUnstructuredGridWriter&gt; iw = vtkSmartPointer&lt;RD_XMLUnstructuredGridWriter&gt;::New();
+<a name="l00120"></a>00120     iw-&gt;SetSystem(<span class="keyword">this</span>);
+<a name="l00121"></a>00121     iw-&gt;SetRenderSettings(&amp;render_settings);
+<a name="l00122"></a>00122     <span class="keywordflow">if</span>(generate_initial_pattern_when_loading)
+<a name="l00123"></a>00123         iw-&gt;GenerateInitialPatternWhenLoading();
+<a name="l00124"></a>00124     iw-&gt;SetFileName(filename);
+<a name="l00125"></a>00125     iw-&gt;SetDataModeToBinary(); <span class="comment">// workaround for http://www.vtk.org/Bug/view.php?id=13382</span>
+<a name="l00126"></a>00126     iw-&gt;SetInput(this-&gt;mesh);
+<a name="l00127"></a>00127     iw-&gt;Write();
+<a name="l00128"></a>00128 }
+<a name="l00129"></a>00129 
+<a name="l00130"></a>00130 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00131"></a>00131 
+<a name="l00132"></a><a class="code" href="classMeshRD.html#aea439a0c84c616efb787cce88a64e51c">00132</a> <span class="keywordtype">void</span> <a class="code" href="namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a8b6dde37a380581b5c30d1d5f912f183">MeshRD::GenerateInitialPattern</a>()
+<a name="l00133"></a>00133 {
+<a name="l00134"></a>00134     this-&gt;BlankImage();
+<a name="l00135"></a>00135 
+<a name="l00136"></a>00136     vtkIdType npts,*pts;
+<a name="l00137"></a>00137     <span class="keywordtype">float</span> cp[3];
+<a name="l00138"></a>00138     vtkFloatingPointType *bounds = this-&gt;mesh-&gt;GetBounds();
+<a name="l00139"></a>00139     <span class="keywordflow">for</span>(vtkIdType iCell=0;iCell&lt;this-&gt;mesh-&gt;GetNumberOfCells();iCell++)
+<a name="l00140"></a>00140     {
+<a name="l00141"></a>00141         this-&gt;mesh-&gt;GetCellPoints(iCell,npts,pts);
+<a name="l00142"></a>00142         <span class="comment">// get a point at the centre of the cell (need a location to sample the overlays)</span>
+<a name="l00143"></a>00143         cp[0]=cp[1]=cp[2]=0.0f;
+<a name="l00144"></a>00144         <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
+<a name="l00145"></a>00145             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> xyz=0;xyz&lt;3;xyz++)
+<a name="l00146"></a>00146                 cp[xyz] += this-&gt;mesh-&gt;GetPoint(pts[iPt])[xyz]-bounds[xyz*2+0];
+<a name="l00147"></a>00147         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> xyz=0;xyz&lt;3;xyz++)
+<a name="l00148"></a>00148             cp[xyz] /= npts;
+<a name="l00149"></a>00149         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iOverlay=0;iOverlay&lt;(int)this-&gt;initial_pattern_generator.size();iOverlay++)
+<a name="l00150"></a>00150         {
+<a name="l00151"></a>00151             <a class="code" href="classOverlay.html" title="An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).">Overlay</a>* overlay = this-&gt;initial_pattern_generator[iOverlay];
 <a name="l00152"></a>00152 
-<a name="l00153"></a>00153             <span class="keywordtype">float</span> val;
-<a name="l00154"></a>00154             vector&lt;float&gt; vals(this-&gt;GetNumberOfChemicals());
-<a name="l00155"></a>00155             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;this-&gt;GetNumberOfChemicals();i++)
-<a name="l00156"></a>00156             {
-<a name="l00157"></a>00157                 vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i).c_str()) );
-<a name="l00158"></a>00158                 <span class="keywordflow">if</span>(!scalars)
-<a name="l00159"></a>00159                     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::GenerateInitialPattern : failed to cast cell data to vtkFloatArray&quot;</span>);
-<a name="l00160"></a>00160                 vals[i] = scalars-&gt;GetValue(iCell);
-<a name="l00161"></a>00161                 <span class="keywordflow">if</span>(i==iC) val = vals[i];
-<a name="l00162"></a>00162             }
-<a name="l00163"></a>00163             vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iC).c_str()) );
-<a name="l00164"></a>00164             <span class="keywordflow">if</span>(!scalars)
-<a name="l00165"></a>00165                 <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::GenerateInitialPattern : failed to cast cell data to vtkFloatArray&quot;</span>);
-<a name="l00166"></a>00166             scalars-&gt;SetValue(iCell,overlay-&gt;<a class="code" href="classOverlay.html#a1acb8b82e5f7b6496cc27a2f21f19803" title="given a vector of values (one for each chemical) at a location in a system, returns the new value...">Apply</a>(vals,<span class="keyword">this</span>,cp[0],cp[1],cp[2]));
-<a name="l00167"></a>00167         }
-<a name="l00168"></a>00168     }
-<a name="l00169"></a>00169     this-&gt;mesh-&gt;Modified();
-<a name="l00170"></a>00170     this-&gt;timesteps_taken = 0;
-<a name="l00171"></a>00171 }
-<a name="l00172"></a>00172 
-<a name="l00173"></a>00173 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00174"></a>00174 
-<a name="l00175"></a><a class="code" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">00175</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">MeshRD::BlankImage</a>()
-<a name="l00176"></a>00176 {
-<a name="l00177"></a>00177     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;n_chemicals;iChem++)
-<a name="l00178"></a>00178     {
-<a name="l00179"></a>00179         vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str()) );
-<a name="l00180"></a>00180         scalars-&gt;FillComponent(0,0.0);
-<a name="l00181"></a>00181     }
-<a name="l00182"></a>00182     this-&gt;mesh-&gt;Modified();
-<a name="l00183"></a>00183     this-&gt;undo_stack.clear();
-<a name="l00184"></a>00184 }
-<a name="l00185"></a>00185 
-<a name="l00186"></a>00186 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00187"></a>00187 
-<a name="l00188"></a><a class="code" href="classMeshRD.html#aac659a9f809c080c5eb6a60974eaa554">00188</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#aac659a9f809c080c5eb6a60974eaa554">MeshRD::GetX</a>()<span class="keyword"> const</span>
-<a name="l00189"></a>00189 <span class="keyword"></span>{
-<a name="l00190"></a>00190     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetBounds()[1]-this-&gt;mesh-&gt;GetBounds()[0];
-<a name="l00191"></a>00191 }
+<a name="l00153"></a>00153             <span class="keywordtype">int</span> iC = overlay-&gt;<a class="code" href="classOverlay.html#adfc33fddea74def34977f986f5a1aeee">GetTargetChemical</a>();
+<a name="l00154"></a>00154             <span class="keywordflow">if</span>(iC&lt;0 || iC&gt;=this-&gt;GetNumberOfChemicals())
+<a name="l00155"></a>00155                 <span class="keywordflow">continue</span>; <span class="comment">// best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)</span>
+<a name="l00156"></a>00156                 <span class="comment">//throw runtime_error(&quot;Overlay: chemical out of range: &quot;+GetChemicalName(iC));</span>
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158             <span class="keywordtype">float</span> val;
+<a name="l00159"></a>00159             vector&lt;float&gt; vals(this-&gt;GetNumberOfChemicals());
+<a name="l00160"></a>00160             <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;this-&gt;GetNumberOfChemicals();i++)
+<a name="l00161"></a>00161             {
+<a name="l00162"></a>00162                 vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(i).c_str()) );
+<a name="l00163"></a>00163                 <span class="keywordflow">if</span>(!scalars)
+<a name="l00164"></a>00164                     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::GenerateInitialPattern : failed to cast cell data to vtkFloatArray&quot;</span>);
+<a name="l00165"></a>00165                 vals[i] = scalars-&gt;GetValue(iCell);
+<a name="l00166"></a>00166                 <span class="keywordflow">if</span>(i==iC) val = vals[i];
+<a name="l00167"></a>00167             }
+<a name="l00168"></a>00168             vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iC).c_str()) );
+<a name="l00169"></a>00169             <span class="keywordflow">if</span>(!scalars)
+<a name="l00170"></a>00170                 <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::GenerateInitialPattern : failed to cast cell data to vtkFloatArray&quot;</span>);
+<a name="l00171"></a>00171             scalars-&gt;SetValue(iCell,overlay-&gt;<a class="code" href="classOverlay.html#a1acb8b82e5f7b6496cc27a2f21f19803" title="given a vector of values (one for each chemical) at a location in a system, returns the new value...">Apply</a>(vals,<span class="keyword">this</span>,cp[0],cp[1],cp[2]));
+<a name="l00172"></a>00172         }
+<a name="l00173"></a>00173     }
+<a name="l00174"></a>00174     this-&gt;mesh-&gt;Modified();
+<a name="l00175"></a>00175     this-&gt;timesteps_taken = 0;
+<a name="l00176"></a>00176 }
+<a name="l00177"></a>00177 
+<a name="l00178"></a>00178 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00179"></a>00179 
+<a name="l00180"></a><a class="code" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">00180</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91">MeshRD::BlankImage</a>()
+<a name="l00181"></a>00181 {
+<a name="l00182"></a>00182     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iChem=0;iChem&lt;this-&gt;n_chemicals;iChem++)
+<a name="l00183"></a>00183     {
+<a name="l00184"></a>00184         vtkFloatArray *scalars = vtkFloatArray::SafeDownCast( this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChem).c_str()) );
+<a name="l00185"></a>00185         scalars-&gt;FillComponent(0,0.0);
+<a name="l00186"></a>00186     }
+<a name="l00187"></a>00187     this-&gt;mesh-&gt;Modified();
+<a name="l00188"></a>00188     this-&gt;undo_stack.clear();
+<a name="l00189"></a>00189 }
+<a name="l00190"></a>00190 
+<a name="l00191"></a>00191 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00192"></a>00192 
-<a name="l00193"></a>00193 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00194"></a>00194 
-<a name="l00195"></a><a class="code" href="classMeshRD.html#ab3ca05d881f38bc552c5f7a7bd84156e">00195</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#ab3ca05d881f38bc552c5f7a7bd84156e">MeshRD::GetY</a>()<span class="keyword"> const</span>
-<a name="l00196"></a>00196 <span class="keyword"></span>{
-<a name="l00197"></a>00197     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetBounds()[3]-this-&gt;mesh-&gt;GetBounds()[2];
-<a name="l00198"></a>00198 }
+<a name="l00193"></a><a class="code" href="classMeshRD.html#aac659a9f809c080c5eb6a60974eaa554">00193</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#aac659a9f809c080c5eb6a60974eaa554">MeshRD::GetX</a>()<span class="keyword"> const</span>
+<a name="l00194"></a>00194 <span class="keyword"></span>{
+<a name="l00195"></a>00195     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetBounds()[1]-this-&gt;mesh-&gt;GetBounds()[0];
+<a name="l00196"></a>00196 }
+<a name="l00197"></a>00197 
+<a name="l00198"></a>00198 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00199"></a>00199 
-<a name="l00200"></a>00200 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00201"></a>00201 
-<a name="l00202"></a><a class="code" href="classMeshRD.html#a5b6d6741f648d711e65738be5acfefbb">00202</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#a5b6d6741f648d711e65738be5acfefbb">MeshRD::GetZ</a>()<span class="keyword"> const</span>
-<a name="l00203"></a>00203 <span class="keyword"></span>{
-<a name="l00204"></a>00204     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetBounds()[5]-this-&gt;mesh-&gt;GetBounds()[4];
-<a name="l00205"></a>00205 }
+<a name="l00200"></a><a class="code" href="classMeshRD.html#ab3ca05d881f38bc552c5f7a7bd84156e">00200</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#ab3ca05d881f38bc552c5f7a7bd84156e">MeshRD::GetY</a>()<span class="keyword"> const</span>
+<a name="l00201"></a>00201 <span class="keyword"></span>{
+<a name="l00202"></a>00202     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetBounds()[3]-this-&gt;mesh-&gt;GetBounds()[2];
+<a name="l00203"></a>00203 }
+<a name="l00204"></a>00204 
+<a name="l00205"></a>00205 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00206"></a>00206 
-<a name="l00207"></a>00207 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00208"></a>00208 
-<a name="l00209"></a><a class="code" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">00209</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">MeshRD::CopyFromMesh</a>(vtkUnstructuredGrid* mesh2)
-<a name="l00210"></a>00210 {
-<a name="l00211"></a>00211     this-&gt;undo_stack.clear();
-<a name="l00212"></a>00212     this-&gt;mesh-&gt;DeepCopy(mesh2);
-<a name="l00213"></a>00213     this-&gt;n_chemicals = this-&gt;mesh-&gt;GetCellData()-&gt;GetNumberOfArrays();
-<a name="l00214"></a>00214 
-<a name="l00215"></a>00215     <span class="keywordflow">if</span>(this-&gt;cell_locator)
-<a name="l00216"></a>00216     {
-<a name="l00217"></a>00217         this-&gt;cell_locator-&gt;Delete();
-<a name="l00218"></a>00218         this-&gt;cell_locator = NULL;
-<a name="l00219"></a>00219     }
-<a name="l00220"></a>00220 
-<a name="l00221"></a>00221     this-&gt;ComputeCellNeighbors();
-<a name="l00222"></a>00222 }
-<a name="l00223"></a>00223 
-<a name="l00224"></a>00224 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00207"></a><a class="code" href="classMeshRD.html#a5b6d6741f648d711e65738be5acfefbb">00207</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#a5b6d6741f648d711e65738be5acfefbb">MeshRD::GetZ</a>()<span class="keyword"> const</span>
+<a name="l00208"></a>00208 <span class="keyword"></span>{
+<a name="l00209"></a>00209     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetBounds()[5]-this-&gt;mesh-&gt;GetBounds()[4];
+<a name="l00210"></a>00210 }
+<a name="l00211"></a>00211 
+<a name="l00212"></a>00212 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00213"></a>00213 
+<a name="l00214"></a><a class="code" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">00214</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a86710329396780b3bf7a6f92e975cdb5">MeshRD::CopyFromMesh</a>(vtkUnstructuredGrid* mesh2)
+<a name="l00215"></a>00215 {
+<a name="l00216"></a>00216     this-&gt;undo_stack.clear();
+<a name="l00217"></a>00217     this-&gt;mesh-&gt;DeepCopy(mesh2);
+<a name="l00218"></a>00218     this-&gt;n_chemicals = this-&gt;mesh-&gt;GetCellData()-&gt;GetNumberOfArrays();
+<a name="l00219"></a>00219 
+<a name="l00220"></a>00220     <span class="keywordflow">if</span>(this-&gt;cell_locator)
+<a name="l00221"></a>00221     {
+<a name="l00222"></a>00222         this-&gt;cell_locator-&gt;Delete();
+<a name="l00223"></a>00223         this-&gt;cell_locator = NULL;
+<a name="l00224"></a>00224     }
 <a name="l00225"></a>00225 
-<a name="l00226"></a><a class="code" href="classMeshRD.html#a26b27b58d237d7326eb09c6c0e6e7541">00226</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a26b27b58d237d7326eb09c6c0e6e7541">MeshRD::InitializeRenderPipeline</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
-<a name="l00227"></a>00227 {
-<a name="l00228"></a>00228     <span class="keywordtype">float</span> low = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;low&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
-<a name="l00229"></a>00229     <span class="keywordtype">float</span> high = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;high&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
-<a name="l00230"></a>00230     <span class="keywordtype">float</span> r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-<a name="l00231"></a>00231     render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;color_low&quot;</span>).<a class="code" href="classProperty.html#ace47c032895ac05a3af7a9fc5cf94222">GetColor</a>(r,g,b);
-<a name="l00232"></a>00232     vtkMath::RGBToHSV(r,g,b,&amp;low_hue,&amp;low_sat,&amp;low_val);
-<a name="l00233"></a>00233     render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;color_high&quot;</span>).<a class="code" href="classProperty.html#ace47c032895ac05a3af7a9fc5cf94222">GetColor</a>(r,g,b);
-<a name="l00234"></a>00234     vtkMath::RGBToHSV(r,g,b,&amp;high_hue,&amp;high_sat,&amp;high_val);
-<a name="l00235"></a>00235     <span class="keywordtype">bool</span> use_image_interpolation = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;use_image_interpolation&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00236"></a>00236     <span class="keywordtype">string</span> activeChemical = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>();
-<a name="l00237"></a>00237     <span class="keywordtype">bool</span> use_wireframe = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;use_wireframe&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00238"></a>00238     <span class="keywordtype">bool</span> show_multiple_chemicals = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_multiple_chemicals&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00239"></a>00239     <span class="keywordtype">bool</span> show_color_scale = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_color_scale&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00240"></a>00240     <span class="keywordtype">bool</span> show_cell_edges = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_cell_edges&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00241"></a>00241     <span class="keywordtype">bool</span> show_bounding_box = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_bounding_box&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00242"></a>00242     <span class="keywordtype">float</span> contour_level = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;contour_level&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
-<a name="l00243"></a>00243     <span class="keywordtype">float</span> surface_r,surface_g,surface_b;
-<a name="l00244"></a>00244     render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;surface_color&quot;</span>).<a class="code" href="classProperty.html#ace47c032895ac05a3af7a9fc5cf94222">GetColor</a>(surface_r,surface_g,surface_b);
-<a name="l00245"></a>00245     <span class="keywordtype">bool</span> slice_3D = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;slice_3D&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
-<a name="l00246"></a>00246     <span class="keywordtype">string</span> slice_3D_axis = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;slice_3D_axis&quot;</span>).<a class="code" href="classProperty.html#a25d3d7ff43f19fc6a65be7e17408136f">GetAxis</a>();
-<a name="l00247"></a>00247     <span class="keywordtype">float</span> slice_3D_position = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;slice_3D_position&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
-<a name="l00248"></a>00248 
-<a name="l00249"></a>00249     <span class="comment">// create a lookup table for mapping values to colors</span>
-<a name="l00250"></a>00250     vtkSmartPointer&lt;vtkLookupTable&gt; lut = vtkSmartPointer&lt;vtkLookupTable&gt;::New();
-<a name="l00251"></a>00251     lut-&gt;SetRampToLinear();
-<a name="l00252"></a>00252     lut-&gt;SetScaleToLinear();
-<a name="l00253"></a>00253     lut-&gt;SetTableRange(low,high);
-<a name="l00254"></a>00254     lut-&gt;SetSaturationRange(low_sat,high_sat);
-<a name="l00255"></a>00255     lut-&gt;SetHueRange(low_hue,high_hue);
-<a name="l00256"></a>00256     lut-&gt;SetValueRange(low_val,high_val);
-<a name="l00257"></a>00257     lut-&gt;Build();
-<a name="l00258"></a>00258 
-<a name="l00259"></a>00259     <span class="keywordflow">if</span>(this-&gt;mesh-&gt;GetCellType(0)==VTK_POLYGON)
-<a name="l00260"></a>00260     {
-<a name="l00261"></a>00261         <span class="comment">// add the mesh actor</span>
-<a name="l00262"></a>00262         vtkSmartPointer&lt;vtkDataSetMapper&gt; mapper = vtkSmartPointer&lt;vtkDataSetMapper&gt;::New();
-<a name="l00263"></a>00263         mapper-&gt;ImmediateModeRenderingOn();
-<a name="l00264"></a>00264         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
-<a name="l00265"></a>00265         actor-&gt;SetMapper(mapper);
-<a name="l00266"></a>00266         <span class="keywordflow">if</span>(use_wireframe &amp;&amp; !slice_3D) <span class="comment">// full wireframe mode: all internal edges</span>
-<a name="l00267"></a>00267         {
-<a name="l00268"></a>00268             <span class="comment">// explicitly extract the edges - the default mapper only shows the outside surface</span>
-<a name="l00269"></a>00269             vtkSmartPointer&lt;vtkExtractEdges&gt; edges = vtkSmartPointer&lt;vtkExtractEdges&gt;::New();
-<a name="l00270"></a>00270             edges-&gt;SetInput(this-&gt;mesh);
-<a name="l00271"></a>00271             mapper-&gt;SetInputConnection(edges-&gt;GetOutputPort());
-<a name="l00272"></a>00272             mapper-&gt;SetScalarModeToUseCellFieldData();
-<a name="l00273"></a>00273         }
-<a name="l00274"></a>00274         <span class="keywordflow">else</span> <span class="keywordflow">if</span>(slice_3D) <span class="comment">// partial wireframe mode: only external surface edges</span>
-<a name="l00275"></a>00275         {
-<a name="l00276"></a>00276             vtkSmartPointer&lt;vtkGeometryFilter&gt; geom = vtkSmartPointer&lt;vtkGeometryFilter&gt;::New();
-<a name="l00277"></a>00277             geom-&gt;SetInput(this-&gt;mesh);
-<a name="l00278"></a>00278             vtkSmartPointer&lt;vtkExtractEdges&gt; edges = vtkSmartPointer&lt;vtkExtractEdges&gt;::New();
-<a name="l00279"></a>00279             edges-&gt;SetInputConnection(geom-&gt;GetOutputPort());
-<a name="l00280"></a>00280             mapper-&gt;SetInputConnection(edges-&gt;GetOutputPort());
-<a name="l00281"></a>00281             mapper-&gt;SetScalarModeToUseCellFieldData();
-<a name="l00282"></a>00282         }
-<a name="l00283"></a>00283         <span class="keywordflow">else</span> <span class="comment">// non-wireframe mode: shows filled external surface</span>
-<a name="l00284"></a>00284         {
-<a name="l00285"></a>00285             <span class="keywordflow">if</span>(use_image_interpolation)
-<a name="l00286"></a>00286             {
-<a name="l00287"></a>00287                 vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
-<a name="l00288"></a>00288                 to_point_data-&gt;SetInput(this-&gt;mesh);
-<a name="l00289"></a>00289                 mapper-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
-<a name="l00290"></a>00290                 mapper-&gt;SetScalarModeToUsePointFieldData();
-<a name="l00291"></a>00291             }
-<a name="l00292"></a>00292             <span class="keywordflow">else</span>
-<a name="l00293"></a>00293             {
-<a name="l00294"></a>00294                 mapper-&gt;SetInput(this-&gt;mesh);
-<a name="l00295"></a>00295                 mapper-&gt;SetScalarModeToUseCellFieldData();
-<a name="l00296"></a>00296             }
-<a name="l00297"></a>00297             <span class="keywordflow">if</span>(show_cell_edges)
-<a name="l00298"></a>00298             {
-<a name="l00299"></a>00299                 actor-&gt;GetProperty()-&gt;EdgeVisibilityOn();
-<a name="l00300"></a>00300                 actor-&gt;GetProperty()-&gt;SetEdgeColor(0,0,0); <span class="comment">// could be a user option</span>
-<a name="l00301"></a>00301             }
-<a name="l00302"></a>00302         }
-<a name="l00303"></a>00303         mapper-&gt;SelectColorArray(activeChemical.c_str());
-<a name="l00304"></a>00304         mapper-&gt;SetLookupTable(lut);
-<a name="l00305"></a>00305         mapper-&gt;UseLookupTableScalarRangeOn();
-<a name="l00306"></a>00306 
-<a name="l00307"></a>00307         pRenderer-&gt;AddActor(actor);
-<a name="l00308"></a>00308     }
-<a name="l00309"></a>00309     <span class="keywordflow">else</span> <span class="keywordflow">if</span>(this-&gt;mesh-&gt;GetCellType(0)==VTK_TETRA)
-<a name="l00310"></a>00310     {
-<a name="l00311"></a>00311         <span class="comment">// show a contour</span>
-<a name="l00312"></a>00312         vtkSmartPointer&lt;vtkAssignAttribute&gt; assign_attribute = vtkSmartPointer&lt;vtkAssignAttribute&gt;::New();
-<a name="l00313"></a>00313         assign_attribute-&gt;SetInput(this-&gt;mesh);
-<a name="l00314"></a>00314         assign_attribute-&gt;Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
-<a name="l00315"></a>00315         vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
-<a name="l00316"></a>00316         to_point_data-&gt;SetInputConnection(assign_attribute-&gt;GetOutputPort());
-<a name="l00317"></a>00317         vtkSmartPointer&lt;vtkContourFilter&gt; surface = vtkSmartPointer&lt;vtkContourFilter&gt;::New();
-<a name="l00318"></a>00318         surface-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
-<a name="l00319"></a>00319         surface-&gt;SetValue(0,contour_level);
-<a name="l00320"></a>00320         vtkSmartPointer&lt;vtkReverseSense&gt; reverse = vtkSmartPointer&lt;vtkReverseSense&gt;::New();
-<a name="l00321"></a>00321         reverse-&gt;SetInputConnection(surface-&gt;GetOutputPort());
-<a name="l00322"></a>00322         vtkSmartPointer&lt;vtkPolyDataMapper&gt; mapper = vtkSmartPointer&lt;vtkPolyDataMapper&gt;::New();
-<a name="l00323"></a>00323         mapper-&gt;SetInputConnection(reverse-&gt;GetOutputPort());
-<a name="l00324"></a>00324         mapper-&gt;ImmediateModeRenderingOn();
-<a name="l00325"></a>00325         mapper-&gt;ScalarVisibilityOff();
-<a name="l00326"></a>00326         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
-<a name="l00327"></a>00327         actor-&gt;SetMapper(mapper);
-<a name="l00328"></a>00328         actor-&gt;GetProperty()-&gt;SetColor(surface_r,surface_g,surface_b);  
-<a name="l00329"></a>00329         actor-&gt;GetProperty()-&gt;SetAmbient(0.1);
-<a name="l00330"></a>00330         actor-&gt;GetProperty()-&gt;SetDiffuse(0.7);
-<a name="l00331"></a>00331         actor-&gt;GetProperty()-&gt;SetSpecular(0.2);
-<a name="l00332"></a>00332         actor-&gt;GetProperty()-&gt;SetSpecularPower(3);
-<a name="l00333"></a>00333         <span class="keywordflow">if</span>(use_wireframe)
-<a name="l00334"></a>00334             actor-&gt;GetProperty()-&gt;SetRepresentationToWireframe();
-<a name="l00335"></a>00335         vtkSmartPointer&lt;vtkProperty&gt; bfprop = vtkSmartPointer&lt;vtkProperty&gt;::New();
-<a name="l00336"></a>00336         actor-&gt;SetBackfaceProperty(bfprop);
-<a name="l00337"></a>00337         bfprop-&gt;SetColor(0.3,0.3,0.3);
-<a name="l00338"></a>00338         bfprop-&gt;SetAmbient(0.3);
-<a name="l00339"></a>00339         bfprop-&gt;SetDiffuse(0.6);
-<a name="l00340"></a>00340         bfprop-&gt;SetSpecular(0.1);
-<a name="l00341"></a>00341         actor-&gt;PickableOff();
-<a name="l00342"></a>00342         pRenderer-&gt;AddActor(actor);
-<a name="l00343"></a>00343     }
-<a name="l00344"></a>00344     <span class="keywordflow">else</span>
-<a name="l00345"></a>00345         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::InitializeRenderPipeline : unsupported cell type&quot;</span>);
-<a name="l00346"></a>00346 
-<a name="l00347"></a>00347     <span class="comment">// add a slice</span>
-<a name="l00348"></a>00348     <span class="keywordflow">if</span>(slice_3D)
+<a name="l00226"></a>00226     this-&gt;ComputeCellNeighbors(this-&gt;neighborhood_type,this-&gt;neighborhood_range,
+<a name="l00227"></a>00227         this-&gt;neighborhood_weight_type);
+<a name="l00228"></a>00228 }
+<a name="l00229"></a>00229 
+<a name="l00230"></a>00230 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00231"></a>00231 
+<a name="l00232"></a><a class="code" href="classMeshRD.html#a26b27b58d237d7326eb09c6c0e6e7541">00232</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a26b27b58d237d7326eb09c6c0e6e7541">MeshRD::InitializeRenderPipeline</a>(vtkRenderer* pRenderer,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
+<a name="l00233"></a>00233 {
+<a name="l00234"></a>00234     <span class="keywordtype">float</span> low = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;low&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
+<a name="l00235"></a>00235     <span class="keywordtype">float</span> high = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;high&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
+<a name="l00236"></a>00236     <span class="keywordtype">float</span> r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
+<a name="l00237"></a>00237     render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;color_low&quot;</span>).<a class="code" href="classProperty.html#ace47c032895ac05a3af7a9fc5cf94222">GetColor</a>(r,g,b);
+<a name="l00238"></a>00238     vtkMath::RGBToHSV(r,g,b,&amp;low_hue,&amp;low_sat,&amp;low_val);
+<a name="l00239"></a>00239     render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;color_high&quot;</span>).<a class="code" href="classProperty.html#ace47c032895ac05a3af7a9fc5cf94222">GetColor</a>(r,g,b);
+<a name="l00240"></a>00240     vtkMath::RGBToHSV(r,g,b,&amp;high_hue,&amp;high_sat,&amp;high_val);
+<a name="l00241"></a>00241     <span class="keywordtype">bool</span> use_image_interpolation = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;use_image_interpolation&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00242"></a>00242     <span class="keywordtype">string</span> activeChemical = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>();
+<a name="l00243"></a>00243     <span class="keywordtype">bool</span> use_wireframe = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;use_wireframe&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00244"></a>00244     <span class="keywordtype">bool</span> show_multiple_chemicals = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_multiple_chemicals&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00245"></a>00245     <span class="keywordtype">bool</span> show_color_scale = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_color_scale&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00246"></a>00246     <span class="keywordtype">bool</span> show_cell_edges = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_cell_edges&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00247"></a>00247     <span class="keywordtype">bool</span> show_bounding_box = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;show_bounding_box&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00248"></a>00248     <span class="keywordtype">float</span> contour_level = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;contour_level&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
+<a name="l00249"></a>00249     <span class="keywordtype">float</span> surface_r,surface_g,surface_b;
+<a name="l00250"></a>00250     render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;surface_color&quot;</span>).<a class="code" href="classProperty.html#ace47c032895ac05a3af7a9fc5cf94222">GetColor</a>(surface_r,surface_g,surface_b);
+<a name="l00251"></a>00251     <span class="keywordtype">bool</span> slice_3D = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;slice_3D&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00252"></a>00252     <span class="keywordtype">string</span> slice_3D_axis = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;slice_3D_axis&quot;</span>).<a class="code" href="classProperty.html#a25d3d7ff43f19fc6a65be7e17408136f">GetAxis</a>();
+<a name="l00253"></a>00253     <span class="keywordtype">float</span> slice_3D_position = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;slice_3D_position&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
+<a name="l00254"></a>00254 
+<a name="l00255"></a>00255     <span class="comment">// create a lookup table for mapping values to colors</span>
+<a name="l00256"></a>00256     vtkSmartPointer&lt;vtkLookupTable&gt; lut = vtkSmartPointer&lt;vtkLookupTable&gt;::New();
+<a name="l00257"></a>00257     lut-&gt;SetRampToLinear();
+<a name="l00258"></a>00258     lut-&gt;SetScaleToLinear();
+<a name="l00259"></a>00259     lut-&gt;SetTableRange(low,high);
+<a name="l00260"></a>00260     lut-&gt;SetSaturationRange(low_sat,high_sat);
+<a name="l00261"></a>00261     lut-&gt;SetHueRange(low_hue,high_hue);
+<a name="l00262"></a>00262     lut-&gt;SetValueRange(low_val,high_val);
+<a name="l00263"></a>00263     lut-&gt;Build();
+<a name="l00264"></a>00264 
+<a name="l00265"></a>00265     <span class="keywordflow">if</span>(this-&gt;mesh-&gt;GetCellType(0)==VTK_POLYGON)
+<a name="l00266"></a>00266     {
+<a name="l00267"></a>00267         <span class="comment">// add the mesh actor</span>
+<a name="l00268"></a>00268         vtkSmartPointer&lt;vtkDataSetMapper&gt; mapper = vtkSmartPointer&lt;vtkDataSetMapper&gt;::New();
+<a name="l00269"></a>00269         mapper-&gt;ImmediateModeRenderingOn();
+<a name="l00270"></a>00270         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
+<a name="l00271"></a>00271         actor-&gt;SetMapper(mapper);
+<a name="l00272"></a>00272         <span class="keywordflow">if</span>(use_wireframe &amp;&amp; !slice_3D) <span class="comment">// full wireframe mode: all internal edges</span>
+<a name="l00273"></a>00273         {
+<a name="l00274"></a>00274             <span class="comment">// explicitly extract the edges - the default mapper only shows the outside surface</span>
+<a name="l00275"></a>00275             vtkSmartPointer&lt;vtkExtractEdges&gt; edges = vtkSmartPointer&lt;vtkExtractEdges&gt;::New();
+<a name="l00276"></a>00276             edges-&gt;SetInput(this-&gt;mesh);
+<a name="l00277"></a>00277             mapper-&gt;SetInputConnection(edges-&gt;GetOutputPort());
+<a name="l00278"></a>00278             mapper-&gt;SetScalarModeToUseCellFieldData();
+<a name="l00279"></a>00279         }
+<a name="l00280"></a>00280         <span class="keywordflow">else</span> <span class="keywordflow">if</span>(slice_3D) <span class="comment">// partial wireframe mode: only external surface edges</span>
+<a name="l00281"></a>00281         {
+<a name="l00282"></a>00282             vtkSmartPointer&lt;vtkGeometryFilter&gt; geom = vtkSmartPointer&lt;vtkGeometryFilter&gt;::New();
+<a name="l00283"></a>00283             geom-&gt;SetInput(this-&gt;mesh);
+<a name="l00284"></a>00284             vtkSmartPointer&lt;vtkExtractEdges&gt; edges = vtkSmartPointer&lt;vtkExtractEdges&gt;::New();
+<a name="l00285"></a>00285             edges-&gt;SetInputConnection(geom-&gt;GetOutputPort());
+<a name="l00286"></a>00286             mapper-&gt;SetInputConnection(edges-&gt;GetOutputPort());
+<a name="l00287"></a>00287             mapper-&gt;SetScalarModeToUseCellFieldData();
+<a name="l00288"></a>00288         }
+<a name="l00289"></a>00289         <span class="keywordflow">else</span> <span class="comment">// non-wireframe mode: shows filled external surface</span>
+<a name="l00290"></a>00290         {
+<a name="l00291"></a>00291             <span class="keywordflow">if</span>(use_image_interpolation)
+<a name="l00292"></a>00292             {
+<a name="l00293"></a>00293                 vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
+<a name="l00294"></a>00294                 to_point_data-&gt;SetInput(this-&gt;mesh);
+<a name="l00295"></a>00295                 mapper-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
+<a name="l00296"></a>00296                 mapper-&gt;SetScalarModeToUsePointFieldData();
+<a name="l00297"></a>00297             }
+<a name="l00298"></a>00298             <span class="keywordflow">else</span>
+<a name="l00299"></a>00299             {
+<a name="l00300"></a>00300                 mapper-&gt;SetInput(this-&gt;mesh);
+<a name="l00301"></a>00301                 mapper-&gt;SetScalarModeToUseCellFieldData();
+<a name="l00302"></a>00302             }
+<a name="l00303"></a>00303             <span class="keywordflow">if</span>(show_cell_edges)
+<a name="l00304"></a>00304             {
+<a name="l00305"></a>00305                 actor-&gt;GetProperty()-&gt;EdgeVisibilityOn();
+<a name="l00306"></a>00306                 actor-&gt;GetProperty()-&gt;SetEdgeColor(0,0,0); <span class="comment">// could be a user option</span>
+<a name="l00307"></a>00307             }
+<a name="l00308"></a>00308         }
+<a name="l00309"></a>00309         mapper-&gt;SelectColorArray(activeChemical.c_str());
+<a name="l00310"></a>00310         mapper-&gt;SetLookupTable(lut);
+<a name="l00311"></a>00311         mapper-&gt;UseLookupTableScalarRangeOn();
+<a name="l00312"></a>00312 
+<a name="l00313"></a>00313         pRenderer-&gt;AddActor(actor);
+<a name="l00314"></a>00314     }
+<a name="l00315"></a>00315     <span class="keywordflow">else</span> <span class="keywordflow">if</span>(use_image_interpolation)
+<a name="l00316"></a>00316     {
+<a name="l00317"></a>00317         <span class="comment">// show a contour</span>
+<a name="l00318"></a>00318         vtkSmartPointer&lt;vtkAssignAttribute&gt; assign_attribute = vtkSmartPointer&lt;vtkAssignAttribute&gt;::New();
+<a name="l00319"></a>00319         assign_attribute-&gt;SetInput(this-&gt;mesh);
+<a name="l00320"></a>00320         assign_attribute-&gt;Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+<a name="l00321"></a>00321         vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
+<a name="l00322"></a>00322         to_point_data-&gt;SetInputConnection(assign_attribute-&gt;GetOutputPort());
+<a name="l00323"></a>00323         vtkSmartPointer&lt;vtkContourFilter&gt; surface = vtkSmartPointer&lt;vtkContourFilter&gt;::New();
+<a name="l00324"></a>00324         surface-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
+<a name="l00325"></a>00325         surface-&gt;SetValue(0,contour_level);
+<a name="l00326"></a>00326         vtkSmartPointer&lt;vtkPolyDataMapper&gt; mapper = vtkSmartPointer&lt;vtkPolyDataMapper&gt;::New();
+<a name="l00327"></a>00327         mapper-&gt;SetInputConnection(surface-&gt;GetOutputPort());
+<a name="l00328"></a>00328         mapper-&gt;ImmediateModeRenderingOn();
+<a name="l00329"></a>00329         mapper-&gt;ScalarVisibilityOff();
+<a name="l00330"></a>00330         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
+<a name="l00331"></a>00331         actor-&gt;SetMapper(mapper);
+<a name="l00332"></a>00332         actor-&gt;GetProperty()-&gt;SetColor(surface_r,surface_g,surface_b);  
+<a name="l00333"></a>00333         actor-&gt;GetProperty()-&gt;SetAmbient(0.1);
+<a name="l00334"></a>00334         actor-&gt;GetProperty()-&gt;SetDiffuse(0.7);
+<a name="l00335"></a>00335         actor-&gt;GetProperty()-&gt;SetSpecular(0.2);
+<a name="l00336"></a>00336         actor-&gt;GetProperty()-&gt;SetSpecularPower(3);
+<a name="l00337"></a>00337         <span class="keywordflow">if</span>(use_wireframe)
+<a name="l00338"></a>00338             actor-&gt;GetProperty()-&gt;SetRepresentationToWireframe();
+<a name="l00339"></a>00339         <span class="comment">/*vtkSmartPointer&lt;vtkProperty&gt; bfprop = vtkSmartPointer&lt;vtkProperty&gt;::New();</span>
+<a name="l00340"></a>00340 <span class="comment">        actor-&gt;SetBackfaceProperty(bfprop);</span>
+<a name="l00341"></a>00341 <span class="comment">        bfprop-&gt;SetColor(0.3,0.3,0.3);</span>
+<a name="l00342"></a>00342 <span class="comment">        bfprop-&gt;SetAmbient(0.3);</span>
+<a name="l00343"></a>00343 <span class="comment">        bfprop-&gt;SetDiffuse(0.6);</span>
+<a name="l00344"></a>00344 <span class="comment">        bfprop-&gt;SetSpecular(0.1);*/</span> <span class="comment">// TODO: re-enable this if can get correct normals</span>
+<a name="l00345"></a>00345         actor-&gt;PickableOff();
+<a name="l00346"></a>00346         pRenderer-&gt;AddActor(actor);
+<a name="l00347"></a>00347     }
+<a name="l00348"></a>00348     <span class="keywordflow">else</span> <span class="comment">// visualise the cells</span>
 <a name="l00349"></a>00349     {
-<a name="l00350"></a>00350         vtkSmartPointer&lt;vtkPlane&gt; plane = vtkSmartPointer&lt;vtkPlane&gt;::New();
-<a name="l00351"></a>00351         vtkFloatingPointType *bounds = this-&gt;mesh-&gt;GetBounds();
-<a name="l00352"></a>00352         plane-&gt;SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
-<a name="l00353"></a>00353                          slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
-<a name="l00354"></a>00354                          slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
-<a name="l00355"></a>00355         <span class="keywordflow">if</span>(slice_3D_axis==<span class="stringliteral">&quot;x&quot;</span>)
-<a name="l00356"></a>00356             plane-&gt;SetNormal(1,0,0);
-<a name="l00357"></a>00357         <span class="keywordflow">else</span> <span class="keywordflow">if</span>(slice_3D_axis==<span class="stringliteral">&quot;y&quot;</span>)
-<a name="l00358"></a>00358             plane-&gt;SetNormal(0,1,0);
-<a name="l00359"></a>00359         <span class="keywordflow">else</span>
-<a name="l00360"></a>00360             plane-&gt;SetNormal(0,0,1);
-<a name="l00361"></a>00361         vtkSmartPointer&lt;vtkCutter&gt; cutter = vtkSmartPointer&lt;vtkCutter&gt;::New();
-<a name="l00362"></a>00362         cutter-&gt;SetCutFunction(plane);
-<a name="l00363"></a>00363         vtkSmartPointer&lt;vtkPolyDataMapper&gt; mapper = vtkSmartPointer&lt;vtkPolyDataMapper&gt;::New();
-<a name="l00364"></a>00364         mapper-&gt;SetInputConnection(cutter-&gt;GetOutputPort());
-<a name="l00365"></a>00365         mapper-&gt;ImmediateModeRenderingOn();
-<a name="l00366"></a>00366         <span class="keywordflow">if</span>(use_image_interpolation)
-<a name="l00367"></a>00367         {
-<a name="l00368"></a>00368             vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
-<a name="l00369"></a>00369             to_point_data-&gt;SetInput(this-&gt;mesh);
-<a name="l00370"></a>00370             cutter-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
-<a name="l00371"></a>00371             mapper-&gt;SetScalarModeToUsePointFieldData();
-<a name="l00372"></a>00372         }
-<a name="l00373"></a>00373         <span class="keywordflow">else</span>
-<a name="l00374"></a>00374         {
-<a name="l00375"></a>00375             cutter-&gt;SetInput(this-&gt;mesh);
-<a name="l00376"></a>00376             mapper-&gt;SetScalarModeToUseCellFieldData();
-<a name="l00377"></a>00377         }
-<a name="l00378"></a>00378         mapper-&gt;SelectColorArray(activeChemical.c_str());
-<a name="l00379"></a>00379         mapper-&gt;SetLookupTable(lut);
-<a name="l00380"></a>00380         mapper-&gt;UseLookupTableScalarRangeOn();
-<a name="l00381"></a>00381         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
-<a name="l00382"></a>00382         actor-&gt;SetMapper(mapper);
-<a name="l00383"></a>00383         actor-&gt;GetProperty()-&gt;LightingOff();
-<a name="l00384"></a>00384         <span class="keywordflow">if</span>(show_cell_edges)
-<a name="l00385"></a>00385         {
-<a name="l00386"></a>00386             actor-&gt;GetProperty()-&gt;EdgeVisibilityOn();
-<a name="l00387"></a>00387             actor-&gt;GetProperty()-&gt;SetEdgeColor(0,0,0); <span class="comment">// could be a user option</span>
-<a name="l00388"></a>00388         }
-<a name="l00389"></a>00389         pRenderer-&gt;AddActor(actor);
-<a name="l00390"></a>00390     }
-<a name="l00391"></a>00391 
-<a name="l00392"></a>00392     <span class="comment">// also add a scalar bar to show how the colors correspond to values</span>
-<a name="l00393"></a>00393     <span class="keywordflow">if</span>(show_color_scale)
-<a name="l00394"></a>00394     {
-<a name="l00395"></a>00395         vtkSmartPointer&lt;vtkScalarBarActor&gt; scalar_bar = vtkSmartPointer&lt;vtkScalarBarActor&gt;::New();
-<a name="l00396"></a>00396         scalar_bar-&gt;SetLookupTable(lut);
-<a name="l00397"></a>00397         pRenderer-&gt;AddActor2D(scalar_bar);
-<a name="l00398"></a>00398     }
-<a name="l00399"></a>00399 
-<a name="l00400"></a>00400     <span class="comment">// add the bounding box</span>
-<a name="l00401"></a>00401     <span class="keywordflow">if</span>(show_bounding_box)
-<a name="l00402"></a>00402     {
-<a name="l00403"></a>00403         vtkSmartPointer&lt;vtkCubeSource&gt; box = vtkSmartPointer&lt;vtkCubeSource&gt;::New();
-<a name="l00404"></a>00404         box-&gt;SetBounds(this-&gt;mesh-&gt;GetBounds());
-<a name="l00405"></a>00405 
-<a name="l00406"></a>00406         vtkSmartPointer&lt;vtkExtractEdges&gt; edges = vtkSmartPointer&lt;vtkExtractEdges&gt;::New();
-<a name="l00407"></a>00407         edges-&gt;SetInputConnection(box-&gt;GetOutputPort());
-<a name="l00408"></a>00408 
-<a name="l00409"></a>00409         vtkSmartPointer&lt;vtkPolyDataMapper&gt; mapper = vtkSmartPointer&lt;vtkPolyDataMapper&gt;::New();
-<a name="l00410"></a>00410         mapper-&gt;SetInputConnection(edges-&gt;GetOutputPort());
-<a name="l00411"></a>00411         mapper-&gt;ImmediateModeRenderingOn();
-<a name="l00412"></a>00412 
-<a name="l00413"></a>00413         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
-<a name="l00414"></a>00414         actor-&gt;SetMapper(mapper);
-<a name="l00415"></a>00415         actor-&gt;GetProperty()-&gt;SetColor(0,0,0);  
-<a name="l00416"></a>00416         actor-&gt;GetProperty()-&gt;SetAmbient(1);
-<a name="l00417"></a>00417 
-<a name="l00418"></a>00418         actor-&gt;PickableOff();
-<a name="l00419"></a>00419         pRenderer-&gt;AddActor(actor);
-<a name="l00420"></a>00420     }
-<a name="l00421"></a>00421 }
-<a name="l00422"></a>00422 
-<a name="l00423"></a>00423 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00350"></a>00350         vtkSmartPointer&lt;vtkAssignAttribute&gt; assign_attribute = vtkSmartPointer&lt;vtkAssignAttribute&gt;::New();
+<a name="l00351"></a>00351         assign_attribute-&gt;SetInput(this-&gt;mesh);
+<a name="l00352"></a>00352         assign_attribute-&gt;Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+<a name="l00353"></a>00353         vtkSmartPointer&lt;vtkThreshold&gt; threshold = vtkSmartPointer&lt;vtkThreshold&gt;::New();
+<a name="l00354"></a>00354         threshold-&gt;SetInputConnection(assign_attribute-&gt;GetOutputPort());
+<a name="l00355"></a>00355         threshold-&gt;ThresholdByUpper(contour_level);
+<a name="l00356"></a>00356         vtkSmartPointer&lt;vtkDataSetMapper&gt; mapper = vtkSmartPointer&lt;vtkDataSetMapper&gt;::New();
+<a name="l00357"></a>00357         mapper-&gt;SetInputConnection(threshold-&gt;GetOutputPort());
+<a name="l00358"></a>00358         mapper-&gt;SetLookupTable(lut);
+<a name="l00359"></a>00359         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
+<a name="l00360"></a>00360         actor-&gt;SetMapper(mapper);
+<a name="l00361"></a>00361         <span class="keywordflow">if</span>(show_cell_edges)
+<a name="l00362"></a>00362         {
+<a name="l00363"></a>00363             actor-&gt;GetProperty()-&gt;EdgeVisibilityOn();
+<a name="l00364"></a>00364             actor-&gt;GetProperty()-&gt;SetEdgeColor(0,0,0); <span class="comment">// could be a user option</span>
+<a name="l00365"></a>00365         }
+<a name="l00366"></a>00366         <span class="keywordflow">if</span>(use_wireframe)
+<a name="l00367"></a>00367             actor-&gt;GetProperty()-&gt;SetRepresentationToWireframe();
+<a name="l00368"></a>00368         actor-&gt;PickableOff();
+<a name="l00369"></a>00369         pRenderer-&gt;AddActor(actor);
+<a name="l00370"></a>00370     }
+<a name="l00371"></a>00371 
+<a name="l00372"></a>00372     <span class="comment">// add a slice</span>
+<a name="l00373"></a>00373     <span class="keywordflow">if</span>(slice_3D)
+<a name="l00374"></a>00374     {
+<a name="l00375"></a>00375         vtkSmartPointer&lt;vtkPlane&gt; plane = vtkSmartPointer&lt;vtkPlane&gt;::New();
+<a name="l00376"></a>00376         vtkFloatingPointType *bounds = this-&gt;mesh-&gt;GetBounds();
+<a name="l00377"></a>00377         plane-&gt;SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
+<a name="l00378"></a>00378                          slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
+<a name="l00379"></a>00379                          slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
+<a name="l00380"></a>00380         <span class="keywordflow">if</span>(slice_3D_axis==<span class="stringliteral">&quot;x&quot;</span>)
+<a name="l00381"></a>00381             plane-&gt;SetNormal(1,0,0);
+<a name="l00382"></a>00382         <span class="keywordflow">else</span> <span class="keywordflow">if</span>(slice_3D_axis==<span class="stringliteral">&quot;y&quot;</span>)
+<a name="l00383"></a>00383             plane-&gt;SetNormal(0,1,0);
+<a name="l00384"></a>00384         <span class="keywordflow">else</span>
+<a name="l00385"></a>00385             plane-&gt;SetNormal(0,0,1);
+<a name="l00386"></a>00386         vtkSmartPointer&lt;vtkCutter&gt; cutter = vtkSmartPointer&lt;vtkCutter&gt;::New();
+<a name="l00387"></a>00387         cutter-&gt;SetCutFunction(plane);
+<a name="l00388"></a>00388         vtkSmartPointer&lt;vtkPolyDataMapper&gt; mapper = vtkSmartPointer&lt;vtkPolyDataMapper&gt;::New();
+<a name="l00389"></a>00389         mapper-&gt;SetInputConnection(cutter-&gt;GetOutputPort());
+<a name="l00390"></a>00390         mapper-&gt;ImmediateModeRenderingOn();
+<a name="l00391"></a>00391         <span class="keywordflow">if</span>(use_image_interpolation)
+<a name="l00392"></a>00392         {
+<a name="l00393"></a>00393             vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
+<a name="l00394"></a>00394             to_point_data-&gt;SetInput(this-&gt;mesh);
+<a name="l00395"></a>00395             cutter-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
+<a name="l00396"></a>00396             mapper-&gt;SetScalarModeToUsePointFieldData();
+<a name="l00397"></a>00397         }
+<a name="l00398"></a>00398         <span class="keywordflow">else</span>
+<a name="l00399"></a>00399         {
+<a name="l00400"></a>00400             cutter-&gt;SetInput(this-&gt;mesh);
+<a name="l00401"></a>00401             mapper-&gt;SetScalarModeToUseCellFieldData();
+<a name="l00402"></a>00402         }
+<a name="l00403"></a>00403         mapper-&gt;SelectColorArray(activeChemical.c_str());
+<a name="l00404"></a>00404         mapper-&gt;SetLookupTable(lut);
+<a name="l00405"></a>00405         mapper-&gt;UseLookupTableScalarRangeOn();
+<a name="l00406"></a>00406         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
+<a name="l00407"></a>00407         actor-&gt;SetMapper(mapper);
+<a name="l00408"></a>00408         actor-&gt;GetProperty()-&gt;LightingOff();
+<a name="l00409"></a>00409         <span class="keywordflow">if</span>(show_cell_edges)
+<a name="l00410"></a>00410         {
+<a name="l00411"></a>00411             actor-&gt;GetProperty()-&gt;EdgeVisibilityOn();
+<a name="l00412"></a>00412             actor-&gt;GetProperty()-&gt;SetEdgeColor(0,0,0); <span class="comment">// could be a user option</span>
+<a name="l00413"></a>00413         }
+<a name="l00414"></a>00414         pRenderer-&gt;AddActor(actor);
+<a name="l00415"></a>00415     }
+<a name="l00416"></a>00416 
+<a name="l00417"></a>00417     <span class="comment">// also add a scalar bar to show how the colors correspond to values</span>
+<a name="l00418"></a>00418     <span class="keywordflow">if</span>(show_color_scale)
+<a name="l00419"></a>00419     {
+<a name="l00420"></a>00420         vtkSmartPointer&lt;vtkScalarBarActor&gt; scalar_bar = vtkSmartPointer&lt;vtkScalarBarActor&gt;::New();
+<a name="l00421"></a>00421         scalar_bar-&gt;SetLookupTable(lut);
+<a name="l00422"></a>00422         pRenderer-&gt;AddActor2D(scalar_bar);
+<a name="l00423"></a>00423     }
 <a name="l00424"></a>00424 
-<a name="l00425"></a><a class="code" href="classMeshRD.html#ace0b4c84bc3c3183df9566d11018e72f">00425</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ace0b4c84bc3c3183df9566d11018e72f">MeshRD::SaveStartingPattern</a>()
-<a name="l00426"></a>00426 {
-<a name="l00427"></a>00427     this-&gt;starting_pattern-&gt;DeepCopy(this-&gt;mesh);
-<a name="l00428"></a>00428 }
-<a name="l00429"></a>00429 
-<a name="l00430"></a>00430 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00431"></a>00431 
-<a name="l00432"></a><a class="code" href="classMeshRD.html#a7a70b84fc183252bd4bae27999bcc9e1">00432</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a7a70b84fc183252bd4bae27999bcc9e1">MeshRD::RestoreStartingPattern</a>()
-<a name="l00433"></a>00433 {
-<a name="l00434"></a>00434     this-&gt;CopyFromMesh(this-&gt;starting_pattern);
-<a name="l00435"></a>00435     this-&gt;timesteps_taken = 0;
-<a name="l00436"></a>00436 }
+<a name="l00425"></a>00425     <span class="comment">// add the bounding box</span>
+<a name="l00426"></a>00426     <span class="keywordflow">if</span>(show_bounding_box)
+<a name="l00427"></a>00427     {
+<a name="l00428"></a>00428         vtkSmartPointer&lt;vtkCubeSource&gt; box = vtkSmartPointer&lt;vtkCubeSource&gt;::New();
+<a name="l00429"></a>00429         box-&gt;SetBounds(this-&gt;mesh-&gt;GetBounds());
+<a name="l00430"></a>00430 
+<a name="l00431"></a>00431         vtkSmartPointer&lt;vtkExtractEdges&gt; edges = vtkSmartPointer&lt;vtkExtractEdges&gt;::New();
+<a name="l00432"></a>00432         edges-&gt;SetInputConnection(box-&gt;GetOutputPort());
+<a name="l00433"></a>00433 
+<a name="l00434"></a>00434         vtkSmartPointer&lt;vtkPolyDataMapper&gt; mapper = vtkSmartPointer&lt;vtkPolyDataMapper&gt;::New();
+<a name="l00435"></a>00435         mapper-&gt;SetInputConnection(edges-&gt;GetOutputPort());
+<a name="l00436"></a>00436         mapper-&gt;ImmediateModeRenderingOn();
 <a name="l00437"></a>00437 
-<a name="l00438"></a>00438 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00439"></a>00439 
-<a name="l00440"></a><a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">00440</a> <span class="keyword">struct </span><a class="code" href="structTNeighbor.html">TNeighbor</a> { vtkIdType <a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a>; <span class="keywordtype">float</span> diffusion_coefficient; };
-<a name="l00441"></a>00441 
-<a name="l00442"></a><a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">00442</a> <span class="keywordtype">void</span> <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(vector&lt;TNeighbor&gt;&amp; neighbors,<a class="code" href="structTNeighbor.html">TNeighbor</a> neighbor)
-<a name="l00443"></a>00443 {
-<a name="l00444"></a>00444     <span class="keywordflow">for</span>(vector&lt;TNeighbor&gt;::const_iterator it=neighbors.begin();it!=neighbors.end();it++)
-<a name="l00445"></a>00445         <span class="keywordflow">if</span>(it-&gt;iNeighbor==neighbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a>)
-<a name="l00446"></a>00446             <span class="keywordflow">return</span>;
-<a name="l00447"></a>00447     neighbors.push_back(neighbor);
-<a name="l00448"></a>00448 }
+<a name="l00438"></a>00438         vtkSmartPointer&lt;vtkActor&gt; actor = vtkSmartPointer&lt;vtkActor&gt;::New();
+<a name="l00439"></a>00439         actor-&gt;SetMapper(mapper);
+<a name="l00440"></a>00440         actor-&gt;GetProperty()-&gt;SetColor(0,0,0);  
+<a name="l00441"></a>00441         actor-&gt;GetProperty()-&gt;SetAmbient(1);
+<a name="l00442"></a>00442 
+<a name="l00443"></a>00443         actor-&gt;PickableOff();
+<a name="l00444"></a>00444         pRenderer-&gt;AddActor(actor);
+<a name="l00445"></a>00445     }
+<a name="l00446"></a>00446 }
+<a name="l00447"></a>00447 
+<a name="l00448"></a>00448 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00449"></a>00449 
-<a name="l00450"></a>00450 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00451"></a>00451 
-<a name="l00452"></a><a class="code" href="classMeshRD.html#ab15aad595216b39164e30aa3d1dc42c6">00452</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ab15aad595216b39164e30aa3d1dc42c6" title="work out which cells are neighbors of each other">MeshRD::ComputeCellNeighbors</a>()
-<a name="l00453"></a>00453 {
-<a name="l00454"></a>00454     <span class="keyword">enum</span> TNeighborhood { CELL_NEIGHBORS, VERTEX_NEIGHBORS };
-<a name="l00455"></a>00455     <span class="keyword">enum</span> TDiffusionCoefficient { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE };
-<a name="l00456"></a>00456     <span class="comment">// TODO: when these possibilities have settled down, allow them to be specified as file options</span>
-<a name="l00457"></a>00457 
-<a name="l00458"></a>00458     TNeighborhood neighborhood_type = VERTEX_NEIGHBORS;
-<a name="l00459"></a>00459     TDiffusionCoefficient diffusion_type = EQUAL;
-<a name="l00460"></a>00460 
-<a name="l00461"></a>00461     <span class="keywordflow">if</span>(diffusion_type==BOUNDARY_SIZE &amp;&amp; neighborhood_type!=CELL_NEIGHBORS)
-<a name="l00462"></a>00462         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : BOUNDARY_SIZE diffusion only works with CELL_NEIGHBORS neighborhood&quot;</span>);
-<a name="l00463"></a>00463 
-<a name="l00464"></a>00464     vtkSmartPointer&lt;vtkIdList&gt; ptIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
-<a name="l00465"></a>00465     vtkSmartPointer&lt;vtkIdList&gt; cellIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
-<a name="l00466"></a>00466     <a class="code" href="structTNeighbor.html">TNeighbor</a> nbor;
-<a name="l00467"></a>00467 
-<a name="l00468"></a>00468     vector&lt;vector&lt;TNeighbor&gt; &gt; cell_neighbors; <span class="comment">// the connectivity between cells; for each cell, what cells are its neighbors?</span>
-<a name="l00469"></a>00469     this-&gt;max_neighbors = 0;
-<a name="l00470"></a>00470     <span class="keywordflow">for</span>(vtkIdType iCell=0;iCell&lt;this-&gt;mesh-&gt;GetNumberOfCells();iCell++)
-<a name="l00471"></a>00471     {
-<a name="l00472"></a>00472         vector&lt;TNeighbor&gt; neighbors;
-<a name="l00473"></a>00473         this-&gt;mesh-&gt;GetCellPoints(iCell,ptIds);
-<a name="l00474"></a>00474         vtkIdType npts = ptIds-&gt;GetNumberOfIds();
-<a name="l00475"></a>00475         <span class="keywordflow">switch</span>(neighborhood_type)
-<a name="l00476"></a>00476         {
-<a name="l00477"></a>00477             <span class="keywordflow">case</span> VERTEX_NEIGHBORS: <span class="comment">// neighbors share a vertex</span>
-<a name="l00478"></a>00478             {
-<a name="l00479"></a>00479                 <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
-<a name="l00480"></a>00480                 {
-<a name="l00481"></a>00481                     vtkSmartPointer&lt;vtkIdList&gt; edgeIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
-<a name="l00482"></a>00482                     edgeIds-&gt;SetNumberOfIds(1);
-<a name="l00483"></a>00483                     edgeIds-&gt;SetId(0,ptIds-&gt;GetId(iPt));
-<a name="l00484"></a>00484                     this-&gt;mesh-&gt;GetCellNeighbors(iCell,edgeIds,cellIds);
-<a name="l00485"></a>00485                     <span class="keywordtype">int</span> nNeighbors = cellIds-&gt;GetNumberOfIds();
-<a name="l00486"></a>00486                     <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;nNeighbors;iNeighbor++)
-<a name="l00487"></a>00487                     {
-<a name="l00488"></a>00488                         nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
-<a name="l00489"></a>00489                         <span class="keywordflow">switch</span>(diffusion_type)
-<a name="l00490"></a>00490                         {
-<a name="l00491"></a>00491                             <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a1d2035a8a801dd6493a323decd091cda">diffusion_coefficient</a> = 1.0f; <span class="keywordflow">break</span>;
-<a name="l00492"></a>00492                             <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported diffusion type&quot;</span>);
-<a name="l00493"></a>00493                         }
-<a name="l00494"></a>00494                         <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
-<a name="l00495"></a>00495                     }
-<a name="l00496"></a>00496                 }
-<a name="l00497"></a>00497             }
-<a name="l00498"></a>00498             <span class="keywordflow">break</span>;
-<a name="l00499"></a>00499             <span class="keywordflow">case</span> CELL_NEIGHBORS: <span class="comment">// neighbors share an edge/face</span>
-<a name="l00500"></a>00500             {
-<a name="l00501"></a>00501                 <span class="keywordflow">switch</span>(this-&gt;mesh-&gt;GetCellType(iCell))
-<a name="l00502"></a>00502                 {
-<a name="l00503"></a>00503                     <span class="keywordflow">case</span> VTK_POLYGON: <span class="comment">// a 2D face, neighbors share an edge</span>
-<a name="l00504"></a>00504                     {
-<a name="l00505"></a>00505                         <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
-<a name="l00506"></a>00506                         {
-<a name="l00507"></a>00507                             vtkSmartPointer&lt;vtkIdList&gt; edgeIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
-<a name="l00508"></a>00508                             edgeIds-&gt;SetNumberOfIds(2);
-<a name="l00509"></a>00509                             edgeIds-&gt;SetId(0,ptIds-&gt;GetId(iPt));
-<a name="l00510"></a>00510                             edgeIds-&gt;SetId(1,ptIds-&gt;GetId((iPt+1)%npts));
-<a name="l00511"></a>00511                             this-&gt;mesh-&gt;GetCellNeighbors(iCell,edgeIds,cellIds);
-<a name="l00512"></a>00512                             <span class="keywordtype">int</span> nNeighbors = cellIds-&gt;GetNumberOfIds();
-<a name="l00513"></a>00513                             <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;nNeighbors;iNeighbor++)
-<a name="l00514"></a>00514                             {
-<a name="l00515"></a>00515                                 nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
-<a name="l00516"></a>00516                                 <span class="keywordflow">switch</span>(diffusion_type)
-<a name="l00517"></a>00517                                 {
-<a name="l00518"></a>00518                                     <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a1d2035a8a801dd6493a323decd091cda">diffusion_coefficient</a> = 1.0f; <span class="keywordflow">break</span>;
-<a name="l00519"></a>00519                                     <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported diffusion type&quot;</span>);
-<a name="l00520"></a>00520                                 }
-<a name="l00521"></a>00521                                 <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
-<a name="l00522"></a>00522                             }
-<a name="l00523"></a>00523                         }
-<a name="l00524"></a>00524                     }
-<a name="l00525"></a>00525                     <span class="keywordflow">break</span>;
-<a name="l00526"></a>00526                     <span class="keywordflow">case</span> VTK_TETRA: <span class="comment">// a 3D tetrahedral cell, neighbors share a triangular face</span>
-<a name="l00527"></a>00527                     {
-<a name="l00528"></a>00528                         <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
-<a name="l00529"></a>00529                         {
-<a name="l00530"></a>00530                             vtkSmartPointer&lt;vtkIdList&gt; faceIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
-<a name="l00531"></a>00531                             faceIds-&gt;SetNumberOfIds(3);
-<a name="l00532"></a>00532                             faceIds-&gt;SetId(0,ptIds-&gt;GetId(iPt));
-<a name="l00533"></a>00533                             faceIds-&gt;SetId(1,ptIds-&gt;GetId((iPt+1)%npts));
-<a name="l00534"></a>00534                             faceIds-&gt;SetId(2,ptIds-&gt;GetId((iPt+2)%npts));
-<a name="l00535"></a>00535                             this-&gt;mesh-&gt;GetCellNeighbors(iCell,faceIds,cellIds);
-<a name="l00536"></a>00536                             <span class="keywordtype">int</span> nNeighbors = cellIds-&gt;GetNumberOfIds();
-<a name="l00537"></a>00537                             <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;nNeighbors;iNeighbor++)
-<a name="l00538"></a>00538                             {
-<a name="l00539"></a>00539                                 nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
-<a name="l00540"></a>00540                                 <span class="keywordflow">switch</span>(diffusion_type)
-<a name="l00541"></a>00541                                 {
-<a name="l00542"></a>00542                                     <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a1d2035a8a801dd6493a323decd091cda">diffusion_coefficient</a> = 1.0f; <span class="keywordflow">break</span>;
-<a name="l00543"></a>00543                                     <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported diffusion type&quot;</span>);
-<a name="l00544"></a>00544                                 }
-<a name="l00545"></a>00545                                 <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
-<a name="l00546"></a>00546                             }
-<a name="l00547"></a>00547                         }
-<a name="l00548"></a>00548                     }
-<a name="l00549"></a>00549                     <span class="keywordflow">break</span>;
-<a name="l00550"></a>00550                     <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported cell type&quot;</span>);
-<a name="l00551"></a>00551                 }
-<a name="l00552"></a>00552             }        
-<a name="l00553"></a>00553             <span class="keywordflow">break</span>;
-<a name="l00554"></a>00554             <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported neighborhood type&quot;</span>);
-<a name="l00555"></a>00555         }
-<a name="l00556"></a>00556         <span class="comment">// normalize the diffusion coefficients for this cell</span>
-<a name="l00557"></a>00557         <span class="keywordtype">float</span> coeff_sum=0.0f;
-<a name="l00558"></a>00558         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iN=0;iN&lt;(int)neighbors.size();iN++)
-<a name="l00559"></a>00559             coeff_sum += neighbors[iN].diffusion_coefficient;
-<a name="l00560"></a>00560         coeff_sum = max(coeff_sum,1e-5f); <span class="comment">// avoid div0</span>
-<a name="l00561"></a>00561         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iN=0;iN&lt;(int)neighbors.size();iN++)
-<a name="l00562"></a>00562             neighbors[iN].diffusion_coefficient /= coeff_sum;
-<a name="l00563"></a>00563         <span class="comment">// store this list of neighbors</span>
-<a name="l00564"></a>00564         cell_neighbors.push_back(neighbors);
-<a name="l00565"></a>00565         <span class="keywordflow">if</span>((<span class="keywordtype">int</span>)neighbors.size()&gt;this-&gt;max_neighbors)
-<a name="l00566"></a>00566             this-&gt;max_neighbors = (<span class="keywordtype">int</span>)neighbors.size();
-<a name="l00567"></a>00567     }
-<a name="l00568"></a>00568     <span class="comment">// N.B. we don&#39;t intend to support cells of mixed dimensionality in one mesh</span>
-<a name="l00569"></a>00569 
-<a name="l00570"></a>00570     <span class="comment">// copy data to plain arrays</span>
-<a name="l00571"></a>00571     <span class="keywordflow">if</span>(this-&gt;cell_neighbor_indices) <span class="keyword">delete</span> []this-&gt;cell_neighbor_indices;
-<a name="l00572"></a>00572     <span class="keywordflow">if</span>(this-&gt;cell_neighbor_weights) <span class="keyword">delete</span> []this-&gt;cell_neighbor_weights;
-<a name="l00573"></a>00573     this-&gt;cell_neighbor_indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[this-&gt;mesh-&gt;GetNumberOfCells()*this-&gt;max_neighbors];
-<a name="l00574"></a>00574     this-&gt;cell_neighbor_weights = <span class="keyword">new</span> <span class="keywordtype">float</span>[this-&gt;mesh-&gt;GetNumberOfCells()*this-&gt;max_neighbors];
-<a name="l00575"></a>00575     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;this-&gt;mesh-&gt;GetNumberOfCells();i++)
-<a name="l00576"></a>00576     {
-<a name="l00577"></a>00577         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=0;j&lt;(int)cell_neighbors[i].size();j++)
-<a name="l00578"></a>00578         {
-<a name="l00579"></a>00579             <span class="keywordtype">int</span> k = i*this-&gt;max_neighbors + j;
-<a name="l00580"></a>00580             this-&gt;cell_neighbor_indices[k] = cell_neighbors[i][j].iNeighbor;
-<a name="l00581"></a>00581             this-&gt;cell_neighbor_weights[k] = cell_neighbors[i][j].diffusion_coefficient;
-<a name="l00582"></a>00582         }
-<a name="l00583"></a>00583         <span class="comment">// fill any remaining slots with iCell,0.0</span>
-<a name="l00584"></a>00584         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=(<span class="keywordtype">int</span>)cell_neighbors[i].size();j&lt;max_neighbors;j++)
-<a name="l00585"></a>00585         {
-<a name="l00586"></a>00586             <span class="keywordtype">int</span> k = i*this-&gt;max_neighbors + j;
-<a name="l00587"></a>00587             this-&gt;cell_neighbor_indices[k] = i;
-<a name="l00588"></a>00588             this-&gt;cell_neighbor_weights[k] = 0.0f;
-<a name="l00589"></a>00589         }
-<a name="l00590"></a>00590     }
-<a name="l00591"></a>00591 }
-<a name="l00592"></a>00592 
-<a name="l00593"></a>00593 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00594"></a>00594 
-<a name="l00595"></a><a class="code" href="classMeshRD.html#a6e378152095384c328d3531a2c5b372f">00595</a> <span class="keywordtype">int</span> <a class="code" href="classMeshRD.html#a6e378152095384c328d3531a2c5b372f">MeshRD::GetNumberOfCells</a>()<span class="keyword"> const</span>
-<a name="l00596"></a>00596 <span class="keyword"></span>{
-<a name="l00597"></a>00597     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetNumberOfCells();
-<a name="l00598"></a>00598 }
-<a name="l00599"></a>00599 
-<a name="l00600"></a>00600 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00601"></a>00601 
-<a name="l00602"></a><a class="code" href="classMeshRD.html#abbde7ed1c4d85e77709af43b52dc7ba5">00602</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#abbde7ed1c4d85e77709af43b52dc7ba5" title="Retrieve the current 3D object as a vtkPolyData.">MeshRD::GetAsMesh</a>(vtkPolyData *out, <span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a> &amp;render_settings)<span class="keyword"> const</span>
-<a name="l00603"></a>00603 <span class="keyword"></span>{
-<a name="l00604"></a>00604     vtkSmartPointer&lt;vtkGeometryFilter&gt; geom = vtkSmartPointer&lt;vtkGeometryFilter&gt;::New();
-<a name="l00605"></a>00605     geom-&gt;SetInput(this-&gt;mesh);
-<a name="l00606"></a>00606     geom-&gt;Update();
-<a name="l00607"></a>00607     out-&gt;DeepCopy(geom-&gt;GetOutput());
-<a name="l00608"></a>00608     <span class="comment">// 2D meshes will get returned unchanged, meshes with 3D cells will have their outer surface returned</span>
-<a name="l00609"></a>00609 }
-<a name="l00610"></a>00610 
-<a name="l00611"></a>00611 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00612"></a>00612 
-<a name="l00613"></a><a class="code" href="classMeshRD.html#a47b5e474c1b4db50c65e70ed6e3b4ba6">00613</a> <span class="keywordtype">int</span> <a class="code" href="classMeshRD.html#a47b5e474c1b4db50c65e70ed6e3b4ba6" title="Retreive the dimensionality of the system volume, irrespective of the cells within it...">MeshRD::GetArenaDimensionality</a>()<span class="keyword"> const</span>
-<a name="l00614"></a>00614 <span class="keyword"></span>{
-<a name="l00615"></a>00615     vtkFloatingPointType epsilon = 1e-4;
-<a name="l00616"></a>00616     vtkFloatingPointType *bounds = this-&gt;mesh-&gt;GetBounds();
-<a name="l00617"></a>00617     <span class="keywordtype">int</span> dimensionality = 0;
-<a name="l00618"></a>00618     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> xyz=0;xyz&lt;3;xyz++)
-<a name="l00619"></a>00619         <span class="keywordflow">if</span>(bounds[xyz*2+1]-bounds[xyz*2+0] &gt; epsilon)
-<a name="l00620"></a>00620             dimensionality++;
-<a name="l00621"></a>00621     <span class="keywordflow">return</span> dimensionality;
-<a name="l00622"></a>00622     <span class="comment">// TODO: rotate datasets on input such that if dimensionality=2 then all z=constant, and if dimensionality=1 then all y=constant and all z=constant</span>
-<a name="l00623"></a>00623 }
-<a name="l00624"></a>00624 
-<a name="l00625"></a>00625 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00626"></a>00626 
-<a name="l00627"></a><a class="code" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044">00627</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044" title="Retrieve the current 2D plane as a vtkImageData.">MeshRD::GetAs2DImage</a>(vtkImageData *out,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)<span class="keyword"> const</span>
-<a name="l00628"></a>00628 <span class="keyword"></span>{
-<a name="l00629"></a>00629     <span class="comment">// TODO</span>
-<a name="l00630"></a>00630 }
-<a name="l00631"></a>00631 
-<a name="l00632"></a>00632 <span class="comment">// ---------------------------------------------------------------------</span>
-<a name="l00633"></a>00633 
-<a name="l00634"></a><a class="code" href="classMeshRD.html#a93a42775bc5ad5f78333d0ee7aff99a3">00634</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#a93a42775bc5ad5f78333d0ee7aff99a3" title="Retrieve the value at a given location.">MeshRD::GetValue</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
-<a name="l00635"></a>00635 {
-<a name="l00636"></a>00636     this-&gt;CreateCellLocatorIfNeeded();
+<a name="l00450"></a><a class="code" href="classMeshRD.html#ace0b4c84bc3c3183df9566d11018e72f">00450</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ace0b4c84bc3c3183df9566d11018e72f">MeshRD::SaveStartingPattern</a>()
+<a name="l00451"></a>00451 {
+<a name="l00452"></a>00452     this-&gt;starting_pattern-&gt;DeepCopy(this-&gt;mesh);
+<a name="l00453"></a>00453 }
+<a name="l00454"></a>00454 
+<a name="l00455"></a>00455 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00456"></a>00456 
+<a name="l00457"></a><a class="code" href="classMeshRD.html#a7a70b84fc183252bd4bae27999bcc9e1">00457</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a7a70b84fc183252bd4bae27999bcc9e1">MeshRD::RestoreStartingPattern</a>()
+<a name="l00458"></a>00458 {
+<a name="l00459"></a>00459     this-&gt;CopyFromMesh(this-&gt;starting_pattern);
+<a name="l00460"></a>00460     this-&gt;timesteps_taken = 0;
+<a name="l00461"></a>00461 }
+<a name="l00462"></a>00462 
+<a name="l00463"></a>00463 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00464"></a>00464 
+<a name="l00465"></a><a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">00465</a> <span class="keyword">struct </span><a class="code" href="structTNeighbor.html">TNeighbor</a> { vtkIdType iNeighbor; <span class="keywordtype">float</span> <a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a>; };
+<a name="l00466"></a>00466 
+<a name="l00467"></a><a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">00467</a> <span class="keywordtype">void</span> <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(vector&lt;TNeighbor&gt;&amp; neighbors,<a class="code" href="structTNeighbor.html">TNeighbor</a> neighbor)
+<a name="l00468"></a>00468 {
+<a name="l00469"></a>00469     <span class="keywordflow">for</span>(vector&lt;TNeighbor&gt;::const_iterator it=neighbors.begin();it!=neighbors.end();it++)
+<a name="l00470"></a>00470         <span class="keywordflow">if</span>(it-&gt;iNeighbor==neighbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a>)
+<a name="l00471"></a>00471             <span class="keywordflow">return</span>;
+<a name="l00472"></a>00472     neighbors.push_back(neighbor);
+<a name="l00473"></a>00473 }
+<a name="l00474"></a>00474 
+<a name="l00475"></a><a class="code" href="MeshRD_8cpp.html#a811a4dadb2f27233d2d36d6ced6fc6cf">00475</a> <span class="keywordtype">bool</span> <a class="code" href="MeshRD_8cpp.html#a811a4dadb2f27233d2d36d6ced6fc6cf">IsEdgeNeighbor</a>(vtkUnstructuredGrid *grid,vtkIdType iCell1,vtkIdType iCell2)
+<a name="l00476"></a>00476 {
+<a name="l00477"></a>00477     vtkSmartPointer&lt;vtkIdList&gt; cellIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
+<a name="l00478"></a>00478     vtkCell* pCell = grid-&gt;GetCell(iCell1);
+<a name="l00479"></a>00479     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iEdge=0;iEdge&lt;pCell-&gt;GetNumberOfEdges();iEdge++)
+<a name="l00480"></a>00480     {
+<a name="l00481"></a>00481         vtkIdList *vertIds = pCell-&gt;GetEdge(iEdge)-&gt;GetPointIds();
+<a name="l00482"></a>00482         grid-&gt;GetCellNeighbors(iCell1,vertIds,cellIds);
+<a name="l00483"></a>00483         <span class="keywordflow">if</span>(cellIds-&gt;IsId(iCell2)&gt;=0)
+<a name="l00484"></a>00484             <span class="keywordflow">return</span> <span class="keyword">true</span>;
+<a name="l00485"></a>00485     }
+<a name="l00486"></a>00486     <span class="keywordflow">return</span> <span class="keyword">false</span>;
+<a name="l00487"></a>00487 }
+<a name="l00488"></a>00488 
+<a name="l00489"></a>00489 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00490"></a>00490 
+<a name="l00491"></a><a class="code" href="classMeshRD.html#af760a68f419979bf235c984a59ce24fb">00491</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#af760a68f419979bf235c984a59ce24fb" title="work out which cells are neighbors of each other">MeshRD::ComputeCellNeighbors</a>(<a class="code" href="classAbstractRD.html#ac56f4b9cc6c45da4b8fb1f908127a559">TNeighborhood</a> neighborhood_type,<span class="keywordtype">int</span> range,<a class="code" href="classAbstractRD.html#a81fd5371f651c3cf9e2d7251db538e47">TWeight</a> weight_type)
+<a name="l00492"></a>00492 {
+<a name="l00493"></a>00493     <span class="comment">// TODO: for now we treat LAPLACIAN weights the same as EQUAL weights, not sure what to do with this on arbitrary meshes</span>
+<a name="l00494"></a>00494     <span class="keywordflow">if</span>(range!=1)
+<a name="l00495"></a>00495         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported range&quot;</span>);
+<a name="l00496"></a>00496     <span class="keywordflow">if</span>(!this-&gt;mesh-&gt;IsHomogeneous())
+<a name="l00497"></a>00497         <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : mixed cell types not supported&quot;</span>);
+<a name="l00498"></a>00498 
+<a name="l00499"></a>00499     vtkSmartPointer&lt;vtkIdList&gt; ptIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
+<a name="l00500"></a>00500     vtkSmartPointer&lt;vtkIdList&gt; cellIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
+<a name="l00501"></a>00501     <a class="code" href="structTNeighbor.html">TNeighbor</a> nbor;
+<a name="l00502"></a>00502 
+<a name="l00503"></a>00503     vector&lt;vector&lt;TNeighbor&gt; &gt; cell_neighbors; <span class="comment">// the connectivity between cells; for each cell, what cells are its neighbors?</span>
+<a name="l00504"></a>00504     this-&gt;max_neighbors = 0;
+<a name="l00505"></a>00505     <span class="keywordflow">for</span>(vtkIdType iCell=0;iCell&lt;this-&gt;mesh-&gt;GetNumberOfCells();iCell++)
+<a name="l00506"></a>00506     {
+<a name="l00507"></a>00507         vector&lt;TNeighbor&gt; neighbors;
+<a name="l00508"></a>00508         this-&gt;mesh-&gt;GetCellPoints(iCell,ptIds);
+<a name="l00509"></a>00509         vtkIdType npts = ptIds-&gt;GetNumberOfIds();
+<a name="l00510"></a>00510         <span class="keywordflow">switch</span>(neighborhood_type)
+<a name="l00511"></a>00511         {
+<a name="l00512"></a>00512             <span class="keywordflow">case</span> VERTEX_NEIGHBORS: <span class="comment">// neighbors share a vertex</span>
+<a name="l00513"></a>00513             {
+<a name="l00514"></a>00514                 vtkSmartPointer&lt;vtkIdList&gt; vertIds = vtkSmartPointer&lt;vtkIdList&gt;::New();
+<a name="l00515"></a>00515                 vertIds-&gt;SetNumberOfIds(1);
+<a name="l00516"></a>00516                 <span class="comment">// first try to add neighbors that are also edge-neighbors of the previously added cell</span>
+<a name="l00517"></a>00517                 <span class="keywordtype">size_t</span> n_previously;
+<a name="l00518"></a>00518                 <span class="keywordflow">do</span> {
+<a name="l00519"></a>00519                     n_previously = neighbors.size();
+<a name="l00520"></a>00520                     <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
+<a name="l00521"></a>00521                     {
+<a name="l00522"></a>00522                         vertIds-&gt;SetId(0,ptIds-&gt;GetId(iPt));
+<a name="l00523"></a>00523                         this-&gt;mesh-&gt;GetCellNeighbors(iCell,vertIds,cellIds);
+<a name="l00524"></a>00524                         <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;cellIds-&gt;GetNumberOfIds();iNeighbor++)
+<a name="l00525"></a>00525                         {
+<a name="l00526"></a>00526                             nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
+<a name="l00527"></a>00527                             <span class="keywordflow">switch</span>(weight_type)
+<a name="l00528"></a>00528                             {
+<a name="l00529"></a>00529                                 <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00530"></a>00530                                 <span class="keywordflow">case</span> LAPLACIAN: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00531"></a>00531                                 <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported weight type&quot;</span>);
+<a name="l00532"></a>00532                             }
+<a name="l00533"></a>00533                             <span class="keywordflow">if</span>(neighbors.empty() || <a class="code" href="MeshRD_8cpp.html#a811a4dadb2f27233d2d36d6ced6fc6cf">IsEdgeNeighbor</a>(this-&gt;mesh,neighbors.back().iNeighbor,nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a>))
+<a name="l00534"></a>00534                                 <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
+<a name="l00535"></a>00535                         }
+<a name="l00536"></a>00536                     }
+<a name="l00537"></a>00537                 } <span class="keywordflow">while</span>(neighbors.size() &gt; n_previously);
+<a name="l00538"></a>00538                 <span class="comment">// add any remaining neighbors (in case mesh is non-manifold)</span>
+<a name="l00539"></a>00539                 <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
+<a name="l00540"></a>00540                 {
+<a name="l00541"></a>00541                     vertIds-&gt;SetId(0,ptIds-&gt;GetId(iPt));
+<a name="l00542"></a>00542                     this-&gt;mesh-&gt;GetCellNeighbors(iCell,vertIds,cellIds);
+<a name="l00543"></a>00543                     <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;cellIds-&gt;GetNumberOfIds();iNeighbor++)
+<a name="l00544"></a>00544                     {
+<a name="l00545"></a>00545                         nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
+<a name="l00546"></a>00546                         <span class="keywordflow">switch</span>(weight_type)
+<a name="l00547"></a>00547                         {
+<a name="l00548"></a>00548                             <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00549"></a>00549                             <span class="keywordflow">case</span> LAPLACIAN: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00550"></a>00550                             <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported weight type&quot;</span>);
+<a name="l00551"></a>00551                         }
+<a name="l00552"></a>00552                         <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
+<a name="l00553"></a>00553                     }
+<a name="l00554"></a>00554                 }
+<a name="l00555"></a>00555             }
+<a name="l00556"></a>00556             <span class="keywordflow">break</span>;
+<a name="l00557"></a>00557             <span class="keywordflow">case</span> EDGE_NEIGHBORS: <span class="comment">// neighbors share an edge</span>
+<a name="l00558"></a>00558             {
+<a name="l00559"></a>00559                 vtkCell* pCell = this-&gt;mesh-&gt;GetCell(iCell);
+<a name="l00560"></a>00560                 <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iEdge=0;iEdge&lt;pCell-&gt;GetNumberOfEdges();iEdge++)
+<a name="l00561"></a>00561                 {
+<a name="l00562"></a>00562                     vtkIdList *vertIds = pCell-&gt;GetEdge(iEdge)-&gt;GetPointIds();
+<a name="l00563"></a>00563                     this-&gt;mesh-&gt;GetCellNeighbors(iCell,vertIds,cellIds);
+<a name="l00564"></a>00564                     <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;cellIds-&gt;GetNumberOfIds();iNeighbor++)
+<a name="l00565"></a>00565                     {
+<a name="l00566"></a>00566                         nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
+<a name="l00567"></a>00567                         <span class="keywordflow">switch</span>(weight_type)
+<a name="l00568"></a>00568                         {
+<a name="l00569"></a>00569                             <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00570"></a>00570                             <span class="keywordflow">case</span> LAPLACIAN: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00571"></a>00571                             <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported weight type&quot;</span>);
+<a name="l00572"></a>00572                         }
+<a name="l00573"></a>00573                         <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
+<a name="l00574"></a>00574                     }
+<a name="l00575"></a>00575                 }
+<a name="l00576"></a>00576             }        
+<a name="l00577"></a>00577             <span class="keywordflow">break</span>;
+<a name="l00578"></a>00578             <span class="keywordflow">case</span> FACE_NEIGHBORS:
+<a name="l00579"></a>00579             {
+<a name="l00580"></a>00580                 vtkCell* pCell = this-&gt;mesh-&gt;GetCell(iCell);
+<a name="l00581"></a>00581                 <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iEdge=0;iEdge&lt;pCell-&gt;GetNumberOfFaces();iEdge++)
+<a name="l00582"></a>00582                 {
+<a name="l00583"></a>00583                     vtkIdList *vertIds = pCell-&gt;GetFace(iEdge)-&gt;GetPointIds();
+<a name="l00584"></a>00584                     this-&gt;mesh-&gt;GetCellNeighbors(iCell,vertIds,cellIds);
+<a name="l00585"></a>00585                     <span class="keywordflow">for</span>(vtkIdType iNeighbor=0;iNeighbor&lt;cellIds-&gt;GetNumberOfIds();iNeighbor++)
+<a name="l00586"></a>00586                     {
+<a name="l00587"></a>00587                         nbor.<a class="code" href="structTNeighbor.html#a799107451fc00a468659663d44e309ed">iNeighbor</a> = cellIds-&gt;GetId(iNeighbor);
+<a name="l00588"></a>00588                         <span class="keywordflow">switch</span>(weight_type)
+<a name="l00589"></a>00589                         {
+<a name="l00590"></a>00590                             <span class="keywordflow">case</span> EQUAL: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00591"></a>00591                             <span class="keywordflow">case</span> LAPLACIAN: nbor.<a class="code" href="structTNeighbor.html#a7e27c3054bccee5911c593a114712ac7">weight</a> = 1.0f; <span class="keywordflow">break</span>;
+<a name="l00592"></a>00592                             <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported weight type&quot;</span>);
+<a name="l00593"></a>00593                         }
+<a name="l00594"></a>00594                         <a class="code" href="MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501">add_if_new</a>(neighbors,nbor);
+<a name="l00595"></a>00595                     }
+<a name="l00596"></a>00596                 }
+<a name="l00597"></a>00597             }
+<a name="l00598"></a>00598             <span class="keywordflow">break</span>;
+<a name="l00599"></a>00599             <span class="keywordflow">default</span>: <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::ComputeCellNeighbors : unsupported neighborhood type&quot;</span>);
+<a name="l00600"></a>00600         }
+<a name="l00601"></a>00601         <span class="comment">// normalize the weights for this cell</span>
+<a name="l00602"></a>00602         <span class="keywordtype">float</span> weight_sum=0.0f;
+<a name="l00603"></a>00603         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iN=0;iN&lt;(int)neighbors.size();iN++)
+<a name="l00604"></a>00604             weight_sum += neighbors[iN].weight;
+<a name="l00605"></a>00605         weight_sum = max(weight_sum,1e-5f); <span class="comment">// avoid div0</span>
+<a name="l00606"></a>00606         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> iN=0;iN&lt;(int)neighbors.size();iN++)
+<a name="l00607"></a>00607             neighbors[iN].weight /= weight_sum;
+<a name="l00608"></a>00608         <span class="comment">// store this list of neighbors</span>
+<a name="l00609"></a>00609         cell_neighbors.push_back(neighbors);
+<a name="l00610"></a>00610         <span class="keywordflow">if</span>((<span class="keywordtype">int</span>)neighbors.size()&gt;this-&gt;max_neighbors)
+<a name="l00611"></a>00611             this-&gt;max_neighbors = (<span class="keywordtype">int</span>)neighbors.size();
+<a name="l00612"></a>00612         this-&gt;max_neighbors = max(1,this-&gt;max_neighbors); <span class="comment">// avoid error in case of unconnected cells or single cell</span>
+<a name="l00613"></a>00613     }
+<a name="l00614"></a>00614 
+<a name="l00615"></a>00615     <span class="comment">// copy data to plain arrays</span>
+<a name="l00616"></a>00616     <span class="keywordflow">if</span>(this-&gt;cell_neighbor_indices) <span class="keyword">delete</span> []this-&gt;cell_neighbor_indices;
+<a name="l00617"></a>00617     <span class="keywordflow">if</span>(this-&gt;cell_neighbor_weights) <span class="keyword">delete</span> []this-&gt;cell_neighbor_weights;
+<a name="l00618"></a>00618     this-&gt;cell_neighbor_indices = <span class="keyword">new</span> <span class="keywordtype">int</span>[this-&gt;mesh-&gt;GetNumberOfCells()*this-&gt;max_neighbors];
+<a name="l00619"></a>00619     this-&gt;cell_neighbor_weights = <span class="keyword">new</span> <span class="keywordtype">float</span>[this-&gt;mesh-&gt;GetNumberOfCells()*this-&gt;max_neighbors];
+<a name="l00620"></a>00620     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> i=0;i&lt;this-&gt;mesh-&gt;GetNumberOfCells();i++)
+<a name="l00621"></a>00621     {
+<a name="l00622"></a>00622         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=0;j&lt;(int)cell_neighbors[i].size();j++)
+<a name="l00623"></a>00623         {
+<a name="l00624"></a>00624             <span class="keywordtype">int</span> k = i*this-&gt;max_neighbors + j;
+<a name="l00625"></a>00625             this-&gt;cell_neighbor_indices[k] = cell_neighbors[i][j].iNeighbor;
+<a name="l00626"></a>00626             this-&gt;cell_neighbor_weights[k] = cell_neighbors[i][j].weight;
+<a name="l00627"></a>00627         }
+<a name="l00628"></a>00628         <span class="comment">// fill any remaining slots with iCell,0.0</span>
+<a name="l00629"></a>00629         <span class="keywordflow">for</span>(<span class="keywordtype">int</span> j=(<span class="keywordtype">int</span>)cell_neighbors[i].size();j&lt;max_neighbors;j++)
+<a name="l00630"></a>00630         {
+<a name="l00631"></a>00631             <span class="keywordtype">int</span> k = i*this-&gt;max_neighbors + j;
+<a name="l00632"></a>00632             this-&gt;cell_neighbor_indices[k] = i;
+<a name="l00633"></a>00633             this-&gt;cell_neighbor_weights[k] = 0.0f;
+<a name="l00634"></a>00634         }
+<a name="l00635"></a>00635     }
+<a name="l00636"></a>00636 }
 <a name="l00637"></a>00637 
-<a name="l00638"></a>00638     <span class="keywordtype">double</span> p[3]={x,y,z};
-<a name="l00639"></a>00639     vtkIdType iCell = this-&gt;cell_locator-&gt;FindCell(p);
-<a name="l00640"></a>00640 
-<a name="l00641"></a>00641     <span class="keywordflow">if</span>(iCell&lt;0)
-<a name="l00642"></a>00642         <span class="keywordflow">return</span> 0.0f;
-<a name="l00643"></a>00643 
-<a name="l00644"></a>00644     <span class="keywordtype">int</span> iChemical = <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>());
-<a name="l00645"></a>00645     <span class="keywordflow">return</span> vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChemical).c_str()))-&gt;GetValue(iCell);
-<a name="l00646"></a>00646 }
-<a name="l00647"></a>00647 
-<a name="l00648"></a>00648 <span class="comment">// --------------------------------------------------------------------------------</span>
-<a name="l00649"></a>00649 
-<a name="l00650"></a><a class="code" href="classMeshRD.html#ad6092c5c5283a64faf0bfd09e8323086">00650</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ad6092c5c5283a64faf0bfd09e8323086" title="Set the value at a given location.">MeshRD::SetValue</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keywordtype">float</span> val,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
-<a name="l00651"></a>00651 {
-<a name="l00652"></a>00652     this-&gt;CreateCellLocatorIfNeeded();
-<a name="l00653"></a>00653 
-<a name="l00654"></a>00654     <span class="keywordtype">double</span> p[3]={x,y,z};
-<a name="l00655"></a>00655     vtkIdType iCell = this-&gt;cell_locator-&gt;FindCell(p);
-<a name="l00656"></a>00656 
-<a name="l00657"></a>00657     <span class="keywordflow">if</span>(iCell&lt;0)
-<a name="l00658"></a>00658         <span class="keywordflow">return</span>;
-<a name="l00659"></a>00659 
-<a name="l00660"></a>00660     <span class="keywordtype">int</span> iChemical = <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>());
-<a name="l00661"></a>00661     <span class="keywordtype">float</span> *pCell = vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChemical).c_str()))-&gt;GetPointer(iCell);
-<a name="l00662"></a>00662     this-&gt;StorePaintAction(iChemical,iCell,*pCell);
-<a name="l00663"></a>00663     *pCell = val;
-<a name="l00664"></a>00664     this-&gt;mesh-&gt;Modified();
-<a name="l00665"></a>00665 }
-<a name="l00666"></a>00666 
-<a name="l00667"></a>00667 <span class="comment">// --------------------------------------------------------------------------------</span>
-<a name="l00668"></a>00668 
-<a name="l00669"></a><a class="code" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2">00669</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2" title="Set the value of all cells within radius r of a given location. The radius is expressed as a proporti...">MeshRD::SetValuesInRadius</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keywordtype">float</span> r,<span class="keywordtype">float</span> val,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
-<a name="l00670"></a>00670 {
-<a name="l00671"></a>00671     this-&gt;CreateCellLocatorIfNeeded();
-<a name="l00672"></a>00672 
-<a name="l00673"></a>00673     <span class="keywordtype">double</span> *dataset_bbox = this-&gt;mesh-&gt;GetBounds();
-<a name="l00674"></a>00674     r *= <a class="code" href="utils_8cpp.html#a0e00877e5543b3ab016f0c7c36538f51">hypot3</a>(dataset_bbox[1]-dataset_bbox[0],dataset_bbox[3]-dataset_bbox[2],dataset_bbox[5]-dataset_bbox[4]);
-<a name="l00675"></a>00675 
-<a name="l00676"></a>00676     <span class="keywordtype">double</span> bbox[6]={x-r,x+r,y-r,y+r,z-r,z+r};
-<a name="l00677"></a>00677     vtkSmartPointer&lt;vtkIdList&gt; cells = vtkSmartPointer&lt;vtkIdList&gt;::New();
-<a name="l00678"></a>00678     this-&gt;cell_locator-&gt;FindCellsWithinBounds(bbox,cells);
-<a name="l00679"></a>00679 
-<a name="l00680"></a>00680     <span class="keywordtype">double</span> p[3] = {x,y,z};
-<a name="l00681"></a>00681 
-<a name="l00682"></a>00682     <span class="keywordtype">int</span> iChemical = <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>());
-<a name="l00683"></a>00683     <span class="keywordflow">for</span>(vtkIdType i=0;i&lt;cells-&gt;GetNumberOfIds();i++)
-<a name="l00684"></a>00684     {
-<a name="l00685"></a>00685         <span class="keywordtype">int</span> iCell = cells-&gt;GetId(i);
-<a name="l00686"></a>00686         vtkIdType npts,*pts;
-<a name="l00687"></a>00687         this-&gt;mesh-&gt;GetCellPoints(iCell,npts,pts);
-<a name="l00688"></a>00688         <span class="comment">// set this cell if any of its points are inside</span>
-<a name="l00689"></a>00689         <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
-<a name="l00690"></a>00690         {
-<a name="l00691"></a>00691             <span class="keywordflow">if</span>(vtkMath::Distance2BetweenPoints(this-&gt;mesh-&gt;GetPoint(pts[iPt]),p)&lt;r*r)
-<a name="l00692"></a>00692             {
-<a name="l00693"></a>00693                 <span class="keywordtype">float</span> *pCell = vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChemical).c_str()))-&gt;GetPointer(iCell);
-<a name="l00694"></a>00694                 this-&gt;StorePaintAction(iChemical,iCell,*pCell);
-<a name="l00695"></a>00695                 *pCell = val;
-<a name="l00696"></a>00696                 <span class="keywordflow">break</span>;
-<a name="l00697"></a>00697             }
-<a name="l00698"></a>00698         }
-<a name="l00699"></a>00699     }
-<a name="l00700"></a>00700     this-&gt;mesh-&gt;Modified();
+<a name="l00638"></a>00638 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00639"></a>00639 
+<a name="l00640"></a><a class="code" href="classMeshRD.html#a6e378152095384c328d3531a2c5b372f">00640</a> <span class="keywordtype">int</span> <a class="code" href="classMeshRD.html#a6e378152095384c328d3531a2c5b372f">MeshRD::GetNumberOfCells</a>()<span class="keyword"> const</span>
+<a name="l00641"></a>00641 <span class="keyword"></span>{
+<a name="l00642"></a>00642     <span class="keywordflow">return</span> this-&gt;mesh-&gt;GetNumberOfCells();
+<a name="l00643"></a>00643 }
+<a name="l00644"></a>00644 
+<a name="l00645"></a>00645 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00646"></a>00646 
+<a name="l00647"></a><a class="code" href="classMeshRD.html#abbde7ed1c4d85e77709af43b52dc7ba5">00647</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#abbde7ed1c4d85e77709af43b52dc7ba5" title="Retrieve the current 3D object as a vtkPolyData.">MeshRD::GetAsMesh</a>(vtkPolyData *out, <span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a> &amp;render_settings)<span class="keyword"> const</span>
+<a name="l00648"></a>00648 <span class="keyword"></span>{
+<a name="l00649"></a>00649     <span class="keywordtype">bool</span> use_image_interpolation = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;use_image_interpolation&quot;</span>).<a class="code" href="classProperty.html#a03fd5dd00e80e8d202da0d47b3d666d2">GetBool</a>();
+<a name="l00650"></a>00650     <span class="keywordtype">string</span> activeChemical = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>();
+<a name="l00651"></a>00651     <span class="keywordtype">float</span> contour_level = render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;contour_level&quot;</span>).<a class="code" href="classProperty.html#a03e9e40bc37b6c2e38dd4fb76ab3c493">GetFloat</a>();
+<a name="l00652"></a>00652 
+<a name="l00653"></a>00653     <span class="comment">// 2D meshes will get returned unchanged, meshes with 3D cells will have their contour returned</span>
+<a name="l00654"></a>00654     <span class="keywordflow">if</span>(this-&gt;mesh-&gt;GetCellType(0)==VTK_POLYGON)
+<a name="l00655"></a>00655     {
+<a name="l00656"></a>00656         vtkSmartPointer&lt;vtkDataSetSurfaceFilter&gt; geom = vtkSmartPointer&lt;vtkDataSetSurfaceFilter&gt;::New();
+<a name="l00657"></a>00657         geom-&gt;SetInput(this-&gt;mesh);
+<a name="l00658"></a>00658         geom-&gt;Update();
+<a name="l00659"></a>00659         out-&gt;DeepCopy(geom-&gt;GetOutput());
+<a name="l00660"></a>00660     }
+<a name="l00661"></a>00661     <span class="keywordflow">else</span> <span class="keywordflow">if</span>(use_image_interpolation)
+<a name="l00662"></a>00662     {
+<a name="l00663"></a>00663         vtkSmartPointer&lt;vtkAssignAttribute&gt; assign_attribute = vtkSmartPointer&lt;vtkAssignAttribute&gt;::New();
+<a name="l00664"></a>00664         assign_attribute-&gt;SetInput(this-&gt;mesh);
+<a name="l00665"></a>00665         assign_attribute-&gt;Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+<a name="l00666"></a>00666         vtkSmartPointer&lt;vtkCellDataToPointData&gt; to_point_data = vtkSmartPointer&lt;vtkCellDataToPointData&gt;::New();
+<a name="l00667"></a>00667         to_point_data-&gt;SetInputConnection(assign_attribute-&gt;GetOutputPort());
+<a name="l00668"></a>00668         vtkSmartPointer&lt;vtkContourFilter&gt; surface = vtkSmartPointer&lt;vtkContourFilter&gt;::New();
+<a name="l00669"></a>00669         surface-&gt;SetInputConnection(to_point_data-&gt;GetOutputPort());
+<a name="l00670"></a>00670         surface-&gt;SetValue(0,contour_level);
+<a name="l00671"></a>00671         surface-&gt;Update();
+<a name="l00672"></a>00672         out-&gt;DeepCopy(surface-&gt;GetOutput());
+<a name="l00673"></a>00673     }
+<a name="l00674"></a>00674     <span class="keywordflow">else</span>
+<a name="l00675"></a>00675     {
+<a name="l00676"></a>00676         vtkSmartPointer&lt;vtkAssignAttribute&gt; assign_attribute = vtkSmartPointer&lt;vtkAssignAttribute&gt;::New();
+<a name="l00677"></a>00677         assign_attribute-&gt;SetInput(this-&gt;mesh);
+<a name="l00678"></a>00678         assign_attribute-&gt;Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+<a name="l00679"></a>00679         vtkSmartPointer&lt;vtkThreshold&gt; threshold = vtkSmartPointer&lt;vtkThreshold&gt;::New();
+<a name="l00680"></a>00680         threshold-&gt;SetInputConnection(assign_attribute-&gt;GetOutputPort());
+<a name="l00681"></a>00681         threshold-&gt;ThresholdByUpper(contour_level);
+<a name="l00682"></a>00682         vtkSmartPointer&lt;vtkDataSetSurfaceFilter&gt; geom = vtkSmartPointer&lt;vtkDataSetSurfaceFilter&gt;::New();
+<a name="l00683"></a>00683         geom-&gt;SetInputConnection(threshold-&gt;GetOutputPort());
+<a name="l00684"></a>00684         geom-&gt;Update();
+<a name="l00685"></a>00685         out-&gt;DeepCopy(geom-&gt;GetOutput());
+<a name="l00686"></a>00686     }
+<a name="l00687"></a>00687 }
+<a name="l00688"></a>00688 
+<a name="l00689"></a>00689 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00690"></a>00690 
+<a name="l00691"></a><a class="code" href="classMeshRD.html#a47b5e474c1b4db50c65e70ed6e3b4ba6">00691</a> <span class="keywordtype">int</span> <a class="code" href="classMeshRD.html#a47b5e474c1b4db50c65e70ed6e3b4ba6" title="Retreive the dimensionality of the system volume, irrespective of the cells within it...">MeshRD::GetArenaDimensionality</a>()<span class="keyword"> const</span>
+<a name="l00692"></a>00692 <span class="keyword"></span>{
+<a name="l00693"></a>00693     vtkFloatingPointType epsilon = 1e-4;
+<a name="l00694"></a>00694     vtkFloatingPointType *bounds = this-&gt;mesh-&gt;GetBounds();
+<a name="l00695"></a>00695     <span class="keywordtype">int</span> dimensionality = 0;
+<a name="l00696"></a>00696     <span class="keywordflow">for</span>(<span class="keywordtype">int</span> xyz=0;xyz&lt;3;xyz++)
+<a name="l00697"></a>00697         <span class="keywordflow">if</span>(bounds[xyz*2+1]-bounds[xyz*2+0] &gt; epsilon)
+<a name="l00698"></a>00698             dimensionality++;
+<a name="l00699"></a>00699     <span class="keywordflow">return</span> dimensionality;
+<a name="l00700"></a>00700     <span class="comment">// TODO: rotate datasets on input such that if dimensionality=2 then all z=constant, and if dimensionality=1 then all y=constant and all z=constant</span>
 <a name="l00701"></a>00701 }
 <a name="l00702"></a>00702 
-<a name="l00703"></a>00703 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00703"></a>00703 <span class="comment">// ---------------------------------------------------------------------</span>
 <a name="l00704"></a>00704 
-<a name="l00705"></a><a class="code" href="classMeshRD.html#a547cc071fdb4eb7dd0b87bd875488485">00705</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a547cc071fdb4eb7dd0b87bd875488485">MeshRD::CreateCellLocatorIfNeeded</a>()
-<a name="l00706"></a>00706 {
-<a name="l00707"></a>00707     <span class="keywordflow">if</span>(this-&gt;cell_locator) <span class="keywordflow">return</span>;
-<a name="l00708"></a>00708 
-<a name="l00709"></a>00709     this-&gt;cell_locator = vtkCellLocator::New();
-<a name="l00710"></a>00710     this-&gt;cell_locator-&gt;SetDataSet(this-&gt;mesh);
-<a name="l00711"></a>00711     this-&gt;cell_locator-&gt;SetTolerance(0.0001);
-<a name="l00712"></a>00712     this-&gt;cell_locator-&gt;BuildLocator();
-<a name="l00713"></a>00713 }
-<a name="l00714"></a>00714 
-<a name="l00715"></a>00715 <span class="comment">// --------------------------------------------------------------------------------</span>
-<a name="l00716"></a>00716 
-<a name="l00717"></a><a class="code" href="classMeshRD.html#ac31f13c9311735171ef42c03a844ed71">00717</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ac31f13c9311735171ef42c03a844ed71">MeshRD::FlipPaintAction</a>(<a class="code" href="structAbstractRD_1_1PaintAction.html" title="We only allow undo for paint actions.">PaintAction</a>&amp; cca)
-<a name="l00718"></a>00718 {
-<a name="l00719"></a>00719     <span class="keywordtype">float</span> *pCell = vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#ab4c915f3abd6d44726f238730aea6543">iChemical</a>).c_str()))-&gt;GetPointer(cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a4d65cd2ad9005a1313572f3ae2830fa1">iCell</a>);
-<a name="l00720"></a>00720     <span class="keywordtype">float</span> old_val = *pCell;
-<a name="l00721"></a>00721     *pCell = cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a47b986ec9cf333bc0a5690ae286646d8">val</a>;
-<a name="l00722"></a>00722     cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a47b986ec9cf333bc0a5690ae286646d8">val</a> = old_val;
-<a name="l00723"></a>00723     cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a0249e81cc7f51b031d8460b54935c774">done</a> = !cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a0249e81cc7f51b031d8460b54935c774">done</a>;
-<a name="l00724"></a>00724     this-&gt;mesh-&gt;Modified();
-<a name="l00725"></a>00725 }
-<a name="l00726"></a>00726 
-<a name="l00727"></a>00727 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00705"></a><a class="code" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044">00705</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#af034d39dd6300828b40dbd0b878ca044" title="Retrieve the current 2D plane as a vtkImageData.">MeshRD::GetAs2DImage</a>(vtkImageData *out,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)<span class="keyword"> const</span>
+<a name="l00706"></a>00706 <span class="keyword"></span>{
+<a name="l00707"></a>00707     <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;MeshRD::GetAs2DImage() : no 2D image available&quot;</span>);
+<a name="l00708"></a>00708 }
+<a name="l00709"></a>00709 
+<a name="l00710"></a>00710 <span class="comment">// ---------------------------------------------------------------------</span>
+<a name="l00711"></a>00711 
+<a name="l00712"></a><a class="code" href="classMeshRD.html#a93a42775bc5ad5f78333d0ee7aff99a3">00712</a> <span class="keywordtype">float</span> <a class="code" href="classMeshRD.html#a93a42775bc5ad5f78333d0ee7aff99a3" title="Retrieve the value at a given location.">MeshRD::GetValue</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
+<a name="l00713"></a>00713 {
+<a name="l00714"></a>00714     this-&gt;CreateCellLocatorIfNeeded();
+<a name="l00715"></a>00715 
+<a name="l00716"></a>00716     <span class="keywordtype">double</span> p[3]={x,y,z},cp[3],dist2;
+<a name="l00717"></a>00717     vtkIdType iCell;
+<a name="l00718"></a>00718     <span class="keywordtype">int</span> subId;
+<a name="l00719"></a>00719     this-&gt;cell_locator-&gt;FindClosestPoint(p,cp,iCell,subId,dist2);
+<a name="l00720"></a>00720     
+<a name="l00721"></a>00721     <span class="keywordflow">if</span>(iCell&lt;0)
+<a name="l00722"></a>00722         <span class="keywordflow">return</span> 0.0f;
+<a name="l00723"></a>00723 
+<a name="l00724"></a>00724     <span class="keywordtype">int</span> iChemical = <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>());
+<a name="l00725"></a>00725     <span class="keywordflow">return</span> vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChemical).c_str()))-&gt;GetValue(iCell);
+<a name="l00726"></a>00726 }
+<a name="l00727"></a>00727 
+<a name="l00728"></a>00728 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00729"></a>00729 
+<a name="l00730"></a><a class="code" href="classMeshRD.html#ad6092c5c5283a64faf0bfd09e8323086">00730</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ad6092c5c5283a64faf0bfd09e8323086" title="Set the value at a given location.">MeshRD::SetValue</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keywordtype">float</span> val,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
+<a name="l00731"></a>00731 {
+<a name="l00732"></a>00732     this-&gt;CreateCellLocatorIfNeeded();
+<a name="l00733"></a>00733 
+<a name="l00734"></a>00734     <span class="keywordtype">double</span> p[3]={x,y,z},cp[3],dist2;
+<a name="l00735"></a>00735     vtkIdType iCell;
+<a name="l00736"></a>00736     <span class="keywordtype">int</span> subId;
+<a name="l00737"></a>00737     this-&gt;cell_locator-&gt;FindClosestPoint(p,cp,iCell,subId,dist2);
+<a name="l00738"></a>00738     
+<a name="l00739"></a>00739     <span class="keywordflow">if</span>(iCell&lt;0)
+<a name="l00740"></a>00740         <span class="keywordflow">return</span>;
+<a name="l00741"></a>00741 
+<a name="l00742"></a>00742     <span class="keywordtype">int</span> iChemical = <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>());
+<a name="l00743"></a>00743     <span class="keywordtype">float</span> *pCell = vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChemical).c_str()))-&gt;GetPointer(iCell);
+<a name="l00744"></a>00744     this-&gt;StorePaintAction(iChemical,iCell,*pCell);
+<a name="l00745"></a>00745     *pCell = val;
+<a name="l00746"></a>00746     this-&gt;mesh-&gt;Modified();
+<a name="l00747"></a>00747 }
+<a name="l00748"></a>00748 
+<a name="l00749"></a>00749 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00750"></a>00750 
+<a name="l00751"></a><a class="code" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2">00751</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#af69b6e49a8613f8821ba125a32ac93a2" title="Set the value of all cells within radius r of a given location. The radius is expressed as a proporti...">MeshRD::SetValuesInRadius</a>(<span class="keywordtype">float</span> x,<span class="keywordtype">float</span> y,<span class="keywordtype">float</span> z,<span class="keywordtype">float</span> r,<span class="keywordtype">float</span> val,<span class="keyword">const</span> <a class="code" href="classProperties.html" title="A set of Property instances that can be saved/loaded to/from XML.">Properties</a>&amp; render_settings)
+<a name="l00752"></a>00752 {
+<a name="l00753"></a>00753     this-&gt;CreateCellLocatorIfNeeded();
+<a name="l00754"></a>00754 
+<a name="l00755"></a>00755     <span class="keywordtype">double</span> *dataset_bbox = this-&gt;mesh-&gt;GetBounds();
+<a name="l00756"></a>00756     r *= <a class="code" href="utils_8cpp.html#a0e00877e5543b3ab016f0c7c36538f51">hypot3</a>(dataset_bbox[1]-dataset_bbox[0],dataset_bbox[3]-dataset_bbox[2],dataset_bbox[5]-dataset_bbox[4]);
+<a name="l00757"></a>00757 
+<a name="l00758"></a>00758     <span class="keywordtype">double</span> bbox[6]={x-r,x+r,y-r,y+r,z-r,z+r};
+<a name="l00759"></a>00759     vtkSmartPointer&lt;vtkIdList&gt; cells = vtkSmartPointer&lt;vtkIdList&gt;::New();
+<a name="l00760"></a>00760     this-&gt;cell_locator-&gt;FindCellsWithinBounds(bbox,cells);
+<a name="l00761"></a>00761 
+<a name="l00762"></a>00762     <span class="keywordtype">double</span> p[3] = {x,y,z};
+<a name="l00763"></a>00763 
+<a name="l00764"></a>00764     <span class="keywordtype">int</span> iChemical = <a class="code" href="utils_8cpp.html#a68e90099fe736c151fdf42384c533550">IndexFromChemicalName</a>(render_settings.<a class="code" href="classProperties.html#aa17a709349f3898e35bbab16755ee301">GetProperty</a>(<span class="stringliteral">&quot;active_chemical&quot;</span>).<a class="code" href="classProperty.html#a5314323165b98c6305c9c3ec428d36ad">GetChemical</a>());
+<a name="l00765"></a>00765     <span class="keywordflow">for</span>(vtkIdType i=0;i&lt;cells-&gt;GetNumberOfIds();i++)
+<a name="l00766"></a>00766     {
+<a name="l00767"></a>00767         <span class="keywordtype">int</span> iCell = cells-&gt;GetId(i);
+<a name="l00768"></a>00768         vtkIdType npts,*pts;
+<a name="l00769"></a>00769         this-&gt;mesh-&gt;GetCellPoints(iCell,npts,pts);
+<a name="l00770"></a>00770         <span class="comment">// set this cell if any of its points are inside</span>
+<a name="l00771"></a>00771         <span class="keywordflow">for</span>(vtkIdType iPt=0;iPt&lt;npts;iPt++)
+<a name="l00772"></a>00772         {
+<a name="l00773"></a>00773             <span class="keywordflow">if</span>(vtkMath::Distance2BetweenPoints(this-&gt;mesh-&gt;GetPoint(pts[iPt]),p)&lt;r*r)
+<a name="l00774"></a>00774             {
+<a name="l00775"></a>00775                 <span class="keywordtype">float</span> *pCell = vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(iChemical).c_str()))-&gt;GetPointer(iCell);
+<a name="l00776"></a>00776                 this-&gt;StorePaintAction(iChemical,iCell,*pCell);
+<a name="l00777"></a>00777                 *pCell = val;
+<a name="l00778"></a>00778                 <span class="keywordflow">break</span>;
+<a name="l00779"></a>00779             }
+<a name="l00780"></a>00780         }
+<a name="l00781"></a>00781     }
+<a name="l00782"></a>00782     this-&gt;mesh-&gt;Modified();
+<a name="l00783"></a>00783 }
+<a name="l00784"></a>00784 
+<a name="l00785"></a>00785 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00786"></a>00786 
+<a name="l00787"></a><a class="code" href="classMeshRD.html#a547cc071fdb4eb7dd0b87bd875488485">00787</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a547cc071fdb4eb7dd0b87bd875488485">MeshRD::CreateCellLocatorIfNeeded</a>()
+<a name="l00788"></a>00788 {
+<a name="l00789"></a>00789     <span class="keywordflow">if</span>(this-&gt;cell_locator) <span class="keywordflow">return</span>;
+<a name="l00790"></a>00790 
+<a name="l00791"></a>00791     this-&gt;cell_locator = vtkCellLocator::New();
+<a name="l00792"></a>00792     this-&gt;cell_locator-&gt;SetDataSet(this-&gt;mesh);
+<a name="l00793"></a>00793     this-&gt;cell_locator-&gt;SetTolerance(0.0001);
+<a name="l00794"></a>00794     this-&gt;cell_locator-&gt;BuildLocator();
+<a name="l00795"></a>00795 }
+<a name="l00796"></a>00796 
+<a name="l00797"></a>00797 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00798"></a>00798 
+<a name="l00799"></a><a class="code" href="classMeshRD.html#ac31f13c9311735171ef42c03a844ed71">00799</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#ac31f13c9311735171ef42c03a844ed71" title="Undo/redo this paint action.">MeshRD::FlipPaintAction</a>(<a class="code" href="structAbstractRD_1_1PaintAction.html" title="We only allow undo for paint actions.">PaintAction</a>&amp; cca)
+<a name="l00800"></a>00800 {
+<a name="l00801"></a>00801     <span class="keywordtype">float</span> *pCell = vtkFloatArray::SafeDownCast(this-&gt;mesh-&gt;GetCellData()-&gt;GetArray(<a class="code" href="utils_8cpp.html#afd49013680a14bc8e1bfb0c79b80972f" title="a, b, c, ... z, aa, ab, ...">GetChemicalName</a>(cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#ab4c915f3abd6d44726f238730aea6543">iChemical</a>).c_str()))-&gt;GetPointer(cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a4d65cd2ad9005a1313572f3ae2830fa1">iCell</a>);
+<a name="l00802"></a>00802     <span class="keywordtype">float</span> old_val = *pCell;
+<a name="l00803"></a>00803     *pCell = cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a47b986ec9cf333bc0a5690ae286646d8">val</a>;
+<a name="l00804"></a>00804     cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a47b986ec9cf333bc0a5690ae286646d8">val</a> = old_val;
+<a name="l00805"></a>00805     cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a0249e81cc7f51b031d8460b54935c774">done</a> = !cca.<a class="code" href="structAbstractRD_1_1PaintAction.html#a0249e81cc7f51b031d8460b54935c774">done</a>;
+<a name="l00806"></a>00806     this-&gt;mesh-&gt;Modified();
+<a name="l00807"></a>00807 }
+<a name="l00808"></a>00808 
+<a name="l00809"></a>00809 <span class="comment">// --------------------------------------------------------------------------------</span>
+<a name="l00810"></a>00810 
+<a name="l00811"></a><a class="code" href="classMeshRD.html#a825cbe9153f2c3555e9721e816152e09">00811</a> <span class="keywordtype">void</span> <a class="code" href="classMeshRD.html#a825cbe9153f2c3555e9721e816152e09">MeshRD::GetMesh</a>(vtkUnstructuredGrid* mesh)<span class="keyword"> const</span>
+<a name="l00812"></a>00812 <span class="keyword"></span>{
+<a name="l00813"></a>00813     mesh-&gt;DeepCopy(this-&gt;mesh);
+<a name="l00814"></a>00814 }
+<a name="l00815"></a>00815 
+<a name="l00816"></a>00816 <span class="comment">// --------------------------------------------------------------------------------</span>
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

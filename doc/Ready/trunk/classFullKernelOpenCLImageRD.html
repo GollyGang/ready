@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -125,11 +125,12 @@ Inheritance diagram for FullKernelOpenCLImageRD:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aafe86b25452b5db33f76c7377f6d480d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#aafe86b25452b5db33f76c7377f6d480d">FullKernelOpenCLImageRD</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
+<tr class="memitem:aad0fdd17622ac211adb9d1fc7f7e4ece"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#aad0fdd17622ac211adb9d1fc7f7e4ece">FullKernelOpenCLImageRD</a> (const <a class="el" href="classOpenCLImageRD.html">OpenCLImageRD</a> &amp;source)</td></tr>
 <tr class="memitem:a27113a61d97f6b03d70027681f783129"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#a27113a61d97f6b03d70027681f783129">InitializeFromXML</a> (vtkXMLDataElement *rd, bool &amp;warn_to_update)</td></tr>
 <tr class="memdesc:a27113a61d97f6b03d70027681f783129"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load this pattern from an RD element.  <a href="#a27113a61d97f6b03d70027681f783129"></a><br/></td></tr>
-<tr class="memitem:a86dacbe4937b24a3b435ad28ac8c5a3f"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
-&lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">GetAsXML</a> () const </td></tr>
-<tr class="memdesc:a86dacbe4937b24a3b435ad28ac8c5a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a86dacbe4937b24a3b435ad28ac8c5a3f"></a><br/></td></tr>
+<tr class="memitem:a010d86f6ec55e9651340bba9c945739e"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
+&lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#a010d86f6ec55e9651340bba9c945739e">GetAsXML</a> (bool generate_initial_pattern_when_loading) const </td></tr>
+<tr class="memdesc:a010d86f6ec55e9651340bba9c945739e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a010d86f6ec55e9651340bba9c945739e"></a><br/></td></tr>
 <tr class="memitem:a2cc4ba99e7ff66d667a93f0980547dcb"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#a2cc4ba99e7ff66d667a93f0980547dcb">GetRuleType</a> () const </td></tr>
 <tr class="memdesc:a2cc4ba99e7ff66d667a93f0980547dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#a2cc4ba99e7ff66d667a93f0980547dcb"></a><br/></td></tr>
 <tr class="memitem:af3ce0fc05d80d84982379de2eda2ff76"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFullKernelOpenCLImageRD.html#af3ce0fc05d80d84982379de2eda2ff76">HasEditableBlockSize</a> () const </td></tr>
@@ -177,7 +178,26 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00031">31</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00032">32</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aad0fdd17622ac211adb9d1fc7f7e4ece"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classFullKernelOpenCLImageRD.html#aafe86b25452b5db33f76c7377f6d480d">FullKernelOpenCLImageRD::FullKernelOpenCLImageRD</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classOpenCLImageRD.html">OpenCLImageRD</a> &amp;&#160;</td>
+          <td class="paramname"><em>source</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00044">44</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -199,18 +219,19 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7">OpenCL_MixIn</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00043">43</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00069">69</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a86dacbe4937b24a3b435ad28ac8c5a3f"></a>
+<a class="anchor" id="a010d86f6ec55e9651340bba9c945739e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">vtkSmartPointer&lt; vtkXMLDataElement &gt; <a class="el" href="classFullKernelOpenCLImageRD.html#a86dacbe4937b24a3b435ad28ac8c5a3f">FullKernelOpenCLImageRD::GetAsXML</a> </td>
+          <td class="memname">vtkSmartPointer&lt; vtkXMLDataElement &gt; <a class="el" href="classFullKernelOpenCLImageRD.html#a010d86f6ec55e9651340bba9c945739e">FullKernelOpenCLImageRD::GetAsXML</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>generate_initial_pattern_when_loading</em></td><td>)</td>
           <td> const<code> [virtual]</code></td>
         </tr>
       </table>
@@ -219,9 +240,9 @@ Protected Attributes</h2></td></tr>
 
 <p>Retrieve an RD element for this pattern, suitable for saving to file. </p>
 
-<p>Reimplemented from <a class="el" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">AbstractRD</a>.</p>
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#aa4fa71d104747e6845c6e2da9bd725ba">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00075">75</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00101">101</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +264,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a8a7c1f17f119ae853635a88749df89c9">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00036">36</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00037">37</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +284,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#ac1bcfe8ed67ff5e7aee5f9bbdc9903ca">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00037">37</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00038">38</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -283,7 +304,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a5774e36e201b8848cffc75f66b221bdc">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00038">38</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00039">39</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +326,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Implements <a class="el" href="classAbstractRD.html#a6f3719fcbeaae0ac22c6de2af086f078">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00033">33</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00034">34</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -327,7 +348,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#aa0e894e42989321515ea217ad5b0dced">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00035">35</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00036">36</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +381,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a4b3c5316c168951a9d8990ec9832839d">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00050">50</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html#l00076">76</a> of file <a class="el" href="FullKernelOpenCLImageRD_8cpp_source.html">FullKernelOpenCLImageRD.cpp</a>.</p>
 
 </div>
 </div>
@@ -381,7 +402,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a79174c8ada7ce7249b7bdca6f1c34489">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00039">39</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00040">40</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +423,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#ad379a85c4a8a1558cbccd32d8649ee19">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00040">40</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00041">41</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -423,7 +444,7 @@ Protected Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classAbstractRD.html#a5ee3e138bcb3b3f3f37016fd8137092b">AbstractRD</a>.</p>
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00041">41</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00042">42</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +460,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00047">47</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
+<p>Definition at line <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html#l00048">48</a> of file <a class="el" href="FullKernelOpenCLImageRD_8hpp_source.html">FullKernelOpenCLImageRD.hpp</a>.</p>
 
 </div>
 </div>
@@ -451,7 +472,7 @@ Protected Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

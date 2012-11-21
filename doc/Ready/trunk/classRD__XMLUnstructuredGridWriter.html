@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -118,6 +118,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad78ac11f0767260f46a782c785f86f52"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#ad78ac11f0767260f46a782c785f86f52">vtkTypeMacro</a> (<a class="el" href="classRD__XMLUnstructuredGridWriter.html">RD_XMLUnstructuredGridWriter</a>, vtkXMLUnstructuredGridWriter)</td></tr>
 <tr class="memitem:a171c6f276c51418e043a164e81b986e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#a171c6f276c51418e043a164e81b986e3">SetSystem</a> (const <a class="el" href="classMeshRD.html">MeshRD</a> *rd_system)</td></tr>
 <tr class="memitem:a737e27b11c723e7f452b283eec07e7a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#a737e27b11c723e7f452b283eec07e7a1">SetRenderSettings</a> (const <a class="el" href="classProperties.html">Properties</a> *settings)</td></tr>
+<tr class="memitem:adc01fba136033fbcd8e3ec2720e706df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#adc01fba136033fbcd8e3ec2720e706df">GenerateInitialPatternWhenLoading</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa3e2c17a93b52cb7c0fe288107fa2dbf"><td class="memItemLeft" align="right" valign="top">static <br class="typebreak"/>
@@ -134,11 +135,12 @@ Static Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a21ea3a6063bf8d19e59db3b0a54929ab"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classMeshRD.html">MeshRD</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#a21ea3a6063bf8d19e59db3b0a54929ab">system</a></td></tr>
 <tr class="memitem:a8ae493b17fff0e4b8a7ede418d010c80"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classProperties.html">Properties</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#a8ae493b17fff0e4b8a7ede418d010c80">render_settings</a></td></tr>
+<tr class="memitem:a48f74563554d27ef7a6f62585e48942c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRD__XMLUnstructuredGridWriter.html#a48f74563554d27ef7a6f62585e48942c">generate_initial_pattern_when_loading</a></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Used to write vtkUnstructuredGrid to XML, with an added RD section containing rule information. </p>
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00103">103</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00105">105</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2d9198fc759dc5c1f7fb2a4ff9a1563d"></a>
 <div class="memitem">
@@ -154,7 +156,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00115">115</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00118">118</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -173,6 +175,24 @@ Protected Attributes</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="adc01fba136033fbcd8e3ec2720e706df"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classRD__XMLUnstructuredGridWriter.html#adc01fba136033fbcd8e3ec2720e706df">RD_XMLUnstructuredGridWriter::GenerateInitialPatternWhenLoading</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00114">114</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -207,7 +227,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00111">111</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00113">113</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -287,6 +307,21 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="a48f74563554d27ef7a6f62585e48942c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classRD__XMLUnstructuredGridWriter.html#a48f74563554d27ef7a6f62585e48942c">RD_XMLUnstructuredGridWriter::generate_initial_pattern_when_loading</a><code> [protected]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00128">128</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a8ae493b17fff0e4b8a7ede418d010c80"></a>
 <div class="memitem">
 <div class="memproto">
@@ -298,7 +333,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00124">124</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00127">127</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -313,7 +348,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00123">123</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
+<p>Definition at line <a class="el" href="IO__XML_8hpp_source.html#l00126">126</a> of file <a class="el" href="IO__XML_8hpp_source.html">IO_XML.hpp</a>.</p>
 
 </div>
 </div>
@@ -325,7 +360,7 @@ Protected Attributes</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

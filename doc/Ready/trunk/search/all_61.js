@@ -5,7 +5,6 @@ var searchData=
   ['abstractrd_2ecpp',['AbstractRD.cpp',['../AbstractRD_8cpp.html',1,'']]],
   ['abstractrd_2ehpp',['AbstractRD.hpp',['../AbstractRD_8hpp.html',1,'']]],
   ['accelerator',['accelerator',['../prefs_8cpp.html#a53b624a5d80e5a337965fd3952ce80b9',1,'prefs.cpp']]],
-  ['accumulated_5ftime',['accumulated_time',['../classMyFrame.html#a360dd3aca02c684f0b960ffdd87d4c22',1,'MyFrame']]],
   ['action_5fid',['action_id',['../prefs_8hpp.html#a15b03b1d71b001298165979475b1aa62',1,'prefs.hpp']]],
   ['action_5finfo',['action_info',['../structaction__info.html',1,'']]],
   ['action_5fpage',['ACTION_PAGE',['../prefs_8cpp.html#a99fb83031ce9923c84392b4e92f956b5ae6193528cfdfbc97479fe6ef2ff962f6',1,'prefs.cpp']]],
@@ -32,8 +31,7 @@ var searchData=
   ['askonnew',['askonnew',['../prefs_8cpp.html#af99b0c2f2338ed759034777927bd3101',1,'askonnew():&#160;prefs.cpp'],['../prefs_8hpp.html#af99b0c2f2338ed759034777927bd3101',1,'askonnew():&#160;prefs.cpp']]],
   ['askonquit',['askonquit',['../prefs_8cpp.html#a0498f5ccb6ca073727aa39f77e82660b',1,'askonquit():&#160;prefs.cpp'],['../prefs_8hpp.html#a0498f5ccb6ca073727aa39f77e82660b',1,'askonquit():&#160;prefs.cpp']]],
   ['assemblekernelsourcefromformula',['AssembleKernelSourceFromFormula',['../classFormulaOpenCLImageRD.html#a06166b3d9360045c9dd1d23113ec368b',1,'FormulaOpenCLImageRD::AssembleKernelSourceFromFormula()'],['../classFormulaOpenCLMeshRD.html#a0e1e716166edee0856dcda2bd8423a64',1,'FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula()'],['../classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832',1,'FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula()'],['../classFullKernelOpenCLMeshRD.html#a1ee9ef955cbcac6f8199fabea04a3371',1,'FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula()'],['../classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7',1,'OpenCL_MixIn::AssembleKernelSourceFromFormula()']]],
+  ['assign_5fattribute_5ffilter',['assign_attribute_filter',['../classImageRD.html#ac48b41e8b9c200e0802fa4960268d524',1,'ImageRD']]],
   ['aui_5fmgr',['aui_mgr',['../classMyFrame.html#abf9f45d8ca80d5bca40f853dea878e5c',1,'MyFrame']]],
-  ['auilayout',['auilayout',['../prefs_8cpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp'],['../prefs_8hpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp']]],
-  ['ax',['ax',['../structTri.html#a33f4dd72d19b2bf1f6b3e4c1b4eccdd3',1,'Tri']]],
-  ['ay',['ay',['../structTri.html#a8ebb57399125cce54f42601e1f85af35',1,'Tri']]]
+  ['auilayout',['auilayout',['../prefs_8cpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp'],['../prefs_8hpp.html#a9c5a9f65dc02b9e7ed8abef92565e5fa',1,'auilayout():&#160;prefs.cpp']]]
 ];

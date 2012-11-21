@@ -12,6 +12,6 @@ var searchData=
   ['from_5fstring',['from_string',['../utils_8hpp.html#a49577a9b6151e7593a58f0d3bf8ae7e4',1,'utils.hpp']]],
   ['from_5fstring_3c_20std_3a_3astring_20_3e',['from_string< std::string >',['../utils_8hpp.html#a75835a93db57bfeda396606aed5fd989',1,'utils.hpp']]],
   ['from_5fstring_3c_20string_20_3e',['from_string< string >',['../utils_8cpp.html#a0d8bda915f51d8d074abbca6bcb0e565',1,'utils.cpp']]],
-  ['fullkernelopenclimagerd',['FullKernelOpenCLImageRD',['../classFullKernelOpenCLImageRD.html#aafe86b25452b5db33f76c7377f6d480d',1,'FullKernelOpenCLImageRD']]],
-  ['fullkernelopenclmeshrd',['FullKernelOpenCLMeshRD',['../classFullKernelOpenCLMeshRD.html#a67c7998870d5a8a096419da67c294d8e',1,'FullKernelOpenCLMeshRD']]]
+  ['fullkernelopenclimagerd',['FullKernelOpenCLImageRD',['../classFullKernelOpenCLImageRD.html#aafe86b25452b5db33f76c7377f6d480d',1,'FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform, int opencl_device)'],['../classFullKernelOpenCLImageRD.html#aad0fdd17622ac211adb9d1fc7f7e4ece',1,'FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD &amp;source)']]],
+  ['fullkernelopenclmeshrd',['FullKernelOpenCLMeshRD',['../classFullKernelOpenCLMeshRD.html#a67c7998870d5a8a096419da67c294d8e',1,'FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform, int opencl_device)'],['../classFullKernelOpenCLMeshRD.html#aa0d4dd78a8771a0b9f4243f53896973c',1,'FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD &amp;source)']]]
 ];

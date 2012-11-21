@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -99,7 +99,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">MeshGenerators.cpp File Reference</div>  </div>
 </div><!--header-->
@@ -116,24 +118,115 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;vtkTransform.h&gt;</code><br/>
 <code>#include &lt;vtkTransformPolyDataFilter.h&gt;</code><br/>
 <code>#include &lt;vtkCellData.h&gt;</code><br/>
+<code>#include &lt;vtkDelaunay2D.h&gt;</code><br/>
 <code>#include &lt;vtkDelaunay3D.h&gt;</code><br/>
 <code>#include &lt;vtkCellArray.h&gt;</code><br/>
+<code>#include &lt;vtkTriangle.h&gt;</code><br/>
+<code>#include &lt;vtkGenericCell.h&gt;</code><br/>
+<code>#include &lt;vtkCleanPolyData.h&gt;</code><br/>
+<code>#include &lt;vtkAppendFilter.h&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
+<code>#include &lt;math.h&gt;</code><br/>
 </div>
 <p><a href="MeshGenerators_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTri.html">Tri</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A two-dimensional triangle, used in MeshRD::GetPenroseRhombiTiling().  <a href="structTri.html#details">More...</a><br/></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTriIndices.html">TriIndices</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The indices of a triangle, used in MeshRD::GetPenroseRhombiTiling().  <a href="structTriIndices.html#details">More...</a><br/></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A two-dimensional triangle, used in <a class="el" href="namespaceMeshGenerators.html#af2bb69dc1c3a600123649b5e2f7b76f4" title="Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).">MeshRD::GetPenroseTiling()</a>.  <a href="structTri.html#details">More...</a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:af3dea1438401976919d0165996a35a3e"><td class="memItemLeft" align="right" valign="top">typedef map&lt; pair&lt; int, int &gt;<br class="typebreak"/>
+, int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MeshGenerators_8cpp.html#af3dea1438401976919d0165996a35a3e">TPairIndex</a></td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a6ce5039403ccbd3da16d27f7d204b212"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MeshGenerators_8cpp.html#a6ce5039403ccbd3da16d27f7d204b212">SplitEdge</a> (const <a class="el" href="structTri.html">Tri</a> &amp;tri, int i1, int i2, double &amp;x, double &amp;y, <a class="el" href="MeshGenerators_8cpp.html#af3dea1438401976919d0165996a35a3e">TPairIndex</a> &amp;edge_splits, vtkPoints *pts)</td></tr>
+<tr class="memdesc:a6ce5039403ccbd3da16d27f7d204b212"><td class="mdescLeft">&#160;</td><td class="mdescRight">For accessing an int by an ordered pair of ints.  <a href="#a6ce5039403ccbd3da16d27f7d204b212"></a><br/></td></tr>
 </table>
+<hr/><h2>Typedef Documentation</h2>
+<a class="anchor" id="af3dea1438401976919d0165996a35a3e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef map&lt;pair&lt;int,int&gt;,int&gt; <a class="el" href="MeshGenerators_8cpp.html#af3dea1438401976919d0165996a35a3e">TPairIndex</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00337">337</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
+
+</div>
+</div>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="a6ce5039403ccbd3da16d27f7d204b212"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="MeshGenerators_8cpp.html#a6ce5039403ccbd3da16d27f7d204b212">SplitEdge</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structTri.html">Tri</a> &amp;&#160;</td>
+          <td class="paramname"><em>tri</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double &amp;&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="MeshGenerators_8cpp.html#af3dea1438401976919d0165996a35a3e">TPairIndex</a> &amp;&#160;</td>
+          <td class="paramname"><em>edge_splits</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vtkPoints *&#160;</td>
+          <td class="paramname"><em>pts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>For accessing an int by an ordered pair of ints. </p>
+<p>Insert a new point between the points, unless one already exists. </p>
+
+<p>Definition at line <a class="el" href="MeshGenerators_8cpp_source.html#l00340">340</a> of file <a class="el" href="MeshGenerators_8cpp_source.html">MeshGenerators.cpp</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

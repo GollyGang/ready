@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aefee61beae9ddefeeab5832ef3654b9a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#aefee61beae9ddefeeab5832ef3654b9a">FormulaOpenCLMeshRD</a> (int <a class="el" href="prefs_8hpp.html#a0de6a378ca700dd877cab59c65ba2f7b">opencl_platform</a>, int <a class="el" href="prefs_8hpp.html#a11d0cbab21425e351638f4bf2cc72874">opencl_device</a>)</td></tr>
 <tr class="memitem:af922159bcfd584bfd286617bd1f627b1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#af922159bcfd584bfd286617bd1f627b1">InitializeFromXML</a> (vtkXMLDataElement *rd, bool &amp;warn_to_update)</td></tr>
 <tr class="memdesc:af922159bcfd584bfd286617bd1f627b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load this pattern from an RD element.  <a href="#af922159bcfd584bfd286617bd1f627b1"></a><br/></td></tr>
-<tr class="memitem:a16224a57fe0beb33dd387b35ae2170f4"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
-&lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">GetAsXML</a> () const </td></tr>
-<tr class="memdesc:a16224a57fe0beb33dd387b35ae2170f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a16224a57fe0beb33dd387b35ae2170f4"></a><br/></td></tr>
+<tr class="memitem:a2c88deba784d04e6313e0123215ef3f5"><td class="memItemLeft" align="right" valign="top">virtual vtkSmartPointer<br class="typebreak"/>
+&lt; vtkXMLDataElement &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a2c88deba784d04e6313e0123215ef3f5">GetAsXML</a> (bool generate_initial_pattern_when_loading) const </td></tr>
+<tr class="memdesc:a2c88deba784d04e6313e0123215ef3f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve an RD element for this pattern, suitable for saving to file.  <a href="#a2c88deba784d04e6313e0123215ef3f5"></a><br/></td></tr>
 <tr class="memitem:ac889d885056a20510e6bb7b828080fe1"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#ac889d885056a20510e6bb7b828080fe1">GetRuleType</a> () const </td></tr>
 <tr class="memdesc:ac889d885056a20510e6bb7b828080fe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns e.g. "inbuilt", "formula", "kernel", as in the XML.  <a href="#ac889d885056a20510e6bb7b828080fe1"></a><br/></td></tr>
 <tr class="memitem:a0e1e716166edee0856dcda2bd8423a64"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFormulaOpenCLMeshRD.html#a0e1e716166edee0856dcda2bd8423a64">AssembleKernelSourceFromFormula</a> (std::string <a class="el" href="classAbstractRD.html#a5de0dccd7c065447c057e5fc46ac9e4c">formula</a>) const </td></tr>
@@ -266,14 +266,15 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a16224a57fe0beb33dd387b35ae2170f4"></a>
+<a class="anchor" id="a2c88deba784d04e6313e0123215ef3f5"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">vtkSmartPointer&lt; vtkXMLDataElement &gt; <a class="el" href="classFormulaOpenCLMeshRD.html#a16224a57fe0beb33dd387b35ae2170f4">FormulaOpenCLMeshRD::GetAsXML</a> </td>
+          <td class="memname">vtkSmartPointer&lt; vtkXMLDataElement &gt; <a class="el" href="classFormulaOpenCLMeshRD.html#a2c88deba784d04e6313e0123215ef3f5">FormulaOpenCLMeshRD::GetAsXML</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>generate_initial_pattern_when_loading</em></td><td>)</td>
           <td> const<code> [virtual]</code></td>
         </tr>
       </table>
@@ -282,7 +283,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Retrieve an RD element for this pattern, suitable for saving to file. </p>
 
-<p>Reimplemented from <a class="el" href="classAbstractRD.html#a8f9f1e2f5cd91b445e898dc5a8f1ce4b">AbstractRD</a>.</p>
+<p>Reimplemented from <a class="el" href="classAbstractRD.html#aa4fa71d104747e6845c6e2da9bd725ba">AbstractRD</a>.</p>
 
 <p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html#l00120">120</a> of file <a class="el" href="FormulaOpenCLMeshRD_8cpp_source.html">FormulaOpenCLMeshRD.cpp</a>.</p>
 
@@ -304,7 +305,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Returns e.g. "inbuilt", "formula", "kernel", as in the XML. </p>
 
-<p>Reimplemented from <a class="el" href="classMeshRD.html#a5f62de46848365e6d77e6ea1b7cc23d6">MeshRD</a>.</p>
+<p>Implements <a class="el" href="classAbstractRD.html#a6f3719fcbeaae0ac22c6de2af086f078">AbstractRD</a>.</p>
 
 <p>Definition at line <a class="el" href="FormulaOpenCLMeshRD_8hpp_source.html#l00031">31</a> of file <a class="el" href="FormulaOpenCLMeshRD_8hpp_source.html">FormulaOpenCLMeshRD.hpp</a>.</p>
 
@@ -413,7 +414,7 @@ Public Member Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

@@ -3,7 +3,8 @@ var searchData=
   ['s',['s',['../classProperty.html#ad838986d1cd14d2045b5540049ad0776',1,'Property']]],
   ['s2vgap',['S2VGAP',['../prefs_8cpp.html#a3c154b751ab3f1fe314373fc26a04359',1,'prefs.cpp']]],
   ['savechanges',['SaveChanges',['../wxutils_8cpp.html#aba71c60bf2fbed7083e7f571655e41f7',1,'SaveChanges(const wxString &amp;query, const wxString &amp;msg):&#160;wxutils.cpp'],['../wxutils_8hpp.html#aba71c60bf2fbed7083e7f571655e41f7',1,'SaveChanges(const wxString &amp;query, const wxString &amp;msg):&#160;wxutils.cpp']]],
-  ['savefile',['SaveFile',['../classMyFrame.html#a610f889b7182018a80c927d4ea93897d',1,'MyFrame::SaveFile()'],['../classAbstractRD.html#a77c2f176da53d7c5b3dbb322a8910d68',1,'AbstractRD::SaveFile()'],['../classImageRD.html#a028dcdf21770403484968c23e0ac4bc6',1,'ImageRD::SaveFile()'],['../classMeshRD.html#ab9f7b46d789bcc4547031322019d496f',1,'MeshRD::SaveFile()']]],
+  ['savecompact',['SaveCompact',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a2c5649daaae4234b59b797dc8a21c9d0',1,'ID']]],
+  ['savefile',['SaveFile',['../classMyFrame.html#a610f889b7182018a80c927d4ea93897d',1,'MyFrame::SaveFile()'],['../classAbstractRD.html#a82243e893a7e528cb809524eb8512052',1,'AbstractRD::SaveFile()'],['../classImageRD.html#a511ce61a338fb5b24968735c1d3d209d',1,'ImageRD::SaveFile()'],['../classMeshRD.html#a913fa39007a4a913180dcbfea1bab50d',1,'MeshRD::SaveFile()']]],
   ['savekeyactions',['SaveKeyActions',['../prefs_8cpp.html#a9a4e48379de2b0a84470f8dee26e1d48',1,'prefs.cpp']]],
   ['savepatterndialog',['SavePatternDialog',['../classMyFrame.html#a68e2ef8eac733779aff5b7028dc8c6be',1,'MyFrame']]],
   ['saveprefs',['SavePrefs',['../prefs_8cpp.html#a36a6fcc2c220a813bd9f3057c8c8bfc1',1,'SavePrefs():&#160;prefs.cpp'],['../prefs_8hpp.html#a36a6fcc2c220a813bd9f3057c8c8bfc1',1,'SavePrefs():&#160;prefs.cpp']]],
@@ -71,9 +72,12 @@ var searchData=
   ['slower',['Slower',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a9ec4f0f78fdccdd3937c37932871cb31',1,'ID']]],
   ['smallerbutt',['smallerbutt',['../classHelpPanel.html#a4134242fe50ad04a945545dc5ab9ed13',1,'HelpPanel::smallerbutt()'],['../classInfoPanel.html#a6c03d8b0f1506ec4dd203acd37eddfc9',1,'InfoPanel::smallerbutt()']]],
   ['smallerbutton',['SmallerButton',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ab5c578aacce9be529d49fe03e90418dd',1,'ID']]],
+  ['smoothed_5ftimesteps_5fper_5fsecond',['smoothed_timesteps_per_second',['../classMyFrame.html#aa2a725b069d0f955d6fb662da887a843',1,'MyFrame']]],
   ['source_5fcombo',['source_combo',['../classRecordingDialog.html#a51880f96ecb8ad37a89397d2202a5408',1,'RecordingDialog']]],
+  ['speed_5fdata_5favailable',['speed_data_available',['../classMyFrame.html#ad141a0c6f416f732fb5583216ddbcdd4',1,'MyFrame']]],
   ['spinctrl',['spinctrl',['../classIntegerDialog.html#a6674b363f835e39f9a15762893c8c752',1,'IntegerDialog']]],
   ['spingap',['SPINGAP',['../prefs_8cpp.html#abb3823efd580f7e48b3a7ed59f34834b',1,'prefs.cpp']]],
+  ['splitedge',['SplitEdge',['../MeshGenerators_8cpp.html#a6ce5039403ccbd3da16d27f7d204b212',1,'MeshGenerators.cpp']]],
   ['start',['Start',['../classwxVTKRenderWindowInteractor.html#a154624253e91687569dcdbedf8144207',1,'wxVTKRenderWindowInteractor']]],
   ['starting_5fpattern',['starting_pattern',['../classImageRD.html#a8df1b398168acbeaa5edf06f8ff4cc97',1,'ImageRD::starting_pattern()'],['../classMeshRD.html#a72da64fb3411931d74a0829a812865a7',1,'MeshRD::starting_pattern()']]],
   ['status',['status',['../classHelpPanel.html#a18c272c20a0e3466c680d1cb5eb331b4',1,'HelpPanel::status()'],['../classInfoPanel.html#a7ffc2a2563319eddd841f9cf3bd2ca41',1,'InfoPanel::status()']]],
@@ -88,5 +92,8 @@ var searchData=
   ['stringdialog',['StringDialog',['../classStringDialog.html',1,'StringDialog'],['../classStringDialog.html#a25f773fd8a028a4e72722e8eed4e7893',1,'StringDialog::StringDialog()']]],
   ['subtract',['Subtract',['../classSubtract.html',1,'Subtract'],['../classSubtract.html#a7d7d515a60f3285c37918050722beaa4',1,'Subtract::Subtract()']]],
   ['svgap',['SVGAP',['../prefs_8cpp.html#a595c2f3398f657c9ee6109d30dc0ec28',1,'prefs.cpp']]],
-  ['system',['system',['../classMyFrame.html#aa0cf2515778738aa537052a169bc34f1',1,'MyFrame::system()'],['../classRD__XMLImageWriter.html#a266bcb01f93565b76d5e32daf6790983',1,'RD_XMLImageWriter::system()'],['../classRD__XMLUnstructuredGridWriter.html#a21ea3a6063bf8d19e59db3b0a54929ab',1,'RD_XMLUnstructuredGridWriter::system()']]]
+  ['system',['system',['../classMyFrame.html#aa0cf2515778738aa537052a169bc34f1',1,'MyFrame::system()'],['../classRD__XMLImageWriter.html#a266bcb01f93565b76d5e32daf6790983',1,'RD_XMLImageWriter::system()'],['../classRD__XMLUnstructuredGridWriter.html#a21ea3a6063bf8d19e59db3b0a54929ab',1,'RD_XMLUnstructuredGridWriter::system()']]],
+  ['systemfactory',['SystemFactory',['../namespaceSystemFactory.html',1,'']]],
+  ['systemfactory_2ecpp',['SystemFactory.cpp',['../SystemFactory_8cpp.html',1,'']]],
+  ['systemfactory_2ehpp',['SystemFactory.hpp',['../SystemFactory_8hpp.html',1,'']]]
 ];

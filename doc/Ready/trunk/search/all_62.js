@@ -14,13 +14,16 @@ var searchData=
   ['blankimage',['BlankImage',['../classAbstractRD.html#a15ee19303ed2801df202ac29c6ea3534',1,'AbstractRD::BlankImage()'],['../classImageRD.html#a0e392b4ad19a659dd8f2fcc0f54c1de0',1,'ImageRD::BlankImage()'],['../classMeshRD.html#ad20d6bc116d28e97b42f4718e6ab6c91',1,'MeshRD::BlankImage()'],['../classOpenCLImageRD.html#aaae51563604b6a0dfd32c170cdad5c34',1,'OpenCLImageRD::BlankImage()'],['../classOpenCLMeshRD.html#af8c9f3cfb3e74368f4d632c53009b78e',1,'OpenCLMeshRD::BlankImage()']]],
   ['block_5fsize',['block_size',['../classFullKernelOpenCLImageRD.html#ad49c0662612b8a198860d212afb75ab1',1,'FullKernelOpenCLImageRD']]],
   ['block_5fsize_5flabel',['block_size_label',['../InfoPanel_8cpp.html#a35021f1f9df3867cb007729783d3c987',1,'InfoPanel.cpp']]],
+  ['boundary_5fsize',['BOUNDARY_SIZE',['../classAbstractRD.html#a81fd5371f651c3cf9e2d7251db538e47a71097e66a58baa3f95af4bea93448513',1,'AbstractRD']]],
   ['brush',['BRUSH',['../classMyFrame.html#a0b64967ace9157e00513aa5a2ef9cc4ca185a2aa8e290376b90a7a4017d0775d7',1,'MyFrame::BRUSH()'],['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ae24daf0234d06276c8961d3acf28c098',1,'ID::Brush()']]],
   ['brush_5fcursor',['brush_cursor',['../classMyFrame.html#a7c142f3f370721b63d285c8bdaf85b76',1,'MyFrame']]],
+  ['brush_5fsizes',['brush_sizes',['../classMyFrame.html#aedb5b52cad08b17ad1fe35610746c1b4',1,'MyFrame']]],
+  ['brushsizelarge',['BrushSizeLarge',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994ae4e0fee132afd2e09798c77f75038714',1,'ID']]],
+  ['brushsizemedium',['BrushSizeMedium',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994a7a2763dca86bc0253e7b4a253434a039',1,'ID']]],
+  ['brushsizesmall',['BrushSizeSmall',['../namespaceID.html#ab9317ede1ebbe3a57796376e8f91d994adca7a0aea851c440ede3506c0e32260f',1,'ID']]],
   ['buffer',['buffer',['../classGrayScottMeshRD.html#aaee5af55bfdfb922a469364ebc2f8415',1,'GrayScottMeshRD']]],
   ['buffer_5fimages',['buffer_images',['../classGrayScottImageRD.html#a56c534592723311d74e2b4563fef4a76',1,'GrayScottImageRD']]],
   ['buffers',['buffers',['../classOpenCL__MixIn.html#a5993289f0899f71b4447d9c8821d0508',1,'OpenCL_MixIn']]],
   ['buildrdsystemxml',['BuildRDSystemXML',['../classRD__XMLImageWriter.html#ae4c22ce9e1e34259668fe41d85204566',1,'RD_XMLImageWriter::BuildRDSystemXML()'],['../classRD__XMLUnstructuredGridWriter.html#a8b8d5f760dc240a3aa6573483cca0538',1,'RD_XMLUnstructuredGridWriter::BuildRDSystemXML()']]],
-  ['buildtree',['BuildTree',['../classPatternsPanel.html#a77334ca07f14ac2cde43f244a3361686',1,'PatternsPanel']]],
-  ['bx',['bx',['../structTri.html#a6788d0a7dc0332ad74caffe90f4fc7b8',1,'Tri']]],
-  ['by',['by',['../structTri.html#afe4677e191f5fb8c279eccfaa63c879e',1,'Tri']]]
+  ['buildtree',['BuildTree',['../classPatternsPanel.html#a77334ca07f14ac2cde43f244a3361686',1,'PatternsPanel']]]
 ];

@@ -2,6 +2,8 @@ var searchData=
 [
   ['m_5ftextctrl',['m_textctrl',['../classMultiLineDialog.html#acadebca990a85013511a69c99214f323',1,'MultiLineDialog']]],
   ['m_5fvalue',['m_value',['../classMultiLineDialog.html#ad6df713376e5d354c61ddcf0a4d2abd2',1,'MultiLineDialog']]],
+  ['main',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
+  ['main_2ecpp',['main.cpp',['../main_8cpp.html',1,'']]],
   ['mainht',['mainht',['../prefs_8cpp.html#afd8ee1110367c04cc21e2219607b7a7b',1,'mainht():&#160;prefs.cpp'],['../prefs_8hpp.html#afd8ee1110367c04cc21e2219607b7a7b',1,'mainht():&#160;prefs.cpp']]],
   ['mainwd',['mainwd',['../prefs_8cpp.html#a7b08ad54bec54f213c5ed4c1d8749548',1,'mainwd():&#160;prefs.cpp'],['../prefs_8hpp.html#a7b08ad54bec54f213c5ed4c1d8749548',1,'mainwd():&#160;prefs.cpp']]],
   ['mainx',['mainx',['../prefs_8cpp.html#a26b11189d93fef33172f1a2a1d174188',1,'mainx():&#160;prefs.cpp'],['../prefs_8hpp.html#a26b11189d93fef33172f1a2a1d174188',1,'mainx():&#160;prefs.cpp']]],
@@ -23,7 +25,6 @@ var searchData=
   ['meshrd',['MeshRD',['../classMeshRD.html',1,'MeshRD'],['../classMeshRD.html#a68cf2323732499b29f26d19bd938fa08',1,'MeshRD::MeshRD()'],['../classMeshRD.html#a7548fe855507da6ee11311989f21555c',1,'MeshRD::MeshRD(MeshRD &amp;)']]],
   ['meshrd_2ecpp',['MeshRD.cpp',['../MeshRD_8cpp.html',1,'']]],
   ['meshrd_2ehpp',['MeshRD.hpp',['../MeshRD_8hpp.html',1,'']]],
-  ['million_5fcell_5fgenerations_5fper_5fsecond',['million_cell_generations_per_second',['../classMyFrame.html#a55a8b53a73aa2c3704f0e9ff7cc8fe7a',1,'MyFrame']]],
   ['minfontsize',['minfontsize',['../prefs_8hpp.html#ab9bb4307b077f19442247557845c3535',1,'prefs.hpp']]],
   ['minint',['minint',['../classIntegerDialog.html#aa240524023db6960f14bb19d77dda901',1,'IntegerDialog']]],
   ['minmainht',['minmainht',['../prefs_8cpp.html#ad39746c614087b9de8d0dbc68bc14816',1,'prefs.cpp']]],

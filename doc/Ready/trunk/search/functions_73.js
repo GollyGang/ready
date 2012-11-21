@@ -1,7 +1,7 @@
 var searchData=
 [
   ['savechanges',['SaveChanges',['../wxutils_8cpp.html#aba71c60bf2fbed7083e7f571655e41f7',1,'SaveChanges(const wxString &amp;query, const wxString &amp;msg):&#160;wxutils.cpp'],['../wxutils_8hpp.html#aba71c60bf2fbed7083e7f571655e41f7',1,'SaveChanges(const wxString &amp;query, const wxString &amp;msg):&#160;wxutils.cpp']]],
-  ['savefile',['SaveFile',['../classMyFrame.html#a610f889b7182018a80c927d4ea93897d',1,'MyFrame::SaveFile()'],['../classAbstractRD.html#a77c2f176da53d7c5b3dbb322a8910d68',1,'AbstractRD::SaveFile()'],['../classImageRD.html#a028dcdf21770403484968c23e0ac4bc6',1,'ImageRD::SaveFile()'],['../classMeshRD.html#ab9f7b46d789bcc4547031322019d496f',1,'MeshRD::SaveFile()']]],
+  ['savefile',['SaveFile',['../classMyFrame.html#a610f889b7182018a80c927d4ea93897d',1,'MyFrame::SaveFile()'],['../classAbstractRD.html#a82243e893a7e528cb809524eb8512052',1,'AbstractRD::SaveFile()'],['../classImageRD.html#a511ce61a338fb5b24968735c1d3d209d',1,'ImageRD::SaveFile()'],['../classMeshRD.html#a913fa39007a4a913180dcbfea1bab50d',1,'MeshRD::SaveFile()']]],
   ['savekeyactions',['SaveKeyActions',['../prefs_8cpp.html#a9a4e48379de2b0a84470f8dee26e1d48',1,'prefs.cpp']]],
   ['savepatterndialog',['SavePatternDialog',['../classMyFrame.html#a68e2ef8eac733779aff5b7028dc8c6be',1,'MyFrame']]],
   ['saveprefs',['SavePrefs',['../prefs_8cpp.html#a36a6fcc2c220a813bd9f3057c8c8bfc1',1,'SavePrefs():&#160;prefs.cpp'],['../prefs_8hpp.html#a36a6fcc2c220a813bd9f3057c8c8bfc1',1,'SavePrefs():&#160;prefs.cpp']]],
@@ -54,6 +54,7 @@ var searchData=
   ['showaboutbox',['ShowAboutBox',['../HelpPanel_8cpp.html#a69114324160abe189b7412b8a56308f9',1,'ShowAboutBox():&#160;HelpPanel.cpp'],['../HelpPanel_8hpp.html#a69114324160abe189b7412b8a56308f9',1,'ShowAboutBox():&#160;HelpPanel.cpp']]],
   ['showhelp',['ShowHelp',['../classHelpPanel.html#a1c53b5bfd2b184c19c13d1783d5445c1',1,'HelpPanel']]],
   ['showprefsdialog',['ShowPrefsDialog',['../classMyFrame.html#ad8e839562e6445a7c23a31b45985cdab',1,'MyFrame']]],
+  ['splitedge',['SplitEdge',['../MeshGenerators_8cpp.html#a6ce5039403ccbd3da16d27f7d204b212',1,'MeshGenerators.cpp']]],
   ['start',['Start',['../classwxVTKRenderWindowInteractor.html#a154624253e91687569dcdbedf8144207',1,'wxVTKRenderWindowInteractor']]],
   ['storepaintaction',['StorePaintAction',['../classAbstractRD.html#aff3b271917b720fcdcc4faebfcaaf016',1,'AbstractRD']]],
   ['stringdialog',['StringDialog',['../classStringDialog.html#a25f773fd8a028a4e72722e8eed4e7893',1,'StringDialog']]],

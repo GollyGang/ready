@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Ready
-   &#160;<span id="projectnumber">0.4</span>
+   &#160;<span id="projectnumber">0.5</span>
    </div>
    <div id="projectbrief">A cross-platform implementation of various reaction-diffusion systems.</div>
   </td>
@@ -128,29 +128,44 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00024"></a>00024 <span class="comment">    /// Subdivides an icosahedron to get a sphere evenly covered with triangles.</span>
 <a name="l00025"></a>00025 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#ab6a64909fa2806c0f4fc1a481686b153" title="Subdivides an icosahedron to get a sphere evenly covered with triangles.">GetGeodesicSphere</a>(<span class="keywordtype">int</span> n_subdivisions,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
 <a name="l00026"></a>00026 <span class="comment"></span>
-<a name="l00027"></a>00027 <span class="comment">    /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.</span>
-<a name="l00028"></a>00028 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a82f55cad06fde1c843ca2632265a10ab" title="Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.">GetTetrahedralMesh</a>(<span class="keywordtype">int</span> n_points,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00027"></a>00027 <span class="comment">    /// Subdivides a torus with quadrilaterals.</span>
+<a name="l00028"></a>00028 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#ad54c367c9b1ebadbcdc980212b647ebd" title="Subdivides a torus with quadrilaterals.">GetTorus</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
 <a name="l00029"></a>00029 <span class="comment"></span>
-<a name="l00030"></a>00030 <span class="comment">    /// Subdivides a torus with quadrilaterals.</span>
-<a name="l00031"></a>00031 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#ad54c367c9b1ebadbcdc980212b647ebd" title="Subdivides a torus with quadrilaterals.">GetTorus</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00030"></a>00030 <span class="comment">    /// Makes a planar mesh of triangles.</span>
+<a name="l00031"></a>00031 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a5998e324113ab7eec361ac6cb7944103" title="Makes a planar mesh of triangles.">GetTriangularMesh</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
 <a name="l00032"></a>00032 <span class="comment"></span>
-<a name="l00033"></a>00033 <span class="comment">    /// Makes a planar mesh of triangles.</span>
-<a name="l00034"></a>00034 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a5998e324113ab7eec361ac6cb7944103" title="Makes a planar mesh of triangles.">GetTriangularMesh</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00033"></a>00033 <span class="comment">    /// Makes a planar mesh of hexagons.</span>
+<a name="l00034"></a>00034 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a2786a507f59b9020da8b92fb2aa3a074" title="Makes a planar mesh of hexagons.">GetHexagonalMesh</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
 <a name="l00035"></a>00035 <span class="comment"></span>
-<a name="l00036"></a>00036 <span class="comment">    /// Makes a planar mesh of hexagons.</span>
-<a name="l00037"></a>00037 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a2786a507f59b9020da8b92fb2aa3a074" title="Makes a planar mesh of hexagons.">GetHexagonalMesh</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00036"></a>00036 <span class="comment">    /// Makes a planar mesh using the rhombille tiling.</span>
+<a name="l00037"></a>00037 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#aec0d732a464d810896e08c4a3047872b" title="Makes a planar mesh using the rhombille tiling.">GetRhombilleTiling</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
 <a name="l00038"></a>00038 <span class="comment"></span>
-<a name="l00039"></a>00039 <span class="comment">    /// Makes a planar mesh using the rhombille tiling.</span>
-<a name="l00040"></a>00040 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#aec0d732a464d810896e08c4a3047872b" title="Makes a planar mesh using the rhombille tiling.">GetRhombilleTiling</a>(<span class="keywordtype">int</span> nx,<span class="keywordtype">int</span> ny,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00039"></a>00039 <span class="comment">    /// Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).</span>
+<a name="l00040"></a>00040 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#af2bb69dc1c3a600123649b5e2f7b76f4" title="Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).">GetPenroseTiling</a>(<span class="keywordtype">int</span> n_subdivisions,<span class="keywordtype">int</span> type,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
 <a name="l00041"></a>00041 <span class="comment"></span>
-<a name="l00042"></a>00042 <span class="comment">    /// Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).</span>
-<a name="l00043"></a>00043 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#af2bb69dc1c3a600123649b5e2f7b76f4" title="Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).">GetPenroseTiling</a>(<span class="keywordtype">int</span> n_subdivisions,<span class="keywordtype">int</span> type,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
-<a name="l00044"></a>00044 }
+<a name="l00042"></a>00042 <span class="comment">    /// Make a 2D Delaunay triangulation from a random set of points</span>
+<a name="l00043"></a>00043 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a0b8a6cf24f5b9279de24cc26de81ca2f" title="Make a 2D Delaunay triangulation from a random set of points.">GetRandomDelaunay2D</a>(<span class="keywordtype">int</span> n_points,vtkUnstructuredGrid *mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00044"></a>00044 <span class="comment"></span>
+<a name="l00045"></a>00045 <span class="comment">    /// Make a 2D Voronoi mesh from a random set of points</span>
+<a name="l00046"></a>00046 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a160816ec2c63255e61f324db9f267ab9" title="Make a 2D Voronoi mesh from a random set of points.">GetRandomVoronoi2D</a>(<span class="keywordtype">int</span> n_points,vtkUnstructuredGrid *mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00047"></a>00047 <span class="comment"></span>
+<a name="l00048"></a>00048 <span class="comment">    /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.</span>
+<a name="l00049"></a>00049 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#ae776563bc2d8ffaf1447a018b9b81393" title="Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.">GetRandomDelaunay3D</a>(<span class="keywordtype">int</span> n_points,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00050"></a>00050 <span class="comment"></span>
+<a name="l00051"></a>00051 <span class="comment">    /// Make a honeycomb from truncated octahedra.</span>
+<a name="l00052"></a>00052 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a6d73375e5834c6e6776e2b13136ad367" title="Make a honeycomb from truncated octahedra.">GetBodyCentredCubicHoneycomb</a>(<span class="keywordtype">int</span> side,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00053"></a>00053 <span class="comment"></span>
+<a name="l00054"></a>00054 <span class="comment">    /// Make a honeycomb from rhombic dodecahedra.</span>
+<a name="l00055"></a>00055 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a6a5a268bf80f4225456e50c324107c1f" title="Make a honeycomb from rhombic dodecahedra.">GetFaceCentredCubicHoneycomb</a>(<span class="keywordtype">int</span> side,vtkUnstructuredGrid* mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00056"></a>00056 <span class="comment"></span>
+<a name="l00057"></a>00057 <span class="comment">    /// Make triakis truncated tetrahedra - the Voronoi cells of the carbon atoms in a diamond lattice.</span>
+<a name="l00058"></a>00058 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="namespaceMeshGenerators.html#a47b0290a986ddb33e2ec6549d771a796" title="Make triakis truncated tetrahedra - the Voronoi cells of the carbon atoms in a diamond lattice...">GetDiamondCells</a>(<span class="keywordtype">int</span> side,vtkUnstructuredGrid *mesh,<span class="keywordtype">int</span> n_chems);
+<a name="l00059"></a>00059 }
 </pre></div></div><!-- contents -->
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 31 2012 14:05:48 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 21 2012 17:35:47 for Ready by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

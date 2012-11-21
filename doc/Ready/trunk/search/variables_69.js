@@ -1,6 +1,7 @@
 var searchData=
 [
   ['i',['i',['../classProperty.html#a8f9da0113de384c3d40eedfc61a8ee50',1,'Property']]],
+  ['i_5ftimesteps_5fper_5fsecond_5fbuffer',['i_timesteps_per_second_buffer',['../classMyFrame.html#ad22f848dd60691a5374863e202cc02ed',1,'MyFrame']]],
   ['icell',['iCell',['../structAbstractRD_1_1PaintAction.html#a4d65cd2ad9005a1313572f3ae2830fa1',1,'AbstractRD::PaintAction']]],
   ['ichemical',['iChemical',['../structAbstractRD_1_1PaintAction.html#ab4c915f3abd6d44726f238730aea6543',1,'AbstractRD::PaintAction']]],
   ['icons_5ffolder',['icons_folder',['../classMyFrame.html#adb7b9ae9a9d0016375da17e64f8a93ab',1,'MyFrame']]],
@@ -28,7 +29,7 @@ var searchData=
   ['image_5fchannel_5forder',['image_channel_order',['../struct__cl__image__format.html#aaedf0bf00bd2b217e865cad706bfad02',1,'_cl_image_format']]],
   ['images',['images',['../classImageRD.html#adba4679bca0840937c0837bf2e7d787d',1,'ImageRD']]],
   ['inabout',['inAbout',['../classHtmlView.html#a279253185a7a24d90f91e8a44c4259b8',1,'HtmlView']]],
-  ['ind',['ind',['../structTriIndices.html#a7cc99617e4e4a1c85c6093556087f025',1,'TriIndices']]],
+  ['index',['index',['../structTri.html#ad48c6cb3168e6f8224865b0f526c5c17',1,'Tri']]],
   ['ineighbor',['iNeighbor',['../structTNeighbor.html#a799107451fc00a468659663d44e309ed',1,'TNeighbor']]],
   ['info_5fpanel',['info_panel',['../classMyFrame.html#a2f1705495767375a3a81b28b90f7749c',1,'MyFrame']]],
   ['infofontsize',['infofontsize',['../prefs_8cpp.html#a7af6ffef487690c55989fafb52cad837',1,'infofontsize():&#160;prefs.cpp'],['../prefs_8hpp.html#a7af6ffef487690c55989fafb52cad837',1,'infofontsize():&#160;prefs.cpp']]],
