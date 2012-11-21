@@ -52,6 +52,7 @@ class ImageRD : public AbstractRD
 
         virtual void GenerateInitialPattern();
         virtual void BlankImage();
+        void GetImage(vtkImageData* im) const;
         virtual void CopyFromImage(vtkImageData* im);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
@@ -80,7 +81,6 @@ class ImageRD : public AbstractRD
 
     protected:
 
-        vtkSmartPointer<vtkImageData> GetImage() const;
         vtkImageData* GetImage(int iChemical) const;
 
         /// use to change the dimensions or the number of chemicals

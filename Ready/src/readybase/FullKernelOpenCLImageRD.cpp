@@ -25,6 +25,7 @@ using namespace std;
 
 // VTK:
 #include <vtkXMLUtilities.h>
+#include <vtkImageData.h>
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -36,6 +37,31 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_
     this->block_size[0]=1;
     this->block_size[1]=1;
     this->block_size[2]=1;
+}
+
+// ---------------------------------------------------------------------------------------------------------
+
+FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD& source)
+    : OpenCLImageRD(source.GetPlatform(),source.GetDevice())
+{
+    this->block_size[0] = source.GetBlockSizeX();
+    this->block_size[1] = source.GetBlockSizeY();
+    this->block_size[2] = source.GetBlockSizeZ();
+
+    this->SetFormula(source.GetKernel());
+
+    vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+    source.GetImage(image);
+    this->SetDimensionsAndNumberOfChemicals(image->GetDimensions()[0],image->GetDimensions()[1],
+        image->GetDimensions()[2],source.GetNumberOfChemicals());
+    this->CopyFromImage(image);
+
+    this->SetRuleName(source.GetRuleName());
+    this->SetDescription(source.GetDescription());
+
+    this->ReadInitialPatternGeneratorFromXML(source.GetAsXML(false)->FindNestedElementWithName("initial_pattern_generator"));
+
+    // TODO: copy starting pattern?
 }
 
 // ---------------------------------------------------------------------------------------------------------

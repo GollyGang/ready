@@ -25,6 +25,7 @@ using namespace std;
 
 // VTK:
 #include <vtkXMLUtilities.h>
+#include <vtkUnstructuredGrid.h>
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -33,6 +34,25 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_de
 {
     this->SetRuleName("Full kernel example");
     this->SetFormula("__kernel void rd_compute() {}");
+}
+
+// ---------------------------------------------------------------------------------------------------------
+
+FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source) 
+    : OpenCLMeshRD(source.GetPlatform(),source.GetDevice())
+{
+    this->SetFormula(source.GetKernel());
+
+    vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    source.GetMesh(mesh);
+    this->CopyFromMesh(mesh);
+
+    this->SetRuleName(source.GetRuleName());
+    this->SetDescription(source.GetDescription());
+
+    this->ReadInitialPatternGeneratorFromXML(source.GetAsXML(false)->FindNestedElementWithName("initial_pattern_generator"));
+
+    // TODO: copy starting pattern?
 }
 
 // ---------------------------------------------------------------------------------------------------------

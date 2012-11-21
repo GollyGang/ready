@@ -221,6 +221,7 @@ class AbstractRD
         virtual void InternalUpdate(int n_steps)=0;
 
         void ClearInitialPatternGenerator();
+        void ReadInitialPatternGeneratorFromXML(vtkXMLDataElement* node);
 
         virtual void FlipPaintAction(PaintAction& cca) =0; ///< Undo/redo this paint action.
         void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.

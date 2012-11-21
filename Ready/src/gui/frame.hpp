@@ -162,6 +162,8 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnUpdateDeleteParameter(wxUpdateUIEvent& event);
         void OnViewFullKernel(wxCommandEvent& event);
         void OnUpdateViewFullKernel(wxUpdateUIEvent& event);
+        void OnConvertToFullKernel(wxCommandEvent& event);
+        void OnUpdateConvertToFullKernel(wxUpdateUIEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
         void OnOpenCLDiagnostics(wxCommandEvent& event);
 
