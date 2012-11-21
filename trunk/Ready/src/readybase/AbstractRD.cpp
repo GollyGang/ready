@@ -267,12 +267,18 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     else this->SetDescription(trim_multiline_string(xml_description->GetCharacterData()));
 
     // initial_pattern_generator:
+    this->ReadInitialPatternGeneratorFromXML(rd->FindNestedElementWithName("initial_pattern_generator"));
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::ReadInitialPatternGeneratorFromXML(vtkXMLDataElement* node)
+{
     this->ClearInitialPatternGenerator();
-    vtkSmartPointer<vtkXMLDataElement> xml_initial_pattern_generator = rd->FindNestedElementWithName("initial_pattern_generator");
-    if(xml_initial_pattern_generator) // optional, default is none
+    if(node) // optional, default is none
     {
-        for(int i=0;i<xml_initial_pattern_generator->GetNumberOfNestedElements();i++)
-             this->initial_pattern_generator.push_back(new Overlay(xml_initial_pattern_generator->GetNestedElement(i)));
+        for(int i=0;i<node->GetNumberOfNestedElements();i++)
+             this->initial_pattern_generator.push_back(new Overlay(node->GetNestedElement(i)));
     }
 }
 

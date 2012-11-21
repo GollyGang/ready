@@ -153,15 +153,14 @@ vtkImageData* ImageRD::GetImage(int iChemical) const
 
 // ---------------------------------------------------------------------
 
-vtkSmartPointer<vtkImageData> ImageRD::GetImage() const
+void ImageRD::GetImage(vtkImageData *im) const
 { 
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
     for(int i=0;i<this->GetNumberOfChemicals();i++)
         iac->AddInput(this->GetImage(i));
     iac->Update();
-    return iac->GetOutput();
+    im->DeepCopy(iac->GetOutput());
 }
-
 
 // ---------------------------------------------------------------------
 
@@ -826,7 +825,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 
 void ImageRD::SaveStartingPattern()
 {
-    this->starting_pattern->DeepCopy(this->GetImage());
+    this->GetImage(this->starting_pattern);
 }
 
 // ---------------------------------------------------------------------

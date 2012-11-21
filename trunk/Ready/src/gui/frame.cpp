@@ -36,6 +36,8 @@
 #include <GrayScottMeshRD.hpp>
 #include <FormulaOpenCLImageRD.hpp>
 #include <FormulaOpenCLMeshRD.hpp>
+#include <FullKernelOpenCLImageRD.hpp>
+#include <FullKernelOpenCLMeshRD.hpp>
 #include <MeshGenerators.hpp>
 #include <SystemFactory.hpp>
 
@@ -188,6 +190,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::DeleteParameter, MyFrame::OnUpdateDeleteParameter)
     EVT_MENU(ID::ViewFullKernel,MyFrame::OnViewFullKernel)
     EVT_UPDATE_UI(ID::ViewFullKernel, MyFrame::OnUpdateViewFullKernel)
+    EVT_MENU(ID::ConvertToFullKernel,MyFrame::OnConvertToFullKernel)
+    EVT_UPDATE_UI(ID::ConvertToFullKernel, MyFrame::OnUpdateConvertToFullKernel)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
     EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
@@ -409,7 +413,9 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(ID::AddParameter, _("&Add Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
         menu->Append(ID::DeleteParameter, _("&Delete Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
+        menu->AppendSeparator();
         menu->Append(ID::ViewFullKernel, _("View Full Kernel") + GetAccelerator(DO_VIEWKERNEL),_("Shows the full OpenCL kernel as expanded from the formula"));
+        menu->Append(ID::ConvertToFullKernel, _("Convert to Full Kernel") + GetAccelerator(DO_CONVERTTOKERNEL),_("Converts the formula to a full kernel rule"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select &OpenCL Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
         menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
@@ -2556,6 +2562,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::AddParameter,              DO_ADDPARAM);
         SetAccelerator(mbar, ID::DeleteParameter,           DO_DELPARAM);
         SetAccelerator(mbar, ID::ViewFullKernel,            DO_VIEWKERNEL);
+        SetAccelerator(mbar, ID::ConvertToFullKernel,       DO_CONVERTTOKERNEL);
         SetAccelerator(mbar, ID::SelectOpenCLDevice,        DO_DEVICE);
         SetAccelerator(mbar, ID::OpenCLDiagnostics,         DO_OPENCL);
     }
@@ -2633,6 +2640,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_ADDPARAM:       cmdid = ID::AddParameter; break;
         case DO_DELPARAM:       cmdid = ID::DeleteParameter; break;
         case DO_VIEWKERNEL:     cmdid = ID::ViewFullKernel; break;
+        case DO_CONVERTTOKERNEL:cmdid = ID::ConvertToFullKernel; break;
         case DO_DEVICE:         cmdid = ID::SelectOpenCLDevice; break;
         case DO_OPENCL:         cmdid = ID::OpenCLDiagnostics; break;
         
@@ -2937,14 +2945,14 @@ void MyFrame::OnDeleteParameter(wxCommandEvent& event)
 
 void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->HasEditableFormula());
+    event.Enable(this->GetCurrentRDSystem()->GetRuleType()=="formula");
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->HasEditableFormula() &&
+    event.Enable(this->GetCurrentRDSystem()->GetRuleType()=="formula" &&
                  this->GetCurrentRDSystem()->GetNumberOfParameters() > 0);
 }
 
@@ -3635,6 +3643,38 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
     this->system->SaveFile(filename.mb_str(),this->render_settings,true);
     this->is_running = false;
     this->UpdateWindows();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnConvertToFullKernel(wxCommandEvent& event)
+{
+    AbstractRD *sys;
+    try
+    {
+        if(this->system->GetFileExtension()=="vti")
+        {
+            sys = new FullKernelOpenCLImageRD(*dynamic_cast<OpenCLImageRD*>(this->system));
+        }
+        else if(this->system->GetFileExtension()=="vtu")
+        {
+            sys = new FullKernelOpenCLMeshRD(*dynamic_cast<OpenCLMeshRD*>(this->system));
+        }
+        else wxMessageBox(_T("Internal error: unrecognised file extension"));
+    }
+    catch(const exception& e)
+    {
+        wxMessageBox(wxString::Format(_T("Error converting rule: %s"),e.what()));
+        return;
+    }
+    this->SetCurrentRDSystem(sys);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateConvertToFullKernel(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->GetRuleType()=="formula");
 }
 
 // ---------------------------------------------------------------------

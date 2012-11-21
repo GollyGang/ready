@@ -84,6 +84,7 @@ namespace ID
         AddParameter,
         DeleteParameter,
         ViewFullKernel,
+        ConvertToFullKernel,
         SelectOpenCLDevice,
         OpenCLDiagnostics,
         

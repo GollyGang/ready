@@ -16,10 +16,10 @@ Big picture issues:
 
 before 0.5 release:
 
-1) Easy way to switch between inbuilt, formula and kernel
-
-- support neighborhood_type and neighborhood_weight on inbuilt rules
+- move file new code to factory
+- support neighborhood_type and neighborhood_weight on inbuilt rules?
 - add some more 2d and 3d u-skate gliders
+- tweak brush sizes
 
 before 0.x release:
 

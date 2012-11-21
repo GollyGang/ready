@@ -807,3 +807,10 @@ void MeshRD::FlipPaintAction(PaintAction& cca)
 }
 
 // --------------------------------------------------------------------------------
+
+void MeshRD::GetMesh(vtkUnstructuredGrid* mesh) const
+{
+    mesh->DeepCopy(this->mesh);
+}
+
+// --------------------------------------------------------------------------------
