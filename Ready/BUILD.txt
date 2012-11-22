@@ -18,7 +18,7 @@ A) Build VTK:
  - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and 
    similar. Change all occurences of /MD (if any) to /MT, and /MDd to 
    /MTd. This ensures that the C runtime is statically-linked, so we 
-   don't need to distribute them too.
+   don't need to distribute it.
  - Generate, then open the resulting VTK.sln and build the Debug and 
    Release targets.
  
@@ -71,7 +71,7 @@ A) Build VTK:
  - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and 
    similar. Change all occurences of /MD (if any) to /MT, and /MDd to 
    /MTd. This ensures that the C runtime is statically-linked, so we 
-   don't need to distribute them too.
+   don't need to distribute it.
  - Set CMAKE_BUILD_TYPE to Release
  - Configure, generate, then build with NMake from the build folder:
     nmake
