@@ -14,16 +14,21 @@ Big picture issues:
   shader - fits in with WebGL Playground idea below.
 - Scripting support
 
+before 0.6 release:
+
+- programmable colouring (R,G,B channels, or something that uses less memory (second opencl pass?))
+- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) 
+- use FFT for speed?
+- image import (user can specify how colors map onto chemicals), import Robert's patterns?
+  (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
+
 before 0.x release:
 
-- use FFT for speed?
 - add Help files for Info Panel, etc.?
 - progress indicator for mesh generators?
 - way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap 
    too, on polyhedral meshes. Needed for images too, to expand a dataset without deleting the data.
 - add spectrum slider to change current paint color?
-- image import (user can specify how colors map onto chemicals), import Robert's patterns?
-  (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - set scene rotating by a setting in the start recording dialog box, or for general use?
 - mouse wheel sensitivity option?
@@ -33,7 +38,6 @@ before 0.x release:
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
 - improve wxHtmlWindow so selected text goes gray on loss of focus (Mac only?)
 - allow user to change the default render settings
-- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) 
 - read Turk's CASCADE language, for freeze-and-continue schemes
 - add initial_pattern_generator to Info Pane for editing
 - export rule to the WebGL Playground template
