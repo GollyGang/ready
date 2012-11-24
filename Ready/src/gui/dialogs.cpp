@@ -658,17 +658,10 @@ IntegerDialog::IntegerDialog(wxWindow* parent,
 
 bool IntegerDialog::TransferDataFromWindow()
 {
-#if defined(__WXMSW__) || defined(__WXGTK__)
     // spinctrl->GetValue() always returns a value within range even if
     // the text ctrl doesn't contain a valid number -- yuk!
     result = spinctrl->GetValue();
-    if (result < minint || result > maxint)
-#else
-    // GetTextValue returns FALSE if text ctrl doesn't contain a valid number
-    // or the number is out of range, but it's not available in wxMSW or wxGTK
-    if ( !spinctrl->GetTextValue(&result) || result < minint || result > maxint )
-#endif
-    {
+    if (result < minint || result > maxint) {
         wxString msg;
         msg.Printf(_("Value must be from %d to %d."), minint, maxint);
         Warning(msg);
