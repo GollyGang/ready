@@ -2194,18 +2194,10 @@ int PrefsDialog::GetSpinVal(long id)
 bool PrefsDialog::BadSpinVal(int id, int minval, int maxval, const wxString& prefix)
 {
     wxSpinCtrl* spinctrl = (wxSpinCtrl*) FindWindow(id);
-#if defined(__WXMSW__) || defined(__WXGTK__)
     // spinctrl->GetValue() always returns a value within range even if
     // the text ctrl doesn't contain a valid number -- yuk!
     int i = spinctrl->GetValue();
-    if (i < minval || i > maxval)
-#else
-    // GetTextValue returns FALSE if text ctrl doesn't contain a valid number
-    // or the number is out of range, but it's not available in wxMSW or wxGTK
-    int i;
-    if ( !spinctrl->GetTextValue(&i) || i < minval || i > maxval )
-#endif
-    {
+    if (i < minval || i > maxval) {
         wxString msg;
         msg.Printf(_("%s must be from %d to %d."), prefix.c_str(), minval, maxval);
         Warning(msg);
