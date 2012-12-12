@@ -3222,16 +3222,48 @@ void MyFrame::OnUpdateExportImage(wxUpdateUIEvent& event)
 
 void MyFrame::RecordFrame()
 {
-    ostringstream oss; 
-    oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-    vtkSmartPointer<vtkImageWriter> writer;
+    ostringstream oss;
+	vtkSmartPointer<vtkImageWriter> writer;
     if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
     else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+	
+	// store the currently active chemical, in the case of multi-reagent output it needs to be restored later.
+	std::string remember_chemical = this->render_settings.GetProperty("active_chemical").GetChemical();
+	
     if(this->record_data_image) // take the 2D data (2D system or 2D slice)
-    {
-        vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
-        this->system->GetAs2DImage(image,this->render_settings);
-        writer->SetInput(image);
+    {		
+		if (this->record_all_chemicals) 
+		{
+			int num_chems = this->system->GetNumberOfChemicals();
+			for (int chemical_number=0; chemical_number < num_chems; chemical_number++)
+			{
+				// make modified name for chemicals.
+				oss.str("");
+				oss.clear();
+				std::string chemical_name = GetChemicalName(chemical_number);
+				oss << this->recording_prefix << "-" << chemical_name << "." << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+				
+				this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(chemical_number));
+				
+        		vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+				this->system->GetAs2DImage(image,this->render_settings);
+				writer->SetInput(image);
+				if (chemical_number < num_chems-1) //write all but the last one as it will get written by the code below.
+				{
+					writer->SetFileName(oss.str().c_str());
+				    writer->Write();
+					if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+				    else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+				}
+			}
+		}
+		else 
+		{
+			oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+			vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+	        this->system->GetAs2DImage(image,this->render_settings);
+    	    writer->SetInput(image);
+		}
     }
     else // take a screenshot of the current view
     {
@@ -3239,9 +3271,18 @@ void MyFrame::RecordFrame()
         screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
         writer->SetInputConnection(screenshot->GetOutputPort());
     }
+	
     writer->SetFileName(oss.str().c_str());
     writer->Write();
-    this->iRecordingFrame++;
+	
+	if ( this->record_all_chemicals )
+	{
+		// restore the stored active chemical so that the user still sees what they usually see in the viewport.
+		// only do this in the case of record_all_chemicals (ie when it has potentially changed), ere it may cause wasted cycles?.
+		this->render_settings.GetProperty("active_chemical").SetChemical( remember_chemical );
+	}
+	
+	this->iRecordingFrame++;
 }
 
 // ---------------------------------------------------------------------
@@ -3251,13 +3292,16 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     if(!this->is_recording)
     {
         bool is_2D_data_available = this->system->Is2DImageAvailable();
+		bool are_multiple_chemicals_available = is_2D_data_available && (this->system->GetNumberOfChemicals() > 1);
         bool default_to_2D_data = (is_2D_data_available && this->system->GetArenaDimensionality()==2);
 
-        RecordingDialog dlg(this,is_2D_data_available,default_to_2D_data);
+        RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data);
         if(dlg.ShowModal()!=wxID_OK) return;
         this->recording_prefix = dlg.recording_prefix;
         this->recording_extension = dlg.recording_extension;
         this->record_data_image = dlg.record_data_image;
+		this->record_all_chemicals = dlg.record_all_chemicals;
+		
         this->iRecordingFrame = 0;
         this->is_recording = true;
     }

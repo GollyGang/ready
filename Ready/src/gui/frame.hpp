@@ -242,7 +242,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool speed_data_available;
 
         // used when recording frames to disk
-        bool is_recording,record_data_image;
+        bool is_recording,record_data_image,record_all_chemicals;
         std::string recording_prefix,recording_extension;
         int iRecordingFrame;
 

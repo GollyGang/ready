@@ -29,12 +29,13 @@ class RecordingDialog : public wxDialog
 {
     public:
 
-        RecordingDialog(wxWindow *parent,bool is_2D_data_available,bool default_is_2D_data);
+        RecordingDialog(wxWindow *parent,bool is_2D_data_available, bool are_multiple_chemicals_available,bool default_is_2D_data);
 
         virtual bool TransferDataFromWindow();  // called when user hits OK
     
         std::string recording_prefix,recording_extension;
         bool record_data_image;
+		bool record_all_chemicals;
 
     protected:
 
