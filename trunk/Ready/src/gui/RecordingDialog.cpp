@@ -25,7 +25,7 @@ using namespace std;
 
 // -----------------------------------------------------------------------------------------------
 
-RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available,bool default_is_2D_data) 
+RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available, bool are_multiple_chemicals_available, bool default_is_2D_data) 
     : wxDialog(parent,wxID_ANY,_("Recording settings"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     // create the controls
@@ -37,6 +37,8 @@ RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available,bool
     this->source_combo->AppendString(_("current view"));
     if(is_2D_data_available)
         this->source_combo->AppendString(_("2D data"));
+	if(are_multiple_chemicals_available)
+		this->source_combo->AppendString(_("2D data (all chemicals)"));
     this->source_combo->SetSelection(default_is_2D_data?1:0);
 
     wxStaticText* folder_label = new wxStaticText(this, wxID_STATIC, _("Save frames here: (will overwrite)"));
@@ -94,7 +96,8 @@ RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available,bool
 
 bool RecordingDialog::TransferDataFromWindow()
 {
-    this->record_data_image = (this->source_combo->GetSelection()==1);
+    this->record_data_image = (this->source_combo->GetSelection()==1) || (this->source_combo->GetSelection()==2);
+	this->record_all_chemicals = (this->source_combo->GetSelection()==2);
     this->recording_extension = string(this->extension_combo->GetValue().mb_str());
     recordingdir = this->folder_edit->GetValue(); // save folder in prefs
     this->recording_prefix = string(this->folder_edit->GetValue().mb_str()) + "/" + string(this->filename_prefix_edit->GetValue().mb_str());
