@@ -220,16 +220,16 @@ END_EVENT_TABLE()
 // ---------------------------------------------------------------------
 
 const char* MyFrame::opencl_not_available_message = 
-	"This file requires OpenCL, which has not been detected on your system.\n\n"
-	"OpenCL allows Ready to take advantage of the many-core architectures on\n"
-	"graphics cards and modern CPUs. OpenCL also allows rules to be written in\n"
-	"a text format and compiled on the fly. It is available on every operating\n"
-	"system, so please install it to get the most out of Ready. (If your OS is\n"
-	"running in a virtual machine then it may not be possible to get OpenCL\n"
-	"working.)\n\n"
-	"You can load the files in the 'CPU-only' folder, which don't use OpenCL. Or\n"
-	"use File > New Pattern or File > Import Mesh to make new examples.";
-						
+    "This file requires OpenCL, which has not been detected on your system.\n\n"
+    "OpenCL allows Ready to take advantage of the many-core architectures on\n"
+    "graphics cards and modern CPUs. OpenCL also allows rules to be written in\n"
+    "a text format and compiled on the fly. It is available on every operating\n"
+    "system, so please install it to get the most out of Ready. (If your OS is\n"
+    "running in a virtual machine then it may not be possible to get OpenCL\n"
+    "working.)\n\n"
+    "You can load the files in the 'CPU-only' folder, which don't use OpenCL. Or\n"
+    "use File > New Pattern or File > Import Mesh to make new examples.";
+
 const float MyFrame::brush_sizes[] = {0.02f,0.05f,0.1f};
 
 // ---------------------------------------------------------------------
@@ -1522,11 +1522,11 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating image..."));
-				ImageRD *image_sys;
-				if(this->is_opencl_available)
-					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
-				else
-					image_sys = new GrayScottImageRD();
+                ImageRD *image_sys;
+                if(this->is_opencl_available)
+                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+                else
+                    image_sys = new GrayScottImageRD();
                 image_sys->SetDimensionsAndNumberOfChemicals(128,1,1,2);
                 sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1537,11 +1537,11 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating image..."));
-				ImageRD *image_sys;
-				if(this->is_opencl_available)
-					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
-				else
-					image_sys = new GrayScottImageRD();
+                ImageRD *image_sys;
+                if(this->is_opencl_available)
+                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+                else
+                    image_sys = new GrayScottImageRD();
                 image_sys->SetDimensionsAndNumberOfChemicals(128,128,1,2);
                 sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1552,11 +1552,11 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             {
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating image..."));
-				ImageRD *image_sys;
-				if(this->is_opencl_available)
-					image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
-				else
-					image_sys = new GrayScottImageRD();
+                ImageRD *image_sys;
+                if(this->is_opencl_available)
+                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+                else
+                    image_sys = new GrayScottImageRD();
                 image_sys->SetDimensionsAndNumberOfChemicals(32,32,32,2);
                 sys = image_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1587,9 +1587,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetGeodesicSphere(divs,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
@@ -1622,9 +1622,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetTorus(nx,ny,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("slice_3D").SetBool(false);
@@ -1656,9 +1656,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetTriangularMesh(n,n,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1692,9 +1692,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetHexagonalMesh(n,n,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1728,9 +1728,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetRhombilleTiling(n,n,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1764,9 +1764,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetPenroseTiling(divs,0,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1800,9 +1800,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetPenroseTiling(divs,1,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1836,9 +1836,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetRandomDelaunay2D(npts,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1871,9 +1871,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetRandomVoronoi2D(npts,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1906,9 +1906,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetRandomDelaunay3D(npts,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1940,9 +1940,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetBodyCentredCubicHoneycomb(side,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -1978,9 +1978,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -2016,9 +2016,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 MeshGenerators::GetDiamondCells(side,mesh,2);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-					mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-				else
-					mesh_sys = new GrayScottMeshRD();
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                else
+                    mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -2055,9 +2055,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     
     wxBusyCursor busy;
     this->SetStatusText(_("Generating data values..."));
-	sys->CreateDefaultInitialPatternGenerator();
-	sys->GenerateInitialPattern();
-	this->SetCurrentRDSystem(sys);
+    sys->CreateDefaultInitialPatternGenerator();
+    sys->GenerateInitialPattern();
+    this->SetCurrentRDSystem(sys);
 
     this->system->SetFilename("untitled");
     this->system->SetModified(false);
@@ -3017,7 +3017,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
     */
 
-	MeshRD *mesh_sys;
+    MeshRD *mesh_sys;
     if(mesh_filename.EndsWith(_T("vtp")))
     {
         if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
@@ -3032,9 +3032,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtp_reader->SetFileName(mesh_filename.mb_str());
         vtp_reader->Update();
         if(this->is_opencl_available)
-			mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-		else
-			mesh_sys = new GrayScottMeshRD();
+            mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+        else
+            mesh_sys = new GrayScottMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
@@ -3054,9 +3054,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         vtu_reader->SetFileName(mesh_filename.mb_str());
         vtu_reader->Update();
         if(this->is_opencl_available)
-			mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-		else
-			mesh_sys = new GrayScottMeshRD();
+            mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+        else
+            mesh_sys = new GrayScottMeshRD();
         mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
     }
     else if(mesh_filename.EndsWith(_T("obj")))
@@ -3073,9 +3073,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         obj_reader->SetFileName(mesh_filename.mb_str());
         obj_reader->Update();
         if(this->is_opencl_available)
-			mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-		else
-			mesh_sys = new GrayScottMeshRD();
+            mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+        else
+            mesh_sys = new GrayScottMeshRD();
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         ug->SetPoints(obj_reader->GetOutput()->GetPoints());
         ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
@@ -3087,10 +3087,10 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         return; 
     }
 
-	mesh_sys->SetNumberOfChemicals(2);
-	mesh_sys->CreateDefaultInitialPatternGenerator();
-	mesh_sys->GenerateInitialPattern();
-	this->SetCurrentRDSystem(mesh_sys);
+    mesh_sys->SetNumberOfChemicals(2);
+    mesh_sys->CreateDefaultInitialPatternGenerator();
+    mesh_sys->GenerateInitialPattern();
+    this->SetCurrentRDSystem(mesh_sys);
 }
 
 // ---------------------------------------------------------------------
@@ -3223,47 +3223,47 @@ void MyFrame::OnUpdateExportImage(wxUpdateUIEvent& event)
 void MyFrame::RecordFrame()
 {
     ostringstream oss;
-	vtkSmartPointer<vtkImageWriter> writer;
+    vtkSmartPointer<vtkImageWriter> writer;
     if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
     else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-	
-	// store the currently active chemical, in the case of multi-reagent output it needs to be restored later.
-	std::string remember_chemical = this->render_settings.GetProperty("active_chemical").GetChemical();
-	
+    
+    // store the currently active chemical, in the case of multi-reagent output it needs to be restored later.
+    std::string remember_chemical = this->render_settings.GetProperty("active_chemical").GetChemical();
+    
     if(this->record_data_image) // take the 2D data (2D system or 2D slice)
-    {		
-		if (this->record_all_chemicals) 
-		{
-			int num_chems = this->system->GetNumberOfChemicals();
-			for (int chemical_number=0; chemical_number < num_chems; chemical_number++)
-			{
-				// make modified name for chemicals.
-				oss.str("");
-				oss.clear();
-				std::string chemical_name = GetChemicalName(chemical_number);
-				oss << this->recording_prefix << "-" << chemical_name << "." << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-				
-				this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(chemical_number));
-				
-        		vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
-				this->system->GetAs2DImage(image,this->render_settings);
-				writer->SetInput(image);
-				if (chemical_number < num_chems-1) //write all but the last one as it will get written by the code below.
-				{
-					writer->SetFileName(oss.str().c_str());
-				    writer->Write();
-					if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
-				    else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-				}
-			}
-		}
-		else 
-		{
-			oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-			vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
-	        this->system->GetAs2DImage(image,this->render_settings);
-    	    writer->SetInput(image);
-		}
+    {        
+        if (this->record_all_chemicals) 
+        {
+            int num_chems = this->system->GetNumberOfChemicals();
+            for (int chemical_number=0; chemical_number < num_chems; chemical_number++)
+            {
+                // make modified name for chemicals.
+                oss.str("");
+                oss.clear();
+                std::string chemical_name = GetChemicalName(chemical_number);
+                oss << this->recording_prefix << "-" << chemical_name << "." << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+                
+                this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(chemical_number));
+                
+                vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+                this->system->GetAs2DImage(image,this->render_settings);
+                writer->SetInput(image);
+                if (chemical_number < num_chems-1) //write all but the last one as it will get written by the code below.
+                {
+                    writer->SetFileName(oss.str().c_str());
+                    writer->Write();
+                    if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+                    else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+                }
+            }
+        }
+        else 
+        {
+            oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+            vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+            this->system->GetAs2DImage(image,this->render_settings);
+            writer->SetInput(image);
+        }
     }
     else // take a screenshot of the current view
     {
@@ -3271,18 +3271,18 @@ void MyFrame::RecordFrame()
         screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
         writer->SetInputConnection(screenshot->GetOutputPort());
     }
-	
+    
     writer->SetFileName(oss.str().c_str());
     writer->Write();
-	
-	if ( this->record_all_chemicals )
-	{
-		// restore the stored active chemical so that the user still sees what they usually see in the viewport.
-		// only do this in the case of record_all_chemicals (ie when it has potentially changed), ere it may cause wasted cycles?.
-		this->render_settings.GetProperty("active_chemical").SetChemical( remember_chemical );
-	}
-	
-	this->iRecordingFrame++;
+    
+    if ( this->record_all_chemicals )
+    {
+        // restore the stored active chemical so that the user still sees what they usually see in the viewport.
+        // only do this in the case of record_all_chemicals (ie when it has potentially changed), ere it may cause wasted cycles?.
+        this->render_settings.GetProperty("active_chemical").SetChemical( remember_chemical );
+    }
+    
+    this->iRecordingFrame++;
 }
 
 // ---------------------------------------------------------------------
@@ -3292,7 +3292,7 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     if(!this->is_recording)
     {
         bool is_2D_data_available = this->system->Is2DImageAvailable();
-		bool are_multiple_chemicals_available = is_2D_data_available && (this->system->GetNumberOfChemicals() > 1);
+        bool are_multiple_chemicals_available = is_2D_data_available && (this->system->GetNumberOfChemicals() > 1);
         bool default_to_2D_data = (is_2D_data_available && this->system->GetArenaDimensionality()==2);
 
         RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data);
@@ -3300,8 +3300,8 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
         this->recording_prefix = dlg.recording_prefix;
         this->recording_extension = dlg.recording_extension;
         this->record_data_image = dlg.record_data_image;
-		this->record_all_chemicals = dlg.record_all_chemicals;
-		
+        this->record_all_chemicals = dlg.record_all_chemicals;
+        
         this->iRecordingFrame = 0;
         this->is_recording = true;
     }

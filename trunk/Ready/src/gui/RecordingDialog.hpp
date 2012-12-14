@@ -35,7 +35,7 @@ class RecordingDialog : public wxDialog
     
         std::string recording_prefix,recording_extension;
         bool record_data_image;
-		bool record_all_chemicals;
+        bool record_all_chemicals;
 
     protected:
 
