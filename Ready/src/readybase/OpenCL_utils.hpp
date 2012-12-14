@@ -42,9 +42,9 @@
 /// Utilities for working with OpenCL.
 namespace OpenCL_utils
 {
-	/// Determines whether at least one OpenCL device is available.
-	bool IsOpenCLAvailable();
-	
+    /// Determines whether at least one OpenCL device is available.
+    bool IsOpenCLAvailable();
+    
     /// Returns a full report on the available OpenCL devices.
     std::string GetOpenCLDiagnostics();
 
