@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="2">
+      
+    <description>
+        Lesmes F, et al. (2003) Noise-controlled self-replicating patterns 
+        &lt;a href=&quot;http://bbm1.ucm.es/fmoran/publications/78-Lesmes-Noise%20controlled%20self-replicating%20patterns-phys.Rev.Lett.91(23)238301-1-4(2003).pdf&quot;&gt;(PDF)&lt;/a&gt;.
+        
+        The noise parameter controls the amount of noise added to the system. With zero noise the
+        system evolves long worms. With noise=0.3, self-replicating dots are seen instead.
+        
+        (Note that their formula is written slightly differently; the (F+k) term appears as a single
+        parameter.)
+    </description>
+      
+    <rule type="formula" name="Gray-Scott">
+        
+      <param name="timestep"> 0.2    </param>
+      <param name="D_a">      0.4     </param>
+      <param name="D_b">      0.2     </param>
+      <param name="k">        0.0655  </param>
+      <param name="F">        0.05    </param>
+      <param name="noise">    0.3     </param>
+      
+      <formula number_of_chemicals="3">
+        delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a) + c*noise;
+        delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
+        c = fmod(c+laplacian_c,1); // randomness [-1,1]
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <circle radius="0.02">
+          <point3d x="0.5" y="0.5" z="0.5" />
+        </circle>
+        <circle radius="0.02">
+          <point3d x="0.8" y="0.7" z="0.5" />
+        </circle>
+        <circle radius="0.02">
+          <point3d x="0.2" y="0.45" z="0.5" />
+        </circle>
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <white_noise low="-1" high="1" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <low value="0" />
+      <high value="1" />
+      <show_displacement_mapped_surface value="false" />
+    </render_settings>
+
+  </RD>
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 127 0 0">
+      <PointData>
+        <DataArray type="Float32" Name="a" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+        <DataArray type="Float32" Name="b" format="appended" RangeMin="0" RangeMax="0" offset="168" />
+        <DataArray type="Float32" Name="c" format="appended" RangeMin="0" RangeMax="0" offset="336" />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+  </AppendedData>
+</VTKFile>

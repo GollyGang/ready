@@ -1,0 +1,70 @@
+<html>
+<title>Ready Help: Quick Start</title>
+<body>
+
+<p>
+<h3>Quick Start</h3>
+
+<p>Ready is a program for exploring <a href="http://en.wikipedia.org/wiki/Reaction-diffusion_system">reaction-diffusion</a> systems.</p>
+
+<p>Click on the files in the Patterns Pane to see some different systems. Use the command Run from the Action menu (or the arrow on the toolbar) to set them running.
+
+<p>
+<font size=+1><b>Install OpenCL</font>
+<p>
+<a href="http://en.wikipedia.org/wiki/OpenCL">OpenCL</a> is a way to harness graphics cards and multi-core CPUs for high-performance computing. Most of the demos in Ready require OpenCL. Use the command "Show OpenCL Diagnostics" on the Action menu to see whether OpenCL is installed on your machine. If one or more devices are listed then everything should work. If not then you'll need to install the latest drivers for your graphics card, or install one of the SDKs from
+<a href="http://developer.amd.com/appsdk">AMD</a> or
+<a href="http://software.intel.com/en-us/articles/vcsource-tools-opencl-sdk/">Intel</a>
+that will work with your CPU. Ensure you are using the fastest available device by using the command "Select OpenCL Device" on the Action menu.
+<p>
+If you can't get OpenCL working (if you're working in a virtual machine, for example) then these options are available to you:
+<ul>
+<li>The demos in the "CPU-only" folder will work. These use the inbuilt Gray-Scott implementation.
+<li>Use File > New Pattern to make new patterns. They will use the inbuilt Gray-Scott implementation.
+<li>Use File > Import Mesh to run Gray-Scott on the surface of imported meshes.
+</ul>
+
+<p>
+<font size=+1><b>Interacting with the rendered scene</font>
+
+<p>From the Action menu: Start or Stop the system running, or take small Steps.
+
+<p>From the View menu: Fit Pattern makes everything visible.<br>
+Wireframe toggles between a wireframe view or a surface view.
+
+<p>
+In the rendering pane:
+<p>
+<b>left mouse:</b> rotates the camera around the focal point, as if the scene is a trackball<br>
+<b>right mouse, or shift+ctrl+left mouse:</b> move up and down to zoom in and out<br>
+<b>scroll wheel:</b> zoom in and out<br>
+<b>shift+left mouse:</b> pan<br>
+<b>ctrl+left mouse:</b> roll (use command+left mouse on Mac)<br>
+<p>
+While painting:
+<p>
+<b>left mouse:</b> paint, brush or pick, depending on the current tool<br>
+<b>right mouse, or shift+left mouse:</b> switch temporarily to color picker tool<br>
+<b>scroll wheel:</b> zoom in and out<br>
+
+<p>Use the <a href="prefs:keyboard">Preferences</a> dialog to create keyboard shortcuts
+for menu items (or other actions, such as opening a particular pattern file).
+
+<p>
+<font size=+1><b>Working with the windows</font>
+
+<p>The Patterns Pane, Info Pane and Help Pane can be shown or hidden
+by using the commands in the View menu.
+You can drag the panes by their title bar to dock them into the
+Ready frame in different positions or float them as separate windows.
+
+<p>
+<font size=+1><b>More help</font>
+
+<p>Send an email to <a href="mailto://reaction-diffusion@googlegroups.com">reaction-diffusion@googlegroups.com</a>
+if you have any problems, or want to get involved.
+
+<p>The <a href="edit:README.txt">README.txt</a> file in the installation folder has some source code credits. <a href="edit:COPYING.txt">COPYING.txt</a> has a copy of the GPLv3 license. <a href="edit:TODO.txt">TODO.txt</a> has a list of things we think we might work on. <a href="edit:BUILD.txt">BUILD.txt</a> has information about building Ready from source code.
+
+</body>
+</html>

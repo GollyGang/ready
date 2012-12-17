@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+
+  <RD format_version="1">
+      
+    <description>
+        Self-replicating spots in two dimensions.  This example uses an inbuilt implementation
+        (currently only Gray-Scott is available) and so the formula cannot be edited.
+    </description>
+    
+    <rule type="inbuilt" name="Gray-Scott">
+      <param name="timestep">   1.0    </param>
+      <param name="D_a">        0.082  </param>
+      <param name="D_b">        0.041  </param>
+      <param name="k">          0.064  </param>
+      <param name="F">          0.035  </param>
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+        <overlay chemical="a">
+            <overwrite />
+            <constant value="1" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="b">
+            <overwrite />
+            <white_noise low="0" high="1" />
+            <rectangle>
+                <point3D x="0.2" y="0.2" z="0.6" />
+                <point3D x="0.5" y="0.5" z="0.8" />
+            </rectangle>
+        </overlay>
+        <overlay chemical="a">
+            <subtract />
+            <other_chemical chemical="b" />
+            <rectangle>
+                <point3D x="0.2" y="0.2" z="0.6" />
+                <point3D x="0.5" y="0.5" z="0.8" />
+            </rectangle>
+        </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+        <active_chemical value="b" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 63 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 63 0 63 0 0">
+      <PointData Scalars="Scalars_">
+        <DataArray type="Float32" Name="Scalars_" NumberOfComponents="2" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+  </AppendedData>
+</VTKFile>
