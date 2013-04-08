@@ -22,7 +22,7 @@ cmake_policy( SET CMP0003 NEW )
 
 project( Ready )
 
-set( READY_VERSION 0.5.1 )   # check matches Help/about.html
+set( READY_VERSION 0.6 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
@@ -145,6 +145,8 @@ set( PATTERN_FILES
   Patterns/PenroseTilings/Goucher_glider.vtu
   Patterns/PenroseTilings/Imai_glider_B2SC4.vtu
   Patterns/PenroseTilings/Goucher_loops.vtu
+  Patterns/Salt/salt2D_demo.vti
+  Patterns/Salt/salt3D_circular330.vti
 )
 
 set( HELP_FILES
