@@ -27,7 +27,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     // cells in state 0 or 1 are down - their state determines the current phase
     // cells in state 2 are up - their location determines whether they move in the current phase
     // A more 'pure CA' way of doing this is to have states representing the checkerboard but 
-	// this way makes it easier to draw on.
+    // this way makes it easier to draw on.
 
     // The rule is based on 29 points within a 7x7 neighborhood
     int val[29];
@@ -64,7 +64,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     const int swappers[4] = { 1,2,3,4 };
     const int activators[4][2] = { {5,8}, {7,10}, {9,12}, {6,11} };
     const int inhibitors[4][6] = { {18,25,22,27,20,28}, {18,24,19,27,21,26}, 
-								   {16,23,14,19,13,21}, {20,15,14,22,17,23} };
+                                   {16,23,14,19,13,21}, {20,15,14,22,17,23} };
 
     if( parity(x+y) == parity(current_phase) ) 
     {
