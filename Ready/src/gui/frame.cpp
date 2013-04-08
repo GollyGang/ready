@@ -3267,6 +3267,7 @@ void MyFrame::RecordFrame()
     }
     else // take a screenshot of the current view
     {
+        oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
         vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
         screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
         writer->SetInputConnection(screenshot->GetOutputPort());
