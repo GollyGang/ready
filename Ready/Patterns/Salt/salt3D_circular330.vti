@@ -33,7 +33,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     // cells in states 0-5 are down - their state determines the current phase
     // cells in state 6 are up - their location parity determines whether they move in the current phase
     // A more 'pure CA' way of doing this is to have states representing the checkerboard but 
-	// this way makes it easier to draw on.
+    // this way makes it easier to draw on.
 
     // get the current phase from somewhere
     // TODO: more CA-like to get from the local neighborhood
