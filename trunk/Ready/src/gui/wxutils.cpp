@@ -216,8 +216,8 @@ wxString FormatFloat(float f,int mdp)
     while (result.GetChar(result.Length()-1) == wxChar('0')) {
         result.Truncate(result.Length()-1);
     }
-    // strip any trailing '.'
-    if (result.GetChar(result.Length()-1) == wxChar('.')) {
+    // strip any trailing decimal separator
+    if (result.GetChar(result.Length()-1) == wxChar('.') || result.GetChar(result.Length()-1) == wxChar(',')) {
         result.Truncate(result.Length()-1);
     }
     return result;
