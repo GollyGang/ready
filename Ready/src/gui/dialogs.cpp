@@ -117,30 +117,6 @@ XYZIntDialog::XYZIntDialog(wxWindow* parent, const wxString& title,
     // select X value (must do this last on Windows)
     xbox->SetFocus();
     xbox->SetSelection(-1,-1);
-
-    // install event handler to detect illegal chars when entering values
-    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
-    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
-    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZIntDialog::OnChar), NULL, this);
-}
-
-// -----------------------------------------------------------------------------
-
-void XYZIntDialog::OnChar(wxKeyEvent& event)
-{
-    int key = event.GetKeyCode();
-    if ( key >= ' ' && key <= '~' ) {
-        if ( key >= '0' && key <= '9' ) {
-            // allow digits
-            event.Skip();
-        } else {
-            // disallow any other displayable ascii char
-            wxBell();
-        }
-    } else {
-        // allow tab, del, arrow keys, etc
-        event.Skip();
-    }
 }
 
 // -----------------------------------------------------------------------------
@@ -234,30 +210,6 @@ XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
     // select X value (must do this last on Windows)
     xbox->SetFocus();
     xbox->SetSelection(-1,-1);
-
-    // install event handler to detect illegal chars when entering values
-    xbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZFloatDialog::OnChar), NULL, this);
-    ybox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZFloatDialog::OnChar), NULL, this);
-    zbox->Connect(wxEVT_CHAR, wxKeyEventHandler(XYZFloatDialog::OnChar), NULL, this);
-}
-
-// -----------------------------------------------------------------------------
-
-void XYZFloatDialog::OnChar(wxKeyEvent& event)
-{
-    int key = event.GetKeyCode();
-    if ( key >= ' ' && key <= '~' ) {
-        if ( (key >= '0' && key <= '9') || key=='.' || key=='e' || key=='E' || key=='+' || key=='-') {
-            // allow digits and other float characters
-            event.Skip();
-        } else {
-            // disallow any other displayable ascii char
-            wxBell();
-        }
-    } else {
-        // allow tab, del, arrow keys, etc
-        event.Skip();
-    }
 }
 
 // -----------------------------------------------------------------------------
@@ -418,27 +370,6 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
         valuebox->SetFocus();
         valuebox->SetSelection(-1,-1);
     #endif
-
-    // install event handler to detect illegal chars when entering value
-    valuebox->Connect(wxEVT_CHAR, wxKeyEventHandler(ParameterDialog::OnChar), NULL, this);
-}
-
-// -----------------------------------------------------------------------------
-
-void ParameterDialog::OnChar(wxKeyEvent& event)
-{
-    int key = event.GetKeyCode();
-    if ( key >= ' ' && key <= '~' ) {
-        if ( (key >= '0' && key <= '9') || key == '.' || key=='-' ) {
-            // allow digits and decimal point and minus sign
-            event.Skip();
-        } else {
-            // disallow any other displayable ascii char
-            wxBell();
-        }
-    } else {
-        event.Skip();
-    }
 }
 
 // -----------------------------------------------------------------------------

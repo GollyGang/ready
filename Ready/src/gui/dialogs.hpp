@@ -49,7 +49,6 @@ class XYZIntDialog : public wxDialog
                   int inx, int iny, int inz,
                   const wxPoint& pos, const wxSize& size);
     
-        void OnChar(wxKeyEvent& event);
         bool ValidNumber(wxTextCtrl* box, int* val);
     
         virtual bool TransferDataFromWindow();  // called when user hits OK
@@ -75,8 +74,6 @@ class XYZFloatDialog : public wxDialog
                   float inx, float iny, float inz,
                   const wxPoint& pos, const wxSize& size);
     
-        void OnChar(wxKeyEvent& event);
-
         virtual bool TransferDataFromWindow();  // called when user hits OK
     
         float GetX() { return xval; }
@@ -126,8 +123,6 @@ class ParameterDialog : public wxDialog
             ~ParameterDialog() { delete onetimer; }
             void OnOneTimer(wxTimerEvent& event);
         #endif
-    
-        void OnChar(wxKeyEvent& event);
     
         virtual bool TransferDataFromWindow();  // called when user hits OK
     
