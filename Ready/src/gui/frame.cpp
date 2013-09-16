@@ -3016,74 +3016,89 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
     */
-
-    MeshRD *mesh_sys;
-    if(mesh_filename.EndsWith(_T("vtp")))
-    {
-        if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-
-        wxBusyCursor busy;
-
-        this->InitializeDefaultRenderSettings();
-        this->render_settings.GetProperty("slice_3D").SetBool(false);
-        this->render_settings.GetProperty("active_chemical").SetChemical("b");
-
-        vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-        vtp_reader->SetFileName(mesh_filename.mb_str());
-        vtp_reader->Update();
-        if(this->is_opencl_available)
-            mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-        else
-            mesh_sys = new GrayScottMeshRD();
-        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
-        ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
-        ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
-        mesh_sys->CopyFromMesh(ug);
-    }
-    else if(mesh_filename.EndsWith(_T("vtu")))
-    {
-        if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-
-        wxBusyCursor busy;
-
-        this->InitializeDefaultRenderSettings();
-        this->render_settings.GetProperty("slice_3D").SetBool(false);
-        this->render_settings.GetProperty("active_chemical").SetChemical("b");
-
-        vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
-        vtu_reader->SetFileName(mesh_filename.mb_str());
-        vtu_reader->Update();
-        if(this->is_opencl_available)
-            mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-        else
-            mesh_sys = new GrayScottMeshRD();
-        mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
-    }
-    else if(mesh_filename.EndsWith(_T("obj")))
-    {
-        if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
     
-        wxBusyCursor busy;
-
-        this->InitializeDefaultRenderSettings();
-        this->render_settings.GetProperty("slice_3D").SetBool(false);
-        this->render_settings.GetProperty("active_chemical").SetChemical("b");
-
-        vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
-        obj_reader->SetFileName(mesh_filename.mb_str());
-        obj_reader->Update();
-        if(this->is_opencl_available)
-            mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
-        else
-            mesh_sys = new GrayScottMeshRD();
-        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
-        ug->SetPoints(obj_reader->GetOutput()->GetPoints());
-        ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
-        mesh_sys->CopyFromMesh(ug);
-    }
-    else
+    MeshRD *mesh_sys;
+    
+    try 
     {
-        wxMessageBox(_("Unsupported file type")); 
+        if(mesh_filename.EndsWith(_T("vtp")))
+        {
+            if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+
+            wxBusyCursor busy;
+
+            this->InitializeDefaultRenderSettings();
+            this->render_settings.GetProperty("slice_3D").SetBool(false);
+            this->render_settings.GetProperty("active_chemical").SetChemical("b");
+
+            vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+            vtp_reader->SetFileName(mesh_filename.mb_str());
+            vtp_reader->Update();
+            if(this->is_opencl_available)
+                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+            else
+                mesh_sys = new GrayScottMeshRD();
+            vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+            ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
+            ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
+            mesh_sys->CopyFromMesh(ug);
+        }
+        else if(mesh_filename.EndsWith(_T("vtu")))
+        {
+            if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+
+            wxBusyCursor busy;
+
+            this->InitializeDefaultRenderSettings();
+            this->render_settings.GetProperty("slice_3D").SetBool(false);
+            this->render_settings.GetProperty("active_chemical").SetChemical("b");
+
+            vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
+            vtu_reader->SetFileName(mesh_filename.mb_str());
+            vtu_reader->Update();
+            if(this->is_opencl_available)
+                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+            else
+                mesh_sys = new GrayScottMeshRD();
+            mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
+        }
+        else if(mesh_filename.EndsWith(_T("obj")))
+        {
+            if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
+        
+            wxBusyCursor busy;
+
+            this->InitializeDefaultRenderSettings();
+            this->render_settings.GetProperty("slice_3D").SetBool(false);
+            this->render_settings.GetProperty("active_chemical").SetChemical("b");
+
+            // temporarily turn off internationalisation, to avoid string-to-float conversion issues
+            char *old_locale = setlocale(LC_NUMERIC,"C");
+            
+            vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
+            obj_reader->SetFileName(mesh_filename.mb_str());
+            obj_reader->Update();
+            if(this->is_opencl_available)
+                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+            else
+                mesh_sys = new GrayScottMeshRD();
+            vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+            ug->SetPoints(obj_reader->GetOutput()->GetPoints());
+            ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
+            mesh_sys->CopyFromMesh(ug);
+            
+            // restore the old locale
+            setlocale(LC_NUMERIC,old_locale);
+        }
+        else
+        {
+            wxMessageBox(_("Unsupported file type")); 
+            return; 
+        }
+    }
+    catch(...)
+    {
+        wxMessageBox(_("Unknown problem importing mesh")); 
         return; 
     }
 
