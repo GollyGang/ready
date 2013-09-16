@@ -49,6 +49,9 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
 AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
                                           Properties &render_settings,bool &warn_to_update)
 {
+    // temporarily turn off internationalisation, to avoid string-to-float conversion issues
+    char *old_locale = setlocale(LC_NUMERIC,"C");
+    
     vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
     bool parallel;
     int data_type = generic_reader->ReadOutputType(filename,parallel);
@@ -66,6 +69,10 @@ AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_av
         default: 
             throw runtime_error("Unsupported data type or file read error");
     }
+    
+    // restore the old locale
+    setlocale(LC_NUMERIC,old_locale);
+
     system->SetFilename(filename);
     system->SetModified(false);
     return system;
