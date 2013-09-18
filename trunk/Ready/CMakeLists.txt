@@ -118,6 +118,7 @@ set( PATTERN_FILES
   Patterns/tri_life.vtu
   Patterns/hex_B2oS2m34_gliders.vtu
   Patterns/oregonator.vti
+  Patterns/Brusselator.vti
   Patterns/larger-than-life.vti
   Patterns/smoothlife_smoothglider.vti
   Patterns/smoothlife_smoothlifeL.vti
@@ -147,6 +148,15 @@ set( PATTERN_FILES
   Patterns/PenroseTilings/Goucher_loops.vtu
   Patterns/Salt/salt2D_demo.vti
   Patterns/Salt/salt3D_circular330.vti
+  Patterns/Yang/Yang_1.vti
+  Patterns/Yang/Yang_2b.vti
+  Patterns/Yang/Yang_2c.vti
+  Patterns/Yang/Yang_2d.vti
+  Patterns/Yang/Yang_3a.vti
+  Patterns/Yang/Yang_3b.vti
+  Patterns/Yang/Yang_3c.vti
+  Patterns/Yang/Yang_3d.vti
+  Patterns/Yang/Yang_4.vti
 )
 
 set( HELP_FILES
