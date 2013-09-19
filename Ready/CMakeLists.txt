@@ -157,6 +157,10 @@ set( PATTERN_FILES
   Patterns/Yang/Yang_3c.vti
   Patterns/Yang/Yang_3d.vti
   Patterns/Yang/Yang_4.vti
+  Patterns/McCabe/McCabe.vti
+  Patterns/McCabe/McCabe_additive3a.vti
+  Patterns/McCabe/McCabe_additive3b.vti
+  Patterns/McCabe/McCabe_simple.vti
 )
 
 set( HELP_FILES
