@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        Jonathan McCabe (2010) &quot;&lt;a href=&quot;http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf&quot;&gt;Cyclic Symmetric Multi-Scale Turing Patterns&lt;/a&gt;&quot;
+
+        The model from the section 'Compound Turing Patterns', with variation on three different scales.
+    </description>
+
+    <rule type="kernel" name="McCabe">
+    
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        #define N 6
+        __constant float radii[ N ] = { 50.0f, 30.0f, 20.0f, 13.0f, 4.0f, 2.0f };
+        
+        // a step function with a linear ramp 
+        float ramp_step(float x,float a,float ea)
+        {
+            return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
+        }
+
+        __kernel void rd_compute(__global float* a_in,
+                                 __global float* a_out) 
+        {
+            const int bx = get_global_id(0);
+            const int by = get_global_id(1);
+            const int bz = get_global_id(2);
+            const int BX = get_global_size(0);
+            const int BY = get_global_size(1);
+            const int i_here = BX*(BY*bz + by) + bx;
+            
+            float densities[ N ];
+            float areas[ N ];
+            for( int i = 0; i &lt; N; ++i )
+            {
+                densities[ i ] = 0.0f;
+                areas[ i ] = 0.0f;
+            }
+            
+            float val;
+            float largest_radius = radii[ 0 ];
+            for(int dy=-largest_radius; dy&lt;=largest_radius; dy++)
+            {
+                for(int dx=-largest_radius; dx&lt;=largest_radius; dx++)
+                {
+                    float r = sqrt((float)(dx*dx + dy*dy));
+                    int tx = (bx+dx+BX) &amp; (BX-1); // wrap
+                    int ty = (by+dy+BY) &amp; (BY-1); // wrap
+                    val = a_in[ BX*(BY*bz+ty)+tx ]; 
+                    // add val, with anti-aliasing:
+                    for( int i = 0; i &lt; N; ++i )
+                    {
+                        float k_in = ramp_step(-r,-radii[ i ],1.0f);
+                        densities[ i ] += val * k_in;
+                        areas[ i ] += k_in;
+                    }
+                }
+            }
+            // normalize
+            for( int i = 0; i &lt; N; ++i )
+            {
+                densities[ i ] /= areas[ i ];
+            }
+            
+            // if inner density is higher than outer then increase, else decrease
+            float diff1 = 0.01f * sign( densities[ 1 ] - densities[ 0 ] );
+            float diff2 = -0.01f * sign( densities[ 3 ] - densities[ 2 ] );
+            float diff3 = -0.01f * sign( densities[ 5 ] - densities[ 4 ] );
+            a_out[i_here] = clamp( a_in[i_here] + diff1 + diff2 + diff3, -1.0f, 1.0f );
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="-0.1" high="0.1" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
+      <low value="-1" />
+      <high value="1" />
+      <show_color_scale value="false" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="1" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

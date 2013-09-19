@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        Jonathan McCabe (2010) &quot;&lt;a href=&quot;http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf&quot;&gt;Cyclic Symmetric Multi-Scale Turing Patterns&lt;/a&gt;&quot;
+
+        The model from the section 'Simple Turing Patterns'. 
+        We add variation at a single scale: wherever a location is lower than its surroundings we decrease it, wherever it is higher than its surroundings we increase it.
+        This is the same idea as the 'voting rule' cellular automaton.
+    </description>
+
+    <rule type="kernel" name="McCabe">
+    
+      <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
+        // ---------------------------------------------
+        __constant float ra = 20.0f;         // outer radius
+        __constant float rb = 9.0f;          // inner radius
+        // ---------------------------------------------
+        
+        // a step function with a linear ramp 
+        float ramp_step(float x,float a,float ea)
+        {
+            return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
+        }
+
+        __kernel void rd_compute(__global float4* a_in,
+                                 __global float4* a_out) 
+        {
+            // block IDS
+            const int bx = get_global_id(0);
+            const int by = get_global_id(1);
+            const int bz = get_global_id(2);
+            const int BX = get_global_size(0);
+            const int BY = get_global_size(1);
+            const int i_here = BX*(BY*bz + by) + bx;
+            
+            // how full are the annulus and inner disk?
+            float4 outf = 0.0f, inf = 0.0f;
+            float area_in = 0.0f, area_out = 0.0f;
+            float4 val; // (we process 4 floats at once, in 4x1x1 blocks)
+            // (if you want a version that processes single floats, see the svn)
+            for(int dy=-ra; dy&lt;=ra; dy++)
+            {
+                for(int dx=-ra; dx&lt;=ra; dx++)
+                {
+                    float r = sqrt((float)(dx*dx + dy*dy)); // same for all 4
+                    // retrieve the float4's we need
+                    int shift = (BX+dx)%4; // (avoid taking modulus of negatives)
+                    int dbx = (dx-shift)/4;
+                    int tx1 = (bx+dbx+BX)   &amp; (BX-1); // wrap
+                    int tx2 = (bx+dbx+1+BX) &amp; (BX-1); // wrap
+                    int ty =  (by+dy+BY)    &amp; (BY-1); // wrap
+                    float4 block1 = a_in[ BX*(BY*bz+ty)+tx1 ]; 
+                    float4 block2 = a_in[ BX*(BY*bz+ty)+tx2 ]; 
+                    // swizzle to get the single float4 we need for this sample
+                    switch(shift)
+                    {
+                        case 0: 
+                            val = block1; 
+                            break;
+                        case 1:
+                            val = (float4)(block1.y,block1.z,block1.w,block2.x); 
+                            break;
+                        case 2:
+                            val = (float4)(block1.z,block1.w,block2.x,block2.y); 
+                            break;
+                        case 3:
+                            val = (float4)(block1.w,block2.x,block2.y,block2.z); 
+                            break;
+                    }
+                    // add val, with anti-aliasing:
+                    float k_in = ramp_step(-r,-rb,1.0f);
+                    inf  += val * k_in;
+                    area_in += k_in;
+                    float k_out = ramp_step(-r,-ra,1.0f);
+                    outf += val * k_out;
+                    area_out += k_out;
+                }
+            }
+            // normalize
+            inf /= area_in;
+            outf /= area_out;
+            
+            // if inner density is higher than outer then increase, else decrease
+            float4 diff = 0.01f * sign( inf - outf );
+            a_out[i_here] = clamp( a_in[i_here] + diff, -1.0f, 1.0f );
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="-0.1" high="0.1" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
+      <low value="-1" />
+      <high value="1" />
+      <show_color_scale value="false" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="1" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
