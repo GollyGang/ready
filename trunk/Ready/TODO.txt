@@ -17,7 +17,7 @@ Big picture issues:
 before 0.6 release:
 
 - programmable colouring (R,G,B channels, or something that uses less memory (second opencl pass?))
-- multi-stage, multi-scale RD (McCabe, Kytta, Woitzel) 
+- multi-stage, multi-scale RD (Kytta, Woitzel) 
 - use FFT for speed?
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
