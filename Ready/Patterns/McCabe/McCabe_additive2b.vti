@@ -5,69 +5,69 @@
     <description>
         Jonathan McCabe (2010) &quot;&lt;a href=&quot;http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf&quot;&gt;Cyclic Symmetric Multi-Scale Turing Patterns&lt;/a&gt;&quot;
 
-        The model from the section 'Compound Turing Patterns', with variation on three different scales.
+        The model from the section 'Compound Turing Patterns', with variation on two different scales.
     </description>
 
     <rule type="kernel" name="McCabe">
     
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
-        #define N 6
-        __constant float radii[ N ] = { 50.0f, 30.0f, 20.0f, 13.0f, 4.0f, 2.0f };
-        
-        // a step function with a linear ramp 
-        float ramp_step(float x,float a,float ea)
-        {
-            return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
-        }
+
+        #define NUM_SCALES 2
+        #define NUM_RADII 4
+        __constant float radii[ NUM_RADII ] = { 20.0f, 12.0f, 6.0f, 4.0f };
+        __constant int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {3, 2} }; // inner, outer indices into radii[]
+        __constant float weight[ NUM_SCALES ] = { 0.01f, 0.01f };
 
         __kernel void rd_compute(__global float* a_in,
                                  __global float* a_out) 
         {
             const int bx = get_global_id(0);
             const int by = get_global_id(1);
-            const int bz = get_global_id(2);
             const int BX = get_global_size(0);
             const int BY = get_global_size(1);
-            const int i_here = BX*(BY*bz + by) + bx;
+            const int i_here = BX*by + bx;
             
-            float densities[ N ];
-            float areas[ N ];
-            for( int i = 0; i &lt; N; ++i )
+            float densities[ NUM_RADII ];
+            float areas[ NUM_RADII ];
+            float radii_squared[ NUM_RADII ];
+            for( int i = 0; i &lt; NUM_RADII; ++i )
             {
                 densities[ i ] = 0.0f;
                 areas[ i ] = 0.0f;
+                radii_squared[ i ] = radii[ i ] * radii[ i ];
             }
-            
+
+            // compute the density of every disk
             float val;
             float largest_radius = radii[ 0 ];
             for(int dy=-largest_radius; dy&lt;=largest_radius; dy++)
             {
                 for(int dx=-largest_radius; dx&lt;=largest_radius; dx++)
                 {
-                    float r = sqrt((float)(dx*dx + dy*dy));
-                    int tx = (bx+dx+BX) &amp; (BX-1); // wrap
-                    int ty = (by+dy+BY) &amp; (BY-1); // wrap
-                    val = a_in[ BX*(BY*bz+ty)+tx ]; 
-                    // add val, with anti-aliasing:
-                    for( int i = 0; i &lt; N; ++i )
+                    int tx = (bx+dx+BX) &amp; (BX-1); // wrap (for powers of 2 only)
+                    int ty = (by+dy+BY) &amp; (BY-1);
+                    val = a_in[ BX*ty + tx ]; 
+                    for( int i = 0; i &lt; NUM_RADII; ++i )
                     {
-                        float k_in = ramp_step(-r,-radii[ i ],1.0f);
-                        densities[ i ] += val * k_in;
-                        areas[ i ] += k_in;
+                        float inside = step( dx*dx+dy*dy, radii_squared[ i ] );
+                        densities[ i ] += val * inside;
+                        areas[ i ] += inside;
                     }
                 }
             }
-            // normalize
-            for( int i = 0; i &lt; N; ++i )
+            for( int i = 0; i &lt; NUM_RADII; ++i )
             {
                 densities[ i ] /= areas[ i ];
             }
             
-            // if inner density is higher than outer then increase, else decrease
-            float diff1 = 0.01f * sign( densities[ 1 ] - densities[ 0 ] );
-            float diff2 = -0.01f * sign( densities[ 3 ] - densities[ 2 ] );
-            float diff3 = -0.01f * sign( densities[ 5 ] - densities[ 4 ] );
-            a_out[i_here] = clamp( a_in[i_here] + diff1 + diff2 + diff3, -1.0f, 1.0f );
+            // sum the variation from each scale
+            float diff = 0.0f;
+            for( int i = 0; i &lt; NUM_SCALES; ++i )
+            {
+                float density_difference = densities[ pairs[ i ][ 0 ] ] - densities[ pairs[ i ][ 1 ] ];
+                diff += weight[ i ] * sign( density_difference );
+            }
+            a_out[i_here] = clamp( a_in[i_here] + diff, -1.0f, 1.0f );
         }
       </kernel>
       
