@@ -148,9 +148,9 @@ set( PATTERN_FILES
   Patterns/PenroseTilings/Goucher_loops.vtu
   Patterns/Salt/salt2D_demo.vti
   Patterns/Salt/salt3D_circular330.vti
-  Patterns/Yang/Yang_1.vti    Patterns/Yang/Yang_2b.vti  Patterns/Yang/Yang_2c.vti
-  Patterns/Yang/Yang_2d.vti   Patterns/Yang/Yang_3a.vti  Patterns/Yang/Yang_3b.vti
-  Patterns/Yang/Yang_3c.vti   Patterns/Yang/Yang_3d.vti  Patterns/Yang/Yang_4.vti
+  Patterns/Yang2002/Yang_1.vti    Patterns/Yang2002/Yang_2b.vti  Patterns/Yang2002/Yang_2c.vti
+  Patterns/Yang2002/Yang_2d.vti   Patterns/Yang2002/Yang_3a.vti  Patterns/Yang2002/Yang_3b.vti
+  Patterns/Yang2002/Yang_3c.vti   Patterns/Yang2002/Yang_3d.vti  Patterns/Yang2002/Yang_4.vti
   Patterns/McCabe/McCabe.vti               Patterns/McCabe/McCabe_simple.vti
   Patterns/McCabe/McCabe_additive2b.vti    Patterns/McCabe/McCabe_additive2a.vti
 )
