@@ -6,14 +6,14 @@
         L. Yang and I.R. Epstein. (2003) &quot;Oscillatory Turing Patterns in Reaction-Diffusion Systems with Two Coupled Layers&quot;&lt;br&gt;
         &lt;a href=&quot;http://hopf.chem.brandeis.edu/pubs/pub288%20rep.pdf&quot;&gt;http://hopf.chem.brandeis.edu/pubs/pub288%20rep.pdf&lt;/a&gt;
         
-        Figure 3(a) from the paper. The spirals take about 1 million timesteps to develop.
+        Figure 3(a) from the paper. Isolated spirals develop.
         
         In the paper the chemicals are named x,z,r,u,w. Here we use a,b,c,d,e. 
         Two Oregonator systems a,b and d,e are coupled with a middle layer c.
     </description>
     
     <rule name="Yang2003" type="formula" wrap="1">
-      <param name="timestep">       0.0001       </param>
+      <param name="timestep">       0.001       </param>
       <param name="Da">             0.1          </param>
       <param name="Db">             0.1          </param>
       <param name="Dc">             0.1          </param>
@@ -82,23 +82,23 @@
     </render_settings>
     
   </RD>
-  <ImageData WholeExtent="0 63 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
-  <Piece Extent="0 63 0 63 0 0">
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
     </PointData>
     <CellData>
