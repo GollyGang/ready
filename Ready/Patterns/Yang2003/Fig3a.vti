@@ -39,17 +39,17 @@
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <white_noise low="0.0582" high="0.0583" />
+        <constant value="0.0449" />
         <everywhere />
       </overlay>
       <overlay chemical="b">
         <overwrite />
-        <white_noise low="0.0582" high="0.0583" />
+        <constant value="0.0449" />
         <everywhere />
       </overlay>
       <overlay chemical="c">
         <overwrite />
-        <white_noise low="0.0637" high="0.0638" />
+        <constant value="0.0505" />
         <everywhere />
       </overlay>
       <overlay chemical="c">
@@ -59,12 +59,12 @@
       </overlay>
       <overlay chemical="d">
         <overwrite />
-        <white_noise low="0.0758" high="0.0759" />
+        <constant value="0.0666" />
         <everywhere />
       </overlay>
       <overlay chemical="e">
         <overwrite />
-        <white_noise low="0.0759" high="0.0760" />
+        <constant value="0.0666" />
         <everywhere />
       </overlay>
     </initial_pattern_generator>
