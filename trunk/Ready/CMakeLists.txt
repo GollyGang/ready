@@ -151,6 +151,7 @@ set( PATTERN_FILES
   Patterns/Yang2002/Yang_1.vti    Patterns/Yang2002/Yang_2b.vti  Patterns/Yang2002/Yang_2c.vti
   Patterns/Yang2002/Yang_2d.vti   Patterns/Yang2002/Yang_3a.vti  Patterns/Yang2002/Yang_3b.vti
   Patterns/Yang2002/Yang_3c.vti   Patterns/Yang2002/Yang_3d.vti  Patterns/Yang2002/Yang_4.vti
+  Patterns/Yang2003/Fig2.vti
   Patterns/Yang2003/Fig3a.vti     Patterns/Yang2003/Fig3b.vti    Patterns/Yang2003/Fig3c.vti
   Patterns/McCabe/McCabe.vti               Patterns/McCabe/McCabe_simple.vti
   Patterns/McCabe/McCabe_additive2b.vti    Patterns/McCabe/McCabe_additive2a.vti
