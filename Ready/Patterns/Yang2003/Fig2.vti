@@ -5,11 +5,12 @@
     <description>
         L. Yang and I.R. Epstein. (2003) &quot;Oscillatory Turing Patterns in Reaction-Diffusion Systems with Two Coupled Layers&quot;&lt;br&gt;
         &lt;a href=&quot;http://hopf.chem.brandeis.edu/pubs/pub288%20rep.pdf&quot;&gt;http://hopf.chem.brandeis.edu/pubs/pub288%20rep.pdf&lt;/a&gt;
+
+        Figure 2 from the paper. Initially spots appear, and then start to twinkle some time later. Eventually the whole
+        pattern adopts a hexagonal pattern on two different scales.
         
-        Figure 2 from the paper. But we haven't managed to reproduce their results - help needed!
-        Some parameters had to be changed to get the behavior
-        described in the paper: Da=Db=0.17. Then change q and q_bar to 
-        0.001 after the appearance of spots in order to get the twinkling eyes.
+        Note that the values for delta and delta_bar are different to those given in the
+        paper, after discussion with Lingfa Yang.
 
         In the paper the chemicals are named x,z,r,u,w. Here we use a,b,c,d,e. 
         Two Oregonator systems a,b and d,e are coupled with a middle layer c.
@@ -17,8 +18,8 @@
     
     <rule name="Yang2003" type="formula" wrap="1">
       <param name="timestep">       0.001        </param>
-      <param name="Da">             1.7          </param>
-      <param name="Db">             1.7          </param>
+      <param name="Da">             0.17         </param>
+      <param name="Db">             0.17         </param>
       <param name="Dc">             6.0          </param>
       <param name="Dd">             0.5          </param>
       <param name="De">             12.0         </param>
@@ -29,8 +30,8 @@
       <param name="q">              0.01         </param>
       <param name="q_bar">          0.01         </param>
       <formula number_of_chemicals="5">
-        float delta = 2.0f * epsilon;
-        float delta_bar = 2.0f * epsilon_bar;
+        float delta = epsilon / 0.36f;
+        float delta_bar = epsilon_bar / 0.36f;
         delta_a = Da * laplacian_a + ( a - a*a - param_f*b*(a-q)/(a+q) ) / epsilon - (a-c)/delta;
         delta_b = Db * laplacian_b + a - b;
         delta_c = Dc * laplacian_c + (a-c)/delta + (d-c)/delta_bar;
@@ -38,64 +39,36 @@
         delta_e = De * laplacian_e + d - e;
       </formula>
     </rule>
-    
-    <!--
-    
-    Values as printed don't give a steady-state with a=0.0575, was a value 
-    misprinted?
-    With parameters as printed: a=b=0.05819, c=0.06378, d=e=0.075952, but patterns fade.
-    
-    Assuming a=0.0575 (as stated) gives different possibilities, 
-    depending on which parameter was misprinted:
-    epsilon=0.19512 gives     a=b=0.0575, c=0.06241, d=e=0.07499 : patterns fade
-    param_f=1.40951 gives     a=b=0.0575, c=0.06318, d=e=0.07552 : patterns fade
-    epsilon_bar=0.05892 gives a=b=0.0575, c=0.06241, d=e=0.07499 : patterns fade
-    param_f_bar=1.12465 gives a=b=0.0575, c=0.06241, d=e=0.07308 : patterns fade
-    
-    Maybe just a lack of precision on f or f_bar? But still no twinkling.
-    
-    q and q_bar must have been different?
-    Or Da, Db? With 1.7 we get spots after steady state, as described. (with q=q_bar=0.01)
-    And setting q=q_bar to 0.001 after that we eventually get the twinkling eyes.
-    Or by drawing on pattern from scratch.
-    
-    But for Da=Db=1.7, q=q_bar=0.001 we don't know if there is a steady-state solution. 
-    WolframAlpha thinks not. And so we have no automatic way to initialise the pattern.
-   
-    With Da=Db=1.7 and q=q_bar=0.002 then we get twinkling eyes, but for q=0.03 or higher 
-    we get stable spots only.
-    
-    -->
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
-        <constant value="0.05819" />
+        <constant value="0.0575" />
         <everywhere />
       </overlay>
       <overlay chemical="b">
         <overwrite />
-        <constant value="0.05819" />
+        <constant value="0.0575" />
         <everywhere />
       </overlay>
       <overlay chemical="c">
         <overwrite />
-        <constant value="0.06378" />
+        <constant value="0.0643" />
         <everywhere />
       </overlay>
       <overlay chemical="c">
         <add />
-        <white_noise low="-0.02" high="0.02" />
+        <white_noise low="-0.001" high="0.001" />
         <everywhere />
       </overlay>
       <overlay chemical="d">
         <overwrite />
-        <constant value="0.075952" />
+        <constant value="0.0792" />
         <everywhere />
       </overlay>
       <overlay chemical="e">
         <overwrite />
-        <constant value="0.075952" />
+        <constant value="0.0792" />
         <everywhere />
       </overlay>
     </initial_pattern_generator>
@@ -106,30 +79,30 @@
       <show_color_scale value="true" />
       <show_multiple_chemicals value="true" />
       <active_chemical value="a" />
-      <low value="0.0" />
-      <high value="0.1" />
+      <low value="0.03" />
+      <high value="0.11" />
       <show_displacement_mapped_surface value="false" />
-      <timesteps_per_render value="3200" />
+      <timesteps_per_render value="1600" />
     </render_settings>
     
   </RD>
-  <ImageData WholeExtent="0 63 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
-  <Piece Extent="0 63 0 63 0 0">
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAAQAAAJwAAAA==eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAAAAAACAtwFAAAAB
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
     </PointData>
     <CellData>
