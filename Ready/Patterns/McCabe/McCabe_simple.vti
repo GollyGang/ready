@@ -5,7 +5,9 @@
     <description>
         Jonathan McCabe (2010) &quot;&lt;a href=&quot;http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf&quot;&gt;Cyclic Symmetric Multi-Scale Turing Patterns&lt;/a&gt;&quot;
 
-        The model from the section 'Compound Turing Patterns', with variation on two different scales.
+        The model from the section 'Simple Turing Patterns'. Each point 'adds variation' - if it is 
+        darker than the local average then it becomes darker still, if it is lighter then it becomes lighter
+        still. The current variation is computed by finding the average within two radii around each location.
     </description>
 
     <rule type="kernel" name="McCabe">
