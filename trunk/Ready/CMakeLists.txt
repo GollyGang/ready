@@ -155,6 +155,9 @@ set( PATTERN_FILES
   Patterns/Yang2003/Fig3a.vti     Patterns/Yang2003/Fig3b.vti    Patterns/Yang2003/Fig3c.vti
   Patterns/McCabe/McCabe.vti               Patterns/McCabe/McCabe_simple.vti
   Patterns/McCabe/McCabe_additive2b.vti    Patterns/McCabe/McCabe_additive2a.vti
+  Patterns/Kytta2007/Fig5.7a.vti  Patterns/Kytta2007/Fig5.7c.vti
+  Patterns/Kytta2007/Fig5.8c.vti  Patterns/Kytta2007/Fig5.8d.vti Patterns/Kytta2007/Fig5.8e.vti
+  Patterns/Kytta2007/Fig5.8f.vti  Patterns/Kytta2007/Fig5.8g.vti
 )
 
 set( HELP_FILES
