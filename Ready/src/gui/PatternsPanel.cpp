@@ -100,21 +100,11 @@ void PatternsPanel::AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTre
     if (dir.Last() == wxFILE_SEP_PATH) dir.Truncate(dir.Length()-1);
     wxDirItemData* diritem = new wxDirItemData(dir, dir, true);
     wxTreeItemId id = treectrl->AppendItem(root, dir.AfterLast(wxFILE_SEP_PATH), 0, 0, diritem);
+    
+    // expand the root item
     if ( diritem->HasFiles() || diritem->HasSubDirs() ) {
         treectrl->SetItemHasChildren(id);
         treectrl->Expand(id);
-        
-        // also expand any subfolders, but only one level
-        if ( diritem->HasSubDirs() ) {
-            wxTreeItemIdValue cookie;
-            wxTreeItemId nextid = treectrl->GetFirstChild(id, cookie);
-            while ( nextid.IsOk() ) {
-                if ( treectrl->ItemHasChildren(nextid) ) {
-                    treectrl->Expand(nextid);
-                }
-                nextid = treectrl->GetNextChild(id, cookie);
-            }
-        }
     }
 }
 
