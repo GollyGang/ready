@@ -182,7 +182,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,x-1);\n" <<
-                indent << "const int ym1 = max(0,y-1);\n";
+                indent << "const int xp1 = min(X-1,x+1);\n";
         kernel_source <<
             indent << "const int i_left =  X*(Y*z + y) + xm1;\n" <<
             indent << "const int i_right = X*(Y*z + y) + xp1;\n";
