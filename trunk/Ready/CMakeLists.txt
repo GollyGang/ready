@@ -118,9 +118,7 @@ set( PATTERN_FILES
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/larger-than-life.vti
-  Patterns/smoothlife_smoothglider.vti
-  Patterns/smoothlife_smoothlifeL.vti
-  Patterns/smoothlife3d_glider.vti
+  Patterns/SmoothLife/smoothglider.vti     Patterns/SmoothLife/smoothlifeL.vti     Patterns/SmoothLife/glider_3D.vti
   Patterns/Purwins_glider3d.vti
   Patterns/Purwins_glider.vti
   Patterns/CPU-only/grayscott_1D.vti 
