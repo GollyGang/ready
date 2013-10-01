@@ -98,8 +98,7 @@ set( PATTERN_FILES
   Patterns/Meinhardt1982/stripes.vti       Patterns/Meinhardt1982/zebra.vtu
   Patterns/Schlogl.vti 
   Patterns/heat_equation.vti 
-  Patterns/Turing.vti
-  Patterns/Turing_noisy.vti
+  Patterns/Turing1952/spots.vti            Patterns/Turing1952/spots_noisy.vti
   Patterns/kernel_test.vti 
   Patterns/Conway_life.vti 
   Patterns/Bays_3D.vti
