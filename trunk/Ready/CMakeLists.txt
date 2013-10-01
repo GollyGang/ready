@@ -100,21 +100,15 @@ set( PATTERN_FILES
   Patterns/heat_equation.vti 
   Patterns/Turing1952/spots.vti            Patterns/Turing1952/spots_noisy.vti
   Patterns/kernel_test.vti 
-  Patterns/Conway_life.vti 
-  Patterns/Bays_3D.vti
   Patterns/mutually-catalytic_spots.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti
-  Patterns/life_torus.vtu
   Patterns/bunny.vtu
   Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
   Patterns/complex_Ginsburg-Landau.vti
   Patterns/complex_Ginsburg-Landau_magnitude.vti
   Patterns/wave_equation.vti
-  Patterns/Buss_hex.vtu
-  Patterns/tri_life.vtu
-  Patterns/hex_B2oS2m34_gliders.vtu
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/larger-than-life.vti
@@ -137,13 +131,19 @@ set( PATTERN_FILES
   Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti
   Patterns/Gray-Scott/U-Skate/Munafo_glider.vti
   Patterns/Gray-Scott/U-Skate/o-ring_2D.vti
-  Patterns/PenroseTilings/life.vtu
-  Patterns/PenroseTilings/life_oscillators.vtu
-  Patterns/PenroseTilings/Goucher_glider.vtu
-  Patterns/PenroseTilings/Imai_glider_B2SC4.vtu
-  Patterns/PenroseTilings/Goucher_loops.vtu
-  Patterns/Salt/salt2D_demo.vti
-  Patterns/Salt/salt3D_circular330.vti
+  Patterns/CellularAutomata/Bays_3D.vti
+  Patterns/CellularAutomata/Conway_life.vti 
+  Patterns/CellularAutomata/life_torus.vtu
+  Patterns/CellularAutomata/Buss_hex.vtu
+  Patterns/CellularAutomata/tri_life.vtu
+  Patterns/CellularAutomata/hex_B2oS2m34_gliders.vtu
+  Patterns/CellularAutomata/PenroseTilings/life.vtu
+  Patterns/CellularAutomata/PenroseTilings/life_oscillators.vtu
+  Patterns/CellularAutomata/PenroseTilings/Goucher_glider.vtu
+  Patterns/CellularAutomata/PenroseTilings/Imai_glider_B2SC4.vtu
+  Patterns/CellularAutomata/PenroseTilings/Goucher_loops.vtu
+  Patterns/CellularAutomata/Salt/salt2D_demo.vti
+  Patterns/CellularAutomata/Salt/salt3D_circular330.vti
   Patterns/Yang2002/Yang_1.vti    Patterns/Yang2002/Yang_2b.vti  Patterns/Yang2002/Yang_2c.vti
   Patterns/Yang2002/Yang_2d.vti   Patterns/Yang2002/Yang_3a.vti  Patterns/Yang2002/Yang_3b.vti
   Patterns/Yang2002/Yang_3c.vti   Patterns/Yang2002/Yang_3d.vti  Patterns/Yang2002/Yang_4.vti
@@ -154,7 +154,7 @@ set( PATTERN_FILES
   Patterns/Kytta2007/Fig5.7a.vti  Patterns/Kytta2007/Fig5.7c.vti
   Patterns/Kytta2007/Fig5.8c.vti  Patterns/Kytta2007/Fig5.8d.vti Patterns/Kytta2007/Fig5.8e.vti
   Patterns/Kytta2007/Fig5.8f.vti  Patterns/Kytta2007/Fig5.8g.vti
-  Patterns/Yang2006/Jumping.vti
+  Patterns/Yang2006/jumping.vti
 )
 
 set( HELP_FILES
