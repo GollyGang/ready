@@ -106,8 +106,8 @@ set( PATTERN_FILES
   Patterns/bunny.vtu
   Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
-  Patterns/complex_Ginsburg-Landau.vti
-  Patterns/complex_Ginsburg-Landau_magnitude.vti
+  Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti
+  Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti
   Patterns/wave_equation.vti
   Patterns/oregonator.vti
   Patterns/Brusselator.vti

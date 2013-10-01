@@ -6,8 +6,10 @@
         &quot;The complex Ginzburg-Landau equation describes a vast variety of phenomena from nonlinear 
         waves to second-order phase transitions, from superconductivity, superfluidity, and 
         Bose-Einstein condensation to liquid crystals and strings in field theory.&quot; 
-        &lt;a href=&quot;http://hopf.chem.brandeis.edu/yanglingfa/pattern/cgle/index.html&quot;&gt;
+        &lt;a href=&quot;http://hopf.chem.brandeis.edu/members_content/yanglingfa/pattern/cgle/&quot;&gt;
         [link]&lt;/a&gt;
+        
+        Here we visualise the magnitude of the complex number in chemical c.
     </description>
       
     <rule type="formula" name="Ginzburg-Landau">
@@ -17,12 +19,13 @@
       <param name="beta">     1.0     </param>
       <param name="delta">    1.0     </param>
       <param name="gamma">    0.0625  </param>
-      <param name="D_a">      0.2     </param>
-      <param name="D_b">      0.2     </param>
+      <param name="D_a">      0.1     </param>
+      <param name="D_b">      0.1     </param>
       
-      <formula number_of_chemicals="2">
+      <formula number_of_chemicals="3">
           delta_a = D_a * laplacian_a + alpha*a - gamma*b + (-beta*a + delta*b)*(a*a+b*b);
           delta_b = D_b * laplacian_b + alpha*b + gamma*a + (-beta*b - delta*a)*(a*a+b*b);
+          c = sqrt(a*a + b*b);
       </formula>
       
     </rule>
@@ -41,15 +44,16 @@
     </initial_pattern_generator>
     
     <render_settings>
+      <color_low r="1" g="0" b="0.321569" />
+      <color_high r="0" g="0.937255" b="1" />
+      <show_color_scale value="true" />
+      <show_multiple_chemicals value="false" />
+      <active_chemical value="c" />
       <low value="-0.25" />
       <high value="0.25" />
-      <show_displacement_mapped_surface value="false" />
-      <show_multiple_chemicals value="false" />
-      <color_low r="0" g="0" b="0" />
-      <color_high r="1" g="1" b="1" />
-      <timesteps_per_render value="10" />
+      <vertical_scale_1D value="30" />
       <vertical_scale_2D value="30" />
-      <contour_level value="0" />
+      <show_displacement_mapped_surface value="false" />
     </render_settings>
 
   </RD>
@@ -58,6 +62,7 @@
       <PointData>
         <DataArray type="Float32" Name="a" format="appended" RangeMin="0" RangeMax="0" offset="0" />
         <DataArray type="Float32" Name="b" format="appended" RangeMin="0" RangeMax="0" offset="616" />
+        <DataArray type="Float32" Name="c" format="appended" RangeMin="0" RangeMax="0" offset="616" />
       </PointData>
       <CellData>
       </CellData>
