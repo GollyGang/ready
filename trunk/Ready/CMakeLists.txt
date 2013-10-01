@@ -111,7 +111,6 @@ set( PATTERN_FILES
   Patterns/wave_equation.vti
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
-  Patterns/larger-than-life.vti
   Patterns/SmoothLife/smoothglider.vti     Patterns/SmoothLife/smoothlifeL.vti     Patterns/SmoothLife/glider_3D.vti
   Patterns/Purwins_glider3d.vti
   Patterns/Purwins_glider.vti
@@ -134,6 +133,7 @@ set( PATTERN_FILES
   Patterns/CellularAutomata/Bays_3D.vti
   Patterns/CellularAutomata/Conway_life.vti 
   Patterns/CellularAutomata/life_torus.vtu
+  Patterns/CellularAutomata/larger-than-life.vti
   Patterns/CellularAutomata/Buss_hex.vtu
   Patterns/CellularAutomata/tri_life.vtu
   Patterns/CellularAutomata/hex_B2oS2m34_gliders.vtu
