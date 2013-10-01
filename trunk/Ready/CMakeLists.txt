@@ -95,7 +95,7 @@ set( RESOURCES
 include_directories( resources )
 
 set( PATTERN_FILES
-  Patterns/Meinhardt_stripes.vti 
+  Patterns/Meinhardt1982/stripes.vti       Patterns/Meinhardt1982/zebra.vtu
   Patterns/Schlogl.vti 
   Patterns/heat_equation.vti 
   Patterns/Turing.vti
@@ -108,7 +108,6 @@ set( PATTERN_FILES
   Patterns/parameter_modulation_demo2.vti
   Patterns/life_torus.vtu
   Patterns/bunny.vtu
-  Patterns/horse.vtu
   Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
   Patterns/complex_Ginsburg-Landau.vti
