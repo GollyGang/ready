@@ -14,7 +14,7 @@
     
     <rule name="Meinhardt" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
     
-      <param name="timestep">    0.02      </param>
+      <param name="timestep">    0.2       </param>
       <param name="k_ab">        0.04      </param>
       <param name="k_c">         0.06      </param>
       <param name="k_de">        0.04      </param>
@@ -125,7 +125,7 @@
         <show_multiple_chemicals value="true" />
         <show_color_scale value="false" />
         <show_displacement_mapped_surface value="false" />
-		<timesteps_per_render value="800" />
+		<timesteps_per_render value="32" />
     </render_settings>
        
   </RD>
