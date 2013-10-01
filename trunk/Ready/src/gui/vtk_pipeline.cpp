@@ -71,9 +71,15 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
     {
         vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
         if(system->GetArenaDimensionality()>2)
+				{
             camera->SetPosition(-3,3,10); // move off-axis to look more natural
-				else if(system->GetArenaDimensionality()==2 && render_settings.GetProperty("show_displacement_mapped_surface").GetBool())
+				}
+				else if( system->GetArenaDimensionality()==2 
+								 && render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
+								 && system->GetFileExtension()!="vtu" )
+				{
             camera->SetPosition(0,-3,10); // move slightly down, to give perspective on the displacement plots
+				}
         pRenderer->SetActiveCamera(camera);
         pRenderer->ResetCamera();
     }
