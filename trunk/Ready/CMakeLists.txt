@@ -153,7 +153,7 @@ set( PATTERN_FILES
   Patterns/Kytta2007/Fig5.7a.vti  Patterns/Kytta2007/Fig5.7c.vti
   Patterns/Kytta2007/Fig5.8c.vti  Patterns/Kytta2007/Fig5.8d.vti Patterns/Kytta2007/Fig5.8e.vti
   Patterns/Kytta2007/Fig5.8f.vti  Patterns/Kytta2007/Fig5.8g.vti
-  Patterns/Yang2006/jumping.vti
+  Patterns/Yang2006/jumping.vti   Patterns/Yang2006/jumping_cGL.vti
 )
 
 set( HELP_FILES
