@@ -5,21 +5,30 @@
     <description>
         Jonathan McCabe (2010) &quot;&lt;a href=&quot;http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf&quot;&gt;Cyclic Symmetric Multi-Scale Turing Patterns&lt;/a&gt;&quot;
 
-        The model from the section 'Simple Turing Patterns'. Each point 'adds variation' - if it is 
-        darker than the local average then it becomes darker still, if it is lighter then it becomes lighter
-        still. The current variation is computed by finding the average within two radii around each location.
+        The model from the section 'Simple Turing Patterns'.
+        
+        The code 'adds variation' at each location:&lt;br&gt;
+        1) Find the average within an inner radius (8).&lt;br&gt;
+        2) Find the average within an outer radius (20).&lt;br&gt;
+        3) If the average inside the inner radius is greater than the average in the outer radius then increase the value at that location by 0.01. Otherwise
+        decrease it by 0.01.&lt;br&gt;
+        4) Ensure the value stays within the range of -1 to +1.
+        
+        Compare with: 'Vote' cellular automata (e.g. B4678/S35678), Schlogl's bistable model, Turing stripes, Stephan Rafler's SmoothLife.
     </description>
 
     <rule type="kernel" name="McCabe">
     
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
-
+      
+        #define NUM_SCALES 1
         #define NUM_RADII 2
-        __constant float radii[ NUM_RADII ] = { 20.0f, 8.0f };
 
         __kernel void rd_compute(__global float* a_in,
                                  __global float* a_out) 
         {
+            float radii[ NUM_RADII ] = { 20.0f, 8.0f };
+                
             const int bx = get_global_id(0);
             const int by = get_global_id(1);
             const int BX = get_global_size(0);
@@ -29,7 +38,7 @@
             float densities[ NUM_RADII ];
             float areas[ NUM_RADII ];
             float radii_squared[ NUM_RADII ];
-            for( int i = 0; i &lt; NUM_RADII; ++i )
+            for( int i = 0; i &lt; NUM_RADII; i++ )
             {
                 densities[ i ] = 0.0f;
                 areas[ i ] = 0.0f;
@@ -46,23 +55,41 @@
                     int tx = (bx+dx+BX) &amp; (BX-1); // wrap (for powers of 2 only)
                     int ty = (by+dy+BY) &amp; (BY-1);
                     val = a_in[ BX*ty + tx ]; 
-                    for( int i = 0; i &lt; NUM_RADII; ++i )
+                    for( int i = 0; i &lt; NUM_RADII; i++ )
                     {
-                        float inside = step( dx*dx+dy*dy, radii_squared[ i ] );
-                        densities[ i ] += val * inside;
-                        areas[ i ] += inside;
+                        if( dx*dx+dy*dy &lt;= radii_squared[ i ] )
+                        {
+                            densities[ i ] += val;
+                            areas[ i ] += 1.0f;
+                        }
                     }
                 }
             }
-            for( int i = 0; i &lt; NUM_RADII; ++i )
+            for( int i = 0; i &lt; NUM_RADII; i++ )
             {
                 densities[ i ] /= areas[ i ];
             }
             
-            // add variation (push this value at this location away from its local average)
+            // add variation
             float density_difference = densities[ 1 ] - densities[ 0 ];
-            float diff = 0.01f * sign( density_difference );
-            a_out[i_here] = clamp( a_in[i_here] + diff, -1.0f, 1.0f );
+            float diff = 0.0f;
+            if( density_difference &gt;= 0.0f )
+            {
+                diff = 0.01f;
+            }
+            else
+            {
+                diff = - 0.01f;
+            }
+            a_out[i_here] = a_in[i_here] + diff;
+            if( a_out[i_here] &gt; 1.0f )
+            {
+                a_out[i_here] = 1.0f;
+            }
+            else if( a_out[i_here] &lt; -1.0f )
+            {
+                a_out[i_here] = -1.0f;
+            }
         }
       </kernel>
       
