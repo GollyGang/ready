@@ -27,6 +27,8 @@ before 0.6 release:
 
 before 0.x release:
 
+- floating-point speed reporting
+- progress indicator on loading large patterns
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - use FFT for speed?
