@@ -23,6 +23,7 @@ before 0.6 release:
 - choice of color palettes: http://www.vtk.org/Wiki/VTK/Examples/Cxx/PolyData/Curvatures
 - choice of log or linear color palette
 - recompile against more recent VTK and wxWidgets?
+- phase diagrams
 
 before 0.x release:
 
@@ -65,10 +66,6 @@ before 1.0 release:
 - graphical UI for editing the initial-pattern-generator overlay stack
 
 future ideas:
-- phase diagrams (plotting trajectories of individual locations through chemical space): keep track of
-  a sample of points over time, allow the user to plot different pairs/triples
-  (Ideally would use vtkDataObjectToTable->vtkChartXY but this doesn't currently support pipelining:
-  http://www.vtk.org/Bug/view.php?id=13268)
 - bug: allow user to change OpenCL platform and device while a pattern is running
 - full control over scene graph, e.g. nodes+connections interface
 - radiosity rendering for better visualization of tangled structures (embed a raytracer)
