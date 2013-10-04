@@ -25,24 +25,23 @@
     <rule type="kernel" name="McCabe">
     
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
-
-        #define NUM_SCALES 4
-        #define NUM_RADII 6
-        __constant float radii[ NUM_RADII ] = { 40.0f, 20.0f, 10.0f, 5.0f, 2.0f, 1.0f };
-        __constant int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {2, 1}, {3, 2}, {5, 4} }; // inner, outer indices into radii[]
-        __constant float amount[ NUM_SCALES ] = { 0.04f, 0.03f, 0.02f, 0.01f };
-            
-        /* On faster machines, try a larger set:
-        #define NUM_SCALES 5
-        #define NUM_RADII 8
-        __constant float radii[ NUM_RADII ] = { 200.0f, 100.0f, 40.0f, 20.0f, 10.0f, 5.0f, 2.0f, 1.0f };
-        __constant int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {3, 2}, {4, 3}, {5, 4}, {7, 6} }; // inner, outer indices into radii[]
-        __constant float amount[ NUM_SCALES ] = { 0.05f, 0.04f, 0.03f, 0.02f, 0.01f };
-        */
-            
         __kernel void rd_compute(__global float* a_in,
                                  __global float* a_out) 
         {
+            #define NUM_SCALES 4
+            #define NUM_RADII 6
+            float radii[ NUM_RADII ] = { 40.0f, 20.0f, 10.0f, 5.0f, 2.0f, 1.0f };
+            int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {2, 1}, {3, 2}, {5, 4} }; // inner, outer indices into radii[]
+            float amount[ NUM_SCALES ] = { 0.04f, 0.03f, 0.02f, 0.01f };
+                
+            /* On faster machines, try a larger set:
+            #define NUM_SCALES 5
+            #define NUM_RADII 8
+            float radii[ NUM_RADII ] = { 200.0f, 100.0f, 40.0f, 20.0f, 10.0f, 5.0f, 2.0f, 1.0f };
+            int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {3, 2}, {4, 3}, {5, 4}, {7, 6} }; // inner, outer indices into radii[]
+            float amount[ NUM_SCALES ] = { 0.05f, 0.04f, 0.03f, 0.02f, 0.01f };
+            */
+                
             const int bx = get_global_id(0);
             const int by = get_global_id(1);
             const int BX = get_global_size(0);
