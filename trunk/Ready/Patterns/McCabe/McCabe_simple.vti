@@ -21,12 +21,11 @@
     
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
       
-        #define NUM_SCALES 1
-        #define NUM_RADII 2
-
         __kernel void rd_compute(__global float* a_in,
                                  __global float* a_out) 
         {
+            #define NUM_SCALES 1
+            #define NUM_RADII 2
             float radii[ NUM_RADII ] = { 20.0f, 8.0f };
                 
             const int bx = get_global_id(0);
