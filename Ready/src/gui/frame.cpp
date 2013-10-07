@@ -1274,6 +1274,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
                 this->RecordFrame();
        
             this->pVTKWindow->Refresh(false);
+            this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
             this->SetStatusBarText();
             
             if (do_one_render) {
@@ -2802,6 +2803,7 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("color_displacement_mapped_surface",true));
     this->render_settings.AddProperty(Property("use_image_interpolation",true));
     this->render_settings.AddProperty(Property("timesteps_per_render",100));
+    this->render_settings.AddProperty(Property("show_phase_plot",true));
     // TODO: allow user to change defaults
 }
 

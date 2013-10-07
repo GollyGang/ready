@@ -414,6 +414,8 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         pRenderer->AddActor(actor);
     }
 
+    // TODO: would like to add a phase plot too but can't get it to work
+
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
     {

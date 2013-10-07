@@ -23,7 +23,6 @@ before 0.6 release:
 - choice of color palettes: http://www.vtk.org/Wiki/VTK/Examples/Cxx/PolyData/Curvatures
 - choice of log or linear color palette
 - recompile against more recent VTK and wxWidgets?
-- phase diagrams
 
 before 0.x release:
 

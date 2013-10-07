@@ -77,7 +77,8 @@ class ImageRD : public AbstractRD
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;
 
-        double xgap,ygap; /// spatial separation for rendering multiple chemicals (currently only used in 2D)
+        double xgap,ygap; /// spatial separation for rendering multiple chemicals
+        double axis_gap; /// spatial separation between axis and content
 
     protected:
 
@@ -103,6 +104,7 @@ class ImageRD : public AbstractRD
         void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& render_settings);
+        void AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ);
 
     private: // deliberately not implemented, to prevent use
 
