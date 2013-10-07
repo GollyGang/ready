@@ -82,10 +82,14 @@ using namespace std;
 #include <vtkPointDataToCellData.h>
 #include <vtkPlane.h>
 #include <vtkCutter.h>
+#include <vtkWarpVector.h>
+#include <vtkVertexGlyphFilter.h>
+#include <vtkPassThroughFilter.h>
+#include <vtkPointSource.h>
 
 // -------------------------------------------------------------------
 
-ImageRD::ImageRD() : xgap(5.0),ygap(3.0)
+ImageRD::ImageRD() : xgap(5.0),ygap(20.0),axis_gap(1.0)
 {
     this->starting_pattern = vtkImageData::New();
     this->assign_attribute_filter = NULL;
@@ -347,6 +351,8 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
+    bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -421,14 +427,14 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
         actor->PickableOff();
-        actor->SetPosition(0.5,-low*scaling+this->ygap,0);
+        actor->SetPosition(0,-low*scaling+this->ygap,0);
         pRenderer->AddActor(actor);
     }
     
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(0,0,this->ygap,(high-low)*scaling+this->ygap,0,0);
+    axis->SetBounds(-this->axis_gap,-this->axis_gap,this->ygap,(high-low)*scaling+this->ygap,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -440,6 +446,12 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     axis->SetNumberOfLabels(5);
     axis->PickableOff();
     pRenderer->AddActor(axis);
+
+    // add a phase plot
+    if(show_phase_plot && this->GetNumberOfChemicals()>=2)
+    {
+        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f,this->ygap*2 + scaling * (high-low),0.0f);
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -466,6 +478,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -629,6 +642,16 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         scalar_bar->SetLookupTable(lut);
         pRenderer->AddActor2D(scalar_bar);
     }
+
+    // add a phase plot
+    if(show_phase_plot && this->GetNumberOfChemicals()>=2)
+    {
+        float posY = this->ygap*2 + this->GetY();
+        if(show_displacement_mapped_surface)
+            posY += this->ygap + this->GetY();
+
+        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,posY,0.0f);
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -654,6 +677,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->ImmediateModeRenderingOn();
@@ -819,6 +843,134 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             scalar_bar->SetLookupTable(lut);
             pRenderer->AddActor2D(scalar_bar);
         }
+    }
+
+    // add a phase plot
+    if(show_phase_plot && this->GetNumberOfChemicals()>=2)
+    {
+        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+this->ygap,0.0f);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ)
+{
+    vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
+    points->SetNumberOfPoints(this->GetNumberOfCells());
+    points->SetRadius(0);
+
+    vtkSmartPointer<vtkMergeFilter> mergeX = vtkSmartPointer<vtkMergeFilter>::New();
+    mergeX->SetGeometryConnection(points->GetOutputPort());
+    mergeX->SetScalars(this->GetImage(0));
+
+    vtkSmartPointer<vtkWarpScalar> warpX = vtkSmartPointer<vtkWarpScalar>::New();
+    warpX->UseNormalOn();
+    warpX->SetNormal(1,0,0);
+    warpX->SetInputConnection(mergeX->GetOutputPort());
+    warpX->SetScaleFactor(scaling);
+
+    vtkSmartPointer<vtkMergeFilter> mergeY = vtkSmartPointer<vtkMergeFilter>::New();
+    mergeY->SetGeometryConnection(warpX->GetOutputPort());
+    mergeY->SetScalars(this->GetImage(1));
+
+    vtkSmartPointer<vtkWarpScalar> warpY = vtkSmartPointer<vtkWarpScalar>::New();
+    warpY->UseNormalOn();
+    warpY->SetNormal(0,1,0);
+    warpY->SetInputConnection(mergeY->GetOutputPort());
+    warpY->SetScaleFactor(scaling);
+
+    vtkSmartPointer<vtkVertexGlyphFilter> glyph = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+
+    float offsetZ = 0.0f;
+    if(this->GetNumberOfChemicals()>2)
+    {
+        vtkSmartPointer<vtkMergeFilter> mergeZ = vtkSmartPointer<vtkMergeFilter>::New();
+        mergeZ->SetGeometryConnection(warpY->GetOutputPort());
+        mergeZ->SetScalars(this->GetImage(2));
+
+        vtkSmartPointer<vtkWarpScalar> warpZ = vtkSmartPointer<vtkWarpScalar>::New();
+        warpZ->UseNormalOn();
+        warpZ->SetNormal(0,0,1);
+        warpZ->SetInputConnection(mergeZ->GetOutputPort());
+        warpZ->SetScaleFactor(scaling);
+
+        glyph->SetInputConnection(warpZ->GetOutputPort());
+
+        offsetZ = low*scaling;
+    }
+    else
+    {
+        glyph->SetInputConnection(warpY->GetOutputPort());
+    }
+
+    vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+    trans->Scale(1,1,-1);
+    vtkSmartPointer<vtkTransformFilter> transFilter = vtkSmartPointer<vtkTransformFilter>::New();
+    transFilter->SetTransform(trans);
+    transFilter->SetInputConnection(glyph->GetOutputPort());
+
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(transFilter->GetOutputPort());
+    mapper->ScalarVisibilityOff();
+    mapper->ImmediateModeRenderingOn();
+    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+    actor->GetProperty()->SetAmbient(1);
+    actor->GetProperty()->SetPointSize(2);
+    actor->PickableOff();
+    actor->SetPosition(posX-low*scaling,posY-low*scaling,posZ+offsetZ);
+    pRenderer->AddActor(actor);
+
+    // also add the axes
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(posX,posX+scaling*(high-low),posY-this->axis_gap,posY-this->axis_gap,posZ,posZ);
+        axis->SetRanges(low,high,0,0,0,0);
+        axis->UseRangesOn();
+        axis->YAxisVisibilityOff();
+        axis->ZAxisVisibilityOff();
+        axis->SetXLabel("");
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
+    }
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(posX-this->axis_gap,posX-this->axis_gap,posY,posY+(high-low)*scaling,posZ,posZ);
+        axis->SetRanges(0,0,low,high,0,0);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->ZAxisVisibilityOff();
+        axis->SetYLabel("");
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
+    }
+    if(this->GetNumberOfChemicals()>2)
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(posX,posX,posY,posY,posZ,posZ-scaling*(high-low));
+        axis->SetRanges(0,0,0,0,low,high);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->YAxisVisibilityOff();
+        axis->SetZLabel("");
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
     }
 }
 

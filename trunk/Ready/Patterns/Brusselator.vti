@@ -31,9 +31,14 @@
     </rule>
     
     <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="2" />
+        <everywhere />
+      </overlay>
       <overlay chemical="b">
         <overwrite />
-        <white_noise low="0" high="4.5" />
+        <white_noise low="2" high="4.5" />
         <everywhere />
       </overlay>
     </initial_pattern_generator>
@@ -48,6 +53,7 @@
       <high value="4.5" />
       <show_displacement_mapped_surface value="false" />
       <timesteps_per_render value="100" />
+      <show_phase_plot value="true" />
     </render_settings>
     
   </RD>
