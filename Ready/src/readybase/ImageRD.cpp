@@ -84,7 +84,6 @@ using namespace std;
 #include <vtkCutter.h>
 #include <vtkWarpVector.h>
 #include <vtkVertexGlyphFilter.h>
-#include <vtkPassThroughFilter.h>
 #include <vtkPointSource.h>
 
 // -------------------------------------------------------------------
