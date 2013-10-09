@@ -1,6 +1,6 @@
 Dependencies: 
 0) CMake: www.cmake.org
-1) VTK (5.10+): www.vtk.org
+1) VTK (5.10.*): www.vtk.org
 2) wxWidgets (2.9.2+): www.wxwidgets.org
 3) any OpenCL SDK.
 
@@ -127,12 +127,11 @@ For 64-bit builds:
 
 =========================== Linux =================================
 
-Install: libgtk2.0-dev, libvtk (if your repository provides a recent
-enough version), libwxgtk (if your repository provides a recent
+Install: libgtk2.0-dev, libvtk (if your repository provides the right 
+version), libwxgtk (if your repository provides a recent
 enough version), any OpenCL SDK, ccmake (cmake-curses-gui).
 
-A) Build VTK (if your repository doesn't provide a recent enough 
-   version):
+A) Build VTK (if your repository doesn't provide the right version):
 
 cd VTK
 mkdir bin
