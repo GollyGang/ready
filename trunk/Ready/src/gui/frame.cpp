@@ -3314,7 +3314,9 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     {
         bool is_2D_data_available = this->system->Is2DImageAvailable();
         bool are_multiple_chemicals_available = is_2D_data_available && (this->system->GetNumberOfChemicals() > 1);
-        bool default_to_2D_data = (is_2D_data_available && this->system->GetArenaDimensionality()==2);
+        bool default_to_2D_data = ( is_2D_data_available && this->system->GetArenaDimensionality()==2
+                                    && !this->render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
+                                    && !this->render_settings.GetProperty("show_phase_plot").GetBool() );
 
         RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data);
         if(dlg.ShowModal()!=wxID_OK) return;
