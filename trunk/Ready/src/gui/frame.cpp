@@ -2804,6 +2804,9 @@ void MyFrame::InitializeDefaultRenderSettings()
     this->render_settings.AddProperty(Property("use_image_interpolation",true));
     this->render_settings.AddProperty(Property("timesteps_per_render",100));
     this->render_settings.AddProperty(Property("show_phase_plot",true));
+    this->render_settings.AddProperty(Property("phase_plot_x_axis","chemical","a"));
+    this->render_settings.AddProperty(Property("phase_plot_y_axis","chemical","b"));
+    this->render_settings.AddProperty(Property("phase_plot_z_axis","chemical","c"));
     // TODO: allow user to change defaults
 }
 

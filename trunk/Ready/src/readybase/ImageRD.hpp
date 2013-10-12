@@ -104,7 +104,8 @@ class ImageRD : public AbstractRD
         void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& render_settings);
-        void AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ);
+        void AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
+                            int iChemX,int iChemY,int iChemZ);
 
     private: // deliberately not implemented, to prevent use
 
