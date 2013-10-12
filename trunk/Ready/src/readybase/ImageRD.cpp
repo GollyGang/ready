@@ -88,7 +88,12 @@ using namespace std;
 
 // -------------------------------------------------------------------
 
-ImageRD::ImageRD() : xgap(5.0),ygap(20.0),axis_gap(1.0)
+ImageRD::ImageRD() 
+    : xgap(5.0)
+    , ygap(20.0)
+    , axis_gap(1.0)
+    , image_top1D(2.0)
+    , image_ratio1D(30.0)
 {
     this->starting_pattern = vtkImageData::New();
     this->assign_attribute_filter = NULL;
@@ -370,36 +375,51 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     lut->SetHueRange(low_hue,high_hue);
     lut->SetValueRange(low_val,high_val);
     lut->Build();
+    
+    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
+    {
+        // pass the image through the lookup table
+        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+        image_mapper->SetLookupTable(lut);
+        image_mapper->SetInput(this->GetImage(iChem));
+      
+        // will convert the x*y 2D image to a x*y grid of quads
+        const float image_height = this->GetX() / this->image_ratio1D;
+        const float image_offset = this->image_top1D - image_height * 2.0f * (iChem - iFirstChem);
+        vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+        plane->SetXResolution(this->GetX());
+        plane->SetYResolution(this->GetY());
+        plane->SetOrigin(0,image_offset-image_height,0);
+        plane->SetPoint1(this->GetX(),image_offset-image_height,0);
+        plane->SetPoint2(0,image_offset,0);
 
-    // pass the image through the lookup table
-    vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
-    image_mapper->SetLookupTable(lut);
-    image_mapper->SetInput(this->GetImage(iActiveChemical));
-  
-    // will convert the x*y 2D image to a x*y grid of quads
-    const int image_height = this->GetX() / 30.0f; // fixed proportions
-    vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
-    plane->SetXResolution(this->GetX());
-    plane->SetYResolution(this->GetY());
-    plane->SetOrigin(0,2-image_height,0);
-    plane->SetPoint1(this->GetX(),2-image_height,0);
-    plane->SetPoint2(0,2,0);
+        vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+        texture->SetInputConnection(image_mapper->GetOutputPort());
+        if(use_image_interpolation)
+            texture->InterpolateOn();
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(plane->GetOutputPort());
 
-    vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
-    texture->SetInputConnection(image_mapper->GetOutputPort());
-    if(use_image_interpolation)
-        texture->InterpolateOn();
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(plane->GetOutputPort());
-
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-    actor->SetTexture(texture);
-    if(show_cell_edges)
-        actor->GetProperty()->EdgeVisibilityOn();
-    actor->GetProperty()->SetEdgeColor(0,0,0);
-    actor->GetProperty()->LightingOff();
-    pRenderer->AddActor(actor);
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->SetTexture(texture);
+        if(show_cell_edges)
+            actor->GetProperty()->EdgeVisibilityOn();
+        actor->GetProperty()->SetEdgeColor(0,0,0);
+        actor->GetProperty()->LightingOff();
+        pRenderer->AddActor(actor);
+        
+        if(this->GetNumberOfChemicals()>1)
+        {
+            vtkSmartPointer<vtkTextActor3D> label = vtkSmartPointer<vtkTextActor3D>::New();
+            label->SetInput(GetChemicalName(iChem).c_str());
+            const float text_label_offset = 20.0f;
+            label->SetPosition(-text_label_offset,image_offset-image_height,0);
+            label->PickableOff();
+            label->SetScale(image_height/10.0);
+            pRenderer->AddActor(label);
+        }
+    }
 
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
@@ -1243,7 +1263,14 @@ float ImageRD::GetValue(float x,float y,float z,const Properties& render_setting
     float offset_x = 0.0f;
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iChemical;
-    if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    if(show_multiple_chemicals && this->GetArenaDimensionality()==1)
+    {
+        // detect which chemical was drawn on from the click position
+        const double image_height = X / this->image_ratio1D;
+        iChemical = int(floor((- y + this->image_top1D + image_height)/(image_height*2))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+    }
+    else if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
     {
         // detect which chemical was drawn on from the click position
         iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
@@ -1279,7 +1306,14 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
     float offset_x = 0.0f;
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iChemical;
-    if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    if(show_multiple_chemicals && this->GetArenaDimensionality()==1)
+    {
+        // detect which chemical was drawn on from the click position
+        const double image_height = X / this->image_ratio1D;
+        iChemical = int(floor((- y + this->image_top1D + image_height)/(image_height*2))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+    }
+    else if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
     {
         // detect which chemical was drawn on from the click position
         iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
@@ -1319,7 +1353,14 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
     float offset_x = 0.0f;
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iChemical;
-    if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    if(show_multiple_chemicals && this->GetArenaDimensionality()==1)
+    {
+        // detect which chemical was drawn on from the click position
+        const double image_height = X / this->image_ratio1D;
+        iChemical = int(floor((- y + this->image_top1D + image_height)/(image_height*2))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+    }
+    else if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
     {
         // detect which chemical was drawn on from the click position
         iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 

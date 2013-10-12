@@ -16,7 +16,6 @@ Big picture issues:
 
 before 0.6 release:
 
-- show multiple 1D strips below each other
 - check that output folder exists before recording
 - flicking multiple chemicals on/off causes crash?
 - colored plot in 1D view?
