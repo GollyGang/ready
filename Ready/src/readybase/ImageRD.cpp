@@ -377,11 +377,12 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     image_mapper->SetInput(this->GetImage(iActiveChemical));
   
     // will convert the x*y 2D image to a x*y grid of quads
+    const int image_height = this->GetX() / 30.0f; // fixed proportions
     vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
     plane->SetXResolution(this->GetX());
     plane->SetYResolution(this->GetY());
-    plane->SetOrigin(0,0,0);
-    plane->SetPoint1(this->GetX(),0,0);
+    plane->SetOrigin(0,2-image_height,0);
+    plane->SetPoint1(this->GetX(),2-image_height,0);
     plane->SetPoint2(0,2,0);
 
     vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
