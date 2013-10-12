@@ -406,7 +406,7 @@ is given by the spatial range of the point coordinates in each direction.
 <li><tt>z</tt> (required) : the z-coordinate.
 </ul>
 
-<h4><a name="render_settings"></a><b>&lt;render_settings&gt;</b></h4>
+<h4><a name="render_settings"></a><b>&lt;render_settings&gt</b></h4>
 
 The render settings specify how the system should be shown on screen.
 Contains one or more of the elements listed below.
@@ -442,6 +442,11 @@ image on the height-mapped surface.
 show sharp pixels (false=sharp pixels, true=interpolated).
 <li><tt>&lt;timesteps_per_render value="100" /&gt;</tt><br>Determines the initial running speed by 
 specifying how often the render window should be updated.
+<li><tt>&lt;show_phase_plot value="true" /&gt;</tt><br>Whether to show the phase plot (a scatter graph of the
+chemicals for each pixel plotted against each other).
+<li><tt>&lt;phase_plot_x value="a" /&gt;</tt><br>The chemical to show on the horizontal plot axis (a, b, c, etc.).
+<li><tt>&lt;phase_plot_y value="b" /&gt;</tt><br>The chemical to show on the vertical plot axis (a, b, c, etc.).
+<li><tt>&lt;phase_plot_z value="c" /&gt;</tt><br>The chemical to show on the inwards plot axis (a, b, c, etc.).
 </ul>
 
 </body>

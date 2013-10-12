@@ -352,6 +352,9 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
+    int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
+    int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
+    int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -449,7 +452,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     // add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f,this->ygap*2 + scaling * (high-low),0.0f);
+        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f,this->ygap*2 + scaling * (high-low),0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
@@ -478,6 +481,9 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
+    int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
+    int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
+    int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
@@ -649,7 +655,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         if(show_displacement_mapped_surface)
             posY += this->ygap + this->GetY();
 
-        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,posY,0.0f);
+        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,posY,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
@@ -677,6 +683,9 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
+    int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
+    int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
+    int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->ImmediateModeRenderingOn();
@@ -847,21 +856,25 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     // add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+this->ygap,0.0f);
+        this->AddPhasePlot( pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+this->ygap,0.0f,
+                            iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
 // ---------------------------------------------------------------------
 
-void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ)
+void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
+    int iChemX,int iChemY,int iChemZ)
 {
+    // TODO: check range of each chem
+    
     vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
     points->SetNumberOfPoints(this->GetNumberOfCells());
     points->SetRadius(0);
 
     vtkSmartPointer<vtkMergeFilter> mergeX = vtkSmartPointer<vtkMergeFilter>::New();
     mergeX->SetGeometryConnection(points->GetOutputPort());
-    mergeX->SetScalars(this->GetImage(0));
+    mergeX->SetScalars(this->GetImage(iChemX));
 
     vtkSmartPointer<vtkWarpScalar> warpX = vtkSmartPointer<vtkWarpScalar>::New();
     warpX->UseNormalOn();
@@ -871,7 +884,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
 
     vtkSmartPointer<vtkMergeFilter> mergeY = vtkSmartPointer<vtkMergeFilter>::New();
     mergeY->SetGeometryConnection(warpX->GetOutputPort());
-    mergeY->SetScalars(this->GetImage(1));
+    mergeY->SetScalars(this->GetImage(iChemY));
 
     vtkSmartPointer<vtkWarpScalar> warpY = vtkSmartPointer<vtkWarpScalar>::New();
     warpY->UseNormalOn();
@@ -886,7 +899,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     {
         vtkSmartPointer<vtkMergeFilter> mergeZ = vtkSmartPointer<vtkMergeFilter>::New();
         mergeZ->SetGeometryConnection(warpY->GetOutputPort());
-        mergeZ->SetScalars(this->GetImage(2));
+        mergeZ->SetScalars(this->GetImage(iChemZ));
 
         vtkSmartPointer<vtkWarpScalar> warpZ = vtkSmartPointer<vtkWarpScalar>::New();
         warpZ->UseNormalOn();
@@ -916,7 +929,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
     actor->GetProperty()->SetAmbient(1);
-    actor->GetProperty()->SetPointSize(2);
+    actor->GetProperty()->SetPointSize(1);
     actor->PickableOff();
     actor->SetPosition(posX-low*scaling,posY-low*scaling,posZ+offsetZ);
     pRenderer->AddActor(actor);
@@ -930,7 +943,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
         axis->UseRangesOn();
         axis->YAxisVisibilityOff();
         axis->ZAxisVisibilityOff();
-        axis->SetXLabel("");
+        axis->SetXLabel(GetChemicalName(iChemX).c_str());
         axis->SetLabelFormat("%.2f");
         axis->SetInertia(10000);
         axis->SetCornerOffset(0);
@@ -946,7 +959,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
         axis->ZAxisVisibilityOff();
-        axis->SetYLabel("");
+        axis->SetYLabel(GetChemicalName(iChemY).c_str());
         axis->SetLabelFormat("%.2f");
         axis->SetInertia(10000);
         axis->SetCornerOffset(0);
@@ -963,7 +976,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
         axis->YAxisVisibilityOff();
-        axis->SetZLabel("");
+        axis->SetZLabel(GetChemicalName(iChemZ).c_str());
         axis->SetLabelFormat("%.2f");
         axis->SetInertia(10000);
         axis->SetCornerOffset(0);
