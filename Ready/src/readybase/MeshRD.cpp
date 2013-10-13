@@ -21,6 +21,7 @@
 #include "utils.hpp"
 #include "Properties.hpp"
 #include "overlays.hpp"
+#include "scene_items.hpp"
 
 // VTK:
 #include <vtkPolyData.h>
@@ -419,9 +420,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
     {
-        vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalar_bar->SetLookupTable(lut);
-        pRenderer->AddActor2D(scalar_bar);
+        AddScalarBar(pRenderer,lut);
     }
 
     // add the bounding box

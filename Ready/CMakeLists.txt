@@ -57,6 +57,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/OpenCL_Dyn_Load.h             src/readybase/OpenCL_Dyn_Load.c 
   src/readybase/MeshGenerators.hpp            src/readybase/MeshGenerators.cpp
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp
+  src/readybase/scene_items.hpp               src/readybase/scene_items.cpp
 )
 include_directories( src/readybase )
 
