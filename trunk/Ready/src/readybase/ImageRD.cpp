@@ -21,6 +21,7 @@
 #include "overlays.hpp"
 #include "Properties.hpp"
 #include "IO_XML.hpp"
+#include "scene_items.hpp"
 
 // stdlib:
 #include <stdlib.h>
@@ -424,9 +425,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
     {
-        vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalar_bar->SetLookupTable(lut);
-        pRenderer->AddActor2D(scalar_bar);
+        AddScalarBar(pRenderer,lut);
     }
 
     // add a line graph for all the chemicals (active one highlighted)
@@ -664,9 +663,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     // add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
     {
-        vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalar_bar->SetLookupTable(lut);
-        pRenderer->AddActor2D(scalar_bar);
+        AddScalarBar(pRenderer,lut);
     }
 
     // add a phase plot
@@ -868,9 +865,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         // also add a scalar bar to show how the colors correspond to values
         if(show_color_scale)
         {
-            vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalar_bar->SetLookupTable(lut);
-            pRenderer->AddActor2D(scalar_bar);
+            AddScalarBar(pRenderer,lut);
         }
     }
 
