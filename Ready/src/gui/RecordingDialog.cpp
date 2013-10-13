@@ -20,6 +20,9 @@
 #include "RecordingDialog.hpp"
 #include "prefs.hpp"
 
+// wxWidgets:
+#include <wx/filename.h>
+
 // STL:
 using namespace std;
 
@@ -92,6 +95,30 @@ RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available, boo
     GetSizer()->SetSizeHints(this);
 }
 
+// -----------------------------------------------------------------------------------------------
+
+bool RecordingDialog::Validate()
+{
+    if( !wxDirExists(this->folder_edit->GetValue()) )
+    {
+        int answer = wxMessageBox("Folder doesn't exist. Create?","Confirm",wxCANCEL);
+        if( answer == wxOK )
+        {
+            bool ret = wxFileName::Mkdir(this->folder_edit->GetValue(),wxS_DIR_DEFAULT,wxPATH_MKDIR_FULL);
+            if( !ret )
+            {
+                wxMessageBox("Unable to create folder.","Error",wxICON_ERROR);
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return wxDialog::Validate();
+}
+    
 // -----------------------------------------------------------------------------------------------
 
 bool RecordingDialog::TransferDataFromWindow()
