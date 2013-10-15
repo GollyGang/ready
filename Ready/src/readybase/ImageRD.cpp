@@ -92,7 +92,6 @@ using namespace std;
 ImageRD::ImageRD() 
     : xgap(5.0)
     , ygap(20.0)
-    , axis_gap(1.0)
     , image_top1D(2.0)
     , image_ratio1D(30.0)
 {
@@ -456,7 +455,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(-this->axis_gap,-this->axis_gap,this->ygap,(high-low)*scaling+this->ygap,0,0);
+    axis->SetBounds(0,0,this->ygap,(high-low)*scaling+this->ygap,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -954,7 +953,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     {
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(posX,posX+scaling*(high-low),posY-this->axis_gap,posY-this->axis_gap,posZ,posZ);
+        axis->SetBounds(posX,posX+scaling*(high-low),posY,posY,posZ,posZ);
         axis->SetRanges(low,high,0,0,0,0);
         axis->UseRangesOn();
         axis->YAxisVisibilityOff();
@@ -970,7 +969,7 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     {
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(posX-this->axis_gap,posX-this->axis_gap,posY,posY+(high-low)*scaling,posZ,posZ);
+        axis->SetBounds(posX,posX,posY,posY+(high-low)*scaling,posZ,posZ);
         axis->SetRanges(0,0,low,high,0,0);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
