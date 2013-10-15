@@ -59,6 +59,8 @@ class MeshRD : public AbstractRD
         virtual void RestoreStartingPattern();
 
         virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
+        void AddPhasePlot(  vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
+                            int iChemX,int iChemY,int iChemZ);
 
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;

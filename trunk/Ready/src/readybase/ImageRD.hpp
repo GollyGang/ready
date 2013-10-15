@@ -78,9 +78,8 @@ class ImageRD : public AbstractRD
         vtkImageData *starting_pattern;
 
         double xgap,ygap;           /// spatial separation for rendering multiple chemicals
-        double axis_gap;           /// spatial separation between axis and content
-        double image_top1D;       /// topmost location of the 1D image strips
-        double image_ratio1D;    /// proportions of the 1D image strips
+        double image_top1D;        /// topmost location of the 1D image strips
+        double image_ratio1D;     /// proportions of the 1D image strips
 
     protected:
 

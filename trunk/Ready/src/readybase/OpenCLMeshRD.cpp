@@ -51,6 +51,14 @@ OpenCLMeshRD::~OpenCLMeshRD()
 
 // -------------------------------------------------------------------------
 
+void OpenCLMeshRD::SetNumberOfChemicals(int n)
+{
+    MeshRD::SetNumberOfChemicals(n);
+    this->CreateOpenCLBuffers();
+}
+
+// -------------------------------------------------------------------------
+
 void OpenCLMeshRD::SetParameterValue(int iParam,float val)
 {
     AbstractRD::SetParameterValue(iParam,val);

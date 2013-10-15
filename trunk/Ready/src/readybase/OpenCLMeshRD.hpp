@@ -30,6 +30,8 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         OpenCLMeshRD(int opencl_platform,int opencl_device);
         virtual ~OpenCLMeshRD();
 
+        virtual void SetNumberOfChemicals(int n);
+
         virtual bool HasEditableFormula() const { return true; }
 
         virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);

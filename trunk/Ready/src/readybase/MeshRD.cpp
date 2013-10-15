@@ -53,6 +53,17 @@
 #include <vtkThreshold.h>
 #include <vtkDataSetSurfaceFilter.h>
 
+#include <vtkPointSource.h>
+#include <vtkSmartPointer.h>
+#include <vtkMergeFilter.h>
+#include <vtkWarpScalar.h>
+#include <vtkVertexGlyphFilter.h>
+#include <vtkTransformFilter.h>
+#include <vtkTransform.h>
+#include <vtkCubeAxesActor2D.h>
+#include <vtkPointData.h>
+#include <vtkRearrangeFields.h>
+
 // STL:
 #include <stdexcept>
 using namespace std;
@@ -100,7 +111,9 @@ void MeshRD::Update(int n_steps)
 void MeshRD::SetNumberOfChemicals(int n)
 {
     for(int iChem=0;iChem<this->n_chemicals;iChem++)
+    {
         this->mesh->GetCellData()->RemoveArray(GetChemicalName(iChem).c_str());
+    }
     this->n_chemicals = n;
     for(int iChem=0;iChem<this->n_chemicals;iChem++)
     {
@@ -252,6 +265,10 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
     string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
     float slice_3D_position = render_settings.GetProperty("slice_3D_position").GetFloat();
+    bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
+    int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
+    int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
+    int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
@@ -415,8 +432,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         pRenderer->AddActor(actor);
     }
 
-    // TODO: would like to add a phase plot too but can't get it to work
-
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
     {
@@ -443,6 +458,156 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
         actor->PickableOff();
         pRenderer->AddActor(actor);
+    }
+
+    // add a phase plot
+    if(show_phase_plot && this->GetNumberOfChemicals()>=2)
+    {
+        this->AddPhasePlot( pRenderer,GetX()/(high-low),low,high,
+                            this->mesh->GetBounds()[0],
+                            this->mesh->GetBounds()[3]+GetY()*0.1f,
+                            this->mesh->GetBounds()[4],
+                            iPhasePlotX,iPhasePlotY,iPhasePlotZ);
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
+    int iChemX,int iChemY,int iChemZ)
+{
+    // TODO: check range of each chem
+    
+    vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
+    points->SetNumberOfPoints(this->GetNumberOfCells());
+    points->SetRadius(0);
+
+    vtkSmartPointer<vtkRearrangeFields> rearrange_fieldsX = vtkSmartPointer<vtkRearrangeFields>::New();
+    rearrange_fieldsX->SetInput(this->mesh);
+    rearrange_fieldsX->AddOperation(vtkRearrangeFields::MOVE,GetChemicalName(iChemX).c_str(),vtkRearrangeFields::CELL_DATA,vtkRearrangeFields::POINT_DATA);
+    vtkSmartPointer<vtkAssignAttribute> assign_attributeX = vtkSmartPointer<vtkAssignAttribute>::New();
+    assign_attributeX->SetInputConnection(rearrange_fieldsX->GetOutputPort());
+    assign_attributeX->Assign(GetChemicalName(iChemX).c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::POINT_DATA);
+    vtkSmartPointer<vtkMergeFilter> mergeX = vtkSmartPointer<vtkMergeFilter>::New();
+    mergeX->SetGeometryConnection(points->GetOutputPort());
+    mergeX->SetScalarsConnection(assign_attributeX->GetOutputPort());
+    vtkSmartPointer<vtkWarpScalar> warpX = vtkSmartPointer<vtkWarpScalar>::New();
+    warpX->UseNormalOn();
+    warpX->SetNormal(1,0,0);
+    warpX->SetInputConnection(mergeX->GetOutputPort());
+    warpX->SetScaleFactor(scaling);
+
+    vtkSmartPointer<vtkRearrangeFields> rearrange_fieldsY = vtkSmartPointer<vtkRearrangeFields>::New();
+    rearrange_fieldsY->SetInput(this->mesh);
+    rearrange_fieldsY->AddOperation(vtkRearrangeFields::MOVE,GetChemicalName(iChemY).c_str(),vtkRearrangeFields::CELL_DATA,vtkRearrangeFields::POINT_DATA);
+    vtkSmartPointer<vtkAssignAttribute> assign_attributeY = vtkSmartPointer<vtkAssignAttribute>::New();
+    assign_attributeY->SetInputConnection(rearrange_fieldsY->GetOutputPort());
+    assign_attributeY->Assign(GetChemicalName(iChemY).c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::POINT_DATA);
+    vtkSmartPointer<vtkMergeFilter> mergeY = vtkSmartPointer<vtkMergeFilter>::New();
+    mergeY->SetGeometryConnection(warpX->GetOutputPort());
+    mergeY->SetScalarsConnection(assign_attributeY->GetOutputPort());
+    vtkSmartPointer<vtkWarpScalar> warpY = vtkSmartPointer<vtkWarpScalar>::New();
+    warpY->UseNormalOn();
+    warpY->SetNormal(0,1,0);
+    warpY->SetInputConnection(mergeY->GetOutputPort());
+    warpY->SetScaleFactor(scaling);
+
+    vtkSmartPointer<vtkVertexGlyphFilter> glyph = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+
+    float offsetZ = 0.0f;
+    if(this->GetNumberOfChemicals()>2)
+    {
+        vtkSmartPointer<vtkRearrangeFields> rearrange_fieldsZ = vtkSmartPointer<vtkRearrangeFields>::New();
+        rearrange_fieldsZ->SetInput(this->mesh);
+        rearrange_fieldsZ->AddOperation(vtkRearrangeFields::MOVE,GetChemicalName(iChemZ).c_str(),vtkRearrangeFields::CELL_DATA,vtkRearrangeFields::POINT_DATA);
+        vtkSmartPointer<vtkAssignAttribute> assign_attributeZ = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attributeZ->SetInputConnection(rearrange_fieldsZ->GetOutputPort());
+        assign_attributeZ->Assign(GetChemicalName(iChemZ).c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::POINT_DATA);
+        vtkSmartPointer<vtkMergeFilter> mergeZ = vtkSmartPointer<vtkMergeFilter>::New();
+        mergeZ->SetGeometryConnection(warpY->GetOutputPort());
+        mergeZ->SetScalarsConnection(assign_attributeZ->GetOutputPort());
+        vtkSmartPointer<vtkWarpScalar> warpZ = vtkSmartPointer<vtkWarpScalar>::New();
+        warpZ->UseNormalOn();
+        warpZ->SetNormal(0,0,1);
+        warpZ->SetInputConnection(mergeZ->GetOutputPort());
+        warpZ->SetScaleFactor(scaling);
+
+        glyph->SetInputConnection(warpZ->GetOutputPort());
+
+        offsetZ = low*scaling;
+    }
+    else
+    {
+        glyph->SetInputConnection(warpY->GetOutputPort());
+    }
+
+    vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+    trans->Scale(1,1,-1);
+    vtkSmartPointer<vtkTransformFilter> transFilter = vtkSmartPointer<vtkTransformFilter>::New();
+    transFilter->SetTransform(trans);
+    transFilter->SetInputConnection(glyph->GetOutputPort());
+
+    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(transFilter->GetOutputPort());
+    mapper->ScalarVisibilityOff();
+    mapper->ImmediateModeRenderingOn();
+    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+    actor->GetProperty()->SetAmbient(1);
+    actor->GetProperty()->SetPointSize(1);
+    actor->PickableOff();
+    actor->SetPosition(posX-low*scaling,posY-low*scaling,posZ+offsetZ);
+    pRenderer->AddActor(actor);
+
+    // also add the axes
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(posX,posX+scaling*(high-low),posY,posY,posZ,posZ);
+        axis->SetRanges(low,high,0,0,0,0);
+        axis->UseRangesOn();
+        axis->YAxisVisibilityOff();
+        axis->ZAxisVisibilityOff();
+        axis->SetXLabel(GetChemicalName(iChemX).c_str());
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
+    }
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(posX,posX,posY,posY+(high-low)*scaling,posZ,posZ);
+        axis->SetRanges(0,0,low,high,0,0);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->ZAxisVisibilityOff();
+        axis->SetYLabel(GetChemicalName(iChemY).c_str());
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
+    }
+    if(this->GetNumberOfChemicals()>2)
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(posX,posX,posY,posY,posZ,posZ-scaling*(high-low));
+        axis->SetRanges(0,0,0,0,low,high);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->YAxisVisibilityOff();
+        axis->SetZLabel(GetChemicalName(iChemZ).c_str());
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
     }
 }
 
