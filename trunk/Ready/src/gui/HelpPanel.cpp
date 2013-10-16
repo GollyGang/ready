@@ -475,7 +475,7 @@ void ShowAboutBox()
     HtmlView* html = new HtmlView(&dlg, wxGetApp().currframe, wxID_ANY, wxDefaultPosition,
                                   #if wxCHECK_VERSION(2,9,0)
                                       // work around SetSize bug below
-                                      wxSize(400, 460),
+                                      wxSize(400, 540),
                                   #else
                                       wxSize(300, 300),
                                   #endif
