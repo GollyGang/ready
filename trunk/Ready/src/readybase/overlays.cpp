@@ -505,6 +505,49 @@ class RadialGradient : public BaseFill
         Point3D *p1,*p2;
 };
 
+class Gaussian : public BaseFill
+{
+    public:
+
+        Gaussian(vtkXMLDataElement* node) : BaseFill(node)
+        {
+            read_required_attribute(node,"height",this->height);
+            read_required_attribute(node,"sigma",this->sigma);
+            if(node->GetNumberOfNestedElements()!=1)
+                throw runtime_error("gasussian: expected one nested element (point3D)");
+            this->center = new Point3D(node->GetNestedElement(0));
+        }
+        virtual ~Gaussian() { delete this->center; }
+
+        static const char* GetTypeName() { return "gaussian"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(Gaussian::GetTypeName());
+            xml->SetFloatAttribute("height",this->height);
+            xml->SetFloatAttribute("sigma",this->sigma);
+            xml->AddNestedElement(this->center->GetAsXML());
+            return xml;
+        }
+
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        {
+            // convert center to absolute coordinates
+            float ax = center->x * system->GetX();
+            float ay = center->y * system->GetY();
+            float az = center->z * system->GetZ();
+            float asigma = this->sigma * max(system->GetX(),max(system->GetY(),system->GetZ())); // (proportional to the largest dimension)
+            float dist = hypot3(ax-x,ay-y,az-z);
+            return this->height * exp( -dist*dist/(2.0f*asigma*asigma) );
+        }
+
+    protected:
+
+        float height,sigma;
+        Point3D *center;
+};
+
 // -------- shapes: -----------
 
 class Everywhere : public BaseShape
@@ -683,6 +726,7 @@ class Pixel : public BaseShape
     else if(name==Parameter::GetTypeName())       return new Parameter(node);
     else if(name==LinearGradient::GetTypeName())  return new LinearGradient(node);
     else if(name==RadialGradient::GetTypeName())  return new RadialGradient(node);
+    else if(name==Gaussian::GetTypeName())  return new Gaussian(node);
     else                                          return NULL;
 }
 

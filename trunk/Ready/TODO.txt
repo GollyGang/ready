@@ -21,7 +21,7 @@ before 0.6 release:
 - choice of log or linear color palette
 - recompile against more recent wxWidgets?
 - fix mouse controls (camera too close?)
-- Gaussian overlay (several rules work better without higher frequencies)
+- sine function overlay
 - Schrodinger equation, NKS pp 163-166
 
 before 0.x release:
