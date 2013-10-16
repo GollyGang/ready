@@ -548,6 +548,53 @@ class Gaussian : public BaseFill
         Point3D *center;
 };
 
+class Sine : public BaseFill
+{
+    public:
+
+        Sine(vtkXMLDataElement* node) : BaseFill(node)
+        {
+            read_required_attribute(node,"phase",this->phase);
+            if(node->GetNumberOfNestedElements()!=2)
+                throw runtime_error("sine: expected two nested elements (point3D,point3D)");
+            this->p1 = new Point3D(node->GetNestedElement(0));
+            this->p2 = new Point3D(node->GetNestedElement(1));
+        }
+        virtual ~Sine() { delete this->p1; delete this->p2; }
+
+        static const char* GetTypeName() { return "sine"; }
+
+        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(Sine::GetTypeName());
+            xml->SetFloatAttribute("phase",this->phase);
+            xml->AddNestedElement(this->p1->GetAsXML());
+            xml->AddNestedElement(this->p2->GetAsXML());
+            return xml;
+        }
+
+        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        {
+            float rel_x = x/system->GetX();
+            float rel_y = y/system->GetY();
+            float rel_z = z/system->GetZ();
+            // project this point onto the axis
+            float blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
+            float bx = (this->p2->x-this->p1->x) / blen;
+            float by = (this->p2->y-this->p1->y) / blen;
+            float bz = (this->p2->z-this->p1->z) / blen;
+            float dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
+            float u = dp / blen; // [0,1]
+            return sin( u * 2.0 * vtkMath::Pi() - phase );
+        }
+
+    protected:
+
+        float phase;
+        Point3D *p1,*p2;
+};
+
 // -------- shapes: -----------
 
 class Everywhere : public BaseShape
@@ -726,7 +773,8 @@ class Pixel : public BaseShape
     else if(name==Parameter::GetTypeName())       return new Parameter(node);
     else if(name==LinearGradient::GetTypeName())  return new LinearGradient(node);
     else if(name==RadialGradient::GetTypeName())  return new RadialGradient(node);
-    else if(name==Gaussian::GetTypeName())  return new Gaussian(node);
+    else if(name==Gaussian::GetTypeName())        return new Gaussian(node);
+    else if(name==Sine::GetTypeName())            return new Sine(node);
     else                                          return NULL;
 }
 
