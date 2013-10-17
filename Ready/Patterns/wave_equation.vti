@@ -41,10 +41,10 @@
        <active_chemical value="a" />
        <show_displacement_mapped_surface value="true" />
        <color_displacement_mapped_surface value="false" />
-       <low value="-2" />
-       <high value="2" />
+       <low value="-1" />
+       <high value="1" />
        <timesteps_per_render value="64" />
-       <vertical_scale_2D value="150" />
+       <vertical_scale_2D value="50" />
        <show_multiple_chemicals value="false" />
     </render_settings>
     
