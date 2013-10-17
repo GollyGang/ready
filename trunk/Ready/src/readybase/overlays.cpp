@@ -555,6 +555,7 @@ class Sine : public BaseFill
         Sine(vtkXMLDataElement* node) : BaseFill(node)
         {
             read_required_attribute(node,"phase",this->phase);
+            read_required_attribute(node,"amplitude",this->amplitude);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("sine: expected two nested elements (point3D,point3D)");
             this->p1 = new Point3D(node->GetNestedElement(0));
@@ -569,6 +570,7 @@ class Sine : public BaseFill
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Sine::GetTypeName());
             xml->SetFloatAttribute("phase",this->phase);
+            xml->SetFloatAttribute("amplitude",this->amplitude);
             xml->AddNestedElement(this->p1->GetAsXML());
             xml->AddNestedElement(this->p2->GetAsXML());
             return xml;
@@ -586,12 +588,12 @@ class Sine : public BaseFill
             float bz = (this->p2->z-this->p1->z) / blen;
             float dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
             float u = dp / blen; // [0,1]
-            return sin( u * 2.0 * vtkMath::Pi() - phase );
+            return this->amplitude * sin( u * 2.0 * vtkMath::Pi() - this->phase );
         }
 
     protected:
 
-        float phase;
+        float phase,amplitude;
         Point3D *p1,*p2;
 };
 
