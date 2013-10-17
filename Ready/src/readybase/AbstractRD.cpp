@@ -207,7 +207,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update)
     // check whether we should warn the user that they need to update Ready
     {
         read_required_attribute(rd,"format_version",i);
-        warn_to_update = (i>3);
+        warn_to_update = (i>4);
         // (we will still proceed and try to read the file but it might fail or give poor results)
     }
 
