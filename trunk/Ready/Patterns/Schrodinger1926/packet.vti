@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+
+    <description>
+        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the 
+        wave function for some quantum state. For a travelling particle, the magnitude of the wave packet describes the probability the that particle 
+        will be found at each location.
+
+        Here a wave packet travels through empty space. Over time the probability spreads out, because of uncertainty in its initial momentum.
+        
+        In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. 
+        The magnitude is shown in 'c' but doesn't affect the system.
+    </description>
+
+    <rule type="formula" name="Schrodinger equation">
+        
+      <param name="timestep">    0.001    </param>
+
+      <formula number_of_chemicals="3">
+        delta_a = -laplacian_b;
+        delta_b =  laplacian_a;
+        c = hypot( a, b );
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+        
+      <overlay chemical="c">
+        <overwrite />
+        <gaussian height="1" sigma="0.03">
+          <point3D x="0.2" y="0.3" z="0.5" />
+        </gaussian>
+        <everywhere />
+      </overlay>
+
+      <overlay chemical="a">
+        <overwrite />
+        <sine amplitude="1" phase="0">
+          <point3D x="0" y="0" z="0" />
+          <point3D x="0.03" y="0" z="0" />
+        </sine>
+        <everywhere />
+      </overlay>
+      <overlay chemical="a"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <sine amplitude="1" phase="1.5708">
+          <point3D x="0" y="0" z="0" />
+          <point3D x="0.03" y="0" z="0" />
+        </sine>
+        <everywhere />
+      </overlay>
+      <overlay chemical="b"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
+      
+    </initial_pattern_generator>
+    
+    <render_settings>
+       <active_chemical value="c" />
+       <show_displacement_mapped_surface value="true" />
+       <color_displacement_mapped_surface value="false" />
+       <low value="-1" />
+       <high value="1" />
+       <vertical_scale_1D value="100" />
+       <vertical_scale_2D value="100" />
+       <timesteps_per_render value="1024" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 511 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 511 0 0 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
