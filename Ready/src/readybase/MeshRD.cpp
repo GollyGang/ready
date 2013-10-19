@@ -16,53 +16,51 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
     
 // local:
-#include "MeshRD.hpp"
 #include "IO_XML.hpp"
-#include "utils.hpp"
-#include "Properties.hpp"
+#include "MeshRD.hpp"
 #include "overlays.hpp"
+#include "Properties.hpp"
 #include "scene_items.hpp"
+#include "utils.hpp"
 
 // VTK:
-#include <vtkPolyData.h>
-#include <vtkXMLDataElement.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
-#include <vtkRenderer.h>
-#include <vtkMath.h>
-#include <vtkLookupTable.h>
-#include <vtkScalarBarActor.h>
-#include <vtkCubeSource.h>
-#include <vtkExtractEdges.h>
-#include <vtkProperty.h>
-#include <vtkCellData.h>
-#include <vtkFloatArray.h>
-#include <vtkIdList.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkDataSetMapper.h>
+#include <vtkAssignAttribute.h>
 #include <vtkCellArray.h>
-#include <vtkGeometryFilter.h>
-#include <vtkCutter.h>
-#include <vtkPlane.h>
+#include <vtkCellData.h>
 #include <vtkCellDataToPointData.h>
 #include <vtkCellLocator.h>
 #include <vtkContourFilter.h>
-#include <vtkAssignAttribute.h>
-#include <vtkReverseSense.h>
-#include <vtkGenericCell.h>
-#include <vtkThreshold.h>
-#include <vtkDataSetSurfaceFilter.h>
-
-#include <vtkPointSource.h>
-#include <vtkSmartPointer.h>
-#include <vtkMergeFilter.h>
-#include <vtkWarpScalar.h>
-#include <vtkVertexGlyphFilter.h>
-#include <vtkTransformFilter.h>
-#include <vtkTransform.h>
 #include <vtkCubeAxesActor2D.h>
+#include <vtkCubeSource.h>
+#include <vtkCutter.h>
+#include <vtkDataSetMapper.h>
+#include <vtkDataSetSurfaceFilter.h>
+#include <vtkExtractEdges.h>
+#include <vtkFloatArray.h>
+#include <vtkGenericCell.h>
+#include <vtkGeometryFilter.h>
+#include <vtkIdList.h>
+#include <vtkLookupTable.h>
+#include <vtkMath.h>
+#include <vtkMergeFilter.h>
+#include <vtkPlane.h>
 #include <vtkPointData.h>
+#include <vtkPointSource.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include <vtkRearrangeFields.h>
+#include <vtkRenderer.h>
+#include <vtkReverseSense.h>
+#include <vtkScalarBarActor.h>
+#include <vtkThreshold.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkVertexGlyphFilter.h>
+#include <vtkWarpScalar.h>
+#include <vtkXMLDataElement.h>
 
 // STL:
 #include <stdexcept>
@@ -476,7 +474,9 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
     int iChemX,int iChemY,int iChemZ)
 {
-    // TODO: check range of each chem
+    iChemX = max( 0, min( iChemX, this->GetNumberOfChemicals()-1 ) );
+    iChemY = max( 0, min( iChemY, this->GetNumberOfChemicals()-1 ) );
+    iChemZ = max( 0, min( iChemZ, this->GetNumberOfChemicals()-1 ) );
     
     vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
     points->SetNumberOfPoints(this->GetNumberOfCells());

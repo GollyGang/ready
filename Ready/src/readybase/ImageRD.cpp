@@ -17,15 +17,15 @@
 
 // local:
 #include "ImageRD.hpp"
-#include "utils.hpp"
+#include "IO_XML.hpp"
 #include "overlays.hpp"
 #include "Properties.hpp"
-#include "IO_XML.hpp"
 #include "scene_items.hpp"
+#include "utils.hpp"
 
 // stdlib:
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
 
 // STL:
 #include <cassert>
@@ -33,59 +33,59 @@
 using namespace std;
 
 // VTK:
-#include <vtkImageData.h>
-#include <vtkImageAppendComponents.h>
-#include <vtkImageExtractComponents.h>
-#include <vtkPointData.h>
-#include <vtkXMLUtilities.h>
+#include <vtkActor.h>
+#include <vtkAssignAttribute.h>
+#include <vtkCamera.h>
 #include <vtkCellData.h>
+#include <vtkCellDataToPointData.h>
+#include <vtkContourFilter.h>
+#include <vtkCubeAxesActor2D.h>
+#include <vtkCubeSource.h>
+#include <vtkCutter.h>
+#include <vtkDataSetMapper.h>
+#include <vtkExtractEdges.h>
+#include <vtkFloatArray.h>
+#include <vtkGeometryFilter.h>
+#include <vtkImageActor.h>
+#include <vtkImageAppendComponents.h>
+#include <vtkImageData.h>
+#include <vtkImageDataGeometryFilter.h>
+#include <vtkImageExtractComponents.h>
+#include <vtkImageMapToColors.h>
+#include <vtkImageMapper.h>
+#include <vtkImageMirrorPad.h>
+#include <vtkImageReslice.h>
+#include <vtkImageToStructuredPoints.h>
 #include <vtkImageWrapPad.h>
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkSmartPointer.h>
-#include <vtkContourFilter.h>
-#include <vtkProperty.h>
-#include <vtkImageActor.h>
-#include <vtkProperty2D.h>
-#include <vtkRendererCollection.h>
 #include <vtkLookupTable.h>
-#include <vtkImageMapToColors.h>
-#include <vtkScalarBarActor.h>
-#include <vtkCubeSource.h>
-#include <vtkExtractEdges.h>
-#include <vtkWarpScalar.h>
-#include <vtkImageDataGeometryFilter.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkImageMirrorPad.h>
-#include <vtkCubeAxesActor2D.h>
-#include <vtkImageReslice.h>
-#include <vtkMatrix4x4.h>
 #include <vtkMath.h>
+#include <vtkMatrix4x4.h>
+#include <vtkMergeFilter.h>
+#include <vtkPlane.h>
+#include <vtkPlaneSource.h>
+#include <vtkPointData.h>
+#include <vtkPointDataToCellData.h>
+#include <vtkPointSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkProperty.h>
+#include <vtkProperty2D.h>
+#include <vtkRearrangeFields.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
+#include <vtkScalarBarActor.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextActor3D.h>
+#include <vtkTextureMapToPlane.h>
 #include <vtkThreshold.h>
-#include <vtkGeometryFilter.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
-#include <vtkFloatArray.h>
-#include <vtkTextureMapToPlane.h>
-#include <vtkDataSetMapper.h>
-#include <vtkImageMapper.h>
-#include <vtkPlaneSource.h>
-#include <vtkMergeFilter.h>
-#include <vtkRearrangeFields.h>
-#include <vtkAssignAttribute.h>
-#include <vtkCellDataToPointData.h>
-#include <vtkImageToStructuredPoints.h>
-#include <vtkPointDataToCellData.h>
-#include <vtkPlane.h>
-#include <vtkCutter.h>
-#include <vtkWarpVector.h>
 #include <vtkVertexGlyphFilter.h>
-#include <vtkPointSource.h>
+#include <vtkWarpScalar.h>
+#include <vtkWarpVector.h>
+#include <vtkXMLUtilities.h>
 
 // -------------------------------------------------------------------
 
@@ -881,7 +881,9 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
     int iChemX,int iChemY,int iChemZ)
 {
-    // TODO: check range of each chem
+    iChemX = max( 0, min( iChemX, this->GetNumberOfChemicals()-1 ) );
+    iChemY = max( 0, min( iChemY, this->GetNumberOfChemicals()-1 ) );
+    iChemZ = max( 0, min( iChemZ, this->GetNumberOfChemicals()-1 ) );
     
     vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
     points->SetNumberOfPoints(this->GetNumberOfCells());
