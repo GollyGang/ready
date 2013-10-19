@@ -16,7 +16,6 @@ Big picture issues:
 
 before 0.6 release:
 
-- flicking multiple chemicals on/off causes crash?
 - choice of color palettes: http://www.vtk.org/Wiki/VTK/Examples/Cxx/PolyData/Curvatures
 - choice of log or linear color palette
 - recompile against more recent wxWidgets?
