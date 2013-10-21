@@ -31,8 +31,8 @@ class RecordingDialog : public wxDialog
 
         RecordingDialog(wxWindow *parent,bool is_2D_data_available, bool are_multiple_chemicals_available,bool default_is_2D_data);
 
-        bool Validate() override;                /// checks for value correctness
-        bool TransferDataFromWindow() override;  /// called when user hits OK
+        bool Validate();                /// checks for value correctness
+        bool TransferDataFromWindow();  /// called when user hits OK
     
         std::string recording_prefix,recording_extension;
         bool record_data_image;
