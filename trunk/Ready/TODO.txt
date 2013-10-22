@@ -16,13 +16,12 @@ Big picture issues:
 
 before 0.6 release:
 
-- choice of color palettes: http://www.vtk.org/Wiki/VTK/Examples/Cxx/PolyData/Curvatures
-- choice of log or linear color palette
-- recompile against more recent wxWidgets?
 - fix mouse controls (camera too close?)
 
 before 0.x release:
 
+- choice of color palettes w/ vtkColorSeries (need vtk6)
+- choice of log or linear color palette
 - NKS rules from pp 163-166
 - floating-point speed reporting
 - progress indicator on loading large patterns
