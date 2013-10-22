@@ -125,7 +125,10 @@
         <show_multiple_chemicals value="true" />
         <show_color_scale value="false" />
         <show_displacement_mapped_surface value="false" />
-		<timesteps_per_render value="32" />
+        <timesteps_per_render value="32" />
+        <phase_plot_x_axis value="a" />
+        <phase_plot_y_axis value="d" />
+        <phase_plot_z_axis value="c" />
     </render_settings>
        
   </RD>
