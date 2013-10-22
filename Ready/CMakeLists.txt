@@ -113,7 +113,7 @@ set( PATTERN_FILES
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/SmoothLife/smoothglider.vti     Patterns/SmoothLife/smoothlifeL.vti     Patterns/SmoothLife/glider_3D.vti
-  Patterns/Purwins1999/glider.vti          Patterns/Purwins1999/glider_3D.vti
+  Patterns/Purwins1999/glider.vti          Patterns/Purwins1999/glider_3D.vti      Patterns/Purwins1999/multiGlider.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
