@@ -17,6 +17,7 @@ Big picture issues:
 before 0.6 release:
 
 - fix mouse controls (camera too close?)
+- avoid using K1 etc. in auto-generated kernels - too common a name
 
 before 0.x release:
 
