@@ -68,11 +68,11 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
     // compute the laplacians
     for(int i=0;i<NC;i++)
         kernel_source << indent << "float laplacian_" << GetChemicalName(i) << " = 0.0f;\n";
-    kernel_source << indent << "int offset = x * max_neighbors;\n";
+    kernel_source << indent << "int _offset = x * max_neighbors;\n";
     kernel_source << indent << "for(int i=0;i<max_neighbors;i++)\n" << indent << "{\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << indent << "laplacian_" << GetChemicalName(i) << " += " << GetChemicalName(i) 
-                      << "_in[neighbor_indices[offset+i]] * neighbor_weights[offset+i];\n";
+                      << "_in[neighbor_indices[_offset+i]] * neighbor_weights[_offset+i];\n";
     kernel_source << indent << "}\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << "laplacian_" << GetChemicalName(i) << " -= " << GetChemicalName(i) << ";\n";
