@@ -88,6 +88,7 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
     for(int i=0;i<NC;i++)
         kernel_source << indent << "float delta_" << GetChemicalName(i) << " = 0.0f;\n";
     kernel_source << f << "\n";
+    kernel_source << "\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << GetChemicalName(i) << "_out[x] = " << GetChemicalName(i) << " + timestep * delta_" << GetChemicalName(i) << ";\n";
     kernel_source << "}\n";

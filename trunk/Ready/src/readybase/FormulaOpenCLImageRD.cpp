@@ -534,7 +534,8 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     kernel_source << "\n";
     // the parameters (assume all float for now)
     for(int i=0;i<(int)this->parameters.size();i++)
-        kernel_source << indent << "float " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
+        kernel_source << indent << "float4 " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
+    kernel_source << "\n";
     // the formula
     istringstream iss(formula);
     string s;
@@ -544,6 +545,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << s << "\n";
     }
     // the last part of the kernel
+    kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)
         kernel_source << indent << GetChemicalName(iC) << "_out[i_here] = " << GetChemicalName(iC) << " + timestep * delta_" << GetChemicalName(iC) << ";\n";
     kernel_source << "}\n";

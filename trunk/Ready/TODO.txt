@@ -17,7 +17,6 @@ Big picture issues:
 before 0.6 release:
 
 - fix mouse controls (camera too close?)
-- bug: parameters in auto-generated kernels should be float4, to avoid pow(float4,float) issue on some systems
 
 before 0.x release:
 
