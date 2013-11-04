@@ -30,12 +30,10 @@
       <param name="q">              0.01         </param>
       <param name="q_bar">          0.01         </param>
       <formula number_of_chemicals="5">
-        float delta = epsilon / 0.36f;
-        float delta_bar = epsilon_bar / 0.36f;
-        delta_a = Da * laplacian_a + ( a - a*a - param_f*b*(a-q)/(a+q) ) / epsilon - (a-c)/delta;
+        delta_a = Da * laplacian_a + ( a - a*a - param_f*b*(a-q)/(a+q) ) / epsilon - (a-c)/(epsilon/0.36f);
         delta_b = Db * laplacian_b + a - b;
-        delta_c = Dc * laplacian_c + (a-c)/delta + (d-c)/delta_bar;
-        delta_d = Dd * laplacian_d + ( d - d*d - param_f_bar*e*(d-q_bar)/(d+q_bar) ) / epsilon_bar - (d-c)/delta_bar;
+        delta_c = Dc * laplacian_c + (a-c)/(epsilon/0.36f) + (d-c)/(epsilon_bar/0.36f);
+        delta_d = Dd * laplacian_d + ( d - d*d - param_f_bar*e*(d-q_bar)/(d+q_bar) ) / epsilon_bar - (d-c)/(epsilon_bar/0.36f);
         delta_e = De * laplacian_e + d - e;
       </formula>
     </rule>
