@@ -1274,7 +1274,6 @@ void MyFrame::OnIdle(wxIdleEvent& event)
                 this->RecordFrame();
        
             this->pVTKWindow->Refresh(false);
-            this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
             this->SetStatusBarText();
             
             if (do_one_render) {
