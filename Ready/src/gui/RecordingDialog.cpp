@@ -101,13 +101,13 @@ bool RecordingDialog::Validate()
 {
     if( !wxDirExists(this->folder_edit->GetValue()) )
     {
-        int answer = wxMessageBox("Folder doesn't exist. Create?","Confirm",wxCANCEL);
+        int answer = wxMessageBox("Folder doesn't exist. Create?","Confirm",wxOK|wxCANCEL);
         if( answer == wxOK )
         {
             bool ret = wxFileName::Mkdir(this->folder_edit->GetValue(),wxS_DIR_DEFAULT,wxPATH_MKDIR_FULL);
             if( !ret )
             {
-                wxMessageBox("Unable to create folder.","Error",wxICON_ERROR);
+                wxMessageBox("Unable to create folder.","Error",wxOK|wxICON_ERROR);
                 return false;
             }
         }
