@@ -70,7 +70,7 @@ Gray-Scott-History-Wave formula, implemented by Dan Wills starting from pre-exis
         0.001
       </param>
       <param name="c_to_F">
-        -0.042
+        -0.03
       </param>
       <param name="c_to_a">
         0
