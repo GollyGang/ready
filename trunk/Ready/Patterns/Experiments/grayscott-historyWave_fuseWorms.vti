@@ -92,7 +92,7 @@ Behavior: Solitons form and begin to oscillate, some solitons become worms that 
         0
       </param>
       <param name="wave_to_F">
-        0.01445
+        0.012
       </param>
       <param name="wave_to_k">
         0.008
