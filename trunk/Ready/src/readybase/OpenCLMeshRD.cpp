@@ -54,6 +54,7 @@ OpenCLMeshRD::~OpenCLMeshRD()
 void OpenCLMeshRD::SetNumberOfChemicals(int n)
 {
     MeshRD::SetNumberOfChemicals(n);
+    this->need_reload_formula = true;
     this->CreateOpenCLBuffers();
 }
 
