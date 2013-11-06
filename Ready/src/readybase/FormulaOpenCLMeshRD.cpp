@@ -62,17 +62,17 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
     kernel_source << "__global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)\n";
     // output the body
     kernel_source << "{\n";
-    kernel_source << indent << "const int x = get_global_id(0);\n";
+    kernel_source << indent << "const int index_x = get_global_id(0);\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[x];\n";
+        kernel_source << indent << "float " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_x];\n";
     // compute the laplacians
     for(int i=0;i<NC;i++)
         kernel_source << indent << "float laplacian_" << GetChemicalName(i) << " = 0.0f;\n";
-    kernel_source << indent << "int _offset = x * max_neighbors;\n";
-    kernel_source << indent << "for(int i=0;i<max_neighbors;i++)\n" << indent << "{\n";
+    kernel_source << indent << "int _offset = index_x * max_neighbors;\n";
+    kernel_source << indent << "for(int _i=0;_i<max_neighbors;_i++)\n" << indent << "{\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << indent << "laplacian_" << GetChemicalName(i) << " += " << GetChemicalName(i) 
-                      << "_in[neighbor_indices[_offset+i]] * neighbor_weights[_offset+i];\n";
+                      << "_in[neighbor_indices[_offset+_i]] * neighbor_weights[_offset+_i];\n";
     kernel_source << indent << "}\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << "laplacian_" << GetChemicalName(i) << " -= " << GetChemicalName(i) << ";\n";
@@ -90,7 +90,7 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
     kernel_source << f << "\n";
     kernel_source << "\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << GetChemicalName(i) << "_out[x] = " << GetChemicalName(i) << " + timestep * delta_" << GetChemicalName(i) << ";\n";
+        kernel_source << indent << GetChemicalName(i) << "_out[index_x] = " << GetChemicalName(i) << " + timestep * delta_" << GetChemicalName(i) << ";\n";
     kernel_source << "}\n";
     return kernel_source.str();
 }

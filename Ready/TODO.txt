@@ -17,7 +17,6 @@ Big picture issues:
 before 0.6 release:
 
 - fix mouse controls / clipping glitch (camera too close?)
-- allow more chemicals to be used (current limit is 8)
 
 before 0.x release:
 
