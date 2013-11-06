@@ -2,6 +2,8 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="3">
     <description>
+Gray-Scott-History-Wave formula, implemented by Dan Wills based on pre-existing pattern code in Ready.
+
 A Gray-Scott reaction-diffusion system is simulated in the a and b reagents, with coupled simulations in the c (history), d (wave), and e (wave derivative) reagents.
 
 The c reagent implements a diffusable summed-history of other reagents. This allows moving features (like gliders) to leave a trail behind them.
@@ -18,7 +20,6 @@ There's something about the dynamics of this pattern that seems predictable. Per
 
 The initial state is set up in such a way to try to start a reaction, but this setup is quite sensitive to initial conditions (particularly c_to_F and wave_to_F) so sometimes you won't get a good starting state. If you get uninteresting evolution (ie everything quickly becomes unmoving or moving only linearly), then you may be able to remedy it by generating a new initial pattern (Action Menu, Generate Intial Pattern). It should give the expected behavior most of the time.
 
-Gray-Scott-History-Wave formula, implemented by Dan Wills starting from pre-existing pattern code in Ready.
     </description>
     <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <param name="timestep">
