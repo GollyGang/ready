@@ -742,7 +742,7 @@ void InfoPanel::ChangeFormula()
 
 void InfoPanel::ChangeNumChemicals()
 {
-    const int MAX_CHEMICALS = 100;
+    const int MAX_CHEMICALS = 1000;
 
     int oldnum = frame->GetCurrentRDSystem()->GetNumberOfChemicals();
     int newnum;
