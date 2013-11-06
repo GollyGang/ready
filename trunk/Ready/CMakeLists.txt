@@ -158,6 +158,12 @@ set( PATTERN_FILES
   Patterns/Schrodinger1926/packet.vti             Patterns/Schrodinger1926/packet_reflect.vti
   Patterns/Schrodinger1926/packet_pass.vti        Patterns/Schrodinger1926/quantum_tunnelling.vti
   Patterns/Schrodinger1926/packet_reflect2D.vti
+  Patterns/Experiments/cglrd_ramps_example_djw.vti  
+  Patterns/Experiments/grayscott-historyWave_fuseWorms.vti
+  Patterns/Experiments/grayscott-historyWave_moreLifelike.vti
+  Patterns/Experiments/grayscott-historyWaveDC_solitonsAndWorms_init.vti
+  Patterns/Experiments/orbits_explodey_init.djw.vti
+  Patterns/Experiments/orbits_sharpWaves-init_djw.vti
 )
 
 set( HELP_FILES
