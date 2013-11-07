@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="3">
+    <description>Gray-Scott-History-Wave formula, implemented by Dan Wills starting from pre-existing pattern code in Ready.
+      
+A Gray-Scott reaction-diffusion system is simulated in the a and b reagents, with coupled simulations in the c (history), d (wave), and e (wave derivative) reagents.
+
+The c reagent implements a diffusable summed-history of other reagents. This allows moving features (like gliders) to leave a trail behind them.
+
+The d and e reagents implement the wave equation. Reagent e has very small values in it, and at present it is used only to make the d reagent - so it can be safely ignored. The wave-equation part includes additional controls for damping, shaping (power), and DC value (for use in output-value-range remapping). The wave simulation is fed by the other reagents, the wave coupling lets moving features (like gliders) leave a wake behind them.
+
+These extra reagents c and d can be fed back into the Gray-Scott simulation. They can be used to offset reagent values, simulation parameters F, k and diffusion rates.
+
+This is the *coralGrow* example pattern, using the system described above, it makes a coral/lichen-like pattern in the c reagent.
+
+Behavior: Short wavefronts travel through space, dividing constantly and annihlating on collision. The fronts leave a long trail behind them in the history reagent (c) which the fronts avoid as much as they can (too high c reagent also destroys wavefronts). The fronts generate a wake in the wave reagent (d), which is used to offset F slightly. This makes the fronts stronger and more coherent.
+
+The initial state is set up in such a way to try to start a reaction, but this setup is sensitive to initial conditions so sometimes it doesn't get going, or ends after a short time. If you get uninteresting evolution (ie it doesn't start or quickly dies out), then you may be able to remedy it by generating a new initial pattern (Action Menu, Generate Intial Pattern). It should give the expected behavior most of the time. This pattern often fares better if the resolution is a made bit larger, (512x512 cells for example).
+
+    </description>
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="timestep">
+        0.5
+      </param>
+      <param name="D_a">
+        0.08
+      </param>
+      <param name="D_b">
+        0.04
+      </param>
+      <param name="k">
+        0.045
+      </param>
+      <param name="F">
+        0.01
+      </param>
+      <param name="a_pow">
+        1
+      </param>
+      <param name="b_pow">
+        2
+      </param>
+	  <param name="a_to_c">
+        0
+      </param>
+      <param name="b_to_c">
+        0.012
+      </param>
+      <param name="c_damp">
+        0.0008
+      </param>
+      <param name="D_c">
+        0.0001
+      </param>
+      <param name="c_pow">
+        1
+      </param>
+      <param name="c_pow_norm">
+        1
+      </param>
+      <param name="c_clamp_min">
+        0
+      </param>
+      <param name="c_clamp_max">
+        1
+      </param>
+      <param name="c_to_k">
+        0
+      </param>
+      <param name="c_to_F">
+        0
+      </param>
+      <param name="c_to_a">
+        -0.01
+      </param>
+      <param name="c_to_b">
+        0
+      </param>
+      <param name="c_to_Da">
+        0
+      </param>
+      <param name="c_to_Db">
+        0
+      </param>
+      <param name="a_to_wave">
+        -1.3e-05
+      </param>
+      <param name="b_to_wave">
+        0.009
+      </param>
+      <param name="c_to_wave">
+        0
+      </param>
+      <param name="wave_diffusion">
+        5e-05
+      </param>
+      <param name="wave_damp">
+        0.9985
+      </param>
+      <param name="wave_power">
+        1.0
+      </param>
+      <param name="wave_DC_value">
+        0.37
+      </param>
+      <param name="wave_clamp">
+        22
+      </param>
+      <param name="wave_to_F">
+        0.01
+      </param>
+      <param name="wave_to_k">
+        0
+      </param>
+      <param name="wave_to_Da">
+        0
+      </param>
+      <param name="wave_to_Db">
+        0
+      </param>
+      <param name="wave_to_a">
+        0
+      </param>
+      <param name="wave_to_b">
+        0
+      </param>
+      <param name="wave_to_c">
+        0
+      </param>
+      <formula number_of_chemicals="5">delta_a = (D_a + c*c_to_Da + (d-wave_DC_value)*wave_to_Da) * laplacian_a - pow(a,(float4)a_pow)*pow(b,(float4)b_pow) + (F + c_to_F*c + (d-wave_DC_value)*wave_to_F)*(1.0f-a) + c*c_to_a + (d-wave_DC_value)*wave_to_a;
+delta_b = (D_b  + c*c_to_Db + (d-wave_DC_value)*wave_to_Db) * laplacian_b + pow(a,(float4)a_pow)*pow(b,(float4)b_pow) - ((F + c_to_F*c + (d-wave_DC_value)*wave_to_F)+(k + c*c_to_k + (d-wave_DC_value)*wave_to_k))*b + c*c_to_b + (d-wave_DC_value)*wave_to_b;
+delta_c = -c*c_damp + a*a_to_c + b*b_to_c + (d-wave_DC_value)*wave_to_c + D_c * laplacian_c;
+c = clamp( pow( (float4)( fabs(c)/c_pow_norm ), (float4)c_pow )*c_pow_norm, c_clamp_min, c_clamp_max );
+d = wave_DC_value + clamp( sign(d-wave_DC_value) * pow( (float4)( fabs(d-wave_DC_value) * wave_damp), (float4)wave_power ) + a * a_to_wave + b * b_to_wave + c * c_to_wave, -wave_clamp, wave_clamp);
+delta_e = (laplacian_d) * wave_diffusion;
+delta_d = e + delta_e;
+      </formula>
+      
+    </rule>
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite>
+          
+        </overwrite>
+        <constant value="0.7">
+          
+        </constant>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>
+          
+        </overwrite>
+        <white_noise low="-0.15" high="0.299">
+          
+        </white_noise>
+        <rectangle>
+          <point3D x="0.45" y="0.1" z="0.4">
+            
+          </point3D>
+          <point3D x="0.55" y="0.9" z="0.6">
+            
+          </point3D>
+          
+        </rectangle>
+        
+      </overlay>
+      <overlay chemical="d">
+        <overwrite>
+          
+        </overwrite>
+        <constant value="0.37">
+          
+        </constant>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="0">
+        
+      </color_low>
+      <color_high r="1" g="1" b="1">
+        
+      </color_high>
+      <show_color_scale value="false">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="false">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="c">
+        
+      </active_chemical>
+      <low value="0">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="15">
+        
+      </vertical_scale_2D>
+      <contour_level value="0.25">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="true">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="false">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="222">
+        
+      </timesteps_per_render>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
