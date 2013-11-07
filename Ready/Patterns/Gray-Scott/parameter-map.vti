@@ -18,10 +18,10 @@
       <param name="F1">       0.0   </param>
       <param name="F2">       0.1   </param>
       <formula number_of_chemicals="2">
-        float hpos = x / (float)X; // [0,1]
-        float vpos = y / (float)Y; // [0,1]
-        float k = k1 + (k2-k1)*hpos;
-        float F = F1 + (F2-F1)*vpos;
+        float4 hpos = index_x / (float)X; // [0,1]
+        float4 vpos = index_y / (float)Y; // [0,1]
+        float4 k = k1 + (k2-k1)*hpos;
+        float4 F = F1 + (F2-F1)*vpos;
         delta_a = 2.0f * diff * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = diff * laplacian_b + a*b*b - (F+k)*b;
       </formula>
