@@ -16,10 +16,12 @@ Big picture issues:
 
 before 0.6 release:
 
-- fix mouse controls / clipping glitch (camera too close?)
+- fix mouse controls (camera too close?)
+- clipping glitch (clip phase plot points?)
 
 before 0.x release:
 
+- perlin noise pattern generators (vtkPerlinNoise)
 - choice of color palettes w/ vtkColorSeries (need vtk6)
 - choice of log or linear color palette
 - NKS rules from pp 163-166
