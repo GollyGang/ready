@@ -1038,9 +1038,13 @@ void MyFrame::OnStep(wxCommandEvent& event)
 
     try
     {
-        if (event.GetId() == ID::Step1) {
+        if (event.GetId() == ID::Step1) 
+        {
             this->system->Update(1);
-        } else if (event.GetId() == ID::StepN) {
+            this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
+        } 
+        else if (event.GetId() == ID::StepN) 
+        {
             // timesteps_per_render might be huge, so don't do this:
             // this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
             // instead we let OnIdle do the stepping, but stop at next render
@@ -1212,6 +1216,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         try 
         {
             this->system->Update(temp_steps);
+            this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
         }
         catch(const exception& e)
         {
