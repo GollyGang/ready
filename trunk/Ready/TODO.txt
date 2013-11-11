@@ -17,7 +17,6 @@ Big picture issues:
 before 0.6 release:
 
 - fix mouse controls (camera too close?)
-- clipping glitch (clip phase plot points?)
 
 before 0.x release:
 

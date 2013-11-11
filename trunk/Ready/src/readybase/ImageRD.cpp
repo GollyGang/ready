@@ -55,6 +55,7 @@ using namespace std;
 #include <vtkImageMapper.h>
 #include <vtkImageMirrorPad.h>
 #include <vtkImageReslice.h>
+#include <vtkImageThreshold.h>
 #include <vtkImageToStructuredPoints.h>
 #include <vtkImageWrapPad.h>
 #include <vtkInteractorStyleTrackballCamera.h>
@@ -884,14 +885,31 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     iChemX = max( 0, min( iChemX, this->GetNumberOfChemicals()-1 ) );
     iChemY = max( 0, min( iChemY, this->GetNumberOfChemicals()-1 ) );
     iChemZ = max( 0, min( iChemZ, this->GetNumberOfChemicals()-1 ) );
-    
+
+    // ensure plot points remain within a reasonable range (else get view clipping issues)
+    double minVal = low-(high-low)*100.0;
+    double maxVal = high+(high-low)*100.0;
+
     vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
     points->SetNumberOfPoints(this->GetNumberOfCells());
     points->SetRadius(0);
 
+    vtkSmartPointer<vtkImageThreshold> thresholdXmin = vtkSmartPointer<vtkImageThreshold>::New();
+    thresholdXmin->SetInput(this->GetImage(iChemX));
+    thresholdXmin->ThresholdByLower(minVal);
+    thresholdXmin->ReplaceInOn();
+    thresholdXmin->SetInValue(minVal);
+    thresholdXmin->ReplaceOutOff();
+    vtkSmartPointer<vtkImageThreshold> thresholdXmax = vtkSmartPointer<vtkImageThreshold>::New();
+    thresholdXmax->SetInputConnection(thresholdXmin->GetOutputPort());
+    thresholdXmax->ThresholdByUpper(maxVal);
+    thresholdXmax->ReplaceInOn();
+    thresholdXmax->SetInValue(maxVal);
+    thresholdXmax->ReplaceOutOff();
+    
     vtkSmartPointer<vtkMergeFilter> mergeX = vtkSmartPointer<vtkMergeFilter>::New();
     mergeX->SetGeometryConnection(points->GetOutputPort());
-    mergeX->SetScalars(this->GetImage(iChemX));
+    mergeX->SetScalarsConnection(thresholdXmax->GetOutputPort());
 
     vtkSmartPointer<vtkWarpScalar> warpX = vtkSmartPointer<vtkWarpScalar>::New();
     warpX->UseNormalOn();
@@ -899,9 +917,22 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     warpX->SetInputConnection(mergeX->GetOutputPort());
     warpX->SetScaleFactor(scaling);
 
+    vtkSmartPointer<vtkImageThreshold> thresholdYmin = vtkSmartPointer<vtkImageThreshold>::New();
+    thresholdYmin->SetInput(this->GetImage(iChemY));
+    thresholdYmin->ThresholdByLower(minVal);
+    thresholdYmin->ReplaceInOn();
+    thresholdYmin->SetInValue(minVal);
+    thresholdYmin->ReplaceOutOff();
+    vtkSmartPointer<vtkImageThreshold> thresholdYmax = vtkSmartPointer<vtkImageThreshold>::New();
+    thresholdYmax->SetInputConnection(thresholdYmin->GetOutputPort());
+    thresholdYmax->ThresholdByUpper(maxVal);
+    thresholdYmax->ReplaceInOn();
+    thresholdYmax->SetInValue(maxVal);
+    thresholdYmax->ReplaceOutOff();
+
     vtkSmartPointer<vtkMergeFilter> mergeY = vtkSmartPointer<vtkMergeFilter>::New();
     mergeY->SetGeometryConnection(warpX->GetOutputPort());
-    mergeY->SetScalars(this->GetImage(iChemY));
+    mergeY->SetScalarsConnection(thresholdYmax->GetOutputPort());
 
     vtkSmartPointer<vtkWarpScalar> warpY = vtkSmartPointer<vtkWarpScalar>::New();
     warpY->UseNormalOn();
@@ -914,9 +945,22 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     float offsetZ = 0.0f;
     if(this->GetNumberOfChemicals()>2)
     {
+        vtkSmartPointer<vtkImageThreshold> thresholdZmin = vtkSmartPointer<vtkImageThreshold>::New();
+        thresholdZmin->SetInput(this->GetImage(iChemZ));
+        thresholdZmin->ThresholdByLower(minVal);
+        thresholdZmin->ReplaceInOn();
+        thresholdZmin->SetInValue(minVal);
+        thresholdZmin->ReplaceOutOff();
+        vtkSmartPointer<vtkImageThreshold> thresholdZmax = vtkSmartPointer<vtkImageThreshold>::New();
+        thresholdZmax->SetInputConnection(thresholdZmin->GetOutputPort());
+        thresholdZmax->ThresholdByUpper(maxVal);
+        thresholdZmax->ReplaceInOn();
+        thresholdZmax->SetInValue(maxVal);
+        thresholdZmax->ReplaceOutOff();
+
         vtkSmartPointer<vtkMergeFilter> mergeZ = vtkSmartPointer<vtkMergeFilter>::New();
         mergeZ->SetGeometryConnection(warpY->GetOutputPort());
-        mergeZ->SetScalars(this->GetImage(iChemZ));
+        mergeZ->SetScalarsConnection(thresholdZmax->GetOutputPort());
 
         vtkSmartPointer<vtkWarpScalar> warpZ = vtkSmartPointer<vtkWarpScalar>::New();
         warpZ->UseNormalOn();
