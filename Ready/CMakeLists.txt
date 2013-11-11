@@ -165,6 +165,7 @@ set( PATTERN_FILES
   Patterns/Experiments/orbits_explodey_init.djw.vti
   Patterns/Experiments/orbits_sharpWaves-init_djw.vti
   Patterns/Experiments/grayscott-historyWave_coralGrow_djw.vti
+  Patterns/Experiments/gladman_vermiformSolitons.vti
 )
 
 set( HELP_FILES
