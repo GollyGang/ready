@@ -3,6 +3,14 @@
   <RD format_version="3">
   
     <description>
+    Simon Gladman: &quot;After my recent experiments with cubic coupling different reaction diffusion models, 
+    I thought I'd return to my roots and see what happens when I do the same to a 
+    Belousov-Zhabotinsky simulation. This reaction is best known for its spiral wavefronts, 
+    so I was expecting spirals within spirals - and that's pretty much what I got.&lt;br&gt;
+    ...&lt;br&gt;
+    That was until I stumbled across something quite unexpected: vermiform solitons popping in 
+    and out of existence.&quot;
+    
     &lt;a href=&quot;http://flexmonkey.blogspot.co.uk/2013/10/veriform-solitons-in-ternary-cubic.html&quot;&gt;http://flexmonkey.blogspot.co.uk/2013/10/veriform-solitons-in-ternary-cubic.html&lt;/a&gt;
     </description>
     
@@ -15,7 +23,6 @@ __kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global fl
     const int z = get_global_id(2);
     const int X = get_global_size(0);
     const int Y = get_global_size(1);
-    const int Z = get_global_size(2);
     const int index_here = X*(Y*z + y) + x;
 
     float4 a = a_in[index_here];
@@ -25,8 +32,7 @@ __kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global fl
     float4 e = e_in[index_here];
     float4 f = f_in[index_here];
 
-    // compute the Laplacians of each chemical
-    // 2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6
+    // compute the local averages of each chemical
     const int xm1 = ((x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((x+1) &amp; (X-1));
     const int ym1 = ((y-1+Y) &amp; (Y-1));
@@ -88,7 +94,6 @@ __kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global fl
     float4 f_w = f_in[index_w];
     float4 f_nw = f_in[index_nw];
     
-    // equal-weights => not really a laplacian
     const float4 K0 = 1.0f/9.0f; // center weight
     const float K1 = 1.0f/9.0f; // edge-neighbors
     const float K2 = 1.0f/9.0f; // vertex-neighbors
@@ -133,28 +138,14 @@ __kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global fl
     float4 couplingE = q * e * (b - e); 
     float4 couplingF = q * f * (c - f);                 
     
-    // c_a + c_a * ((reactionAlpha * (reactionGamma * c_b)) - c_c)
     a_out[index_here] = couplingA + laplacian_a + laplacian_a * ((alpha_one* (gamma_one * laplacian_b)) - laplacian_c);
-
-    // c_b + c_b * ((reactionBeta * c_c) - (reactionAlpha * c_a)
-    b_out[index_here] = couplingB +  laplacian_b + laplacian_b * ((beta_one * laplacian_c) - (alpha_one * laplacian_a)); 
-                        
-    // c_c + c_c * ((reactionGamma * c_a) - (reactionBeta * c_b))
+    b_out[index_here] = couplingB + laplacian_b + laplacian_b * ((beta_one * laplacian_c) - (alpha_one * laplacian_a)); 
     c_out[index_here] = couplingC + laplacian_c + laplacian_c * ((gamma_one * laplacian_a) - (beta_one * laplacian_b));
     
-    // -----
-    
-    // c_a + c_a * ((reactionAlpha * (reactionGamma * c_b)) - c_c)
     d_out[index_here] = couplingD + laplacian_d + laplacian_d * ((alpha_two* (gamma_two * laplacian_e)) - laplacian_f);
-    
-    // c_b + c_b * ((reactionBeta * c_c) - (reactionAlpha * c_a)
-    e_out[index_here] = couplingE +  laplacian_e + laplacian_e * ((beta_two * laplacian_f) - (alpha_two * laplacian_d)); 
-    
-    // c_c + c_c * ((reactionGamma * c_a) - (reactionBeta * c_b))
+    e_out[index_here] = couplingE + laplacian_e + laplacian_e * ((beta_two * laplacian_f) - (alpha_two * laplacian_d)); 
     f_out[index_here] = couplingF + laplacian_f + laplacian_f * ((gamma_two * laplacian_d) - (beta_two * laplacian_e));
-    
-    // -----
-    
+
     a_out[index_here] = clamp( a_out[index_here], 0.0f, 1.0f );    
     b_out[index_here] = clamp( b_out[index_here], 0.0f, 1.0f );    
     c_out[index_here] = clamp( c_out[index_here], 0.0f, 1.0f );    

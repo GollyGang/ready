@@ -11,6 +11,18 @@
         
         In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. 
         The magnitude is shown in 'c' but doesn't affect the system.
+        
+        Derivation:
+        
+        &lt;tt&gt;
+        i*(dx/dt) = -Laplacian(x)
+        &lt;/tt&gt;
+        
+        where x is a complex number a+bi, i is the square root of -1.
+        
+        hence:
+        &lt;tt&gt;&lt;pre&gt;da/dt = -Im(Laplacian(x)) = -Laplacian(b)
+        db/dt =  Re(Laplacian(x)) =  Laplacian(a)&lt;/pre&gt;&lt;/tt&gt;
     </description>
 
     <rule type="formula" name="Schrodinger equation">
