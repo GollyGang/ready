@@ -25,11 +25,11 @@
 #include "Properties.hpp"
 
 // VTK:
-#include <vtkRendererCollection.h>
-#include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include <vtkObjectFactory.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkObjectFactory.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 
 // STL:
 #include <stdexcept>

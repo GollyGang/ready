@@ -353,7 +353,22 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
+if( ${VTK_MAJOR_VERSION} GREATER 5 )
+  target_link_libraries( 
+    readybase 
+    vtkCommonCore 
+    vtkFiltersModeling
+    vtkFiltersTexture
+    vtkInteractionStyle 
+    vtkIOXML 
+    vtkRenderingCore 
+    vtkRenderingAnnotation 
+    vtkRenderingFreeType 
+    vtkRenderingFreeTypeOpenGL 
+  )
+else()
+  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
+endif()
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )

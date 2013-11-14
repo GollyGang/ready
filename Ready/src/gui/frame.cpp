@@ -61,20 +61,20 @@
 using namespace std;
 
 // VTK:
+#include <vtkCellArray.h>
+#include <vtkCellPicker.h>
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkWindowToImageFilter.h>
-#include <vtkPNGWriter.h>
 #include <vtkJPEGWriter.h>
-#include <vtkSmartPointer.h>
+#include <vtkOBJReader.h>
+#include <vtkPNGWriter.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
 #include <vtkRendererCollection.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkWindowToImageFilter.h>
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkOBJReader.h>
-#include <vtkPolyData.h>
-#include <vtkCellPicker.h>
-#include <vtkPointData.h>
-#include <vtkCellArray.h>
 
 #ifdef __WXMAC__
     #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
@@ -3171,7 +3171,11 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
         wxBusyCursor busy;
         vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
         writer->SetFileName(mesh_filename.mb_str());
-        writer->SetInput(pd);
+        #if VTK_MAJOR_VERSION >= 6
+            writer->SetInputData(pd);
+        #else
+            writer->SetInput(pd);
+        #endif
         writer->Write();
     }
     else
@@ -3229,7 +3233,11 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     writer->SetFileName(filename.mb_str());
     vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
     system->GetAs2DImage(image,this->render_settings);
-    writer->SetInput(image);
+    #if VTK_MAJOR_VERSION >= 6
+        writer->SetInputData(image);
+    #else
+        writer->SetInput(image);
+    #endif
     writer->Write();
 
     // TODO: merge with OnSaveScreenshot
@@ -3271,7 +3279,11 @@ void MyFrame::RecordFrame()
                 
                 vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
                 this->system->GetAs2DImage(image,this->render_settings);
-                writer->SetInput(image);
+                #if VTK_MAJOR_VERSION >= 6
+                    writer->SetInputData(image);
+                #else
+                    writer->SetInput(image);
+                #endif
                 if (chemical_number < num_chems-1) //write all but the last one as it will get written by the code below.
                 {
                     writer->SetFileName(oss.str().c_str());
@@ -3286,7 +3298,11 @@ void MyFrame::RecordFrame()
             oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
             vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
             this->system->GetAs2DImage(image,this->render_settings);
-            writer->SetInput(image);
+            #if VTK_MAJOR_VERSION >= 6
+                writer->SetInputData(image);
+            #else
+                writer->SetInput(image);
+            #endif
         }
     }
     else // take a screenshot of the current view

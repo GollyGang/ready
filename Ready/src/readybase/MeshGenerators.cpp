@@ -20,23 +20,23 @@
 #include "utils.hpp"
 
 // VTK:
-#include <vtkSmartPointer.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkPlatonicSolidSource.h>
-#include <vtkLinearSubdivisionFilter.h>
-#include <vtkMath.h>
-#include <vtkFloatArray.h>
-#include <vtkPointSource.h>
-#include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkAppendFilter.h>
+#include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkCleanPolyData.h>
 #include <vtkDelaunay2D.h>
 #include <vtkDelaunay3D.h>
-#include <vtkCellArray.h>
-#include <vtkTriangle.h>
+#include <vtkFloatArray.h>
 #include <vtkGenericCell.h>
-#include <vtkCleanPolyData.h>
-#include <vtkAppendFilter.h>
+#include <vtkLinearSubdivisionFilter.h>
+#include <vtkMath.h>
+#include <vtkPlatonicSolidSource.h>
+#include <vtkPointSource.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkTriangle.h>
+#include <vtkUnstructuredGrid.h>
 
 // STL:
 #include <vector>
@@ -522,7 +522,11 @@ void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,
     poly->SetPoints(pts);
     poly->SetPolys(cells);
     vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
-    del->SetInput(poly);
+    #if VTK_MAJOR_VERSION >= 6
+        del->SetInputData(poly);
+    #else
+        del->SetInput(poly);
+    #endif
     del->Update();
     mesh->SetPoints(del->GetOutput()->GetPoints());
     mesh->SetCells(VTK_POLYGON,del->GetOutput()->GetPolys());
@@ -561,7 +565,11 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         old_poly->SetPoints(pts);
         old_poly->SetPolys(cells);
         vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
-        del->SetInput(old_poly);
+        #if VTK_MAJOR_VERSION >= 6
+            del->SetInputData(old_poly);
+        #else
+            del->SetInput(old_poly);
+        #endif
         del->Update();
         old_poly->DeepCopy(del->GetOutput());
         old_poly->BuildLinks();
@@ -644,7 +652,11 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
     poly->SetPoints(pts);
     poly->SetPolys(new_cells);
     vtkSmartPointer<vtkCleanPolyData> clean = vtkSmartPointer<vtkCleanPolyData>::New();
-    clean->SetInput(poly);
+    #if VTK_MAJOR_VERSION >= 6
+        clean->SetInputData(poly);
+    #else
+        clean->SetInput(poly);
+    #endif
     clean->PointMergingOff();
     clean->Update();
     mesh->SetPoints(clean->GetOutput()->GetPoints());
@@ -742,7 +754,11 @@ void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
                 }
                 ug->InsertNextCell(VTK_POLYHEDRON,24,&pointIds.front(),14,&faceStream.front());
                 ug->SetPoints(points);
-                append->AddInput(ug);
+                #if VTK_MAJOR_VERSION >= 6
+                    append->AddInputData(ug);
+                #else
+                    append->AddInput(ug);
+                #endif
             }
         }
     }
@@ -799,7 +815,11 @@ void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
                 }
                 ug->InsertNextCell(VTK_POLYHEDRON,14,&pointIds.front(),12,&faceStream.front());
                 ug->SetPoints(points);
-                append->AddInput(ug);
+                #if VTK_MAJOR_VERSION >= 6
+                    append->AddInputData(ug);
+                #else
+                    append->AddInput(ug);
+                #endif
             }
         }
     }
@@ -881,7 +901,11 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
                 }
                 ug->InsertNextCell(VTK_POLYHEDRON,16,&pointIds.front(),16,&faceStream.front());
                 ug->SetPoints(points);
-                append->AddInput(ug);
+                #if VTK_MAJOR_VERSION >= 6
+                    append->AddInputData(ug);
+                #else
+                    append->AddInput(ug);
+                #endif
             }
         }
     }

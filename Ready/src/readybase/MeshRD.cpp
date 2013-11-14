@@ -135,7 +135,11 @@ void MeshRD::SaveFile(const char* filename,const Properties& render_settings,boo
         iw->GenerateInitialPatternWhenLoading();
     iw->SetFileName(filename);
     iw->SetDataModeToBinary(); // workaround for http://www.vtk.org/Bug/view.php?id=13382
-    iw->SetInput(this->mesh);
+    #if VTK_MAJOR_VERSION >= 6
+        iw->SetInputData(this->mesh);
+    #else
+        iw->SetInput(this->mesh);
+    #endif
     iw->Write();
 }
 
@@ -289,14 +293,22 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         {
             // explicitly extract the edges - the default mapper only shows the outside surface
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
-            edges->SetInput(this->mesh);
+            #if VTK_MAJOR_VERSION >= 6
+                edges->SetInputData(this->mesh);
+            #else
+                edges->SetInput(this->mesh);
+            #endif
             mapper->SetInputConnection(edges->GetOutputPort());
             mapper->SetScalarModeToUseCellFieldData();
         }
         else if(slice_3D) // partial wireframe mode: only external surface edges
         {
             vtkSmartPointer<vtkGeometryFilter> geom = vtkSmartPointer<vtkGeometryFilter>::New();
-            geom->SetInput(this->mesh);
+            #if VTK_MAJOR_VERSION >= 6
+                geom->SetInputData(this->mesh);
+            #else
+                geom->SetInput(this->mesh);
+            #endif
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
             edges->SetInputConnection(geom->GetOutputPort());
             mapper->SetInputConnection(edges->GetOutputPort());
@@ -307,13 +319,21 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             if(use_image_interpolation)
             {
                 vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
-                to_point_data->SetInput(this->mesh);
+                #if VTK_MAJOR_VERSION >= 6
+                    to_point_data->SetInputData(this->mesh);
+                #else
+                    to_point_data->SetInput(this->mesh);
+                #endif
                 mapper->SetInputConnection(to_point_data->GetOutputPort());
                 mapper->SetScalarModeToUsePointFieldData();
             }
             else
             {
-                mapper->SetInput(this->mesh);
+                #if VTK_MAJOR_VERSION >= 6
+                    mapper->SetInputData(this->mesh);
+                #else
+                    mapper->SetInput(this->mesh);
+                #endif
                 mapper->SetScalarModeToUseCellFieldData();
             }
             if(show_cell_edges)
@@ -332,7 +352,11 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     {
         // show a contour
         vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        assign_attribute->SetInput(this->mesh);
+        #if VTK_MAJOR_VERSION >= 6
+            assign_attribute->SetInputData(this->mesh);
+        #else
+            assign_attribute->SetInput(this->mesh);
+        #endif
         assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
         vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
         to_point_data->SetInputConnection(assign_attribute->GetOutputPort());
@@ -364,7 +388,11 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     else // visualise the cells
     {
         vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        assign_attribute->SetInput(this->mesh);
+        #if VTK_MAJOR_VERSION >= 6
+            assign_attribute->SetInputData(this->mesh);
+        #else
+            assign_attribute->SetInput(this->mesh);
+        #endif
         assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
         vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
         threshold->SetInputConnection(assign_attribute->GetOutputPort());
@@ -407,13 +435,21 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         if(use_image_interpolation)
         {
             vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
-            to_point_data->SetInput(this->mesh);
+            #if VTK_MAJOR_VERSION >= 6
+                to_point_data->SetInputData(this->mesh);
+            #else
+                to_point_data->SetInput(this->mesh);
+            #endif
             cutter->SetInputConnection(to_point_data->GetOutputPort());
             mapper->SetScalarModeToUsePointFieldData();
         }
         else
         {
-            cutter->SetInput(this->mesh);
+            #if VTK_MAJOR_VERSION >= 6
+                cutter->SetInputData(this->mesh);
+            #else
+                cutter->SetInput(this->mesh);
+            #endif
             mapper->SetScalarModeToUseCellFieldData();
         }
         mapper->SelectColorArray(activeChemical.c_str());
@@ -483,7 +519,11 @@ void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float h
     points->SetRadius(0);
 
     vtkSmartPointer<vtkRearrangeFields> rearrange_fieldsX = vtkSmartPointer<vtkRearrangeFields>::New();
-    rearrange_fieldsX->SetInput(this->mesh);
+    #if VTK_MAJOR_VERSION >= 6
+        rearrange_fieldsX->SetInputData(this->mesh);
+    #else
+        rearrange_fieldsX->SetInput(this->mesh);
+    #endif
     rearrange_fieldsX->AddOperation(vtkRearrangeFields::MOVE,GetChemicalName(iChemX).c_str(),vtkRearrangeFields::CELL_DATA,vtkRearrangeFields::POINT_DATA);
     vtkSmartPointer<vtkAssignAttribute> assign_attributeX = vtkSmartPointer<vtkAssignAttribute>::New();
     assign_attributeX->SetInputConnection(rearrange_fieldsX->GetOutputPort());
@@ -498,7 +538,11 @@ void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float h
     warpX->SetScaleFactor(scaling);
 
     vtkSmartPointer<vtkRearrangeFields> rearrange_fieldsY = vtkSmartPointer<vtkRearrangeFields>::New();
-    rearrange_fieldsY->SetInput(this->mesh);
+    #if VTK_MAJOR_VERSION >= 6
+        rearrange_fieldsY->SetInputData(this->mesh);
+    #else
+        rearrange_fieldsY->SetInput(this->mesh);
+    #endif
     rearrange_fieldsY->AddOperation(vtkRearrangeFields::MOVE,GetChemicalName(iChemY).c_str(),vtkRearrangeFields::CELL_DATA,vtkRearrangeFields::POINT_DATA);
     vtkSmartPointer<vtkAssignAttribute> assign_attributeY = vtkSmartPointer<vtkAssignAttribute>::New();
     assign_attributeY->SetInputConnection(rearrange_fieldsY->GetOutputPort());
@@ -518,7 +562,11 @@ void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float h
     if(this->GetNumberOfChemicals()>2)
     {
         vtkSmartPointer<vtkRearrangeFields> rearrange_fieldsZ = vtkSmartPointer<vtkRearrangeFields>::New();
-        rearrange_fieldsZ->SetInput(this->mesh);
+        #if VTK_MAJOR_VERSION >= 6
+            rearrange_fieldsZ->SetInputData(this->mesh);
+        #else
+            rearrange_fieldsZ->SetInput(this->mesh);
+        #endif
         rearrange_fieldsZ->AddOperation(vtkRearrangeFields::MOVE,GetChemicalName(iChemZ).c_str(),vtkRearrangeFields::CELL_DATA,vtkRearrangeFields::POINT_DATA);
         vtkSmartPointer<vtkAssignAttribute> assign_attributeZ = vtkSmartPointer<vtkAssignAttribute>::New();
         assign_attributeZ->SetInputConnection(rearrange_fieldsZ->GetOutputPort());
@@ -820,14 +868,22 @@ void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) cons
     if(this->mesh->GetCellType(0)==VTK_POLYGON)
     {
         vtkSmartPointer<vtkDataSetSurfaceFilter> geom = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
-        geom->SetInput(this->mesh);
+        #if VTK_MAJOR_VERSION >= 6
+            geom->SetInputData(this->mesh);
+        #else
+            geom->SetInput(this->mesh);
+        #endif
         geom->Update();
         out->DeepCopy(geom->GetOutput());
     }
     else if(use_image_interpolation)
     {
         vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        assign_attribute->SetInput(this->mesh);
+        #if VTK_MAJOR_VERSION >= 6
+            assign_attribute->SetInputData(this->mesh);
+        #else
+            assign_attribute->SetInput(this->mesh);
+        #endif
         assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
         vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
         to_point_data->SetInputConnection(assign_attribute->GetOutputPort());
@@ -840,7 +896,11 @@ void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) cons
     else
     {
         vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        assign_attribute->SetInput(this->mesh);
+        #if VTK_MAJOR_VERSION >= 6
+            assign_attribute->SetInputData(this->mesh);
+        #else
+            assign_attribute->SetInput(this->mesh);
+        #endif
         assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
         vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
         threshold->SetInputConnection(assign_attribute->GetOutputPort());
