@@ -166,7 +166,13 @@ void ImageRD::GetImage(vtkImageData *im) const
 { 
     vtkSmartPointer<vtkImageAppendComponents> iac = vtkSmartPointer<vtkImageAppendComponents>::New();
     for(int i=0;i<this->GetNumberOfChemicals();i++)
-        iac->AddInput(this->GetImage(i));
+    {
+        #if VTK_MAJOR_VERSION >= 6
+            iac->AddInputData(this->GetImage(i));
+        #else
+            iac->AddInput(this->GetImage(i));
+        #endif
+    }
     iac->Update();
     im->DeepCopy(iac->GetOutput());
 }
@@ -201,7 +207,11 @@ void ImageRD::CopyFromImage(vtkImageData* im)
     {
         // convert multi-component data to single-component data in multiple images
         vtkSmartPointer<vtkImageExtractComponents> iec = vtkSmartPointer<vtkImageExtractComponents>::New();
-        iec->SetInput(im);
+        #if VTK_MAJOR_VERSION >= 6
+            iec->SetInputData(im);
+        #else
+            iec->SetInput(im);
+        #endif
         for(int i=0;i<this->GetNumberOfChemicals();i++)
         {
             iec->SetComponents(i);
@@ -234,10 +244,15 @@ void ImageRD::AllocateImages(int x,int y,int z,int nc)
 {
     vtkImageData *im = vtkImageData::New();
     assert(im);
-    im->SetNumberOfScalarComponents(1);
-    im->SetScalarTypeToFloat();
-    im->SetDimensions(x,y,z);
-    im->AllocateScalars();
+    #if VTK_MAJOR_VERSION >= 6
+        im->SetDimensions(x,y,z);
+        im->AllocateScalars(VTK_FLOAT,1);
+    #else
+        im->SetNumberOfScalarComponents(1);
+        im->SetScalarTypeToFloat();
+        im->SetDimensions(x,y,z);
+        im->AllocateScalars();
+    #endif
     if(im->GetDimensions()[0]!=x || im->GetDimensions()[1]!=y || im->GetDimensions()[2]!=z)
         throw runtime_error("ImageRD::AllocateVTKImage : Failed to allocate image data - dimensions too big?");
     return im;
@@ -382,7 +397,11 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(this->GetImage(iChem));
+        #if VTK_MAJOR_VERSION >= 6
+            image_mapper->SetInputData(this->GetImage(iChem));
+        #else
+            image_mapper->SetInput(this->GetImage(iChem));
+        #endif
       
         // will convert the x*y 2D image to a x*y grid of quads
         const float image_height = this->GetX() / this->image_ratio1D;
@@ -432,7 +451,11 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInput(this->GetImage(iChemical));
+        #if VTK_MAJOR_VERSION >= 6
+            plane->SetInputData(this->GetImage(iChemical));
+        #else
+            plane->SetInput(this->GetImage(iChemical));
+        #endif
         vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
         warp->SetInputConnection(plane->GetOutputPort());
         warp->SetScaleFactor(-scaling);
@@ -527,7 +550,11 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
         image_mapper->SetLookupTable(lut);
-        image_mapper->SetInput(this->GetImage(iChem));
+        #if VTK_MAJOR_VERSION >= 6
+            image_mapper->SetInputData(this->GetImage(iChem));
+        #else
+            image_mapper->SetInput(this->GetImage(iChem));
+        #endif
 
         // will convert the x*y 2D image to a x*y grid of quads
         vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
@@ -557,7 +584,11 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         if(show_displacement_mapped_surface)
         {
             vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-            plane->SetInput(this->GetImage(iChem));
+            #if VTK_MAJOR_VERSION >= 6
+                plane->SetInputData(this->GetImage(iChem));
+            #else
+                plane->SetInput(this->GetImage(iChem));
+            #endif
             vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
             warp->SetInputConnection(plane->GetOutputPort());
             warp->SetScaleFactor(scaling);
@@ -714,12 +745,20 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     // we first convert the image from point data to cell data, to match the users expectations
 
     vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
-    pad->SetInput(image);
+    #if VTK_MAJOR_VERSION >= 6
+        pad->SetInputData(image);
+    #else
+        pad->SetInput(image);
+    #endif
     pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
 
     // move the pixel values (stored in the point data) to cell data
     vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
-    prearrange_fields->SetInput(image);
+    #if VTK_MAJOR_VERSION >= 6
+        prearrange_fields->SetInputData(image);
+    #else
+        prearrange_fields->SetInput(image);
+    #endif
     prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
         vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
 
@@ -895,7 +934,11 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     points->SetRadius(0);
 
     vtkSmartPointer<vtkImageThreshold> thresholdXmin = vtkSmartPointer<vtkImageThreshold>::New();
-    thresholdXmin->SetInput(this->GetImage(iChemX));
+    #if VTK_MAJOR_VERSION >= 6
+        thresholdXmin->SetInputData(this->GetImage(iChemX));
+    #else
+        thresholdXmin->SetInput(this->GetImage(iChemX));
+    #endif
     thresholdXmin->ThresholdByLower(minVal);
     thresholdXmin->ReplaceInOn();
     thresholdXmin->SetInValue(minVal);
@@ -918,7 +961,11 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     warpX->SetScaleFactor(scaling);
 
     vtkSmartPointer<vtkImageThreshold> thresholdYmin = vtkSmartPointer<vtkImageThreshold>::New();
-    thresholdYmin->SetInput(this->GetImage(iChemY));
+    #if VTK_MAJOR_VERSION >= 6
+        thresholdYmin->SetInputData(this->GetImage(iChemY));
+    #else
+        thresholdYmin->SetInput(this->GetImage(iChemY));
+    #endif
     thresholdYmin->ThresholdByLower(minVal);
     thresholdYmin->ReplaceInOn();
     thresholdYmin->SetInValue(minVal);
@@ -946,7 +993,11 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     if(this->GetNumberOfChemicals()>2)
     {
         vtkSmartPointer<vtkImageThreshold> thresholdZmin = vtkSmartPointer<vtkImageThreshold>::New();
-        thresholdZmin->SetInput(this->GetImage(iChemZ));
+        #if VTK_MAJOR_VERSION >= 6
+            thresholdZmin->SetInputData(this->GetImage(iChemZ));
+        #else
+            thresholdZmin->SetInput(this->GetImage(iChemZ));
+        #endif
         thresholdZmin->ThresholdByLower(minVal);
         thresholdZmin->ReplaceInOn();
         thresholdZmin->SetInValue(minVal);
@@ -1112,7 +1163,11 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
                 float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
                 vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-                plane->SetInput(this->GetImage(iActiveChemical));
+                #if VTK_MAJOR_VERSION >= 6
+                    plane->SetInputData(this->GetImage(iActiveChemical));
+                #else
+                    plane->SetInput(this->GetImage(iActiveChemical));
+                #endif
                 vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
                 warp->SetInputConnection(plane->GetOutputPort());
                 warp->SetScaleFactor(-scaling);
@@ -1125,7 +1180,11 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
                 float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
                 vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-                plane->SetInput(this->GetImage(iActiveChemical));
+                #if VTK_MAJOR_VERSION >= 6
+                    plane->SetInputData(this->GetImage(iActiveChemical));
+                #else
+                    plane->SetInput(this->GetImage(iActiveChemical));
+                #endif
                 vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
                 warp->SetInputConnection(plane->GetOutputPort());
                 warp->SetScaleFactor(scaling);
@@ -1142,7 +1201,11 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
                 // turns the 3d grid of sampled values into a polygon mesh for rendering,
                 // by making a surface that contours the volume at a specified level    
                 vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-                surface->SetInput(this->GetImage(iActiveChemical));
+                #if VTK_MAJOR_VERSION >= 6
+                    surface->SetInputData(this->GetImage(iActiveChemical));
+                #else
+                    surface->SetInput(this->GetImage(iActiveChemical));
+                #endif
                 surface->SetValue(0, contour_level);
                 surface->Update();
                 out->DeepCopy(surface->GetOutput());
@@ -1154,7 +1217,11 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
                 int *extent = image->GetExtent();
 
                 vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
-                pad->SetInput(image);
+                #if VTK_MAJOR_VERSION >= 6
+                    pad->SetInputData(image);
+                #else
+                    pad->SetInput(image);
+                #endif
                 pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
                 pad->Update();
                 pad->GetOutput()->GetCellData()->SetScalars(image->GetPointData()->GetScalars()); // a non-pipelined operation
@@ -1205,7 +1272,11 @@ void ImageRD::SaveFile(const char* filename,const Properties& render_settings,bo
         iw->GenerateInitialPatternWhenLoading();
     iw->SetFileName(filename);
     iw->SetDataModeToBinary(); // (to match MeshRD::SaveFile())
-    iw->SetInput(im);
+    #if VTK_MAJOR_VERSION >= 6
+        iw->SetInputData(im);
+    #else
+        iw->SetInput(im);
+    #endif
     iw->Write();
 }
 
@@ -1239,7 +1310,11 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
     {
         case 1: 
         case 2:
-            image_mapper->SetInput(this->GetImage(iActiveChemical));
+            #if VTK_MAJOR_VERSION >= 6
+                image_mapper->SetInputData(this->GetImage(iActiveChemical));
+            #else
+                image_mapper->SetInput(this->GetImage(iActiveChemical));
+            #endif
             break;
         case 3:
             {
@@ -1280,7 +1355,11 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
                 resliceAxes->SetElement(2, 3, slice_3D_position * this->GetZ());
 
                 vtkSmartPointer<vtkImageReslice> voi = vtkSmartPointer<vtkImageReslice>::New();
-                voi->SetInput(this->GetImage(iActiveChemical));
+                #if VTK_MAJOR_VERSION >= 6
+                    voi->SetInputData(this->GetImage(iActiveChemical));
+                #else
+                    voi->SetInput(this->GetImage(iActiveChemical));
+                #endif
                 voi->SetOutputDimensionality(2);
                 voi->SetResliceAxes(resliceAxes);
                 image_mapper->SetInputConnection(voi->GetOutputPort());
