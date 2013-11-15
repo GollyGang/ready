@@ -59,6 +59,7 @@
     <render_settings>
         <use_image_interpolation value="false" />
         <vertical_scale_2D value="3" />
+        <timesteps_per_render value="1" />
     </render_settings>
 
     
