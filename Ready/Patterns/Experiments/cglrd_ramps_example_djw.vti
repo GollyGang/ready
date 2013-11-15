@@ -53,7 +53,7 @@ This modification (by Dan Wills) adds a tent-shaped horizontal control ramp to t
       </param>
       <formula number_of_chemicals="4">
 //make the ramp
-d = ( fabs(  ( ( get_global_id(0) * 1.0f) / ( get_global_size(0) * 1.0f ) )  - 0.5 ) * 2.0);
+d = ( fabs(  ( ( get_global_id(0) * 1.0f) / ( get_global_size(0) * 1.0f ) )  - 0.5f ) * 2.0f);
 // apply power    
 d = pow( d, rampPower );
 //make derivs, applying the ramping
