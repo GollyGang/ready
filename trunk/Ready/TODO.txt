@@ -14,13 +14,9 @@ Big picture issues:
   shader - fits in with WebGL Playground idea below.
 - Scripting support
 
-before 0.6 release:
-
-- fix mouse controls (camera too close?)
-- turn gladman_vermiformSolitons into a formula rule?
-
 before 0.x release:
 
+- fix panning issue on complex scenes (e.g. Bays_3D.vti)
 - perlin noise pattern generators (vtkPerlinNoise)
 - choice of color palettes w/ vtkColorSeries (need vtk6)
 - choice of log or linear color palette
