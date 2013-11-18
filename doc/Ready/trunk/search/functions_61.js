@@ -1,0 +1,18 @@
+var searchData=
+[
+  ['abstractrd',['AbstractRD',['../classAbstractRD.html#ad8b9cf3e0212bdc64f12b8d220e73425',1,'AbstractRD']]],
+  ['add',['Add',['../classAdd.html#a42660a9b5eaaf7abfbe50c8602a1076e',1,'Add']]],
+  ['add_5fif_5fnew',['add_if_new',['../MeshRD_8cpp.html#a2426cbdddf15cb6f38564d84adae0501',1,'MeshRD.cpp']]],
+  ['adddefaultkeyactions',['AddDefaultKeyActions',['../prefs_8cpp.html#a561f8734ac9b2da848da296a0ce2a8e2',1,'prefs.cpp']]],
+  ['addparameter',['AddParameter',['../classAbstractRD.html#abef0fac4cc1d8426a37ebef49e172998',1,'AbstractRD::AddParameter()'],['../classFormulaOpenCLImageRD.html#a49c870bdbf13801f04885fc07871e54a',1,'FormulaOpenCLImageRD::AddParameter()'],['../classFormulaOpenCLMeshRD.html#a2d1fb48c79bf5a08b4c9479eb8f5e7f9',1,'FormulaOpenCLMeshRD::AddParameter()'],['../classOpenCLMeshRD.html#a0b7a38d554a6765cad0b90fb9ecc9eb6',1,'OpenCLMeshRD::AddParameter()']]],
+  ['addphaseplot',['AddPhasePlot',['../classImageRD.html#aed51190cb295e6709ebf3f9a43cdd8f3',1,'ImageRD::AddPhasePlot()'],['../classMeshRD.html#ab4fa1260a1d71cf6df09784ac95a033f',1,'MeshRD::AddPhasePlot()']]],
+  ['addproperty',['AddProperty',['../classProperties.html#a4dead31cae115f63e8d9100f44ee0f5b',1,'Properties']]],
+  ['addrecentpattern',['AddRecentPattern',['../classMyFrame.html#a73641e373264629dc3cc639222847135',1,'MyFrame']]],
+  ['addscalarbar',['AddScalarBar',['../scene__items_8cpp.html#a109590c487eca0ed374587e2239535c6',1,'AddScalarBar(vtkRenderer *pRenderer, vtkScalarsToColors *lut):&#160;scene_items.cpp'],['../scene__items_8hpp.html#a109590c487eca0ed374587e2239535c6',1,'AddScalarBar(vtkRenderer *pRenderer, vtkScalarsToColors *lut):&#160;scene_items.cpp']]],
+  ['allocateimages',['AllocateImages',['../classGrayScottImageRD.html#ac0ece4290035af9c4b04f60aaca4be0b',1,'GrayScottImageRD::AllocateImages()'],['../classImageRD.html#ac496af879f4ae78d25403be495de8c45',1,'ImageRD::AllocateImages()'],['../classOpenCLImageRD.html#a2b45e9256c9412d3b57b49fb87df4cf6',1,'OpenCLImageRD::AllocateImages()']]],
+  ['allocatevtkimage',['AllocateVTKImage',['../classImageRD.html#aff86f7467e47e211e54f4d1783c90a60',1,'ImageRD']]],
+  ['appenddir',['AppendDir',['../classPatternsPanel.html#a8d20ef182ba93d6d9e3a4678596fea99',1,'PatternsPanel']]],
+  ['appendrow',['AppendRow',['../classInfoPanel.html#ad186593c2052c0cd29644750f9e1bafd',1,'InfoPanel']]],
+  ['apply',['Apply',['../classBaseOperation.html#af57cef3e460b00521ea3d98cf0e9a6a1',1,'BaseOperation::Apply()'],['../classAdd.html#ae08094dd2d132923bc08545784b5049c',1,'Add::Apply()'],['../classSubtract.html#ab1360d58103fbd7cfa9b46c9e1e9d79b',1,'Subtract::Apply()'],['../classOverwrite.html#ae6d9b43be58804d9d631293fbfe36f92',1,'Overwrite::Apply()'],['../classMultiply.html#ace626127c79ae541804db1a859015a7f',1,'Multiply::Apply()'],['../classDivide.html#a68798b761d69444d619233aa85a4bf7c',1,'Divide::Apply()'],['../classOverlay.html#a1acb8b82e5f7b6496cc27a2f21f19803',1,'Overlay::Apply()']]],
+  ['assemblekernelsourcefromformula',['AssembleKernelSourceFromFormula',['../classFormulaOpenCLImageRD.html#a06166b3d9360045c9dd1d23113ec368b',1,'FormulaOpenCLImageRD::AssembleKernelSourceFromFormula()'],['../classFormulaOpenCLMeshRD.html#a0e1e716166edee0856dcda2bd8423a64',1,'FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula()'],['../classFullKernelOpenCLImageRD.html#a0b89c33801fbaf1f79257fdaff687832',1,'FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula()'],['../classFullKernelOpenCLMeshRD.html#a1ee9ef955cbcac6f8199fabea04a3371',1,'FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula()'],['../classOpenCL__MixIn.html#a8cd46f8ea6b1128076eecd65bf7b7fc7',1,'OpenCL_MixIn::AssembleKernelSourceFromFormula()']]]
+];
