@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
+  <RD format_version="4">
       
     <description>
         &quot;The complex Ginzburg-Landau equation describes a vast variety of phenomena from nonlinear 
@@ -50,6 +50,7 @@
       <timesteps_per_render value="10" />
       <vertical_scale_2D value="30" />
       <contour_level value="0" />
+      <show_phase_plot value="true" />
     </render_settings>
 
   </RD>
