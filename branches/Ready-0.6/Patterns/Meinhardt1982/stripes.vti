@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+
+  <RD format_version="3">
+  
+    <description>
+      Hans Meinhardt's five-chemical model for producing stripes.
+      
+      Meinhardt, Hans (1982) &quot;Models of Biological Pattern Formation&quot;&lt;br&gt;
+      &lt;a href=&quot;http://www.eb.tuebingen.mpg.de/research/emeriti/hans-meinhardt/82-book/bur82.html&quot;&gt;book available to download&lt;/a&gt;
+      
+      Based on Greg Turk's implementation: &lt;a href=&quot;http://www.cc.gatech.edu/~turk/reaction_diffusion/reaction_diffusion.html&quot;&gt;link&lt;/a&gt;
+    </description>
+    
+    <rule name="Meinhardt" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    
+      <param name="timestep">    0.2       </param>
+      <param name="k_ab">        0.04      </param>
+      <param name="k_c">         0.06      </param>
+      <param name="k_de">        0.04      </param>
+      <param name="diff1">       0.005     </param>
+      <param name="diff2">       0.4       </param>
+      
+      <formula number_of_chemicals="5">
+        delta_a = diff1 * laplacian_a + 0.01f * a * a * e / c - a * k_ab;
+        delta_b = diff1 * laplacian_b + 0.01f * b * b * d / c - b * k_ab;
+        delta_c = 0.01f * a * a * e + 0.01f * b * b * d - c * k_c;
+        delta_d = diff2 * laplacian_d + (a - d) * k_de;
+        delta_e = diff2 * laplacian_e + (b - e) * k_de;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+    
+        <!-- a = k_c / (2*k_ab) -->
+        <overlay chemical="a">
+            <overwrite />
+            <parameter name="k_c" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="a">
+            <divide />
+            <constant value="2" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="a">
+            <divide />
+            <parameter name="k_ab" />
+            <everywhere />
+        </overlay>
+        
+        <!-- b = a -->
+        <overlay chemical="b">
+            <overwrite />
+            <other_chemical chemical="a" />
+            <everywhere />
+        </overlay>
+        
+        <!-- c = 0.02*a*a*a/k_c -->
+        <overlay chemical="c">
+            <overwrite />
+            <other_chemical chemical="a" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="c">
+            <multiply />
+            <other_chemical chemical="a" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="c">
+            <multiply />
+            <other_chemical chemical="a" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="c">
+            <divide />
+            <parameter name="k_c" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="c">
+            <multiply />
+            <constant value="0.02" />
+            <everywhere />
+        </overlay>
+        
+        <!-- d = a -->
+        <overlay chemical="d">
+            <overwrite />
+            <other_chemical chemical="a" />
+            <everywhere />
+        </overlay>
+        
+        <!-- e = a -->
+        <overlay chemical="e">
+            <overwrite />
+            <other_chemical chemical="a" />
+            <everywhere />
+        </overlay>
+        
+        <!-- add a seed pattern -->
+        <overlay chemical="a">
+            <overwrite />
+            <!--<constant value="0.5" />-->
+            <white_noise low="0.5" high="1" />
+            <circle radius="0.05" >
+              <point3d x="0.2" y="0.4" z="0.4" />
+            </circle>
+            <circle radius="0.05" >
+              <point3d x="0.3" y="0.8" z="0.4" />
+            </circle>
+            <rectangle>
+              <point3d x="0.95" y="0" z="0" />
+              <point3d x="1" y="1" z="1" />
+            </rectangle>
+        </overlay>
+        
+    </initial_pattern_generator>
+
+    <render_settings>
+        <low value="0" />
+        <high value="1.5" />
+        <color_low r="0" g="0" b="0" />
+        <color_high r="1" g="1" b="1" />
+        <show_multiple_chemicals value="true" />
+        <show_color_scale value="false" />
+        <show_displacement_mapped_surface value="false" />
+        <timesteps_per_render value="32" />
+        <phase_plot_x_axis value="a" />
+        <phase_plot_y_axis value="d" />
+        <phase_plot_z_axis value="c" />
+    </render_settings>
+       
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

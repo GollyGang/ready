@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="3">
+  
+    <description>
+      John E. Pearson (1993) &quot;&lt;a href=&quot;http://jaguar.biologie.hu-berlin.de/~wolfram/pages/seminar_theoretische_biologie_2007/literatur/schaber/Pearson1993Science261.pdf&quot;&gt;Complex Patterns in a Simple System&lt;/a&gt;&quot; Science 261(5118):189-192.
+      
+      Change the parameters k and F to explore the systems that John Pearson described. The supplied 
+      settings (k=0.06, F=0.04) correspond to his picture 'theta' in Fig. 2.
+      
+      In this pattern we include the delta_x parameter, which determines the scale of the simulation. 
+      In other patterns we often merge this value into the diffusion coefficients, for simplicity. 
+      See the formula below for how this is done.
+      
+      Ready uses 'a' and 'b' for the chemical names, instead of 'U' and 'V'. Apart from that we're
+      following Pearson's work as closely as possible.
+    </description>
+    
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="timestep">        1              </param>
+      <param name="delta_x">         0.009765625    </param>
+      <param name="D_a">             0.00002        </param>
+      <param name="D_b">             0.00001        </param>
+      <param name="k">               0.060          </param>
+      <param name="F">               0.040          </param>
+      <formula number_of_chemicals="2">
+        delta_a = D_a * laplacian_a / (delta_x*delta_x) - a*b*b + F*(1.0f-a);
+        delta_b = D_b * laplacian_b / (delta_x*delta_x) + a*b*b - (F+k)*b;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+    
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="1" />
+        <everywhere />
+      </overlay>
+      
+      <!-- Initial conditions as described in the paper: a central 20x20 square with 0.5,0.25 +/- 1% -->
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0.49" high="0.51" />
+        <rectangle>
+          <point3D x="0.46" y="0.46" z="0.46" />
+          <point3D x="0.54" y="0.54" z="0.54" />
+        </rectangle>
+      </overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <white_noise low="0.24" high="0.26" />
+        <rectangle>
+          <point3D x="0.46" y="0.46" z="0.46" />
+          <point3D x="0.54" y="0.54" z="0.54" />
+        </rectangle>
+      </overlay>
+      
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <low value="0.2" />
+      <high value="1" />
+      <color_low r="0" g="0" b="1" />
+      <color_high r="1" g="0" b="0" />
+      <show_color_scale value="true" />
+      <show_multiple_chemicals value="false" />
+      <show_displacement_mapped_surface value="false" />
+      <color_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="100" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="3">
+  
+    <description>
+    Simon Gladman: &quot;After my recent experiments with cubic coupling different reaction diffusion models, 
+    I thought I'd return to my roots and see what happens when I do the same to a 
+    Belousov-Zhabotinsky simulation. This reaction is best known for its spiral wavefronts, 
+    so I was expecting spirals within spirals - and that's pretty much what I got.&lt;br&gt;
+    ...&lt;br&gt;
+    That was until I stumbled across something quite unexpected: vermiform solitons popping in 
+    and out of existence.&quot;
+    
+    &lt;a href=&quot;http://flexmonkey.blogspot.co.uk/2013/10/veriform-solitons-in-ternary-cubic.html&quot;&gt;http://flexmonkey.blogspot.co.uk/2013/10/veriform-solitons-in-ternary-cubic.html&lt;/a&gt;
+    </description>
+    
+    <rule name="gladman" type="kernel">
+      <kernel number_of_chemicals="6" block_size_x="4" block_size_y="1" block_size_z="1">
+__kernel void rd_compute(__global float4 *a_in,__global float4 *b_in,__global float4 *c_in,__global float4 *d_in,__global float4 *e_in,__global float4 *f_in,__global float4 *a_out,__global float4 *b_out,__global float4 *c_out,__global float4 *d_out,__global float4 *e_out,__global float4 *f_out)
+{
+    const int x = get_global_id(0);
+    const int y = get_global_id(1);
+    const int z = get_global_id(2);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int index_here = X*(Y*z + y) + x;
+
+    float4 a = a_in[index_here];
+    float4 b = b_in[index_here];
+    float4 c = c_in[index_here];
+    float4 d = d_in[index_here];
+    float4 e = e_in[index_here];
+    float4 f = f_in[index_here];
+
+    // compute the local averages of each chemical
+    const int xm1 = ((x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xp1 = ((x+1) &amp; (X-1));
+    const int ym1 = ((y-1+Y) &amp; (Y-1));
+    const int yp1 = ((y+1) &amp; (Y-1));
+    const int index_n =  X*(Y*z + ym1) + x;
+    const int index_ne = X*(Y*z + ym1) + xp1;
+    const int index_e =  X*(Y*z + y) + xp1;
+    const int index_se = X*(Y*z + yp1) + xp1;
+    const int index_s =  X*(Y*z + yp1) + x;
+    const int index_sw = X*(Y*z + yp1) + xm1;
+    const int index_w =  X*(Y*z + y) + xm1;
+    const int index_nw = X*(Y*z + ym1) + xm1;
+    float4 a_n = a_in[index_n];
+    float4 a_ne = a_in[index_ne];
+    float4 a_e = a_in[index_e];
+    float4 a_se = a_in[index_se];
+    float4 a_s = a_in[index_s];
+    float4 a_sw = a_in[index_sw];
+    float4 a_w = a_in[index_w];
+    float4 a_nw = a_in[index_nw];
+    float4 b_n = b_in[index_n];
+    float4 b_ne = b_in[index_ne];
+    float4 b_e = b_in[index_e];
+    float4 b_se = b_in[index_se];
+    float4 b_s = b_in[index_s];
+    float4 b_sw = b_in[index_sw];
+    float4 b_w = b_in[index_w];
+    float4 b_nw = b_in[index_nw];
+    float4 c_n = c_in[index_n];
+    float4 c_ne = c_in[index_ne];
+    float4 c_e = c_in[index_e];
+    float4 c_se = c_in[index_se];
+    float4 c_s = c_in[index_s];
+    float4 c_sw = c_in[index_sw];
+    float4 c_w = c_in[index_w];
+    float4 c_nw = c_in[index_nw];
+    float4 d_n = d_in[index_n];
+    float4 d_ne = d_in[index_ne];
+    float4 d_e = d_in[index_e];
+    float4 d_se = d_in[index_se];
+    float4 d_s = d_in[index_s];
+    float4 d_sw = d_in[index_sw];
+    float4 d_w = d_in[index_w];
+    float4 d_nw = d_in[index_nw];
+    float4 e_n = e_in[index_n];
+    float4 e_ne = e_in[index_ne];
+    float4 e_e = e_in[index_e];
+    float4 e_se = e_in[index_se];
+    float4 e_s = e_in[index_s];
+    float4 e_sw = e_in[index_sw];
+    float4 e_w = e_in[index_w];
+    float4 e_nw = e_in[index_nw];
+    float4 f_n = f_in[index_n];
+    float4 f_ne = f_in[index_ne];
+    float4 f_e = f_in[index_e];
+    float4 f_se = f_in[index_se];
+    float4 f_s = f_in[index_s];
+    float4 f_sw = f_in[index_sw];
+    float4 f_w = f_in[index_w];
+    float4 f_nw = f_in[index_nw];
+    
+    const float4 K0 = 1.0f/9.0f; // center weight
+    const float K1 = 1.0f/9.0f; // edge-neighbors
+    const float K2 = 1.0f/9.0f; // vertex-neighbors
+    float4 laplacian_a = (float4)(a_n.x* K1 + a_n.y*K2 + a.y*K1 + a_s.y*K2 + a_s.x*K1 + a_sw.w*K2 + a_w.w*K1 + a_nw.w*K2,
+    a_n.y*K1 + a_n.z*K2 + a.z*K1 + a_s.z*K2 + a_s.y*K1 + a_s.x*K2 + a.x*K1 + a_n.x*K2,
+    a_n.z*K1 + a_n.w*K2 + a.w*K1 + a_s.w*K2 + a_s.z*K1 + a_s.y*K2 + a.y*K1 + a_n.y*K2,
+    a_n.w*K1 + a_ne.x*K2 + a_e.x*K1 + a_se.x*K2 + a_s.w*K1 + a_s.z*K2 + a.z*K1 + a_n.z*K2 ) + a*K0;
+    float4 laplacian_b = (float4)(b_n.x* K1 + b_n.y*K2 + b.y*K1 + b_s.y*K2 + b_s.x*K1 + b_sw.w*K2 + b_w.w*K1 + b_nw.w*K2,
+    b_n.y*K1 + b_n.z*K2 + b.z*K1 + b_s.z*K2 + b_s.y*K1 + b_s.x*K2 + b.x*K1 + b_n.x*K2,
+    b_n.z*K1 + b_n.w*K2 + b.w*K1 + b_s.w*K2 + b_s.z*K1 + b_s.y*K2 + b.y*K1 + b_n.y*K2,
+    b_n.w*K1 + b_ne.x*K2 + b_e.x*K1 + b_se.x*K2 + b_s.w*K1 + b_s.z*K2 + b.z*K1 + b_n.z*K2 ) + b*K0;
+    float4 laplacian_c = (float4)(c_n.x* K1 + c_n.y*K2 + c.y*K1 + c_s.y*K2 + c_s.x*K1 + c_sw.w*K2 + c_w.w*K1 + c_nw.w*K2,
+    c_n.y*K1 + c_n.z*K2 + c.z*K1 + c_s.z*K2 + c_s.y*K1 + c_s.x*K2 + c.x*K1 + c_n.x*K2,
+    c_n.z*K1 + c_n.w*K2 + c.w*K1 + c_s.w*K2 + c_s.z*K1 + c_s.y*K2 + c.y*K1 + c_n.y*K2,
+    c_n.w*K1 + c_ne.x*K2 + c_e.x*K1 + c_se.x*K2 + c_s.w*K1 + c_s.z*K2 + c.z*K1 + c_n.z*K2 ) + c*K0;
+    float4 laplacian_d = (float4)(d_n.x* K1 + d_n.y*K2 + d.y*K1 + d_s.y*K2 + d_s.x*K1 + d_sw.w*K2 + d_w.w*K1 + d_nw.w*K2,
+    d_n.y*K1 + d_n.z*K2 + d.z*K1 + d_s.z*K2 + d_s.y*K1 + d_s.x*K2 + d.x*K1 + d_n.x*K2,
+    d_n.z*K1 + d_n.w*K2 + d.w*K1 + d_s.w*K2 + d_s.z*K1 + d_s.y*K2 + d.y*K1 + d_n.y*K2,
+    d_n.w*K1 + d_ne.x*K2 + d_e.x*K1 + d_se.x*K2 + d_s.w*K1 + d_s.z*K2 + d.z*K1 + d_n.z*K2 ) + d*K0;
+    float4 laplacian_e = (float4)(e_n.x* K1 + e_n.y*K2 + e.y*K1 + e_s.y*K2 + e_s.x*K1 + e_sw.w*K2 + e_w.w*K1 + e_nw.w*K2,
+    e_n.y*K1 + e_n.z*K2 + e.z*K1 + e_s.z*K2 + e_s.y*K1 + e_s.x*K2 + e.x*K1 + e_n.x*K2,
+    e_n.z*K1 + e_n.w*K2 + e.w*K1 + e_s.w*K2 + e_s.z*K1 + e_s.y*K2 + e.y*K1 + e_n.y*K2,
+    e_n.w*K1 + e_ne.x*K2 + e_e.x*K1 + e_se.x*K2 + e_s.w*K1 + e_s.z*K2 + e.z*K1 + e_n.z*K2 ) + e*K0;
+    float4 laplacian_f = (float4)(f_n.x* K1 + f_n.y*K2 + f.y*K1 + f_s.y*K2 + f_s.x*K1 + f_sw.w*K2 + f_w.w*K1 + f_nw.w*K2,
+    f_n.y*K1 + f_n.z*K2 + f.z*K1 + f_s.z*K2 + f_s.y*K1 + f_s.x*K2 + f.x*K1 + f_n.x*K2,
+    f_n.z*K1 + f_n.w*K2 + f.w*K1 + f_s.w*K2 + f_s.z*K1 + f_s.y*K2 + f.y*K1 + f_n.y*K2,
+    f_n.w*K1 + f_ne.x*K2 + f_e.x*K1 + f_se.x*K2 + f_s.w*K1 + f_s.z*K2 + f.z*K1 + f_n.z*K2 ) + f*K0;
+    
+    float4 q = 1.0f; // "Coupling"
+    float4 alpha_one = 3.0465f;
+    float4 beta_one = 2.5169f;
+    float4 gamma_one = 2.2444f;
+    float4 alpha_two = 1.7755f;
+    float4 beta_two = 0.4901f;
+    float4 gamma_two = 0.169f;
+
+    float4 couplingA = q * a * d * (1.0f - a); 
+    float4 couplingB = q * b * e * (1.0f - b); 
+    float4 couplingC = q * c * f * (1.0f - c); 
+    
+    float4 couplingD = q * d * (a - d); 
+    float4 couplingE = q * e * (b - e); 
+    float4 couplingF = q * f * (c - f);                 
+    
+    a_out[index_here] = couplingA + laplacian_a + laplacian_a * ((alpha_one* (gamma_one * laplacian_b)) - laplacian_c);
+    b_out[index_here] = couplingB + laplacian_b + laplacian_b * ((beta_one * laplacian_c) - (alpha_one * laplacian_a)); 
+    c_out[index_here] = couplingC + laplacian_c + laplacian_c * ((gamma_one * laplacian_a) - (beta_one * laplacian_b));
+    
+    d_out[index_here] = couplingD + laplacian_d + laplacian_d * ((alpha_two* (gamma_two * laplacian_e)) - laplacian_f);
+    e_out[index_here] = couplingE + laplacian_e + laplacian_e * ((beta_two * laplacian_f) - (alpha_two * laplacian_d)); 
+    f_out[index_here] = couplingF + laplacian_f + laplacian_f * ((gamma_two * laplacian_d) - (beta_two * laplacian_e));
+
+    a_out[index_here] = clamp( a_out[index_here], 0.0f, 1.0f );    
+    b_out[index_here] = clamp( b_out[index_here], 0.0f, 1.0f );    
+    c_out[index_here] = clamp( c_out[index_here], 0.0f, 1.0f );    
+     
+    d_out[index_here] = clamp( d_out[index_here], 0.0f, 1.0f );    
+    e_out[index_here] = clamp( e_out[index_here], 0.0f, 1.0f );                        
+    f_out[index_here] = clamp( f_out[index_here], 0.0f, 1.0f );    
+}
+      </kernel>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a"> <overwrite /> <white_noise low="0" high="1" /> <everywhere /> </overlay>
+      <overlay chemical="b"> <overwrite /> <white_noise low="0" high="1" /> <everywhere /> </overlay>
+      <overlay chemical="c"> <overwrite /> <white_noise low=".9" high="1" /> <everywhere /> </overlay>
+      <overlay chemical="d"> <overwrite /> <white_noise low="0" high=".4" /> <everywhere /> </overlay>
+      <overlay chemical="e"> <overwrite /> <white_noise low="0" high=".5" /> <everywhere /> </overlay>
+      <overlay chemical="f"> <overwrite /> <white_noise low="0" high=".8" /> <everywhere /> </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="1">
+        
+      </color_low>
+      <color_high r="1" g="0" b="0">
+        
+      </color_high>
+      <show_color_scale value="false">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="true">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="d">
+        
+      </active_chemical>
+      <low value="0">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="15">
+        
+      </vertical_scale_2D>
+      <contour_level value="0.25">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="true">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="false">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="8">
+        
+      </timesteps_per_render>
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="f" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

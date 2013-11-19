@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        Jonathan McCabe (2010) &quot;&lt;a href=&quot;http://www.jonathanmccabe.com/Cyclic_Symmetric_Multi-Scale_Turing_Patterns.pdf&quot;&gt;Cyclic Symmetric Multi-Scale Turing Patterns&lt;/a&gt;&quot;
+
+        The model from the section 'Multi-Scale Turing Patterns'. 
+        
+        The code 'adds variation' at each location at whichever scale has least:&lt;br&gt;
+        1) Find the average within a set of inner and outer radii.&lt;br&gt;
+        2) For each pair, find the difference between the outer and inner averages.&lt;br&gt;
+        3) Find the pair that has the least difference between the two.&lt;br&gt;
+        4) For that pair, if the average inside the inner radius is greater than the average in the outer radius then increase the 
+        value at that location by 0.01. Otherwise decrease it by 0.01.&lt;br&gt;
+        5) Ensure the value stays within the range of -1 to +1.
+        
+        Blog posts about this:&lt;br&gt;
+        &lt;a href=&quot;http://softologyblog.wordpress.com/2011/07/05/multi-scale-turing-patterns/&quot;&gt;http://softologyblog.wordpress.com/2011/07/05/multi-scale-turing-patterns/&lt;/a&gt;&lt;br&gt;
+        &lt;a href=&quot;http://www.wblut.com/2011/07/13/mccabeism-turning-noise-into-a-thing-of-beauty/&quot;&gt;http://www.wblut.com/2011/07/13/mccabeism-turning-noise-into-a-thing-of-beauty/&lt;/a&gt;
+        
+        Find more of Jonathan's work on &lt;a href=&quot;http://www.flickr.com/photos/33409576@N08/&quot;&gt;his Flickr page&lt;/a&gt;
+    </description>
+
+    <rule type="kernel" name="McCabe">
+    
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float* a_in,
+                                 __global float* a_out) 
+        {
+            #define NUM_SCALES 4
+            #define NUM_RADII 6
+            float radii[ NUM_RADII ] = { 40.0f, 20.0f, 10.0f, 5.0f, 2.0f, 1.0f };
+            int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {2, 1}, {3, 2}, {5, 4} }; // inner, outer indices into radii[]
+            float amount[ NUM_SCALES ] = { 0.04f, 0.03f, 0.02f, 0.01f };
+                
+            /* On faster machines, try a larger set:
+            #define NUM_SCALES 5
+            #define NUM_RADII 8
+            float radii[ NUM_RADII ] = { 200.0f, 100.0f, 40.0f, 20.0f, 10.0f, 5.0f, 2.0f, 1.0f };
+            int pairs[ NUM_SCALES ][ 2 ] = { {1, 0}, {3, 2}, {4, 3}, {5, 4}, {7, 6} }; // inner, outer indices into radii[]
+            float amount[ NUM_SCALES ] = { 0.05f, 0.04f, 0.03f, 0.02f, 0.01f };
+            */
+                
+            const int bx = get_global_id(0);
+            const int by = get_global_id(1);
+            const int BX = get_global_size(0);
+            const int BY = get_global_size(1);
+            const int i_here = BX*by + bx;
+            
+            float densities[ NUM_RADII ];
+            float areas[ NUM_RADII ];
+            float radii_squared[ NUM_RADII ];
+            for( int i = 0; i &lt; NUM_RADII; i++ )
+            {
+                densities[ i ] = 0.0f;
+                areas[ i ] = 0.0f;
+                radii_squared[ i ] = radii[ i ] * radii[ i ];
+            }
+
+            // compute the density of every disk
+            float val;
+            float largest_radius = radii[ 0 ];
+            for(int dy=-largest_radius; dy&lt;=largest_radius; dy++)
+            {
+                for(int dx=-largest_radius; dx&lt;=largest_radius; dx++)
+                {
+                    int tx = (bx+dx+BX) &amp; (BX-1); // wrap (for powers of 2 only)
+                    int ty = (by+dy+BY) &amp; (BY-1);
+                    val = a_in[ BX*ty + tx ]; 
+                    for( int i = 0; i &lt; NUM_RADII; i++ )
+                    {
+                        if( dx*dx+dy*dy &lt;= radii_squared[ i ] )
+                        {
+                            densities[ i ] += val;
+                            areas[ i ] += 1.0f;
+                        }
+                    }
+                }
+            }
+            for( int i = 0; i &lt; NUM_RADII; i++ )
+            {
+                densities[ i ] /= areas[ i ];
+            }
+            
+            // add variation on whichever scale has least
+            float lowest_variation = 1e6f;
+            float diff;
+            for( int i = 0; i &lt; NUM_SCALES; i++ )
+            {
+                float density_difference = densities[ pairs[ i ][ 0 ] ] - densities[ pairs[ i ][ 1 ] ];
+                float variation = density_difference;
+                if( variation &lt; 0.0f )
+                {
+                    variation *= -1.0f;
+                }
+                if( variation &lt; lowest_variation )
+                {
+                    lowest_variation = variation;
+                    if( density_difference &gt;= 0.0f )
+                    {
+                        diff = amount[ i ];
+                    }
+                    else
+                    {
+                        diff = - amount[ i ];
+                    }
+                }
+            }
+            a_out[i_here] = a_in[i_here] + diff;
+            if( a_out[i_here] &gt; 1.0f )
+            {
+                a_out[i_here] = 1.0f;
+            }
+            else if( a_out[i_here] &lt; -1.0f )
+            {
+                a_out[i_here] = -1.0f;
+            }
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="-0.1" high="0.1" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
+      <low value="-1" />
+      <high value="1" />
+      <show_color_scale value="false" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="1" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

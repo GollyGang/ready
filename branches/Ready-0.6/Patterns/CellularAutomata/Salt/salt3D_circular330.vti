@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="3">
+    <description>
+Miller and Fredkin&apos;s Salt CA, in 2D.&lt;br&gt;
+From: &quot;Circular Motion of Strings in Cellular Automata, and Other Surprises&quot;, Daniel B. Miller and Edward Fredkin&lt;br&gt;
+See: &lt;a href=&quot;http://digitalphilosophy.org&quot;&gt;digitalphilosophy.org&lt;/a&gt;
+
+&quot;The simplest orbiting string is created using three cells in a Knight&apos;s Move relationship with each
+other, but in two different axis-aligned planes. The path it traces is roughly hexagonal, and all the points in
+its path lie on a single plane. As we increase the length of the string (by adding cells diagonally along one
+of the planes), we also increase the radius of the path it traces. As the radius increases, the string&apos;s path
+(calculated as the average position of each &apos;up&apos; cell in the string) begins to closely approximate a circle. We 
+have analyzed the degree to which these paths approximate circles: as the radius increases, the
+standard deviation from a true circle, plotted as a percentage of the radius, approaches zero.&quot;
+    </description>
+    <rule name="Salt_3D" type="kernel">
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+bool is_up(int val) { return val==6; }
+int parity(int val) { return val%2; }
+
+__kernel void rd_compute(__global float *a_in,__global float *a_out)
+{
+    const int x = get_global_id(0);
+    const int y = get_global_id(1);
+    const int z = get_global_id(2);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int Z = get_global_size(2);
+    const int i_here = X*(Y*z+y) + x;
+
+    // We implement the 3D Salt CA as a 7-state CA with a radius-3 Moore neighborhood
+    // cells in states 0-5 are down - their state determines the current phase
+    // cells in state 6 are up - their location parity determines whether they move in the current phase
+    // A more 'pure CA' way of doing this is to have states representing the checkerboard but 
+    // this way makes it easier to draw on.
+
+    // get the current phase from somewhere
+    // TODO: more CA-like to get from the local neighborhood
+    int current_phase = -1;
+    for( int sx=0; sx&lt;X; ++sx )
+    {
+        int val = a_in[sx];
+        if(!is_up(val))
+        {
+            current_phase = val;
+            break;
+        }
+    }           
+    if(current_phase==-1)
+    {
+        // one rare case: we couldn&apos;t find phase anywhere
+        a_out[i_here] = a_in[i_here];
+        return;
+    }
+
+    // the rule is based on 29 points within a 7x7x1 neighborhood
+    int val[29];
+    {
+        const int coords[29][2] = { {0,0},{1,1},{-1,1},{-1,-1},{1,-1}, // 0-5: centre and 4 candidate swap sites
+            {2,-1},{2,1},{1,2},{-1,2},{-2,1},{-2,-1},{-1,-2},{1,-2},   // 5-12: activators
+            {-2,-3},{0,-3},{2,-3},
+            {-3,-2},{3,-2},
+            {0,-1},
+            {-3,0},{-1,0},{1,0},{3,0},
+            {0,1},
+            {-3,2},{3,2},
+            {-2,3},{0,3},{2,3}}; // 13-28: inhibitors
+        int sx,sy,sz;
+        for(int i=0;i&lt;29;++i)
+        {
+            switch( current_phase )
+            {
+                case 0:
+                case 3: // XY
+                    sx = (x + coords[i][0] + X) &amp; (X-1); // wrap (assumes X is a power of 2)
+                    sy = (y + coords[i][1] + Y) &amp; (Y-1); // wrap (assumes Y is a power of 2)
+                    sz = z;
+                    break;
+                case 1:
+                case 4: // YZ
+                    sy = (y + coords[i][0] + Y) &amp; (Y-1); // wrap (assumes Y is a power of 2)
+                    sz = (z + coords[i][1] + Z) &amp; (Z-1); // wrap (assumes Z is a power of 2)
+                    sx = x;
+                    break;
+                case 2:
+                case 5: // ZX
+                    sz = (z + coords[i][0] + Z) &amp; (Z-1); // wrap (assumes Z is a power of 2)
+                    sx = (x + coords[i][1] + X) &amp; (X-1); // wrap (assumes X is a power of 2)
+                    sy = y;
+                    break;
+            }
+            val[i] = (int)( a_in[ X*(Y*sz + sy) + sx ] );
+        }
+    }
+
+    const int swappers[4] = { 1,2,3,4 };
+    const int activators[4][2] = { {5,8}, {7,10}, {9,12}, {6,11} };
+    const int inhibitors[4][6] = { {18,25,22,27,20,28}, {18,24,19,27,21,26}, 
+                                   {16,23,14,19,13,21}, {20,15,14,22,17,23} };
+
+    // update:
+    if( parity(x+y+z) == parity(current_phase) ) // is this cell active?
+    {
+        int numSwaps = 0, iSwap;
+        for( int i=0; i&lt;4; ++i )
+        {
+            // if either activator is up then the swap is possible
+            // if any inhibitor is up then the swap is forbidden
+            if( ( is_up(val[activators[i][0]]) || is_up(val[activators[i][1]]) ) 
+                &amp;&amp; !( is_up(val[inhibitors[i][0]]) || is_up(val[inhibitors[i][1]]) || 
+                is_up(val[inhibitors[i][2]]) || is_up(val[inhibitors[i][3]]) || 
+                is_up(val[inhibitors[i][4]]) || is_up(val[inhibitors[i][5]]) ) )
+            {
+                ++numSwaps;
+                iSwap = i;
+            }
+        }
+        // if exactly one swap is wanted then apply it
+        if( numSwaps == 1 )
+            a_out[i_here] = val[swappers[iSwap]];
+        else
+            a_out[i_here] = val[0];
+    }
+    else
+    {
+        a_out[i_here] = val[0];
+    }
+    // down cells change phase for next time
+    if(!is_up(a_out[i_here]))
+    {
+        a_out[i_here] = ( (int)(a_out[i_here]) + 1) % 6;
+    }
+}
+      </kernel>
+      
+    </rule>
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite/>
+        <constant value="0"/>
+        <everywhere/>
+      </overlay>
+      
+      <overlay chemical="a">
+        <overwrite/>
+        <constant value="6" /> 
+        <!-- http://busyboxes.org/n : (0,2,-1),(2,0,1),(2,2,0) -->
+        <!-- simplest orbiting string -->
+        <!--<pixel x="10" y="12" z="9" />
+        <pixel x="12" y="10" z="11" />
+        <pixel x="12" y="12" z="10" /> -->
+        <!-- http://busyboxes.org/o : (0,2,-1),(2,0,1),(2,2,0),(2,-1,3),(2,-3,4),(2,-4,6),(2,-6,7),(2,-7,9) -->
+        <!-- "begins to closely approximate a circle" -->
+        <pixel x="20" y="22" z="9" />
+        <pixel x="22" y="20" z="11" />
+        <pixel x="22" y="22" z="10" />
+        <pixel x="22" y="19" z="13" />
+        <pixel x="22" y="17" z="14" />
+        <pixel x="22" y="16" z="16" />
+        <pixel x="22" y="14" z="17" />
+        <pixel x="22" y="13" z="19" />
+        <!--  http://busyboxes.org/p : (1,-1,-5),(2,1,-5),(3,2,-4),(-1,1,-2) -->
+        <!-- <pixel x="21" y="19" z="15" />
+        <pixel x="22" y="21" z="15" />
+        <pixel x="23" y="22" z="16" />
+        <pixel x="19" y="21" z="18" /> -->
+        <!-- http://busyboxes.org/q : (1,-1,-5),(2,1,-5),(3,2,-4),(-1,1,-2),(-4,4,-2) -->
+        <!-- <pixel x="21" y="19" z="15" />
+        <pixel x="22" y="21" z="15" />
+        <pixel x="23" y="22" z="16" />
+        <pixel x="19" y="21" z="18" />
+        <pixel x="16" y="24" z="18" /> -->
+        <!-- http://busyboxes.org/r : (1,-1,-5),(2,1,-5),(3,2,-4),(-1,1,-2),(-4,4,-2),(-4,7,-5) -->
+        <!-- <pixel x="21" y="19" z="15" />
+        <pixel x="22" y="21" z="15" />
+        <pixel x="23" y="22" z="16" />
+        <pixel x="19" y="21" z="18" />
+        <pixel x="16" y="24" z="18" />
+        <pixel x="16" y="27" z="15" /> -->
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1" />
+      <color_low r="0.392157" g="0.392157" b="0.392157" />
+      <color_high r="1" g="1" b="1" />
+      <show_color_scale value="false" />
+      <low value="5" />
+      <high value="6" />
+      <contour_level value="5.5">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="true">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="false">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.56">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="true">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="false">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="1">
+        
+      </timesteps_per_render>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 31 0 31 0 31" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 31 0 31 0 31">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="6">
+        BAAAAACAAAAAAAAANAAAAEMAAAA+AAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7dBBDQAACMSwk4Z0pOGBDwlpFSxLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAva7rgnseAPDDAChhAgF4nO3OAQ0AAAgDoEczutGMoZuQgAQAAAAAAPipa3sAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJcMX9gBAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

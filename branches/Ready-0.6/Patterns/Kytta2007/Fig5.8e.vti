@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="2">
+  
+    <description>
+        Klaus Kyttä (2007) &quot;Computational Studies of Pattern Formation in 
+        Multiple Layer Turing Systems&quot;
+        &lt;a href=&quot;lib.tkk.fi/Dipl/2007/urn007645.pdf&quot;&gt;PDF&lt;/a&gt;
+        
+        Figure 5.8e.
+        
+        Two cubic-coupled Brusselator systems a,b and c,d.
+    </description>
+    
+    <rule name="Yang" type="formula" wrap="1">
+      <param name="timestep">       0.001         </param>
+      <param name="q">              0.09          </param>
+      <param name="p1">             3.0           </param>
+      <param name="p2">             9.0           </param>
+      <param name="Da">             1.85          </param>
+      <param name="Db">             5.66          </param>
+      <param name="Dc">             50.6          </param>
+      <param name="Dd">             186.0         </param>
+      <formula number_of_chemicals="4">
+        delta_a = Da * laplacian_a + q*a*c*(c-a) + p1 - (1.0f+p2)*a + a*a*b;
+        delta_b = Db * laplacian_b + q*b*d*(d-b) + p2*a             - a*a*b;
+        delta_c = Dc * laplacian_c + q*a*c*(a-c) + p1 - (1.0f+p2)*c + c*c*d;
+        delta_d = Dd * laplacian_d + q*b*d*(b-d) + p2*c             - c*c*d;
+      </formula>
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+    
+      <!-- Steady-state of Brusselator system is given by u=p1, v=p2/p1 -->
+    
+      <overlay chemical="a">
+        <overwrite />
+        <parameter name="p1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <parameter name="p2" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <divide />
+        <parameter name="p1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <add />
+        <white_noise low="-0.01" high="0.01" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <parameter name="p1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="d">
+        <overwrite />
+        <parameter name="p2" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="d">
+        <divide />
+        <parameter name="p1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="d">
+        <add />
+        <white_noise low="-0.01" high="0.01" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="1" />
+      <color_high r="1" g="0" b="0" />
+      <show_color_scale value="true" />
+      <show_multiple_chemicals value="true" />
+      <active_chemical value="a" />
+      <low value="0" />
+      <high value="5" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="100" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

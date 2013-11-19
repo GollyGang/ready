@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        The smoothglider, a parameter set of SmoothLife, by Stephan Rafler.
+        &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;PDF&lt;/a&gt;,
+        &lt;a href=&quot;http://sourceforge.net/projects/smoothlife/&quot;&gt;software&lt;/a&gt;.
+        
+        SmoothLife was designed as a continuous version of Conway's Game of Life.
+        The glider is capable of travelling in any direction, and is similar in
+        appearance to the one in Larger-than-Life.
+        
+        This version uses discrete time stepping. Anti-aliasing and a smooth transition
+        function are used to enable the size of the kernel to be as small as possible.
+    </description>
+
+    <rule type="kernel" name="SmoothLife">
+    
+      <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
+        // ---------------------------------------------
+        // smoothglider (discrete time stepping 2D)
+        __constant float ra = 12.0f;         // outer radius
+        __constant float rr = 3.0f;          // ratio of radii
+        __constant float b1 = 0.278f;        // birth1
+        __constant float b2 = 0.365f;        // birth2
+        __constant float s1 = 0.267f;        // survival1
+        __constant float s2 = 0.445f;        // survival2
+        __constant float alpha_n = 0.028f;   // sigmoid width for outer fullness
+        __constant float alpha_m = 0.147f;   // sigmoid width for inner fullness
+        // ---------------------------------------------
+
+        // the logistic function is used as a smooth step function
+        float4 sigma1(float4 x,float4 a,float alpha) 
+        { 
+            return 1.0f / ( 1.0f + exp( -(x-a)*4.0f/alpha ) );
+        }
+        
+        float4 sigma2(float4 x,float4 a,float4 b,float alpha)
+        {
+            return sigma1(x,a,alpha) 
+                * ( 1.0f-sigma1(x,b,alpha) );
+        }
+        
+        float4 sigma_m(float x,float y,float4 m,float alpha)
+        {
+            return x * ( 1.0f-sigma1(m,0.5f,alpha) ) 
+                + y * sigma1(m,0.5f,alpha);
+        }
+        
+        // the transition function
+        // (n = outer fullness, m = inner fullness)
+        float4 s(float4 n,float4 m)
+        {
+            return sigma2( n, sigma_m(b1,s1,m,alpha_m), 
+                sigma_m(b2,s2,m,alpha_m), alpha_n );
+        }
+        
+        // a step function with a linear ramp 
+        float ramp_step(float x,float a,float ea)
+        {
+            return clamp((x-a)/ea + 0.5f,0.0f,1.0f);
+        }
+
+        __kernel void rd_compute(__global float4* a_in,
+                                 __global float4* a_out) 
+        {
+            const float rb = ra/rr; // inner radius
+            
+            // block IDs
+            const int bx = get_global_id(0);
+            const int by = get_global_id(1);
+            const int bz = get_global_id(2);
+            const int BX = get_global_size(0);
+            const int BY = get_global_size(1);
+            const int i_here = BX*(BY*bz + by) + bx;
+            
+            // how full are the annulus and inner disk?
+            float4 outf = 0.0f, inf = 0.0f;
+            float area_in = 0.0f, area_out = 0.0f;
+            float4 val; // (we process 4 floats at once, in 4x1x1 blocks)
+            // (if you want a version that processes single floats, see the svn)
+            for(int dy=-ra; dy&lt;=ra; dy++)
+            {
+                for(int dx=-ra; dx&lt;=ra; dx++)
+                {
+                    float r = sqrt((float)(dx*dx + dy*dy)); // same for all 4
+                    // retrieve the float4's we need
+                    int shift = (BX+dx)%4; // (avoid taking modulus of negatives)
+                    int dbx = (dx-shift)/4;
+                    int tx1 = (bx+dbx+BX)   &amp; (BX-1); // wrap
+                    int tx2 = (bx+dbx+1+BX) &amp; (BX-1); // wrap
+                    int ty =  (by+dy+BY)    &amp; (BY-1); // wrap
+                    float4 block1 = a_in[ BX*(BY*bz+ty)+tx1 ]; 
+                    float4 block2 = a_in[ BX*(BY*bz+ty)+tx2 ]; 
+                    // swizzle to get the single float4 we need for this sample
+                    switch(shift)
+                    {
+                        case 0: 
+                            val = block1; 
+                            break;
+                        case 1:
+                            val = (float4)(block1.y,block1.z,block1.w,block2.x); 
+                            break;
+                        case 2:
+                            val = (float4)(block1.z,block1.w,block2.x,block2.y); 
+                            break;
+                        case 3:
+                            val = (float4)(block1.w,block2.x,block2.y,block2.z); 
+                            break;
+                    }
+                    // add val, with anti-aliasing:
+                    float k_in = ramp_step(-r,-rb,1.0f);
+                    inf  += val * k_in;
+                    area_in += k_in;
+                    float k_out = ramp_step(-r,-ra,1.0f) 
+                                * ramp_step(r,rb,1.0f);
+                    outf += val * k_out;
+                    area_out += k_out;
+                }
+            }
+            // normalize
+            inf /= area_in;
+            outf /= area_out;
+            
+            a_out[i_here] = s(outf,inf); // discrete time step
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="0.75" /> <!-- very sensitive to this -->
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
+      <show_color_scale value="true" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="1" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

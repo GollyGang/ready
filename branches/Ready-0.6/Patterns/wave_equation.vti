@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+    <description>
+        Wave equation. Here 'a' stores the value, 'b' stores the rate of change.
+        
+        The wave equation says that the second derivative (the rate of change of the rate of change)
+        is proportional to the Laplacian of the value. Compare with the &lt;a href=&quot;open:Patterns/heat_equation.vti&quot;&gt;heat equation&lt;/a&gt;, where it is
+        the first derivative (the rate of change) that is proportional to the Laplacian.
+        
+        You can reduce the damping parameter to get closer to the pure wave equation but you will need to reduce the timestep too, to avoid
+        issues with numerical stability. (We use a very simple method: finite differencing with Euler integration.)
+        
+        (Parameter 'vis' simply scales the chemicals to have a similar range, for better visualisation.)
+    </description>
+
+    <rule type="formula" name="Wave equation" wrap="0">
+        
+      <param name="timestep">        0.1    </param>
+      <param name="damping">         0.2    </param>
+      <param name="vis">             15.0   </param>
+
+      <formula number_of_chemicals="2">
+        delta_a = b/vis + damping*laplacian_a;
+        delta_b = laplacian_a*vis;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <gaussian height="4" sigma="0.05">
+          <point3D x="0.4" y="0.3" z="0.5" />
+        </gaussian>
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+       <active_chemical value="a" />
+       <show_displacement_mapped_surface value="true" />
+       <color_displacement_mapped_surface value="false" />
+       <low value="-1" />
+       <high value="1" />
+       <timesteps_per_render value="64" />
+       <vertical_scale_2D value="50" />
+       <show_multiple_chemicals value="false" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 255 0 255 0 0">
+      <PointData>
+        <DataArray type="Float32" Name="a" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+        <DataArray type="Float32" Name="b" format="appended" RangeMin="0" RangeMax="0" offset="616" />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+  </AppendedData>
+</VTKFile>

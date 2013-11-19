@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        This is an example rule where we give the whole OpenCL kernel instead of just a formula. See also Conway_life.vti. Note that we can use float (or float2) instead of float4, as long as the block size matches, e.g. 2x1x1 for float2, 4x1x1 for float4.
+    </description>
+
+    <rule type="kernel" name="Kernel test">
+    
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float* a_in,__global float* a_out) 
+        {
+            const int x = get_global_id(0);
+            const int y = get_global_id(1);
+            const int z = get_global_id(2);
+            const int X = get_global_size(0);
+            const int Y = get_global_size(1);
+            const int i_here = X*(Y*z + y) + x;
+
+            const int xm1 = ((x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+            const int xp1 = ((x+1) &amp; (X-1));
+            const int i_left =  X*(Y*z + y) + xm1;
+            const int i_right = X*(Y*z + y) + xp1;
+
+            // blur in the x-direction
+            a_out[i_here] = (a_in[i_here] + a_in[i_left] + a_in[i_right]) / 3.0f;
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <rectangle>
+          <point3D x="0.2" y="0.3" z="0" />
+          <point3D x="0.5" y="0.6" z="1" />
+        </rectangle>
+      </overlay>
+    </initial_pattern_generator>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 127 0 63 0 0">
+      <PointData Scalars="Scalars_">
+        <DataArray type="Float32" Name="Scalars_" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+  </AppendedData>
+</VTKFile>

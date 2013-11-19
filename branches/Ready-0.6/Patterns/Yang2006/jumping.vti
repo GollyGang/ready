@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+
+  <RD format_version="3">
+  
+    <description>
+        Lingfa Yang, Anatol M. Zhabotinsky and Irving R. Epstein (2006) &quot;Jumping solitary waves in an 
+        autonomous reaction–diffusion system with subcritical wave instability&quot;
+        &lt;a href=&quot;http://hopf.chem.brandeis.edu/pubs/pub325%20rep.pdf&quot;&gt;PDF&lt;/a&gt;
+        
+        &quot;Here we present a new type of solitary traveling
+        waves, which we call jumping oscillons (JO). They propagate
+        in such a manner that the pulse periodically disappears and
+        then reemerges at a fixed distance from its previous position.
+        Thus, in a co-moving frame, the wave looks like a stationary
+        oscillon.&quot;
+    </description>
+    
+    <rule name="Yang2006" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="D_a">         1.0         </param>
+      <param name="D_b">         1.0         </param>
+      <param name="D_c">         60.0        </param>
+      <param name="k1">          -8.5        </param>
+      <param name="k3">          10.0        </param>
+      <param name="k4">          2.0         </param>
+      <param name="tau">         50.0        </param>
+      <param name="dx">          0.5         </param>
+      <param name="timestep">    0.001       </param>
+      <formula number_of_chemicals="3">
+        delta_a = D_a * laplacian_a / (dx*dx) + k1 + 2.0f*a - a*a*a - k3*b - k4*c;
+        delta_b = D_b * laplacian_b / (dx*dx) + ( a - b ) / tau;
+        delta_c = D_c * laplacian_c / (dx*dx) + a - c;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="-0.8" />
+        <everywhere/>
+      </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="0.0" />
+        <rectangle>
+          <point3d x="0.5" y="0" z="0" />
+          <point3d x="0.6" y="0.2" z="0.2" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="-1.2" />
+        <rectangle>
+          <point3d x="0.4" y="0" z="0" />
+          <point3d x="0.5" y="0.2" z="0.2" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="-0.8" />
+        <everywhere/>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="-0.73" />
+        <rectangle>
+          <point3d x="0.4" y="0" z="0" />
+          <point3d x="0.5" y="0.2" z="0.2" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <constant value="-0.8" />
+        <everywhere/>
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <constant value="-0.68" />
+        <rectangle>
+          <point3d x="0.5" y="0" z="0" />
+          <point3d x="0.6" y="0.2" z="0.2" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <constant value="-0.95" />
+        <rectangle>
+          <point3d x="0.2" y="0" z="0" />
+          <point3d x="0.5" y="0.2" z="0.2" />
+        </rectangle>
+      </overlay>
+     
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <low value="-1.5" />
+      <high value="1.5" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="64" />
+      <show_multiple_chemicals value="true" />
+      <contour_level value="-0.75" />
+      <show_color_scale value="false" />
+      <vertical_scale_1D value="100" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 255 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 0 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+  
+</VTKFile>

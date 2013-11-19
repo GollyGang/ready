@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="2">
+      
+    <description>
+        Lingfa Yang, Anatol M. Zhabotinsky and Irving R. Epstein (2006) &quot;Jumping solitary waves in an 
+        autonomous reaction–diffusion system with subcritical wave instability&quot;
+        &lt;a href=&quot;http://hopf.chem.brandeis.edu/pubs/pub325%20rep.pdf&quot;&gt;PDF&lt;/a&gt;
+        
+        A jumping oscillon was also found in a quintic complex Ginzburg-Landau rule. 
+        Here we show a stationary oscillon and a travelling one. Eventually they collide.
+        
+        From the paper, the equation is:&lt;br&gt;
+        dA/dt = mu*A + alpha*|A|*|A|*A + beta*laplacian(A) + nu*|A|*|A|*|A|*|A|*A&lt;br&gt;
+        Parameters mu, alpha and beta are complex numbers, nu is a real number.
+    
+        Chemicals a and b represent the real and imaginary parts of the complex number A = a+bi.
+        Chemical c is just used to visualise the (squared) magnitude of A. Note that the magnitude
+        is constant for both oscillons.
+        
+        Note that parameter nu is different to that shown in the paper. Another anomaly is that 
+        the 'narrow oscillon' mentioned doesn't seem to be present.
+    </description>
+      
+    <rule type="formula" name="Ginzburg-Landau">
+        
+      <param name="timestep">   0.01    </param>
+      <param name="muRe">       -0.1    </param>
+      <param name="muIm">       0.1     </param>
+      <param name="alphaRe">    3.0     </param>
+      <param name="alphaIm">    1.0     </param>
+      <param name="betaRe">     1.0     </param>
+      <param name="betaIm">     1.0     </param>
+      <param name="nu">         -7.0    </param>
+      <param name="dx">         0.3     </param>
+      
+      <formula number_of_chemicals="3">
+          c = a*a + b*b; // squared magnitude
+          delta_a = (muRe*a - muIm*b) + c*(alphaRe*a - alphaIm*b) + (betaRe*laplacian_a - betaIm*laplacian_b)/(dx*dx) + nu*c*c*a;
+          delta_b = (muRe*b + muIm*a) + c*(alphaRe*b + alphaIm*a) + (betaRe*laplacian_b + betaIm*laplacian_a)/(dx*dx) + nu*c*c*b;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+    
+      <!-- a jumping oscillon travelling to the right -->
+       
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="-0.4" />
+        <rectangle>
+          <point3d x="0.25" y="0.45" z="0.45" />
+          <point3d x="0.3" y="0.5" z="0.5" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="0.4" />
+        <rectangle>
+          <point3d x="0.3" y="0.5" z="0.5" />
+          <point3d x="0.35" y="0.55" z="0.55" />
+        </rectangle>
+      </overlay>
+      
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="0.4" />
+        <rectangle>
+          <point3d x="0.225" y="0.425" z="0.425" />
+          <point3d x="0.275" y="0.475" z="0.475" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="-0.3" />
+        <rectangle>
+          <point3d x="0.275" y="0.475" z="0.475" />
+          <point3d x="0.35" y="0.55" z="0.55" />
+        </rectangle>
+      </overlay>
+      
+      <!-- a stationary oscillon for it to crash into -->
+      
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="0.4" />
+        <rectangle>
+          <point3d x="0.8" y="0.2" z="0.2" />
+          <point3d x="0.85" y="0.25" z="0.25" />
+        </rectangle>
+      </overlay>
+      
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <low value="-0.7" />
+      <high value="0.7" />
+      <show_displacement_mapped_surface value="false" />
+      <show_multiple_chemicals value="true" />
+      <timesteps_per_render value="8" />
+      <vertical_scale_1D value="100" />
+      <contour_level value="0" />
+      <show_color_scale value="false" />
+    </render_settings>
+
+  </RD>
+  
+  <ImageData WholeExtent="0 511 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 511 0 0 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
