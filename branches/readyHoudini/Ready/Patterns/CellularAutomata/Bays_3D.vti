@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+    <description>
+    The kernel code implements a 3D cellular automaton for rule 4,5/5
+    in the notation used by Carter Bays and his colleagues
+    (see applet &lt;a href="http://www.cse.sc.edu/~bays/d4d4d4/"&gt;here&lt;/a&gt;).
+    
+    The initial pattern has a glider in one corner and a random blob in the middle.
+    </description>
+
+    <rule name="3D-CA rule 4,5/5" type="kernel">
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float* a_in, __global float* a_out) 
+        {
+            const int x = get_global_id(0);
+            const int y = get_global_id(1);
+            const int z = get_global_id(2);
+            const int X = get_global_size(0);
+            const int Y = get_global_size(1);
+            const int Z = get_global_size(2);
+            const int i_xyz = X*(Y*z + y) + x;
+        
+            const int xm1 = ((x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+            const int xp1 = ((x+1) &amp; (X-1));
+            const int ym1 = ((y-1+Y) &amp; (Y-1));
+            const int yp1 = ((y+1) &amp; (Y-1));
+            const int zm1 = ((z-1+Z) &amp; (Z-1));
+            const int zp1 = ((z+1) &amp; (Z-1));
+        
+            // 8 neighbors around i_xyz
+            const int i_w =  X*(Y*z + y) + xm1;
+            const int i_e =  X*(Y*z + y) + xp1;
+            const int i_n =  X*(Y*z + ym1) + x;
+            const int i_s =  X*(Y*z + yp1) + x;
+            const int i_nw = X*(Y*z + ym1) + xm1;
+            const int i_ne = X*(Y*z + ym1) + xp1;
+            const int i_sw = X*(Y*z + yp1) + xm1;
+            const int i_se = X*(Y*z + yp1) + xp1;
+        
+            // 9 neighbors above i_xyz
+            const int i_m =   X*(Y*zm1 + y) + x;
+            const int i_wm =  X*(Y*zm1 + y) + xm1;
+            const int i_em =  X*(Y*zm1 + y) + xp1;
+            const int i_nm =  X*(Y*zm1 + ym1) + x;
+            const int i_sm =  X*(Y*zm1 + yp1) + x;
+            const int i_nwm = X*(Y*zm1 + ym1) + xm1;
+            const int i_nem = X*(Y*zm1 + ym1) + xp1;
+            const int i_swm = X*(Y*zm1 + yp1) + xm1;
+            const int i_sem = X*(Y*zm1 + yp1) + xp1;
+        
+            // 9 neighbors below i_xyz
+            const int i_p =   X*(Y*zp1 + y) + x;
+            const int i_wp =  X*(Y*zp1 + y) + xm1;
+            const int i_ep =  X*(Y*zp1 + y) + xp1;
+            const int i_np =  X*(Y*zp1 + ym1) + x;
+            const int i_sp =  X*(Y*zp1 + yp1) + x;
+            const int i_nwp = X*(Y*zp1 + ym1) + xm1;
+            const int i_nep = X*(Y*zp1 + ym1) + xp1;
+            const int i_swp = X*(Y*zp1 + yp1) + xm1;
+            const int i_sep = X*(Y*zp1 + yp1) + xp1;
+        
+            float n = a_in[i_n] + a_in[i_ne] + a_in[i_e] + a_in[i_se] + a_in[i_s] + a_in[i_sw] + a_in[i_w] + a_in[i_nw]
+                    + a_in[i_nm] + a_in[i_nem] + a_in[i_em] + a_in[i_sem] + a_in[i_sm] + a_in[i_swm] + a_in[i_wm] + a_in[i_nwm]
+                    + a_in[i_np] + a_in[i_nep] + a_in[i_ep] + a_in[i_sep] + a_in[i_sp] + a_in[i_swp] + a_in[i_wp] + a_in[i_nwp]
+                    + a_in[i_m] + a_in[i_p];
+            if (a_in[i_xyz] &lt; 0.5f) {
+                if (n &gt; 4.5f &amp;&amp; n &lt; 5.5f) a_out[i_xyz] = 1.0f; // b5
+                else a_out[i_xyz] = 0.0f;
+            } else {
+                if (n &gt; 3.5f &amp;&amp; n &lt; 5.5f) a_out[i_xyz] = 1.0f; // s4,5
+                else a_out[i_xyz] = 0.0f;
+            }
+        }
+      </kernel>
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <!-- create random blob in middle -->
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <rectangle>
+          <point3D x="0.2" y="0.2" z="0.2" />
+          <point3D x="0.8" y="0.8" z="0.8" />
+        </rectangle>
+      </overlay>
+      <!-- create glider in corner -->
+      <overlay chemical="a"> 
+        <overwrite /> 
+        <constant value="1" />
+        <pixel x="2" y="2" z="2" />
+        <pixel x="3" y="2" z="2" />
+        <pixel x="1" y="3" z="2" />
+        <pixel x="4" y="3" z="2" />
+        <pixel x="2" y="4" z="2" />
+        <pixel x="3" y="4" z="2" />
+        <pixel x="2" y="2" z="1" />
+        <pixel x="3" y="2" z="1" />
+        <pixel x="1" y="3" z="1" />
+        <pixel x="4" y="3" z="1" />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <slice_3D value="false" />
+      <use_image_interpolation value="false" />
+      <timesteps_per_render value="1" />
+      <show_cell_edges value="true" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 63 0 63 0 63" Origin="0 0 0" Spacing="1 1 1">
+    <Piece Extent="0 63 0 63 0 63">
+      <PointData>
+        <DataArray type="Float32" Name="a" format="appended" RangeMin="0" RangeMax="0" offset="0" />
+      </PointData>
+      <CellData>
+      </CellData>
+    </Piece>
+  </ImageData>
+  <AppendedData encoding="base64">
+   _IAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+  </AppendedData>
+</VTKFile>

@@ -1,0 +1,104 @@
+<html>
+<title>Ready Help: Action Menu</title>
+<body>
+
+<p>
+<h3>Action Menu</h3>
+
+<p>
+<font size=+1><b>Step by 1</b></font>
+
+<p>
+Advances the pattern by a single timestep.
+
+<p>
+<font size=+1><b>Step by N</b></font>
+
+<p>
+Advances the pattern by the current number of timesteps per render.
+This number can be set via Change Running Speed (see below) or
+by editing the render setting in the Info Pane.
+
+<p>
+<font size=+1><b>Run</b>/<b>Stop</b></font>
+
+<p>
+Starts or stops simulating the current pattern.
+
+<p>
+<font size=+1><b>Run Faster</b></font>
+
+<p>
+Doubles the number of timesteps taken between each render.
+
+<p>
+<font size=+1><b>Run Slower</b></font>
+
+<p>
+Halves the number of timesteps taken between each render.
+
+<p>
+<font size=+1><b>Change Running Speed...</b></font><a name="Action_ChangeRunningSpeed"></a>
+
+<p>
+Allows the number of timesteps taken between each render to be specified manually.
+
+<p>
+<font size=+1><b>Reset</b></font>
+
+<p>
+Restores the starting pattern, to re-run from the beginning.
+
+<p>
+<font size=+1><b>Generate Initial Pattern</b></font><a name="Action_GenerateInitialPattern"></a>
+
+<p>
+Applies the <a href="formats.html#overlay">overlays</a> stored in the 
+<a href="formats.html#initial_pattern_generator">initial_pattern_generator</a> section of the file, 
+to generate a suitable starting pattern. Usually different each time.
+
+<p>
+<font size=+1><b>Blank</b></font><a name="Action_Blank"></a>
+
+<p>
+Sets all the chemicals to zero.
+
+<p>
+<font size=+1><b>Add Parameter...</b></font>
+
+<p>
+Adds a new parameter, first asking for the name.
+
+<p>
+<font size=+1><b>Delete Parameter...</b></font>
+
+<p>
+Deletes a parameter, first asking for the parameter to delete.
+
+<p>
+<font size=+1><b>View Full Kernel</b></font><a name="Action_ViewFullKernel"></a>
+
+<p>
+For formula-based rules, shows the expanded OpenCL kernel that is created internally.
+
+<p>
+<font size=+1><b>Convert to Full Kernel</b></font><a name="Action_ConvertToFullKernel"></a>
+
+<p>
+Converts a formula-based rule to a kernel rule. This gives you more flexibility to change the
+rule in ways not supported by formulae, such as treating the neighbors differently.
+
+<p>
+<font size=+1><b>Select OpenCL Device...</b></font>
+
+<p>
+Opens a dialog so you can select which OpenCL device will be used.
+
+<p>
+<font size=+1><b>Show OpenCL Diagnostics...</b></font>
+
+<p>
+Displays information about all the available OpenCL devices.
+
+</body>
+</html>

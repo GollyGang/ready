@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="2">
+  
+    <description>
+      The two-variable &lt;a href=&quot;http://en.wikipedia.org/wiki/Oregonator&quot;&gt;Oregonator&lt;/a&gt; 
+      model of the &lt;a href=&quot;http://en.wikipedia.org/wiki/Belousov-Zhabotinsky_reaction&quot;&gt;Belousov–Zhabotinsky reaction&lt;/a&gt;.
+    </description>
+    
+    <rule name="Oregonator" type="formula" wrap="0">
+      <param name="timestep">       0.0001        </param>
+      <param name="D_a">            1             </param>
+      <param name="D_b">            0.6           </param>
+      <param name="epsilon">        0.01          </param>
+      <param name="f">              1.4           </param>
+      <param name="q">              0.002         </param>
+      <param name="dx">             0.2           </param>
+      <formula number_of_chemicals="2">
+        delta_a = D_a*laplacian_a/(dx*dx) + (a - a*a - f*b*(a-q)/(a+q)) / epsilon;
+        delta_b = D_b*laplacian_b/(dx*dx) + a - b;
+      </formula>
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+    
+      <!-- seed with some linear gradient strips -->
+      <overlay chemical="b">
+        <overwrite />
+        <linear_gradient val1="0" val2="0.2">
+          <point3D x="0.2" y="0.5" z="0.5" />
+          <point3D x="0.6" y="0.5" z="0.5" />
+        </linear_gradient>
+        <rectangle>
+          <point3D x="0.2" y="0.45" z="0.5" />
+          <point3D x="0.6" y="0.55" z="0.5" />
+        </rectangle>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <linear_gradient val1="0.2" val2="0">
+          <point3D x="0.2" y="0.5" z="0.5" />
+          <point3D x="0.6" y="0.5" z="0.5" />
+        </linear_gradient>
+        <rectangle>
+          <point3D x="0.2" y="0.75" z="0.5" />
+          <point3D x="0.6" y="0.85" z="0.5" />
+        </rectangle>
+      </overlay>
+      
+      <!-- add a bit of noise for more realism -->
+      <overlay chemical="a">
+        <add />
+        <white_noise low="0" high="0.1" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <add />
+        <white_noise low="0" high="0.1" />
+        <everywhere />
+      </overlay>
+    
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="1" />
+      <color_high r="1" g="0" b="0" />
+      <show_color_scale value="true" />
+      <show_multiple_chemicals value="true" />
+      <active_chemical value="b" />
+      <low value="0" />
+      <high value="0.9" />
+      <show_displacement_mapped_surface value="false" />
+      <color_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="64" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

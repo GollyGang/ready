@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="1">
+  
+    <description>
+        Larger than Life, by &lt;a href=&quot;http://www.csun.edu/~kme52026/thesis.html&quot;&gt;Kellie Michele Evans&lt;/a&gt;.
+        
+        The parameter R controls the distance over which the neighbor count is taken. The two
+        ranges [b1,b2] and [s1,s2] define the allowed number of neighbors for birth and survival, 
+        respectively. 
+        
+        More examples at the &lt;a href=&quot;http://www.mirekw.com/ca/rullex_lgtl.html&quot;&gt;CA rules lexicon&lt;/a&gt;.
+    </description>
+
+    <rule type="kernel" name="Larger-than-Life">
+    
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float* a_in,__global float* a_out) 
+        {
+            //--------------------------------------
+            const int R = 5;    // range
+            const int b1 = 34;  // birth1
+            const int b2 = 45;  // birth2
+            const int s1 = 34;  // survival1
+            const int s2 = 58;  // survival2
+            //--------------------------------------
+            
+            const int x = get_global_id(0);
+            const int y = get_global_id(1);
+            const int z = get_global_id(2);
+            const int X = get_global_size(0);
+            const int Y = get_global_size(1);
+            const int i_here = X*(Y*z + y) + x;
+            
+            int n = 0;   // number of live neighbors
+            for(int sx=x-R; sx&lt;=x+R; sx++)
+            {
+                for(int sy=y-R; sy&lt;=y+R; sy++)
+                {
+                    if(sx==x &amp;&amp; sy==y) continue;
+                    int tx = (sx+X) &amp; (X-1); // wrap
+                    int ty = (sy+Y) &amp; (Y-1); // wrap
+                    if( round( a_in[ X*(Y*z+ty)+tx ] ) == 1 )
+                        n++;
+                }
+            }
+            int a = round(a_in[i_here]);
+            if(a==0 &amp;&amp; n&gt;=b1 &amp;&amp; n&lt;=b2)
+                a_out[i_here] = 1; // birth
+            else if(a==1 &amp;&amp; n&gt;=s1 &amp;&amp; n&lt;=s2)
+                a_out[i_here] = 1; // survival
+            else
+                a_out[i_here] = 0; // death (or remaining dead)
+        }
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="1" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
+      <show_color_scale value="false" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="1" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

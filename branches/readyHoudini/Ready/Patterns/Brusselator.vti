@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="2">
+  
+    <description>
+        The Brusselator is a theoretical model for a type of autocatalytic chemical reaction.&lt;br&gt;
+        &lt;a href=&quot;http://en.wikipedia.org/wiki/Brusselator&quot;&gt;http://en.wikipedia.org/wiki/Brusselator&lt;/a&gt;&lt;br&gt;
+
+        Initially the system oscillates. After around 50000 timesteps the world becomes dominated by rotating spirals. 
+        This behavior is seen with real chemicals in the Belousov–Zhabotinsky reaction.&lt;br&gt;
+        &lt;a href=&quot;http://en.wikipedia.org/wiki/Belousov%E2%80%93Zhabotinsky_reaction&quot;&gt;http://en.wikipedia.org/wiki/Belousov-Zhabotinsky_reaction&lt;/a&gt;
+
+        Thanks to Jan Krieger for the code:&lt;br&gt;
+        &lt;a href=&quot;http://en.wikipedia.org/wiki/File:Brusselator_space.gif&quot;&gt;http://en.wikipedia.org/wiki/File:Brusselator_space.gif&lt;/a&gt;
+    </description>
+    
+    <rule name="Brusselator" type="formula" wrap="1">
+      <param name="timestep">       0.01          </param>
+      <param name="D_a">            0.05          </param>
+      <param name="D_b">            0.005         </param>
+      <param name="k1">             1.0           </param>
+      <param name="k2">             1.0           </param>
+      <param name="k3">             1.0           </param>
+      <param name="k4">             1.0           </param>
+      <param name="A">              1.0           </param>
+      <param name="B">              3.0           </param>
+      <formula number_of_chemicals="2">
+        delta_a = D_a * laplacian_a + k1*A + k2*a*a*b - k3*B*a - k4*a;
+        delta_b = D_b * laplacian_b        - k2*a*a*b + k3*B*a;
+      </formula>
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <white_noise low="0" high="2" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <white_noise low="2" high="4.5" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="1" />
+      <color_high r="1" g="0" b="0" />
+      <show_color_scale value="true" />
+      <show_multiple_chemicals value="true" />
+      <active_chemical value="b" />
+      <low value="0" />
+      <high value="4.5" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="100" />
+      <show_phase_plot value="true" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="2">
+  
+    <description>
+        L. Yang and I.R. Epstein. (2003) &quot;Oscillatory Turing Patterns in Reaction-Diffusion Systems with Two Coupled Layers&quot;&lt;br&gt;
+        &lt;a href=&quot;http://hopf.chem.brandeis.edu/pubs/pub288%20rep.pdf&quot;&gt;http://hopf.chem.brandeis.edu/pubs/pub288%20rep.pdf&lt;/a&gt;
+        
+        Figure 3(a) from the paper. Isolated spirals develop.
+        
+        In the paper the chemicals are named x,z,r,u,w. Here we use a,b,c,d,e. 
+        Two Oregonator systems a,b and d,e are coupled with a middle layer c.
+    </description>
+    
+    <rule name="Yang2003" type="formula" wrap="1">
+      <param name="timestep">       0.001       </param>
+      <param name="Da">             0.1          </param>
+      <param name="Db">             0.1          </param>
+      <param name="Dc">             0.1          </param>
+      <param name="Dd">             5.0          </param>
+      <param name="De">             100.0        </param>
+      <param name="epsilon">        0.14         </param>
+      <param name="param_f">        1.6          </param>
+      <param name="epsilon_bar">    0.4          </param>
+      <param name="param_f_bar">    1.1          </param>
+      <param name="q">              0.01         </param>
+      <param name="q_bar">          0.01         </param>
+      <formula number_of_chemicals="5">
+        delta_a = Da * laplacian_a + ( a - a*a - param_f*b*(a-q)/(a+q) ) / epsilon - (a-c)/(2.0f*epsilon);
+        delta_b = Db * laplacian_b + a - b;
+        delta_c = Dc * laplacian_c + (a-c)/(2.0f*epsilon) + (d-c)/(2.0f*epsilon_bar);
+        delta_d = Dd * laplacian_d + ( d - d*d - param_f_bar*e*(d-q_bar)/(d+q_bar) ) / epsilon_bar - (d-c)/(2.0f*epsilon_bar);
+        delta_e = De * laplacian_e + d - e;
+      </formula>
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="0.0449" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="0.0449" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <constant value="0.0505" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="c">
+        <add />
+        <white_noise low="-0.02" high="0.02" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="d">
+        <overwrite />
+        <constant value="0.0666" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="e">
+        <overwrite />
+        <constant value="0.0666" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <color_low r="0" g="0" b="0" />
+      <color_high r="1" g="1" b="1" />
+      <show_color_scale value="true" />
+      <show_multiple_chemicals value="true" />
+      <active_chemical value="a" />
+      <low value="0.02" />
+      <high value="0.2" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="100" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

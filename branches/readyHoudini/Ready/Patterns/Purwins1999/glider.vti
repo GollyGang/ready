@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+
+  <RD format_version="3">
+  
+    <description>
+      C. P. Schenk, A. W. Liehr, M. Bode, and H.-G. Purwins
+      (1999) &quot;Quasi-Particles in a Three-Dimensional Three-Component Reaction-Diffusion System&quot;
+      High Performance Computing in Science and Engineering, pp. 354-364. 
+      &lt;a href=&quot;http://www.uni-muenster.de/Physik.AP/Purwins/RD/Literatur/hlrs1999.pdf&quot;&gt;[PDF]&lt;/a&gt;
+      
+      Dissipative solitons in a three-chemical system, by the Purwins group at 
+      Munster. &lt;a href=&quot;http://www.uni-muenster.de/Physik.AP/Purwins/Gruppe/Purwins-en.html&quot;&gt;[link]&lt;/a&gt;
+    </description>
+    
+    <rule name="Schenk" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="D_a">         0.00015     </param>
+      <param name="D_b">         0.00015     </param>
+      <param name="D_c">         0.0096      </param> <!-- N.B. typo in paper -->
+      <param name="k3">          8.5         </param>
+      <param name="lambda">      2.0         </param>
+      <param name="k1">          -6.92       </param>
+      <param name="theta">       1.0         </param>
+      <param name="tau">         48.0        </param>
+      <param name="dx">          0.009       </param>
+      <param name="timestep">    0.002       </param>
+      <formula number_of_chemicals="3">
+        delta_a = D_a * laplacian_a / (dx*dx) - b - k3*c + lambda*a - a*a*a + k1;
+        delta_b = ( D_b * laplacian_b / (dx*dx) + a - b ) / tau;
+        delta_c = ( D_c * laplacian_c / (dx*dx) + a - c ) / theta;
+      </formula>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+
+    <!-- stable state -->
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="-0.82" />
+        <everywhere/>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="-0.87" />
+        <everywhere/>
+      </overlay>
+      <overlay chemical="c">
+        <overwrite />
+        <constant value="-0.843297" />
+        <everywhere/>
+      </overlay>
+
+      <!-- some gliders -->
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="1.3" />
+        <circle radius="0.05"> <point3d x="0.5" y="0.5" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.3" y="0.7" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.5" y="0.82" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.5" y="0.2" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.2" y="0.2" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.8" y="0.8" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.82" y="0.3" z="0.5" /> </circle>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <constant value="1.3" />
+        <circle radius="0.05"> <point3d x="0.47" y="0.5" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.33" y="0.7" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.53" y="0.8" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.5" y="0.23" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.2" y="0.23" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.8" y="0.83" z="0.5" /> </circle>
+        <circle radius="0.05"> <point3d x="0.8" y="0.36" z="0.5" /> </circle>
+      </overlay>
+      
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <low value="-1.5" />
+      <high value="1.5" />
+      <show_displacement_mapped_surface value="false" />
+      <timesteps_per_render value="400" />
+      <show_multiple_chemicals value="false" />
+      <contour_level value="-0.75" />
+    </render_settings>
+    
+  </RD>
+  
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+  
+</VTKFile>
