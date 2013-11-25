@@ -71,11 +71,16 @@ public:
 							    OP_Operator *);
 	void initRenderProperties( Properties &render_settings );
 	void updateVtiFile( const char *update_file );
-	void updateSystemFromParms();
+	void updateSystemFromParms( OP_Context &context );
 	void addSpareParms(const PRM_Template *spareParmTemplate, const char *folderName);
 	float float_parm( const char *name, int idx, int vidx, fpreal t );
-	bool parmChanged();
+	bool parmChanged( OP_Context &context );
 	void clearSpareParms();
+	bool parmNameInTemplateList( PRM_Name parm, PRM_Template* prmList, int listLength );
+	bool parmTemplateInNameList( PRM_Template parm, PRM_Name* prmNameList, int listLength );
+	bool strInPrmNameList( std::string parmName, PRM_Name* prmNameList, int listLength );
+	bool parmNameInPrmNameList( PRM_Name parmName, PRM_Name* prmNameList, int listLength );
+	void clearSpareParmsNotInList( PRM_Name *oldParmNames, int numOldParms, PRM_Name* newParmNames, int numNewParms );
 	void updateCopyBuffersAndMap( int rReagent, int bReagent, int cReagent );
 	void updateCopyBuffersIfNeeded( bool force );
 	int getReagentOffset( int baseReagentIndex );
@@ -101,10 +106,12 @@ private:
 	unsigned long reagent_block_size;
 	int num_reagents;
 	int num_parameters;
+	PRM_Name *parmNames;
 	float *parmValues;
+	int old_num_parameters;
+	PRM_Name *oldParmNames;
 	int *reagentCopyMap;
 	int numCopyReagents;
-	PRM_Name *parmNames;
 	static int *indexOffsets;
 	
 	int REAGENT_R() { INT_PARM("reagentR", 0, 0, 0) }

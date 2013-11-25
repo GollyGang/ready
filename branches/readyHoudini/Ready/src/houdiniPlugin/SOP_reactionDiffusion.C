@@ -137,6 +137,10 @@ SOP_reactionDiffusion::SOP_reactionDiffusion(OP_Network *net, const char *name, 
 	this->reagentCopyMap = NULL;
 	this->rd_data = NULL;
 	this->system = NULL;
+	this->oldParmNames = NULL;
+	this->old_num_parameters = 0;
+	this->parmNames = NULL;
+	this->parmValues = NULL;
 	CE_Context *cecontext = CE_Context::getContext();
 	// cl::Context object from the OpenCL C++ wrapper library
 	cl::Context clcontext = cecontext->getCLContext();
@@ -159,6 +163,99 @@ SOP_reactionDiffusion::SOP_reactionDiffusion(OP_Network *net, const char *name, 
 //	}
 //}
 
+bool SOP_reactionDiffusion::strInPrmNameList( std::string parmName, PRM_Name* prmNameList, int listLength )
+{
+	if ( prmNameList != NULL )
+	{
+		for (int i = 0; i < listLength; i++)
+		{
+			//cout << "Check number " << i << " of " << listLength << " comparing: " << parmName.c_str() << " and " << prmNameList[i].getToken() << "\n";
+			if ( strcmp( parmName.c_str(), prmNameList[i].getToken() ) == 0 )
+			{
+				//cout << "Match\n";
+				return true;
+			}
+		}
+	}// else {
+	//	cout << "NULL prmNameList!\n";
+	//}
+	return false;
+}
+
+bool SOP_reactionDiffusion::parmNameInPrmNameList( PRM_Name parmName, PRM_Name* prmNameList, int listLength )
+{
+	if ( prmNameList != NULL )
+	{
+		for (int i = 0; i < listLength; i++)
+		{
+			//cout << "Pnipnl: Check number " << i << " of " << listLength << " comparing: " << parmName.getToken() << " and " << prmNameList[i].getToken() << "\n";
+			if ( strcmp( parmName.getToken(), prmNameList[i].getToken() ) == 0 )
+			{
+				//cout << "Pnipnl: Match\n";
+				return true;
+			}
+		}
+	}// else {
+	//	cout << "Pnipnl: NULL prmNameList!\n";
+	//}
+	return false;
+}
+
+bool SOP_reactionDiffusion::parmNameInTemplateList( PRM_Name parm, PRM_Template* prmList, int listLength )
+{
+	if ( prmList != NULL )
+	{
+		for (int i = 0; i < listLength; i++)
+		{
+			if ( strcmp( parm.getToken(), prmList[i].getNamePtr()->getToken() ) )
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool SOP_reactionDiffusion::parmTemplateInNameList( PRM_Template parm, PRM_Name* prmNameList, int listLength )
+{
+	if ( prmNameList != NULL )
+	{
+		for (int i = 0; i < listLength; i++)
+		{
+			if ( strcmp( parm.getNamePtr()->getToken(), prmNameList[i].getToken() ) )
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void SOP_reactionDiffusion::clearSpareParmsNotInList( PRM_Name *oldParmNames, int numOldParms, PRM_Name* newParmNames, int numNewParms )
+{
+	OP_Director *director = OPgetDirector();
+	
+	if ( (this->num_parameters > 0) && (oldParmNames != NULL) )
+	{
+		for (int parm=0;parm<numOldParms;parm++)
+		{
+			//UT_StringArray *errs; //= new UT_StringArray();
+			//UT_StringArray *warn; // = new UT_StringArray();
+			
+			//try not to remove and remake parms that are already there
+			PRM_Name old_name = oldParmNames[parm];
+			if ( !this->parmNameInPrmNameList( old_name, newParmNames, numNewParms ) )
+			{
+				director->removeNodeSpareParm( this, oldParmNames[parm].getToken() );//, errs, warn );
+				cout << "Parm not in new parm list, removing: " << oldParmNames[parm].getToken() << ".\n";
+			} else {
+				cout << "Parm in new parm list, skipping removal: " << oldParmNames[parm].getToken() << ".\n";
+			}
+		}
+	}  
+	//director->deleteAllNodeSpareParms( this );
+}
+
 void SOP_reactionDiffusion::clearSpareParms()
 {
 	OP_Director *director = OPgetDirector();
@@ -168,7 +265,7 @@ void SOP_reactionDiffusion::clearSpareParms()
 		{
 			//UT_StringArray *errs; //= new UT_StringArray();
 			//UT_StringArray *warn; // = new UT_StringArray();
-			director->removeNodeSpareParm( this, parmNames[parm].getToken() );//, errs, warn );
+			director->removeNodeSpareParm( this, this->parmNames[parm].getToken() );//, errs, warn );
 
 		}
 	}  
@@ -210,12 +307,12 @@ void SOP_reactionDiffusion::updateCopyBuffersAndMap( int rReagent, int gReagent,
 	this->reagentB = bReagent;
 	
 	this->numCopyReagents = copyCount;
-	cout << "Copying: " << this->numCopyReagents << " reagents.\n";
+	// cout << "Copying: " << this->numCopyReagents << " reagents.\n";
 	
-	for (int k=0; k<this->numCopyReagents; k++)
-	{
-		cout << "Reagent map[" << k << "] = " << reagentCopyMap[k] << ".\n";
-	}
+	//for (int k=0; k<this->numCopyReagents; k++)
+	//{
+	//	cout << "Reagent map[" << k << "] = " << reagentCopyMap[k] << ".\n";
+	//}
 	
 	if (this->numCopyReagents > 0)
 	{
@@ -238,12 +335,8 @@ void SOP_reactionDiffusion::updateVtiFile( const char *update_file )
 		delete this->system;
 	}
 	cout << "Deleted system.\n";
-	delete this->loadedVtiName;
-	cout << "Deleted loadedVtiName.\n";
     this->system = SystemFactory::CreateFromFile(update_file,this->is_opencl_available,this->opencl_platform,this->opencl_device,this->raw_context,*this->render_settings,this->warn_to_update);
 	cout << "Loaded system.\n";
-	this->loadedVtiName = new UT_String( update_file, true );
-	cout << "loaded VTI.." << this->loadedVtiName->buffer() << "\n";
 	
 	this->last_cooked_frame = FLT_MIN;
 	this->system->Update( 0 );
@@ -253,8 +346,15 @@ void SOP_reactionDiffusion::updateVtiFile( const char *update_file )
 	int nreagents = this->system->GetNumberOfChemicals();
 	
 	cout << "Num reagents:" << nreagents << "\n";
-	this->num_parameters = this->system->GetNumberOfParameters();
-	
+	this->old_num_parameters = this->num_parameters;
+	//needs to get deleted
+	this->oldParmNames = new PRM_Name[ this->old_num_parameters ];
+	for ( int j=0; j < this->old_num_parameters; j++ )
+	{
+		cout << "saving old parm name: " << parmNames[j].getToken() << "\n";
+		this->oldParmNames[j] = PRM_Name( strdup( parmNames[j].getToken() ), strdup( parmNames[j].getToken() ) );
+	}
+		
 	if ( ( this->reagentCopyMap == NULL ) || (this->num_reagents != nreagents) )
 	{
 		cout << "(Re)creating reagentCopyMap.\n";
@@ -270,16 +370,27 @@ void SOP_reactionDiffusion::updateVtiFile( const char *update_file )
 		this->updateCopyBuffersIfNeeded( false );
 	}
 	
-	//cout << "Looping parms\n";
+	cout << "Looping parms\n";
 	//this->num_parameters = this->system->GetNumberOfParameters();
+	
+	//need to delete these guys some more
+	//if (this->parmValues != NULL ) delete this->parmValues;
+	//if (this->parmNames  != NULL ) delete this->parmNames;
+	
+	this->num_parameters = this->system->GetNumberOfParameters();
 	this->parmValues = new float[this->num_parameters];
 	this->parmNames = new PRM_Name[ this->num_parameters ];
+	
+	//alloc room for max that we may need, may end up using less.
 	PRM_Default parmDefaults[ this->num_parameters ];
 	PRM_Template templateList[ this->num_parameters+1 ];
+	int addedParmCount = 0;
 	
+	cout << "...\n";
 	for (int i=0;i<this->num_parameters;i++)
 	{
 		std::string parmName = this->system->GetParameterName( i );
+		
 		float parmVal = this->system->GetParameterValue( i );
 		//record parm value so that we can know if any have changed
 		this->parmValues[i] = parmVal;
@@ -289,18 +400,51 @@ void SOP_reactionDiffusion::updateVtiFile( const char *update_file )
 		//char *parmNameCap = strdup( parmName.c_str() );
 		//capitalize( parmNameCap );
 		//const char* parmNameCapConst = parmNameCap;
-		this->parmNames[i] = PRM_Name( strdup(parmName.c_str()), strdup(parmName.c_str()) );
-		parmDefaults[i] = PRM_Default( parmVal );
-		templateList[i] = PRM_Template( PRM_FLT, 1, &this->parmNames[i], &parmDefaults[i] );
+		if ( !strInPrmNameList( parmName, this->oldParmNames, this->old_num_parameters ) )
+		{
+			this->parmNames[i] = PRM_Name( strdup(parmName.c_str()), strdup(parmName.c_str()) );
+			parmDefaults[i] = PRM_Default( parmVal );
+			templateList[addedParmCount] = PRM_Template( PRM_FLT, 1, &this->parmNames[i], &parmDefaults[i] );
+			addedParmCount += 1;
+			cout << "Adding new parameter: " << parmName.c_str() << "\n";
+		} else {
+			//still add the name because the parameter is still there and that's how things are tracked
+			this->parmNames[i] = PRM_Name( strdup(parmName.c_str()), strdup(parmName.c_str()) );
+			cout << "Skipping the addition of parameter: " << parmName.c_str() << "\n";
+			//only reset parm values when a new file is loaded
+			if ( strcmp( update_file, loadedVtiName->buffer() ) != 0 )
+			{
+				cout << "Resetting parm value because vtiFileName was different:\n -->" << update_file << "\n <--" << loadedVtiName->buffer() << "\n";
+				this->setParameterOrProperty( parmName.c_str(), 0, 0, parmVal );
+			}
+			//__"set the parameter value? yes.. or will auto-change read-in take care of that?! maybe so.
+		}
 	}
-	templateList[this->num_parameters] = PRM_Template(); //add sentinel terminator
+	cout << "loopin' done, addedParmCount is" << addedParmCount << "\n";
+	templateList[addedParmCount] = PRM_Template(); //add sentinel terminator
 	
-	this->clearSpareParms();
-	//add the parms
-	this->addSpareParms( templateList, NULL );
-		
+	//int numNewParms = this->countParmsToAdd( templateList, this->num_parameters-1, this->parmNames, this->num_parameters );
+	
+	//PRM_Template newParmList[ numNewParms ];
+	//this->getParmsToAdd( newParmList, templateList, nTemplates, parmNames, nParmNames );
+	
+	//remove just the ones we're not about to add:
+	cout << "clearning spare parms not in list...\n";
+	this->clearSpareParmsNotInList( this->oldParmNames, this->old_num_parameters, this->parmNames, this->num_parameters );
+	//this->clearSpareParms();
+	
+	if (addedParmCount > 0)
+	{
+		//add the (new) parms
+		cout << "adding new parms...\n";
+		this->addSpareParms( templateList, NULL );
+	}
+	delete this->loadedVtiName;
+	cout << "Deleted loadedVtiName.\n";
 	//cout << ".. new update file .. :" << this->loadedVtiName->buffer() << "\n";
-	cout << "VTI load finished.\n";
+	this->loadedVtiName = new UT_String( update_file, true );
+	cout << "loaded VTI.." << this->loadedVtiName->buffer() << "\n";
+	cout << "VTI update finished.\n";
 }
 
 
@@ -321,19 +465,24 @@ SOP_reactionDiffusion::~SOP_reactionDiffusion()
 
 float SOP_reactionDiffusion::float_parm( const char *name, int idx, int vidx, fpreal t )
 {
-	    return evalFloat( name, &indexOffsets[idx], vidx, t);
+	    return evalFloat( name, &indexOffsets[idx], vidx, t );
 }
 
-bool SOP_reactionDiffusion::parmChanged()
+bool SOP_reactionDiffusion::parmChanged( OP_Context &context )
 {
-	for (int i=0;i<this->num_parameters;i++)
+	if (this->parmNames != NULL)
 	{
-		UT_String parmName = UT_String( this->parmNames[i].getToken() );
-		float parmVal = float_parm( parmName.buffer(), 0, 0, 0 );
-		if ( parmVal != this->parmValues[i] )
+		for (int i=0;i<this->num_parameters;i++)
 		{
-			cout << "RD Parm changed.";
-			return true;
+			//cout << "Checking RD Parm:" << i << "\n";
+			UT_String parmName = UT_String( this->parmNames[i].getToken() );
+			//cout << " -- RD Parm Name:" << parmName.buffer() << "\n";
+			float parmVal = float_parm( parmName.buffer(), 0, 0, context.getTime() );
+			if ( parmVal != this->parmValues[i] )
+			{
+				cout << "RD Parm changed.\n";
+				return true;
+			}
 		}
 	}
 	int rReagent = REAGENT_R();
@@ -347,17 +496,17 @@ bool SOP_reactionDiffusion::parmChanged()
 	return false;
 }
 
-void SOP_reactionDiffusion::updateSystemFromParms()
+void SOP_reactionDiffusion::updateSystemFromParms( OP_Context &context )
 {
 	//cout << "Starting updateSystemFromParms.\n";
-	if ( SOP_reactionDiffusion::parmChanged() )
+	if ( SOP_reactionDiffusion::parmChanged( context ) )
 	{
 		//cout << "Parm changed!\n";
 		for ( int i=0; i < this->num_parameters; i++ )
 		{ 
 			string name( this->parmNames[i].getToken() );
 			UT_String UT_name = UT_String( name );
-			float parmVal = float_parm( UT_name, 0, 0, 0 );
+			float parmVal = float_parm( UT_name, 0, 0, context.getTime() );
 			//cout << "new value: " << parmVal << "\n";
 			this->system->SetParameterValueByName( name, parmVal );
 			this->parmValues[i] = parmVal;
@@ -455,7 +604,7 @@ OP_ERROR SOP_reactionDiffusion::cookMySop(OP_Context &context)
 		}
 		
 		//cout << "did steps: " << steps_to_do << "\n";
-		this->updateSystemFromParms();
+		this->updateSystemFromParms( context );
 		
 		//cout << "copying N " << this->numCopyReagents << " reagents.\n";
 		for (int reagent=0;reagent < this->numCopyReagents; reagent++)
@@ -487,6 +636,9 @@ OP_ERROR SOP_reactionDiffusion::cookMySop(OP_Context &context)
 		GA_RWHandleV3 Phandle( ptAttribRef );
 
 	    GA_Offset ptoff;
+		
+		// need to check here whether there's enough room for the copy
+		// also need to check the incoming geometry type, mainly whether it's points or voxels, and switch the copy method.
 	    GA_FOR_ALL_PTOFF(gdp, ptoff)
 	    {
 			//if ((ptoff % 10000) == 0)
@@ -503,6 +655,18 @@ OP_ERROR SOP_reactionDiffusion::cookMySop(OP_Context &context)
 
 			Phandle.set( ptoff, Pvalue );
 	    }
+		
+		// if writing to a voxel primitive
+		//UT_VoxelArrayF *vox;
+		//UT_VoxelArrayIterator vit;
+		//vit.setArray(vox);
+		//for (vit.rewind(); !vit.atEnd(); vit.advance())
+		//{
+	    //	writeLoc = vit.x() + vit.y() * xSize + vit.z() * xSize * ySize;
+		//  //vit.setArray may be able to use this eventually
+		//  vit.setValue( rd_data[ writeLoc ] );
+		//total += vit.getValue();
+		//}
 		//cout << "Updating system from parms.\n";
 		this->last_cooked_frame = frame;
 	
