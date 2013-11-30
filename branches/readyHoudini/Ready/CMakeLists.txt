@@ -34,6 +34,11 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
+set( MAKE_LINKABLE_LIB 1 )
+
+if( MAKE_LINKABLE_LIB )
+	add_definitions( -D__EXTERNAL_OPENCL__ )
+endif()
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
@@ -274,6 +279,10 @@ if( APPLE )
   set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
   set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
 elseif(UNIX)
+  # The following line should be the only change needed to this file to get ready to build from a local compile of wxWidgets (that includes the private headers, which ready uses).
+  set( wxWidgets_CONFIG_EXECUTABLE /home/dan/dev/wxWidgets-2.9.4/wx-config )
+  # one day it should work using this
+  # set( wxWidgets_CONFIG_EXECUTABLE /usr/bin/wx-config )
   # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
   set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
 endif()
@@ -338,6 +347,9 @@ if( USE_SSE )
     endif()
   else()
     add_definitions( -msse2 -ffast-math )
+	if( MAKE_LINKABLE_LIB )
+		add_definitions( -fPIC )
+	endif()
   endif()
   add_definitions( -DUSE_SSE )
 endif()
@@ -367,7 +379,7 @@ if( ${VTK_MAJOR_VERSION} GREATER 5 )
     vtkRenderingFreeTypeOpenGL 
   )
 else()
-  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
+  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid vtkFiltering vtkImaging )
 endif()
 
 # create command-line utility
