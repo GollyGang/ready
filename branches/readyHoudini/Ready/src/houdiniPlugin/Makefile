@@ -21,7 +21,7 @@
 
 # To make it link I had to add -fPIC to Ready's CMakeLists.txt, which I put in the first add_definitions() call in the build block (not a good spot, should be moved down.. but need to discuss this with the team in any case).
 
-READYROOT = /home/dan/dev/ready/readyCommit/reaction-diffusion/
+READYROOT = ../../
 DSONAME = SOP_reactionDiffusion.so 
 SOURCES = SOP_reactionDiffusion.C
 INCDIRS	= -I/home/dan/dev/ready/readyCommit/reaction-diffusion/src/readybase -I/usr/include/vtk-5.10 -I/opt/cuda/include/CL
