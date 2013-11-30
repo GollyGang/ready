@@ -80,6 +80,42 @@ AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_av
 
 // -------------------------------------------------------------------------------------------------------------
 
+#if defined( __EXTERNAL_OPENCL__ )
+AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device, 
+										  cl_context external_context, Properties &render_settings, bool &warn_to_update)
+{
+    // temporarily turn off internationalisation, to avoid string-to-float conversion issues
+    char *old_locale = setlocale(LC_NUMERIC,"C");
+    
+    vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
+    bool parallel;
+    int data_type = generic_reader->ReadOutputType(filename,parallel);
+    AbstractRD *system;
+    switch(data_type)
+    {
+        case VTK_IMAGE_DATA: 
+            system = CreateFromImageDataFile(filename,is_opencl_available, opencl_platform, opencl_device,
+                render_settings, warn_to_update); 
+            break;
+        case VTK_UNSTRUCTURED_GRID: 
+            system = CreateFromUnstructuredGridFile(filename,is_opencl_available,opencl_platform,opencl_device,
+                render_settings,warn_to_update); 
+            break;
+        default: 
+            throw runtime_error("Unsupported data type or file read error");
+    }
+    
+    // restore the old locale
+    setlocale(LC_NUMERIC,old_locale);
+
+    system->SetFilename(filename);
+    system->SetModified(false);
+    return system;
+}
+#endif
+
+// -------------------------------------------------------------------------------------------------------------
+
 AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
                                     Properties &render_settings,bool &warn_to_update)
 {
@@ -132,6 +168,63 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
 
     return image_system;
 }
+
+// -------------------------------------------------------------------------------------------------------------
+
+#if defined( __EXTERNAL_OPENCL__ )
+AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
+                                    cl_context external_context, Properties &render_settings,bool &warn_to_update)
+{
+    vtkSmartPointer<RD_XMLImageReader> reader = vtkSmartPointer<RD_XMLImageReader>::New();
+    reader->SetFileName(filename);
+    reader->Update();
+    vtkImageData *image = reader->GetOutput();
+
+    string type = reader->GetType();
+    string name = reader->GetName();
+
+    ImageRD* image_system;
+    if(type=="inbuilt")
+    {
+        if(name=="Gray-Scott")
+            image_system = new GrayScottImageRD();
+        else 
+            throw runtime_error("Unsupported inbuilt implementation: "+name);
+    }
+    else if(type=="formula")
+    {
+        if(!is_opencl_available) 
+            throw runtime_error("Pattern requires OpenCL");
+        image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+    }
+    else if(type=="kernel")
+    {
+        if(!is_opencl_available) 
+            throw runtime_error("Pattern requires OpenCL");
+        image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device);
+    }
+    else throw runtime_error("Unsupported rule type: "+type);
+    image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
+
+    // render settings
+    vtkSmartPointer<vtkXMLDataElement> xml_render_settings = 
+        reader->GetRDElement()->FindNestedElementWithName("render_settings");
+    if(xml_render_settings) // optional
+        render_settings.OverwriteFromXML(xml_render_settings);
+
+    int dim[3];
+    image->GetDimensions(dim);
+    int nc = image->GetNumberOfScalarComponents() * image->GetPointData()->GetNumberOfArrays();
+    image_system->SetDimensions(dim[0],dim[1],dim[2]);
+    image_system->SetNumberOfChemicals(nc);
+    if(reader->ShouldGenerateInitialPatternWhenLoading())
+        image_system->GenerateInitialPattern();
+    else
+        image_system->CopyFromImage(image);
+
+    return image_system;
+}
+#endif
 
 // -------------------------------------------------------------------------------------------------------------
 

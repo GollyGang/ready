@@ -33,6 +33,32 @@ OpenCL_MixIn::OpenCL_MixIn(int opencl_platform,int opencl_device)
     this->iPlatform = opencl_platform;
     this->iDevice = opencl_device;
     this->need_reload_context = true;
+    this->external_context = false;
+    this->need_write_to_opencl_buffers = true;
+    this->kernel_function_name = "rd_compute";
+
+    // initialise the opencl things to null in case we fail to create them
+    this->device_id = NULL;
+    this->context = NULL;
+    this->command_queue = NULL;
+    this->kernel = NULL;
+    this->program = NULL;
+
+    if(LinkOpenCL()!= CL_SUCCESS)
+        throw runtime_error("Failed to load dynamic library for OpenCL");
+
+    this->iCurrentBuffer = 0;
+}
+
+// ---------------------------------------------------------------------------
+
+OpenCL_MixIn::OpenCL_MixIn( int opencl_platform, int opencl_device, cl_context externalContext )
+{
+    this->iPlatform = opencl_platform;
+    this->iDevice = opencl_device;
+    this->context = externalContext;
+    this->external_context = true;
+    this->need_reload_context = true;
     this->need_write_to_opencl_buffers = true;
     this->kernel_function_name = "rd_compute";
 
@@ -132,12 +158,18 @@ void OpenCL_MixIn::ReloadContextIfNeeded()
             throw runtime_error("OpenCL_MixIn::ReloadContextIfNeeded : too few devices available");
         this->device_id = devices_available[this->iDevice];
     }
-
-    // create the context
-    clReleaseContext(this->context);
-    this->context = clCreateContext(NULL,1,&this->device_id,NULL,NULL,&ret);
-    throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to create context: ");
-
+    
+    // If using external context then we don't need to create a new one
+    // Probably need to get the device_id from the external context via the getInfo method
+    // CL_QUEUE_DEVICE
+    if (!this->external_context)
+    {
+        // create the context
+        clReleaseContext(this->context);
+        this->context = clCreateContext(NULL,1,&this->device_id,NULL,NULL,&ret);
+        throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to create context: ");
+    }
+    
     // create the command queue
     clReleaseCommandQueue(this->command_queue);
     this->command_queue = clCreateCommandQueue(this->context,this->device_id,0,&ret);

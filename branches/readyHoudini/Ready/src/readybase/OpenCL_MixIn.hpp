@@ -19,9 +19,12 @@
 #define __OPENCLMIXIN__
 
 // OpenCL:
-#ifdef __APPLE__
+#if defined( __APPLE__ )
     // OpenCL is linked at start up time on Mac OS 10.6+
     #include <OpenCL/opencl.h>
+#elif defined( __EXTERNAL_OPENCL__ )
+	// compiling for use as a plugin into an app that provides its own openCL context.
+	#include <CL/opencl.h>
 #else
     // OpenCL is loaded dynamically on Windows and Linux
     #include "OpenCL_Dyn_Load.h"
@@ -37,6 +40,7 @@ class OpenCL_MixIn
     public:
 
         OpenCL_MixIn(int opencl_platform,int opencl_device);
+		OpenCL_MixIn(int opencl_platform,int opencl_device, cl_context externalContext);
         virtual ~OpenCL_MixIn();
     
         void SetPlatform(int i);
@@ -47,7 +51,7 @@ class OpenCL_MixIn
     protected:
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
-
+        void ImportExternalContext( cl_context externalContext );
         void ReloadContextIfNeeded();
         virtual void ReloadKernelIfNeeded() =0;
 
@@ -70,7 +74,7 @@ class OpenCL_MixIn
 
         cl_command_queue command_queue;
 
-        bool need_reload_context,need_write_to_opencl_buffers;
+        bool need_reload_context,external_context,need_write_to_opencl_buffers;
 
         std::vector<cl_mem> buffers[2];
         int iCurrentBuffer;

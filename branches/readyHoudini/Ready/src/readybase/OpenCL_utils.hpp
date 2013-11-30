@@ -31,6 +31,10 @@
     #define CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE        0x103B
     #define CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF          0x103C
     #define CL_DEVICE_OPENCL_C_VERSION                  0x103D
+#elif defined( __EXTERNAL_OPENCL__ )
+	// compiling for use as a plugin into an app that provides its own openCL context.
+	// #include <CL/cl_platform.h>
+	#include <CL/opencl.h>
 #else
     // OpenCL is loaded dynamically on Windows and Linux
     #include "OpenCL_Dyn_Load.h"

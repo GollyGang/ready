@@ -1010,6 +1010,13 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
 
 // --------------------------------------------------------------------------------
 
+void MeshRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+{
+	//do nothing for now, TODO, provide an implementation.
+}
+
+// --------------------------------------------------------------------------------
+
 void MeshRD::CreateCellLocatorIfNeeded()
 {
     if(this->cell_locator) return;

@@ -51,7 +51,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
 
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
-
+        virtual void GetFromOpenCLBuffers( float* dest, int chemical_id );
         virtual void Undo();
         virtual void Redo();
 

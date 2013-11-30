@@ -173,6 +173,27 @@ void AbstractRD::SetParameterValue(int iParam,float val)
 
 // ---------------------------------------------------------------------
 
+void AbstractRD::SetParameterValueByName(const std::string& name, float value)
+{
+    for(int iParam=0;iParam<(int)this->parameters.size();iParam++)
+        if(this->parameters[iParam].first == name)
+		{
+            this->parameters[iParam].second = value;
+			this->is_modified = true;
+			return;
+		}
+    throw runtime_error("ImageRD::SetParameterValueByName : parameter name not found: "+name);
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::QueueReloadFormula()
+{
+	this->need_reload_formula = true;
+}
+
+// ---------------------------------------------------------------------
+
 bool AbstractRD::IsParameter(const string& name) const
 {
     for(int i=0;i<(int)this->parameters.size();i++)

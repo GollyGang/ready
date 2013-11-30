@@ -352,7 +352,7 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
 
 cl_int OpenCL_utils::LinkOpenCL()
 {
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( __EXTERNAL_OPENCL__ )
     return CL_SUCCESS;
 #else
     return clLibLoad();

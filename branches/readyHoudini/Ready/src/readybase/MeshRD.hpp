@@ -71,7 +71,8 @@ class MeshRD : public AbstractRD
         virtual float GetValue(float x,float y,float z,const Properties& render_settings);
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
-
+		virtual void GetFromOpenCLBuffers( float* dest, int chemical_id );
+		
         void GetMesh(vtkUnstructuredGrid* mesh) const;
 
     protected: // functions

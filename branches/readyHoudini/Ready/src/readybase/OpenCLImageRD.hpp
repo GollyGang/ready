@@ -28,6 +28,7 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
     public:
 
         OpenCLImageRD(int opencl_platform,int opencl_device);
+        OpenCLImageRD(int opencl_platform,int opencl_device, cl_context externalContext);
 
         virtual bool HasEditableFormula() const { return true; }
 
@@ -43,6 +44,7 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual void Undo();
         virtual void Redo();
+        virtual void GetFromOpenCLBuffers( float* dest, int chemical_id );
 
     protected:
 

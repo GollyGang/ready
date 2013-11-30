@@ -325,6 +325,13 @@ void OpenCLMeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,c
 
 // ----------------------------------------------------------------------------------------------------------------
 
+void OpenCLMeshRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+{
+	//do nothing for now, TODO, provide an implementation.
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLMeshRD::Undo()
 {
     MeshRD::Undo();
