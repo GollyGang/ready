@@ -4,6 +4,7 @@
 #include <UT/UT_DSOVersion.h>
 #include <SYS/SYS_Math.h>
 #include <GU/GU_Detail.h>
+#include <GU/GU_PrimVolume.h>
 #include <GEO/GEO_AttributeHandle.h>
 #include <PRM/PRM_Include.h>
 #include <PI/PI_SpareProperty.h>
@@ -76,7 +77,7 @@ void newSopOperator(OP_OperatorTable *table)
 }
 
 // SOP Parameters.
-static PRM_Name	    names[] =
+static PRM_Name parm_names[] =
 {
     PRM_Name("vtiFile","Vti Filename"),
 	PRM_Name("writeAttribute","Write Attribute"),
@@ -85,30 +86,59 @@ static PRM_Name	    names[] =
     PRM_Name("reagentR","Reagent R"),
     PRM_Name("reagentG","Reagent G"),
 	PRM_Name("reagentB","Reagent B"),
-	PRM_Name("setF","Set F"),
-	PRM_Name("setK","Set k"),
+	PRM_Name("xRes","X Res"),
+	PRM_Name("yRes","Y Res"),
+	PRM_Name("zRes","Z Res"),
+	PRM_Name("regenerateInitialState","Regenerate Initial State"),
 };
 
 int * readyHoudini::indexOffsets = 0;
 
 //static PRM_Default  sopThresholdDefault(1e-03f);
-static PRM_Default fileDefault(0, "/home/dan/bin/ready/Patterns/grayscott-djw/grayscott_demo_worms_moreDiffuse_256.vti");
-static PRM_Default attribDefault(0, "Cd");
-static PRM_Default startFrameDefault(1.0f);
-static PRM_Default stepsDefault(100);
-static PRM_Default reagentZeroDefault(0);
-static PRM_Default reagentOneDefault(1);
-static PRM_Default reagentMinusOneDefault(-1);
+static PRM_Default parm_defaults[] =
+{
+	//PRM_Default(0, "/home/dan/bin/ready/Patterns/grayscott-djw/grayscott_demo_worms_moreDiffuse_256.vti"), //file
+	PRM_Default(0, "/home/dan/bin/ready/Patterns/grayscott-sharpenTweak/grayscott-evolvingMask-extra_flowyDots-liveBubbles.vti"), //file
+	PRM_Default(0, "Cd"), //attribname
+	PRM_Default(1.0f), // startFrame
+	PRM_Default(100), //steps
+	PRM_Default(2), //reagentZero
+	PRM_Default(3), //reagentOne
+	PRM_Default(1), //reagentMinusOne
+	PRM_Default( 256 ), //xres
+    PRM_Default( 256 ), //yres
+    PRM_Default( 1 ), //zres
+    PRM_Default( 0 ), //regenerateInitialState
+};
+
+static PRM_Type parm_types[] =
+{
+	PRM_FILE, // vtiFile
+	PRM_STRING,//writeAttribute
+	PRM_INT, //startFrame
+	PRM_INT, //stepsPerFrame
+	PRM_INT, //reagentR
+	PRM_INT, //reagentG
+    PRM_INT, //reagentB
+    PRM_INT, //xRes
+    PRM_INT, //yRes
+    PRM_INT, //zRes
+    PRM_TOGGLE, //regenerateInitialState
+};            
 
 PRM_Template readyHoudini::myTemplateList[] =
 {
-    PRM_Template(PRM_FILE, 1, &names[0], &fileDefault),
-	PRM_Template(PRM_STRING, 1, &names[1], &attribDefault),
-    PRM_Template(PRM_FLT, 1, &names[2], &startFrameDefault),
-    PRM_Template(PRM_INT, 1, &names[3], &stepsDefault),
-    PRM_Template(PRM_INT, 1, &names[4], &reagentZeroDefault),
-    PRM_Template(PRM_INT, 1, &names[5], &reagentOneDefault),
-	PRM_Template(PRM_INT, 1, &names[6], &reagentMinusOneDefault),
+    PRM_Template(parm_types[0], 1, &parm_names[0], &parm_defaults[0]),
+    PRM_Template(parm_types[1], 1, &parm_names[1], &parm_defaults[1]),
+    PRM_Template(parm_types[2], 1, &parm_names[2], &parm_defaults[2]),
+    PRM_Template(parm_types[3], 1, &parm_names[3], &parm_defaults[3]),
+    PRM_Template(parm_types[4], 1, &parm_names[4], &parm_defaults[4]),
+    PRM_Template(parm_types[5], 1, &parm_names[5], &parm_defaults[5]),
+    PRM_Template(parm_types[6], 1, &parm_names[6], &parm_defaults[6]),
+    PRM_Template(parm_types[7], 1, &parm_names[7], &parm_defaults[7]),
+    PRM_Template(parm_types[8], 1, &parm_names[8], &parm_defaults[8]),
+    PRM_Template(parm_types[9], 1, &parm_names[9], &parm_defaults[9]),
+    PRM_Template(parm_types[10], 1, &parm_names[10], &parm_defaults[10]),
     PRM_Template() // sentinel
 };
 
@@ -141,6 +171,9 @@ readyHoudini::readyHoudini(OP_Network *net, const char *name, OP_Operator *op)
 	this->old_num_parameters = 0;
 	this->parmNames = NULL;
 	this->parmValues = NULL;
+    this->system_resx = -1;
+    this->system_resy = -1;
+    this->system_resz = -1;
 	CE_Context *cecontext = CE_Context::getContext();
 	// cl::Context object from the OpenCL C++ wrapper library
 	cl::Context clcontext = cecontext->getCLContext();
@@ -247,10 +280,10 @@ void readyHoudini::clearSpareParmsNotInList( PRM_Name *oldParmNames, int numOldP
 			if ( !this->parmNameInPrmNameList( old_name, newParmNames, numNewParms ) )
 			{
 				director->removeNodeSpareParm( this, oldParmNames[parm].getToken() );//, errs, warn );
-				cout << "Parm not in new parm list, removing: " << oldParmNames[parm].getToken() << ".\n";
-			} else {
-				cout << "Parm in new parm list, skipping removal: " << oldParmNames[parm].getToken() << ".\n";
-			}
+				//cout << "Parm not in new parm list, removing: " << oldParmNames[parm].getToken() << ".\n";
+			} //else {
+				//cout << "Parm in new parm list, skipping removal: " << oldParmNames[parm].getToken() << ".\n";
+			//}
 		}
 	}  
 	//director->deleteAllNodeSpareParms( this );
@@ -278,16 +311,23 @@ void readyHoudini::updateCopyBuffersIfNeeded( bool force )
 	int rReagent = REAGENT_R();
 	int gReagent = REAGENT_G();
 	int bReagent = REAGENT_B();
-	if ( force || (this->reagentR != rReagent) || (this->reagentG != gReagent) || (this->reagentB != bReagent) || (this->rd_data == NULL) )
+    int xres = this->system->GetX();
+	int yres = this->system->GetY();
+	int zres = this->system->GetZ(); 
+    
+    cout << "Stored dims: (" << this->system_resx << "," << this->system_resy << "," << this->system_resz << ")\n";
+    cout << "System dims: (" << xres << "," << yres << "," << zres << ")\n";
+    
+	if ( force || (this->reagentR != rReagent) || (this->reagentG != gReagent) || (this->reagentB != bReagent) || (this->rd_data == NULL) || (this->system_resx != xres) || (this->system_resy != yres) || (this->system_resz != zres))
 	{
-		//cout << "Need to update copyBuffersAndMap.\n";
-		this->updateCopyBuffersAndMap( rReagent, gReagent, bReagent );
+		cout << "Need to update copyBuffersAndMap.\n";
+		this->updateCopyBuffersAndMap( rReagent, gReagent, bReagent, xres, yres, zres );
 	}
 }
 
-void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bReagent )
+void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bReagent, int xres, int yres, int zres )
 {
-	//cout << "Starting updateCopyBuffersAndMap.\n";
+	cout << "Starting updateCopyBuffersAndMap.\n";
 	int copyCount = 0;
 	for ( int k=0; k<this->num_reagents; k++ )
 	{
@@ -305,7 +345,16 @@ void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bRea
 	this->reagentR = rReagent;
 	this->reagentG = gReagent;
 	this->reagentB = bReagent;
-	
+    
+	this->system_resx = xres;
+    this->system_resy = yres;
+    this->system_resz = zres;
+    
+    int old_block_size = this->reagent_block_size;
+    this->reagent_block_size = sizeof(float) * xres * yres * zres;
+    
+    cout << "Old/New block size: " << old_block_size << " / " << this->reagent_block_size << "\n";
+    
 	this->numCopyReagents = copyCount;
 	// cout << "Copying: " << this->numCopyReagents << " reagents.\n";
 	
@@ -329,7 +378,8 @@ void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bRea
 
 void readyHoudini::updateVtiFile( const char *update_file )
 {
-	cout << "Loading vti: " << update_file << "\n";
+    
+    cout << "Loading vti: " << update_file << "\n";
 	if ( this->system != NULL )
 	{
 		delete this->system;
@@ -342,6 +392,22 @@ void readyHoudini::updateVtiFile( const char *update_file )
 	this->system->Update( 0 );
 	this->step_count = 0;
 	
+    
+	if ( strcmp( this->loadedVtiName->buffer(), update_file ) == 0 )
+    {
+        cout << "Vti same.\n";//, setting dims: (" << this->system_resx << "," << this->system_resy << "," << this->system_resz << ")\n";
+        //this->system->SetDimensions( this->system_resx, this->system_resy, this->system_resz ); 
+    } else {
+        cout << "Vti different, getting res.\n";
+        this->system_resx = system->GetX();
+        this->system_resy = system->GetY();
+        this->system_resz = system->GetZ();
+        this->setParameterOrProperty( "xRes", 0, 0, this->system_resx );
+        this->setParameterOrProperty( "yRes", 0, 0, this->system_resy );
+        this->setParameterOrProperty( "zRes", 0, 0, this->system_resz );
+    }
+    
+    int oldBlockSize = this->reagent_block_size;
 	this->reagent_block_size = sizeof(float) * this->system->GetX() * this->system->GetY() * this->system->GetZ();
 	int nreagents = this->system->GetNumberOfChemicals();
 	
@@ -355,7 +421,7 @@ void readyHoudini::updateVtiFile( const char *update_file )
 		this->oldParmNames[j] = PRM_Name( strdup( parmNames[j].getToken() ), strdup( parmNames[j].getToken() ) );
 	}
 		
-	if ( ( this->reagentCopyMap == NULL ) || (this->num_reagents != nreagents) )
+	if ( ( this->reagentCopyMap == NULL ) || (this->num_reagents != nreagents) || (this->reagent_block_size != oldBlockSize) )
 	{
 		cout << "(Re)creating reagentCopyMap.\n";
 		delete this->reagentCopyMap;
@@ -370,7 +436,7 @@ void readyHoudini::updateVtiFile( const char *update_file )
 		this->updateCopyBuffersIfNeeded( false );
 	}
 	
-	cout << "Looping parms\n";
+	//cout << "Looping parms\n";
 	//this->num_parameters = this->system->GetNumberOfParameters();
 	
 	//need to delete these guys some more
@@ -386,7 +452,7 @@ void readyHoudini::updateVtiFile( const char *update_file )
 	PRM_Template templateList[ this->num_parameters+1 ];
 	int addedParmCount = 0;
 	
-	cout << "...\n";
+	//cout << "...\n";
 	for (int i=0;i<this->num_parameters;i++)
 	{
 		std::string parmName = this->system->GetParameterName( i );
@@ -406,21 +472,21 @@ void readyHoudini::updateVtiFile( const char *update_file )
 			parmDefaults[i] = PRM_Default( parmVal );
 			templateList[addedParmCount] = PRM_Template( PRM_FLT, 1, &this->parmNames[i], &parmDefaults[i] );
 			addedParmCount += 1;
-			cout << "Adding new parameter: " << parmName.c_str() << "\n";
+			//cout << "Adding new parameter: " << parmName.c_str() << "\n";
 		} else {
 			//still add the name because the parameter is still there and that's how things are tracked
 			this->parmNames[i] = PRM_Name( strdup(parmName.c_str()), strdup(parmName.c_str()) );
-			cout << "Skipping the addition of parameter: " << parmName.c_str() << "\n";
+			//cout << "Skipping the addition of parameter: " << parmName.c_str() << "\n";
 			//only reset parm values when a new file is loaded
 			if ( strcmp( update_file, loadedVtiName->buffer() ) != 0 )
 			{
-				cout << "Resetting parm value because vtiFileName was different:\n -->" << update_file << "\n <--" << loadedVtiName->buffer() << "\n";
+				//cout << "Resetting parm value because vtiFileName was different:\n -->" << update_file << "\n <--" << loadedVtiName->buffer() << "\n";
 				this->setParameterOrProperty( parmName.c_str(), 0, 0, parmVal );
 			}
 			//__"set the parameter value? yes.. or will auto-change read-in take care of that?! maybe so.
 		}
 	}
-	cout << "loopin' done, addedParmCount is" << addedParmCount << "\n";
+	//cout << "loopin' done, addedParmCount is" << addedParmCount << "\n";
 	templateList[addedParmCount] = PRM_Template(); //add sentinel terminator
 	
 	//int numNewParms = this->countParmsToAdd( templateList, this->num_parameters-1, this->parmNames, this->num_parameters );
@@ -485,6 +551,7 @@ bool readyHoudini::parmChanged( OP_Context &context )
 			}
 		}
 	}
+    
 	int rReagent = REAGENT_R();
 	int gReagent = REAGENT_G();
 	int bReagent = REAGENT_B();
@@ -493,6 +560,16 @@ bool readyHoudini::parmChanged( OP_Context &context )
 		cout << "Reagent mapping changed.\n";
 		return true;
 	}
+    
+    int xres = X_RES();
+	int yres = Y_RES();
+	int zres = Z_RES();
+	if ( (this->system_resx != xres) || (this->system_resy != yres) || (this->system_resz != zres) )
+	{
+		cout << "Sim res changed.\n";
+		return true;
+	}
+    
 	return false;
 }
 
@@ -511,8 +588,21 @@ void readyHoudini::updateSystemFromParms( OP_Context &context )
 			this->system->SetParameterValueByName( name, parmVal );
 			this->parmValues[i] = parmVal;
 		}
-		
+        
+        //this->system_resx = X_RES();
+        //this->system_resy = Y_RES();
+        //this->system_resz = Z_RES();
+        this->system->SetDimensions( X_RES(), Y_RES(), Z_RES() );
+        
+        //have a checkbox to control this:
+        int regen = REGEN();
+        if (regen)
+        {
+            this->system->GenerateInitialPattern();
+        }
+        
 		this->system->QueueReloadFormula();
+        this->system->Update(0);
 		//cout << "Updating copyBuffers if needed.\n";
 		this->updateCopyBuffersIfNeeded( false );
 	}
@@ -565,12 +655,9 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 	int bReagent = REAGENT_B();
 	int step_per_frame = STEPS_PER_FRAME();
 	this->start_frame = START_FRAME();
-	//cout << "start frame: " << this->start_frame << "\n";
 	
 	fpreal frame = OPgetDirector()->getChannelManager()->getSample( context.getTime() );
-	
-	//cout << "frame: " << frame << "\n";
-	
+		
 	if ( ( this->start_frame == (int)frame ) || ( vtiFilename != *this->loadedVtiName ) )
 	{
 		//cout << "VTI needs updating.\n";
@@ -585,38 +672,26 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 	}
 	
 	try {
-		//get difference in frames between max cooked and now, and step that many frames.
-		//cout << "step_per_frame: " << step_per_frame << "\n";
-		
-		float frameDif = frame - start_frame;
-		
-		//cout << "frameDif: " << frameDif << "\n";
-		
+		//get difference in frames between max cooked and now, and step that many frames.		
+		float frameDif = frame - start_frame;		
 		int steps_to_do = (int)( frameDif * step_per_frame - this->step_count );
 		
-		//cout << "steps_to_do: " << steps_to_do << "\n";
-		// think about adding a 'interactive' flag, that limtis the max_steps_to_do, temporaily, so that load on a late frame doesn't take ages.
-		
+		// Think about adding a 'interactive' flag, that limtis the max_steps_to_do, temporaily, so that load on a late frame doesn't take ages.
+		//cout << "System res: ( " << this->system->GetX() << ", " << this->system->GetY() << ", " << this->system->GetZ() << ")\n";
+        //cout << "Block size: " << this->reagent_block_size << "\n";
+        
 		if ( steps_to_do > 0 )
 		{
 	        this->system->Update( steps_to_do );
 			this->step_count += steps_to_do;
 		}
 		
-		//cout << "did steps: " << steps_to_do << "\n";
 		this->updateSystemFromParms( context );
 		
-		//cout << "copying N " << this->numCopyReagents << " reagents.\n";
 		for (int reagent=0;reagent < this->numCopyReagents; reagent++)
 		{
-			/*if ( ((int(frame) % 20) == 0) || (this->start_frame == (int)frame) )
-			{
-				cout << "grabbing reagent " << reagent << " copy map value: " << this->reagentCopyMap[reagent] << "\n";
-			}*/
 			this->system->GetFromOpenCLBuffers( rd_data+reagent*this->reagent_block_size, this->reagentCopyMap[reagent] );
 		}
-		
-		//cout << "copied n buffers: " << this->numCopyReagents << "\n";
 		
 		//const char *save_file = "/home/dan/test.vti";
         //system->SaveFile(save_file,*this->render_settings,false);
@@ -624,49 +699,80 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 		//numReagents detail attrib
 		//stepCount detail attrib
 		
-		GA_RWAttributeRef ptAttribRef = gdp->findAttribute(GA_ATTRIB_POINT, this->writeAttributeName->buffer() );
 		
-		if (!ptAttribRef.isValid())
-		{
-			//cout << "Attrib not found, creating it.\n";
-			ptAttribRef = gdp->addFloatTuple(GA_ATTRIB_POINT, "Cd", 3, GA_Defaults(0.0));
-			ptAttribRef.setTypeInfo(GA_TYPE_COLOR);
-		}
+		GA_Size nprims = gdp->getNumPrimitives();
+		//cout << "nprims: " << nprims << "\n";
+		GEO_PrimVolume *vol = NULL;
+		const GEO_Primitive *prim = NULL;
 		
-		GA_RWHandleV3 Phandle( ptAttribRef );
+		if (nprims > 0)
+    	{
+        	GA_Offset primoff = gdp->primitiveOffset( GA_Index( 0 ) );
+        	prim = gdp->getGEOPrimitive( primoff );
+        	if ( prim->getTypeId() == GEO_PRIMVOLUME )
+			{
+            	vol = ( GEO_PrimVolume *) prim;
+			}
+    	}
+        
+		if (vol == NULL)
+        {
+            GA_RWAttributeRef ptAttribRef = gdp->findAttribute(GA_ATTRIB_POINT, this->writeAttributeName->buffer() );
 
-	    GA_Offset ptoff;
-		
-		// need to check here whether there's enough room for the copy
-		// also need to check the incoming geometry type, mainly whether it's points or voxels, and switch the copy method.
-	    GA_FOR_ALL_PTOFF(gdp, ptoff)
-	    {
-			//if ((ptoff % 10000) == 0)
-			//{
-			//	cout << "making rgb, rReagent: " << rReagent << " offset " << this->getReagentOffset(rReagent,true) << "\n";
-			//	cout << "making rgb, gReagent: " << gReagent << " offset " << this->getReagentOffset(gReagent,true) << "\n";
-			//	cout << "making rgb, bReagent: " << bReagent << " offset " << this->getReagentOffset(bReagent,true) << "\n";
-			//}
+		    if (!ptAttribRef.isValid())
+		    {
+			    //cout << "Attrib not found, creating it.\n";
+			    ptAttribRef = gdp->addFloatTuple(GA_ATTRIB_POINT, "Cd", 3, GA_Defaults(0.0));
+			    ptAttribRef.setTypeInfo(GA_TYPE_COLOR);
+		    }
 
-			UT_Vector3 Pvalue = Phandle.get( ptoff );
-			Pvalue.x() = ( rReagent < 0 ) ? 0 : rd_data[ptoff + this->getReagentOffset(rReagent) * this->reagent_block_size];
-			Pvalue.y() = ( gReagent < 0 ) ? 0 : rd_data[ptoff + this->getReagentOffset(gReagent) * this->reagent_block_size];
-			Pvalue.z() = ( bReagent < 0 ) ? 0 : rd_data[ptoff + this->getReagentOffset(bReagent) * this->reagent_block_size];
+		    GA_RWHandleV3 Phandle( ptAttribRef );
+	        GA_Offset ptoff;
 
-			Phandle.set( ptoff, Pvalue );
-	    }
-		
-		// if writing to a voxel primitive
-		//UT_VoxelArrayF *vox;
-		//UT_VoxelArrayIterator vit;
-		//vit.setArray(vox);
-		//for (vit.rewind(); !vit.atEnd(); vit.advance())
-		//{
-	    //	writeLoc = vit.x() + vit.y() * xSize + vit.z() * xSize * ySize;
-		//  //vit.setArray may be able to use this eventually
-		//  vit.setValue( rd_data[ writeLoc ] );
-		//total += vit.getValue();
-		//}
+		    // need to check here whether there's enough room for the copy
+		    // also need to check the incoming geometry type, mainly whether it's points or voxels, and switch the copy method.
+	        GA_FOR_ALL_PTOFF(gdp, ptoff)
+	        {
+			    UT_Vector3 Pvalue = Phandle.get( ptoff );
+			    Pvalue.x() = ( rReagent < 0 ) ? 0 : rd_data[ptoff + this->getReagentOffset(rReagent) * this->reagent_block_size];
+			    Pvalue.y() = ( gReagent < 0 ) ? 0 : rd_data[ptoff + this->getReagentOffset(gReagent) * this->reagent_block_size];
+			    Pvalue.z() = ( bReagent < 0 ) ? 0 : rd_data[ptoff + this->getReagentOffset(bReagent) * this->reagent_block_size];
+
+			    Phandle.set( ptoff, Pvalue );
+	        }
+		} else {
+            //cout << "Volume prim copy mode\n";
+		    // if writing to a voxel primitive
+		    UT_VoxelArrayWriteHandleF handle = vol->getVoxelWriteHandle();
+            handle->size(this->system_resx, this->system_resy, this->system_resz);
+            
+            for (int z = 0; z < this->system_resz; z++)
+            {
+                for (int y = 0; y < this->system_resy; y++)
+                {
+                    for (int x = 0; x < this->system_resx; x++)
+                    {
+                        unsigned long offset = x + y * this->system_resx + z * this->system_resx * this->system_resy;
+                        float v = rd_data[offset + this->getReagentOffset(0) * this->reagent_block_size];
+                        handle->setValue(x, y, z, v);
+                    }
+                }
+            }
+
+            
+            /*UT_VoxelArrayF *vox;
+		    UT_VoxelArrayIterator vit;
+		    vit.setArray(vol);
+		    for (vit.rewind(); !vit.atEnd(); vit.advance())
+		    {
+	            writeLoc = vit.x() + vit.y() * xSize + vit.z() * xSize * ySize;
+		        // May be able to use this eventually: vit.setArray()
+		        vit.setValue( rd_data[ writeLoc ] );
+                //total += vit.getValue();
+		    }*/
+            
+            //vol.setVoxels( voxArray );
+        }
 		//cout << "Updating system from parms.\n";
 		this->last_cooked_frame = frame;
 	

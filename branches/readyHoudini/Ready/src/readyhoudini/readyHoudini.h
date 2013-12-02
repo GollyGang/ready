@@ -66,7 +66,8 @@ public:
 	readyHoudini(OP_Network *net, const char *name, OP_Operator *op);
     virtual ~readyHoudini();
 
-    static PRM_Template		 myTemplateList[];
+	static PRM_Template          myTemplateList[];
+    //static PRM_Template		 getTemplateList();
     static OP_Node		*myConstructor(OP_Network*, const char *,
 							    OP_Operator *);
 	void initRenderProperties( Properties &render_settings );
@@ -81,7 +82,7 @@ public:
 	bool strInPrmNameList( std::string parmName, PRM_Name* prmNameList, int listLength );
 	bool parmNameInPrmNameList( PRM_Name parmName, PRM_Name* prmNameList, int listLength );
 	void clearSpareParmsNotInList( PRM_Name *oldParmNames, int numOldParms, PRM_Name* newParmNames, int numNewParms );
-	void updateCopyBuffersAndMap( int rReagent, int bReagent, int cReagent );
+	void updateCopyBuffersAndMap( int rReagent, int bReagent, int cReagent, int xres, int yres, int zres );
 	void updateCopyBuffersIfNeeded( bool force );
 	int getReagentOffset( int baseReagentIndex );
 
@@ -96,6 +97,16 @@ private:
 	float last_cooked_frame;
 	int steps_per_frame;
 	int step_count;
+	
+	int system_resx;
+	int system_resy;
+	int system_resz;
+	
+	int X_RES() { INT_PARM("xRes", 0, 0, 0) }
+	int Y_RES() { INT_PARM("yRes", 0, 0, 0) }
+	int Z_RES() { INT_PARM("zRes", 0, 0, 0) }
+	int REGEN() { INT_PARM("regenerateInitialState", 0, 0, 0) }
+	
 	bool is_opencl_available;
 	int opencl_platform; // TODO: get from houdini context
 	int opencl_device; // TODO: get from houdini context
@@ -122,7 +133,7 @@ private:
 	int reagentG;
 	int reagentB;
 	
-	float START_FRAME() { FLOAT_PARM("startFrame", 0, 0, 0) }
+	int START_FRAME() { INT_PARM("startFrame", 0, 0, 0) }
 	int STEPS_PER_FRAME() { INT_PARM("stepsPerFrame", 0, 0, 0) }
 	void VTIFILE(UT_String &path, fpreal t) { evalString(path, "vtiFile", 0, t); }
 	void WRITEATTRIBNAME(UT_String &path, fpreal t) { evalString(path, "writeAttribute", 0, t); }
