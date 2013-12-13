@@ -22,7 +22,7 @@ cmake_policy( SET CMP0003 NEW )
 
 project( Ready )
 
-set( READY_VERSION 0.6 )   # check matches Help/about.html
+set( READY_VERSION 0.7beta )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
@@ -166,6 +166,7 @@ set( PATTERN_FILES
   Patterns/Experiments/orbits_sharpWaves-init_djw.vti
   Patterns/Experiments/grayscott-historyWave_coralGrow_djw.vti
   Patterns/Experiments/gladman_vermiformSolitons.vti
+  Patterns/Experiments/LifeBlur.vti
 )
 
 set( HELP_FILES
