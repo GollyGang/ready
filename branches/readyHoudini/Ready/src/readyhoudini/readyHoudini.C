@@ -59,13 +59,16 @@ void readyHoudini::initRenderProperties(Properties &render_settings)
     render_settings.AddProperty( Property("color_displacement_mapped_surface",true) );
     render_settings.AddProperty( Property("use_image_interpolation",true) );
     render_settings.AddProperty( Property("timesteps_per_render",100) );
-	
-	cout << "initRenderProperties called.\n";
+    render_settings.AddProperty( Property("show_phase_plot",false) );
+	render_settings.AddProperty( Property("phase_plot_x_axis","chemical","a") );
+	render_settings.AddProperty( Property("phase_plot_y_axis","chemical","b") );
+	render_settings.AddProperty( Property("phase_plot_z_axis","chemical","c") );	
+	// cout << "initRenderProperties called.\n";
 }
 
 void newSopOperator(OP_OperatorTable *table)
 {
-	 cout << "Defining ready_rd compiled operator type . . .\n";
+	 //cout << "Defining ready_rd compiled operator type . . .\n";
      table->addOperator(new OP_Operator("ready_rd",
 					"Ready RD",
 					 readyHoudini::myConstructor,
@@ -73,7 +76,7 @@ void newSopOperator(OP_OperatorTable *table)
 					 1,
 					 1,
 					 0));
-	 cout << "Done.\n";
+	 //cout << "Done.\n";
 }
 
 // SOP Parameters.
@@ -98,13 +101,14 @@ int * readyHoudini::indexOffsets = 0;
 static PRM_Default parm_defaults[] =
 {
 	//PRM_Default(0, "/home/dan/bin/ready/Patterns/grayscott-djw/grayscott_demo_worms_moreDiffuse_256.vti"), //file
-	PRM_Default(0, "/home/dan/bin/ready/Patterns/grayscott-sharpenTweak/grayscott-evolvingMask-extra_flowyDots-liveBubbles.vti"), //file
+	//PRM_Default(0, "/home/dan/bin/ready/Patterns/grayscott-sharpenTweak/grayscott-evolvingMask-extra_flowyDots-liveBubbles.vti"), //file
+	PRM_Default(0, "/home/dan/bin/ready-0.6/Patterns/grayscott-withWave/grayscott-historyWave_wormDotWaves_dustMotes_2.vti"), //file
 	PRM_Default(0, "Cd"), //attribname
 	PRM_Default(1.0f), // startFrame
 	PRM_Default(100), //steps
-	PRM_Default(2), //reagentZero
-	PRM_Default(3), //reagentOne
-	PRM_Default(1), //reagentMinusOne
+	PRM_Default(0), //reagentZero
+	PRM_Default(0), //reagentOne
+	PRM_Default(0), //reagentMinusOne
 	PRM_Default( 256 ), //xres
     PRM_Default( 256 ), //yres
     PRM_Default( 1 ), //zres
@@ -144,18 +148,18 @@ PRM_Template readyHoudini::myTemplateList[] =
 
 OP_Node * readyHoudini::myConstructor(OP_Network *net, const char *name, OP_Operator *op)
 {
-	cout << "RD Constructor.\n";
+	// cout << "RD Constructor.\n";
     return new readyHoudini(net, name, op);
 }
 
 readyHoudini::readyHoudini(OP_Network *net, const char *name, OP_Operator *op)
 	: SOP_Node(net, name, op)
 {
-	cout << "RD self-constructor.\n";
+	// cout << "RD self-constructor.\n";
 	this->render_settings = new Properties("render_settings");
-	cout << "Init settings object..\n";
+	// cout << "Init settings object..\n";
     initRenderProperties( *this->render_settings );
-	cout << "Make test RD sim object from file..\n";
+	// cout << "Make RD sim object from file..\n";
 	// Houdini CE_Context - this will initialize Houdini OpenCL
 	this->is_opencl_available = true;
     this->opencl_platform = 0; // TODO: get from houdini context
@@ -179,12 +183,12 @@ readyHoudini::readyHoudini(OP_Network *net, const char *name, OP_Operator *op)
 	cl::Context clcontext = cecontext->getCLContext();
 	// raw clContext handle
 	this->raw_context = clcontext();
-	cout << "Got cl_context from houdini.\n";
+	// cout << "Got cl_context from houdini.\n";
 	//const char *test_file = "/home/dan/bin/ready/Patterns/grayscott-djw/grayscott_demo_worms_moreDiffuse_256.vti";
 	
     //this->updateVtiFile( test_file );
 	//this->loadedVtiName = new UT_String( test_file, true );
-	cout << "Constructor finished.\n";
+	// cout << "Constructor finished.\n";
 }
 
 //static void capitalize(char *sPtr)
@@ -315,19 +319,19 @@ void readyHoudini::updateCopyBuffersIfNeeded( bool force )
 	int yres = this->system->GetY();
 	int zres = this->system->GetZ(); 
     
-    cout << "Stored dims: (" << this->system_resx << "," << this->system_resy << "," << this->system_resz << ")\n";
-    cout << "System dims: (" << xres << "," << yres << "," << zres << ")\n";
+    // cout << "Stored dims: (" << this->system_resx << "," << this->system_resy << "," << this->system_resz << ")\n";
+    // cout << "System dims: (" << xres << "," << yres << "," << zres << ")\n";
     
 	if ( force || (this->reagentR != rReagent) || (this->reagentG != gReagent) || (this->reagentB != bReagent) || (this->rd_data == NULL) || (this->system_resx != xres) || (this->system_resy != yres) || (this->system_resz != zres))
 	{
-		cout << "Need to update copyBuffersAndMap.\n";
+		// cout << "Need to update copyBuffersAndMap.\n";
 		this->updateCopyBuffersAndMap( rReagent, gReagent, bReagent, xres, yres, zres );
 	}
 }
 
 void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bReagent, int xres, int yres, int zres )
 {
-	cout << "Starting updateCopyBuffersAndMap.\n";
+	// cout << "Starting updateCopyBuffersAndMap.\n";
 	int copyCount = 0;
 	for ( int k=0; k<this->num_reagents; k++ )
 	{
@@ -350,10 +354,10 @@ void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bRea
     this->system_resy = yres;
     this->system_resz = zres;
     
-    int old_block_size = this->reagent_block_size;
+    //int old_block_size = this->reagent_block_size;
     this->reagent_block_size = sizeof(float) * xres * yres * zres;
     
-    cout << "Old/New block size: " << old_block_size << " / " << this->reagent_block_size << "\n";
+    // cout << "Old/New block size: " << old_block_size << " / " << this->reagent_block_size << "\n";
     
 	this->numCopyReagents = copyCount;
 	// cout << "Copying: " << this->numCopyReagents << " reagents.\n";
@@ -379,14 +383,14 @@ void readyHoudini::updateCopyBuffersAndMap( int rReagent, int gReagent, int bRea
 void readyHoudini::updateVtiFile( const char *update_file )
 {
     
-    cout << "Loading vti: " << update_file << "\n";
+    // cout << "Loading vti: " << update_file << "\n";
 	if ( this->system != NULL )
 	{
 		delete this->system;
 	}
-	cout << "Deleted system.\n";
+	// cout << "Deleted system.\n";
     this->system = SystemFactory::CreateFromFile(update_file,this->is_opencl_available,this->opencl_platform,this->opencl_device,this->raw_context,*this->render_settings,this->warn_to_update);
-	cout << "Loaded system.\n";
+	// cout << "Loaded system.\n";
 	
 	this->last_cooked_frame = FLT_MIN;
 	this->system->Update( 0 );
@@ -395,10 +399,10 @@ void readyHoudini::updateVtiFile( const char *update_file )
     
 	if ( strcmp( this->loadedVtiName->buffer(), update_file ) == 0 )
     {
-        cout << "Vti same.\n";//, setting dims: (" << this->system_resx << "," << this->system_resy << "," << this->system_resz << ")\n";
+        // cout << "Vti same.\n";//, setting dims: (" << this->system_resx << "," << this->system_resy << "," << this->system_resz << ")\n";
         //this->system->SetDimensions( this->system_resx, this->system_resy, this->system_resz ); 
     } else {
-        cout << "Vti different, getting res.\n";
+        // cout << "Vti different, getting res.\n";
         this->system_resx = system->GetX();
         this->system_resy = system->GetY();
         this->system_resz = system->GetZ();
@@ -411,28 +415,28 @@ void readyHoudini::updateVtiFile( const char *update_file )
 	this->reagent_block_size = sizeof(float) * this->system->GetX() * this->system->GetY() * this->system->GetZ();
 	int nreagents = this->system->GetNumberOfChemicals();
 	
-	cout << "Num reagents:" << nreagents << "\n";
+	// cout << "Num reagents:" << nreagents << "\n";
 	this->old_num_parameters = this->num_parameters;
 	//needs to get deleted
 	this->oldParmNames = new PRM_Name[ this->old_num_parameters ];
 	for ( int j=0; j < this->old_num_parameters; j++ )
 	{
-		cout << "saving old parm name: " << parmNames[j].getToken() << "\n";
+		// cout << "saving old parm name: " << parmNames[j].getToken() << "\n";
 		this->oldParmNames[j] = PRM_Name( strdup( parmNames[j].getToken() ), strdup( parmNames[j].getToken() ) );
 	}
 		
 	if ( ( this->reagentCopyMap == NULL ) || (this->num_reagents != nreagents) || (this->reagent_block_size != oldBlockSize) )
 	{
-		cout << "(Re)creating reagentCopyMap.\n";
+		// cout << "(Re)creating reagentCopyMap.\n";
 		delete this->reagentCopyMap;
 		this->num_reagents = nreagents;
 		this->reagentCopyMap = new int[this->num_reagents]; //allocate num_reagents, but only copyCount of these will be used
-		cout << "Updating copy buffers (force)..\n";
+		// cout << "Updating copy buffers (force)..\n";
 		this->updateCopyBuffersIfNeeded( true );
 
 	} else {
 	
-		cout << "Updating copy buffers (if needed)..\n";
+		// cout << "Updating copy buffers (if needed)..\n";
 		this->updateCopyBuffersIfNeeded( false );
 	}
 	
@@ -495,38 +499,61 @@ void readyHoudini::updateVtiFile( const char *update_file )
 	//this->getParmsToAdd( newParmList, templateList, nTemplates, parmNames, nParmNames );
 	
 	//remove just the ones we're not about to add:
-	cout << "clearning spare parms not in list...\n";
+	// cout << "clearning spare parms not in list...\n";
 	this->clearSpareParmsNotInList( this->oldParmNames, this->old_num_parameters, this->parmNames, this->num_parameters );
 	//this->clearSpareParms();
 	
 	if (addedParmCount > 0)
 	{
 		//add the (new) parms
-		cout << "adding new parms...\n";
+		// cout << "adding new parms...\n";
 		this->addSpareParms( templateList, NULL );
 	}
 	delete this->loadedVtiName;
-	cout << "Deleted loadedVtiName.\n";
+	// cout << "Deleted loadedVtiName.\n";
 	//cout << ".. new update file .. :" << this->loadedVtiName->buffer() << "\n";
 	this->loadedVtiName = new UT_String( update_file, true );
-	cout << "loaded VTI.." << this->loadedVtiName->buffer() << "\n";
-	cout << "VTI update finished.\n";
+	// cout << "loaded VTI.." << this->loadedVtiName->buffer() << "\n";
+	// cout << "VTI update finished.\n";
 }
 
 
 readyHoudini::~readyHoudini()
 {
+	cout << "Destruktor 1\n";
 	delete this->render_settings; // a Properties object
+	cout << "Destruktor 1.1\n";
 	delete this->system; // an AbstractRD-derived object
+	cout << "Destruktor 1.2\n";
 	delete this->loadedVtiName;
+	cout << "Destruktor 1.3\n";
 	delete this->parmValues;
-	delete this->parmNames;
+	cout << "Destruktor 1.4\n";
+	//CRASH!
+	if (this->parmNames != NULL) 
+	{
+		cout << "Destruktor 1.4.1\n";
+		delete[] this->parmNames;
+	}
+	cout << "Destruktor 1.5\n";
+	if (this->oldParmNames != NULL) 
+	{
+		cout << "Destruktor 1.5.1\n";
+		delete[] this->oldParmNames;
+	}
+	cout << "Destruktor 1.6\n";
 	delete this->reagentCopyMap;
+	cout << "Destruktor 2\n";
+	if ( this->writeAttributeName != NULL )
+	{
+		delete this->writeAttributeName;
+	}
+	cout << "Destruktor 3\n";
 	if ( this->num_reagents > 0 )
 	{
 		delete this->rd_data;
 	}
-	cout << "RD Destructor.\n";
+	cout << "Destruktor 4 (end)\n";
 }
 
 float readyHoudini::float_parm( const char *name, int idx, int vidx, fpreal t )
@@ -557,7 +584,7 @@ bool readyHoudini::parmChanged( OP_Context &context )
 	int bReagent = REAGENT_B();
 	if ( (this->reagentR != rReagent) || (this->reagentG != gReagent) || (this->reagentB != bReagent) )
 	{
-		cout << "Reagent mapping changed.\n";
+		// cout << "Reagent mapping changed.\n";
 		return true;
 	}
     
@@ -566,7 +593,7 @@ bool readyHoudini::parmChanged( OP_Context &context )
 	int zres = Z_RES();
 	if ( (this->system_resx != xres) || (this->system_resy != yres) || (this->system_resz != zres) )
 	{
-		cout << "Sim res changed.\n";
+		// cout << "Sim res changed.\n";
 		return true;
 	}
     
@@ -647,7 +674,7 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 	
 	UT_String writeAttrib;
 	WRITEATTRIBNAME( writeAttrib, 0 );
-	
+	delete this->writeAttributeName;
 	this->writeAttributeName = new UT_String( writeAttrib.buffer(), true );
 	
 	int rReagent = REAGENT_R();
@@ -666,7 +693,7 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 	
 	if ( this->last_cooked_frame == FLT_MIN )
 	{
-		cout << "last_cooked_frame INIT to: " << frame << "\n";
+		// cout << "last_cooked_frame INIT to: " << frame << "\n";
 		this->last_cooked_frame = frame;
 		//don't solve on the first frame
 	}
@@ -702,24 +729,49 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 		
 		GA_Size nprims = gdp->getNumPrimitives();
 		//cout << "nprims: " << nprims << "\n";
-		GEO_PrimVolume *vol = NULL;
 		const GEO_Primitive *prim = NULL;
+		int nvols = 0;
 		
+		//should probably just use a growable data structure here rather than iterating twice
 		if (nprims > 0)
     	{
-        	GA_Offset primoff = gdp->primitiveOffset( GA_Index( 0 ) );
-        	prim = gdp->getGEOPrimitive( primoff );
-        	if ( prim->getTypeId() == GEO_PRIMVOLUME )
+			for (int i=0; i<nprims;i++)
 			{
-            	vol = ( GEO_PrimVolume *) prim;
+	        	GA_Offset primoff = gdp->primitiveOffset( GA_Index( i ) );
+    	    	prim = gdp->getGEOPrimitive( primoff );
+        		if ( prim->getTypeId() == GEO_PRIMVOLUME ) //and in some group, would be nice
+				{
+					nvols += 1;
+				}
 			}
     	}
-        
-		if (vol == NULL)
+		
+		GEO_PrimVolume *vols[nvols];
+		
+        if (nvols > 0)
         {
+			int donecount = 0;
+			//vols = new GEO_PrimVolume*[ nvols ];
+			
+			for (int i=0; i<nprims;i++)
+			{
+	        	GA_Offset primoff = gdp->primitiveOffset( GA_Index( i ) );
+    	    	prim = gdp->getGEOPrimitive( primoff );
+        		if ( prim->getTypeId() == GEO_PRIMVOLUME ) //and in some group, would be nice
+				{
+					vols[donecount] = ( GEO_PrimVolume * ) prim;
+					donecount += 1;
+				}
+			}
+		}
+		// donecount should be == nvols at this point
+		
+		if (nvols <= 0)
+        {
+			//attribute mode
             GA_RWAttributeRef ptAttribRef = gdp->findAttribute(GA_ATTRIB_POINT, this->writeAttributeName->buffer() );
 
-		    if (!ptAttribRef.isValid())
+		    if ( !ptAttribRef.isValid() )
 		    {
 			    //cout << "Attrib not found, creating it.\n";
 			    ptAttribRef = gdp->addFloatTuple(GA_ATTRIB_POINT, "Cd", 3, GA_Defaults(0.0));
@@ -741,24 +793,36 @@ OP_ERROR readyHoudini::cookMySop(OP_Context &context)
 			    Phandle.set( ptoff, Pvalue );
 	        }
 		} else {
-            //cout << "Volume prim copy mode\n";
-		    // if writing to a voxel primitive
-		    UT_VoxelArrayWriteHandleF handle = vol->getVoxelWriteHandle();
-            handle->size(this->system_resx, this->system_resy, this->system_resz);
-            
-            for (int z = 0; z < this->system_resz; z++)
-            {
-                for (int y = 0; y < this->system_resy; y++)
-                {
-                    for (int x = 0; x < this->system_resx; x++)
-                    {
-                        unsigned long offset = x + y * this->system_resx + z * this->system_resx * this->system_resy;
-                        float v = rd_data[offset + this->getReagentOffset(0) * this->reagent_block_size];
-                        handle->setValue(x, y, z, v);
-                    }
-                }
-            }
-
+			//currently, nvols had better be less than three! :/ need to fix that.
+			for ( int j = 0; j < nvols; j++ )
+			{
+            	//cout << "Volume prim copy mode\n";
+		    	// if writing to a voxel primitive
+		    	UT_VoxelArrayWriteHandleF handle = vols[j]->getVoxelWriteHandle();
+            	handle->size(this->system_resx, this->system_resy, this->system_resz);
+				int roffs = 0;
+				if (j==0) roffs = rReagent;
+				if (j==1) roffs = gReagent;
+				if (j==2) roffs = bReagent;
+				
+				int reagentOffset = this->getReagentOffset(roffs);
+				long int reagentBlockSize = this->reagent_block_size;
+				
+				//cout << "Copying into volume number: " << j << " with offset/block size: " << reagentOffset << " / " << reagentBlockSize << "\n";
+				
+            	for (int z = 0; z < this->system_resz; z++)
+            	{
+                	for (int y = 0; y < this->system_resy; y++)
+                	{
+                    	for (int x = 0; x < this->system_resx; x++)
+                    	{
+                        	unsigned long offset = x + y * this->system_resx + z * this->system_resx * this->system_resy;
+                        	float v = rd_data[offset + reagentOffset * reagentBlockSize ];
+                        	handle->setValue(x, y, z, v);
+                    	}
+                	}
+            	}
+			}
             
             /*UT_VoxelArrayF *vox;
 		    UT_VoxelArrayIterator vit;
