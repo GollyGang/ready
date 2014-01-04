@@ -1,4 +1,4 @@
-#  Copyright 2011, 2012, 2013 The Ready Bunch
+#  Copyright 2011, 2012, 2013, 2014 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -157,6 +157,7 @@ set( PATTERN_FILES
   Patterns/Schrodinger1926/packet.vti             Patterns/Schrodinger1926/packet_reflect.vti
   Patterns/Schrodinger1926/packet_pass.vti        Patterns/Schrodinger1926/quantum_tunnelling.vti
   Patterns/Schrodinger1926/packet_reflect2D.vti
+  Patterns/Froese2014/Froese2014_Fig3.vti
   Patterns/Experiments/mutually-catalytic_spots.vti
   Patterns/Experiments/cglrd_ramps_example_djw.vti  
   Patterns/Experiments/grayscott-historyWave_fuseWorms.vti
