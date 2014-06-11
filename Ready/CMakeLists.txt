@@ -168,6 +168,7 @@ set( PATTERN_FILES
   Patterns/Experiments/grayscott-historyWave_coralGrow_djw.vti
   Patterns/Experiments/gladman_vermiformSolitons.vti
   Patterns/Experiments/LifeBlur.vti
+  Patterns/Experiments/MandelbrotWorms_CornusAmmonis.vti
 )
 
 set( HELP_FILES
