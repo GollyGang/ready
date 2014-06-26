@@ -97,6 +97,7 @@ include_directories( resources )
 
 set( PATTERN_FILES
   Patterns/Meinhardt1982/stripes.vti       Patterns/Meinhardt1982/zebra.vtu
+  Patterns/advection.vti
   Patterns/Schlogl.vti 
   Patterns/heat_equation.vti 
   Patterns/Turing1952/spots.vti            Patterns/Turing1952/spots_noisy.vti
