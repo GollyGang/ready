@@ -159,6 +159,7 @@ set( PATTERN_FILES
   Patterns/Schrodinger1926/packet_pass.vti        Patterns/Schrodinger1926/quantum_tunnelling.vti
   Patterns/Schrodinger1926/packet_reflect2D.vti
   Patterns/Froese2014/Froese2014_Fig3.vti
+  Patterns/Pennybacker2013/phyllotaxis_fibonacci.vti Patterns/Pennybacker2013/phyllotaxis_hexagons.vti
   Patterns/Experiments/mutually-catalytic_spots.vti
   Patterns/Experiments/cglrd_ramps_example_djw.vti  
   Patterns/Experiments/grayscott-historyWave_fuseWorms.vti
