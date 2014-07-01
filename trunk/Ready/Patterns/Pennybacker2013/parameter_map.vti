@@ -8,7 +8,7 @@
       Despite only having a single chemical a complex range of patterns is possible.
       
       In this simplified version the gradient term is not present but the core pattern-formation mechanism remains. This parameter
-      map shows the parameter mu varying from -1 on the left to 1 on the right, and beta varying from -3 at the bottom to 3 at the top.
+      map shows the parameter mu varying from -1 on the left to 5 on the right, and beta varying from -3 at the bottom to 3 at the top.
     </description>
     
     <rule name="phyllotaxis" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
