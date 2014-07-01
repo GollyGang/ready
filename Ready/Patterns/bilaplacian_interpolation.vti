@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+  
+    <description>
+        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Biharmonic_equation&quot;&gt;biharmonic equation&lt;/a&gt; says that the biharmonic (or bilaplacian) operator gives a value of zero everywhere. We approach this by
+        applying this formula:
+        
+        da/dt = -bilaplacian(a)
+        
+        which says that the rate of change is given by the negative of the bilaplacian operator. Compare this with the result of the laplacian operator, in 
+        &lt;a href=&quot;open:Patterns/heat_equation_interpolation.vti&quot;&gt;heat_equation_interpolation.vti&lt;/a&gt;.
+        
+        To provide boundary conditions we use a fixed pattern in channel b.
+    </description>
+    
+    <rule name="Biharmonic equation" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
+__kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
+{
+    const int index_x = get_global_id(0);
+    const int index_y = get_global_id(1);
+    const int index_z = get_global_id(2);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int Z = get_global_size(2);
+
+    const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xm2 = ((index_x-2+X) &amp; (X-1));
+    const int xp1 = ((index_x+1) &amp; (X-1));
+    const int xp2 = ((index_x+2) &amp; (X-1));
+    const int ym1 = ((index_y-1+Y) &amp; (Y-1));
+    const int ym2 = ((index_y-2+Y) &amp; (Y-1));
+    const int yp1 = ((index_y+1) &amp; (Y-1));
+    const int yp2 = ((index_y+2) &amp; (Y-1));
+    const int index_here = X*(Y*index_z + index_y) + index_x;
+    const int index_n =  X*(Y*index_z + ym1) + index_x;
+    const int index_n2 =  X*(Y*index_z + ym2) + index_x;
+    const int index_ne = X*(Y*index_z + ym1) + xp1;
+    const int index_e =  X*(Y*index_z + index_y) + xp1;
+    const int index_e2 =  X*(Y*index_z + index_y) + xp2;
+    const int index_se = X*(Y*index_z + yp1) + xp1;
+    const int index_s =  X*(Y*index_z + yp1) + index_x;
+    const int index_s2 =  X*(Y*index_z + yp2) + index_x;
+    const int index_sw = X*(Y*index_z + yp1) + xm1;
+    const int index_w =  X*(Y*index_z + index_y) + xm1;
+    const int index_w2 =  X*(Y*index_z + index_y) + xm2;
+    const int index_nw = X*(Y*index_z + ym1) + xm1;
+    float a = a_in[index_here];
+    float b = b_in[index_here];
+    float a_n = a_in[index_n];
+    float a_ne = a_in[index_ne];
+    float a_e = a_in[index_e];
+    float a_se = a_in[index_se];
+    float a_s = a_in[index_s];
+    float a_sw = a_in[index_sw];
+    float a_w = a_in[index_w];
+    float a_nw = a_in[index_nw];
+    float a_n2 = a_in[index_n2];
+    float a_e2 = a_in[index_e2];
+    float a_s2 = a_in[index_s2];
+    float a_w2 = a_in[index_w2];
+
+    float timestep = 0.0001f;
+    float h = 0.4f; // grid spacing
+    
+    // 5-point stencil for the Laplacian: [ 0,1,0; 1,-4,1; 0,1,0 ] / (h*h)
+    float laplacian = ( a_n + a_e + a_s + a_w - 4.0f * a ) / ( h * h );
+
+    // 13-point stencil for the Bi-Laplacian: [ 0,0,1,0,0; 0,2,-8,2,0; 1,-8,20,-8,1; 0,2,-8,2,0; 0,0,1,0,0 ] / (h*h*h*h)
+    float bilaplacian = ( a_n2 + a_e2 + a_s2 + a_w2 + 2.0f * ( a_ne + a_se + a_sw + a_nw ) 
+                          - 8.0f * ( a_n + a_e + a_s + a_w ) + 20.0f * a ) / ( h * h * h * h );
+
+    float delta_a = -bilaplacian * step(-0.01f,-b);
+    //float delta_a = laplacian * step(-0.01f,-b);
+    // (switch between these two to see the difference
+
+    a_out[index_here] = a + timestep * delta_a;
+    b_out[index_here] = b;
+}
+
+      </kernel>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="b">
+        <overwrite>
+          
+        </overwrite>
+        <constant value="0.7">
+          
+        </constant>
+        <rectangle>
+          <point3D x="0.2" y="0.2" z="0.4">
+            
+          </point3D>
+          <point3D x="0.4" y="0.8" z="0.6">
+            
+          </point3D>
+          
+        </rectangle>
+        
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>
+          
+        </overwrite>
+        <constant value="0.5">
+          
+        </constant>
+        <rectangle>
+          <point3D x="0.55" y="0.2" z="0.4">
+            
+          </point3D>
+          <point3D x="0.8" y="0.3" z="0.6">
+            
+          </point3D>
+          
+        </rectangle>
+        
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>
+          
+        </overwrite>
+        <constant value="1">
+          
+        </constant>
+        <circle radius="0.1">
+          <point3D x="0.7" y="0.8" z="0.6">
+            
+          </point3D>
+          
+        </circle>
+        
+      </overlay>
+      <overlay chemical="a">
+        <overwrite>
+          
+        </overwrite>
+        <other_chemical chemical="b">
+          
+        </other_chemical>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+      
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="1">
+        
+      </color_low>
+      <color_high r="1" g="0" b="0">
+        
+      </color_high>
+      <show_color_scale value="true">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="true">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="a">
+        
+      </active_chemical>
+      <low value="0">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="50">
+        
+      </vertical_scale_2D>
+      <contour_level value="0.25">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="true">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="true">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="false">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="100">
+        
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+        
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+        
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+        
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+        
+      </phase_plot_z_axis>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
