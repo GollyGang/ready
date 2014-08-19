@@ -36,7 +36,7 @@ of the parameters must be altered. Some examples:
 Recording...</a> to produce a sequence of images. Then use your favorite utility to make a video 
 file. For example in <a href="http://ffmpeg.org/">FFmpeg</a> the following command makes a high 
 quality <a href="http://en.wikipedia.org/wiki/MPEG-4">MPEG-4</a> video at 50 frames per second: 
-<br><tt>ffmpeg -r 50 -i frame_%06d.png video.mp4</tt>
+<br><tt>ffmpeg -r 50 -i frame_%06d.png -vb 5000k -vcodec libx264 video.mp4</tt>
 <li>If your 3D mesh resolution is too low, use an external tool like 
 <a href="http://meshlab.sourceforge.net">MeshLab</a> to subdivide it before importing into Ready.
 <li><a href="http://www.paraview.org">ParaView</a> can load the output of Ready (vtu and vti files) 
