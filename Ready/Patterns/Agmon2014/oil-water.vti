@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+
+    <description>
+      A model of two mutually-repelling fluids, such as oil and water, undergoing phase separation.
+      
+      Eran Agmon, Alexander J. Gates, Valentin Churavy and Randall D. Beer (2014)
+      "Quantifying robustness in a spatial model of metabolism-boundary co-construction"
+      &lt;a href=&quot;http://mitpress.mit.edu/sites/default/files/titles/content/alife14/978-0-262-32621-6-ch082.pdf&quot;&gt;[PDF]&lt;/a&gt;
+      
+    </description>
+    
+    <rule name="oil-water" type="kernel">
+      <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
+float2 repulsion_potential( float a, float b ) {
+    // given values a and b at a location, what is the repulsion potential for chemicals a and b?
+    const float repulsion_constant = 0.7f;
+    return repulsion_constant * (float2)( b, a );
+}
+
+float bias( float delta ) {
+    if( fabs(delta) &lt; 1E-6f )
+        return 1.0f;
+    else
+        return delta / ( 1.0f - exp(-delta) );
+}
+
+#define n_neighbors 8
+
+__kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
+{
+    const int index_x = get_global_id(0);
+    const int index_y = get_global_id(1);
+    const int index_z = get_global_id(2);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int Z = get_global_size(2);
+    const int index_here = X*(Y*index_z + index_y) + index_x;
+    const float a = a_in[index_here];
+    const float b = b_in[index_here];
+
+    const int dx_neighbors[ n_neighbors ] = { 0, 1, 1, 1, 0, -1, -1, -1 }; // Moore neighborhood
+    const int dy_neighbors[ n_neighbors ] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+
+    // first find repulsion potential in center
+    float2 repulsion_potential_center = repulsion_potential( a, b );
+    for( int i = 0; i &lt; n_neighbors; ++i ) {
+        const int tx = ( index_x + dx_neighbors[i] + X ) &amp; (X-1); // wrap (assumes X is a power of 2)
+        const int ty = ( index_y + dy_neighbors[i] + Y ) &amp; (Y-1); // wrap (assumes Y is a power of 2)
+        const int index_t =  X*(Y*index_z + ty) + tx;
+        repulsion_potential_center += repulsion_potential( a_in[ index_t ], b_in[ index_t ] );
+    }
+
+    // then find repulsion biases at each neighbor and accumulate the biased laplacian
+    float delta_a = 0.0f;
+    float delta_b = 0.0f;
+    for( int i = 0; i &lt; n_neighbors; ++i ) {
+        const int tx = ( index_x + dx_neighbors[i] + X ) &amp; (X-1); // wrap (assumes X is a power of 2)
+        const int ty = ( index_y + dy_neighbors[i] + Y ) &amp; (Y-1); // wrap (assumes Y is a power of 2)
+        const int index_t =  X*(Y*index_z + ty) + tx;
+        // find the repulsion potential of this neighbor
+        float2 repulsion_potential_neighbor = repulsion_potential( a_in[ index_t ], b_in[ index_t ] );
+        for( int j = 0; j &lt; n_neighbors; ++j ) {
+            const int sx = ( tx + dx_neighbors[j] + X ) &amp; (X-1); // wrap (assumes X is a power of 2)
+            const int sy = ( ty + dy_neighbors[j] + Y ) &amp; (Y-1); // wrap (assumes Y is a power of 2)
+            const int index_s =  X*(Y*index_z + sy) + sx;
+            repulsion_potential_neighbor += repulsion_potential( a_in[ index_s ], b_in[ index_s ] );
+        }
+        // sum the laplacian
+        float2 delta = repulsion_potential_center - repulsion_potential_neighbor;
+        float2 bias_to_neighbor = (float2)( bias( delta.x ), bias( delta.y ) );
+        float2 bias_from_neighbor = (float2)( bias( -delta.x ), bias( -delta.y ) );
+        delta_a += bias_from_neighbor.x * a_in[ index_t ] - bias_to_neighbor.x * a; // inflow - outflow
+        delta_b += bias_from_neighbor.y * b_in[ index_t ] - bias_to_neighbor.y * b;
+    }
+
+    // forward Euler integration
+    float timestep = 0.05f;
+    a_out[index_here] = a + timestep * delta_a;
+    b_out[index_here] = b + timestep * delta_b;
+}
+      </kernel>
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a"> <overwrite/> <white_noise low="0" high="1" /> <everywhere/> </overlay>
+      <overlay chemical="b"> <overwrite/> <white_noise low="0" high="1" /> <everywhere/> </overlay>
+    </initial_pattern_generator>
+
+    <render_settings>
+      <show_displacement_mapped_surface value="false" />
+      <show_multiple_chemicals value="false" />
+      <timesteps_per_render value="16" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
