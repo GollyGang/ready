@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+    <description>
+        The advection equation: da/dt = -da/dx
+        
+        After a while instabilities appear because we are using only simple numerical methods. This version uses two-step
+        Adams-Bashforth integration, with the gradient of the previous step stored in channel b. It gets much further than
+        forward Euler before noticeable errors appear.
+    </description>
+    <rule name="Advection" type="kernel">
+      <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
+__kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
+{
+    const int index_x = get_global_id(0);
+    const int index_y = get_global_id(1);
+    const int index_z = get_global_id(2);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int Z = get_global_size(2);
+    const int index_here = X*(Y*index_z + index_y) + index_x;
+
+    float a = a_in[index_here];
+    float b = b_in[index_here];
+ 
+    const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xp1 = ((index_x+1) &amp; (X-1));
+    const int index_e =  X*(Y*index_z + index_y) + xp1;
+    const int index_w =  X*(Y*index_z + index_y) + xm1;
+    float a_e = a_in[index_e];
+    float a_w = a_in[index_w];
+
+    float h = 0.1f; // grid spacing
+    float timestep = 0.01f;
+    float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
+    float delta_a = -x_gradient_a;
+    a_out[index_here] = a + 1.5f * timestep * delta_a - 0.5f * timestep * b;
+    b_out[index_here] = delta_a;
+    // two-step Adams-Bashforth, where b contains the gradient of
+    // the previous step 
+}
+      </kernel>
+      
+    </rule>
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite>
+          
+        </overwrite>
+        <gaussian height="1" sigma="0.05">
+          <point3D x="0.5" y="0.5" z="0.5">
+            
+          </point3D>
+          
+        </gaussian>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+      
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="1">
+        
+      </color_low>
+      <color_high r="1" g="0" b="0">
+        
+      </color_high>
+      <show_color_scale value="true">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="true">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="a">
+        
+      </active_chemical>
+      <low value="0">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="15">
+        
+      </vertical_scale_2D>
+      <contour_level value="0.25">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="true">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="true">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="8">
+        
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+        
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+        
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+        
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+        
+      </phase_plot_z_axis>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 0 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

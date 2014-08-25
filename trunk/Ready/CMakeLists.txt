@@ -174,6 +174,9 @@ set( PATTERN_FILES
   Patterns/Experiments/gladman_vermiformSolitons.vti
   Patterns/Experiments/LifeBlur.vti
   Patterns/Experiments/MandelbrotWorms_CornusAmmonis.vti
+  Patterns/Experiments/NumericalMethods/advection_forwardEuler.vti
+  Patterns/Experiments/NumericalMethods/advection_2stepAdamsBashforth.vti
+  Patterns/Experiments/NumericalMethods/advection_3stepAdamsBashforth.vti
   Patterns/Agmon2014/oil-water.vti
 )
 
