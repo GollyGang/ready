@@ -174,6 +174,7 @@ set( PATTERN_FILES
   Patterns/Experiments/gladman_vermiformSolitons.vti
   Patterns/Experiments/LifeBlur.vti
   Patterns/Experiments/MandelbrotWorms_CornusAmmonis.vti
+  Patterns/Agmon2014/oil-water.vti
 )
 
 set( HELP_FILES
