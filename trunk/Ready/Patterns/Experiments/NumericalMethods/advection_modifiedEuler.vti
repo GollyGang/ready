@@ -2,14 +2,18 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="4">
     <description>
-        The advection equation: da/dt = -da/dx
-        
-        This version uses two-step Adams-Bashforth integration, with the gradient of the previous step 
-        stored in channel b. It gets much further than forward Euler before noticeable errors appear.
+      The advection equation: da/dt = -da/dx
+
+      This method is modified Euler, where two time steps are taken and the result is the average 
+      of the start and end points. The modified Euler method is one of a family of second-order
+      Runge-Kutta methods (with the midpoint method and Heun's method).
+      
+      This implementation does the computation in two steps, so results appear in alternating frames.
     </description>
     <rule name="Advection" type="kernel">
-      <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
-__kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
+      <kernel number_of_chemicals="3" block_size_x="1" block_size_y="1" block_size_z="1">
+        __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *c_in,
+                                 __global float *a_out,__global float *b_out,__global float *c_out)
 {
     const int index_x = get_global_id(0);
     const int index_y = get_global_id(1);
@@ -21,22 +25,26 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
 
     float a = a_in[index_here];
     float b = b_in[index_here];
- 
+    float c = c_in[index_here];
+
     const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((index_x+1) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
     const int index_w =  X*(Y*index_z + index_y) + xm1;
     float a_e = a_in[index_e];
     float a_w = a_in[index_w];
+    float c_e = c_in[index_e];
+    float c_w = c_in[index_w];
 
     float h = 0.1f; // grid spacing
     float timestep = 0.01f;
     float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
+    float x_gradient_c = ( c_e - c_w ) / ( 2.0 * h );
     float delta_a = -x_gradient_a;
-    a_out[index_here] = a + 1.5f * timestep * delta_a - 0.5f * timestep * b;
-    b_out[index_here] = delta_a;
-    // two-step Adams-Bashforth, where b contains the gradient of
-    // the previous step 
+    float delta_c = -x_gradient_c;
+    a_out[index_here] = ( b + c + timestep*delta_c ) / 2.0f;
+    b_out[index_here] = a;
+    c_out[index_here] = a + timestep * delta_a;
 }
       </kernel>
       
@@ -146,6 +154,9 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
         AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
       </DataArray>
       <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
         AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
       </DataArray>
     </PointData>

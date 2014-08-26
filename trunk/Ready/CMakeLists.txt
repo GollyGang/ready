@@ -174,10 +174,17 @@ set( PATTERN_FILES
   Patterns/Experiments/gladman_vermiformSolitons.vti
   Patterns/Experiments/LifeBlur.vti
   Patterns/Experiments/MandelbrotWorms_CornusAmmonis.vti
+  Patterns/Agmon2014/oil-water.vti
   Patterns/Experiments/NumericalMethods/advection_forwardEuler.vti
   Patterns/Experiments/NumericalMethods/advection_2stepAdamsBashforth.vti
   Patterns/Experiments/NumericalMethods/advection_3stepAdamsBashforth.vti
-  Patterns/Agmon2014/oil-water.vti
+  Patterns/Experiments/NumericalMethods/advection_modifiedEuler.vti
+  Patterns/Experiments/NumericalMethods/advection_midpointMethod.vti
+  Patterns/Experiments/NumericalMethods/advection_HeunsMethod.vti
+  Patterns/Experiments/NumericalMethods/advection_LaxFriedrichs.vti
+  Patterns/Experiments/NumericalMethods/advection_LaxWendroff.vti
+  Patterns/Experiments/NumericalMethods/advection_RungeKutta4.vti
+  Patterns/Experiments/NumericalMethods/advection_staggeredLeapfrog.vti
 )
 
 set( HELP_FILES
