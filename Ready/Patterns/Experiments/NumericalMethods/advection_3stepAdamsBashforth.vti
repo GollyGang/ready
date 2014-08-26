@@ -4,8 +4,8 @@
     <description>
         The advection equation: da/dt = -da/dx
 
-        After a while instabilities appear because we are using only simple numerical methods. This version uses three-step
-        Adams-Bashforth integration, with the gradient of the previous two steps stored in channels b and c.
+        This version uses three-step Adams-Bashforth integration, with the gradient of the previous two steps 
+        stored in channels b and c. It gets further than the two-step version before noticeable errors appear.
     </description>
     <rule name="Advection" type="kernel">
       <kernel number_of_chemicals="3" block_size_x="1" block_size_y="1" block_size_z="1">
@@ -30,10 +30,10 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
     const int index_w =  X*(Y*index_z + index_y) + xm1;
     float a_e = a_in[index_e];
     float a_w = a_in[index_w];
+    
     float h = 0.1f; // grid spacing
     float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
     float delta_a = -x_gradient_a;
-
     float timestep = 0.01f;
     a_out[index_here] = a + ( timestep / 12.0f ) * ( 23.0f * delta_a - 16.0f * b + 5.0f * c );
     b_out[index_here] = delta_a;

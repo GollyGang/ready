@@ -3,11 +3,12 @@
   <RD format_version="4">
     <description>
         The advection equation: da/dt = -da/dx
-        
-        This version uses two-step Adams-Bashforth integration, with the gradient of the previous step 
-        stored in channel b. It gets much further than forward Euler before noticeable errors appear.
+
+        This is the Staggered Leapfrog version of the Lax-Friedrichs method. The delta is found from the neighbors
+        but applied to the central location not at the current timestep but at the one before, which is stored in
+        channel b.
     </description>
-    <rule name="Advection" type="kernel">
+    <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
 __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
 {
@@ -21,7 +22,7 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
 
     float a = a_in[index_here];
     float b = b_in[index_here];
- 
+
     const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((index_x+1) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
@@ -29,36 +30,22 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
     float a_e = a_in[index_e];
     float a_w = a_in[index_w];
 
-    float h = 0.1f; // grid spacing
+	float h = 0.1f; // grid spacing
     float timestep = 0.01f;
     float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
     float delta_a = -x_gradient_a;
-    a_out[index_here] = a + 1.5f * timestep * delta_a - 0.5f * timestep * b;
-    b_out[index_here] = delta_a;
-    // two-step Adams-Bashforth, where b contains the gradient of
-    // the previous step 
+    a_out[index_here] = b + 2.0f * timestep * delta_a;
+    b_out[index_here] = a;
 }
       </kernel>
       
     </rule>
+    
     <initial_pattern_generator apply_when_loading="true">
-      <overlay chemical="a">
-        <overwrite>
-          
-        </overwrite>
-        <gaussian height="1" sigma="0.05">
-          <point3D x="0.5" y="0.5" z="0.5">
-            
-          </point3D>
-          
-        </gaussian>
-        <everywhere>
-          
-        </everywhere>
-        
-      </overlay>
-      
+      <overlay chemical="a"> <overwrite /> <gaussian height="1" sigma="0.05"> <point3D x="0.5" y="0.5" z="0.5" /> </gaussian> <everywhere /> </overlay>
+      <overlay chemical="b"> <overwrite /> <gaussian height="1" sigma="0.05"> <point3D x="0.5" y="0.5" z="0.5" /> </gaussian> <everywhere /> </overlay>
     </initial_pattern_generator>
+    
     <render_settings>
       <surface_color r="1" g="1" b="1">
         

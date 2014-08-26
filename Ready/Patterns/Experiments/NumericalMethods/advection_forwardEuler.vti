@@ -4,8 +4,16 @@
     <description>
         The advection equation: da/dt = -da/dx
 
-        After a while instabilities appear because we are using only simple numerical methods. This version uses forward
-        Euler integration, which very quickly has problems with this timestep of 0.01.
+        Here we are using forward Euler integration, also known as FTCS (Forward Time, Centered Space). 
+        Of all the methods this is the easiest to understand and the worst performing. Notice that 
+        instabilities soon appear and destroy the solution.
+        
+        At every timestep the new value is given by: 
+        
+        new_a = a + timestep * delta_a
+        
+        The other methods in this folder have the same timestep (0.01) but last longer before noticeable errors
+        appear.
     </description>
     <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
