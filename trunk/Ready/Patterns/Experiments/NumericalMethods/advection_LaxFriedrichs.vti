@@ -117,7 +117,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
       <use_image_interpolation value="true">
         
       </use_image_interpolation>
-      <timesteps_per_render value="64">
+      <timesteps_per_render value="8">
         
       </timesteps_per_render>
       <show_phase_plot value="false">
