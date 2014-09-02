@@ -107,10 +107,8 @@ void OpenCL_MixIn::ReloadContextIfNeeded()
     // retrieve our chosen platform
     cl_platform_id platform_id;
     {
-        const int MAX_PLATFORMS = 10;
-        cl_platform_id platforms_available[MAX_PLATFORMS];
-        cl_uint num_platforms;
-        ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+        cl_uint num_platforms = 0;
+        ret = clGetPlatformIDs( 0, nullptr, &num_platforms );
         if(ret != CL_SUCCESS || num_platforms==0)
         {
             throw runtime_error("No OpenCL platforms available");
@@ -118,18 +116,27 @@ void OpenCL_MixIn::ReloadContextIfNeeded()
         }
         if(this->iPlatform >= (int)num_platforms)
             throw runtime_error("OpenCL_MixIn::ReloadContextIfNeeded : too few platforms available");
+        vector<cl_platform_id> platforms_available( num_platforms );
+        ret = clGetPlatformIDs( num_platforms, platforms_available.data(), nullptr );
+        if(ret != CL_SUCCESS)
+        {
+            throw runtime_error("Failed to retrieve OpenCL platforms");
+            // currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn't work
+        }
         platform_id = platforms_available[this->iPlatform];
     }
 
     // retrieve our chosen device
     {
-        const int MAX_DEVICES = 10;
-        cl_device_id devices_available[MAX_DEVICES];
-        cl_uint num_devices;
-        ret = clGetDeviceIDs(platform_id,CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
-        throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to retrieve device IDs: ");
+        cl_uint num_devices = 0;
+        ret = clGetDeviceIDs(platform_id,CL_DEVICE_TYPE_ALL,0,nullptr,&num_devices);
+        throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to retrieve number of device IDs: ");
         if(this->iDevice >= (int)num_devices)
             throw runtime_error("OpenCL_MixIn::ReloadContextIfNeeded : too few devices available");
+
+        vector<cl_device_id> devices_available(num_devices);
+        ret = clGetDeviceIDs(platform_id,CL_DEVICE_TYPE_ALL,num_devices,devices_available.data(),nullptr);
+        throwOnError(ret,"OpenCL_MixIn::ReloadContextIfNeeded : Failed to retrieve device IDs: ");
         this->device_id = devices_available[this->iDevice];
     }
 
@@ -165,14 +172,15 @@ void OpenCL_MixIn::TestKernel(std::string kernel_source)
     ret = clBuildProgram(temp_program,1,&this->device_id,"-cl-denorms-are-zero -cl-fast-relaxed-math",NULL,NULL);
     if(ret != CL_SUCCESS)
     {
-        const int MAX_BUILD_LOG = 10000;
-        char build_log[MAX_BUILD_LOG];
-        size_t build_log_length;
-        cl_int ret2 = clGetProgramBuildInfo(temp_program,this->device_id,CL_PROGRAM_BUILD_LOG,MAX_BUILD_LOG,build_log,&build_log_length);
-        throwOnError(ret2,"OpenCL_MixIn::TestKernel : retrieving program build log failed: ");
+        size_t build_log_length = 0;
+        cl_int ret2 = clGetProgramBuildInfo(temp_program,this->device_id,CL_PROGRAM_BUILD_LOG,0,nullptr,&build_log_length);
+        throwOnError(ret2,"OpenCL_MixIn::TestKernel : retrieving length of program build log failed: ");
+        vector<char> build_log(build_log_length);
+        cl_int ret3 = clGetProgramBuildInfo(temp_program,this->device_id,CL_PROGRAM_BUILD_LOG,build_log_length,build_log.data(),nullptr);
+        throwOnError(ret3,"OpenCL_MixIn::TestKernel : retrieving program build log failed: ");
         { ofstream out("kernel.txt"); out << kernel_source; }
         ostringstream oss;
-        oss << "OpenCL_MixIn::TestKernel : build failed: (kernel saved as kernel.txt)\n\n" << build_log;
+        oss << "OpenCL_MixIn::TestKernel : build failed (kernel saved as kernel.txt):\n\n" << string( begin( build_log ), end( build_log ) );
         throwOnError(ret,oss.str().c_str());
     }
     clReleaseProgram(temp_program);
