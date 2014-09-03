@@ -17,6 +17,20 @@
     </description>
     <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+
+float centeredGradient( float a, float b, float c, float dx ) {
+    return ( c - a ) / ( 2.0 * dx );
+}
+
+// given three neighboring samples a,b,c each separated by dx what is the rate of change at b?
+float delta( float a, float b, float c, float dx ) {
+    return - centeredGradient( a, b, c, dx ); // the advection equation: da/dt = -dx/dt
+}
+
+float forwardEuler( float a, float b, float c, float dx, float dt ) {
+    return b + dt * delta( a, b, c, dx );
+}
+
 __kernel void rd_compute(__global float *a_in,__global float *a_out)
 {
     const int index_x = get_global_id(0);
@@ -27,20 +41,15 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     const int Z = get_global_size(2);
     const int index_here = X*(Y*index_z + index_y) + index_x;
 
-    float a = a_in[index_here];
-
     const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((index_x+1) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
     const int index_w =  X*(Y*index_z + index_y) + xm1;
-    float a_e = a_in[index_e];
-    float a_w = a_in[index_w];
 
-    float h = 0.1f; // grid spacing
-    float timestep = 0.01f;
-    float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
-    float delta_a = -x_gradient_a;
-    a_out[index_here] = a + timestep * delta_a;
+    float dx = 0.1f; // grid spacing
+    float dt = 0.01f; // timestep
+    
+    a_out[index_here] = forwardEuler( a_in[ index_w ], a_in[ index_here ], a_in[ index_e ], dx, dt );
 }
       </kernel>
       

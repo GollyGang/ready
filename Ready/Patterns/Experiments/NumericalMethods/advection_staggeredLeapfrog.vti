@@ -10,6 +10,21 @@
     </description>
     <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
+float centeredGradient( float a, float b, float c, float dx ) {
+    return ( c - a ) / ( 2.0 * dx );
+}
+
+// given three neighboring samples a,b,c each separated by dx what is the rate of change at b?
+float delta( float a, float b, float c, float dx ) {
+    return - centeredGradient( a, b, c, dx ); // the advection equation: da/dt = -dx/dt
+}
+
+// http://apps.nrbook.com/empanel/index.html#pg=1040
+float StaggeredLeapfrog( float a, float b, float c, float b_prev, float dx, float dt ) {
+    // the rate of change comes from the current state but is applied to the previous state
+    return b_prev + 2.0f * dt * delta( a, b, c, dx );
+}
+
 __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
 {
     const int index_x = get_global_id(0);
@@ -20,22 +35,16 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
     const int Z = get_global_size(2);
     const int index_here = X*(Y*index_z + index_y) + index_x;
 
-    float a = a_in[index_here];
-    float b = b_in[index_here];
-
     const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((index_x+1) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
     const int index_w =  X*(Y*index_z + index_y) + xm1;
-    float a_e = a_in[index_e];
-    float a_w = a_in[index_w];
 
-	float h = 0.1f; // grid spacing
-    float timestep = 0.01f;
-    float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
-    float delta_a = -x_gradient_a;
-    a_out[index_here] = b + 2.0f * timestep * delta_a;
-    b_out[index_here] = a;
+	float dx = 0.1f; // grid spacing
+    float dt = 0.01f; // timestep
+
+    a_out[index_here] = StaggeredLeapfrog( a_in[ index_w ], a_in[ index_here ], a_in[ index_e ], b_in[ index_here ], dx, dt );
+    b_out[index_here] = a_in[ index_here ]; // store the current state for next time
 }
       </kernel>
       
@@ -59,7 +68,7 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
       <show_color_scale value="true">
         
       </show_color_scale>
-      <show_multiple_chemicals value="true">
+      <show_multiple_chemicals value="false">
         
       </show_multiple_chemicals>
       <active_chemical value="a">

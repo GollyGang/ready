@@ -6,13 +6,36 @@
 
       This is Heun's method, where a two-thirds step is first taken. Heun's method is one of a family of second-order
       Runge-Kutta methods (with the modified Euler method and the midpoint method).
-      
-      This implementation does the computation in two steps, so results appear in alternating frames.
     </description>
     <rule name="Advection" type="kernel">
-      <kernel number_of_chemicals="3" block_size_x="1" block_size_y="1" block_size_z="1">
-        __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *c_in,
-                                 __global float *a_out,__global float *b_out,__global float *c_out)
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+float centeredGradient( float a, float b, float c, float dx ) {
+    return ( c - a ) / ( 2.0 * dx );
+}
+
+// given three neighboring samples a,b,c each separated by dx what is the rate of change at b?
+float delta( float a, float b, float c, float dx ) {
+    return - centeredGradient( a, b, c, dx ); // the advection equation: da/dt = -dx/dt
+}
+
+float forwardEuler( float a, float b, float c, float dx, float dt ) {
+    return b + dt * delta( a, b, c, dx );
+}
+
+float HeunsMethod( float a, float b, float c, float d, float e, float dx, float dt ) {
+    // take a two-thirds step forwards
+    float k1 = delta( b, c, d, dx );
+    float s1 = 2.0f / 3.0f;
+    float b2 = forwardEuler( a, b, c, dx, dt * s1 );
+    float c2 = forwardEuler( b, c, d, dx, dt * s1 );
+    float d2 = forwardEuler( c, d, e, dx, dt * s1 );
+    float k2 = delta( b2, c2, d2, dx );
+    // combine the gradient at the start with the gradient from the two-thirds step
+    float k = 0.25f * k1 + 0.75f * k2;
+    return c + dt * k;
+}
+
+__kernel void rd_compute(__global float *a_in,__global float *a_out)
 {
     const int index_x = get_global_id(0);
     const int index_y = get_global_id(1);
@@ -22,30 +45,19 @@
     const int Z = get_global_size(2);
     const int index_here = X*(Y*index_z + index_y) + index_x;
 
-    float a = a_in[index_here];
-    float b = b_in[index_here];
-    float c = c_in[index_here];
-
-    const int xm1 = (index_x-1+X) &amp; (X-1); // wrap (assumes X is a power of 2)
-    const int xp1 = (index_x+1) &amp; (X-1);
+    const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xp1 = ((index_x+1) &amp; (X-1));
+    const int xm2 = ((index_x-2+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xp2 = ((index_x+2) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
     const int index_w =  X*(Y*index_z + index_y) + xm1;
-    float a_e = a_in[index_e];
-    float a_w = a_in[index_w];
-    float c_e = c_in[index_e];
-    float c_w = c_in[index_w];
+    const int index_ee =  X*(Y*index_z + index_y) + xp2;
+    const int index_ww =  X*(Y*index_z + index_y) + xm2;
 
-    float h = 0.1f; // grid spacing
-    float timestep = 0.01f;
-    float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
-    float x_gradient_c = ( c_e - c_w ) / ( 2.0 * h );
-    float delta_a = -x_gradient_a;
-    float delta_c = -x_gradient_c;
-    float alpha = 2.0f / 3.0f;
-    float K1 = ( c - b ) / alpha;
-    a_out[index_here] = b + 1.0f / 4.0f * K1 + 3.0f / 4.0f * timestep * delta_c;
-    b_out[index_here] = a;
-    c_out[index_here] = a + alpha * timestep * delta_a;
+    float dx = 0.1f; // grid spacing
+    float dt = 0.01f; // timestep
+    
+    a_out[index_here] = HeunsMethod( a_in[ index_ww ], a_in[ index_w ], a_in[ index_here ], a_in[ index_e ], a_in[ index_ee ], dx, dt );
 }
       </kernel>
       
@@ -152,12 +164,6 @@
   <Piece Extent="0 255 0 0 0 0">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
-      </DataArray>
-      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
-      </DataArray>
-      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
         AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
       </DataArray>
     </PointData>
