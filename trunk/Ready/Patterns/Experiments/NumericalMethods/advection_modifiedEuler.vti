@@ -7,13 +7,32 @@
       This method is modified Euler, where two time steps are taken and the result is the average 
       of the start and end points. The modified Euler method is one of a family of second-order
       Runge-Kutta methods (with the midpoint method and Heun's method).
-      
-      This implementation does the computation in two steps, so results appear in alternating frames.
     </description>
     <rule name="Advection" type="kernel">
-      <kernel number_of_chemicals="3" block_size_x="1" block_size_y="1" block_size_z="1">
-        __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *c_in,
-                                 __global float *a_out,__global float *b_out,__global float *c_out)
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+float centeredGradient( float a, float b, float c, float dx ) {
+    return ( c - a ) / ( 2.0 * dx );
+}
+
+// given three neighboring samples a,b,c each separated by dx what is the rate of change at b?
+float delta( float a, float b, float c, float dx ) {
+    return - centeredGradient( a, b, c, dx ); // the advection equation: da/dt = -dx/dt
+}
+
+float forwardEuler( float a, float b, float c, float dx, float dt ) {
+    return b + dt * delta( a, b, c, dx );
+}
+
+float modifiedEuler( float a, float b, float c, float d, float e, float dx, float dt ) {
+    // take two steps forwards then average the start and end positions
+    float b2 = forwardEuler( a, b, c, dx, dt );
+    float c2 = forwardEuler( b, c, d, dx, dt );
+    float d2 = forwardEuler( c, d, e, dx, dt );
+    float c3 = forwardEuler( b2, c2, d2, dx, dt );
+    return ( c + c3 ) / 2.0f;
+}
+
+__kernel void rd_compute(__global float *a_in,__global float *a_out)
 {
     const int index_x = get_global_id(0);
     const int index_y = get_global_id(1);
@@ -23,28 +42,19 @@
     const int Z = get_global_size(2);
     const int index_here = X*(Y*index_z + index_y) + index_x;
 
-    float a = a_in[index_here];
-    float b = b_in[index_here];
-    float c = c_in[index_here];
-
     const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((index_x+1) &amp; (X-1));
+    const int xm2 = ((index_x-2+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xp2 = ((index_x+2) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
     const int index_w =  X*(Y*index_z + index_y) + xm1;
-    float a_e = a_in[index_e];
-    float a_w = a_in[index_w];
-    float c_e = c_in[index_e];
-    float c_w = c_in[index_w];
+    const int index_ee =  X*(Y*index_z + index_y) + xp2;
+    const int index_ww =  X*(Y*index_z + index_y) + xm2;
 
-    float h = 0.1f; // grid spacing
-    float timestep = 0.01f;
-    float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
-    float x_gradient_c = ( c_e - c_w ) / ( 2.0 * h );
-    float delta_a = -x_gradient_a;
-    float delta_c = -x_gradient_c;
-    a_out[index_here] = ( b + c + timestep*delta_c ) / 2.0f;
-    b_out[index_here] = a;
-    c_out[index_here] = a + timestep * delta_a;
+    float dx = 0.1f; // grid spacing
+    float dt = 0.01f; // timestep
+    
+    a_out[index_here] = modifiedEuler( a_in[ index_ww ], a_in[ index_w ], a_in[ index_here ], a_in[ index_e ], a_in[ index_ee ], dx, dt );
 }
       </kernel>
       
@@ -151,12 +161,6 @@
   <Piece Extent="0 255 0 0 0 0">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
-      </DataArray>
-      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
-      </DataArray>
-      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
         AQAAAACAAAAABAAAEQAAAA==eJxjYBgFo2AUjFQAAAQAAAE=
       </DataArray>
     </PointData>
