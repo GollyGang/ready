@@ -1,7 +1,7 @@
 Dependencies: 
 0) CMake: www.cmake.org
-1) VTK (5.10.*): www.vtk.org
-2) wxWidgets (2.9.2+): www.wxwidgets.org
+1) VTK (latest, or at least 5.10.*): www.vtk.org
+2) wxWidgets (latest, or at least 2.9.2): www.wxwidgets.org
 3) any OpenCL SDK.
 
 Ready uses CMake for pre-build setup. You might need to read some CMake
@@ -13,7 +13,7 @@ A) Build VTK:
  - Use CMake (cmake-gui.exe) and make a separate build folder. Use the 
    Visual Studio generator that corresponds to whichever version you
    have installed.
- - Set BUILD_TESTING to off (we don't need it). 
+ - Ensure BUILD_TESTING is off (we don't need it). 
  - Ensure BUILD_SHARED_LIBS is off.
  - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and 
    similar. Change all occurences of /MD (if any) to /MT, and /MDd to 
@@ -43,9 +43,9 @@ C) Build Ready:
  - Set VTK_DIR to the build folder of VTK, if CMake didn't find the 
    right version automatically.
  - Set OPENCL_LIBRARIES to the location of a suitable OpenCL.lib, e.g.
-    E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/lib/Win32/OpenCL.lib
+    C:/CUDA/lib/OpenCL.lib
  - Set OPENCL_INCLUDE_DIRS to e.g.
-    E:/NVIDIA GPU Computing SDK 4.1/OpenCL/common/inc
+    C:/CUDA/include
  - Generate, then open the resulting Ready.sln and build the Debug and
    Release targets. Set Ready as the "StartUp Project" to have it run
    by default.
@@ -55,9 +55,9 @@ C) Build Ready:
    
 For 64-bit builds:
 - select the 64-bit generators in CMake
-- use the 64-bit version of OpenCL.lib
-- c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_amd64_lib
-  (vc_x64_lib with wxWidgets 2.9.4 or later)
+- use the 64-bit version of OpenCL.lib, e.g. C:/CUDA/lib64/OpenCL.lib
+- c:\wxWidgets\lib\vc_lib is now c:\wxWidgets\lib\vc_x64_lib
+- use a 64-bit Visual Studio command prompt for building wxWidgets
 
 ================ Windows, using the command-line =====================
 
