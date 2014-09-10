@@ -29,8 +29,8 @@ using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 
-FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_device)
-    : OpenCLImageRD(opencl_platform,opencl_device)
+FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_device,int data_type)
+    : OpenCLImageRD(opencl_platform,opencl_device,data_type)
 {
     this->SetRuleName("Full kernel example");
     this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");
@@ -42,7 +42,7 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_
 // ---------------------------------------------------------------------------------------------------------
 
 FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD& source)
-    : OpenCLImageRD(source.GetPlatform(),source.GetDevice())
+    : OpenCLImageRD(source.GetPlatform(),source.GetDevice(),source.GetDataType())
 {
     this->block_size[0] = source.GetBlockSizeX();
     this->block_size[1] = source.GetBlockSizeY();

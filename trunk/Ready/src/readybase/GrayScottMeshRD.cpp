@@ -28,6 +28,7 @@
 // ---------------------------------------------------------------------
 
 GrayScottMeshRD::GrayScottMeshRD()
+    : InbuiltMeshRD(VTK_FLOAT)
 {
     this->rule_name = "Gray-Scott";
     this->n_chemicals = 2;

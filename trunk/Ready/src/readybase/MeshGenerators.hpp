@@ -22,38 +22,38 @@ class vtkUnstructuredGrid;
 namespace MeshGenerators 
 {
     /// Subdivides an icosahedron to get a sphere evenly covered with triangles.
-    void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Subdivides a torus with quadrilaterals.
-    void GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Makes a planar mesh of triangles.
-    void GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Makes a planar mesh of hexagons.
-    void GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Makes a planar mesh using the rhombille tiling.
-    void GetRhombilleTiling(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetRhombilleTiling(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).
-    void GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Make a 2D Delaunay triangulation from a random set of points
-    void GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems);
+    void GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 
     /// Make a 2D Voronoi mesh from a random set of points
-    void GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems);
+    void GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 
     /// Applies the Delaunay algorithm to scattered points to get a mesh of tetrahedra.
-    void GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Make a honeycomb from truncated octahedra.
-    void GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Make a honeycomb from rhombic dodecahedra.
-    void GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems);
+    void GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Make triakis truncated tetrahedra - the Voronoi cells of the carbon atoms in a diamond lattice.
-    void GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_chems);
+    void GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 }

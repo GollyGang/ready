@@ -23,7 +23,7 @@ class FullKernelOpenCLMeshRD : public OpenCLMeshRD
 {
     public:
 
-        FullKernelOpenCLMeshRD(int opencl_platform,int opencl_device);
+        FullKernelOpenCLMeshRD(int opencl_platform,int opencl_device,int data_type);
         FullKernelOpenCLMeshRD(const OpenCLMeshRD& source); // copy construct from source
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);

@@ -1516,6 +1516,9 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     // we'll need to restore current render settings if user decides not to create a new pattern
     // or some sort of error occurs
     Properties previous_render_settings = this->render_settings;
+
+    // perhaps at some point we will want this to be determined by the user
+    const int data_type = VTK_FLOAT;
     
     this->InitializeDefaultRenderSettings();
     AbstractRD *sys;
@@ -1529,7 +1532,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->SetStatusText(_("Generating image..."));
                 ImageRD *image_sys;
                 if(this->is_opencl_available)
-                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
                 else
                     image_sys = new GrayScottImageRD();
                 image_sys->SetDimensionsAndNumberOfChemicals(128,1,1,2);
@@ -1544,7 +1547,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->SetStatusText(_("Generating image..."));
                 ImageRD *image_sys;
                 if(this->is_opencl_available)
-                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
                 else
                     image_sys = new GrayScottImageRD();
                 image_sys->SetDimensionsAndNumberOfChemicals(128,128,1,2);
@@ -1559,7 +1562,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->SetStatusText(_("Generating image..."));
                 ImageRD *image_sys;
                 if(this->is_opencl_available)
-                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
                 else
                     image_sys = new GrayScottImageRD();
                 image_sys->SetDimensionsAndNumberOfChemicals(32,32,32,2);
@@ -1589,10 +1592,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetGeodesicSphere(divs,mesh,2);
+                MeshGenerators::GetGeodesicSphere(divs,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1624,10 +1627,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTorus(nx,ny,mesh,2);
+                MeshGenerators::GetTorus(nx,ny,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1658,10 +1661,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTriangularMesh(n,n,mesh,2);
+                MeshGenerators::GetTriangularMesh(n,n,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1694,10 +1697,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHexagonalMesh(n,n,mesh,2);
+                MeshGenerators::GetHexagonalMesh(n,n,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1730,10 +1733,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRhombilleTiling(n,n,mesh,2);
+                MeshGenerators::GetRhombilleTiling(n,n,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1766,10 +1769,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetPenroseTiling(divs,0,mesh,2);
+                MeshGenerators::GetPenroseTiling(divs,0,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1802,10 +1805,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetPenroseTiling(divs,1,mesh,2);
+                MeshGenerators::GetPenroseTiling(divs,1,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1838,10 +1841,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomDelaunay2D(npts,mesh,2);
+                MeshGenerators::GetRandomDelaunay2D(npts,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1873,10 +1876,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomVoronoi2D(npts,mesh,2);
+                MeshGenerators::GetRandomVoronoi2D(npts,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1908,10 +1911,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomDelaunay3D(npts,mesh,2);
+                MeshGenerators::GetRandomDelaunay3D(npts,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1942,10 +1945,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetBodyCentredCubicHoneycomb(side,mesh,2);
+                MeshGenerators::GetBodyCentredCubicHoneycomb(side,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -1980,10 +1983,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2);
+                MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -2018,10 +2021,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetDiamondCells(side,mesh,2);
+                MeshGenerators::GetDiamondCells(side,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
                 else
                     mesh_sys = new GrayScottMeshRD();
                 mesh_sys->CopyFromMesh(mesh);
@@ -3025,6 +3028,9 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
     if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
     */
+
+    // at some point we would want the user to decide what data type to use on the imported mesh
+    const int data_type = VTK_FLOAT;
     
     MeshRD *mesh_sys;
     
@@ -3044,7 +3050,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
             vtp_reader->SetFileName(mesh_filename.mb_str());
             vtp_reader->Update();
             if(this->is_opencl_available)
-                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
             else
                 mesh_sys = new GrayScottMeshRD();
             vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
@@ -3066,7 +3072,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
             vtu_reader->SetFileName(mesh_filename.mb_str());
             vtu_reader->Update();
             if(this->is_opencl_available)
-                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
             else
                 mesh_sys = new GrayScottMeshRD();
             mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
@@ -3088,7 +3094,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
             obj_reader->SetFileName(mesh_filename.mb_str());
             obj_reader->Update();
             if(this->is_opencl_available)
-                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
             else
                 mesh_sys = new GrayScottMeshRD();
             vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();

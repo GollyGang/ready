@@ -35,8 +35,9 @@ using namespace std;
 
 // ----------------------------------------------------------------------------------------------------------------
 
-OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device)
-    : OpenCL_MixIn(opencl_platform,opencl_device)
+OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device,int data_type)
+    : ImageRD(data_type)
+    , OpenCL_MixIn(opencl_platform,opencl_device)
 {
 }
 
@@ -91,7 +92,7 @@ void OpenCLImageRD::CreateOpenCLBuffers()
 {
     this->ReloadContextIfNeeded();
 
-    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+    const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
     const int NC = this->GetNumberOfChemicals();
 
     this->ReleaseOpenCLBuffers();
@@ -115,12 +116,12 @@ void OpenCLImageRD::WriteToOpenCLBuffersIfNeeded()
 {
     if(!this->need_write_to_opencl_buffers) return;
 
-    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+    const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
 
     this->iCurrentBuffer = 0;
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
-        float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
+        void* data = this->images[ic]->GetScalarPointer();
         cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
     }
@@ -154,11 +155,11 @@ void OpenCLImageRD::BlankImage()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc)
+void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
     if(x&(x-1) || y&(y-1) || z&(z-1))
         throw runtime_error("OpenCLImageRD::AllocateImages : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
-    ImageRD::AllocateImages(x,y,z,nc);
+    ImageRD::AllocateImages(x,y,z,nc,data_type);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
@@ -203,10 +204,10 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
 void OpenCLImageRD::ReadFromOpenCLBuffers()
 {
     // read from opencl buffers into our image
-    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+    const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
-        float* data = static_cast<float*>(this->images[ic]->GetScalarPointer());
+        void* data = this->images[ic]->GetScalarPointer();
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::ReadFromOpenCLBuffers : buffer reading failed: ");
     }

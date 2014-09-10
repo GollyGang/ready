@@ -27,12 +27,27 @@ using namespace std;
 
 // ---------------------------------------------------------------------
 
-AbstractRD::AbstractRD()
+AbstractRD::AbstractRD(int data_type)
 {
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
     this->is_modified = false;
     this->wrap = true;
+
+    switch( data_type ) {
+        default:
+        case VTK_FLOAT:
+            this->data_type = VTK_FLOAT;
+            this->data_type_size = sizeof( float );
+            this->data_type_string = "float";
+            this->data_type_suffix = "f";
+            break;
+        case VTK_DOUBLE:
+            this->data_type = VTK_DOUBLE;
+            this->data_type_size = sizeof( double );
+            this->data_type_string = "double";
+            this->data_type_suffix = "";
+    }
 
     this->neighborhood_type = VERTEX_NEIGHBORS;
     this->neighborhood_range = 1;
@@ -477,6 +492,13 @@ int AbstractRD::GetNeighborhoodRange() const
 std::string AbstractRD::GetNeighborhoodWeight() const
 {
     return this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second;
+}
+
+// ---------------------------------------------------------------------
+
+int AbstractRD::GetDataType() const
+{
+    return this->data_type;
 }
 
 // ---------------------------------------------------------------------

@@ -23,6 +23,7 @@
 class InbuiltImageRD : public ImageRD
 {
     public:
+        InbuiltImageRD(int data_type) : ImageRD(data_type) {}
 
         std::string GetRuleType() const { return "inbuilt"; }
 
@@ -46,7 +47,7 @@ class GrayScottImageRD : public InbuiltImageRD
 
     protected:
 
-        virtual void AllocateImages(int x,int y,int z,int nc);
+        virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
 
         virtual void InternalUpdate(int n_steps);
 

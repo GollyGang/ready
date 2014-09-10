@@ -44,7 +44,6 @@ using namespace std;
 #include <vtkCutter.h>
 #include <vtkDataSetMapper.h>
 #include <vtkExtractEdges.h>
-#include <vtkFloatArray.h>
 #include <vtkGeometryFilter.h>
 #include <vtkImageActor.h>
 #include <vtkImageAppendComponents.h>
@@ -90,8 +89,9 @@ using namespace std;
 
 // -------------------------------------------------------------------
 
-ImageRD::ImageRD() 
-    : xgap(5.0)
+ImageRD::ImageRD(int data_type) 
+    : AbstractRD(data_type)
+    , xgap(5.0)
     , ygap(20.0)
     , image_top1D(2.0)
     , image_ratio1D(30.0)
@@ -227,29 +227,29 @@ void ImageRD::CopyFromImage(vtkImageData* im)
 
 // ---------------------------------------------------------------------
 
-void ImageRD::AllocateImages(int x,int y,int z,int nc)
+void ImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
     this->DeallocateImages();
     this->n_chemicals = nc;
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
-        this->images[i] = AllocateVTKImage(x,y,z);
+        this->images[i] = AllocateVTKImage(x,y,z,data_type);
     this->is_modified = true;
     this->undo_stack.clear();
 }
 
 // ---------------------------------------------------------------------
 
-/* static */ vtkImageData* ImageRD::AllocateVTKImage(int x,int y,int z)
+/* static */ vtkImageData* ImageRD::AllocateVTKImage(int x,int y,int z,int data_type)
 {
     vtkImageData *im = vtkImageData::New();
     assert(im);
     #if VTK_MAJOR_VERSION >= 6
         im->SetDimensions(x,y,z);
-        im->AllocateScalars(VTK_FLOAT,1);
+        im->AllocateScalars(data_type,1);
     #else
         im->SetNumberOfScalarComponents(1);
-        im->SetScalarTypeToFloat();
+        im->SetScalarType(data_type);
         im->SetDimensions(x,y,z);
         im->AllocateScalars();
     #endif
@@ -283,11 +283,11 @@ void ImageRD::GenerateInitialPattern()
                         continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                         //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-                    float *val = vtk_at(static_cast<float*>(this->GetImage(iC)->GetScalarPointer()),x,y,z,X,Y);
+                    float val = this->GetImage(iC)->GetScalarComponentAsFloat(x,y,z,0);
                     vector<float> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
-                        vals[i] = *vtk_at(static_cast<float*>(this->GetImage(i)->GetScalarPointer()),x,y,z,X,Y);
-                    *val = overlay->Apply(vals,this,x,y,z);
+                        vals[i] = this->GetImage(i)->GetScalarComponentAsFloat(x,y,z,0);
+                    this->GetImage(iC)->SetScalarComponentFromFloat(x,y,z,0,overlay->Apply(vals,this,x,y,z));
                 }
             }
         }
@@ -1117,21 +1117,21 @@ void ImageRD::RestoreStartingPattern()
 
 void ImageRD::SetDimensions(int x, int y, int z)
 {
-    this->AllocateImages(x,y,z,this->GetNumberOfChemicals());
+    this->AllocateImages(x,y,z,this->GetNumberOfChemicals(),this->data_type);
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::SetNumberOfChemicals(int n)
 {
-    this->AllocateImages(this->GetX(),this->GetY(),this->GetZ(),n);
+    this->AllocateImages(this->GetX(),this->GetY(),this->GetZ(),n,this->data_type);
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc)
 {
-    this->AllocateImages(x,y,z,nc);
+    this->AllocateImages(x,y,z,nc,this->data_type);
 }
 
 // ---------------------------------------------------------------------
@@ -1259,10 +1259,10 @@ void ImageRD::SaveFile(const char* filename,const Properties& render_settings,bo
     im->GetPointData()->SetScalars(NULL);
     for(int iChem=0;iChem<this->GetNumberOfChemicals();iChem++)
     {
-        vtkSmartPointer<vtkFloatArray> fa = vtkSmartPointer<vtkFloatArray>::New();
-        fa->DeepCopy(this->images[iChem]->GetPointData()->GetScalars());
-        fa->SetName(GetChemicalName(iChem).c_str());
-        im->GetPointData()->AddArray(fa);
+        vtkSmartPointer<vtkDataArray> da = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( this->data_type ) );
+        da->DeepCopy(this->images[iChem]->GetPointData()->GetScalars());
+        da->SetName(GetChemicalName(iChem).c_str());
+        im->GetPointData()->AddArray(da);
     }
 
     vtkSmartPointer<RD_XMLImageWriter> iw = vtkSmartPointer<RD_XMLImageWriter>::New();
@@ -1410,7 +1410,7 @@ float ImageRD::GetValue(float x,float y,float z,const Properties& render_setting
     iy = min(Y-1,max(0,iy));
     iz = min(Z-1,max(0,iz));
 
-    return *vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),ix,iy,iz,X,Y);
+    return this->GetImage(iChemical)->GetScalarComponentAsFloat(ix,iy,iz,0);
 }
 
 // --------------------------------------------------------------------------------
@@ -1453,10 +1453,11 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
     iy = min(Y-1,max(0,iy));
     iz = min(Z-1,max(0,iz));
 
-    float *pCell = vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),ix,iy,iz,X,Y);
-    int iCell = pCell - static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer());
-    this->StorePaintAction(iChemical,iCell,*pCell);
-    *pCell = val;
+    float old_val = this->GetImage(iChemical)->GetScalarComponentAsFloat(ix,iy,iz,0);
+    int ijk[3] = { ix, iy, iz };
+    vtkIdType iCell = this->GetImage(iChemical)->ComputeCellId(ijk);
+    this->StorePaintAction(iChemical,iCell,old_val);
+    this->GetImage(iChemical)->SetScalarComponentFromFloat(ix,iy,iz,0,val);
     this->images[iChemical]->Modified();
 }
 
@@ -1511,10 +1512,11 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
             {
                 if(hypot3(ix-tx,iy-ty,iz-tz)<r)
                 {
-                    float *pCell = vtk_at(static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer()),tx,ty,tz,X,Y);
-                    int iCell = pCell - static_cast<float*>(this->GetImage(iChemical)->GetScalarPointer());
-                    this->StorePaintAction(iChemical,iCell,*pCell);
-                    *pCell = val;
+                    float old_val = this->GetImage(iChemical)->GetScalarComponentAsFloat(tx,ty,tz,0);
+                    int ijk[3] = { tx, ty, tz };
+                    vtkIdType iCell = this->GetImage(iChemical)->ComputeCellId(ijk);
+                    this->StorePaintAction(iChemical,iCell,old_val);
+                    this->GetImage(iChemical)->SetScalarComponentFromFloat(tx,ty,tz,0,val);
                 }
             }
         }

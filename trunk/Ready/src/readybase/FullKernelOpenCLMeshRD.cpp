@@ -29,8 +29,8 @@ using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 
-FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_device)
-    : OpenCLMeshRD(opencl_platform,opencl_device)
+FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_device,int data_type)
+    : OpenCLMeshRD(opencl_platform,opencl_device,data_type)
 {
     this->SetRuleName("Full kernel example");
     this->SetFormula("__kernel void rd_compute() {}");
@@ -39,7 +39,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_de
 // ---------------------------------------------------------------------------------------------------------
 
 FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source) 
-    : OpenCLMeshRD(source.GetPlatform(),source.GetDevice())
+    : OpenCLMeshRD(source.GetPlatform(),source.GetDevice(),source.GetDataType())
 {
     this->SetFormula(source.GetKernel());
 

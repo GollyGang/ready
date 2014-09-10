@@ -25,7 +25,7 @@ class FullKernelOpenCLImageRD : public OpenCLImageRD
 {
     public:
 
-        FullKernelOpenCLImageRD(int opencl_platform,int opencl_device);
+        FullKernelOpenCLImageRD(int opencl_platform,int opencl_device,int data_type);
         FullKernelOpenCLImageRD(const OpenCLImageRD& source); // copy construct from another
 
         virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);

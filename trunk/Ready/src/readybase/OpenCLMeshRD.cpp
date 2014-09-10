@@ -30,12 +30,12 @@ using namespace std;
 #include <vtkMath.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkCellData.h>
-#include <vtkFloatArray.h>
 
 // -------------------------------------------------------------------------
 
-OpenCLMeshRD::OpenCLMeshRD(int opencl_platform,int opencl_device)
-    : OpenCL_MixIn(opencl_platform,opencl_device)
+OpenCLMeshRD::OpenCLMeshRD(int opencl_platform,int opencl_device,int data_type)
+    : MeshRD(data_type)
+    , OpenCL_MixIn(opencl_platform,opencl_device)
 {
     this->clBuffer_cell_neighbor_indices = NULL;
     this->clBuffer_cell_neighbor_weights = NULL;
@@ -193,31 +193,30 @@ void OpenCLMeshRD::CreateOpenCLBuffers()
 {
     this->ReloadContextIfNeeded();
 
-    const unsigned long MEM_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells();
-    const int NC = this->GetNumberOfChemicals();
-
     this->ReleaseOpenCLBuffers();
 
     cl_int ret;
 
     // create two buffers for each chemical (we will switch between them)
+    const size_t MEM_SIZE = this->data_type_size * this->mesh->GetNumberOfCells();
+    const int NC = this->GetNumberOfChemicals();
     for(int io=0;io<2;io++)
     {
         this->buffers[io].resize(NC);
         for(int ic=0;ic<NC;ic++)
         {
             this->buffers[io][ic] = clCreateBuffer(this->context, CL_MEM_READ_WRITE, MEM_SIZE, NULL, &ret);
-            throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : buffer creation failed: ");
+            throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : data buffer creation failed: ");
         }
     }
     
     // create a buffer for the indices of the neighbors of each cell
-    const unsigned long NBORS_INDICES_SIZE = sizeof(int) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
+    const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_indices = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_INDICES_SIZE, NULL, &ret);
     throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : neighbor_indices buffer creation failed: ");
 
     // create a buffer for the diffusion coefficients of the neighbors of each cell
-    const unsigned long NBORS_WEIGHTS_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
+    const size_t NBORS_WEIGHTS_SIZE = sizeof(float) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_weights = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_WEIGHTS_SIZE, NULL, &ret);
     throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : neighbor_weights buffer creation failed: ");
 }
@@ -232,24 +231,24 @@ void OpenCLMeshRD::WriteToOpenCLBuffersIfNeeded()
         this->CreateOpenCLBuffers();
 
     cl_int ret;
-    const unsigned long MEM_SIZE = sizeof(float) * (int)this->mesh->GetNumberOfCells();
+    const size_t MEM_SIZE = this->data_type_size * this->mesh->GetNumberOfCells();
     this->iCurrentBuffer = 0;
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
-        float* data = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(ic).c_str()) )->GetPointer(0);
+        const void* data = this->mesh->GetCellData()->GetArray(GetChemicalName(ic).c_str())->WriteVoidPointer(0,0);
         ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: ");
+        throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : data buffer writing failed: ");
     }
 
     // fill indices buffer
-    const unsigned long NBORS_INDICES_SIZE = sizeof(int) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
+    const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     ret = clEnqueueWriteBuffer(this->command_queue,this->clBuffer_cell_neighbor_indices, CL_TRUE, 0, NBORS_INDICES_SIZE, this->cell_neighbor_indices, 0, NULL, NULL);
-    throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: ");
+    throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : indices buffer writing failed: ");
 
     // fill weights buffer
-    const unsigned long NBORS_WEIGHTS_SIZE = sizeof(float) * (unsigned long)this->mesh->GetNumberOfCells() * this->max_neighbors;
+    const size_t NBORS_WEIGHTS_SIZE = sizeof(float) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     ret = clEnqueueWriteBuffer(this->command_queue,this->clBuffer_cell_neighbor_weights, CL_TRUE, 0, NBORS_WEIGHTS_SIZE, this->cell_neighbor_weights, 0, NULL, NULL);
-    throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : buffer writing failed: ");
+    throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : weights buffer writing failed: ");
 
     this->need_write_to_opencl_buffers = false;
 }
@@ -259,12 +258,14 @@ void OpenCLMeshRD::WriteToOpenCLBuffersIfNeeded()
 void OpenCLMeshRD::ReadFromOpenCLBuffers()
 {
     // read from opencl buffers into our mesh data
-    const unsigned long MEM_SIZE = sizeof(float) * (int)this->mesh->GetNumberOfCells();
+    const size_t MEM_SIZE = this->data_type_size * this->mesh->GetNumberOfCells();
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
-        float* data = vtkFloatArray::SafeDownCast( this->mesh->GetCellData()->GetArray(GetChemicalName(ic).c_str()) )->GetPointer(0);
+        vtkDataArray *array = this->mesh->GetCellData()->GetArray(GetChemicalName(ic).c_str());
+        if( !array ) throw runtime_error( "OpenCLMeshRD::ReadFromOpenCLBuffers : named array not found" );
+        void* data = array->WriteVoidPointer(0,0);
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLMeshRD::ReadFromOpenCLBuffers : buffer reading failed: ");
+        throwOnError(ret,"OpenCLMeshRD::ReadFromOpenCLBuffers : data buffer reading failed: ");
     }
 }
 

@@ -60,6 +60,9 @@ namespace OpenCL_utils
     /// Returns a description of this device.
     std::string GetDeviceDescription(int iPlatform,int iDevice);
 
+    /// Returns whether we can use double precision on this device.
+    bool CanUseDoubles(int iPlatform,int iDevice);
+
     /// Returns a description of the OpenCL error code.
     const char* GetDescriptionOfOpenCLError(cl_int err);
 

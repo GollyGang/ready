@@ -24,6 +24,8 @@ class InbuiltMeshRD : public MeshRD
 {
     public:
 
+        InbuiltMeshRD(int data_type) : MeshRD(data_type) {}
+
         virtual std::string GetRuleType() const { return "inbuilt"; }
 
         virtual bool HasEditableFormula() const { return false; }
