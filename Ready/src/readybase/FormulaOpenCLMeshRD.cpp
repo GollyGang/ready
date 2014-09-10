@@ -29,8 +29,8 @@ using namespace std;
 
 // -------------------------------------------------------------------------
 
-FormulaOpenCLMeshRD::FormulaOpenCLMeshRD(int opencl_platform,int opencl_device)
-    : OpenCLMeshRD(opencl_platform,opencl_device)
+FormulaOpenCLMeshRD::FormulaOpenCLMeshRD(int opencl_platform,int opencl_device,int data_type)
+    : OpenCLMeshRD(opencl_platform,opencl_device,data_type)
 {
     // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");
@@ -53,21 +53,31 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
 
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
+    if( this->data_type == VTK_DOUBLE ) {
+        kernel_source << "\
+#ifdef cl_khr_fp64\n\
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
+#elif defined(cl_amd_fp64)\n\
+    #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n\
+#else\n\
+    #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
+#endif\n\n";
+    }
     // output the function definition
     kernel_source << "__kernel void rd_compute(";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global float *" << GetChemicalName(i) << "_in,";
+        kernel_source << "__global " << this->data_type_string << " *" << GetChemicalName(i) << "_in,";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global float *" << GetChemicalName(i) << "_out,";
+        kernel_source << "__global " << this->data_type_string << " *" << GetChemicalName(i) << "_out,";
     kernel_source << "__global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)\n";
     // output the body
     kernel_source << "{\n";
     kernel_source << indent << "const int index_x = get_global_id(0);\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_x];\n";
+        kernel_source << indent << this->data_type_string << " " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_x];\n";
     // compute the laplacians
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float laplacian_" << GetChemicalName(i) << " = 0.0f;\n";
+        kernel_source << indent << this->data_type_string << " laplacian_" << GetChemicalName(i) << " = 0.0" << this->data_type_suffix << ";\n";
     kernel_source << indent << "int _offset = index_x * max_neighbors;\n";
     kernel_source << indent << "for(int _i=0;_i<max_neighbors;_i++)\n" << indent << "{\n";
     for(int i=0;i<NC;i++)
@@ -78,15 +88,15 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
         kernel_source << indent << "laplacian_" << GetChemicalName(i) << " -= " << GetChemicalName(i) << ";\n";
     kernel_source << indent << "// scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "laplacian_" << GetChemicalName(i) << " *= 4.0f;\n"; // TODO: not sure about 3D meshes
+        kernel_source << indent << "laplacian_" << GetChemicalName(i) << " *= 4.0" << this->data_type_suffix << ";\n"; // TODO: not sure about 3D meshes
     // the parameters (assume all float for now)
     kernel_source << "\n" << indent << "// parameters:\n";
     for(int i=0;i<(int)this->parameters.size();i++)
-        kernel_source << indent << "float " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
+        kernel_source << indent << this->data_type_string << " " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
     // the update step
     kernel_source << "\n" << indent << "// update step:\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float delta_" << GetChemicalName(i) << " = 0.0f;\n";
+        kernel_source << indent << this->data_type_string << " delta_" << GetChemicalName(i) << " = 0.0" << this->data_type_suffix << ";\n";
     kernel_source << f << "\n";
     kernel_source << "\n";
     for(int i=0;i<NC;i++)

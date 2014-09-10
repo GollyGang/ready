@@ -28,9 +28,11 @@
 #include <Properties.hpp>
 
 // VTK:
-#include <vtkXMLGenericDataObjectReader.h>
+#include <vtkCellData.h>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkXMLGenericDataObjectReader.h>
 
 // STL:
 #include <stdexcept>
@@ -54,9 +56,9 @@ AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_av
     
     vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
     bool parallel;
-    int data_type = generic_reader->ReadOutputType(filename,parallel);
+    int data_structure_type = generic_reader->ReadOutputType(filename,parallel);
     AbstractRD *system;
-    switch(data_type)
+    switch(data_structure_type)
     {
         case VTK_IMAGE_DATA: 
             system = CreateFromImageDataFile(filename,is_opencl_available,opencl_platform,opencl_device,
@@ -88,6 +90,7 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     reader->Update();
     vtkImageData *image = reader->GetOutput();
 
+    int data_type = image->GetPointData()->GetArray(0)->GetDataType();
     string type = reader->GetType();
     string name = reader->GetName();
 
@@ -103,13 +106,13 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     {
         if(!is_opencl_available) 
             throw runtime_error("Pattern requires OpenCL");
-        image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device);
+        image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
         if(!is_opencl_available) 
             throw runtime_error("Pattern requires OpenCL");
-        image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device);
+        image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device,data_type);
     }
     else throw runtime_error("Unsupported rule type: "+type);
     image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
@@ -143,6 +146,7 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     reader->Update();
     vtkUnstructuredGrid *ugrid = reader->GetOutput();
 
+    int data_type = ugrid->GetCellData()->GetArray(0)->GetDataType();
     string type = reader->GetType();
     string name = reader->GetName();
 
@@ -158,13 +162,13 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     {
         if(!is_opencl_available) 
             throw runtime_error("Pattern requires OpenCL");
-        mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device);
+        mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
         if(!is_opencl_available) 
             throw runtime_error("Pattern requires OpenCL");
-        mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device);
+        mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device,data_type);
     }
     else throw runtime_error("Unsupported rule type: "+type);
 

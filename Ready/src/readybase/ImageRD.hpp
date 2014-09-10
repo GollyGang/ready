@@ -31,7 +31,7 @@ class ImageRD : public AbstractRD
 {
     public:
 
-        ImageRD();
+        ImageRD(int data_type);
         virtual ~ImageRD();
 
         virtual void SaveFile(const char* filename,const Properties& render_settings,
@@ -86,11 +86,11 @@ class ImageRD : public AbstractRD
         vtkImageData* GetImage(int iChemical) const;
 
         /// use to change the dimensions or the number of chemicals
-        virtual void AllocateImages(int x,int y,int z,int nc);
+        virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
 
         void DeallocateImages();
 
-        static vtkImageData* AllocateVTKImage(int x,int y,int z);
+        static vtkImageData* AllocateVTKImage(int x,int y,int z,int data_type);
 
         virtual int GetArenaDimensionality() const;
 

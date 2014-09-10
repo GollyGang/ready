@@ -29,8 +29,8 @@ using namespace std;
 
 // -------------------------------------------------------------------------
 
-FormulaOpenCLImageRD::FormulaOpenCLImageRD(int opencl_platform,int opencl_device)
-    : OpenCLImageRD(opencl_platform,opencl_device)
+FormulaOpenCLImageRD::FormulaOpenCLImageRD(int opencl_platform,int opencl_device,int data_type)
+    : OpenCLImageRD(opencl_platform,opencl_device,data_type)
 {
     // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");
@@ -40,7 +40,7 @@ FormulaOpenCLImageRD::FormulaOpenCLImageRD(int opencl_platform,int opencl_device
     this->AddParameter("k",0.06f);
     this->AddParameter("F",0.035f);
     this->SetFormula("\
-delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
+delta_a = D_a * laplacian_a - a*b*b + F*(1.0"+this->data_type_suffix+"-a);\n\
 delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;");
 }
 
@@ -53,13 +53,23 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
 
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
+    if( this->data_type == VTK_DOUBLE ) {
+        kernel_source << "\
+#ifdef cl_khr_fp64\n\
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
+#elif defined(cl_amd_fp64)\n\
+    #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n\
+#else\n\
+    #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
+#endif\n\n";
+    }
     // output the function definition
     kernel_source << "__kernel void rd_compute(";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global float4 *" << GetChemicalName(i) << "_in,";
+        kernel_source << "__global " << this->data_type_string << "4 *" << GetChemicalName(i) << "_in,";
     for(int i=0;i<NC;i++)
     {
-        kernel_source << "__global float4 *" << GetChemicalName(i) << "_out";
+        kernel_source << "__global " << this->data_type_string << "4 *" << GetChemicalName(i) << "_out";
         if(i<NC-1)
             kernel_source << ",";
     }
@@ -73,7 +83,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         indent << "const int Z = get_global_size(2);\n" <<
         indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "float4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_here];\n"; // "float4 a = a_in[index_here];"
+        kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_here];\n"; // "float4 a = a_in[index_here];"
     if(this->neighborhood_type==FACE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1) // neighborhood_weight not relevant
     {
         const int NDIRS = 6;
@@ -83,12 +93,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 3D 7-point stencil: [ [ 0,0,0; 0,1,0; 0,0,0 ], [0,1,0; 1,-6,1; 0,1,0 ], [ 0,0,0; 0,1,0; 0,0,0 ] ]\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n" << 
-                indent << "const int ym1 = ((index_y-1+Y) & (Y-1));\n" <<
-                indent << "const int yp1 = ((index_y+1) & (Y-1));\n" <<
-                indent << "const int zm1 = ((index_z-1+Z) & (Z-1));\n" <<
-                indent << "const int zp1 = ((index_z+1) & (Z-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" << 
+                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+                indent << "const int yp1 = (index_y+1) & (Y-1);\n" <<
+                indent << "const int zm1 = (index_z-1+Z) & (Z-1);\n" <<
+                indent << "const int zp1 = (index_z+1) & (Z-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -106,12 +116,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_back =  X*(Y*zp1 + index_y) + index_x;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -6.0f; // center weight\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -6.0" << this->data_type_suffix << "; // center weight\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << 
                 chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w + " << chem << "_fore.x + " << chem << "_back.x,\n";
             kernel_source << indent << 
                 chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x + " << chem << "_fore.y + " << chem << "_back.y,\n";
@@ -133,10 +143,10 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 2D 5-point stencil: [ 0,1,0; 1,-4,1; 0,1,0 ]\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n" <<
-                indent << "const int ym1 = ((index_y-1+Y) & (Y-1));\n" <<
-                indent << "const int yp1 = ((index_y+1) & (Y-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
+                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+                indent << "const int yp1 = (index_y+1) & (Y-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -150,12 +160,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_down =  X*(Y*index_z + yp1) + index_x;";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -4.0f; // center weight\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -4.0" << this->data_type_suffix << "; // center weight\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)("
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)("
                 << chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w,\n";
             kernel_source << indent <<
                 chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x,\n";
@@ -177,8 +187,8 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 1D 3-point stencil: [ 1,-2,1 ]\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -188,12 +198,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_right = X*(Y*index_z + index_y) + xp1;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -2.0f; // center weight\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -2.0" << this->data_type_suffix << "; // center weight\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << chem << "_left.w + " << chem << ".y,\n";
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << chem << "_left.w + " << chem << ".y,\n";
             kernel_source << indent << chem << ".x + " << chem << ".z,\n";
             kernel_source << indent << chem << ".y + " << chem << ".w,\n";
             kernel_source << indent << chem << ".z + " << chem << "_right.x) + _K0*" << chem << ";\n";
@@ -209,10 +219,10 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n" <<
-                indent << "const int ym1 = ((index_y-1+Y) & (Y-1));\n" <<
-                indent << "const int yp1 = ((index_y+1) & (Y-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
+                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+                indent << "const int yp1 = (index_y+1) & (Y-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -230,14 +240,14 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_nw = X*(Y*index_z + ym1) + xm1;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -20.0f/6.0f; // center weight\n";
-        kernel_source << indent << "const float _K1 = 4.0f/6.0f; // edge-neighbors\n";
-        kernel_source << indent << "const float _K2 = 1.0f/6.0f; // vertex-neighbors\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -20.0" << this->data_type_suffix << "/6.0" << this->data_type_suffix << "; // center weight\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K1 = 4.0" << this->data_type_suffix << "/6.0" << this->data_type_suffix << "; // edge-neighbors\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K2 = 1.0" << this->data_type_suffix << "/6.0" << this->data_type_suffix << "; // vertex-neighbors\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << 
                 chem << "_n.x*_K1 + " << chem << "_n.y*_K2 + " << chem << ".y*_K1 + " << chem << "_s.y*_K2 + " 
                 << chem << "_s.x*_K1 + " << chem << "_sw.w*_K2 + " << chem << "_w.w*_K1 + " << chem << "_nw.w*_K2,\n";
             kernel_source << indent << 
@@ -264,10 +274,10 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 2D equal-weighted 9-point stencil: [ 1,1,1; 1,-8,1; 1,1,1 ] / 2\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n" <<
-                indent << "const int ym1 = ((index_y-1+Y) & (Y-1));\n" <<
-                indent << "const int yp1 = ((index_y+1) & (Y-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
+                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+                indent << "const int yp1 = (index_y+1) & (Y-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -285,13 +295,13 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_nw = X*(Y*index_z + ym1) + xm1;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -4.0f; // center weight\n";
-        kernel_source << indent << "const float4 _K1 = 1.0f/2.0f; // edge-neighbors\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -4.0" << this->data_type_suffix << "; // center weight\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K1 = 1.0" << this->data_type_suffix << "/2.0" << this->data_type_suffix << "; // edge-neighbors\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(" << 
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << 
                 chem << "_n.x + " << chem << "_n.y + " << chem << ".y + " << chem << "_s.y + " << chem << "_s.x + " << chem << "_sw.w + " << chem << "_w.w + " << chem << "_nw.w,\n";
             kernel_source << indent << 
                 chem << "_n.y + " << chem << "_n.z + " << chem << ".z + " << chem << "_s.z + " << chem << "_s.y + " << chem << "_s.x + " << chem << ".x + " << chem << "_n.x,\n";
@@ -317,12 +327,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 3D 19-point stencil: [ [ 0,1,0; 1,2,1; 0,1,0 ], [ 1,2,1; 2,-24,2; 1,2,1 ], [ 0,1,0; 1,2,1; 0,1,0 ] ] / 6\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n" <<
-                indent << "const int ym1 = ((index_y-1+Y) & (Y-1));\n" <<
-                indent << "const int yp1 = ((index_y+1) & (Y-1));\n" <<
-                indent << "const int zm1 = ((index_z-1+Z) & (Z-1));\n" <<
-                indent << "const int zp1 = ((index_z+1) & (Z-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
+                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+                indent << "const int yp1 = (index_y+1) & (Y-1);\n" <<
+                indent << "const int zm1 = (index_z-1+Z) & (Z-1);\n" <<
+                indent << "const int zp1 = (index_z+1) & (Z-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -352,14 +362,14 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_uw =  X*(Y*zp1 + index_y) + xm1;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -24.0f/6.0f; // center weight\n";
-        kernel_source << indent << "const float _K1 = 2.0f/6.0f; // face-neighbors\n";
-        kernel_source << indent << "const float _K2 = 1.0f/6.0f; // edge-neighbors\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -24.0" << this->data_type_suffix << "/6.0" << this->data_type_suffix << "; // center weight\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K1 = 2.0" << this->data_type_suffix << "/6.0" << this->data_type_suffix << "; // face-neighbors\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K2 = 1.0" << this->data_type_suffix << "/6.0" << this->data_type_suffix << "; // edge-neighbors\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(\n";
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(\n";
             // x:
             // first collect the 6 face-neighbors:
             kernel_source << indent << indent << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " << 
@@ -414,12 +424,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "// 3D 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26\n";
         if(this->wrap)
             kernel_source <<
-                indent << "const int xm1 = ((index_x-1+X) & (X-1)); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = ((index_x+1) & (X-1));\n" <<
-                indent << "const int ym1 = ((index_y-1+Y) & (Y-1));\n" <<
-                indent << "const int yp1 = ((index_y+1) & (Y-1));\n" <<
-                indent << "const int zm1 = ((index_z-1+Z) & (Z-1));\n" <<
-                indent << "const int zp1 = ((index_z+1) & (Z-1));\n";
+                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
+                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+                indent << "const int yp1 = (index_y+1) & (Y-1);\n" <<
+                indent << "const int zm1 = (index_z-1+Z) & (Z-1);\n" <<
+                indent << "const int zp1 = (index_z+1) & (Z-1);\n";
         else
             kernel_source <<
                 indent << "const int xm1 = max(0,index_x-1);\n" <<
@@ -457,15 +467,15 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             indent << "const int index_unw = X*(Y*zp1 + ym1) + xm1;\n";
         for(int iC=0;iC<NC;iC++)
             for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << "float4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const float4 _K0 = -88.0f/26.0f; // center weight\n";
-        kernel_source << indent << "const float _K1 = 6.0f/26.0f; // face-neighbors\n";
-        kernel_source << indent << "const float _K2 = 3.0f/26.0f; // edge-neighbors\n";
-        kernel_source << indent << "const float _K3 = 2.0f/26.0f; // corner-neighbors\n";
+                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -88.0" << this->data_type_suffix << "/26.0" << this->data_type_suffix << "; // center weight\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K1 = 6.0" << this->data_type_suffix << "/26.0" << this->data_type_suffix << "; // face-neighbors\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K2 = 3.0" << this->data_type_suffix << "/26.0" << this->data_type_suffix << "; // edge-neighbors\n";
+        kernel_source << indent << "const " << this->data_type_string << " _K3 = 2.0" << this->data_type_suffix << "/26.0" << this->data_type_suffix << "; // corner-neighbors\n";
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << "float4 laplacian_" << chem << " = (float4)(\n";
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(\n";
             // x:
             // first collect the 6 face-neighbors:
             kernel_source << indent << indent << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " << 
@@ -530,11 +540,11 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     }
     kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << "float4 delta_" << GetChemicalName(iC) << " = 0.0f;\n";
+        kernel_source << indent << this->data_type_string << "4 delta_" << GetChemicalName(iC) << " = 0.0" << this->data_type_suffix << ";\n";
     kernel_source << "\n";
     // the parameters (assume all float for now)
     for(int i=0;i<(int)this->parameters.size();i++)
-        kernel_source << indent << "float4 " << this->parameters[i].first << " = " << this->parameters[i].second << "f;\n";
+        kernel_source << indent << this->data_type_string << "4 " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
     kernel_source << "\n";
     // the formula
     istringstream iss(formula);

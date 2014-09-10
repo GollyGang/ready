@@ -71,13 +71,14 @@ void OpenCL_utils::throwOnError(cl_int ret,const char* message)
 
 // ---------------------------------------------------------------------------------------------------------
 
-std::string OpenCL_utils::GetOpenCLDiagnostics()
+std::string OpenCL_utils::GetOpenCLDiagnostics() // should never throw
 {
     ostringstream report;
 
-    if(LinkOpenCL()!= CL_SUCCESS)
+    cl_int ret = LinkOpenCL();
+    if(ret != CL_SUCCESS)
     {
-        report << "Failed to load dynamic library for OpenCL";
+        report << "Failed to load dynamic library for OpenCL: " << GetDescriptionOfOpenCLError(ret);
         return report.str();
     }
 
@@ -85,8 +86,13 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
     const size_t MAX_PLATFORMS = 10;
     cl_platform_id platforms_available[MAX_PLATFORMS];
     cl_uint num_platforms;
-    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
-    if(ret != CL_SUCCESS || num_platforms==0)
+    ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    if(ret != CL_SUCCESS)
+    {
+        report << "clGetPlatformIDs failed: " << GetDescriptionOfOpenCLError(ret);
+        return report.str();
+    }
+    if(num_platforms==0)
     {
         report << "No OpenCL platforms available";
         // currently only likely to see this when running in a virtualized OS, where an opencl.dll is found but doesn't work
@@ -103,14 +109,24 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
             size_t info_length;
             for(cl_platform_info i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
             {
-                clGetPlatformInfo(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&info_length);
+                ret = clGetPlatformInfo(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&info_length);
+                if(ret != CL_SUCCESS)
+                {
+                    report << "clGetPlatformInfo failed: " << GetDescriptionOfOpenCLError(ret);
+                    return report.str();
+                }
                 report << GetPlatformInfoIdAsString(i) << " : " << info << "\n";
             }
 
             const size_t MAX_DEVICES = 10;
             cl_device_id devices_available[MAX_DEVICES];
             cl_uint num_devices;
-            clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
+            ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,MAX_DEVICES,devices_available,&num_devices);
+            if(ret != CL_SUCCESS)
+            {
+                report << "clGetDeviceIDs failed: " << GetDescriptionOfOpenCLError(ret);
+                return report.str();
+            }
             report << "\nFound " << num_devices << " device(s) on this platform.\n";
 
             const int N_CHAR_RETURNING_IDS = 6;
@@ -130,52 +146,107 @@ std::string OpenCL_utils::GetOpenCLDiagnostics()
             const int N_SIZET_RETURNING_IDS = 8;
             cl_device_info sizetReturningIds[N_SIZET_RETURNING_IDS] = {CL_DEVICE_IMAGE2D_MAX_HEIGHT,CL_DEVICE_IMAGE2D_MAX_WIDTH,CL_DEVICE_IMAGE3D_MAX_DEPTH,CL_DEVICE_IMAGE3D_MAX_HEIGHT,
                 CL_DEVICE_IMAGE3D_MAX_WIDTH,CL_DEVICE_MAX_PARAMETER_SIZE,CL_DEVICE_MAX_WORK_GROUP_SIZE,CL_DEVICE_PROFILING_TIMER_RESOLUTION};
+            const int N_FPCONFIG_RETURNING_IDS = 2;
+            cl_device_info fpConfigReturningIds[N_FPCONFIG_RETURNING_IDS] = {CL_DEVICE_SINGLE_FP_CONFIG,CL_DEVICE_DOUBLE_FP_CONFIG};
 
             cl_uint uint_value;
             cl_bool bool_value;
             cl_ulong ulong_value;
             size_t sizet_value;
+            cl_device_fp_config fp_config_value;
             for(unsigned int iDevice=0;iDevice<num_devices;iDevice++)
             {
                 report << "Device " << iDevice+1 << ":\n";
                 for(int i=0;i<N_CHAR_RETURNING_IDS;i++)
                 {
-                    clGetDeviceInfo(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,&info_length);
-                    report << GetDeviceInfoIdAsString(charReturningIds[i]) << " : " << info << "\n";
+                    ret = clGetDeviceInfo(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,NULL);
+                    if(ret != CL_SUCCESS) {
+                        report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                    }
+                    else {
+                        report << GetDeviceInfoIdAsString(charReturningIds[i]) << " : " << info << "\n";
+                    }
                 }
                 for(int i=0;i<N_UINT_RETURNING_IDS;i++)
                 {
-                    clGetDeviceInfo(devices_available[iDevice],uintReturningIds[i],sizeof(uint_value),&uint_value,&info_length);
-                    report << GetDeviceInfoIdAsString(uintReturningIds[i]) << " : " << uint_value << "\n";
+                    ret = clGetDeviceInfo(devices_available[iDevice],uintReturningIds[i],sizeof(uint_value),&uint_value,NULL);
+                    if(ret != CL_SUCCESS) {
+                        report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                    }
+                    else {
+                        report << GetDeviceInfoIdAsString(uintReturningIds[i]) << " : " << uint_value << "\n";
+                    }
                 }
                 for(int i=0;i<N_BOOL_RETURNING_IDS;i++)
                 {
-                    clGetDeviceInfo(devices_available[iDevice],boolReturningIds[i],sizeof(bool_value),&bool_value,&info_length);
-                    report << GetDeviceInfoIdAsString(boolReturningIds[i]) << " : " << (bool_value?"yes":"no") << "\n";
+                    ret = clGetDeviceInfo(devices_available[iDevice],boolReturningIds[i],sizeof(bool_value),&bool_value,NULL);
+                    if(ret != CL_SUCCESS) {
+                        report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                    }
+                    else {
+                        report << GetDeviceInfoIdAsString(boolReturningIds[i]) << " : " << (bool_value?"yes":"no") << "\n";
+                    }
                 }
                 for(int i=0;i<N_ULONG_RETURNING_IDS;i++)
                 {
-                    clGetDeviceInfo(devices_available[iDevice],ulongReturningIds[i],sizeof(ulong_value),&ulong_value,&info_length);
-                    report << GetDeviceInfoIdAsString(ulongReturningIds[i]) << " : " << ulong_value << "\n";
+                    ret = clGetDeviceInfo(devices_available[iDevice],ulongReturningIds[i],sizeof(ulong_value),&ulong_value,NULL);
+                    if(ret != CL_SUCCESS) {
+                        report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                    }
+                    else {
+                        report << GetDeviceInfoIdAsString(ulongReturningIds[i]) << " : " << ulong_value << "\n";
+                    }
                 }
                 for(int i=0;i<N_SIZET_RETURNING_IDS;i++)
                 {
-                    clGetDeviceInfo(devices_available[iDevice],sizetReturningIds[i],sizeof(sizet_value),&sizet_value,&info_length);
-                    report << GetDeviceInfoIdAsString(sizetReturningIds[i]) << " : " << sizet_value << "\n";
+                    ret = clGetDeviceInfo(devices_available[iDevice],sizetReturningIds[i],sizeof(sizet_value),&sizet_value,NULL);
+                    if(ret != CL_SUCCESS) {
+                        report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                    }
+                    else {
+                        report << GetDeviceInfoIdAsString(sizetReturningIds[i]) << " : " << sizet_value << "\n";
+                    }
+                }
+                for(int i=0;i<N_FPCONFIG_RETURNING_IDS;i++)
+                {
+                    ret = clGetDeviceInfo(devices_available[iDevice],fpConfigReturningIds[i],sizeof(fp_config_value),&fp_config_value,NULL);
+                    if(ret != CL_SUCCESS) {
+                        report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                    }
+                    else {
+                        report << GetDeviceInfoIdAsString(fpConfigReturningIds[i]) << " :";
+                        if(fp_config_value&CL_FP_DENORM) report << " CL_FP_DENORM";
+                        if(fp_config_value&CL_FP_INF_NAN) report << " CL_FP_INF_NAN";
+                        if(fp_config_value&CL_FP_ROUND_TO_NEAREST) report << " CL_FP_ROUND_TO_NEAREST";
+                        if(fp_config_value&CL_FP_ROUND_TO_ZERO) report << " CL_FP_ROUND_TO_ZERO";
+                        if(fp_config_value&CL_FP_ROUND_TO_INF ) report << " CL_FP_ROUND_TO_INF";
+                        if(fp_config_value&CL_FP_FMA) report << " CL_FP_FMA";
+                        report << "\n";
+                    }
                 }
                 // CL_DEVICE_MAX_WORK_ITEM_SIZES:
                 size_t dim[3];
-                clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_MAX_WORK_ITEM_SIZES,sizeof(dim),dim,&info_length);
-                report << GetDeviceInfoIdAsString(CL_DEVICE_MAX_WORK_ITEM_SIZES) << " : " << dim[0] << ", " << dim[1] << ", " << dim[2] << "\n";
+                ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_MAX_WORK_ITEM_SIZES,sizeof(dim),dim,NULL);
+                if(ret != CL_SUCCESS) {
+                    report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                }
+                else {
+                    report << GetDeviceInfoIdAsString(CL_DEVICE_MAX_WORK_ITEM_SIZES) << " : " << dim[0] << ", " << dim[1] << ", " << dim[2] << "\n";
+                }
                 // CL_DEVICE_TYPE:
                 cl_device_type device_type;
-                clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_TYPE,sizeof(device_type),&device_type,&info_length);
-                ostringstream oss;
-                if(device_type&CL_DEVICE_TYPE_CPU) oss << "CPU";
-                if(device_type&CL_DEVICE_TYPE_GPU) { if(!oss.str().empty()) { oss << " & "; } oss << "GPU"; }
-                if(device_type&CL_DEVICE_TYPE_ACCELERATOR) { if(!oss.str().empty()) { oss << " & "; } oss << "ACCELERATOR"; }
-                if(device_type&CL_DEVICE_TYPE_DEFAULT) { if(!oss.str().empty()) { oss << " & "; } oss << "DEFAULT"; }
-                report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
+                ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_TYPE,sizeof(device_type),&device_type,NULL);
+                if(ret != CL_SUCCESS) {
+                    report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                }
+                else {
+                    ostringstream oss;
+                    if(device_type&CL_DEVICE_TYPE_CPU) oss << "CPU";
+                    if(device_type&CL_DEVICE_TYPE_GPU) { if(!oss.str().empty()) { oss << " & "; } oss << "GPU"; }
+                    if(device_type&CL_DEVICE_TYPE_ACCELERATOR) { if(!oss.str().empty()) { oss << " & "; } oss << "ACCELERATOR"; }
+                    if(device_type&CL_DEVICE_TYPE_DEFAULT) { if(!oss.str().empty()) { oss << " & "; } oss << "DEFAULT"; }
+                    report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
+                }
             }
             report << "\n";
         }
@@ -350,6 +421,35 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
 
 // ---------------------------------------------------------------------------------------------------------
 
+bool OpenCL_utils::CanUseDoubles(int iPlatform,int iDevice)
+{
+    LinkOpenCL();
+
+    // get available OpenCL platforms
+    const size_t MAX_PLATFORMS = 10;
+    cl_platform_id platforms_available[MAX_PLATFORMS];
+    cl_uint num_platforms;
+    cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
+    throwOnError(ret,"OpenCL_utils::CanUseDoubles : clGetPlatformIDs failed: ");
+
+    ostringstream oss;
+    const size_t MAX_DEVICES = 10;
+    cl_device_id devices_available[MAX_DEVICES];
+    cl_uint num_devices;
+    ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,
+        MAX_DEVICES,devices_available,&num_devices);
+    throwOnError(ret,"OpenCL_utils::CanUseDoubles : clGetDeviceIDs failed: ");
+
+    cl_device_fp_config double_fp_config;
+    ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_DOUBLE_FP_CONFIG,
+        sizeof(double_fp_config),&double_fp_config,NULL);
+    throwOnError(ret,"OpenCL_utils::CanUseDoubles : clGetDeviceInfo failed: ");
+
+    return double_fp_config > 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------
+
 cl_int OpenCL_utils::LinkOpenCL()
 {
 #ifdef __APPLE__
@@ -463,6 +563,7 @@ const char* OpenCL_utils::GetDeviceInfoIdAsString(cl_device_info i)
         case CL_DEVICE_MAX_SAMPLERS:                   return "CL_DEVICE_MAX_SAMPLERS";
         case CL_DEVICE_MEM_BASE_ADDR_ALIGN:            return "CL_DEVICE_MEM_BASE_ADDR_ALIGN";
         case CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE:       return "CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE";
+        case CL_DEVICE_DOUBLE_FP_CONFIG:               return "CL_DEVICE_DOUBLE_FP_CONFIG";
         case CL_DEVICE_SINGLE_FP_CONFIG:               return "CL_DEVICE_SINGLE_FP_CONFIG";
         case CL_DEVICE_GLOBAL_MEM_CACHE_TYPE:          return "CL_DEVICE_GLOBAL_MEM_CACHE_TYPE";
         case CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE:      return "CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE";

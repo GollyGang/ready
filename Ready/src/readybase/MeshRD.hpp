@@ -31,7 +31,7 @@ class MeshRD : public AbstractRD
 {
     public:
 
-        MeshRD();
+        MeshRD(int data_type);
         virtual ~MeshRD();
 
         virtual void SaveFile(const char* filename,const Properties& render_settings,

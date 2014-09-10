@@ -39,7 +39,7 @@ class AbstractRD
 {
     public:
 
-        AbstractRD();
+        AbstractRD(int data_type);
         virtual ~AbstractRD();
 
         /// Load this pattern from an RD element.
@@ -160,6 +160,9 @@ class AbstractRD
         int GetNeighborhoodRange() const;
         std::string GetNeighborhoodWeight() const;
 
+        /// Retrieve the data type used for storing values (VTK_FLOAT or VTK_DOUBLE)
+        int GetDataType() const;
+
     protected: // typedefs
 
         enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
@@ -182,6 +185,11 @@ class AbstractRD
         std::string rule_name, description;
 
         int n_chemicals;
+
+        int data_type;
+        size_t data_type_size;
+        std::string data_type_string;
+        std::string data_type_suffix;
 
         std::vector<Overlay*> initial_pattern_generator;
 

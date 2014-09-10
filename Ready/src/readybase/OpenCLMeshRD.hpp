@@ -27,7 +27,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
 {
     public:
 
-        OpenCLMeshRD(int opencl_platform,int opencl_device);
+        OpenCLMeshRD(int opencl_platform,int opencl_device,int data_type);
         virtual ~OpenCLMeshRD();
 
         virtual void SetNumberOfChemicals(int n);

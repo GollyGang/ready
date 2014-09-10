@@ -31,6 +31,7 @@ using namespace std;
 #include <vtkImageData.h>
 
 GrayScottImageRD::GrayScottImageRD()
+    : InbuiltImageRD(VTK_FLOAT)
 {
     this->rule_name = "Gray-Scott";
     this->n_chemicals = 2;
@@ -41,15 +42,16 @@ GrayScottImageRD::GrayScottImageRD()
     this->AddParameter("F",0.035f);
 }
 
-void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc)
+void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
+    // N.B. this class is hardwired for Gray-Scott using floats, so data_type is ignored
     if(nc!=2) throw runtime_error("GrayScottImageRD::AllocateImages : this implementation is for 2 chemicals only"); 
-    ImageRD::AllocateImages(x,y,z,2);
+    ImageRD::AllocateImages(x,y,z,2,VTK_FLOAT);
     // also allocate our buffer images
     this->DeleteBuffers();
     this->buffer_images.resize(2);
     for(int i=0;i<2;i++)
-        this->buffer_images[i] = AllocateVTKImage(x,y,z);
+        this->buffer_images[i] = AllocateVTKImage(x,y,z,VTK_FLOAT);
 }
 
 GrayScottImageRD::~GrayScottImageRD()
