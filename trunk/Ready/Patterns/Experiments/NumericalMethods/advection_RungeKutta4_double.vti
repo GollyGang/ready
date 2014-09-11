@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+    <description>
+      The advection equation: da/dt = -da/dx
+
+      Here we are integrating with fourth-order Runge-Kutta, perhaps the most popular of the explicit
+      integration methods.
+
+      &lt;ol&gt;
+      &lt;li&gt;The derivative k1 is computed from the current state, a.
+      &lt;li&gt;A half-step forward in time is taken, using k1: a2 = a + (timestep/2)*k1
+      &lt;li&gt;The derivative k2 is computed from state a2.
+      &lt;li&gt;A half-step forward in time from the start is taken again, using k2 this time: a3 = a + (timestep/2)*k2
+      &lt;li&gt;The derivative k3 is computed from state a3.
+      &lt;li&gt;A full step forward in time from the start is taken, using k3: a4 = a + timestep*k3
+      &lt;li&gt;The derivative k4 is computed from state a4.
+      &lt;li&gt;The new state is given by a' = a + timestep * (k1 + 2*k2 + 2*k3 + k4) / 6
+      &lt;/ol&gt;
+      
+      Strangely this method doesn't outperform the others in this folder. Is this because the deviations in the advection
+      equation are coming from rounding errors rather than from numerical inaccuracies? If we used doubles instead of floats
+      would the difference between these integration methods then become apparent?
+    </description>
+    <rule name="Advection" type="kernel">
+      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+
+#ifdef cl_khr_fp64
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+#elif defined(cl_amd_fp64)
+    #pragma OPENCL EXTENSION cl_amd_fp64 : enable
+#else
+    #error "Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team."
+#endif
+
+double centeredGradient( double a, double b, double c, double dx ) {
+    return ( c - a ) / ( 2.0 * dx );
+}
+
+// given three neighboring samples a,b,c each separated by dx what is the rate of change at b?
+double delta( double a, double b, double c, double dx ) {
+    return - centeredGradient( a, b, c, dx ); // the advection equation: da/dt = -dx/dt
+}
+
+double RungeKutta4( double a, double b, double c, double d, double e, double f, double g, double h, double i, double dx, double dt ) {
+    // take a half step forwards to position 2
+    double b2 = b + 0.5 * dt * delta( a, b, c, dx );
+    double c2 = c + 0.5 * dt * delta( b, c, d, dx );
+    double d2 = d + 0.5 * dt * delta( c, d, e, dx );
+    double e2 = e + 0.5 * dt * delta( d, e, f, dx );
+    double f2 = f + 0.5 * dt * delta( e, f, g, dx );
+    double g2 = g + 0.5 * dt * delta( f, g, h, dx );
+    double h2 = h + 0.5 * dt * delta( g, h, i, dx );
+    // take a half step forwards from the start using the gradient from position 2, to get to position 3
+    double c3 = c + 0.5 * dt * delta( b2, c2, d2, dx );
+    double d3 = d + 0.5 * dt * delta( c2, d2, e2, dx );
+    double e3 = e + 0.5 * dt * delta( d2, e2, f2, dx );
+    double f3 = f + 0.5 * dt * delta( e2, f2, g2, dx );
+    double g3 = g + 0.5 * dt * delta( f2, g2, h2, dx );
+    // take a full step forwards from the start using the gradient from position 3, to get to position 4
+    double d4 = d + dt * delta( c3, d3, e3, dx );
+    double e4 = e + dt * delta( d3, e3, f3, dx );
+    double f4 = f + dt * delta( e3, f3, g3, dx );
+    // now find the gradients from the four positions at the central site
+    double k1 = delta( d,  e,  f,  dx );
+    double k2 = delta( d2, e2, f2, dx );
+    double k3 = delta( d3, e3, f3, dx );
+    double k4 = delta( d4, e4, f4, dx );
+    // combine the gradients to get the step we want
+    return e + dt * ( k1 + 2.0 * k2 + 2.0 * k3 + k4 ) / 6.0;
+}
+
+__kernel void rd_compute(__global double *a_in,__global double *a_out)
+{
+    const int index_x = get_global_id(0);
+    const int index_y = get_global_id(1);
+    const int index_z = get_global_id(2);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int Z = get_global_size(2);
+    const int index_here = X*(Y*index_z + index_y) + index_x;
+
+    const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
+    const int xp1 = ((index_x+1) &amp; (X-1));
+    const int xm2 = ((index_x-2+X) &amp; (X-1));
+    const int xp2 = ((index_x+2) &amp; (X-1));
+    const int xm3 = ((index_x-3+X) &amp; (X-1));
+    const int xp3 = ((index_x+3) &amp; (X-1));
+    const int xm4 = ((index_x-4+X) &amp; (X-1));
+    const int xp4 = ((index_x+4) &amp; (X-1));
+    const int index_p1 =  X*(Y*index_z + index_y) + xp1;
+    const int index_p2 =  X*(Y*index_z + index_y) + xp2;
+    const int index_p3 =  X*(Y*index_z + index_y) + xp3;
+    const int index_p4 =  X*(Y*index_z + index_y) + xp4;
+    const int index_m1 =  X*(Y*index_z + index_y) + xm1;
+    const int index_m2 =  X*(Y*index_z + index_y) + xm2;
+    const int index_m3 =  X*(Y*index_z + index_y) + xm3;
+    const int index_m4 =  X*(Y*index_z + index_y) + xm4;
+
+    double dx = 0.1; // grid spacing
+    double dt = 0.01; // timestep
+    
+    a_out[index_here] = RungeKutta4( a_in[ index_m4 ], a_in[ index_m3 ], a_in[ index_m2 ], a_in[ index_m1 ], a_in[ index_here ], 
+                                     a_in[ index_p1 ], a_in[ index_p2 ], a_in[ index_p3 ], a_in[ index_p4 ], dx, dt );
+}
+      </kernel>
+      
+    </rule>
+    
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a"> <overwrite /> <gaussian height="1" sigma="0.05"> <point3D x="0.5" y="0.5" z="0.5" /> </gaussian> <everywhere /> </overlay>
+    </initial_pattern_generator>
+    
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="1">
+        
+      </color_low>
+      <color_high r="1" g="0" b="0">
+        
+      </color_high>
+      <show_color_scale value="true">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="false">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="a">
+        
+      </active_chemical>
+      <low value="0">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="15">
+        
+      </vertical_scale_2D>
+      <contour_level value="0.25">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="true">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="true">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="8">
+        
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+        
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+        
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+        
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+        
+      </phase_plot_z_axis>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 0 0 0">
+    <PointData>
+      <DataArray type="Float64" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

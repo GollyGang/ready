@@ -4,34 +4,22 @@
     <description>
         The advection equation: da/dt = -da/dx
 
-        Here we are using forward Euler integration, also known as FTCS (Forward Time, Centered Space). 
-        Of all the methods this is the easiest to understand and the worst performing. Notice that 
-        instabilities soon appear and destroy the solution.
-        
-        At every timestep the new value is given by: 
-        
-        new_a = a + timestep * delta_a
-        
-        The other methods in this folder have the same timestep (0.01) but last longer before noticeable errors
-        appear.
+        This version uses three-step Adams-Bashforth integration, with the gradient of the previous two steps 
+        stored in channels b and c. It gets further than the two-step version before noticeable errors appear.
     </description>
-    <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
-      <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
+    <rule name="Advection" type="kernel">
+      <kernel number_of_chemicals="3" block_size_x="1" block_size_y="1" block_size_z="1">
 
-float centeredGradient( float a, float b, float c, float dx ) {
-    return ( c - a ) / ( 2.0 * dx );
-}
+#ifdef cl_khr_fp64
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable
+#elif defined(cl_amd_fp64)
+    #pragma OPENCL EXTENSION cl_amd_fp64 : enable
+#else
+    #error "Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team."
+#endif
 
-// given three neighboring samples a,b,c each separated by dx what is the rate of change at b?
-float delta( float a, float b, float c, float dx ) {
-    return - centeredGradient( a, b, c, dx ); // the advection equation: da/dt = -dx/dt
-}
-
-float forwardEuler( float a, float b, float c, float dx, float dt ) {
-    return b + dt * delta( a, b, c, dx );
-}
-
-__kernel void rd_compute(__global float *a_in,__global float *a_out)
+__kernel void rd_compute(__global double *a_in,__global double *b_in,__global double *c_in,
+                         __global double *a_out,__global double *b_out,__global double *c_out)
 {
     const int index_x = get_global_id(0);
     const int index_y = get_global_id(1);
@@ -41,15 +29,26 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     const int Z = get_global_size(2);
     const int index_here = X*(Y*index_z + index_y) + index_x;
 
+    double a = a_in[index_here];
+    double b = b_in[index_here];
+    double c = c_in[index_here];
+
     const int xm1 = ((index_x-1+X) &amp; (X-1)); // wrap (assumes X is a power of 2)
     const int xp1 = ((index_x+1) &amp; (X-1));
     const int index_e =  X*(Y*index_z + index_y) + xp1;
     const int index_w =  X*(Y*index_z + index_y) + xm1;
-
-    float dx = 0.1f; // grid spacing
-    float dt = 0.01f; // timestep
+    double a_e = a_in[index_e];
+    double a_w = a_in[index_w];
     
-    a_out[index_here] = forwardEuler( a_in[ index_w ], a_in[ index_here ], a_in[ index_e ], dx, dt );
+    double h = 0.1; // grid spacing
+    double x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
+    double delta_a = -x_gradient_a;
+    double timestep = 0.01;
+    a_out[index_here] = a + ( timestep / 12.0 ) * ( 23.0 * delta_a - 16.0 * b + 5.0 * c );
+    b_out[index_here] = delta_a;
+    c_out[index_here] = b;
+    // three-step Adams-Bashforth, where b contains the gradient of
+    // the previous step and c of the step before that
 }
       </kernel>
       
@@ -155,8 +154,14 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
   <ImageData WholeExtent="0 255 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 255 0 0 0 0">
     <PointData>
-      <DataArray type="Float32" Name="a" format="binary" RangeMin="1.9258163405e-022" RangeMax="0.99847531319">
-        AQAAAACAAAAABAAAHAMAAA==eJwdk38slHEcxzUrLRcJMedw59wdzv1wv++5ex5Djm6zmGlkM0aXjVqS1e1i0aVsbLRdIyplVmuti66rMxrVokOErLBVFrnYWl20VdTbX7e7e57v9/N5v18v5sRReqDpL93AvRRqPu/PcHe3M6YbuWFd361hNx2q8IODA+GiL6kRFbTXEdsDs5i1rhnmojGXxeydZV3oPBzpUryPzDcdYi+fnWTPpadHqb2GoojBBE7t9cccckDILdZ3cccKQ3lifjPP5vSK/vXCGP2KvRjNWc2IMWf0x7CqYmOfWlpiK+07+V2uE/xexxR/aUUVV1/TEVdS7i14mHVcEMIcEXjQ4oQbo03CYalbeC9JL0rj3RadSt4lTtssEGc328V7pQHxdTNl8UHWvvjnefskztVSyVLdE4nvkT1SwpAvXXt2V1qZ6CkLLdLJrpgtsp4PH2Ut5Tz5nO2MXLZml8t7digkvsmKn+MNimvLToWfzU9JX09XCoKblTmbI8qgHz6qPk6Kaqj6osrD5VBlFW2o3vny1fxsg3q4qVXt1o+qH5zzIjKdYuLzrIFgJVmIt5cHiMa5dWLFztAwqnWa/WNGTUp3m6bu6qCmQPlN45Pnr/1tlWgbhnK0Ifxa7TStXdu64NAmes9rJ1a2kfSxILLwgIgcN+rJ+WMlZHKgmUx4YyE1n+6QX0X9ZG7HJNm520VW3PKgXtbTqMW2YCrlEZtKtYqoPwUayn1DRyUkZlImeh614FlMFU2XUrayk5Tu/mmKW2OirFNVVEBb9dYnvuN3/I/n8Dzew/s4B+fhXJyPe3Af7sX9mAPzYC7MhzkxL+bG/NgD+2Av7Ic9sS/2xv7IAXkgF+SDnJAXckN+yBF5Ilfki5yRN3JH/ugBfaAX9IOe0Bd6Q3/oEX2iV/SLntE3ekf/4AA8gAvwAU7AC7gBP+AIPIEr8AXOwBu4A39bHP7nEVyCT3AKXsEt+AXH4Blcg29wDt7BPfiHB/ABXsAPeAJf4A38gUfwCV7BL3gG3+Ad/IOH8BFewk94Cl/hLfyFx/AZXsNveA7f4f0/gUCvRQ==
+      <DataArray type="Float64" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float64" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float64" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
       </DataArray>
     </PointData>
     <CellData>
