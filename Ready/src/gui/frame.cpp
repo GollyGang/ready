@@ -1496,16 +1496,16 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     
     // ask user what type of dataset to generate:
     enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
-        BodyCentredCubic, FaceCentredCubic, Diamond }; // TODO: tetrahedral grid (different kinds)
+        BodyCentredCubic, FaceCentredCubic, Diamond, HyperbolicPlane, HyperbolicSpace }; // TODO: tetrahedral grid (different kinds)
     int sel;
     {
-        const int N_CHOICES = 16;
+        const int N_CHOICES = 18;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
             _("Geodesic sphere"), _("Torus"), _("Triangular mesh"), _("Hexagonal mesh"),
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
             _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay honeycomb (tetrahedra)"), 
             _("Body-centred cubic honeycomb (truncated octahedra)"), _("Face-centred cubic honeycomb (rhombic dodecahedra)"), 
-            _("Diamond honeycomb (triakis truncated tetrahedra)") };
+            _("Diamond honeycomb (triakis truncated tetrahedra)"),_("Hyperbolic plane tiling"),_("Hyperbolic space tiling") };
         wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
         dlg.SetSelection(1); // default selection
         dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
@@ -1518,7 +1518,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     Properties previous_render_settings = this->render_settings;
 
     // perhaps at some point we will want this to be determined by the user
-    const int data_type = VTK_FLOAT;
+    const int data_type = VTK_DOUBLE;
     
     this->InitializeDefaultRenderSettings();
     AbstractRD *sys;
@@ -2034,6 +2034,31 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                break;
+            }
+            break;
+            case HyperbolicSpace:
+            {
+                wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetHyperbolicSpaceTiling(mesh,2,data_type);
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
+                else
+                    mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_bounding_box").SetBool(false);
+                this->render_settings.GetProperty("contour_level").SetFloat(-1.0);
+                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                this->render_settings.GetProperty("color_low").SetColor(1,1,1);
+                this->render_settings.GetProperty("show_color_scale").SetBool(false);
                 break;
             }
             break;

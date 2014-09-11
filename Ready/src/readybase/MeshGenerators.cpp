@@ -925,3 +925,206 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
 }
 
 // ---------------------------------------------------------------------
+
+void sphereInversion( const double p[3], const double q[3], const double r, double p_out[3] )
+{
+    //  reflect p in the sphere radius r center q
+    const double r2 = r*r;
+    const double pq2 = pow(p[0]-q[0],2.0) + pow(p[1]-q[1],2.0) + pow(p[2]-q[2],2.0);
+    const double f = r2 / pq2;
+    p_out[0] = q[0] + f * ( p[0] - q[0] );
+    p_out[1] = q[1] + f * ( p[1] - q[1] );
+    p_out[2] = q[2] + f * ( p[2] - q[2] );
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetHyperbolicPlaneTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type)
+{
+}
+
+// ---------------------------------------------------------------------
+
+void MeshGenerators::GetHyperbolicSpaceTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type)
+{
+    // {4,3,5}, following instructions from APG:
+
+    // define the central cube
+    const double t = ( 1 - sqrt( 7 - 3*sqrt(5) ) ) / 3;
+    const double cube_coords[8][3] = {{-t,-t,-t},{t,-t,-t},{t,t,-t},{-t,t,-t},{-t,-t,t},{t,-t,t},{t,t,t},{-t,t,t}};
+    const int cube_faces[6][4] = {{0,1,2,3},{1,5,6,2},{3,2,6,7},{4,0,3,7},{5,1,0,4},{6,5,4,7}};
+
+    // define the mirror spheres
+    const double R = sqrt( 3 - sqrt(5) );
+    const double sphere_centers[6][3] = {{1,0,0},{0,1,0},{0,0,1},{-1,0,0},{0,-1,0},{0,0,-1}};
+
+    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    append->MergePointsOn();
+
+    double p[3];
+
+    // make the central cube
+    {
+        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        vector<vtkIdType> pointIds,faceStream;
+        vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+        for(int iV = 0; iV < 8; ++iV ) {
+            pointIds.push_back( points->InsertNextPoint( cube_coords[iV][0],cube_coords[iV][1],cube_coords[iV][2] ) );
+        }
+        for(int iF = 0; iF < 6; ++iF ) 
+        {
+            faceStream.push_back( 4 );
+            for(int j = 0; j < 4; ++j )
+                faceStream.push_back( cube_faces[iF][j] );
+        }
+        ug->InsertNextCell(VTK_POLYHEDRON,8,&pointIds.front(),6,&faceStream.front());
+        ug->SetPoints(points);
+        #if VTK_MAJOR_VERSION >= 6
+            append->AddInputData(ug);
+        #else
+            append->AddInput(ug);
+        #endif
+    }
+    // level 1: mirror the cube in the six spheres
+    for( int iSphere = 0; iSphere < 6; ++iSphere )
+    {
+        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        vector<vtkIdType> pointIds,faceStream;
+        vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+        for(int iV = 0; iV < 8; ++iV ) {
+            sphereInversion( cube_coords[iV], sphere_centers[iSphere], R, p );
+            pointIds.push_back( points->InsertNextPoint( p ) );
+        }
+        for(int iF = 0; iF < 6; ++iF ) 
+        {
+            faceStream.push_back( 4 );
+            for(int j = 0; j < 4; ++j )
+                faceStream.push_back( cube_faces[iF][j] );
+        }
+        ug->InsertNextCell(VTK_POLYHEDRON,8,&pointIds.front(),6,&faceStream.front());
+        ug->SetPoints(points);
+        #if VTK_MAJOR_VERSION >= 6
+            append->AddInputData(ug);
+        #else
+            append->AddInput(ug);
+        #endif
+    }
+    // level 2: mirror the cube first in one sphere, then in a different one
+    for( int iSphere1 = 0; iSphere1 < 6; ++iSphere1 )
+    {
+        for( int iSphere2 = 0; iSphere2 < 6; ++iSphere2 )
+        {
+            if( iSphere2 == iSphere1 ) continue; // don't want to reflect it back where it came from
+            vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+            vector<vtkIdType> pointIds,faceStream;
+            vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+            for(int iV = 0; iV < 8; ++iV ) {
+                sphereInversion( cube_coords[iV], sphere_centers[iSphere1], R, p );
+                sphereInversion( p, sphere_centers[iSphere2], R, p );
+                pointIds.push_back( points->InsertNextPoint( p ) );
+            }
+            for(int iF = 0; iF < 6; ++iF ) 
+            {
+                faceStream.push_back( 4 );
+                for(int j = 0; j < 4; ++j )
+                    faceStream.push_back( cube_faces[iF][j] );
+            }
+            ug->InsertNextCell(VTK_POLYHEDRON,8,&pointIds.front(),6,&faceStream.front());
+            ug->SetPoints(points);
+            #if VTK_MAJOR_VERSION >= 6
+                append->AddInputData(ug);
+            #else
+                append->AddInput(ug);
+            #endif
+        }
+    }
+    // level 3: mirror the cube multiple times, but never in the same sphere twice in succession
+    for( int iSphere1 = 0; iSphere1 < 6; ++iSphere1 )
+    {
+        for( int iSphere2 = 0; iSphere2 < 6; ++iSphere2 )
+        {
+            if( iSphere2 == iSphere1 ) continue; // don't want to reflect it back where it came from
+            for( int iSphere3 = 0; iSphere3 < 6; ++iSphere3 )
+            {
+                if( iSphere3 == iSphere2 ) continue; // don't want to reflect it back where it came from
+                vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                vector<vtkIdType> pointIds,faceStream;
+                vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+                for(int iV = 0; iV < 8; ++iV ) {
+                    sphereInversion( cube_coords[iV], sphere_centers[iSphere1], R, p );
+                    sphereInversion( p, sphere_centers[iSphere2], R, p );
+                    sphereInversion( p, sphere_centers[iSphere3], R, p );
+                    pointIds.push_back( points->InsertNextPoint( p ) );
+                }
+                for(int iF = 0; iF < 6; ++iF ) 
+                {
+                    faceStream.push_back( 4 );
+                    for(int j = 0; j < 4; ++j )
+                        faceStream.push_back( cube_faces[iF][j] );
+                }
+                ug->InsertNextCell(VTK_POLYHEDRON,8,&pointIds.front(),6,&faceStream.front());
+                ug->SetPoints(points);
+                #if VTK_MAJOR_VERSION >= 6
+                    append->AddInputData(ug);
+                #else
+                    append->AddInput(ug);
+                #endif
+            }
+        }
+    }
+    // level 4: mirror the cube multiple times, but never in the same sphere twice in succession
+    for( int iSphere1 = 0; iSphere1 < 6; ++iSphere1 )
+    {
+        for( int iSphere2 = 0; iSphere2 < 6; ++iSphere2 )
+        {
+            if( iSphere2 == iSphere1 ) continue; // don't want to reflect it back where it came from
+            for( int iSphere3 = 0; iSphere3 < 6; ++iSphere3 )
+            {
+                if( iSphere3 == iSphere2 ) continue; // don't want to reflect it back where it came from
+                for( int iSphere4 = 0; iSphere4 < 6; ++iSphere4 )
+                {
+                    if( iSphere4 == iSphere3 ) continue; // don't want to reflect it back where it came from
+                    vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                    vector<vtkIdType> pointIds,faceStream;
+                    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+                    for(int iV = 0; iV < 8; ++iV ) { 
+                        sphereInversion( cube_coords[iV], sphere_centers[iSphere1], R, p );
+                        sphereInversion( p, sphere_centers[iSphere2], R, p );
+                        sphereInversion( p, sphere_centers[iSphere3], R, p );
+                        sphereInversion( p, sphere_centers[iSphere4], R, p );
+                        pointIds.push_back( points->InsertNextPoint( p ) );
+                    }
+                    for(int iF = 0; iF < 6; ++iF ) 
+                    {
+                        faceStream.push_back( 4 );
+                        for(int j = 0; j < 4; ++j )
+                            faceStream.push_back( cube_faces[iF][j] );
+                    }
+                    ug->InsertNextCell(VTK_POLYHEDRON,8,&pointIds.front(),6,&faceStream.front());
+                    ug->SetPoints(points);
+                    #if VTK_MAJOR_VERSION >= 6
+                        append->AddInputData(ug);
+                    #else
+                        append->AddInput(ug);
+                    #endif
+                }
+            }
+        }
+    }
+
+    append->Update();
+    mesh->DeepCopy(append->GetOutput()); 
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+}
+
+// ---------------------------------------------------------------------

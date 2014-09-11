@@ -56,4 +56,10 @@ namespace MeshGenerators
 
     /// Make triakis truncated tetrahedra - the Voronoi cells of the carbon atoms in a diamond lattice.
     void GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
+
+    // Make {4,5} or something like that - details to come
+    void GetHyperbolicPlaneTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type);
+
+    // Make {4,3,5} or something like that - details to come
+    void GetHyperbolicSpaceTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 }
