@@ -60,6 +60,6 @@ namespace MeshGenerators
     // Make {4,5} or something like that - details to come
     void GetHyperbolicPlaneTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 
-    // Make {4,3,5} or something like that - details to come
-    void GetHyperbolicSpaceTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type);
+    // Currently only makes {4,3,5}, at the specified recursion level
+    void GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 }

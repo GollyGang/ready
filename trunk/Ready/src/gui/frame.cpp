@@ -1518,7 +1518,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     Properties previous_render_settings = this->render_settings;
 
     // perhaps at some point we will want this to be determined by the user
-    const int data_type = VTK_DOUBLE;
+    const int data_type = VTK_FLOAT;
     
     this->InitializeDefaultRenderSettings();
     AbstractRD *sys;
@@ -2039,10 +2039,27 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             break;
             case HyperbolicSpace:
             {
+                int levels;
+                {
+                    const int N_CHOICES = 7;
+                    int level_choices[N_CHOICES] = {1,2,3,4,5,6,7};
+                    int cells[N_CHOICES] = {7,37,163,661,2643,10497,41505};
+                    wxString level_descriptions[N_CHOICES];
+                    for(int i=0;i<N_CHOICES;i++)
+                        level_descriptions[i] = wxString::Format("%d levels - %d cells",level_choices[i],cells[i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of levels:"),_("Hyperbolic space tiling options"),N_CHOICES,level_descriptions);
+                    dlg.SetSelection(2); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
+                    levels = level_choices[dlg.GetSelection()];
+                }
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHyperbolicSpaceTiling(mesh,2,data_type);
+                MeshGenerators::GetHyperbolicSpaceTiling(levels,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                     mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
@@ -2051,14 +2068,11 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 mesh_sys->CopyFromMesh(mesh);
                 sys = mesh_sys;
                 this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_bounding_box").SetBool(false);
-                this->render_settings.GetProperty("contour_level").SetFloat(-1.0);
-                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
+                this->render_settings.GetProperty("slice_3D").SetBool(true);
+                this->render_settings.GetProperty("show_bounding_box").SetBool(true);
                 this->render_settings.GetProperty("show_cell_edges").SetBool(true);
                 this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                this->render_settings.GetProperty("color_low").SetColor(1,1,1);
-                this->render_settings.GetProperty("show_color_scale").SetBool(false);
+                this->render_settings.GetProperty("timesteps_per_render").SetInt(1);
                 break;
             }
             break;
