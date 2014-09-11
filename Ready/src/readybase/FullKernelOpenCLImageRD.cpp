@@ -33,7 +33,7 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_
     : OpenCLImageRD(opencl_platform,opencl_device,data_type)
 {
     this->SetRuleName("Full kernel example");
-    this->SetFormula("__kernel void rd_compute(__global float* a_in,__global float* a_out) {}");
+    this->SetFormula("__kernel void rd_compute() {}");
     this->block_size[0]=1;
     this->block_size[1]=1;
     this->block_size[2]=1;
