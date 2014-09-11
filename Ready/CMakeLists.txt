@@ -186,6 +186,16 @@ set( PATTERN_FILES
   Patterns/Experiments/NumericalMethods/advection_LaxWendroff.vti
   Patterns/Experiments/NumericalMethods/advection_RungeKutta4.vti
   Patterns/Experiments/NumericalMethods/advection_staggeredLeapfrog.vti
+  Patterns/Experiments/NumericalMethods/advection_forwardEuler_double.vti
+  Patterns/Experiments/NumericalMethods/advection_2stepAdamsBashforth_double.vti
+  Patterns/Experiments/NumericalMethods/advection_3stepAdamsBashforth_double.vti
+  Patterns/Experiments/NumericalMethods/advection_modifiedEuler_double.vti
+  Patterns/Experiments/NumericalMethods/advection_midpointMethod_double.vti
+  Patterns/Experiments/NumericalMethods/advection_HeunsMethod_double.vti
+  Patterns/Experiments/NumericalMethods/advection_LaxFriedrichs_double.vti
+  Patterns/Experiments/NumericalMethods/advection_LaxWendroff_double.vti
+  Patterns/Experiments/NumericalMethods/advection_RungeKutta4_double.vti
+  Patterns/Experiments/NumericalMethods/advection_staggeredLeapfrog_double.vti
 )
 
 set( HELP_FILES
