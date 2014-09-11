@@ -52,6 +52,7 @@ const wxString dimensions_label = _("Dimensions");
 const wxString block_size_label = _("Block size");
 const wxString number_of_cells_label = _("Number of cells");
 const wxString wrap_label = _("Toroidal wrap-around");
+const wxString data_type_label = _("Data type");
 const wxString neighborhood_type_label = _("Neighborhood");
 const wxString neighborhood_range_label = _("Neighborhood range");
 const wxString neighborhood_weight_label = _("Neighborhood weight");
@@ -433,6 +434,8 @@ void InfoPanel::Update(const AbstractRD* const system)
                                             
     if(system->HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
+
+    contents += AppendRow(data_type_label,data_type_label,system->GetDataType()==VTK_DOUBLE?_("double"):_("float"),false);
 
     contents += _T("</table>");
 
