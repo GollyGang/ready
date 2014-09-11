@@ -950,13 +950,13 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
 {
     // {4,3,5}, following instructions from Adam P. Goucher - many thanks!
 
-    // define the central cube
+    // define the central cell
     const double t = ( 1 - sqrt( 7 - 3*sqrt(5) ) ) / 3;
     const int num_vertices = 8;
     const int num_faces = 6;
     const int num_vertices_per_face = 4;
-    const double cube_coords[num_vertices][3] = {{-t,-t,-t},{t,-t,-t},{t,t,-t},{-t,t,-t},{-t,-t,t},{t,-t,t},{t,t,t},{-t,t,t}};
-    const int cube_faces[num_faces][num_vertices_per_face] = {{0,1,2,3},{1,5,6,2},{3,2,6,7},{4,0,3,7},{5,1,0,4},{6,5,4,7}};
+    const double vertex_coords[num_vertices][3] = {{-t,-t,-t},{t,-t,-t},{t,t,-t},{-t,t,-t},{-t,-t,t},{t,-t,t},{t,t,t},{-t,t,t}};
+    const int faces[num_faces][num_vertices_per_face] = {{0,1,2,3},{1,5,6,2},{3,2,6,7},{4,0,3,7},{5,1,0,4},{6,5,4,7}};
 
     // define the mirror spheres
     const int num_spheres = num_faces;
@@ -991,11 +991,11 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
     {
         // make a cell by reflecting the starting cell in the order listed
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
-        vector<vtkIdType> pointIds,faceStream;
+        vector<vtkIdType> pointIds;
         vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
         double centroid[3] = {0,0,0};
         for(int iV = 0; iV < num_vertices; ++iV ) { 
-            double p[3] = { cube_coords[iV][0], cube_coords[iV][1], cube_coords[iV][2] };
+            double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( const auto& iSphere : sphere_list )
                 sphereInversion( p, sphere_centers[iSphere], R, p );
             pointIds.push_back( points->InsertNextPoint( p ) );
@@ -1003,20 +1003,21 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
             centroid[1]+=p[1];
             centroid[2]+=p[2];
         }
-        for(int iF = 0; iF < num_faces; ++iF ) 
-        {
-            faceStream.push_back( num_vertices_per_face );
-            for(int j = 0; j < num_vertices_per_face; ++j )
-                faceStream.push_back( cube_faces[iF][j] );
-        }
-        ug->InsertNextCell(VTK_POLYHEDRON,num_vertices,&pointIds.front(),num_faces,&faceStream.front());
-        ug->SetPoints(points);
         // only add this cell if we haven't seen this centroid before
         centroid[0] /= num_vertices;
         centroid[1] /= num_vertices;
         centroid[2] /= num_vertices;
         if( point_locator->IsInsertedPoint( centroid ) < 0 )
         {
+            vector<vtkIdType> faceStream;
+            for(int iF = 0; iF < num_faces; ++iF ) 
+            {
+                faceStream.push_back( num_vertices_per_face );
+                for(int j = 0; j < num_vertices_per_face; ++j )
+                    faceStream.push_back( faces[iF][j] );
+            }
+            ug->InsertNextCell(VTK_POLYHEDRON,num_vertices,&pointIds.front(),num_faces,&faceStream.front());
+            ug->SetPoints(points);
             #if VTK_MAJOR_VERSION >= 6
                 append->AddInputData(ug);
             #else
