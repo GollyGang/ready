@@ -948,7 +948,13 @@ void MeshGenerators::GetHyperbolicPlaneTiling(vtkUnstructuredGrid *mesh,int n_ch
 
 void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
 {
-    // {4,3,5}, following instructions from Adam P. Goucher - many thanks!
+    // {4,3,5} : http://en.wikipedia.org/wiki/Order-5_cubic_honeycomb
+    // following instructions from Adam P. Goucher - many thanks!
+    // TODO: 
+    // {3,5,3} : http://en.wikipedia.org/wiki/Icosahedral_honeycomb
+    // {5,3,4} : http://en.wikipedia.org/wiki/Order-4_dodecahedral_honeycomb
+    // {5,3,5} : http://en.wikipedia.org/wiki/Order-5_dodecahedral_honeycomb
+    // also: subdivide into cubes? (apart from {3,5,3})
 
     // define the central cell
     const double t = ( 1 - sqrt( 7 - 3*sqrt(5) ) ) / 3;
@@ -962,15 +968,6 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
     const int num_spheres = num_faces;
     const double R = sqrt( 3 - sqrt(5) );
     const double sphere_centers[num_spheres][3] = {{1,0,0},{0,1,0},{0,0,1},{-1,0,0},{0,-1,0},{0,0,-1}};
-
-    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
-    append->MergePointsOn();
-
-    vtkSmartPointer<vtkPoints> locator_points = vtkSmartPointer<vtkPoints>::New();
-    double bounds[6] = {-10,10,-10,10,-10,10};
-
-    vtkSmartPointer<vtkPointLocator> point_locator = vtkSmartPointer<vtkPointLocator>::New();
-    point_locator->InitPointInsertion(locator_points,bounds);
 
     // make a list of lists of sphere ids to use
     vector< vector< int > > sphere_lists;
@@ -986,6 +983,14 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
             }
         }
     }
+
+    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    append->MergePointsOn();
+
+    vtkSmartPointer<vtkPointLocator> point_locator = vtkSmartPointer<vtkPointLocator>::New();
+    vtkSmartPointer<vtkPoints> locator_points = vtkSmartPointer<vtkPoints>::New();
+    double bounds[6] = {-10,10,-10,10,-10,10};
+    point_locator->InitPointInsertion(locator_points,bounds);
 
     for( const auto& sphere_list : sphere_lists )
     {
