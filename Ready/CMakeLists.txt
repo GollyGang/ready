@@ -174,6 +174,12 @@ set( PATTERN_FILES
   Patterns/Experiments/gladman_vermiformSolitons.vti
   Patterns/Experiments/LifeBlur.vti
   Patterns/Experiments/CornusAmmonis/MandelbrotWorms.vti
+  Patterns/Experiments/CornusAmmonis/mutually-catalytic-pinwheels.vti
+  Patterns/Experiments/CornusAmmonis/mutually-catalytic-spots-second-order-sobel.vti
+  Patterns/Experiments/CornusAmmonis/pearson-chained-edge-detectors.vti
+  Patterns/Experiments/CornusAmmonis/surfing-solitons.vti
+  Patterns/Experiments/CornusAmmonis/tip-splitting-web.vti
+  Patterns/Experiments/CornusAmmonis/worms2.vti
   Patterns/Agmon2014/cells.vti
   Patterns/Agmon2014/oil-water.vti
   Patterns/Experiments/NumericalMethods/advection_forwardEuler.vti
