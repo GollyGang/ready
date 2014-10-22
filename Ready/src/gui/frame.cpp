@@ -2037,6 +2037,31 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 break;
             }
             break;
+            case HyperbolicPlane:
+            {
+                int levels = 10; // TODO: make these user options
+                int schlafli1 = 3;
+                int schlafli2 = 7;
+                wxBusyCursor busy;
+                this->SetStatusText(_("Generating mesh..."));
+                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+                MeshGenerators::GetHyperbolicPlaneTiling(schlafli1,schlafli2,levels,mesh,2,data_type);
+                MeshRD *mesh_sys;
+                if(this->is_opencl_available)
+                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
+                else
+                    mesh_sys = new GrayScottMeshRD();
+                mesh_sys->CopyFromMesh(mesh);
+                sys = mesh_sys;
+                this->render_settings.GetProperty("active_chemical").SetChemical("b");
+                this->render_settings.GetProperty("slice_3D").SetBool(false);
+                this->render_settings.GetProperty("show_bounding_box").SetBool(true);
+                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
+                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
+                this->render_settings.GetProperty("timesteps_per_render").SetInt(1);
+                break;
+            }
+            break;
             case HyperbolicSpace:
             {
                 int levels;

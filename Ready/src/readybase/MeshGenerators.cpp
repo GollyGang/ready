@@ -43,6 +43,7 @@
 using namespace std;
 
 // stdlib:
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 // ---------------------------------------------------------------------
@@ -927,7 +928,7 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
 
 // ---------------------------------------------------------------------
 
-void sphereInversion( const double p[3], const double q[3], const double r, double p_out[3] )
+void sphereInversion( const double p[3], const vector<double>& q, const double r, double p_out[3] )
 {
     //  reflect p in the sphere radius r center q
     const double r2 = r*r;
@@ -940,11 +941,145 @@ void sphereInversion( const double p[3], const double q[3], const double r, doub
 
 // ---------------------------------------------------------------------
 
-void MeshGenerators::GetHyperbolicPlaneTiling(vtkUnstructuredGrid *mesh,int n_chems,int data_type)
+void GetInversionCircleForPlaneTiling( double edge_length, int schlafli1, int schlafli2, double& R, double& d ) {
+    // return the radius R and distance d from the polygon center of the inversion circle for the desired tiling
+    double A = M_PI * ( 0.5 - 1.0 / schlafli1 ); // half corner angle if polygon was in Euclidean space
+    double C = M_PI / schlafli2; // half corner angle required to attain desired tiling
+    double B = A - C; // angle defect
+    double v = 0.5 * edge_length;
+    R = v / sin( B );
+    d = v * tan( A ) + v / tan( B );
+}
+
+void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
 {
+    // define the central cell
+    const double edge_length = 1.0;
+    const int num_vertices = schlafli1;
+    vector<vector<double> > vertex_coords(num_vertices,vector<double>(3));
+    vector<int> faces(num_vertices);
+    double r1 = 0.5 * edge_length / cos( M_PI * ( 0.5 - 1.0 / schlafli1 ) );
+    for( int i = 0; i < num_vertices; ++i )
+    {
+        double angle = ( i + 0.5 ) * 2.0 * M_PI / schlafli1;
+        vertex_coords[i][0] = r1 * cos( angle );
+        vertex_coords[i][1] = r1 * sin( angle );
+        vertex_coords[i][2] = 0.0;
+        faces[i] = i;
+    }
+
+    // define the mirror spheres
+    const int num_spheres = num_vertices;
+    double R = 0.0;
+    double d = 0.0;
+    GetInversionCircleForPlaneTiling( edge_length, schlafli1, schlafli2, R, d );
+    vector<vector<double> > sphere_centers(num_spheres,vector<double>(3));
+    double n[3];
+    for( int i = 0; i < num_vertices; ++i ) {
+        for( int xyz = 0; xyz < 3; ++xyz )
+            n[xyz] = ( vertex_coords[i][xyz] + vertex_coords[(i+1)%num_vertices][xyz] ) / 2.0;
+        double nl = sqrt( n[0]*n[0] + n[1]*n[1] + n[2]*n[2] );
+        sphere_centers[i][0] = n[0] * d / nl;
+        sphere_centers[i][1] = n[1] * d / nl;
+        sphere_centers[i][2] = n[2] * d / nl;
+    }
+
+    // make a list of lists of sphere ids to use
+    vector< vector< int > > sphere_lists;
+    sphere_lists.push_back( vector<int>() );
+    size_t iList = 0;
+    for( int iLevel = 0; iLevel < num_levels; ++iLevel ) {
+        const size_t num_lists = sphere_lists.size();
+        for( ; iList < num_lists; ++iList ) {
+            for( int iExtraSphere = 0; iExtraSphere < num_spheres; ++iExtraSphere ) {
+                vector<int> extended_list( sphere_lists[iList] );
+                extended_list.push_back( iExtraSphere );
+                sphere_lists.push_back( extended_list );
+            }
+        }
+    }
+
+    vtkSmartPointer<vtkAppendFilter> append = vtkSmartPointer<vtkAppendFilter>::New();
+    append->MergePointsOn();
+
+    vtkSmartPointer<vtkPointLocator> point_locator = vtkSmartPointer<vtkPointLocator>::New();
+    vtkSmartPointer<vtkPoints> locator_points = vtkSmartPointer<vtkPoints>::New();
+    double bounds[6] = {-10,10,-10,10,-10,10};
+    point_locator->InitPointInsertion(locator_points,bounds);
+
+    for( const auto& sphere_list : sphere_lists )
+    {
+        // make a cell by reflecting the starting cell in the order listed
+        vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+        vector<vtkIdType> pointIds;
+        vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+        double centroid[3] = {0,0,0};
+        for(int iV = 0; iV < num_vertices; ++iV ) { 
+            double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
+            for( const auto& iSphere : sphere_list )
+                sphereInversion( p, sphere_centers[iSphere], R, p );
+            pointIds.push_back( points->InsertNextPoint( p ) );
+            centroid[0]+=p[0];
+            centroid[1]+=p[1];
+            centroid[2]+=p[2];
+        }
+        // only add this cell if we haven't seen this centroid before
+        centroid[0] /= num_vertices;
+        centroid[1] /= num_vertices;
+        centroid[2] /= num_vertices;
+        if( point_locator->IsInsertedPoint( centroid ) < 0 )
+        {
+            vector<vtkIdType> faceStream;
+            faceStream.push_back( num_vertices );
+            for( int j = 0; j < num_vertices; ++j )
+                faceStream.push_back( faces[j] );
+            ug->InsertNextCell(VTK_POLYGON,num_vertices,&pointIds.front(),1,&faceStream.front());
+            ug->SetPoints(points);
+            #if VTK_MAJOR_VERSION >= 6
+                append->AddInputData(ug);
+            #else
+                append->AddInput(ug);
+            #endif
+            point_locator->InsertNextPoint( centroid );
+        }
+    }
+
+    append->Update();
+    mesh->DeepCopy(append->GetOutput()); 
+
+    // allocate the chemicals arrays
+    for(int iChem=0;iChem<n_chems;iChem++)
+    {
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        scalars->SetNumberOfComponents(1);
+        scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
+        scalars->SetName(GetChemicalName(iChem).c_str());
+        scalars->FillComponent(0,0.0f);
+        mesh->GetCellData()->AddArray(scalars);
+    }
+
 }
 
 // ---------------------------------------------------------------------
+
+void GetInversionSphereForSpaceTessellation( double edge_length, int schlafli1, int schlafli2, int schlafli3, double& R, double& d ) {
+    // return the radius R and distance d from the polyhedron center of the inversion sphere for the desired tessellation
+    /* TODO
+    var v = edge_length / 2.0; // distance from center of edge to rotation point
+    var m1 = Math.sqrt( r1*r1 - v*v ); // distance from polygon center to edge midpoint
+    var m2 = Math.sqrt( r2*r2 - v*v ); // distance from polyhedron center to edge midpoint (if in 3D)
+    var h = Math.sqrt( m2*m2 - m1*m1 );
+    var cc = p3(0,m1,h); // polyhedron center
+    var c = p3(0,m1,0); // polygon center
+    var p = p3(v,0,0); // a vertex
+    var mp = p3(0,0,0);
+    var pch = -Math.sqrt( r3*r3 - r1*r1 ); // height of the center of the inversion sphere above the polygon face
+    var q = pch - h; // distance from polyhedron center to inversion sphere center
+    var d = 2.0 * ( m1 * q / m2 ); // separation of inversion sphere centers, because triangle cc:c1:mp is similar to cc:(ccc1+ccc2)/2:ccc1
+    var psi3 = ( 180.0 / Math.PI ) * 2.0 * Math.acos( d / ( 2.0 * r3 ) ); // the dihedral angle in the bulged polyhedra
+    var schlafli3 = 360.0 / psi3; // how many polyhedra will fit around each edge?
+    */
+}
 
 void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
 {
@@ -1002,7 +1137,7 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
         for(int iV = 0; iV < num_vertices; ++iV ) { 
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( const auto& iSphere : sphere_list )
-                sphereInversion( p, sphere_centers[iSphere], R, p );
+                sphereInversion( p, vector<double>(begin(sphere_centers[iSphere]),end(sphere_centers[iSphere])), R, p );
             pointIds.push_back( points->InsertNextPoint( p ) );
             centroid[0]+=p[0];
             centroid[1]+=p[1];
