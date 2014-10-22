@@ -2064,7 +2064,10 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             break;
             case HyperbolicSpace:
             {
-                int levels;
+                int levels = 2; // TODO: make these user options
+                int schlafli1 = 4;
+                int schlafli2 = 3;
+                int schlafli3 = 5;
                 {
                     const int N_CHOICES = 7;
                     int level_choices[N_CHOICES] = {1,2,3,4,5,6,7};
@@ -2084,7 +2087,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHyperbolicSpaceTiling(levels,mesh,2,data_type);
+                MeshGenerators::GetHyperbolicSpaceTessellation(schlafli1,schlafli2,schlafli3,levels,mesh,2,data_type);
                 MeshRD *mesh_sys;
                 if(this->is_opencl_available)
                     mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);

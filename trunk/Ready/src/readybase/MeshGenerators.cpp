@@ -1095,43 +1095,84 @@ void GetInversionSphereForSpaceTessellation( double edge_length, int schlafli1, 
     double m2 = sqrt( r2*r2 - v*v ); // distance from polyhedron center to edge midpoint
     double h = sqrt( m2*m2 - m1*m1 ); // height of the polyhedron center above the polygon
     double k = ( m2 / m1 ) * cos( M_PI / schlafli3 );
-    R = -( -sqrt( h*h - k*k*r1*r1 + r1*r1 ) - h * k ) / ( k*k - 1.0 );
+    R = ( sqrt( h*h - k*k*r1*r1 + r1*r1 ) + h * k ) / ( k*k - 1.0 );
     d = h + sqrt( R*R - r1*r1 );
 }
 
-void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
+void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,int schlafli3,int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
 {
-    // {4,3,5} : http://en.wikipedia.org/wiki/Order-5_cubic_honeycomb
-    // following instructions from Adam P. Goucher - many thanks!
-    // TODO: 
-    // {3,5,3} : http://en.wikipedia.org/wiki/Icosahedral_honeycomb
-    // {5,3,4} : http://en.wikipedia.org/wiki/Order-4_dodecahedral_honeycomb
-    // {5,3,5} : http://en.wikipedia.org/wiki/Order-5_dodecahedral_honeycomb
-    // also: subdivide into cubes? (apart from {3,5,3})
+    // implemented with help from Adam P. Goucher - many thanks!
+
+    enum { cube, dodecahedron, icosahedron } BasePolyhedron;
+    if( schlafli1 == 4 && schlafli2 == 3 ) BasePolyhedron = cube;
+    else if( schlafli1 == 5 && schlafli2 == 3 ) BasePolyhedron = dodecahedron;
+    else if( schlafli1 == 3 && schlafli2 == 5 ) BasePolyhedron = icosahedron;
+    else throw( runtime_error( "MeshGenerators::GetHyperbolicSpaceTessellation : unsupported tessellation" ) );
+
+    double R,d;
+    const double edge_length = 1.0;
+    GetInversionSphereForSpaceTessellation(edge_length,schlafli1,schlafli2,schlafli3,R,d);
+
+    // TODO: subdivide into cubes? (apart from {3,5,3})
 
     // define the central cell
-    const double t = ( 1 - sqrt( 7 - 3*sqrt(5) ) ) / 3;
-    const int num_vertices = 8;
-    const int num_faces = 6;
-    const int num_vertices_per_face = 4;
-    const double vertex_coords[num_vertices][3] = {{-t,-t,-t},{t,-t,-t},{t,t,-t},{-t,t,-t},{-t,-t,t},{t,-t,t},{t,t,t},{-t,t,t}};
-    const int faces[num_faces][num_vertices_per_face] = {{0,1,2,3},{1,5,6,2},{3,2,6,7},{4,0,3,7},{5,1,0,4},{6,5,4,7}};
-
-    // define the mirror spheres
-    const int num_spheres = num_faces;
-    const double R = sqrt( 3 - sqrt(5) );
-    const double sphere_centers[num_spheres][3] = {{1,0,0},{0,1,0},{0,0,1},{-1,0,0},{0,-1,0},{0,0,-1}};
-
-    // test: what does our other function say?
-    /*double R2, d2;
-    GetInversionSphereForSpaceTessellation( 1.0,3,5,3,R2,d2);
-    GetInversionSphereForSpaceTessellation( 2.0*t,4,3,5,R2,d2);
-    R = R2;
-    for( int i = 0; i < num_spheres; ++i ) {
-        sphere_centers[i][0] *= d2;
-        sphere_centers[i][1] *= d2;
-        sphere_centers[i][2] *= d2;
-    }*/
+    int num_vertices;
+    int num_faces;
+    int num_vertices_per_face;
+    vector<vector<double> > vertex_coords;
+    vector<vector<int> > faces;
+    vector<vector<double> > sphere_centers;
+    switch( BasePolyhedron ) {
+        case cube:
+        {
+            num_vertices = 8;
+            num_faces = 6;
+            num_vertices_per_face = 4;
+            const double t = edge_length / 2.0;
+            const double coords[8][3] = {{-t,-t,-t},{t,-t,-t},{t,t,-t},{-t,t,-t},{-t,-t,t},{t,-t,t},{t,t,t},{-t,t,t}};
+            const int faces_array[6][4] = {{0,1,2,3},{1,5,6,2},{3,2,6,7},{4,0,3,7},{5,1,0,4},{6,5,4,7}};
+            for( int i = 0; i < 8; ++i )
+                vertex_coords.push_back( vector<double>( begin( coords[i] ), end( coords[i] ) ) );
+            for( int i = 0; i < 6; ++i )
+                faces.push_back( vector<int>( begin( faces_array[i] ), end( faces_array[i] ) ) );
+        }
+        break;
+        /* TODO
+        case dodecahedron:
+        {
+            const double phi = ( 1.0 + sqrt(5.0) ) / 2.0;
+            num_vertices = 20;
+            num_faces = 12;
+            num_vertices_per_face = 5;
+            double coords[20][3] = { {-1,-1,-1},{1,-1,-1},{1,1,-1},{-1,1,-1},{-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1}, // 0-7 orange
+                {0,1/phi,phi},{0,-1/phi,phi},{0,1/phi,-phi},{0,-1/phi,-phi}, // 8-11 green
+                {1/phi,phi,0},{-1/phi,phi,0},{1/phi,-phi,0},{-1/phi,-phi,0}, // 12-15 blue
+                {phi,0,1/phi},{-phi,0,1/phi},{phi,0,-1/phi},{-phi,0,-1/phi} }; // 16-19 pink
+            const int faces_array[12][5] = {{0,11,1,14,15},{};
+            // scale so that edge length is as desired
+            const double e = 2.0 / phi;
+            for( int i = 0; i < 20; ++i )
+                for( int xyz = 0; xyz < 3; ++xyz )
+                    coords[i][xyz] *= edge_length / e;
+            for( int i = 0; i < 20; ++i )
+                vertex_coords.push_back( vector<double>( begin( coords[i] ), end( coords[i] ) ) );
+            for( int i = 0; i < 12; ++i )
+                faces.push_back( vector<int>( begin( faces_array[i] ), end( faces_array[i] ) ) );
+        }
+        break;*/
+    }
+    // the inversion spheres lie on the lines that pass through the center of each face
+    for( int i = 0; i < num_faces; ++i ) {
+        double n[3] = {0,0,0};
+        for( int j = 0; j < num_vertices_per_face; ++j ) {
+            for( int xyz = 0; xyz < 3; ++xyz )
+                n[xyz] += vertex_coords[ faces[i][j] ][ xyz ];
+        }
+        const double nl = sqrt( n[0]*n[0] + n[1]*n[1] + n[2]*n[2] );
+        for( int xyz = 0; xyz < 3; ++xyz )
+            n[xyz] *= d / nl;
+        sphere_centers.push_back( vector<double>( begin( n ), end( n ) ) );
+    }
 
     // make a list of lists of sphere ids to use
     vector< vector< int > > sphere_lists;
@@ -1140,7 +1181,7 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
     for( int iLevel = 0; iLevel < num_levels; ++iLevel ) {
         const size_t num_lists = sphere_lists.size();
         for( ; iList < num_lists; ++iList ) {
-            for( int iExtraSphere = 0; iExtraSphere < num_spheres; ++iExtraSphere ) {
+            for( int iExtraSphere = 0; iExtraSphere < num_faces; ++iExtraSphere ) {
                 vector<int> extended_list( sphere_lists[iList] );
                 extended_list.push_back( iExtraSphere );
                 sphere_lists.push_back( extended_list );
@@ -1166,7 +1207,7 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
         for(int iV = 0; iV < num_vertices; ++iV ) { 
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( const auto& iSphere : sphere_list )
-                sphereInversion( p, vector<double>(begin(sphere_centers[iSphere]),end(sphere_centers[iSphere])), R, p );
+                sphereInversion( p, sphere_centers[iSphere], R, p );
             pointIds.push_back( points->InsertNextPoint( p ) );
             centroid[0]+=p[0];
             centroid[1]+=p[1];

@@ -57,9 +57,9 @@ namespace MeshGenerators
     /// Make triakis truncated tetrahedra - the Voronoi cells of the carbon atoms in a diamond lattice.
     void GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 
-    // Make a hyperbolic plane tiling such as {3,7} or {4,5} by passing the Schlafli symbol
+    // Make a hyperbolic plane tiling such as {3,7} or {4,5} at the specified recursion level
     void GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 
-    // Currently only makes {4,3,5}, at the specified recursion level
-    void GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
+    // Make a hyperbolic space tessellation such as {4,3,5} at the specified recursion level
+    void GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,int schlafli3,int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
 }
