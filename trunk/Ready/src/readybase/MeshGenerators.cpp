@@ -941,6 +941,12 @@ void sphereInversion( const double p[3], const vector<double>& q, const double r
 
 // ---------------------------------------------------------------------
 
+double GetPolygonRadius( double edge_length, int num_sides ) {
+    return 0.5 * edge_length / cos( M_PI * ( 0.5 - 1.0 / num_sides ) );
+}
+
+// ---------------------------------------------------------------------
+
 void GetInversionCircleForPlaneTiling( double edge_length, int schlafli1, int schlafli2, double& R, double& d ) {
     // return the radius R and distance d from the polygon center of the inversion circle for the desired tiling
     double A = M_PI * ( 0.5 - 1.0 / schlafli1 ); // half corner angle if polygon was in Euclidean space
@@ -951,6 +957,8 @@ void GetInversionCircleForPlaneTiling( double edge_length, int schlafli1, int sc
     d = v * tan( A ) + v / tan( B );
 }
 
+// ---------------------------------------------------------------------
+
 void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
 {
     // define the central cell
@@ -958,7 +966,7 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
     const int num_vertices = schlafli1;
     vector<vector<double> > vertex_coords(num_vertices,vector<double>(3));
     vector<int> faces(num_vertices);
-    double r1 = 0.5 * edge_length / cos( M_PI * ( 0.5 - 1.0 / schlafli1 ) );
+    double r1 = GetPolygonRadius( edge_length, schlafli1 );
     for( int i = 0; i < num_vertices; ++i )
     {
         double angle = ( i + 0.5 ) * 2.0 * M_PI / schlafli1;
@@ -1062,23 +1070,33 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
 
 // ---------------------------------------------------------------------
 
+double GetPolyhedronRadius( double edge_length, int schlafli1, int schlafli2 ) {
+    // TODO: find a general method for this (see hyperplay) - for now a few cases is enough because there are only four regular hyperbolic tilings
+    if( schlafli1 == 4 && schlafli2 == 3 ) {
+        return sqrt( 3.0 * pow( edge_length / 2.0, 2.0 ) ); // cube
+    }
+    else if( schlafli1 == 5 && schlafli2 == 3 ) {
+        return edge_length * sqrt( 3.0 ) * ( 1.0 + sqrt( 5.0 ) ) / 4.0; // dodecahedron
+    }
+    else if( schlafli1 == 3 && schlafli2 == 5 ) {
+        return edge_length * sqrt( ( 5.0 + sqrt( 5.0 ) ) / 8.0 ); // icosahedron
+    }
+    return 0.0;
+}
+
+// ---------------------------------------------------------------------
+
 void GetInversionSphereForSpaceTessellation( double edge_length, int schlafli1, int schlafli2, int schlafli3, double& R, double& d ) {
     // return the radius R and distance d from the polyhedron center of the inversion sphere for the desired tessellation
-    /* TODO
-    var v = edge_length / 2.0; // distance from center of edge to rotation point
-    var m1 = Math.sqrt( r1*r1 - v*v ); // distance from polygon center to edge midpoint
-    var m2 = Math.sqrt( r2*r2 - v*v ); // distance from polyhedron center to edge midpoint (if in 3D)
-    var h = Math.sqrt( m2*m2 - m1*m1 );
-    var cc = p3(0,m1,h); // polyhedron center
-    var c = p3(0,m1,0); // polygon center
-    var p = p3(v,0,0); // a vertex
-    var mp = p3(0,0,0);
-    var pch = -Math.sqrt( r3*r3 - r1*r1 ); // height of the center of the inversion sphere above the polygon face
-    var q = pch - h; // distance from polyhedron center to inversion sphere center
-    var d = 2.0 * ( m1 * q / m2 ); // separation of inversion sphere centers, because triangle cc:c1:mp is similar to cc:(ccc1+ccc2)/2:ccc1
-    var psi3 = ( 180.0 / Math.PI ) * 2.0 * Math.acos( d / ( 2.0 * r3 ) ); // the dihedral angle in the bulged polyhedra
-    var schlafli3 = 360.0 / psi3; // how many polyhedra will fit around each edge?
-    */
+    double v = edge_length / 2.0; // distance from center of edge to rotation point
+    double r1 = GetPolygonRadius( edge_length, schlafli1 );
+    double r2 = GetPolyhedronRadius( edge_length, schlafli1, schlafli2 );
+    double m1 = sqrt( r1*r1 - v*v ); // distance from polygon center to edge midpoint
+    double m2 = sqrt( r2*r2 - v*v ); // distance from polyhedron center to edge midpoint
+    double h = sqrt( m2*m2 - m1*m1 ); // height of the polyhedron center above the polygon
+    double k = ( m2 / m1 ) * cos( M_PI / schlafli3 );
+    R = -( -sqrt( h*h - k*k*r1*r1 + r1*r1 ) - h * k ) / ( k*k - 1.0 );
+    d = h + sqrt( R*R - r1*r1 );
 }
 
 void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
@@ -1103,6 +1121,17 @@ void MeshGenerators::GetHyperbolicSpaceTiling(int num_levels,vtkUnstructuredGrid
     const int num_spheres = num_faces;
     const double R = sqrt( 3 - sqrt(5) );
     const double sphere_centers[num_spheres][3] = {{1,0,0},{0,1,0},{0,0,1},{-1,0,0},{0,-1,0},{0,0,-1}};
+
+    // test: what does our other function say?
+    /*double R2, d2;
+    GetInversionSphereForSpaceTessellation( 1.0,3,5,3,R2,d2);
+    GetInversionSphereForSpaceTessellation( 2.0*t,4,3,5,R2,d2);
+    R = R2;
+    for( int i = 0; i < num_spheres; ++i ) {
+        sphere_centers[i][0] *= d2;
+        sphere_centers[i][1] *= d2;
+        sphere_centers[i][2] *= d2;
+    }*/
 
     // make a list of lists of sphere ids to use
     vector< vector< int > > sphere_lists;
