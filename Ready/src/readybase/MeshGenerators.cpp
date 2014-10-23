@@ -1071,9 +1071,8 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
 // ---------------------------------------------------------------------
 
 double GetPolyhedronRadius( double edge_length, int schlafli1, int schlafli2 ) {
-    // TODO: find a general method for this (see hyperplay) - for now a few cases is enough because there are only four regular hyperbolic tilings
     if( schlafli1 == 4 && schlafli2 == 3 ) {
-        return sqrt( 3.0 * pow( edge_length / 2.0, 2.0 ) ); // cube
+        return edge_length * sqrt( 3.0 ) / 2.0; // cube
     }
     else if( schlafli1 == 5 && schlafli2 == 3 ) {
         return edge_length * sqrt( 3.0 ) * ( 1.0 + sqrt( 5.0 ) ) / 4.0; // dodecahedron
@@ -1081,7 +1080,7 @@ double GetPolyhedronRadius( double edge_length, int schlafli1, int schlafli2 ) {
     else if( schlafli1 == 3 && schlafli2 == 5 ) {
         return edge_length * sqrt( ( 5.0 + sqrt( 5.0 ) ) / 8.0 ); // icosahedron
     }
-    return 0.0;
+    else throw runtime_error( "GetPolyhedronRadius : unsupported polyhedron" );
 }
 
 // ---------------------------------------------------------------------
@@ -1103,15 +1102,13 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
 {
     // implemented with help from Adam P. Goucher - many thanks!
 
-    enum { cube, dodecahedron, icosahedron } BasePolyhedron;
-    if( schlafli1 == 4 && schlafli2 == 3 ) BasePolyhedron = cube;
-    else if( schlafli1 == 5 && schlafli2 == 3 ) BasePolyhedron = dodecahedron;
-    else if( schlafli1 == 3 && schlafli2 == 5 ) BasePolyhedron = icosahedron;
+    int BasePolyhedronType;
+    if( schlafli1 == 4 && schlafli2 == 3 ) BasePolyhedronType = VTK_SOLID_CUBE;
+    else if( schlafli1 == 5 && schlafli2 == 3 ) BasePolyhedronType = VTK_SOLID_DODECAHEDRON;
+    else if( schlafli1 == 3 && schlafli2 == 5 ) BasePolyhedronType = VTK_SOLID_ICOSAHEDRON;
     else throw( runtime_error( "MeshGenerators::GetHyperbolicSpaceTessellation : unsupported tessellation" ) );
 
-    double R,d;
     const double edge_length = 1.0;
-    GetInversionSphereForSpaceTessellation(edge_length,schlafli1,schlafli2,schlafli3,R,d);
 
     // TODO: subdivide into cubes? (apart from {3,5,3})
 
@@ -1122,45 +1119,39 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
     vector<vector<double> > vertex_coords;
     vector<vector<int> > faces;
     vector<vector<double> > sphere_centers;
-    switch( BasePolyhedron ) {
-        case cube:
-        {
-            num_vertices = 8;
-            num_faces = 6;
-            num_vertices_per_face = 4;
-            const double t = edge_length / 2.0;
-            const double coords[8][3] = {{-t,-t,-t},{t,-t,-t},{t,t,-t},{-t,t,-t},{-t,-t,t},{t,-t,t},{t,t,t},{-t,t,t}};
-            const int faces_array[6][4] = {{0,1,2,3},{1,5,6,2},{3,2,6,7},{4,0,3,7},{5,1,0,4},{6,5,4,7}};
-            for( int i = 0; i < 8; ++i )
-                vertex_coords.push_back( vector<double>( begin( coords[i] ), end( coords[i] ) ) );
-            for( int i = 0; i < 6; ++i )
-                faces.push_back( vector<int>( begin( faces_array[i] ), end( faces_array[i] ) ) );
+    {
+        vtkSmartPointer<vtkPlatonicSolidSource> source = vtkSmartPointer<vtkPlatonicSolidSource>::New();
+        source->SetSolidType( BasePolyhedronType );
+        const double polyhedron_scale = GetPolyhedronRadius( edge_length, schlafli1, schlafli2 );
+        vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+        transform->Scale( polyhedron_scale, polyhedron_scale, polyhedron_scale ); // scale so that edge length is as desired
+        vtkSmartPointer<vtkTransformPolyDataFilter> trans = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+        trans->SetTransform(transform);
+        trans->SetInputConnection(source->GetOutputPort());
+        trans->Update();
+        num_vertices = trans->GetOutput()->GetNumberOfPoints();
+        for( int i = 0; i < num_vertices; ++i ) {
+            double *p = trans->GetOutput()->GetPoint( i );
+            vertex_coords.push_back( vector<double>( p, p+3 ) );
         }
-        break;
-        /* TODO
-        case dodecahedron:
-        {
-            const double phi = ( 1.0 + sqrt(5.0) ) / 2.0;
-            num_vertices = 20;
-            num_faces = 12;
-            num_vertices_per_face = 5;
-            double coords[20][3] = { {-1,-1,-1},{1,-1,-1},{1,1,-1},{-1,1,-1},{-1,-1,1},{1,-1,1},{1,1,1},{-1,1,1}, // 0-7 orange
-                {0,1/phi,phi},{0,-1/phi,phi},{0,1/phi,-phi},{0,-1/phi,-phi}, // 8-11 green
-                {1/phi,phi,0},{-1/phi,phi,0},{1/phi,-phi,0},{-1/phi,-phi,0}, // 12-15 blue
-                {phi,0,1/phi},{-phi,0,1/phi},{phi,0,-1/phi},{-phi,0,-1/phi} }; // 16-19 pink
-            const int faces_array[12][5] = {{0,11,1,14,15},{};
-            // scale so that edge length is as desired
-            const double e = 2.0 / phi;
-            for( int i = 0; i < 20; ++i )
-                for( int xyz = 0; xyz < 3; ++xyz )
-                    coords[i][xyz] *= edge_length / e;
-            for( int i = 0; i < 20; ++i )
-                vertex_coords.push_back( vector<double>( begin( coords[i] ), end( coords[i] ) ) );
-            for( int i = 0; i < 12; ++i )
-                faces.push_back( vector<int>( begin( faces_array[i] ), end( faces_array[i] ) ) );
+        num_faces = trans->GetOutput()->GetNumberOfCells();
+        trans->GetOutput()->BuildCells();
+        for( vtkIdType i = 0; i < num_faces; ++i ) {
+            vtkIdType *f;
+            vtkIdType np;
+            trans->GetOutput()->GetCellPoints(i,np,f);
+            num_vertices_per_face = np;
+            vector<int> ids;
+            for( vtkIdType j = 0; j < np; ++j )
+                ids.push_back( f[j] );
+            faces.push_back( ids );
         }
-        break;*/
     }
+
+    // work out how big the inversion spheres need to be to get the desired tiling
+    double R,d;
+    GetInversionSphereForSpaceTessellation(edge_length,schlafli1,schlafli2,schlafli3,R,d);
+
     // the inversion spheres lie on the lines that pass through the center of each face
     for( int i = 0; i < num_faces; ++i ) {
         double n[3] = {0,0,0};

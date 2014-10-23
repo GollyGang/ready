@@ -2064,20 +2064,47 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             break;
             case HyperbolicSpace:
             {
-                int levels = 2; // TODO: make these user options
-                int schlafli1 = 4;
-                int schlafli2 = 3;
-                int schlafli3 = 5;
+                const int NUM_TESSELLATION_TYPES = 4;
+                // choose the tessellation
+                int tessellationType, schlafli1, schlafli2, schlafli3;
                 {
-                    const int N_CHOICES = 7;
-                    int level_choices[N_CHOICES] = {1,2,3,4,5,6,7};
-                    int cells[N_CHOICES] = {7,37,163,661,2643,10497,41505};
-                    wxString level_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        level_descriptions[i] = wxString::Format("%d levels - %d cells",level_choices[i],cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of levels:"),_("Hyperbolic space tiling options"),N_CHOICES,level_descriptions);
+                    wxString descriptions[NUM_TESSELLATION_TYPES] = { "{4,3,5} : order-5 cubic honeycomb", "{5,3,4} : order-4 dodecahedral honeycomb", 
+                        "{5,3,5} : order-5 dodecahedral honeycomb",  "{3,5,3} : icosahedral honeycomb" };
+                    wxSingleChoiceDialog dlg(this,_("Select the tessellation required:"),_("Hyperbolic space tessellation options"),NUM_TESSELLATION_TYPES,descriptions);
+                    dlg.SetSelection(0); // default selection
+                    dlg.SetSize(wxDefaultCoord,130+NUM_TESSELLATION_TYPES*20); // increase dlg height so we see all choices without having to scroll
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
+                    tessellationType = dlg.GetSelection();
+                    switch( tessellationType ) {
+                        case 0: schlafli1 = 4; schlafli2 = 3; schlafli3 = 5; break;
+                        case 1: schlafli1 = 5; schlafli2 = 3; schlafli3 = 4; break;
+                        case 2: schlafli1 = 5; schlafli2 = 3; schlafli3 = 5; break;
+                        case 3: schlafli1 = 3; schlafli2 = 5; schlafli3 = 3; break;
+                    }
+                }
+                // choose the recursion depth
+                int levels;
+                {
+                    const int MAX_CHOICES = 7;
+                    int level_choices[MAX_CHOICES] = {1,2,3,4,5,6,7};
+                    int cells[NUM_TESSELLATION_TYPES][MAX_CHOICES] = {
+                        {7,37,163,661,2643,10497,41505}, // {4,3,5} : https://oeis.org/A247308
+                        {13,115,927,7329,57741,0,0},     // {5,3,4}
+                        {13,145,1537,16129,0,0,0},       // {5,3,5}
+                        {21,281,3493,42963,0,0,0}        // {3,5,3}
+                    };
+                    int num_choices[NUM_TESSELLATION_TYPES] = { 7, 5, 4, 4 };
+                    wxArrayString level_descriptions;
+                    level_descriptions.resize( num_choices[ tessellationType ] );
+                    for( int i = 0; i < num_choices[ tessellationType ]; ++i )
+                        level_descriptions[i] = wxString::Format("%d levels - %d cells",level_choices[i],cells[tessellationType][i]);
+                    wxSingleChoiceDialog dlg(this,_("Select the number of levels:"),_("Hyperbolic space tessellation options"),
+                        level_descriptions);
                     dlg.SetSelection(2); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+                    dlg.SetSize(wxDefaultCoord,130+num_choices[ tessellationType ]*20); // increase dlg height so we see all choices without having to scroll
                     if(dlg.ShowModal()!=wxID_OK) {
                         this->render_settings = previous_render_settings;
                         return;
