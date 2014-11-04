@@ -2039,9 +2039,32 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             break;
             case HyperbolicPlane:
             {
-                int levels = 10; // TODO: make these user options
-                int schlafli1 = 3;
-                int schlafli2 = 7;
+                // choose the tessellation
+                int schlafli1, schlafli2;
+                {
+                    // sensible choices: {3,7+},{4,5+},{5,4+},{6,4+},{7+,3+}
+                    const int s1_min = 3;
+                    const int s_max = 8;
+                    const int s2_min[s_max+1] = { 0, 0, 0, 7, 5, 4, 4, 3, 3 };
+                    const wxString polygons[s_max+1] = { _(""), _(""), _(""), _("triangles"), _("squares"), _("pentagons"), _("hexagons"), _("heptagons"), _("octagons") }; 
+                    wxArrayString descriptions;
+                    vector<pair<int,int> > choices;
+                    for(int s1 = s1_min; s1 <= s_max; ++s1 ) {
+                        for( int s2 = s2_min[s1]; s2 <= s_max; ++s2 ) {
+                            descriptions.Add( wxString::Format( _("{%d,%d} - %d %s around each vertex"), s1, s2, s2, polygons[s1] ) );
+                            choices.push_back( make_pair( s1, s2 ) );
+                        }
+                    }
+                    wxSingleChoiceDialog dlg(this,_("Select the tiling:"),_("Hyperbolic plane options"),descriptions);
+                    dlg.SetSelection(0); // default selection
+                    if(dlg.ShowModal()!=wxID_OK) {
+                        this->render_settings = previous_render_settings;
+                        return;
+                    }
+                    schlafli1 = choices[dlg.GetSelection()].first;
+                    schlafli2 = choices[dlg.GetSelection()].second;
+                }
+                int levels = 30 / schlafli1; // make this a user option?
                 wxBusyCursor busy;
                 this->SetStatusText(_("Generating mesh..."));
                 vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
