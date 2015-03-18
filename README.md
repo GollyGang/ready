@@ -4,7 +4,7 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.6 from the links on the left, or the [Downloads tab](https://code.google.com/p/reaction-diffusion/downloads/list). Ready works on Windows (XP, Vista, 7, 8), Mac OS (10.6+) and Linux.
+Download Ready 0.6 from the [releases tab](https://github.com/timhutton/ready/releases). Ready works on Windows (XP, Vista, 7, 8), Mac OS (10.6+) and Linux.
 
 [Changes](http://reaction-diffusion.googlecode.com/svn/trunk/Ready/Help/changes.html), [To-do list](http://code.google.com/p/reaction-diffusion/source/browse/trunk/Ready/TODO.txt), [Code documentation](http://reaction-diffusion.googlecode.com/svn/doc/Ready/trunk/index.html), [Credits](http://reaction-diffusion.googlecode.com/svn/trunk/Ready/Help/credits.html)
 
@@ -30,7 +30,7 @@ Citations:
 
 Please cite Ready as:
 
-Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki, Dan Wills. "Ready, a cross-platform implementation of various reaction-diffusion systems." https://code.google.com/p/reaction-diffusion
+Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki, Dan Wills. "Ready, a cross-platform implementation of various reaction-diffusion systems." https://github.com/timhutton/ready
 
 Blog coverage:
   * Tim's blog, December 2012: "[Ready 0.5](http://ferkeltongs.livejournal.com/36454.html)"
