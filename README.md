@@ -30,7 +30,9 @@ Citations:
 
 Please cite Ready as:
 
-Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki, Dan Wills. "Ready, a cross-platform implementation of various reaction-diffusion systems." https://github.com/timhutton/ready
+    Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki, Dan Wills. 
+    "Ready, a cross-platform implementation of various reaction-diffusion systems." 
+    https://github.com/timhutton/ready
 
 Blog coverage:
   * Tim's blog, December 2012: "[Ready 0.5](http://ferkeltongs.livejournal.com/36454.html)"
