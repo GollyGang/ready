@@ -8,7 +8,7 @@ Download Ready 0.6 from the [releases tab](https://github.com/timhutton/ready/re
 
 [Changes](https://timhutton.github.io/ready/Help/changes.html), [To-do list](https://timhutton.github.io/ready/TODO.txt), [Credits](https://timhutton.github.io/ready/Help/credits.html)
 
-For questions, send email to our mailing list. Either email it directly [reaction-diffusion@googlegroups.com](mailto:reaction-diffusion@googlegroups.com) or [join](https://groups.google.com/forum/#!forum/reaction-diffusion) to receive all the messages and avoid having to wait for your message to be moderated. Or you can email [tim.hutton@gmail.com](mailto:tim.hutton@gmail.com).
+For questions, [join our mailing list](https://groups.google.com/forum/#!forum/reaction-diffusion). Or you can email [tim.hutton@gmail.com](mailto:tim.hutton@gmail.com).
 
 Screenshots:
 
