@@ -6,7 +6,7 @@ Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
 Download Ready 0.6 from the [releases tab](https://github.com/timhutton/ready/releases). Ready works on Windows (XP, Vista, 7, 8), Mac OS (10.6+) and Linux.
 
-[Changes](https://timhutton.github.io/ready/Help/changes.html), [To-do list](https://timhutton.github.io/ready/TODO.txt), [Code documentation](http://reaction-diffusion.googlecode.com/svn/doc/Ready/trunk/index.html), [Credits](https://timhutton.github.io/ready/Help/credits.html)
+[Changes](https://timhutton.github.io/ready/Help/changes.html), [To-do list](https://timhutton.github.io/ready/TODO.txt), [Credits](https://timhutton.github.io/ready/Help/credits.html)
 
 Screenshots:
 
