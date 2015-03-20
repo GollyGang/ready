@@ -2,7 +2,7 @@
                                     About
 ---------------------------------------------------------------------------------
 
-For help, visit: http://code.google.com/p/reaction-diffusion/
+For help, visit: https://github.com/GollyGang/ready
 Or email: reaction-diffusion@googlegroups.com
 
 Ready is free software. Help us improve it!
