@@ -4,9 +4,9 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.6 from the [releases tab](https://github.com/timhutton/ready/releases). Ready works on Windows (XP, Vista, 7, 8), Mac OS (10.6+) and Linux.
+Download Ready 0.6 from the [releases tab](https://github.com/GollyGang/ready/releases). Ready works on Windows (XP, Vista, 7, 8), Mac OS (10.6+) and Linux.
 
-[Changes](https://timhutton.github.io/ready/Help/changes.html), [To-do list](https://timhutton.github.io/ready/TODO.txt), [Credits](https://timhutton.github.io/ready/Help/credits.html)
+[Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
 For questions, [join our mailing list](https://groups.google.com/forum/#!forum/reaction-diffusion). Or you can email [tim.hutton@gmail.com](mailto:tim.hutton@gmail.com).
 
