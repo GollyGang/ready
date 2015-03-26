@@ -1,4 +1,4 @@
-#  Copyright 2011, 2012, 2013, 2014 The Ready Bunch
+#  Copyright 2011, 2012, 2013, 2014, 2015 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -286,18 +286,11 @@ ELSE(WIN32)
         PROPERTIES COMPILE_FLAGS "-ObjC++")
     ENDIF(VTK_USE_COCOA)
   ELSE(APPLE)
-    # Ok X11 for sure, but just check:
-    IF(NOT VTK_USE_X)
-      MESSAGE(FATAL_ERROR "You need to have VTK_USE_X")
-    ENDIF(NOT VTK_USE_X)
     # CMake 2.6:
-    # technically those packages are not required since one can still use the Motif/X11 version and not the gtk one:
     FIND_PACKAGE(PkgConfig)
     pkg_check_modules (GTK2 gtk+-2.0)
-    #MESSAGE("${GTK2_INCLUDE_DIRS}")
     INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
     LINK_LIBRARIES(${GTK2_LIBRARIES})
-    # Can I require all my user to have the gl lib on linux, even if they do not really need it...
     SET(WXGLCANVASLIBS "gl")
   ENDIF(APPLE)
 ENDIF(WIN32)
@@ -393,9 +386,12 @@ if( ${VTK_MAJOR_VERSION} GREATER 5 )
   target_link_libraries( 
     readybase 
     vtkCommonCore 
+    vtkFiltersExtraction
+    vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
-    vtkInteractionStyle 
+    vtkInteractionStyle
+    vtkIOImage 
     vtkIOXML 
     vtkRenderingCore 
     vtkRenderingAnnotation 
@@ -444,6 +440,7 @@ endif()
 
 if( CMAKE_COMPILER_IS_GNUCXX )
   list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )  # strip release binary, for smaller file size
+  set ( CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
 #----------------------------------------doxygen------------------------------------------------
