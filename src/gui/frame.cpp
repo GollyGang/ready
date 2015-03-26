@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011, 2012, 2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -2994,7 +2994,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
         // rearrange the dimensions (for visualization we need the z to be 1 for 2D images, and both y and z to be 1 for 1D images)
         if( (x==1 && (y>1 || z>1)) || (y==1 && z>1) )
         {
-            float d[3]={x,y,z};
+            float d[3]={ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z) };
             sort(d,d+3);
             if(d[2]!=x || d[1]!=y || d[0]!=z) {
                 x=d[2]; y=d[1]; z=d[0];
