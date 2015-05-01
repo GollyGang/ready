@@ -16,6 +16,7 @@ Big picture issues:
 
 before 0.x release:
 
+- IPG with transparency, allowing only part of the saved pattern to be overwritten (John Denton wanted this)
 - save OBJ files from Start Recording dialog
 - merged phase plot and graph for 1D patterns: plot graph at right angles, to e.g. show Schroedinger as a corkscrew
 - fix panning issue on complex scenes (e.g. Bays_3D.vti)
