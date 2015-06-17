@@ -85,7 +85,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     const int index_m4 =  X*(Y*index_z + index_y) + xm4;
 
     float dx = 0.1f; // grid spacing
-    float dt = 0.01f; // timestep
+    float dt = 0.05f; // timestep
     
     a_out[index_here] = RungeKutta4( a_in[ index_m4 ], a_in[ index_m3 ], a_in[ index_m2 ], a_in[ index_m1 ], a_in[ index_here ], 
                                      a_in[ index_p1 ], a_in[ index_p2 ], a_in[ index_p3 ], a_in[ index_p4 ], dx, dt );
@@ -159,7 +159,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
       <use_image_interpolation value="true">
         
       </use_image_interpolation>
-      <timesteps_per_render value="8">
+      <timesteps_per_render value="1">
         
       </timesteps_per_render>
       <show_phase_plot value="false">

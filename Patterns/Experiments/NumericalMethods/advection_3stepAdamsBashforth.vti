@@ -34,7 +34,7 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
     float h = 0.1f; // grid spacing
     float x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
     float delta_a = -x_gradient_a;
-    float timestep = 0.01f;
+    float timestep = 0.05f;
     a_out[index_here] = a + ( timestep / 12.0f ) * ( 23.0f * delta_a - 16.0f * b + 5.0f * c );
     b_out[index_here] = delta_a;
     c_out[index_here] = b;
@@ -123,7 +123,7 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
       <use_image_interpolation value="true">
         
       </use_image_interpolation>
-      <timesteps_per_render value="8">
+      <timesteps_per_render value="1">
         
       </timesteps_per_render>
       <show_phase_plot value="false">

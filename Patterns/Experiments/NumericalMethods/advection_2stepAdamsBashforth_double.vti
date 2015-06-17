@@ -39,7 +39,7 @@ __kernel void rd_compute(__global double *a_in,__global double *b_in,__global do
     double a_w = a_in[index_w];
 
     double h = 0.1; // grid spacing
-    double timestep = 0.01;
+    double timestep = 0.05;
     double x_gradient_a = ( a_e - a_w ) / ( 2.0 * h );
     double delta_a = -x_gradient_a;
     a_out[index_here] = a + 1.5 * timestep * delta_a - 0.5 * timestep * b;
@@ -129,7 +129,7 @@ __kernel void rd_compute(__global double *a_in,__global double *b_in,__global do
       <use_image_interpolation value="true">
         
       </use_image_interpolation>
-      <timesteps_per_render value="8">
+      <timesteps_per_render value="1">
         
       </timesteps_per_render>
       <show_phase_plot value="false">

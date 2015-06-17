@@ -52,7 +52,7 @@ __kernel void rd_compute(__global double *a_in,__global double *a_out)
     const int index_w =  X*(Y*index_z + index_y) + xm1;
 
     double dx = 0.1; // grid spacing
-    double dt = 0.01; // timestep
+    double dt = 0.05; // timestep
     
     a_out[index_here] = LaxWendroff( a_in[ index_w ], a_in[ index_here ], a_in[ index_e ], dx, dt );
 }
@@ -138,7 +138,7 @@ __kernel void rd_compute(__global double *a_in,__global double *a_out)
       <use_image_interpolation value="true">
         
       </use_image_interpolation>
-      <timesteps_per_render value="8">
+      <timesteps_per_render value="1">
         
       </timesteps_per_render>
       <show_phase_plot value="false">
