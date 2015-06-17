@@ -41,7 +41,7 @@ class BaseOperation : public XML_Object
         /// construct when we don't know the derived type (returns NULL if name is unknown)
         static BaseOperation* New(vtkXMLDataElement* node);
 
-        virtual void Apply(float& target,float value) const =0;
+        virtual void Apply(double& target,double value) const =0;
 
     protected:
         
@@ -60,7 +60,7 @@ class BaseFill : public XML_Object
         static BaseFill* New(vtkXMLDataElement* node);
 
         /// what value would this fill type be at the given location, given the existing data
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const =0;
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const =0;
 
     protected:
 
@@ -145,9 +145,9 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
     return xml;
 }
 
-float Overlay::Apply(vector<float> vals,AbstractRD* system,float x,float y,float z) const
+double Overlay::Apply(vector<double> vals,AbstractRD* system,float x,float y,float z) const
 {
-    float val = vals[this->iTargetChemical];
+    double val = vals[this->iTargetChemical];
     for(int iShape=0;iShape<(int)this->shapes.size();iShape++)
     {
         if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ(), system->GetArenaDimensionality() ) )
@@ -211,7 +211,7 @@ class Add : public BaseOperation
             return xml;
         }
 
-        virtual void Apply(float& target,float value) const { target += value; }
+        virtual void Apply(double& target,double value) const { target += value; }
 };
 
 class Subtract : public BaseOperation
@@ -229,7 +229,7 @@ class Subtract : public BaseOperation
             return xml;
         }
 
-        virtual void Apply(float& target,float value) const { target -= value; }
+        virtual void Apply(double& target,double value) const { target -= value; }
 };
 
 class Overwrite : public BaseOperation
@@ -247,7 +247,7 @@ class Overwrite : public BaseOperation
             return xml;
         }
 
-        virtual void Apply(float& target,float value) const { target = value; }
+        virtual void Apply(double& target,double value) const { target = value; }
 };
 
 class Multiply : public BaseOperation
@@ -265,7 +265,7 @@ class Multiply : public BaseOperation
             return xml;
         }
 
-        virtual void Apply(float& target,float value) const { target *= value; }
+        virtual void Apply(double& target,double value) const { target *= value; }
 };
 
 class Divide : public BaseOperation
@@ -283,7 +283,7 @@ class Divide : public BaseOperation
             return xml;
         }
 
-        virtual void Apply(float& target,float value) const { target /= value; }
+        virtual void Apply(double& target,double value) const { target /= value; }
 };
 
 // -------- fill methods: -----------
@@ -307,14 +307,14 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
             return this->value;
         }
 
     protected:
 
-        float value;
+        double value;
 };
 
 class OtherChemical : public BaseFill
@@ -338,7 +338,7 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
             if(this->iOtherChemical < 0 || this->iOtherChemical >= (int)vals.size())
                 throw runtime_error("OtherChemical:GetValue : chemical out of range");
@@ -369,7 +369,7 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
             return system->GetParameterValueByName(this->parameter_name.c_str());
         }
@@ -400,14 +400,14 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
             return frand(this->low,this->high);
         }
 
     protected:
 
-        float low,high;
+        double low,high;
 };
 
 class LinearGradient : public BaseFill
@@ -438,24 +438,24 @@ class LinearGradient : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
-            float rel_x = x/system->GetX();
-            float rel_y = y/system->GetY();
-            float rel_z = z/system->GetZ();
+            double rel_x = x/system->GetX();
+            double rel_y = y/system->GetY();
+            double rel_z = z/system->GetZ();
             // project this point onto the linear gradient axis
-            float blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
-            float bx = (this->p2->x-this->p1->x) / blen;
-            float by = (this->p2->y-this->p1->y) / blen;
-            float bz = (this->p2->z-this->p1->z) / blen;
-            float dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
-            float u = dp / blen; // [0,1]
+            double blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
+            double bx = (this->p2->x-this->p1->x) / blen;
+            double by = (this->p2->y-this->p1->y) / blen;
+            double bz = (this->p2->z-this->p1->z) / blen;
+            double dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
+            double u = dp / blen; // [0,1]
             return this->val1 + (this->val2-this->val1) * u;
         }
 
     protected:
 
-        float val1,val2;
+        double val1,val2;
         Point3D *p1,*p2;
 };
 
@@ -487,21 +487,21 @@ class RadialGradient : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
             // convert p1 and p2 to absolute coordinates
-            float rp1x = p1->x * system->GetX();
-            float rp1y = p1->y * system->GetY();
-            float rp1z = p1->z * system->GetZ();
-            float rp2x = p2->x * system->GetX();
-            float rp2y = p2->y * system->GetY();
-            float rp2z = p2->z * system->GetZ();
+            double rp1x = p1->x * system->GetX();
+            double rp1y = p1->y * system->GetY();
+            double rp1z = p1->z * system->GetZ();
+            double rp2x = p2->x * system->GetX();
+            double rp2y = p2->y * system->GetY();
+            double rp2z = p2->z * system->GetZ();
             return val1 + (val2-val1) * hypot3(x-rp1x,y-rp1y,z-rp1z) / hypot3(rp2x-rp1x,rp2y-rp1y,rp2z-rp1z);
         }
 
     protected:
 
-        float val1,val2;
+        double val1,val2;
         Point3D *p1,*p2;
 };
 
@@ -531,20 +531,20 @@ class Gaussian : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
             // convert center to absolute coordinates
-            float ax = center->x * system->GetX();
-            float ay = center->y * system->GetY();
-            float az = center->z * system->GetZ();
-            float asigma = this->sigma * max(system->GetX(),max(system->GetY(),system->GetZ())); // (proportional to the largest dimension)
-            float dist = hypot3(ax-x,ay-y,az-z);
+            double ax = center->x * system->GetX();
+            double ay = center->y * system->GetY();
+            double az = center->z * system->GetZ();
+            double asigma = this->sigma * max(system->GetX(),max(system->GetY(),system->GetZ())); // (proportional to the largest dimension)
+            double dist = hypot3(ax-x,ay-y,az-z);
             return this->height * exp( -dist*dist/(2.0f*asigma*asigma) );
         }
 
     protected:
 
-        float height,sigma;
+        double height,sigma;
         Point3D *center;
 };
 
@@ -576,24 +576,24 @@ class Sine : public BaseFill
             return xml;
         }
 
-        virtual float GetValue(AbstractRD *system,vector<float> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
         {
-            float rel_x = x/system->GetX();
-            float rel_y = y/system->GetY();
-            float rel_z = z/system->GetZ();
+            double rel_x = x/system->GetX();
+            double rel_y = y/system->GetY();
+            double rel_z = z/system->GetZ();
             // project this point onto the axis
-            float blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
-            float bx = (this->p2->x-this->p1->x) / blen;
-            float by = (this->p2->y-this->p1->y) / blen;
-            float bz = (this->p2->z-this->p1->z) / blen;
-            float dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
-            float u = dp / blen; // [0,1]
+            double blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
+            double bx = (this->p2->x-this->p1->x) / blen;
+            double by = (this->p2->y-this->p1->y) / blen;
+            double bz = (this->p2->z-this->p1->z) / blen;
+            double dp = (rel_x-this->p1->x) * bx + (rel_y-this->p1->y) * by + (rel_z-this->p1->z) * bz; // dp = a.norm(b)
+            double u = dp / blen; // [0,1]
             return this->amplitude * sin( u * 2.0 * vtkMath::Pi() - this->phase );
         }
 
     protected:
 
-        float phase,amplitude;
+        double phase,amplitude;
         Point3D *p1,*p2;
 };
 
@@ -646,9 +646,9 @@ class Rectangle : public BaseShape
 
         virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
         {
-            float rel_x = x/X;
-            float rel_y = y/Y;
-            float rel_z = z/Z;
+            double rel_x = x/X;
+            double rel_y = y/Y;
+            double rel_z = z/Z;
             switch(dimensionality)
             {
                 default:
@@ -693,10 +693,10 @@ class Circle : public BaseShape
         virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
         {
             // convert the center and radius to absolute coordinates
-            float cx = this->c->x * X;
-            float cy = this->c->y * Y;
-            float cz = this->c->z * Z;
-            float abs_radius = this->radius * max(X,max(Y,Z)); // (radius is proportional to the largest dimension)
+            double cx = this->c->x * X;
+            double cy = this->c->y * Y;
+            double cz = this->c->z * Z;
+            double abs_radius = this->radius * max(X,max(Y,Z)); // (radius is proportional to the largest dimension)
             switch(dimensionality)
             {
                 default:
@@ -709,7 +709,7 @@ class Circle : public BaseShape
     protected:
 
         Point3D *c;
-        float radius;
+        double radius;
 };
 
 class Pixel : public BaseShape

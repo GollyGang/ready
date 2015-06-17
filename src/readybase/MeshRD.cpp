@@ -171,8 +171,8 @@ void MeshRD::GenerateInitialPattern()
                 continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                 //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-            float val;
-            vector<float> vals(this->GetNumberOfChemicals());
+            double val;
+            vector<double> vals(this->GetNumberOfChemicals());
             for(int i=0;i<this->GetNumberOfChemicals();i++)
             {
                 vals[i] = this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str())->GetComponent( iCell, 0 );

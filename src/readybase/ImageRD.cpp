@@ -283,11 +283,11 @@ void ImageRD::GenerateInitialPattern()
                         continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                         //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-                    float val = this->GetImage(iC)->GetScalarComponentAsFloat(x,y,z,0);
-                    vector<float> vals(this->GetNumberOfChemicals());
+                    double val = this->GetImage(iC)->GetScalarComponentAsDouble(x,y,z,0);
+                    vector<double> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
-                        vals[i] = this->GetImage(i)->GetScalarComponentAsFloat(x,y,z,0);
-                    this->GetImage(iC)->SetScalarComponentFromFloat(x,y,z,0,overlay->Apply(vals,this,x,y,z));
+                        vals[i] = this->GetImage(i)->GetScalarComponentAsDouble(x,y,z,0);
+                    this->GetImage(iC)->SetScalarComponentFromDouble(x,y,z,0,overlay->Apply(vals,this,x,y,z));
                 }
             }
         }

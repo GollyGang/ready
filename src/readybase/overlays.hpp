@@ -49,7 +49,7 @@ class Overlay : public XML_Object
         int GetTargetChemical() const { return this->iTargetChemical; }
 
         /// given a vector of values (one for each chemical) at a location in a system, returns the new value
-        float Apply(std::vector<float> vals,AbstractRD* system,float x,float y,float z) const;
+        double Apply(std::vector<double> vals,AbstractRD* system,float x,float y,float z) const;
 
     protected:
     
