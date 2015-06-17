@@ -17,10 +17,6 @@
       &lt;li&gt;The derivative k4 is computed from state a4.
       &lt;li&gt;The new state is given by a' = a + timestep * (k1 + 2*k2 + 2*k3 + k4) / 6
       &lt;/ol&gt;
-      
-      Strangely this method doesn't outperform the others in this folder. Is this because the deviations in the advection
-      equation are coming from rounding errors rather than from numerical inaccuracies? If we used doubles instead of floats
-      would the difference between these integration methods then become apparent?
     </description>
     <rule name="Advection" type="kernel">
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
