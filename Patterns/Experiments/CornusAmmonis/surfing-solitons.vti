@@ -37,28 +37,28 @@
       </param>
       <formula number_of_chemicals="4">
         float4 uax = (float4)(
-(-(a_nw.w + a_sw.w) + (a_n.y   + a_s.y) - 2.0 * a_w.w + 2.0 * a.y  ),
-(-(a_n.x  + a_s.x)  + (a_n.z   + a_s.z) - 2.0 * a.x   + 2.0 * a.z  ),
-(-(a_n.y  + a_s.y)  + (a_n.w   + a_s.w) - 2.0 * a.y   + 2.0 * a.w  ),
-(-(a_n.z  + a_s.z)  + (a_ne.x + a_se.x) - 2.0 * a.z   + 2.0 * a_e.x));
+(-(a_nw.w + a_sw.w) + (a_n.y   + a_s.y) - 2.0f * a_w.w + 2.0f * a.y  ),
+(-(a_n.x  + a_s.x)  + (a_n.z   + a_s.z) - 2.0f * a.x   + 2.0f * a.z  ),
+(-(a_n.y  + a_s.y)  + (a_n.w   + a_s.w) - 2.0f * a.y   + 2.0f * a.w  ),
+(-(a_n.z  + a_s.z)  + (a_ne.x + a_se.x) - 2.0f * a.z   + 2.0f * a_e.x));
 
 float4 uay = (float4)(
-((a_nw.w + a_n.y ) - (a_sw.w +  a_s.y) - 2.0 * a_s.x + 2.0 * a_n.x),
-((a_n.x  + a_n.z ) - (a_s.x  +  a_s.z) - 2.0 * a_s.y + 2.0 * a_n.y),
-((a_n.y  + a_n.w ) - (a_s.y  +  a_s.w) - 2.0 * a_s.z + 2.0 * a_n.z),
-((a_n.z  + a_ne.x) - (a_s.z  + a_se.x) - 2.0 * a_s.w + 2.0 * a_n.w));
+((a_nw.w + a_n.y ) - (a_sw.w +  a_s.y) - 2.0f * a_s.x + 2.0f * a_n.x),
+((a_n.x  + a_n.z ) - (a_s.x  +  a_s.z) - 2.0f * a_s.y + 2.0f * a_n.y),
+((a_n.y  + a_n.w ) - (a_s.y  +  a_s.w) - 2.0f * a_s.z + 2.0f * a_n.z),
+((a_n.z  + a_ne.x) - (a_s.z  + a_se.x) - 2.0f * a_s.w + 2.0f * a_n.w));
 
 float4 ubx = (float4)(
-(-(b_nw.w + b_sw.w) + (b_n.y   + b_s.y) - 2.0 * b_w.w + 2.0 * b.y  ),
-(-(b_n.x  + b_s.x)  + (b_n.z   + b_s.z) - 2.0 * b.x   + 2.0 * b.z  ),
-(-(b_n.y  + b_s.y)  + (b_n.w   + b_s.w) - 2.0 * b.y   + 2.0 * b.w  ),
-(-(b_n.z  + b_s.z)  + (b_ne.x + b_se.x) - 2.0 * b.z   + 2.0 * b_e.x));
+(-(b_nw.w + b_sw.w) + (b_n.y   + b_s.y) - 2.0f * b_w.w + 2.0f * b.y  ),
+(-(b_n.x  + b_s.x)  + (b_n.z   + b_s.z) - 2.0f * b.x   + 2.0f * b.z  ),
+(-(b_n.y  + b_s.y)  + (b_n.w   + b_s.w) - 2.0f * b.y   + 2.0f * b.w  ),
+(-(b_n.z  + b_s.z)  + (b_ne.x + b_se.x) - 2.0f * b.z   + 2.0f * b_e.x));
 
 float4 uby = (float4)(
-((b_nw.w + b_n.y ) - (b_sw.w +  b_s.y) - 2.0 * b_s.x + 2.0 * b_n.x),
-((b_n.x  + b_n.z ) - (b_s.x  +  b_s.z) - 2.0 * b_s.y + 2.0 * b_n.y),
-((b_n.y  + b_n.w ) - (b_s.y  +  b_s.w) - 2.0 * b_s.z + 2.0 * b_n.z),
-((b_n.z  + b_ne.x) - (b_s.z  + b_se.x) - 2.0 * b_s.w + 2.0 * b_n.w));
+((b_nw.w + b_n.y ) - (b_sw.w +  b_s.y) - 2.0f * b_s.x + 2.0f * b_n.x),
+((b_n.x  + b_n.z ) - (b_s.x  +  b_s.z) - 2.0f * b_s.y + 2.0f * b_n.y),
+((b_n.y  + b_n.w ) - (b_s.y  +  b_s.w) - 2.0f * b_s.z + 2.0f * b_n.z),
+((b_n.z  + b_ne.x) - (b_s.z  + b_se.x) - 2.0f * b_s.w + 2.0f * b_n.w));
 
 float4 mm_b = (float4)(
 (b_nw.w + b_n.x + b_n.y  + b_w.w + b.y   + b_sw.w + b_s.x + b_s.y ),
@@ -72,10 +72,10 @@ float4 mm_c = (float4)(
 (c_n.y  + c_n.z + c_n.w  + c.y   + c.w   + c_s.y  + c_s.z + c_s.w ),
 (c_n.z  + c_n.w + c_ne.x + c.z   + c_e.x + c_s.z  + c_s.w + c_se.x));
 
-float4 dp = pow(pow(uax * ubx - uay * uby, 2) + pow(uay * ubx + uax * uby, 2), 0.5);
+float4 dp = pow(pow(uax * ubx - uay * uby, 2) + pow(uay * ubx + uax * uby, 2), 0.5f);
 
 c = pow((mm_b + b + 3)/10, 5)*20;
-d = (mm_c + c) * 0.1;
+d = (mm_c + c) * 0.1f;
 delta_a = (D_a * (a * a - b * b)) + aScale * laplacian_b + aConst * b - acS * sign(a) * a * a;
 delta_b = dps * dp + D_b * a * b - bScale * laplacian_a + bConst * a - bcS * sign(b) * b * b;
       </formula>

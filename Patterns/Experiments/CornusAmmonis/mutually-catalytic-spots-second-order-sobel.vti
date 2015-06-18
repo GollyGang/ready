@@ -49,31 +49,31 @@
       </param>
       <formula number_of_chemicals="7">
         float4 uax = (float4)(
-(-(a_nw.w + a_sw.w) + (a_n.y   + a_s.y) - 2.0 * a_w.w + 2.0 * a.y  ),
-(-(a_n.x  + a_s.x)  + (a_n.z   + a_s.z) - 2.0 * a.x   + 2.0 * a.z  ),
-(-(a_n.y  + a_s.y)  + (a_n.w   + a_s.w) - 2.0 * a.y   + 2.0 * a.w  ),
-(-(a_n.z  + a_s.z)  + (a_ne.x + a_se.x) - 2.0 * a.z   + 2.0 * a_e.x));
+(-(a_nw.w + a_sw.w) + (a_n.y   + a_s.y) - 2.0f * a_w.w + 2.0f * a.y  ),
+(-(a_n.x  + a_s.x)  + (a_n.z   + a_s.z) - 2.0f * a.x   + 2.0f * a.z  ),
+(-(a_n.y  + a_s.y)  + (a_n.w   + a_s.w) - 2.0f * a.y   + 2.0f * a.w  ),
+(-(a_n.z  + a_s.z)  + (a_ne.x + a_se.x) - 2.0f * a.z   + 2.0f * a_e.x));
 
 
 float4 uay = (float4)(
-((a_nw.w + a_n.y ) - (a_sw.w +  a_s.y) - 2.0 * a_s.x + 2.0 * a_n.x),
-((a_n.x  + a_n.z ) - (a_s.x  +  a_s.z) - 2.0 * a_s.y + 2.0 * a_n.y),
-((a_n.y  + a_n.w ) - (a_s.y  +  a_s.w) - 2.0 * a_s.z + 2.0 * a_n.z),
-((a_n.z  + a_ne.x) - (a_s.z  + a_se.x) - 2.0 * a_s.w + 2.0 * a_n.w));
+((a_nw.w + a_n.y ) - (a_sw.w +  a_s.y) - 2.0f * a_s.x + 2.0f * a_n.x),
+((a_n.x  + a_n.z ) - (a_s.x  +  a_s.z) - 2.0f * a_s.y + 2.0f * a_n.y),
+((a_n.y  + a_n.w ) - (a_s.y  +  a_s.w) - 2.0f * a_s.z + 2.0f * a_n.z),
+((a_n.z  + a_ne.x) - (a_s.z  + a_se.x) - 2.0f * a_s.w + 2.0f * a_n.w));
 
 
 float4 uax2 = (float4)(
-(a_nw.w + a_sw.w + a_n.y   + a_s.y) + 2.0 * (a_w.w + a.y  ) - 2.0 * (a_n.x + a_s.x + 2.0 * a.x),
-(a_n.x  + a_s.x  + a_n.z   + a_s.z) + 2.0 * (a.x   + a.z  ) - 2.0 * (a_n.y + a_s.y + 2.0 * a.y),
-(a_n.y  + a_s.y  + a_n.w   + a_s.w) + 2.0 * (a.y   + a.w  ) - 2.0 * (a_n.z + a_s.z + 2.0 * a.z),
-(a_n.z  + a_s.z  + a_ne.x + a_se.x) + 2.0 * (a.z   + a_e.x) - 2.0 * (a_n.w + a_s.w + 2.0 * a.w));
+(a_nw.w + a_sw.w + a_n.y   + a_s.y) + 2.0f * (a_w.w + a.y  ) - 2.0f * (a_n.x + a_s.x + 2.0f * a.x),
+(a_n.x  + a_s.x  + a_n.z   + a_s.z) + 2.0f * (a.x   + a.z  ) - 2.0f * (a_n.y + a_s.y + 2.0f * a.y),
+(a_n.y  + a_s.y  + a_n.w   + a_s.w) + 2.0f * (a.y   + a.w  ) - 2.0f * (a_n.z + a_s.z + 2.0f * a.z),
+(a_n.z  + a_s.z  + a_ne.x + a_se.x) + 2.0f * (a.z   + a_e.x) - 2.0f * (a_n.w + a_s.w + 2.0f * a.w));
 
 
 float4 uay2 = (float4)(
-(a_nw.w + a_sw.w + a_n.y   + a_s.y) + 2.0 * (a_n.x + a_s.x) - 2.0 * (a_w.w + a.y   + 2.0 * a.x),
-(a_n.x  + a_s.x  + a_n.z   + a_s.z) + 2.0 * (a_n.y + a_s.y) - 2.0 * (a.x   + a.z   + 2.0 * a.y),
-(a_n.y  + a_s.y  + a_n.w   + a_s.w) + 2.0 * (a_n.z + a_s.z) - 2.0 * (a.y   + a.w   + 2.0 * a.z),
-(a_n.z  + a_s.z  + a_ne.x + a_se.x) + 2.0 * (a_n.w + a_s.w) - 2.0 * (a.z   + a_e.x + 2.0 * a.w));
+(a_nw.w + a_sw.w + a_n.y   + a_s.y) + 2.0f * (a_n.x + a_s.x) - 2.0f * (a_w.w + a.y   + 2.0f * a.x),
+(a_n.x  + a_s.x  + a_n.z   + a_s.z) + 2.0f * (a_n.y + a_s.y) - 2.0f * (a.x   + a.z   + 2.0f * a.y),
+(a_n.y  + a_s.y  + a_n.w   + a_s.w) + 2.0f * (a_n.z + a_s.z) - 2.0f * (a.y   + a.w   + 2.0f * a.z),
+(a_n.z  + a_s.z  + a_ne.x + a_se.x) + 2.0f * (a_n.w + a_s.w) - 2.0f * (a.z   + a_e.x + 2.0f * a.w));
 
 
 float4 uaxy = (float4)(
@@ -83,8 +83,8 @@ float4 uaxy = (float4)(
 (- a_n.z  + a_s.z  + a_ne.x - a_se.x));
 
 
-float4 uaxsq = pow(uax, 2.0);
-float4 uaysq = pow(uay, 2.0);
+float4 uaxsq = pow(uax, 2.0f);
+float4 uaysq = pow(uay, 2.0f);
 float4 dsq = 0;
 if (!(any(isequal(uaxsq, 0)) || any(isequal(uaysq, 0)))) {
     dsq = (uaxsq * uax2 + 2 * uax * uay * uaxy + uaysq * uay2) / (uaxsq * uaysq); 
@@ -92,45 +92,45 @@ if (!(any(isequal(uaxsq, 0)) || any(isequal(uaysq, 0)))) {
 
 
 float4 ubx = (float4)(
-(-(b_nw.w + b_sw.w) + (b_n.y   + b_s.y) - 2.0 * b_w.w + 2.0 * b.y  ),
-(-(b_n.x  + b_s.x)  + (b_n.z   + b_s.z) - 2.0 * b.x   + 2.0 * b.z  ),
-(-(b_n.y  + b_s.y)  + (b_n.w   + b_s.w) - 2.0 * b.y   + 2.0 * b.w  ),
-(-(b_n.z  + b_s.z)  + (b_ne.x + b_se.x) - 2.0 * b.z   + 2.0 * b_e.x));
+(-(b_nw.w + b_sw.w) + (b_n.y   + b_s.y) - 2.0f * b_w.w + 2.0f * b.y  ),
+(-(b_n.x  + b_s.x)  + (b_n.z   + b_s.z) - 2.0f * b.x   + 2.0f * b.z  ),
+(-(b_n.y  + b_s.y)  + (b_n.w   + b_s.w) - 2.0f * b.y   + 2.0f * b.w  ),
+(-(b_n.z  + b_s.z)  + (b_ne.x + b_se.x) - 2.0f * b.z   + 2.0f * b_e.x));
 
 
 float4 uby = (float4)(
-((b_nw.w + b_n.y ) - (b_sw.w +  b_s.y) - 2.0 * b_s.x + 2.0 * b_n.x),
-((b_n.x  + b_n.z ) - (b_s.x  +  b_s.z) - 2.0 * b_s.y + 2.0 * b_n.y),
-((b_n.y  + b_n.w ) - (b_s.y  +  b_s.w) - 2.0 * b_s.z + 2.0 * b_n.z),
-((b_n.z  + b_ne.x) - (b_s.z  + b_se.x) - 2.0 * b_s.w + 2.0 * b_n.w));
+((b_nw.w + b_n.y ) - (b_sw.w +  b_s.y) - 2.0f * b_s.x + 2.0f * b_n.x),
+((b_n.x  + b_n.z ) - (b_s.x  +  b_s.z) - 2.0f * b_s.y + 2.0f * b_n.y),
+((b_n.y  + b_n.w ) - (b_s.y  +  b_s.w) - 2.0f * b_s.z + 2.0f * b_n.z),
+((b_n.z  + b_ne.x) - (b_s.z  + b_se.x) - 2.0f * b_s.w + 2.0f * b_n.w));
 
 
 float4 ucx = (float4)(
-(-(c_nw.w + c_sw.w) + (c_n.y   + c_s.y) - 2.0 * c_w.w + 2.0 * c.y  ),
-(-(c_n.x  + c_s.x)  + (c_n.z   + c_s.z) - 2.0 * c.x   + 2.0 * c.z  ),
-(-(c_n.y  + c_s.y)  + (c_n.w   + c_s.w) - 2.0 * c.y   + 2.0 * c.w  ),
-(-(c_n.z  + c_s.z)  + (c_ne.x + c_se.x) - 2.0 * c.z   + 2.0 * c_e.x));
+(-(c_nw.w + c_sw.w) + (c_n.y   + c_s.y) - 2.0f * c_w.w + 2.0f * c.y  ),
+(-(c_n.x  + c_s.x)  + (c_n.z   + c_s.z) - 2.0f * c.x   + 2.0f * c.z  ),
+(-(c_n.y  + c_s.y)  + (c_n.w   + c_s.w) - 2.0f * c.y   + 2.0f * c.w  ),
+(-(c_n.z  + c_s.z)  + (c_ne.x + c_se.x) - 2.0f * c.z   + 2.0f * c_e.x));
 
 
 float4 ucy = (float4)(
-((c_nw.w + c_n.y ) - (c_sw.w +  c_s.y) - 2.0 * c_s.x + 2.0 * c_n.x),
-((c_n.x  + c_n.z ) - (c_s.x  +  c_s.z) - 2.0 * c_s.y + 2.0 * c_n.y),
-((c_n.y  + c_n.w ) - (c_s.y  +  c_s.w) - 2.0 * c_s.z + 2.0 * c_n.z),
-((c_n.z  + c_ne.x) - (c_s.z  + c_se.x) - 2.0 * c_s.w + 2.0 * c_n.w));
+((c_nw.w + c_n.y ) - (c_sw.w +  c_s.y) - 2.0f * c_s.x + 2.0f * c_n.x),
+((c_n.x  + c_n.z ) - (c_s.x  +  c_s.z) - 2.0f * c_s.y + 2.0f * c_n.y),
+((c_n.y  + c_n.w ) - (c_s.y  +  c_s.w) - 2.0f * c_s.z + 2.0f * c_n.z),
+((c_n.z  + c_ne.x) - (c_s.z  + c_se.x) - 2.0f * c_s.w + 2.0f * c_n.w));
 
 
 float4 udx = (float4)(
-(-(d_nw.w + d_sw.w) + (d_n.y   + d_s.y) - 2.0 * d_w.w + 2.0 * d.y  ),
-(-(d_n.x  + d_s.x)  + (d_n.z   + d_s.z) - 2.0 * d.x   + 2.0 * d.z  ),
-(-(d_n.y  + d_s.y)  + (d_n.w   + d_s.w) - 2.0 * d.y   + 2.0 * d.w  ),
-(-(d_n.z  + d_s.z)  + (d_ne.x + d_se.x) - 2.0 * d.z   + 2.0 * d_e.x));
+(-(d_nw.w + d_sw.w) + (d_n.y   + d_s.y) - 2.0f * d_w.w + 2.0f * d.y  ),
+(-(d_n.x  + d_s.x)  + (d_n.z   + d_s.z) - 2.0f * d.x   + 2.0f * d.z  ),
+(-(d_n.y  + d_s.y)  + (d_n.w   + d_s.w) - 2.0f * d.y   + 2.0f * d.w  ),
+(-(d_n.z  + d_s.z)  + (d_ne.x + d_se.x) - 2.0f * d.z   + 2.0f * d_e.x));
 
 
 float4 udy = (float4)(
-((d_nw.w + d_n.y ) - (d_sw.w +  d_s.y) - 2.0 * d_s.x + 2.0 * d_n.x),
-((d_n.x  + d_n.z ) - (d_s.x  +  d_s.z) - 2.0 * d_s.y + 2.0 * d_n.y),
-((d_n.y  + d_n.w ) - (d_s.y  +  d_s.w) - 2.0 * d_s.z + 2.0 * d_n.z),
-((d_n.z  + d_ne.x) - (d_s.z  + d_se.x) - 2.0 * d_s.w + 2.0 * d_n.w));
+((d_nw.w + d_n.y ) - (d_sw.w +  d_s.y) - 2.0f * d_s.x + 2.0f * d_n.x),
+((d_n.x  + d_n.z ) - (d_s.x  +  d_s.z) - 2.0f * d_s.y + 2.0f * d_n.y),
+((d_n.y  + d_n.w ) - (d_s.y  +  d_s.w) - 2.0f * d_s.z + 2.0f * d_n.z),
+((d_n.z  + d_ne.x) - (d_s.z  + d_se.x) - 2.0f * d_s.w + 2.0f * d_n.w));
 
 
 float4 dp1 = ucx * udx + ucy * udy;
@@ -139,11 +139,11 @@ float4 dp2 = ubx * ucy - uby * ucx;
 
 delta_a = 2.0f * diff_ab * laplacian_a - a*b*b + F1*(1.0f-a);
 delta_b = diff_ab * laplacian_b + a*b*b - (F1+k1-d*b_feed)*b;
-delta_c = (a - 0.5) * dps2 * dp2 + 2.0f * diff_cd * laplacian_c - c*d*d + F2*(1.0f-c);
+delta_c = (a - 0.5f) * dps2 * dp2 + 2.0f * diff_cd * laplacian_c - c*d*d + F2*(1.0f-c);
 delta_d = dps1 * dp1 + f + diff_cd * laplacian_d + c*d*d - (F2+k2-step(0.15f,b)*d_feed)*d;
 e = 2.0f*b + d*2.0f;
 f = vs * sign(dsq) * pow(fabs(dsq), vp) + vo;
-g = (f * 2) + 0.5;
+g = (f * 2) + 0.5f;
       </formula>
       
     </rule>
