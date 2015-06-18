@@ -1,4 +1,4 @@
-#  Copyright 2011, 2012, 2013, 2014, 2015 The Ready Bunch
+#  Copyright 2011-2015 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -113,7 +113,7 @@ set( PATTERN_FILES
   Patterns/wave_equation.vti
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
-  Patterns/SmoothLife/smoothglider.vti     Patterns/SmoothLife/smoothlifeL.vti     Patterns/SmoothLife/glider_3D.vti
+  Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
   Patterns/Purwins1999/glider.vti          Patterns/Purwins1999/glider_3D.vti      Patterns/Purwins1999/multiGlider.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
@@ -150,8 +150,8 @@ set( PATTERN_FILES
   Patterns/Yang2002/Yang_3c.vti   Patterns/Yang2002/Yang_3d.vti  Patterns/Yang2002/Yang_4.vti
   Patterns/Yang2003/Fig2.vti
   Patterns/Yang2003/Fig3a.vti     Patterns/Yang2003/Fig3b.vti    Patterns/Yang2003/Fig3c.vti
-  Patterns/McCabe/McCabe.vti               Patterns/McCabe/McCabe_simple.vti
-  Patterns/McCabe/McCabe_additive2b.vti    Patterns/McCabe/McCabe_additive2a.vti
+  Patterns/McCabe2010/McCabe.vti               Patterns/McCabe2010/McCabe_simple.vti
+  Patterns/McCabe2010/McCabe_additive2b.vti    Patterns/McCabe2010/McCabe_additive2a.vti
   Patterns/Kytta2007/Fig5.7a.vti  Patterns/Kytta2007/Fig5.7c.vti
   Patterns/Kytta2007/Fig5.8c.vti  Patterns/Kytta2007/Fig5.8d.vti Patterns/Kytta2007/Fig5.8e.vti
   Patterns/Kytta2007/Fig5.8f.vti  Patterns/Kytta2007/Fig5.8g.vti
@@ -163,16 +163,16 @@ set( PATTERN_FILES
   Patterns/Pennybacker2013/phyllotaxis_fibonacci.vti Patterns/Pennybacker2013/phyllotaxis_hexagons.vti
   Patterns/Pennybacker2013/spots.vti Patterns/Pennybacker2013/stripes.vti
   Patterns/Pennybacker2013/parameter_map.vti
-  Patterns/Experiments/mutually-catalytic_spots.vti
-  Patterns/Experiments/cglrd_ramps_example_djw.vti  
-  Patterns/Experiments/grayscott-historyWave_fuseWorms.vti
-  Patterns/Experiments/grayscott-historyWave_moreLifelike.vti
-  Patterns/Experiments/grayscott-historyWaveDC_solitonsAndWorms_init.vti
-  Patterns/Experiments/orbits_explodey_init.djw.vti
-  Patterns/Experiments/orbits_sharpWaves-init_djw.vti
-  Patterns/Experiments/grayscott-historyWave_coralGrow_djw.vti
-  Patterns/Experiments/gladman_vermiformSolitons.vti
-  Patterns/Experiments/LifeBlur.vti
+  Patterns/Experiments/TimHutton/mutually-catalytic_spots.vti
+  Patterns/Experiments/DanWills/cglrd_ramps_example.vti  
+  Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms.vti
+  Patterns/Experiments/DanWills/grayscott-historyWave_moreLifelike.vti
+  Patterns/Experiments/DanWills/grayscott-historyWaveDC_solitonsAndWorms_init.vti
+  Patterns/Experiments/DanWills/orbits_explodey_init.vti
+  Patterns/Experiments/DanWills/orbits_sharpWaves-init.vti
+  Patterns/Experiments/DanWills/grayscott-historyWave_coralGrow.vti
+  Patterns/Experiments/SimonGladman/vermiformSolitons.vti
+  Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/CornusAmmonis/MandelbrotWorms.vti
   Patterns/Experiments/CornusAmmonis/mutually-catalytic-pinwheels.vti
   Patterns/Experiments/CornusAmmonis/mutually-catalytic-spots-second-order-sobel.vti
@@ -180,28 +180,28 @@ set( PATTERN_FILES
   Patterns/Experiments/CornusAmmonis/surfing-solitons.vti
   Patterns/Experiments/CornusAmmonis/tip-splitting-web.vti
   Patterns/Experiments/CornusAmmonis/worms2.vti
-  Patterns/Agmon2014/cells.vti
+  Patterns/Agmon2014/cells.vti      Patterns/Agmon2014/cells_double.vti
   Patterns/Agmon2014/oil-water.vti
-  Patterns/Experiments/NumericalMethods/advection_forwardEuler.vti
-  Patterns/Experiments/NumericalMethods/advection_2stepAdamsBashforth.vti
-  Patterns/Experiments/NumericalMethods/advection_3stepAdamsBashforth.vti
-  Patterns/Experiments/NumericalMethods/advection_modifiedEuler.vti
-  Patterns/Experiments/NumericalMethods/advection_midpointMethod.vti
-  Patterns/Experiments/NumericalMethods/advection_HeunsMethod.vti
-  Patterns/Experiments/NumericalMethods/advection_LaxFriedrichs.vti
-  Patterns/Experiments/NumericalMethods/advection_LaxWendroff.vti
-  Patterns/Experiments/NumericalMethods/advection_RungeKutta4.vti
-  Patterns/Experiments/NumericalMethods/advection_staggeredLeapfrog.vti
-  Patterns/Experiments/NumericalMethods/advection_forwardEuler_double.vti
-  Patterns/Experiments/NumericalMethods/advection_2stepAdamsBashforth_double.vti
-  Patterns/Experiments/NumericalMethods/advection_3stepAdamsBashforth_double.vti
-  Patterns/Experiments/NumericalMethods/advection_modifiedEuler_double.vti
-  Patterns/Experiments/NumericalMethods/advection_midpointMethod_double.vti
-  Patterns/Experiments/NumericalMethods/advection_HeunsMethod_double.vti
-  Patterns/Experiments/NumericalMethods/advection_LaxFriedrichs_double.vti
-  Patterns/Experiments/NumericalMethods/advection_LaxWendroff_double.vti
-  Patterns/Experiments/NumericalMethods/advection_RungeKutta4_double.vti
-  Patterns/Experiments/NumericalMethods/advection_staggeredLeapfrog_double.vti
+  Patterns/NumericalMethods/advection_forwardEuler.vti
+  Patterns/NumericalMethods/advection_2stepAdamsBashforth.vti
+  Patterns/NumericalMethods/advection_3stepAdamsBashforth.vti
+  Patterns/NumericalMethods/advection_modifiedEuler.vti
+  Patterns/NumericalMethods/advection_midpointMethod.vti
+  Patterns/NumericalMethods/advection_HeunsMethod.vti
+  Patterns/NumericalMethods/advection_LaxFriedrichs.vti
+  Patterns/NumericalMethods/advection_LaxWendroff.vti
+  Patterns/NumericalMethods/advection_RungeKutta4.vti
+  Patterns/NumericalMethods/advection_staggeredLeapfrog.vti
+  Patterns/NumericalMethods/advection_forwardEuler_double.vti
+  Patterns/NumericalMethods/advection_2stepAdamsBashforth_double.vti
+  Patterns/NumericalMethods/advection_3stepAdamsBashforth_double.vti
+  Patterns/NumericalMethods/advection_modifiedEuler_double.vti
+  Patterns/NumericalMethods/advection_midpointMethod_double.vti
+  Patterns/NumericalMethods/advection_HeunsMethod_double.vti
+  Patterns/NumericalMethods/advection_LaxFriedrichs_double.vti
+  Patterns/NumericalMethods/advection_LaxWendroff_double.vti
+  Patterns/NumericalMethods/advection_RungeKutta4_double.vti
+  Patterns/NumericalMethods/advection_staggeredLeapfrog_double.vti
 )
 
 set( HELP_FILES

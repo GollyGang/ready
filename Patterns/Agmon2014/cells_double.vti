@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+  
+    <description>
+        An artificial life model of autopoeitic cells.
+
+        Eran Agmon, Alexander J. Gates, Valentin Churavy and Randall D. Beer (2014)
+        &quot;Quantifying robustness in a spatial model of metabolism-boundary co-construction&quot;
+        &lt;a href=&quot;http://mitpress.mit.edu/sites/default/files/titles/content/alife14/978-0-262-32621-6-ch082.pdf&quot;&gt;[PDF]&lt;/a&gt;
+        In Proc. ALIFE 14.
+
+        a = autocatalyst&lt;br&gt;
+        b = membrane&lt;br&gt;
+        c = food&lt;br&gt;
+        d = water&lt;br&gt;
+        e = membrane orientation
+        
+        This implementation is as described in the paper, with one exception. The paper implies that the contribution of the central site 
+        of the inclusive Moore neighborhood to the repulsion potential is zero. Eran advised us that instead it should be taken to be one.
+        
+        This implementation does not currently give the same behavior as described in the paper - the cell should stabilise. We are 
+        investigating why but thought it useful to include this pattern even in its current broken state.
+        
+        The membrane orientation (channel e) is initialized by the code on the first iteration, so will jump to being a conical gradient. This
+        is not a feature of the model.
+    </description>
+    
+    <rule name="Agmon2014" type="kernel">
+      <kernel number_of_chemicals="5" block_size_x="1" block_size_y="1" block_size_z="1">
+      
+#define PI 3.14159265358979
+
+double4 bias( const double4 delta ) {
+    return select( delta / ( 1.0 - exp( -delta ) ), 1.0, isless( fabs( delta ), 1E-6 ) ); // patch the removable singularity at delta=0
+}
+
+void computeEllipseAreas( const double theta, const double long_axis, const double short_axis, double *Area ) {
+    // Area[9]: inclusive Moore neighborhood (central site plus 8 neighbors clockwise from north)
+    double a1 = long_axis*short_axis/2 * (  PI/8-theta - atan((short_axis-long_axis)*sin(2*(  PI/8-theta)) / (short_axis+long_axis + (short_axis-long_axis)*cos(2*(  PI/8-theta)))));
+    double a2 = long_axis*short_axis/2 * (3*PI/8-theta - atan((short_axis-long_axis)*sin(2*(3*PI/8-theta)) / (short_axis+long_axis + (short_axis-long_axis)*cos(2*(3*PI/8-theta)))));
+    double a3 = long_axis*short_axis/2 * (5*PI/8-theta - atan((short_axis-long_axis)*sin(2*(5*PI/8-theta)) / (short_axis+long_axis + (short_axis-long_axis)*cos(2*(5*PI/8-theta)))));
+    double a4 = long_axis*short_axis/2 * (7*PI/8-theta - atan((short_axis-long_axis)*sin(2*(7*PI/8-theta)) / (short_axis+long_axis + (short_axis-long_axis)*cos(2*(7*PI/8-theta)))));
+    double a5 = long_axis*short_axis/2 * (9*PI/8-theta - atan((short_axis-long_axis)*sin(2*(9*PI/8-theta)) / (short_axis+long_axis + (short_axis-long_axis)*cos(2*(9*PI/8-theta)))));  
+    Area[0] = 1.0;
+    Area[2] = Area[6] = (a2-a1)/(long_axis*short_axis*PI);
+    Area[1] = Area[5] = (a3-a2)/(long_axis*short_axis*PI);
+    Area[8] = Area[4] = (a4-a3)/(long_axis*short_axis*PI);
+    Area[7] = Area[3] = (a5-a4)/(long_axis*short_axis*PI);
+}
+
+int wrap( const int x, const int X ) {
+    return ( x + X ) &amp; ( X - 1 ); // (assumes X is a power of 2)
+}
+
+int getSiteIndex( const int x, const int y, const int X, const int Y ) {
+    const int tx = wrap( x, X );
+    const int ty = wrap( y, Y );
+    return X*ty + tx;
+}
+
+double4 repulsionPotentials( const double A, const double M, const double W, const double area, 
+                             const double fAA, const double fMA, const double fMM, const double fMW ) {
+    return (double4)( ( A * fAA ) + ( M * fMA * area ),
+                     ( A * fMA * area ) + ( M * fMM * area ) + ( W * fMW * area ),
+                     0.0,
+                     ( M * fMW * area ) ); // A, M, F, W
+}
+      
+double4 computePotentialAtSite( const int x, const int y, const int X, const int Y, 
+                                const double theta, const double long_axis, const double short_axis,
+                                __global double *A, __global double *M, __global double *W,
+                                const double fAA, const double fMA, const double fMM, const double fMW ) 
+{
+    const int inclusiveMooreNeighbors[9][2] = { {0,0}, {0,-1}, {1,-1}, {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1} };
+    
+    // membrane particles have an orientation which affects the strength of repulsion in different directions
+    double ellipse_areas[9];
+    computeEllipseAreas( theta, long_axis, short_axis, ellipse_areas );
+    
+    double4 potentials = (double4)( 0.0 );
+    for( int i = 0; i &lt; 9; ++i ) {
+        const int index_s = getSiteIndex( x + inclusiveMooreNeighbors[i][0], y + inclusiveMooreNeighbors[i][1], X, Y );
+        potentials += repulsionPotentials( A[ index_s ], M[ index_s ], W[ index_s ], ellipse_areas[i], fAA, fMA, fMM, fMW );
+    }
+    return potentials;
+}
+
+__kernel void rd_compute(__global double *A_in, __global double *M_in, __global double *F_in, __global double *W_in, __global double *theta_in,
+                         __global double *A_out,__global double *M_out,__global double *F_out,__global double *W_out,__global double *theta_out)
+{
+    //------------- parameters ----------------------
+    const double kAA = 0.09;
+    const double kAM = 0.1;
+    const double kA = 0.001;
+    const double kM = 0.001;
+    const double kTheta = 0.0125;
+    const double dA = 0.29;
+    const double dM = 0.29;
+    const double dF = 0.29;
+    const double dW = 0.29;
+    const double fAA = 0.1875;
+    const double fMM = 1.5;
+    const double fMA = 7.0;
+    const double fMW = 7.0;
+    const double long_axis = 20.0;
+    const double short_axis = 1.0;
+    const double kF = 0.8;
+    const double sF = 0.18;
+    const double food_exclusion_radius = 9.0;
+    const double timestep = 0.01;
+    //-----------------------------------------------
+
+    const int x = get_global_id(0);
+    const int y = get_global_id(1);
+    const int X = get_global_size(0);
+    const int Y = get_global_size(1);
+    const int index_here = getSiteIndex( x, y, X, Y );
+    const int MooreNeighbors[8][2] = { {0,-1}, {1,-1}, {1,0}, {1,1}, {0,1}, {-1,1}, {-1,0}, {-1,-1} }; // clockwise from north
+    
+    const double A = A_in[ index_here ];
+    const double M = M_in[ index_here ];
+    const double F = F_in[ index_here ];
+    const double W = W_in[ index_here ];
+    double   theta = theta_in[ index_here ];
+    
+    // initialize orientation programmatically (a workaround until we get a conical_gradient fill)
+    if( isless( theta, 0.0 ) ) { // (a negative value means this is the first iteration)
+        if( hypot( x - X/2.0, y - Y/2.0 ) > 2.5 )
+            theta = fmod( atan( -( y - Y/2.0 ) / ( x - X/2.0 ) ) - PI / 2.0 + PI, PI );
+        else
+            theta = 0.0;
+    }
+    
+    // find the rates of change due to reactions happening
+    double delta_A = kAA * F * A * A - kA * A;
+    double delta_M = kAM * F * A * A - kM * M;
+    double delta_F = -( kAA + kAM ) * F * A * A;
+    double delta_W = 0.0;
+    double delta_theta = 0.0;
+    
+    // add in the rates of change due to diffusion in and out of the cell
+    double4 potentials_here = computePotentialAtSite( x, y, X, Y, theta, long_axis, short_axis, A_in, M_in, W_in, fAA, fMA, fMM, fMW );
+    for( int i = 0; i &lt; 8; ++i ) {
+        const int tx = x + MooreNeighbors[i][0];
+        const int ty = y + MooreNeighbors[i][1];
+        const int index_t = getSiteIndex( tx, ty, X, Y );
+        double theta_there = theta_in[ index_t ];
+        double4 potentials_there = computePotentialAtSite( tx, ty, X, Y, theta_there, long_axis, short_axis, A_in, M_in, W_in, fAA, fMA, fMM, fMW );
+        double4 bias_in  = bias( potentials_there - potentials_here );
+        double4 bias_out = bias( potentials_here  - potentials_there );
+        delta_A += dA * ( A_in[ index_t ] * bias_in.s0 - A * bias_out.s0 ); // inflow - outflow
+        delta_M += dM * ( M_in[ index_t ] * bias_in.s1 - M * bias_out.s1 );
+        delta_F += dF * ( F_in[ index_t ] * bias_in.s2 - F * bias_out.s2 );
+        delta_W += dW * ( W_in[ index_t ] * bias_in.s3 - W * bias_out.s3 );
+        // also update the orientation of the membrane based on an alignment force
+        delta_theta += kTheta * sin( 2.0 * ( theta_there - theta ) ) * M_in[ index_t ];
+    }
+    
+    // food levels are regulated by an external mechanism, outside of a central circle
+    double isOutsideCircle = step( food_exclusion_radius, hypot( x - X/2.0, y - Y/2.0 ) );
+    delta_F += kF * ( sF - F ) * isOutsideCircle;
+    // (using coordinates here, so not a truly local model as implemented)
+
+    // forward Euler integration
+    A_out[index_here]     =     A + timestep * delta_A;
+    M_out[index_here]     =     M + timestep * delta_M;
+    F_out[index_here]     =     F + timestep * delta_F;
+    W_out[index_here]     =     W + timestep * delta_W;
+    theta_out[index_here] = theta + timestep * delta_theta;
+    
+    // keep orientation in the range [0,pi)
+    theta_out[index_here] = fmod( theta_out[ index_here ] + PI, PI ); 
+}
+      </kernel>
+      
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+    
+      <!-- autocatalyst: 0.6 in a disk of diameter 5 pixels (64x64 grid) -->   
+      <overlay chemical="a"> <overwrite /> <constant value="0.6" /> <circle radius="0.0391"> <point3d x="0.5" y="0.5" z="0.5" /> </circle> </overlay>
+
+      <!-- membrane: 0.8 in an annulus of diameters 11 and 5 (64x64 grid)  -->
+      <overlay chemical="b"> <overwrite /> <constant value="0.8" /> <circle radius="0.0859"> <point3d x="0.5" y="0.5" z="0.5" /> </circle> </overlay>
+      <overlay chemical="b"> <overwrite /> <constant value="0.0" /> <circle radius="0.0391"> <point3d x="0.5" y="0.5" z="0.5" /> </circle> </overlay>
+
+      <!-- food: 0.18 everywhere (variable sF in code above) -->
+      <overlay chemical="c"> <overwrite /> <constant value="0.18" /> <everywhere /> </overlay>
+
+      <!-- water: fill up to make total concentration 1 everywhere -->
+      <overlay chemical="d"> <overwrite /> <constant value="1" /> <everywhere /> </overlay>
+      <overlay chemical="d"> <subtract /> <other_chemical chemical="a" /> <everywhere /> </overlay>
+      <overlay chemical="d"> <subtract /> <other_chemical chemical="b" /> <everywhere /> </overlay>
+      <overlay chemical="d"> <subtract /> <other_chemical chemical="c" /> <everywhere /> </overlay>
+
+      <!-- membrane orientation: is initialized in code, triggered by a negative value -->
+      <overlay chemical="e"> <overwrite /> <constant value="-1" /> <everywhere /> </overlay>
+      
+    </initial_pattern_generator>
+
+    <render_settings>
+      <low value="0" />
+      <high value="3.15" />
+      <show_displacement_mapped_surface value="false" />
+      <use_image_interpolation value="false" />
+      <timesteps_per_render value="8" />
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 63 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 63 0 63 0 0">
+    <PointData>
+      <DataArray type="Float64" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+      <DataArray type="Float64" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+      <DataArray type="Float64" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+      <DataArray type="Float64" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+      <DataArray type="Float64" Name="e" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAAAAAANAAAAA==eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAQ==
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
