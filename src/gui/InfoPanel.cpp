@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -435,7 +435,8 @@ void InfoPanel::Update(const AbstractRD* const system)
     if(system->HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
 
-    contents += AppendRow(data_type_label,data_type_label,system->GetDataType()==VTK_DOUBLE?_("double"):_("float"),false);
+    contents += AppendRow(data_type_label,data_type_label,system->GetDataType()==VTK_DOUBLE?_("double"):_("float"),
+        system->HasEditableDataType());
 
     contents += _T("</table>");
 
@@ -829,6 +830,20 @@ void InfoPanel::ChangeWrapOption()
 
 // -----------------------------------------------------------------------------
 
+void InfoPanel::ChangeDataType()
+{
+    AbstractRD* sys = frame->GetCurrentRDSystem();
+    switch( sys->GetDataType() ) {
+        default:
+        case VTK_FLOAT: sys->SetDataType( VTK_DOUBLE ); break;
+        case VTK_DOUBLE: sys->SetDataType( VTK_FLOAT ); break;
+    }
+    this->Update(sys);
+    frame->RenderSettingsChanged();
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::ChangeInfo(const wxString& label)
 {
     if ( label == rule_name_label ) {
@@ -851,6 +866,9 @@ void InfoPanel::ChangeInfo(const wxString& label)
 
     } else if ( label == wrap_label ) {
         ChangeWrapOption();
+
+    } else if ( label == data_type_label ) {
+        ChangeDataType();
 
     } else if ( frame->GetRenderSettings().IsProperty(string(label.mb_str())) ) {
         ChangeRenderSetting(label);

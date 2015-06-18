@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -32,4 +32,6 @@ class FullKernelOpenCLMeshRD : public OpenCLMeshRD
         virtual std::string GetRuleType() const { return "kernel"; }
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
+
+        virtual bool HasEditableDataType() const { return false; }
 };

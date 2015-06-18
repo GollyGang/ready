@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -91,6 +91,7 @@ class InfoPanel : public wxPanel
         void ChangeDimensions();
         void ChangeBlockSize();
         void ChangeWrapOption();
+        void ChangeDataType();
         
         // event handlers
         void OnSmallerButton(wxCommandEvent& event);

@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -43,7 +43,9 @@ class FullKernelOpenCLImageRD : public OpenCLImageRD
 
         virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
         
-    protected:
+        virtual bool HasEditableDataType() const { return false; }
+
+protected:
     
         int block_size[3];
 };

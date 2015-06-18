@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -163,6 +163,12 @@ class AbstractRD
         /// Retrieve the data type used for storing values (VTK_FLOAT or VTK_DOUBLE)
         int GetDataType() const;
 
+        /// Returns whether this system allows the data type to be changed or not
+        virtual bool HasEditableDataType() const =0;
+
+        /// Change the data type used for storing values (VTK_FLOAT or VTK_DOUBLE)
+        void SetDataType(int type);
+
     protected: // typedefs
 
         enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
@@ -233,6 +239,10 @@ class AbstractRD
 
         virtual void FlipPaintAction(PaintAction& cca) =0; ///< Undo/redo this paint action.
         void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.
+
+    private: // functions
+
+        void InternalSetDataType(int type);
 };
 
 #endif 

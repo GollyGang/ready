@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -31,6 +31,7 @@ class InbuiltImageRD : public ImageRD
         virtual bool HasEditableNumberOfChemicals() const { return false; }
 
         virtual bool HasEditableWrapOption() const { return true; }
+        virtual bool HasEditableDataType() const { return false; }
 };
 
 /// An inbuilt implementation: n-dimensional Gray-Scott.

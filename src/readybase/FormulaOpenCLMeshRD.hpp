@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -38,4 +38,6 @@ class FormulaOpenCLMeshRD : public OpenCLMeshRD
         virtual void DeleteAllParameters();
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
+
+        virtual bool HasEditableDataType() const { return true; }
 };

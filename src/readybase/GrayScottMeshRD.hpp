@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2014 The Ready Bunch
 
     This file is part of Ready.
 
@@ -30,6 +30,7 @@ class InbuiltMeshRD : public MeshRD
 
         virtual bool HasEditableFormula() const { return false; }
         virtual bool HasEditableNumberOfChemicals() const { return false; }
+        virtual bool HasEditableDataType() const { return false; }
 };
 
 /// A non-OpenCL mesh implementation, just as an example.

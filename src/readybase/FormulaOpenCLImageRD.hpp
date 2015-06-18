@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -47,4 +47,5 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
 
         virtual bool HasEditableWrapOption() const { return true; }
         virtual void SetWrap(bool w);
+        virtual bool HasEditableDataType() const { return true; }
 };

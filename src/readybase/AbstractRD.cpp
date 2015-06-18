@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -33,21 +33,7 @@ AbstractRD::AbstractRD(int data_type)
     this->need_reload_formula = true;
     this->is_modified = false;
     this->wrap = true;
-
-    switch( data_type ) {
-        default:
-        case VTK_FLOAT:
-            this->data_type = VTK_FLOAT;
-            this->data_type_size = sizeof( float );
-            this->data_type_string = "float";
-            this->data_type_suffix = "f";
-            break;
-        case VTK_DOUBLE:
-            this->data_type = VTK_DOUBLE;
-            this->data_type_size = sizeof( double );
-            this->data_type_string = "double";
-            this->data_type_suffix = "";
-    }
+    this->InternalSetDataType(data_type);
 
     this->neighborhood_type = VERTEX_NEIGHBORS;
     this->neighborhood_range = 1;
@@ -502,3 +488,33 @@ int AbstractRD::GetDataType() const
 }
 
 // ---------------------------------------------------------------------
+
+void AbstractRD::SetDataType(int type)
+{
+    this->InternalSetDataType(type);
+    this->SetNumberOfChemicals(this->n_chemicals); // we use this because it causes the data to be reallocated
+    this->GenerateInitialPattern(); // TODO: would be nice to keep current pattern somehow
+}
+
+// ---------------------------------------------------------------------
+
+void AbstractRD::InternalSetDataType(int type)
+{
+    switch( type ) {
+        default:
+        case VTK_FLOAT:
+            this->data_type = VTK_FLOAT;
+            this->data_type_size = sizeof( float );
+            this->data_type_string = "float";
+            this->data_type_suffix = "f";
+            break;
+        case VTK_DOUBLE:
+            this->data_type = VTK_DOUBLE;
+            this->data_type_size = sizeof( double );
+            this->data_type_string = "double";
+            this->data_type_suffix = "";
+    }
+}
+
+// ---------------------------------------------------------------------
+
