@@ -38,6 +38,9 @@
 #include "wxutils.hpp"           // for Warning, Fatal, Beep
 #include "prefs.hpp"
 
+// STL:
+#include <algorithm>
+
 // -----------------------------------------------------------------------------
 
 // Ready's preferences file is a simple text file.  It's initially created in

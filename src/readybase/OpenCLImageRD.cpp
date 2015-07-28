@@ -27,6 +27,7 @@ using namespace OpenCL_utils;
 #include <utility>
 #include <sstream>
 #include <cassert>
+#include <algorithm>
 using namespace std;
 
 // VTK:

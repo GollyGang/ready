@@ -30,6 +30,7 @@
 // STL:
 #include <cassert>
 #include <stdexcept>
+#include <algorithm>
 using namespace std;
 
 // VTK:
