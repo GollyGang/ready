@@ -25,10 +25,11 @@ Press coverage:
 
 Citations:
 
-  * Kaier Wang, Moira L. Steyn-Ross, D. Alistair Steyn-Ross, Marcus T. Wilson, Jamie W. Sleigh, Yoichi Shiraishi ["Simulations of pattern dynamics for reaction-diffusion systems via SIMULINK"](http://www.biomedcentral.com/1752-0509/8/45) BMC Systems Biology 8(14), 2014.
+  * Nathanael Aubert and Olaf Witkowski. ["Reaction-Diffusion Risk: Chemical Signaling in a Conquest Game"](https://www.cs.york.ac.uk/nature/ecal2015/late-breaking/164.pdf) Late Breaking Proceedings of the European Conference on Artificial Life 2015, pp. 29-30, 2015.
+  * Kaier Wang, Moira L. Steyn-Ross, D. Alistair Steyn-Ross, Marcus T. Wilson, Jamie W. Sleigh, Yoichi Shiraishi. ["Simulations of pattern dynamics for reaction-diffusion systems via SIMULINK"](http://www.biomedcentral.com/1752-0509/8/45) BMC Systems Biology 8(14), 2014.
   * Aubert, Nathanaël, Clément Mosca, Teruo Fujii, Masami Hagiya, and Yannick Rondelez. ["Computer-assisted design for scaling up systems based on DNA reaction networks"](http://www.yannick-rondelez.com/wp-content/uploads/2014/03/Untitled-37758-1.pdf) Journal of The Royal Society Interface 11, no. 93, 2014.
   * Millán, Emmanuel N., Paula Martínez, Graciela Verónica Gil Costa, María Fabiana Piccoli, Alicia Marcela Printista, Carlos Bederian, Carlos García Garino, and Eduardo M. Bringa. ["Parallel implementation of a cellular automata in a hybrid CPU/GPU environment"](http://sedici.unlp.edu.ar/bitstream/handle/10915/31730/Documento_completo.pdf?sequence=1) In XVIII Congreso Argentino de Ciencias de la Computación. 2013.
-  * Adam P. Goucher ["Gliders in cellular automata on Penrose tilings"](http://cp4space.files.wordpress.com/2012/11/2012-penrose-gliders.pdf), Journal of Cellular Automata, Volume 7, Number 5-6, p. 385-392, 2012.
+  * Adam P. Goucher. ["Gliders in cellular automata on Penrose tilings"](http://cp4space.files.wordpress.com/2012/11/2012-penrose-gliders.pdf), Journal of Cellular Automata, Volume 7, Number 5-6, p. 385-392, 2012.
 
 Please cite Ready as:
 
