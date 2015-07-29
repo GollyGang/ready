@@ -114,6 +114,7 @@ set( PATTERN_FILES
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
+  Patterns/SmoothLife2011/gaussian-smoothlife.vti
   Patterns/Purwins1999/glider.vti          Patterns/Purwins1999/glider_3D.vti      Patterns/Purwins1999/multiGlider.vti
   Patterns/CPU-only/grayscott_1D.vti 
   Patterns/CPU-only/grayscott_2D.vti 
@@ -152,6 +153,7 @@ set( PATTERN_FILES
   Patterns/Yang2003/Fig3a.vti     Patterns/Yang2003/Fig3b.vti    Patterns/Yang2003/Fig3c.vti
   Patterns/McCabe2010/McCabe.vti               Patterns/McCabe2010/McCabe_simple.vti
   Patterns/McCabe2010/McCabe_additive2b.vti    Patterns/McCabe2010/McCabe_additive2a.vti
+  Patterns/McCabe2010/fast-mccabe.vti
   Patterns/Kytta2007/Fig5.7a.vti  Patterns/Kytta2007/Fig5.7c.vti
   Patterns/Kytta2007/Fig5.8c.vti  Patterns/Kytta2007/Fig5.8d.vti Patterns/Kytta2007/Fig5.8e.vti
   Patterns/Kytta2007/Fig5.8f.vti  Patterns/Kytta2007/Fig5.8g.vti
@@ -180,6 +182,9 @@ set( PATTERN_FILES
   Patterns/Experiments/CornusAmmonis/surfing-solitons.vti
   Patterns/Experiments/CornusAmmonis/tip-splitting-web.vti
   Patterns/Experiments/CornusAmmonis/worms2.vti
+  Patterns/Experiments/CornusAmmonis/bz-warpsharp.vti
+  Patterns/Experiments/CornusAmmonis/smoke.vti
+  Patterns/Experiments/CornusAmmonis/splats.vti
   Patterns/Agmon2014/cells.vti      Patterns/Agmon2014/cells_double.vti
   Patterns/Agmon2014/oil-water.vti
   Patterns/NumericalMethods/advection_forwardEuler.vti
@@ -202,6 +207,7 @@ set( PATTERN_FILES
   Patterns/NumericalMethods/advection_LaxWendroff_double.vti
   Patterns/NumericalMethods/advection_RungeKutta4_double.vti
   Patterns/NumericalMethods/advection_staggeredLeapfrog_double.vti
+  Patterns/Guo2014/guo.vti
 )
 
 set( HELP_FILES

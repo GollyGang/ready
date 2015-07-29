@@ -1,0 +1,285 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+    <description>
+      A 2-chemical system with 25-point gaussian and laplacian terms.
+    </description>
+    <rule name="Splats" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="timestep">
+        0.05
+      </param>
+      <param name="D_a">
+        -0.3
+      </param>
+      <param name="D_b">
+        0.3
+      </param>
+      <param name="sk">
+        -0.9
+      </param>
+      <param name="abla">
+        -1
+      </param>
+      <param name="bblb">
+        -1
+      </param>
+      <param name="ala">
+        -2
+      </param>
+      <param name="blb">
+        -2
+      </param>
+      <param name="aga">
+        1.1
+      </param>
+      <param name="bgb">
+        2
+      </param>
+      <formula number_of_chemicals="2">
+            // gaussian kernel
+    const float gauss[25] = {
+        1.0f/273.0f, 4.0f/273.0f,  7.0f/273.0f,  4.0f/273.0f,  1.0f/273.0f,
+        4.0f/273.0f, 16.0f/273.0f, 26.0f/273.0f, 16.0f/273.0f, 4.0f/273.0f,
+        7.0f/273.0f, 26.0f/273.0f, 41.0f/273.0f, 26.0f/273.0f, 7.0f/273.0f,
+        4.0f/273.0f, 16.0f/273.0f, 26.0f/273.0f, 16.0f/273.0f, 4.0f/273.0f,
+        1.0f/273.0f, 4.0f/273.0f,  7.0f/273.0f,  4.0f/273.0f,  1.0f/273.0f
+    };
+
+    // bilaplacian kernel (9-point laplacian stencil convolved with itself)
+    const float lap[25] = {
+        1.0f/36.0f, 2.0f/9.0f,  0.5,  2.0f/9.0f, 1.0f/36.0f,
+        2.0f/9.0f, -2.0f/9.0f, -4.0, -2.0f/9.0f, 2.0f/9.0f,
+        0.5,       -4.0,       13.0, -4.0,       0.5,
+        2.0f/9.0f, -2.0f/9.0f, -4.0, -2.0f/9.0f, 2.0f/9.0f,
+        1.0f/36.0f, 2.0f/9.0f,  0.5,  2.0f/9.0f, 1.0f/36.0f
+    };
+
+    // accumulators
+    float4 bilaplacian_a = 0.0f;
+    float4 bilaplacian_b = 0.0f;
+    float4 gaussian_a = 0.0f;
+    float4 gaussian_b = 0.0f;
+    const int offset = 2;
+    const int dim = 5;
+    for (int i = -offset; i &lt;= offset; i++) {
+        for (int j = -offset; j &lt;= offset; j++) {
+            int y = ((index_y + j + Y) &amp; (Y-1)); 
+            float4 a_swiz;
+            float4 b_swiz;
+            // swizzle according to x position
+            if (i == -2) {
+                int x_m1 = ((index_x-1+X) &amp; (X-1));
+                int in_w =  X * (Y * index_z + y) + x_m1;
+                int in_c =  X * (Y * index_z + y) + index_x;
+                a_swiz = (float4)(
+                   a_in[in_w].z,
+                   a_in[in_w].w,
+                   a_in[in_c].x,
+                   a_in[in_c].y 
+                );
+                b_swiz = (float4)(
+                   b_in[in_w].z,
+                   b_in[in_w].w,
+                   b_in[in_c].x,
+                   b_in[in_c].y 
+                );
+            } else if (i == -1) {
+                int x_m1 = ((index_x-1+X) &amp; (X-1));
+                int in_w =  X * (Y * index_z + y) + x_m1;
+                int in_c =  X * (Y * index_z + y) + index_x;
+                a_swiz = (float4)(
+                   a_in[in_w].w,
+                   a_in[in_c].x,
+                   a_in[in_c].y,
+                   a_in[in_c].z 
+                );  
+                b_swiz = (float4)(
+                   b_in[in_w].w,
+                   b_in[in_c].x,
+                   b_in[in_c].y,
+                   b_in[in_c].z 
+                );                               
+            } else if (i == 0) {
+                int in_c =  X * (Y * index_z + y) + index_x;
+                a_swiz = (float4)(
+                   a_in[in_c].x,
+                   a_in[in_c].y,
+                   a_in[in_c].z,
+                   a_in[in_c].w 
+                );
+                b_swiz = (float4)(
+                   b_in[in_c].x,
+                   b_in[in_c].y,
+                   b_in[in_c].z,
+                   b_in[in_c].w 
+                );                
+            } else if (i == 1) {
+                int x_p1 = ((index_x+1) &amp; (X-1));
+                int in_e =  X * (Y * index_z + y) + x_p1;
+                int in_c =  X * (Y * index_z + y) + index_x;
+                a_swiz = (float4)(
+                   a_in[in_c].y,
+                   a_in[in_c].z,
+                   a_in[in_c].w,
+                   a_in[in_e].x 
+                );
+                b_swiz = (float4)(
+                   b_in[in_c].y,
+                   b_in[in_c].z,
+                   b_in[in_c].w,
+                   b_in[in_e].x 
+                );                
+            } else if (i == 2) {
+                int x_p1 = ((index_x+1) &amp; (X-1));
+                int in_e =  X * (Y * index_z + y) + x_p1;
+                int in_c =  X * (Y * index_z + y) + index_x;
+                a_swiz = (float4)(
+                   a_in[in_c].z,
+                   a_in[in_c].w,
+                   a_in[in_e].x,
+                   a_in[in_e].y 
+                );            
+                b_swiz = (float4)(
+                   b_in[in_c].z,
+                   b_in[in_c].w,
+                   b_in[in_e].x,
+                   b_in[in_e].y 
+                ); 
+            }
+            int k_index = (i + offset) + (j + offset) * dim;
+            float gw = gauss[k_index];
+            float lapw = lap[k_index];
+            gaussian_a += a_swiz * gw;
+            gaussian_b += b_swiz * gw;
+            bilaplacian_a += a_swiz * lapw; 
+            bilaplacian_b += b_swiz * lapw;
+        }
+    }
+
+delta_a = aga * gaussian_a + abla * bilaplacian_a + ala * laplacian_a + sk * a - a * a * a + D_b * b;
+delta_b = bgb * gaussian_b + bblb * bilaplacian_b + blb * laplacian_b + sk * b - b * b * b + D_a * a;
+      </formula>
+      
+    </rule>
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite>
+          
+        </overwrite>
+        <white_noise low="-1" high="1">
+          
+        </white_noise>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>
+          
+        </overwrite>
+        <white_noise low="-1" high="1">
+          
+        </white_noise>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+      
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="0">
+        
+      </color_low>
+      <color_high r="1" g="1" b="1">
+        
+      </color_high>
+      <show_color_scale value="false">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="true">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="a">
+        
+      </active_chemical>
+      <low value="-1">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="30">
+        
+      </vertical_scale_2D>
+      <contour_level value="0">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="false">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="false">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="false">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="false">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="128">
+        
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+        
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+        
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+        
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+        
+      </phase_plot_z_axis>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
