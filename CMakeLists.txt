@@ -184,6 +184,7 @@ set( PATTERN_FILES
   Patterns/Experiments/CornusAmmonis/worms2.vti
   Patterns/Experiments/CornusAmmonis/bz-warpsharp.vti
   Patterns/Experiments/CornusAmmonis/smoke.vti
+  Patterns/Experiments/CornusAmmonis/smoke-ising.vti
   Patterns/Experiments/CornusAmmonis/splats.vti
   Patterns/Agmon2014/cells.vti      Patterns/Agmon2014/cells_double.vti
   Patterns/Agmon2014/oil-water.vti
