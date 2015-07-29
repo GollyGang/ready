@@ -440,7 +440,6 @@ endif()
 
 if( CMAKE_COMPILER_IS_GNUCXX )
   list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )  # strip release binary, for smaller file size
-  set ( CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
 #----------------------------------------doxygen------------------------------------------------

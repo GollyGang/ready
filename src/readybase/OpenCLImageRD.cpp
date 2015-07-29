@@ -63,14 +63,14 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     if(ret != CL_SUCCESS)
     {
         size_t build_log_length = 0;
-        cl_int ret2 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,0,nullptr,&build_log_length);
+        cl_int ret2 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,0,0,&build_log_length);
         throwOnError(ret2,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving length of program build log failed: ");
         vector<char> build_log(build_log_length);
-        cl_int ret3 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,build_log_length,build_log.data(),nullptr);
+        cl_int ret3 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,build_log_length,build_log.data(),0);
         throwOnError(ret3,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving program build log failed: ");
         { ofstream out("kernel.txt"); out << kernel_source; }
         ostringstream oss;
-        oss << "OpenCLImageRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << string( begin( build_log ), end( build_log ) );
+        oss << "OpenCLImageRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << string( build_log.begin(), build_log.end() );
         throwOnError(ret,oss.str().c_str());
     }
 

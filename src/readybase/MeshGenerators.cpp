@@ -1015,8 +1015,9 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
     double bounds[6] = {-10,10,-10,10,-10,10};
     point_locator->InitPointInsertion(locator_points,bounds);
 
-    for( const auto& sphere_list : sphere_lists )
+    for( int iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
     {
+		vector<int>& sphere_list = sphere_lists[iSphereList];
         // make a cell by reflecting the starting cell in the order listed
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         vector<vtkIdType> pointIds;
@@ -1024,8 +1025,11 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
         double centroid[3] = {0,0,0};
         for(int iV = 0; iV < num_vertices; ++iV ) { 
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
-            for( const auto& iSphere : sphere_list )
+            for( int iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
+            {
+				int iSphere = sphere_list[iSphereEntry];
                 sphereInversion( p, sphere_centers[iSphere], R, p );
+			}
             pointIds.push_back( points->InsertNextPoint( p ) );
             centroid[0]+=p[0];
             centroid[1]+=p[1];
@@ -1162,7 +1166,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
         const double nl = sqrt( n[0]*n[0] + n[1]*n[1] + n[2]*n[2] );
         for( int xyz = 0; xyz < 3; ++xyz )
             n[xyz] *= d / nl;
-        sphere_centers.push_back( vector<double>( begin( n ), end( n ) ) );
+        sphere_centers.push_back( vector<double>( n, n+3 ) );
     }
 
     // make a list of lists of sphere ids to use
@@ -1188,8 +1192,9 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
     double bounds[6] = {-10,10,-10,10,-10,10};
     point_locator->InitPointInsertion(locator_points,bounds);
 
-    for( const auto& sphere_list : sphere_lists )
+    for( int iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
     {
+		vector<int>& sphere_list = sphere_lists[iSphereList];
         // make a cell by reflecting the starting cell in the order listed
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         vector<vtkIdType> pointIds;
@@ -1197,8 +1202,11 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
         double centroid[3] = {0,0,0};
         for(int iV = 0; iV < num_vertices; ++iV ) { 
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
-            for( const auto& iSphere : sphere_list )
+            for( int iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
+            {
+				int iSphere = sphere_list[iSphereEntry];
                 sphereInversion( p, sphere_centers[iSphere], R, p );
+			}
             pointIds.push_back( points->InsertNextPoint( p ) );
             centroid[0]+=p[0];
             centroid[1]+=p[1];
