@@ -149,6 +149,6 @@ bool MyApp::OnInit()
  *
  * \section homepage_sec Homepage: 
  *
- * <http://code.google.com/p/reaction-diffusion/>
+ * <https://github.com/GollyGang/ready>
  *
  */

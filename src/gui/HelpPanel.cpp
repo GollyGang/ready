@@ -89,7 +89,7 @@ END_EVENT_TABLE()
 void HtmlView::OnLinkClicked(const wxHtmlLinkInfo& link)
 {
     wxString url = link.GetHref();
-    if ( url.StartsWith(wxT("http:")) || url.StartsWith(wxT("mailto:")) ) {
+    if (url.StartsWith(wxT("http:")) || url.StartsWith(wxT("https:")) || url.StartsWith(wxT("mailto:"))) {
         // pass http/mailto URL to user's preferred browser/emailer
         if ( !wxLaunchDefaultBrowser(url) )
             Warning(_("Could not open URL in browser!"));
@@ -475,7 +475,7 @@ void ShowAboutBox()
     HtmlView* html = new HtmlView(&dlg, wxGetApp().currframe, wxID_ANY, wxDefaultPosition,
                                   #if wxCHECK_VERSION(2,9,0)
                                       // work around SetSize bug below
-                                      wxSize(400, 540),
+                                      wxSize(400, 600),
                                   #else
                                       wxSize(300, 300),
                                   #endif

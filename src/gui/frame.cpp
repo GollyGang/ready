@@ -3260,7 +3260,7 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
     {
         wxBusyCursor busy;
         ofstream out(mesh_filename.mb_str());
-        out << "# Output from Ready - http://code.google.com/p/reaction-diffusion\n";
+        out << "# Output from Ready - https://github.com/GollyGang/ready\n";
         pd->BuildCells();
         for(vtkIdType iPt=0;iPt<pd->GetNumberOfPoints();iPt++)
             out << "v " << pd->GetPoint(iPt)[0] << " " << pd->GetPoint(iPt)[1] << " " << pd->GetPoint(iPt)[2] << "\n";
