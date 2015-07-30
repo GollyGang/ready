@@ -14,7 +14,7 @@
 
 // ---------------------------------------------
 // smoothglider (discrete time stepping 2D)
-__constant float or = 33.0f;         // outer radius
+__constant float outr = 33.0f;         // outer radius
 __constant float ir = 11.0f;          // ratio of radii
 __constant int oc = 90;         // outer radius
 __constant int ic = 30;          // ratio of radii
@@ -110,11 +110,11 @@ __global float* c_out
     const int i_here = BX*by + bx;
 
 
-    b_out[i_here] = gaussian1dv(a_in, or, oc, bx, by, BX, BY);
+    b_out[i_here] = gaussian1dv(a_in, outr, oc, bx, by, BX, BY);
     c_out[i_here] = gaussian1dv(a_in, ir, ic, bx, by, BX, BY);
 
 
-    float outf = gaussian1dh(b_in, or, oc, bx, by, BX, BY);
+    float outf = gaussian1dh(b_in, outr, oc, bx, by, BX, BY);
     float inf  = gaussian1dh(c_in, ir, ic, bx, by, BX, BY);
 
 
