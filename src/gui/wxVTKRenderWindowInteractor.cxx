@@ -890,7 +890,7 @@ void wxVTKRenderWindowInteractor::SetRenderWhenDisabled(int newValue)
   //resulting in a Render(), resulting in Update() being called whilst
   //still in progress.
 
-  RenderWhenDisabled = (bool)newValue;
+  RenderWhenDisabled = ( newValue != 0 );
 }
 //---------------------------------------------------------------------------
 //

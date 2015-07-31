@@ -1015,7 +1015,7 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
     double bounds[6] = {-10,10,-10,10,-10,10};
     point_locator->InitPointInsertion(locator_points,bounds);
 
-    for( int iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
+    for( size_t iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
     {
 		vector<int>& sphere_list = sphere_lists[iSphereList];
         // make a cell by reflecting the starting cell in the order listed
@@ -1025,7 +1025,7 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
         double centroid[3] = {0,0,0};
         for(int iV = 0; iV < num_vertices; ++iV ) { 
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
-            for( int iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
+            for( size_t iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
             {
 				int iSphere = sphere_list[iSphereEntry];
                 sphereInversion( p, sphere_centers[iSphere], R, p );
@@ -1192,7 +1192,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
     double bounds[6] = {-10,10,-10,10,-10,10};
     point_locator->InitPointInsertion(locator_points,bounds);
 
-    for( int iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
+    for( size_t iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
     {
 		vector<int>& sphere_list = sphere_lists[iSphereList];
         // make a cell by reflecting the starting cell in the order listed
@@ -1202,7 +1202,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
         double centroid[3] = {0,0,0};
         for(int iV = 0; iV < num_vertices; ++iV ) { 
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
-            for( int iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
+            for( size_t iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
             {
 				int iSphere = sphere_list[iSphereEntry];
                 sphereInversion( p, sphere_centers[iSphere], R, p );
