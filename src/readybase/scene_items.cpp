@@ -23,6 +23,7 @@
 #include <vtkScalarsToColors.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSmartPointer.h>
+#include <vtkTextProperty.h>
 
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
 {
@@ -33,5 +34,9 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
     scalar_bar->SetHeight(0.15);
     scalar_bar->SetPosition(0.25,0.01);
     scalar_bar->SetMaximumHeightInPixels(80);
-    pRenderer->AddActor2D(scalar_bar);
+	// workaround for http://www.paraview.org/Bug/view.php?id=14561
+	scalar_bar->SetTitle("M");
+	scalar_bar->GetTitleTextProperty()->SetOpacity(0);
+	scalar_bar->SetTitleRatio(0.7);
+	pRenderer->AddActor2D(scalar_bar);
 }
