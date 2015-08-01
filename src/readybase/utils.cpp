@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -124,38 +124,32 @@ int IndexFromChemicalName(const string& s)
 
 // ---------------------------------------------------------------------------------------------------------
 
-// read a multiline string, strip leading whitespace where shared by all lines
+// read a multiline string, strip leading whitespace from all lines
 string trim_multiline_string(const char* s)
 {
-    vector<string> vs;
     istringstream iss(s);
-    string item;
-    int minLeadingWhitespace = INT_MAX,tailtrim = 0;
+	string item;
+	vector<string> vs;
     while(getline(iss, item, '\n'))
     {
-        int leadingWhitespace = (int)item.find_first_not_of(" \t");
+        size_t leadingWhitespace = item.find_first_not_of(" \t");
         if(leadingWhitespace!=string::npos)
         {
-            minLeadingWhitespace = min(minLeadingWhitespace,leadingWhitespace);
-            vs.push_back(item);
-            tailtrim=0;
+			vs.push_back( item.substr(leadingWhitespace) ); // trim the leading whitespace
         }
-        else
-        {
-            if(!vs.empty()) 
-                vs.push_back("\n");
-            // (lines with all-whitespace don't contribute to minLeadingWhitespace)
-            tailtrim++;
-        }
+		else
+		{
+			if( !vs.empty() && !vs.back().empty() )
+				vs.push_back("");
+		}
     }
     ostringstream oss;
-    for(int i=0;i<(int)vs.size()-tailtrim;i++)
+    for( size_t i=0; i < vs.size(); i++ )
     {
-        if(minLeadingWhitespace < (int)vs[i].size())
-            oss << vs[i].substr(minLeadingWhitespace);
-        if(i < (int)vs.size()-tailtrim-1)
+		oss << vs[i];
+        if( i < vs.size()-1 )
             oss << "\n";
-    }
+	}
     return oss.str();
 }
 
@@ -167,6 +161,18 @@ void InterpolateInHSV(const float r1,const float g1,const float b1,const float r
     vtkMath::RGBToHSV(r1,g1,b1,&h1,&s1,&v1);
     vtkMath::RGBToHSV(r2,g2,b2,&h2,&s2,&v2);
     vtkMath::HSVToRGB(h1+(h2-h1)*u,s1+(s2-s1)*u,v1+(v2-v1)*u,&r,&g,&b);
+}
+
+// ---------------------------------------------------------------------------------------------------------
+
+string ReplaceAllSubstrings(string subject, const string& search, const string& replace)
+{
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != string::npos) {
+		subject.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+	return subject;
 }
 
 // ---------------------------------------------------------------------------------------------------------

@@ -596,7 +596,9 @@ vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML(bool generate_
     vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
     formula->SetName("formula");
     formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    formula->SetCharacterData(this->GetFormula().c_str(),(int)this->GetFormula().length());
+	string f = this->GetFormula();
+	f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
+	formula->SetCharacterData(f.c_str(), (int)f.length());
     rule->AddNestedElement(formula);
 
     return rd;
