@@ -130,12 +130,14 @@ string trim_multiline_string(const char* s)
     istringstream iss(s);
 	string item;
 	vector<string> vs;
+	size_t minLeadingWhitespace = SIZE_MAX;
     while(getline(iss, item, '\n'))
     {
         size_t leadingWhitespace = item.find_first_not_of(" \t");
         if(leadingWhitespace!=string::npos)
         {
-			vs.push_back( item.substr(leadingWhitespace) ); // trim the leading whitespace
+			minLeadingWhitespace = min(minLeadingWhitespace, leadingWhitespace);
+			vs.push_back( item );
         }
 		else
 		{
@@ -146,7 +148,9 @@ string trim_multiline_string(const char* s)
     ostringstream oss;
     for( size_t i=0; i < vs.size(); i++ )
     {
-		oss << vs[i];
+		item = vs[i];
+		if( item.size() > minLeadingWhitespace)
+			oss << item.substr(minLeadingWhitespace);
         if( i < vs.size()-1 )
             oss << "\n";
 	}
