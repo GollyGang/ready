@@ -87,8 +87,8 @@ int debuglevel = 0;              // for displaying debug info if > 0
     int infofontsize = 10;       // font size in Win/Linux info pane
     int helpfontsize = 10;       // font size in Win/Linux help pane
 #endif
-int textdlgwd = 500;             // width of multi-line text dialog
-int textdlght = 300;             // height of multi-line text dialog
+int textdlgwd = 800;             // width of multi-line text dialog
+int textdlght = 600;             // height of multi-line text dialog
 bool showtips = true;            // show button tips?
 bool repaint_to_erase = false;   // whether painting over the current color reverts to low
 bool allowbeep = true;           // okay to play beep sound?
