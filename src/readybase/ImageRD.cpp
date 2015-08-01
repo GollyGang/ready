@@ -857,19 +857,19 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         pRenderer->AddActor(actor);
     }
 
-    // add a 2D slice too
+	// create a lookup table for mapping values to colors
+	vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+	lut->SetRampToLinear();
+	lut->SetScaleToLinear();
+	lut->SetTableRange(low, high);
+	lut->SetSaturationRange(low_sat, high_sat);
+	lut->SetHueRange(low_hue, high_hue);
+	lut->SetValueRange(low_val, high_val);
+	lut->Build();
+
+	// add a 2D slice too
     if(slice_3D)
     {
-        // create a lookup table for mapping values to colors
-        vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-        lut->SetRampToLinear();
-        lut->SetScaleToLinear();
-        lut->SetTableRange(low,high);
-        lut->SetSaturationRange(low_sat,high_sat);
-        lut->SetHueRange(low_hue,high_hue);
-        lut->SetValueRange(low_val,high_val);
-        lut->Build();
-
         vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
         vtkFloatingPointType *bounds = image->GetBounds();
         plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
@@ -901,15 +901,15 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
         }
         pRenderer->AddActor(actor);
-
-        // also add a scalar bar to show how the colors correspond to values
-        if(show_color_scale)
-        {
-            AddScalarBar(pRenderer,lut);
-        }
     }
 
-    // add a phase plot
+	// also add a scalar bar to show how the colors correspond to values
+	if (show_color_scale)
+	{
+		AddScalarBar(pRenderer, lut);
+	}
+
+	// add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
         this->AddPhasePlot( pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+this->ygap,0.0f,
