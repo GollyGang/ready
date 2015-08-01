@@ -90,6 +90,13 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     reader->Update();
     vtkImageData *image = reader->GetOutput();
 
+	if( image == NULL )
+		throw runtime_error("Failed to read image.");
+	if (image->GetPointData() == NULL)
+		throw runtime_error("Image has no point data.");
+	if (image->GetPointData()->GetArray(0) == NULL)
+		throw runtime_error("No arrays in image point data.");
+
     int data_type = image->GetPointData()->GetArray(0)->GetDataType();
     string type = reader->GetType();
     string name = reader->GetName();
@@ -146,7 +153,14 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     reader->Update();
     vtkUnstructuredGrid *ugrid = reader->GetOutput();
 
-    int data_type = ugrid->GetCellData()->GetArray(0)->GetDataType();
+	if (ugrid == NULL)
+		throw runtime_error("Failed to read unstructured grid.");
+	if (ugrid->GetCellData() == NULL)
+		throw runtime_error("Unstructured grid has no cell data.");
+	if (ugrid->GetCellData()->GetArray(0) == NULL)
+		throw runtime_error("No arrays in unstructured grid cell data.");
+
+	int data_type = ugrid->GetCellData()->GetArray(0)->GetDataType();
     string type = reader->GetType();
     string name = reader->GetName();
 
