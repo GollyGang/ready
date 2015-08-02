@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>
+#include <cstdint>
 
 // VTK:
 #include <vtkMath.h>
@@ -31,6 +32,12 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
+
+// ---------------------------------------------------------------------------------------------------------
+
+#ifndef SIZE_MAX
+  #define SIZE_MAX ((size_t) - 1)
+#endif
 
 // ---------------------------------------------------------------------------------------------------------
 
