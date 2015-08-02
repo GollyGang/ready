@@ -5,14 +5,12 @@ UI annoyances:
 - can floating panes go behind main window?
 
 Big picture issues:
-- Dan Wills enquired whether could use readybase as a back-end engine to Houdini. In general this 
-  could be an awesome way to reach more users - appear as a Houdini/Blender plugin, for example. 
-  I've added "rdy", a command-line version of Ready, just to demonstrate the possibilities.
 - Would love an Android version but OpenCL isn't supported. Renderscript Compute seems to be the 
   thing but kernels are compiled at build time, which isn't what we want. Could work as a pattern 
   viewer, allowing users to finger paint. NDK is another possibility. Maybe OpenGL ES, with a 
   shader - fits in with WebGL Playground idea below.
 - Scripting support
+- use FFT for speed?
 
 before 0.x release:
 
@@ -28,17 +26,14 @@ before 0.x release:
 - progress indicator on loading large patterns
 - image import (user can specify how colors map onto chemicals), import Robert's patterns?
   (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
-- use FFT for speed?
 - programmable colouring (R,G,B channels, or something that uses less memory (second opencl pass?))
 - add Help files for Info Panel, etc.?
 - progress indicator for mesh generators?
 - way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap 
    too, on polyhedral meshes. Needed for images too, to expand a dataset without deleting the data.
 - add spectrum slider to change current paint color?
-- how to organise examples - folders by rule type? folders by intention (teaching, demo, CPU-only, scientific)?
 - set scene rotating by a setting in the start recording dialog box, or for general use?
 - mouse wheel sensitivity option?
-- relax power of 2 size requirement? (only a speed benefit) but some kernels use this too
 - toggle between single channel painting and multi-channel painting. Sometimes we want to paint just in channels
   a and b, though, for example, which is trickier.
 - fix Mac bug: can't disable tooltips (bug is in wxOSX-Cocoa)
