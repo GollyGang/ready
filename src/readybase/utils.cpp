@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>
-#include <cstdint>
 
 // VTK:
 #include <vtkMath.h>
