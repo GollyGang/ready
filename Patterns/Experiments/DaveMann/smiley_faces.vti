@@ -63,13 +63,13 @@
       <formula number_of_chemicals="9">
         delta_a = D_a * laplacian_a / (delta_x*delta_x) - a*b*b + F*(1.0f-a)+g*noise;
         delta_b = D_b * laplacian_b / (delta_x*delta_x) + a*b*b - (F+k)*b;
-        delta_c = D_c * laplacian_c / (delta_y*delta_y) - c*d*d + (F2)*(1.0f-c) + f*0.01;
-        delta_d = D_d * laplacian_d / (delta_y*delta_y) + c*d*d - (F2+k2)*d + g*noise*3 + b*0.05 - f*0.0407;
-        delta_e = D_c * laplacian_e / (delta_y*delta_y) - e*f*f + (F2)*(1.0f-e) + d*0.01;
-        delta_f = D_d * laplacian_f / (delta_y*delta_y) + e*f*f - (F2+k2)*f + g*noise*3 + b*0.05 - d*0.0407;
+        delta_c = D_c * laplacian_c / (delta_y*delta_y) - c*d*d + (F2)*(1.0f-c) + f*0.01f;
+        delta_d = D_d * laplacian_d / (delta_y*delta_y) + c*d*d - (F2+k2)*d + g*noise*3.0f + b*0.05f - f*0.0407f;
+        delta_e = D_c * laplacian_e / (delta_y*delta_y) - e*f*f + (F2)*(1.0f-e) + d*0.01f;
+        delta_f = D_d * laplacian_f / (delta_y*delta_y) + e*f*f - (F2+k2)*f + g*noise*3.0f + b*0.05f - d*0.0407f;
         g = fmod(g+laplacian_g,1); // randomness [-1,1]
-        delta_h = D_h * laplacian_h / ((delta_z+d*0.007)*delta_z) - h*i*i + (F3+b*0.19f)*(1.0f-h);
-        delta_i = D_i * laplacian_i / ((delta_z+d*0.007)*delta_z) + h*i*i - (F3+k3+b*0.2f+d*0.008)*i + g*noise;
+        delta_h = D_h * laplacian_h / ((delta_z+d*0.007f)*delta_z) - h*i*i + (F3+b*0.19f)*(1.0f-h);
+        delta_i = D_i * laplacian_i / ((delta_z+d*0.007f)*delta_z) + h*i*i - (F3+k3+b*0.2f+d*0.008f)*i + g*noise;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true">
