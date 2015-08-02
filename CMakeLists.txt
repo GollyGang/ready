@@ -19,7 +19,10 @@
     
 cmake_minimum_required( VERSION 2.6 )
 cmake_policy( SET CMP0003 NEW )
-cmake_policy( SET CMP0043 NEW )
+if(POLICY CMP0043)
+  # policy not known to older versions ...
+  cmake_policy(SET CMP0043 NEW)
+endif(POLICY CMP0043)
 
 project( Ready )
 
