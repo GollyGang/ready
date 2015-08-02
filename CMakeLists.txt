@@ -187,6 +187,7 @@ set( PATTERN_FILES
   Patterns/Experiments/CornusAmmonis/smoke.vti
   Patterns/Experiments/CornusAmmonis/smoke-ising.vti
   Patterns/Experiments/CornusAmmonis/splats.vti
+  Patterns/Experiments/DaveMann/smiley_faces.vti
   Patterns/Agmon2014/cells.vti      Patterns/Agmon2014/cells_double.vti
   Patterns/Agmon2014/oil-water.vti
   Patterns/NumericalMethods/advection_forwardEuler.vti
