@@ -444,8 +444,8 @@ if( MSVC )
 endif()
 
 if( CMAKE_COMPILER_IS_GNUCXX )
-  list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-s" )           # strip release binary, for smaller file size
-  list( APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE "-ldl -fPIC" )   # allow dynamic linking (found needed on Gentoo)
+  set( CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -s" )   # strip release binary, for smaller file size
+  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl" )                 # allow dynamic linking (found needed on Gentoo)
 endif()
 
 #----------------------------------------doxygen------------------------------------------------
