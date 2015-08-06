@@ -62,17 +62,6 @@
   }
 #endif
 
-// To access objc calls on cocoa
-#ifdef __WXCOCOA__
-  #ifdef VTK_USE_COCOA
-    #import <Cocoa/Cocoa.h>
-    // This trick is no longer need in VTK CVS, should get rid of that:
-    #define id Id
-  #else
-    #error Build mismatch you need both wxWidgets and VTK to be configure against Cocoa to work
-  #endif //VTK_USE_COCOA
-#endif //__WXCOCOA__
-
 #ifdef __WXGTK__
  #include <gdk/gdkx.h> // GDK_WINDOW_XWINDOW is found here in wxWidgets 2.8.0
  #include "gdk/gdkprivate.h"
