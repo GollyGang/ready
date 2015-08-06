@@ -156,15 +156,15 @@ make package_source
  make    # Take a nap, it'll be a while
  sudo make install
 
-2. If you have not already done do, build VTK 5.10 (no install is needed in this 
+2. If you have not already done do, build VTK 6.2 (no install is needed in this
    case because we supply the option "-DVTK_DIR:PATH=$HOME/devt/VTK/build" when 
    cmake'ing Ready)
 
  cd
  cd devt    # A directory for things I download and build but do not checkout/modify/checkin
- curl 'http://www.vtk.org/files/release/5.10/vtk-5.10.0.tar.gz' > vtk-5.10.0.tar.gz
- gunzip vtk-5.10.0.tar.gz
- tar -xvf vtk-5.10.0.tar        # (creates directory ./VTK)
+ curl 'http://www.vtk.org/files/release/6.2/vtk-6.2.0.tar.gz' > vtk-6.2.0.tar.gz
+ gunzip vtk-6.2.0.tar.gz
+ tar -xvf vtk-6.2.0.tar        # (creates directory ./VTK)
  cd VTK
  mkdir build
  cd build
