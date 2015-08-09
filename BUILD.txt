@@ -114,6 +114,7 @@ cd bin
 ccmake ..
 "c" (configure)
  - Set BUILD_TESTING to off (we don't need it). 
+ - Set BUILD_SHARED_LIBS to off (so we can distribute easily)
  - Set CMAKE_BUILD_TYPE to: Release
 "g" (generate)
 make
