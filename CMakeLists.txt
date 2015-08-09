@@ -177,6 +177,11 @@ set( PATTERN_FILES
   Patterns/Experiments/DanWills/orbits_explodey_init.vti
   Patterns/Experiments/DanWills/orbits_sharpWaves-init.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_coralGrow.vti
+  Patterns/Experiments/DanWills/grayscott-historyWaveDC_movingWormsAndSolitons.vti
+  Patterns/Experiments/DanWills/orbitsNova_buildAndDestroyBlobs.vti
+  Patterns/Experiments/DanWills/orbits_epochs.vti
+  Patterns/Experiments/DanWills/grayscott-historyWaveDC_dualPhaseSolitonWormFlow.vti
+  Patterns/Experiments/DanWills/heat-equation-boiling-history-wave_glidersUnstable.vti
   Patterns/Experiments/SimonGladman/vermiformSolitons.vti
   Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/CornusAmmonis/MandelbrotWorms.vti

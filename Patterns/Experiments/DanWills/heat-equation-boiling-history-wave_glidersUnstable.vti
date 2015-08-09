@@ -2,13 +2,13 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="3">
     <description>
-The &lt;a href=&quot;http://en.wikipedia.org/wiki/Heat_equation&quot;&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.
-      
-This formula adds additional reagents to the Heat Equation that model something akin to 'Boil History' in B and 'Boil Wave/Wake' in C and D. When the boil threshold is exceeded, the boil-event emits value into history and wave, allowing it to leave a diffusing history behind it, as well as a rippling wake.
-	  
-In this pattern (using the boiling heat formula as described above), moving glider-like wavefronts form against a background of chaotic boil-events. Constant creation and annihlation usually ends up with a particular flow-direction winning out overall, and wider wavefronts can form once this direction is established, which tend to dominate the individual smaller wavefronts.
-	  
-Written by Dan Wills, (as a bit of an homage-to-CAPOW by Rudy Rucker) based on earlier code in the Ready repo.
+        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Heat_equation&quot;&gt;heat equation&lt;/a&gt;, also known as the diffusion equation, describes multiple phenomena including the spreading-out of heat in a solid body and the diffusion of chemicals in a liquid.
+              
+        This formula adds additional reagents to the Heat Equation that model something akin to 'Boil History' in B and 'Boil Wave/Wake' in C and D. When the boil threshold is exceeded, the boil-event emits value into history and wave, allowing it to leave a diffusing history behind it, as well as a rippling wake.
+              
+        In this pattern (using the boiling heat formula as described above), moving glider-like wavefronts form against a background of chaotic boil-events. Constant creation and annihlation usually ends up with a particular flow-direction winning out overall, and wider wavefronts can form once this direction is established, which tend to dominate the individual smaller wavefronts.
+              
+        Written by Dan Wills, (as a bit of an homage-to-CAPOW by Rudy Rucker) based on earlier code in the Ready repo.
     </description>
     <rule name="Heat Equation with History And Wave" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <param name="timestep">
@@ -114,15 +114,15 @@ Written by Dan Wills, (as a bit of an homage-to-CAPOW by Rudy Rucker) based on e
         0
       </param>
       <formula number_of_chemicals="4">
-                                                a = clamp( sign(a) * pow( fabs( a + a_boil_rate ), (float4) a_power ) + (c-wave_DC_value)*wave_to_a, (float4) a_clamp_min, (float4) a_clamp_max);
-float4 boil = pow( clamp( (float4) ( ((a+laplacian_a * boil_diffusion) - boil_threshold ) * boil_heat_loss ), (float4) 0.0, (float4) 1.0 ), (float4)boil_power );
-a = a + ( -a * boil + b * -a * a_boil_history_rate );
-delta_a = laplacian_a * (a_diffusion_rate + (c-wave_DC_value)*wave_to_Da) + (c-wave_DC_value)*wave_to_a + b*a_from_b;
-delta_b = -b*(b_damp + c*wave_to_b_damp) + a*b_from_a + boil*b_from_boil + (b_diffusion + (c-wave_DC_value)*wave_to_Db) * laplacian_b + (c-wave_DC_value)*wave_to_b;
-b = clamp( sign(b) * pow( (float4)( fabs(b)/b_pow_norm ), (float4)b_pow )*b_pow_norm, b_clamp_min, b_clamp_max );
-c = wave_DC_value + clamp( sign(c-wave_DC_value) * pow( (float4)( fabs(c-wave_DC_value)/wave_pow_norm * wave_damp ), (float4)wave_power )*wave_pow_norm, -wave_clamp, wave_clamp);
-delta_d = (laplacian_c) * wave_diffusion;
-delta_c = d + delta_d + a * wave_from_a + b * wave_from_b + boil*wave_from_boil;
+        a = clamp( sign(a) * pow( fabs( a + a_boil_rate ), (float4) a_power ) + (c-wave_DC_value)*wave_to_a, (float4) a_clamp_min, (float4) a_clamp_max);
+        float4 boil = pow( clamp( (float4) ( ((a+laplacian_a * boil_diffusion) - boil_threshold ) * boil_heat_loss ), (float4) 0.0f, (float4) 1.0f ), (float4)boil_power );
+        a = a + ( -a * boil + b * -a * a_boil_history_rate );
+        delta_a = laplacian_a * (a_diffusion_rate + (c-wave_DC_value)*wave_to_Da) + (c-wave_DC_value)*wave_to_a + b*a_from_b;
+        delta_b = -b*(b_damp + c*wave_to_b_damp) + a*b_from_a + boil*b_from_boil + (b_diffusion + (c-wave_DC_value)*wave_to_Db) * laplacian_b + (c-wave_DC_value)*wave_to_b;
+        b = clamp( sign(b) * pow( (float4)( fabs(b)/b_pow_norm ), (float4)b_pow )*b_pow_norm, b_clamp_min, b_clamp_max );
+        c = wave_DC_value + clamp( sign(c-wave_DC_value) * pow( (float4)( fabs(c-wave_DC_value)/wave_pow_norm * wave_damp ), (float4)wave_power )*wave_pow_norm, -wave_clamp, wave_clamp);
+        delta_d = (laplacian_c) * wave_diffusion;
+        delta_c = d + delta_d + a * wave_from_a + b * wave_from_b + boil*wave_from_boil;
       </formula>
       
     </rule>

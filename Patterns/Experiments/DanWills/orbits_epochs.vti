@@ -2,8 +2,9 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="4">
     <description>
-This is an rd formula that uses an iteration step implemented to treat reagents a and b as a complex number (a+bi) and raise it to a power. Inspired by what a normal orbits-fractal (eg Julia, Mandelbrot) step does.
-Implemented by Dan Wills - gdanzo@gmail.com
+        This is an RD formula that uses an iteration step implemented to treat reagents a and b as a complex number (a+bi) and raise it to a power. Inspired by what a normal orbits-fractal (eg Julia, Mandelbrot) step does.
+        
+        Implemented by Dan Wills - gdanzo@gmail.com
     </description>
     <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <param name="timestep">
@@ -75,12 +76,13 @@ Implemented by Dan Wills - gdanzo@gmail.com
       <param name="dDisplayMult">
         1
       </param>
-      <formula number_of_chemicals="4">                                                                                                c = pow((a+constRealInner)*(a+constRealInner) + (b+constImagInner)*(b+constImagInner), mag_power) * mag_amp + mag_zeroPt;
-d = atan2( b+constRealInner, a+constRealInner ) * phaseAmp + phaseOffset;
-delta_a = clamp( timestep * pow( c, realPower) * pow( eConst, -imagPower*d ) * cos( imagPower * log( c ) + realPower * d ) + D_a * laplacian_a - unDa_b * laplacian_b + constReal, clampMin, clampMax );
-delta_b = clamp( timestep * pow( c, realPower) * pow( eConst, -imagPower*d ) * sin( imagPower * log( c ) + realPower * d ) + D_b * laplacian_b - unDb_a * laplacian_a + constImag, clampMin, clampMax );
-c = (c + cDisplayOffset) * cDisplayMult;
-d = (d + dDisplayOffset) * dDisplayMult;
+      <formula number_of_chemicals="4">
+        c = pow( (a+constRealInner) * (a+constRealInner) + (b+constImagInner) * (b+constImagInner), mag_power) * mag_amp + mag_zeroPt;
+        d = atan2( b+constRealInner, a+constRealInner ) * phaseAmp + phaseOffset;
+        delta_a = clamp( timestep * pow( c, realPower) * pow( eConst, -imagPower*d ) * cos( imagPower * log( c ) + realPower * d ) + D_a * laplacian_a - unDa_b * laplacian_b + constReal, clampMin, clampMax );
+        delta_b = clamp( timestep * pow( c, realPower) * pow( eConst, -imagPower*d ) * sin( imagPower * log( c ) + realPower * d ) + D_b * laplacian_b - unDb_a * laplacian_a + constImag, clampMin, clampMax );
+        c = (c + cDisplayOffset) * cDisplayMult;
+        d = (d + dDisplayOffset) * dDisplayMult;
       </formula>
       
     </rule>

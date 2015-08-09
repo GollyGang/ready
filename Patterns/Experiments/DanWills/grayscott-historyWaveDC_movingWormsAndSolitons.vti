@@ -2,11 +2,15 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="4">
     <description>
-A gray-scott reaction-diffusion system is simulated in the a and b reagents, with two coupled simpler systems in c,d,e. 
-The c reagent implements a diffuse kind of &apos;history&apos; of the other reagents (ie so that gliders can leave a &apos;trail&apos;).
-The d and e reagents implement the wave equation, with additional damping and shaping controls, which is fed by the other reagents (for example gliders can leave a rippley &apos;wake&apos; behind them).
-The extra reagents can feed back into the gray-scott ones, and also control the gray-scott parameters (including diffusion).
-Implemented by Dan Wills (gdanzo@gmail.com) based on earlier work from the Ready codebase.
+        A Gray-Scott reaction-diffusion system is simulated in the a and b reagents, with two coupled simpler systems in c,d,e. 
+        
+        The c reagent implements a diffuse kind of &apos;history&apos; of the other reagents (ie so that gliders can leave a &apos;trail&apos;).
+        
+        The d and e reagents implement the wave equation, with additional damping and shaping controls, which is fed by the other reagents (for example gliders can leave a rippley &apos;wake&apos; behind them).
+        
+        The extra reagents can feed back into the Gray-Scott ones, and also control the Gray-Scott parameters (including diffusion).
+
+        Implemented by Dan Wills (gdanzo@gmail.com) based on earlier work from the Ready codebase.
     </description>
     <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <param name="timestep">
@@ -118,13 +122,13 @@ Implemented by Dan Wills (gdanzo@gmail.com) based on earlier work from the Ready
         0
       </param>
       <formula number_of_chemicals="5">
-                delta_a = (D_a + c*c_to_Da + (d-wave_DC_value)*wave_to_Da) * laplacian_a - pow(a,(float4)a_pow)*pow(b,(float4)b_pow) + (F + c_to_F*c + (d-wave_DC_value)*wave_to_F)*(1.0f-a) + c*c_to_a + (d-wave_DC_value)*wave_to_a;
-delta_b = (D_b  + c*c_to_Db + (d-wave_DC_value)*wave_to_Db) * laplacian_b + pow(a,(float4)a_pow)*pow(b,(float4)b_pow) - ((F + c_to_F*c + (d-wave_DC_value)*wave_to_F)+(k + c*c_to_k + (d-wave_DC_value)*wave_to_k))*b + c*c_to_b + (d-wave_DC_value)*wave_to_b;
-delta_c = -c*c_damp + a*a_to_c + b*b_to_c + (d-wave_DC_value)*wave_to_c + D_c * laplacian_c;
-c = clamp( pow( (float4)( fabs(c)/c_pow_norm ), (float4)c_pow )*c_pow_norm, c_clamp_min, c_clamp_max );
-d = wave_DC_value + clamp( sign(d-wave_DC_value) * pow( (float4)( fabs(d-wave_DC_value) * wave_damp), (float4)wave_power ) + a * a_to_wave + b * b_to_wave + c * c_to_wave, -wave_clamp, wave_clamp);
-delta_e = (laplacian_d) * wave_diffusion;
-delta_d = e + delta_e;
+        delta_a = (D_a + c*c_to_Da + (d-wave_DC_value)*wave_to_Da) * laplacian_a - pow(a,(float4)a_pow)*pow(b,(float4)b_pow) + (F + c_to_F*c + (d-wave_DC_value)*wave_to_F)*(1.0f-a) + c*c_to_a + (d-wave_DC_value)*wave_to_a;
+        delta_b = (D_b  + c*c_to_Db + (d-wave_DC_value)*wave_to_Db) * laplacian_b + pow(a,(float4)a_pow)*pow(b,(float4)b_pow) - ((F + c_to_F*c + (d-wave_DC_value)*wave_to_F)+(k + c*c_to_k + (d-wave_DC_value)*wave_to_k))*b + c*c_to_b + (d-wave_DC_value)*wave_to_b;
+        delta_c = -c*c_damp + a*a_to_c + b*b_to_c + (d-wave_DC_value)*wave_to_c + D_c * laplacian_c;
+        c = clamp( pow( (float4)( fabs(c)/c_pow_norm ), (float4)c_pow )*c_pow_norm, c_clamp_min, c_clamp_max );
+        d = wave_DC_value + clamp( sign(d-wave_DC_value) * pow( (float4)( fabs(d-wave_DC_value) * wave_damp), (float4)wave_power ) + a * a_to_wave + b * b_to_wave + c * c_to_wave, -wave_clamp, wave_clamp);
+        delta_e = (laplacian_d) * wave_diffusion;
+        delta_d = e + delta_e;
       </formula>
       
     </rule>
