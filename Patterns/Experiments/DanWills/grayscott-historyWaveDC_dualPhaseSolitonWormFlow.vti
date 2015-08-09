@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+    <description>
+A gray-scott reaction-diffusion system is simulated in the a and b reagents, with two coupled simpler systems in c,d,e. 
+The c reagent implements a diffuse kind of &apos;history&apos; of the other reagents (ie so that gliders can leave a &apos;trail&apos;).
+The d and e reagents implement the wave equation, with additional damping and shaping controls, which is fed by the other reagents (for example gliders can leave a rippley &apos;wake&apos; behind them).
+The extra reagents can feed back into the gray-scott ones, and also control the gray-scott parameters (including diffusion).
+Implemented by Dan Wills (gdanzo@gmail.com) based on existing work in the Ready codebase.
+
+This example starts as flowing maze-like growth which *usually* (not always) decays forming a flowing field of worms and solitons. When conditions are right, they switch back to this 'elevated' form of growth, that is both stronger growing and generally more maze-forming. The dynamic behaviour switching has an interesting long-term chaotic effect on the underlying behaviour, which would otherwise tend to end in a constant state or loop.
+
+There are very rare initial states that end up with the system stuck in the 'elevated' state, and it may stay that way for some time. So, if it looks flowing fingerprints and no dots for ages, you might need to generate a new initial state.
+    </description>
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="timestep">
+        1
+      </param>
+      <param name="D_a">
+        0.2
+      </param>
+      <param name="D_b">
+        0.1
+      </param>
+      <param name="k">
+        0.059
+      </param>
+      <param name="F">
+        0.09
+      </param>
+      <param name="a_pow">
+        1
+      </param>
+      <param name="b_pow">
+        2
+      </param>
+      <param name="a_to_c">
+        0
+      </param>
+      <param name="b_to_c">
+        0.0152
+      </param>
+      <param name="c_damp">
+        5e-05
+      </param>
+      <param name="D_c">
+        0.083
+      </param>
+      <param name="c_pow">
+        1.0059
+      </param>
+      <param name="c_pow_norm">
+        2
+      </param>
+      <param name="c_clamp_min">
+        0
+      </param>
+      <param name="c_clamp_max">
+        2
+      </param>
+      <param name="c_to_k">
+        0
+      </param>
+      <param name="c_to_F">
+        -0.0132
+      </param>
+      <param name="c_to_a">
+        0
+      </param>
+      <param name="c_to_b">
+        -0.00115
+      </param>
+      <param name="c_to_Da">
+        0.001
+      </param>
+      <param name="c_to_Db">
+        -0.0009
+      </param>
+      <param name="wave_diffusion">
+        5e-05
+      </param>
+      <param name="wave_damp">
+        0.98
+      </param>
+      <param name="wave_power">
+        1.005
+      </param>
+      <param name="a_to_wave">
+        0
+      </param>
+      <param name="b_to_wave">
+        0.019
+      </param>
+      <param name="c_to_wave">
+        -1e-05
+      </param>
+      <param name="wave_DC_value">
+        0.5
+      </param>
+      <param name="wave_clamp">
+        4
+      </param>
+      <param name="wave_to_F">
+        -0.02
+      </param>
+      <param name="wave_to_k">
+        -0.00295
+      </param>
+      <param name="wave_to_Da">
+        0
+      </param>
+      <param name="wave_to_Db">
+        -0.01
+      </param>
+      <param name="wave_to_a">
+        0
+      </param>
+      <param name="wave_to_b">
+        0
+      </param>
+      <param name="wave_to_c">
+        0.0056
+      </param>
+      <formula number_of_chemicals="5">
+                                delta_a = (D_a + c*c_to_Da + (d-wave_DC_value)*wave_to_Da) * laplacian_a - pow(a,(float4)a_pow)*pow(b,(float4)b_pow) + (F + c_to_F*c + (d-wave_DC_value)*wave_to_F)*(1.0f-a) + c*c_to_a + (d-wave_DC_value)*wave_to_a;
+delta_b = (D_b  + c*c_to_Db + (d-wave_DC_value)*wave_to_Db) * laplacian_b + pow(a,(float4)a_pow)*pow(b,(float4)b_pow) - ((F + c_to_F*c + (d-wave_DC_value)*wave_to_F)+(k + c*c_to_k + (d-wave_DC_value)*wave_to_k))*b + c*c_to_b + (d-wave_DC_value)*wave_to_b;
+delta_c = -c*c_damp + a*a_to_c + b*b_to_c + (d-wave_DC_value)*wave_to_c + D_c * laplacian_c;
+c = clamp( pow( (float4)( fabs(c)/c_pow_norm ), (float4)c_pow )*c_pow_norm, c_clamp_min, c_clamp_max );
+d = wave_DC_value + clamp( sign(d-wave_DC_value) * pow( (float4)( fabs(d-wave_DC_value) * wave_damp), (float4)wave_power ) + a * a_to_wave + b * b_to_wave + c * c_to_wave, -wave_clamp, wave_clamp);
+delta_e = (laplacian_d) * wave_diffusion;
+delta_d = e + delta_e;
+      </formula>
+      
+    </rule>
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite>
+          
+        </overwrite>
+        <constant value="0.7">
+          
+        </constant>
+        <everywhere>
+          
+        </everywhere>
+        
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>
+          
+        </overwrite>
+        <white_noise low="-0.1" high="0.42">
+          
+        </white_noise>
+        <rectangle>
+          <point3D x="0" y="0" z="0">
+            
+          </point3D>
+          <point3D x="1" y="1" z="1">
+            
+          </point3D>
+          
+        </rectangle>
+        
+      </overlay>
+      
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+        
+      </surface_color>
+      <color_low r="0" g="0" b="0">
+        
+      </color_low>
+      <color_high r="1" g="1" b="1">
+        
+      </color_high>
+      <show_color_scale value="false">
+        
+      </show_color_scale>
+      <show_multiple_chemicals value="false">
+        
+      </show_multiple_chemicals>
+      <active_chemical value="b">
+        
+      </active_chemical>
+      <low value="0">
+        
+      </low>
+      <high value="1">
+        
+      </high>
+      <vertical_scale_1D value="30">
+        
+      </vertical_scale_1D>
+      <vertical_scale_2D value="15">
+        
+      </vertical_scale_2D>
+      <contour_level value="0.25">
+        
+      </contour_level>
+      <use_wireframe value="false">
+        
+      </use_wireframe>
+      <show_cell_edges value="false">
+        
+      </show_cell_edges>
+      <show_bounding_box value="true">
+        
+      </show_bounding_box>
+      <slice_3D value="true">
+        
+      </slice_3D>
+      <slice_3D_axis value="z">
+        
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+        
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="false">
+        
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+        
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+        
+      </use_image_interpolation>
+      <timesteps_per_render value="256">
+        
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+        
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+        
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+        
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+        
+      </phase_plot_z_axis>
+      
+    </render_settings>
+    
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0.69999998808" RangeMax="0.69999998808">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="-0.099999241531" RangeMax="0.41999617219">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="e" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
