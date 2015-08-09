@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="4">
+    <description>
+An RD that uses an iteration step implemented to treat reagents a and b as a complex number (a+bi) and raising it to a power, similarly to a Nova orbits-fractal step. There are extensive notes about this in the comments in the code.
+Implemented by Dan Wills - gdanzo@gmail.com
+&lt;/a&gt;
+    </description>
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="timestep">
+        0.001
+      </param>
+      <param name="clampMin">
+        -1.15
+      </param>
+      <param name="clampMax">
+        9
+      </param>
+      <param name="relaxReal">
+        1.9
+      </param>
+      <param name="relaxImag">
+        -0.02
+      </param>
+      <param name="constReal">
+        3.141
+      </param>
+      <param name="constImag">
+        0.8
+      </param>
+      <param name="powerReal">
+        -0.16
+      </param>
+      <param name="powerImag">
+        3
+      </param>
+      <param name="D_a">
+        88
+      </param>
+      <param name="D_b">
+        12
+      </param>
+      <param name="mag_amp">
+        1
+      </param>
+      <param name="mag_power">
+        0.7
+      </param>
+      <param name="mag_add">
+        -0.39
+      </param>
+      <param name="phase_offset">
+        -0.5
+      </param>
+      <param name="phase_scale">
+        1.17
+      </param>
+      <formula number_of_chemicals="4">
+// Nova is: z = z - R * ( (z^p - 1) / (p * z^(p-1)) ) + complexOffset
+// Where:
+//  z is the complex value: (a+ib)
+//  p is the complex power: (c+id) (these are changed to u and t in the implemented code)
+//  R is the complex relaxation: (e+if)
+//  c is the complex offset: (g+ih)
+//  z^p is the complex number z, raised to complex power p, which we precompute: (p + iq)
+//  z^(p-1) is the complex number z, raised to complex power (p-1), which we precompute: (r + is)
+//  E is the real constant e ( a literal is used here: 2.718281828459045235360287471352 )
+// for reference: complex power of z=(a+ib), where MAG is z&apos;s magnitude and PHASE is z&apos;s phase:
+// real part: pow( MAG, powerReal) * pow( E, -powerImag * PHASE ) * cos( powerReal * PHASE + powerImag * log( MAG ) )
+// imag part: same as real but with sin instead of cos
+// Complex fraction manipulation reference:
+// http://www.purplemath.com/modules/complex2.htm
+// Nova formula, substituting variable names from above:
+//  change in z = (-e - if) * ( ( (p - 1.0 + iq) ) / ( (c+id ) * (r+is) ) ) + (g+ih)
+// Denominator: (c+id) * (r+is), becomes: cr - ds + i(cs + dr)
+// Multiplying R into the numerator of the central fraction:
+// (-e - if) * (p - 1.0 + iq)
+// Which gives: -ep + e - ieq - ifp + if + fq
+// Collect into real and imag:
+//         -ep + e + fq - i( eq + fp - f )
+// Now we need to get the +c in terms of the denominator, so we multiply it by denom/denom.
+// new c denominator is: cr - ds + i(cs + dr):
+// c new numerator:
+//    ( g + ih ) * ( cr - ds + i(cs + dr) )
+// Which is:
+// gcr - gds + igcs + igdr + ihcr - ihds - csh - hdr
+// Collect into real and imag (c numerator):
+// gcr - gds - hcs - hdr + i( gcs + gdr + hcr - hds )
+// now the numerators can be added together:
+// -ep + e + fq - i( eq + fp - f ) + gcr - gds - hcs - hdr + i( gcs + gdr + hcr - hds )
+// Which makes the forumula:
+//
+// -ep + e + fq + gcr - gds - hcs - hdr + i( eq + fp - f + gcs + gdr + hcr - hds )
+//               ------------------------------------------------
+//                            cr - ds + i(cs + dr)
+//
+// We need to separate into real and imaginary in order to actually apply it, so:
+// To get rid of i in the denominator, we need to multiply by the fractional complex conjugate identity, in other words, mult by:
+//    cr - ds - i(cs + dr) 
+// * ----------------------
+//    cr - ds - i(cs + dr)
+// This will give a new denominator of:
+// ( (cr - ds) + i(cs + dr)) * ( (cr - ds) - i(cs + dr))
+// Which expands to:
+// (cr - ds)(cr - ds) - i(cr - ds)(cs + dr) + i(cs + dr)(cr - ds) + (cs + dr)(cs + dr)
+// The imaginary bits cancel out, leaving:
+// (cr - ds)^2 + (cs + dr)^2
+// Which expands to:
+// (cr - ds)(cr - ds) + (cs + dr)(cs + dr)
+// Expanded:
+// crcr - 2(crds) + cscs + 2(csdr) + drdr
+// ccrr + ccss + ddrr + ddss
+// The new denominator, simplified:
+// cc( rr + ss ) + dd( rr + ss )
+// On top, we now have this monster:
+// ( -ep + e + fq + gcr - gds - hcs - hdr + i( eq + fp - f + gcs + gdr + hcr - hds ) ) * ( cr - ds - i(cs + dr) )
+// Expanded:
+// (-ep + e + fq + gcr - gds - hcs - hdr) * (cr - ds) - (-ep + e + fq + gcr - gds - hcs - hdr) * i(cs + dr) +
+// i(eq + fp - f + gcs + gdr + hcr - hds) * (cr - ds) - i(eq + fp - f + gcs + gdr + hcr - hds) * i(cs + dr)
+// Real bit:
+// (-ep + e + fq + gcr - gds - hcs - hdr) * (cr - ds) - ( ieq + ifp - if + igcs + igdr + ihcr - ihds ) * ( ics + idr ) )
+// Expanded:
+//  -epcr + epds + ecr - eds + fqcr - fqds + gcrcr - gcrds - gdscr + gdsds - hcscr + hcsds - hdrcr + hdrds
+// + eqcs + eqdr + fpcs + fpdr - fcs - fdr + gcscs + gcsdr + gdrcs + gdrdr + hcrcs + hcrdr - hdscs - hdsdr
+// Reordered:
+//  -epcr + epds + ecr - eds + fqcr - fqds + gcrcr + gdsds - gcrds - gdscr - hcscr + hcsds - hcrdr + hddrs
+// + eqcs + eqdr + fpcs + fpdr - fcs - fdr + gcscs + gdrdr + gcrds + gdscr + hcscr - hcsds + hcrdr - hddrs
+// From which we can cancel a few things, giving:
+//  -epcr + epds + ecr - eds + eqcs + eqdr + fpcs + fpdr - fcs - fdr + fqcr - fqds + gcrcr + gdsds + gcscs + gdrdr
+// simplified:
+//   e( c( -pr + r + qs ) + d( ps - s + qr ) ) + 
+//   f( p( cs + dr ) + q( -cr - ds ) - cs - dr ) +
+//   g( cc( rr + ss ) + dd( ss + rr ) )
+// imag bit:
+// - (-ep + e + fq + gcr - gds - hcs - hdr) * i(cs + dr) + i(eq + fp - f + gcs + gdr + hcr - hds) * (cr - ds)
+// (ep - e - fq - gcr + gds + hcs + hdr) * i(cs + dr) + i(eq + fp - f + gcs + gdr + hcr - hds) * (cr - ds)
+// Expanded:
+// iepcs + iepdr - iecs - iedr -ifqcs -ifqdr - igcrcs - igcrdr + igdscs + igdsdr + ihcscs + ihcsdr + ihdrcs + ihdrdr + 
+// ieqcr - ieqds + ifpcr - ifpds -ifcr + ifds + igcscr - igcsds + igdrcr - igdrds + ihcrcr - ihcrds - ihdscr + ihdsds
+// cancellation
+// iepcs + iepdr - iecs - iedr -ifqcs -ifqdr + ihcscs + ihdrdr  
+// + ieqcr - ieqds + ifpcr - ifpds -ifcr + ifds + ihcrcr + ihdsds 
+// simplification:
+// i( e( c( ps + qr - s ) + d( pr - qs - r ) ) + f( c( pr - qs - r ) + d ( -ps - qr + s ) ) + h( cc( rr + + ss ) + dd( rr + ss ) ) )
+//optimizations:
+// precompute:
+//    PrQsR = pr - qs - r
+//    PsQrS = ps + qr - s
+//    RRSS = r*r + s*s
+// this makes the formula:
+//   i( e( c( PsQrS ) + d( PrQsR ) ) + 
+//   f( c( PrQsR ) + d ( -PsQrS ) ) + 
+//   h( cc( RRSS ) + dd( RRSS ) ) )
+c = pow(a*a + b*b, mag_power) * mag_amp + mag_add;
+d = atan2( b, a ) * phase_scale + phase_offset;
+float4 p = pow( c, powerReal) * pow( 2.718281828459045235360287471352, -powerImag*d ) * cos( powerImag * log( c ) + powerReal * d );
+float4 q = pow( c, powerReal) * pow( 2.718281828459045235360287471352, -powerImag*d ) * sin( powerImag * log( c ) + powerReal * d );
+float4 r = pow( c, powerReal-1.0) * pow( 2.718281828459045235360287471352, -powerImag*d ) * cos( powerImag * log( c ) + (powerReal-1.0) * d );
+float4 s = pow( c, powerReal-1.0) * pow( 2.718281828459045235360287471352, -powerImag*d ) * sin( powerImag * log( c ) + (powerReal-1.0) * d );
+float4 e = relaxReal;
+float4 f = relaxImag;
+float4 g = constReal;
+float4 h = constImag;
+float4 t = powerReal;
+float4 u = powerImag;
+// bit of crunching later..
+// precompute inner bits:
+float4 rr_plus_ss = ( r*r + s*s );
+float4 csdr = ( c*s + d*r );
+float4 PrQsR = p*r - q*s - r;
+float4 PsQrS = p*s + q*r - s;
+float4 denominator = t*t*rr_plus_ss + u*u*rr_plus_ss;
+//remap c TO t and d TO u
+float4 realNumerator = e*( t*( -PrQsR ) + u*( PsQrS ) ) + f*( p*( t*u*s*r ) + q*( -t*s*u*r ) - t*s - u*r ) + g*( t*t*rr_plus_ss + u*u*rr_plus_ss );
+float4 imagNumerator = e*( t*( PsQrS ) + u*( PrQsR ) ) + f*( t*( PrQsR ) + u*( -PsQrS ) ) + h*( t*t*( rr_plus_ss ) + u*u*( rr_plus_ss ) );
+delta_a = clamp( ( realNumerator / denominator ), clampMin, clampMax ) + D_a * laplacian_a;
+delta_b = clamp( ( imagNumerator / denominator ), clampMin, clampMax ) + D_b * laplacian_b;
+      </formula>
+    </rule>
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a">
+        <overwrite>
+        </overwrite>
+        <white_noise low="-2" high="2">
+        </white_noise>
+        <everywhere>
+        </everywhere>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>
+        </overwrite>
+        <white_noise low="-2" high="2">
+        </white_noise>
+        <everywhere>
+        </everywhere>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>  
+        </overwrite>
+        <white_noise low="-5.5" high="-0.4">
+        </white_noise>
+        <circle radius="0.5">
+          <point3D x="0.32" y="0.6" z="0.5">
+          </point3D>
+        </circle>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite>  
+        </overwrite>
+        <white_noise low="0.2" high="0.5">
+        </white_noise>
+        <circle radius="0.2">
+          <point3D x="0.75" y="0.25" z="0.5">
+          </point3D>
+        </circle>
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+      </surface_color>
+      <color_low r="0" g="0" b="0">
+      </color_low>
+      <color_high r="1" g="1" b="1">
+      </color_high>
+      <show_color_scale value="false">
+      </show_color_scale>
+      <show_multiple_chemicals value="false">
+      </show_multiple_chemicals>
+      <active_chemical value="b">
+      </active_chemical>
+      <low value="-6">
+      </low>
+      <high value="6">
+      </high>
+      <vertical_scale_1D value="30">
+      </vertical_scale_1D>
+      <vertical_scale_2D value="30">
+      </vertical_scale_2D>
+      <contour_level value="0">
+      </contour_level>
+      <use_wireframe value="false">
+      </use_wireframe>
+      <show_cell_edges value="false">
+      </show_cell_edges>
+      <show_bounding_box value="true">
+      </show_bounding_box>
+      <slice_3D value="true">
+      </slice_3D>
+      <slice_3D_axis value="z">
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="false">
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+      </use_image_interpolation>
+      <timesteps_per_render value="222">
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+      </phase_plot_z_axis>
+    </render_settings>
+  </RD>
+  <ImageData WholeExtent="0 511 0 511 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 511 0 511 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="-1.9999755621" RangeMax="1.9999973774">
+IAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="-1.9999915361" RangeMax="1.999989748">
+IAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+IAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+IAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
