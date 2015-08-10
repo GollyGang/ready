@@ -169,7 +169,7 @@ make package_source
  cd VTK
  mkdir build
  cd build
- cmake ..
+ cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF
  make     # This also takes some time
 
 3. Then do this to get, configure and build Ready (assuming VTK was built in 
