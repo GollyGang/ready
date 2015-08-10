@@ -4,7 +4,7 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.6 from the [releases tab](https://github.com/GollyGang/ready/releases). Ready works on Windows (XP, Vista, 7, 8), Mac OS (10.6+) and Linux.
+Download Ready 0.7: [Windows 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Windows-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Windows-32bit.zip)), [MacOS](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Mac.zip), [Linux 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-32bit.zip)), [source](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Source.zip). More details on the [releases tab](https://github.com/GollyGang/ready/releases).
 
 [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
