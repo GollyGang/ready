@@ -6,7 +6,7 @@ Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
 Download Ready 0.7 here: 
   * [Windows 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Windows-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Windows-32bit.zip))
-  * [MacOS](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Mac.zip)
+  * [MacOS (10.6+)](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Mac.zip)
   * [Linux 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-32bit.zip))
   * [Source](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Source.zip)
 
