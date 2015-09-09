@@ -15,7 +15,6 @@ Big picture issues:
 before 0.x release:
 
 - IPG with transparency, allowing only part of the saved pattern to be overwritten (John Denton wanted this)
-- save OBJ files from Start Recording dialog
 - merged phase plot and graph for 1D patterns: plot graph at right angles, to e.g. show Schroedinger as a corkscrew
 - fix panning issue on complex scenes (e.g. Bays_3D.vti)
 - new fill types: perlin noise (vtkPerlinNoise), conical gradient
@@ -42,6 +41,7 @@ before 0.x release:
 - read Turk's CASCADE language, for freeze-and-continue schemes
 - add initial_pattern_generator to Info Pane for editing
 - export rule to the WebGL Playground template
+- export rule and cells to e.g. Matlab for simulating with different tools
 - add orientation indicator, as in Paraview
 - mesh relaxation & subdivision scheme for imported meshes (similar to Turk but can use VTK for this)
 - simpler subdivide-until-equal-density scheme, to equalise cell area/volume (also to just subdivide)
