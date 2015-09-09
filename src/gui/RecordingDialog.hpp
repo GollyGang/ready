@@ -51,6 +51,11 @@ class RecordingDialog : public wxDialog
 
     protected:
 
+        const wxString source_current_view;
+        const wxString source_2D_data;
+        const wxString source_2D_data_all_chemicals;
+        const wxString source_3D_surface;
+
         wxComboBox *source_combo;
         wxComboBox *extension_combo;
         wxTextCtrl *folder_edit;

@@ -3249,10 +3249,17 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
     // 2. output ImageRD 3d-image contour for active chemical
     // 3. output ImageRD 2d-image displacement-mapped surface for active chemical
 
-    wxString mesh_filename = wxFileSelector(_("Export a mesh:"),wxEmptyString,wxEmptyString,wxEmptyString,
-        _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-    if(mesh_filename.empty()) return; // user cancelled
+    wxString mesh_filename = wxFileSelector(_("Export a mesh:"), wxEmptyString, wxEmptyString, wxEmptyString,
+        _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    if (mesh_filename.empty()) return; // user cancelled
 
+    SaveCurrentMesh(mesh_filename);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::SaveCurrentMesh(const wxString& mesh_filename)
+{
     vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
     this->system->GetAsMesh(pd,this->render_settings);
 
@@ -3378,72 +3385,82 @@ void MyFrame::OnUpdateExportImage(wxUpdateUIEvent& event)
 void MyFrame::RecordFrame()
 {
     ostringstream oss;
-    vtkSmartPointer<vtkImageWriter> writer;
-    if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
-    else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-    
-    // store the currently active chemical, in the case of multi-reagent output it needs to be restored later.
-    std::string remember_chemical = this->render_settings.GetProperty("active_chemical").GetChemical();
-    
-    if(this->record_data_image) // take the 2D data (2D system or 2D slice)
-    {        
-        if (this->record_all_chemicals) 
+
+    if (this->record_3D_surface)
+    {
+        // save the 3D mesh
+        oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+        SaveCurrentMesh(wxString(oss.str().c_str()));
+    }
+    else
+    {
+        vtkSmartPointer<vtkImageWriter> writer;
+        if (this->recording_extension == _T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+        else if (this->recording_extension == _T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+
+        // store the currently active chemical, in the case of multi-reagent output it needs to be restored later.
+        std::string remember_chemical = this->render_settings.GetProperty("active_chemical").GetChemical();
+
+        if (this->record_data_image) // take the 2D data (2D system or 2D slice)
         {
-            int num_chems = this->system->GetNumberOfChemicals();
-            for (int chemical_number=0; chemical_number < num_chems; chemical_number++)
+            if (this->record_all_chemicals)
             {
-                // make modified name for chemicals.
-                oss.str("");
-                oss.clear();
-                std::string chemical_name = GetChemicalName(chemical_number);
-                oss << this->recording_prefix << chemical_name << "_" << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-                
-                this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(chemical_number));
-                
-                vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
-                this->system->GetAs2DImage(image,this->render_settings);
-                #if VTK_MAJOR_VERSION >= 6
-                    writer->SetInputData(image);
-                #else
-                    writer->SetInput(image);
-                #endif
-                if (chemical_number < num_chems-1) //write all but the last one as it will get written by the code below.
+                int num_chems = this->system->GetNumberOfChemicals();
+                for (int chemical_number = 0; chemical_number < num_chems; chemical_number++)
                 {
-                    writer->SetFileName(oss.str().c_str());
-                    writer->Write();
-                    if(this->recording_extension==_T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
-                    else if(this->recording_extension==_T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+                    // make modified name for chemicals.
+                    oss.str("");
+                    oss.clear();
+                    std::string chemical_name = GetChemicalName(chemical_number);
+                    oss << this->recording_prefix << chemical_name << "_" << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+
+                    this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(chemical_number));
+
+                    vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+                    this->system->GetAs2DImage(image, this->render_settings);
+                    #if VTK_MAJOR_VERSION >= 6
+                      writer->SetInputData(image);
+                    #else
+                      writer->SetInput(image);
+                    #endif
+                    if (chemical_number < num_chems - 1) //write all but the last one as it will get written by the code below.
+                    {
+                        writer->SetFileName(oss.str().c_str());
+                        writer->Write();
+                        if (this->recording_extension == _T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
+                        else if (this->recording_extension == _T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+                    }
                 }
             }
+            else
+            {
+                oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+                vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
+                this->system->GetAs2DImage(image, this->render_settings);
+                #if VTK_MAJOR_VERSION >= 6
+                  writer->SetInputData(image);
+                #else
+                  writer->SetInput(image);
+                #endif
+            }
         }
-        else 
+        else // take a screenshot of the current view
         {
             oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-            vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
-            this->system->GetAs2DImage(image,this->render_settings);
-            #if VTK_MAJOR_VERSION >= 6
-                writer->SetInputData(image);
-            #else
-                writer->SetInput(image);
-            #endif
+            vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
+            screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
+            writer->SetInputConnection(screenshot->GetOutputPort());
         }
-    }
-    else // take a screenshot of the current view
-    {
-        oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-        vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
-        screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
-        writer->SetInputConnection(screenshot->GetOutputPort());
-    }
-    
-    writer->SetFileName(oss.str().c_str());
-    writer->Write();
-    
-    if ( this->record_all_chemicals )
-    {
-        // restore the stored active chemical so that the user still sees what they usually see in the viewport.
-        // only do this in the case of record_all_chemicals (ie when it has potentially changed), ere it may cause wasted cycles?.
-        this->render_settings.GetProperty("active_chemical").SetChemical( remember_chemical );
+
+        writer->SetFileName(oss.str().c_str());
+        writer->Write();
+
+        if (this->record_all_chemicals)
+        {
+            // restore the stored active chemical so that the user still sees what they usually see in the viewport.
+            // only do this in the case of record_all_chemicals (ie when it has potentially changed), ere it may cause wasted cycles?.
+            this->render_settings.GetProperty("active_chemical").SetChemical(remember_chemical);
+        }
     }
     
     this->iRecordingFrame++;
@@ -3464,7 +3481,7 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     bool default_to_2D_data = ( is_2D_data_available && this->system->GetArenaDimensionality()==2
                                 && !this->render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
                                 && !this->render_settings.GetProperty("show_phase_plot").GetBool() );
-    bool is_3D_surface_available = this->system->GetArenaDimensionality() == 3;
+    bool is_3D_surface_available = this->system->GetArenaDimensionality() > 1;
 
     RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data,is_3D_surface_available);
     if(dlg.ShowModal()!=wxID_OK) return;
@@ -3472,12 +3489,7 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     this->recording_extension = dlg.recording_extension;
     this->record_data_image = dlg.record_data_image;
     this->record_all_chemicals = dlg.record_all_chemicals;
-
-    if (dlg.record_3D_surface) // temporary measure
-    {
-        wxMessageBox(_("Not yet supported."));
-        return;
-    }
+    this->record_3D_surface = dlg.record_3D_surface;
 
     this->iRecordingFrame = 0;
     this->is_recording = true;

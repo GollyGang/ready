@@ -205,6 +205,7 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
+        void SaveCurrentMesh(const wxString& mesh_filename);
 
     private:
 
@@ -242,7 +243,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool speed_data_available;
 
         // used when recording frames to disk
-        bool is_recording,record_data_image,record_all_chemicals;
+        bool is_recording,record_data_image,record_all_chemicals,record_3D_surface;
         std::string recording_prefix,recording_extension;
         int iRecordingFrame;
 

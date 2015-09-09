@@ -41,6 +41,10 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
                                  bool default_is_2D_data,
                                  bool is_3D_surface_available) 
     : wxDialog(parent,wxID_ANY,_("Recording settings"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
+    , source_current_view(_("current view"))
+    , source_2D_data(_("2D data"))
+    , source_2D_data_all_chemicals(_("2D data (all chemicals)"))
+    , source_3D_surface(_("3D surface"))
 {
     // create the controls
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
@@ -48,13 +52,13 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
     
     wxStaticText* source_label = new wxStaticText(this, wxID_STATIC, _("Image source:"));
     this->source_combo = new wxComboBox(this, ID::SourceCombo, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY);
-    this->source_combo->AppendString(_("current view"));
+    this->source_combo->AppendString(this->source_current_view);
     if(is_2D_data_available)
-        this->source_combo->AppendString(_("2D data"));
+        this->source_combo->AppendString(this->source_2D_data);
     if(are_multiple_chemicals_available)
-        this->source_combo->AppendString(_("2D data (all chemicals)"));
+        this->source_combo->AppendString(this->source_2D_data_all_chemicals);
     if (is_3D_surface_available)
-        this->source_combo->AppendString(_("3D surface"));
+        this->source_combo->AppendString(this->source_3D_surface);
     this->source_combo->SetSelection(default_is_2D_data ? 1 : 0);
 
     wxStaticText* folder_label = new wxStaticText(this, wxID_STATIC, _("Save frames here: (will overwrite)"));
@@ -136,10 +140,10 @@ bool RecordingDialog::Validate()
 
 bool RecordingDialog::TransferDataFromWindow()
 {
-    this->record_data_image = (this->source_combo->GetSelection()==1) || (this->source_combo->GetSelection()==2);
-    this->record_all_chemicals = (this->source_combo->GetSelection()==2);
+    this->record_data_image = (this->source_combo->GetValue()==this->source_2D_data) || (this->source_combo->GetValue()==this->source_2D_data_all_chemicals);
+    this->record_all_chemicals = (this->source_combo->GetValue()==this->source_2D_data_all_chemicals);
     this->recording_extension = string(this->extension_combo->GetValue().mb_str());
-    this->record_3D_surface = (this->source_combo->GetSelection() == 3);
+    this->record_3D_surface = (this->source_combo->GetValue() == this->source_3D_surface);
     recordingdir = this->folder_edit->GetValue(); // save folder in prefs
     this->recording_prefix = string(this->folder_edit->GetValue().mb_str()) + "/" + string(this->filename_prefix_edit->GetValue().mb_str());
     // TODO: save other settings in prefs too, if wanted
@@ -160,15 +164,15 @@ void RecordingDialog::OnChangeFolder(wxCommandEvent& event)
 void RecordingDialog::OnSourceSelectionChange(wxCommandEvent& event)
 {
     this->extension_combo->Clear();
-    switch (this->source_combo->GetCurrentSelection())
+    if (this->source_combo->GetValue() == this->source_3D_surface)
     {
-        default:
-            this->extension_combo->AppendString(_(".png"));
-            this->extension_combo->AppendString(_(".jpg"));
-            break;
-        case 3:
-            this->extension_combo->AppendString(_(".obj"));
-            break;
+        this->extension_combo->AppendString(_(".obj"));
+        this->extension_combo->AppendString(_(".vtp"));
+    }
+    else
+    {
+        this->extension_combo->AppendString(_(".png"));
+        this->extension_combo->AppendString(_(".jpg"));
     }
     this->extension_combo->SetSelection(0);
 }
