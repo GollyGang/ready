@@ -3396,7 +3396,7 @@ void MyFrame::RecordFrame()
                 oss.str("");
                 oss.clear();
                 std::string chemical_name = GetChemicalName(chemical_number);
-                oss << this->recording_prefix << "-" << chemical_name << "." << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
+                oss << this->recording_prefix << chemical_name << "_" << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
                 
                 this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(chemical_number));
                 
@@ -3453,26 +3453,27 @@ void MyFrame::RecordFrame()
 
 void MyFrame::OnRecordFrames(wxCommandEvent &event)
 {
-    if(!this->is_recording)
+    if (this->is_recording)
     {
-        bool is_2D_data_available = this->system->Is2DImageAvailable();
-        bool are_multiple_chemicals_available = is_2D_data_available && (this->system->GetNumberOfChemicals() > 1);
-        bool default_to_2D_data = ( is_2D_data_available && this->system->GetArenaDimensionality()==2
-                                    && !this->render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
-                                    && !this->render_settings.GetProperty("show_phase_plot").GetBool() );
-
-        RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data);
-        if(dlg.ShowModal()!=wxID_OK) return;
-        this->recording_prefix = dlg.recording_prefix;
-        this->recording_extension = dlg.recording_extension;
-        this->record_data_image = dlg.record_data_image;
-        this->record_all_chemicals = dlg.record_all_chemicals;
-        
-        this->iRecordingFrame = 0;
-        this->is_recording = true;
-    }
-    else
         this->is_recording = false;
+        return;
+    }
+
+    bool is_2D_data_available = this->system->Is2DImageAvailable();
+    bool are_multiple_chemicals_available = is_2D_data_available && (this->system->GetNumberOfChemicals() > 1);
+    bool default_to_2D_data = ( is_2D_data_available && this->system->GetArenaDimensionality()==2
+                                && !this->render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
+                                && !this->render_settings.GetProperty("show_phase_plot").GetBool() );
+
+    RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data);
+    if(dlg.ShowModal()!=wxID_OK) return;
+    this->recording_prefix = dlg.recording_prefix;
+    this->recording_extension = dlg.recording_extension;
+    this->record_data_image = dlg.record_data_image;
+    this->record_all_chemicals = dlg.record_all_chemicals;
+        
+    this->iRecordingFrame = 0;
+    this->is_recording = true;
 }
 
 // ---------------------------------------------------------------------
