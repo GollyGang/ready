@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -29,21 +29,34 @@ class RecordingDialog : public wxDialog
 {
     public:
 
-        RecordingDialog(wxWindow *parent,bool is_2D_data_available, bool are_multiple_chemicals_available,bool default_is_2D_data);
+        RecordingDialog(wxWindow *parent,
+                        bool is_2D_data_available,
+                        bool are_multiple_chemicals_available,
+                        bool default_is_2D_data,
+                        bool is_3D_surface_available);
 
         bool Validate();                /// checks for value correctness
         bool TransferDataFromWindow();  /// called when user hits OK
     
-        std::string recording_prefix,recording_extension;
+        std::string recording_prefix;
+        std::string recording_extension;
         bool record_data_image;
         bool record_all_chemicals;
+        bool record_3D_surface;
 
     protected:
 
+        void OnSourceSelectionChange(wxCommandEvent& event);
         void OnChangeFolder(wxCommandEvent& event);
 
     protected:
 
-        wxComboBox *source_combo, *extension_combo;
-        wxTextCtrl *folder_edit, *filename_prefix_edit;
+        wxComboBox *source_combo;
+        wxComboBox *extension_combo;
+        wxTextCtrl *folder_edit;
+        wxTextCtrl *filename_prefix_edit;
+
+    private:
+
+        DECLARE_EVENT_TABLE()
 };

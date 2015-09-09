@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -16,8 +16,9 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // local:
-#include "dialogs.hpp"
 #include "RecordingDialog.hpp"
+#include "dialogs.hpp"
+#include "IDs.hpp"
 #include "prefs.hpp"
 
 // wxWidgets:
@@ -28,7 +29,17 @@ using namespace std;
 
 // -----------------------------------------------------------------------------------------------
 
-RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available, bool are_multiple_chemicals_available, bool default_is_2D_data) 
+BEGIN_EVENT_TABLE(RecordingDialog, wxDialog)
+  EVT_COMBOBOX(ID::SourceCombo, RecordingDialog::OnSourceSelectionChange)
+END_EVENT_TABLE()
+
+// -----------------------------------------------------------------------------------------------
+
+RecordingDialog::RecordingDialog(wxWindow *parent,
+                                 bool is_2D_data_available,
+                                 bool are_multiple_chemicals_available,
+                                 bool default_is_2D_data,
+                                 bool is_3D_surface_available) 
     : wxDialog(parent,wxID_ANY,_("Recording settings"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     // create the controls
@@ -36,13 +47,15 @@ RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available, boo
     SetSizer(vbox);
     
     wxStaticText* source_label = new wxStaticText(this, wxID_STATIC, _("Image source:"));
-    this->source_combo = new wxComboBox(this,wxID_ANY);
+    this->source_combo = new wxComboBox(this, ID::SourceCombo, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY);
     this->source_combo->AppendString(_("current view"));
     if(is_2D_data_available)
         this->source_combo->AppendString(_("2D data"));
     if(are_multiple_chemicals_available)
         this->source_combo->AppendString(_("2D data (all chemicals)"));
-    this->source_combo->SetSelection(default_is_2D_data?1:0);
+    if (is_3D_surface_available)
+        this->source_combo->AppendString(_("3D surface"));
+    this->source_combo->SetSelection(default_is_2D_data ? 1 : 0);
 
     wxStaticText* folder_label = new wxStaticText(this, wxID_STATIC, _("Save frames here: (will overwrite)"));
     wxBoxSizer* hbox1 = new wxBoxSizer(wxHORIZONTAL);
@@ -62,7 +75,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent,bool is_2D_data_available, boo
         this->filename_prefix_edit = new wxTextCtrl(this,wxID_ANY,_("frame_"));
         hbox2->Add(this->filename_prefix_edit,1,wxRIGHT,10);
         hbox2->Add(new wxStaticText(this, wxID_STATIC, _("000000")),0, wxRIGHT | wxALIGN_BOTTOM,10);
-        this->extension_combo = new wxComboBox(this,wxID_ANY);
+        this->extension_combo = new wxComboBox(this,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,0,NULL,wxCB_READONLY);
         this->extension_combo->AppendString(_(".png"));
         this->extension_combo->AppendString(_(".jpg"));
         this->extension_combo->SetSelection(0);
@@ -126,6 +139,7 @@ bool RecordingDialog::TransferDataFromWindow()
     this->record_data_image = (this->source_combo->GetSelection()==1) || (this->source_combo->GetSelection()==2);
     this->record_all_chemicals = (this->source_combo->GetSelection()==2);
     this->recording_extension = string(this->extension_combo->GetValue().mb_str());
+    this->record_3D_surface = (this->source_combo->GetSelection() == 3);
     recordingdir = this->folder_edit->GetValue(); // save folder in prefs
     this->recording_prefix = string(this->folder_edit->GetValue().mb_str()) + "/" + string(this->filename_prefix_edit->GetValue().mb_str());
     // TODO: save other settings in prefs too, if wanted
@@ -139,6 +153,24 @@ void RecordingDialog::OnChangeFolder(wxCommandEvent& event)
     wxDirDialog dlg(NULL, "Choose target folder", this->folder_edit->GetValue(), wxDD_DEFAULT_STYLE | wxDD_DIR_MUST_EXIST);
     if(dlg.ShowModal()!=wxID_OK) return;
     this->folder_edit->SetValue(dlg.GetPath());
+}
+
+// -----------------------------------------------------------------------------------------------
+
+void RecordingDialog::OnSourceSelectionChange(wxCommandEvent& event)
+{
+    this->extension_combo->Clear();
+    switch (this->source_combo->GetCurrentSelection())
+    {
+        default:
+            this->extension_combo->AppendString(_(".png"));
+            this->extension_combo->AppendString(_(".jpg"));
+            break;
+        case 3:
+            this->extension_combo->AppendString(_(".obj"));
+            break;
+    }
+    this->extension_combo->SetSelection(0);
 }
 
 // -----------------------------------------------------------------------------------------------

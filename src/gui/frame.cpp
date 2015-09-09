@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013, 2015 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -3464,14 +3464,21 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     bool default_to_2D_data = ( is_2D_data_available && this->system->GetArenaDimensionality()==2
                                 && !this->render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
                                 && !this->render_settings.GetProperty("show_phase_plot").GetBool() );
+    bool is_3D_surface_available = this->system->GetArenaDimensionality() == 3;
 
-    RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data);
+    RecordingDialog dlg(this,is_2D_data_available,are_multiple_chemicals_available,default_to_2D_data,is_3D_surface_available);
     if(dlg.ShowModal()!=wxID_OK) return;
     this->recording_prefix = dlg.recording_prefix;
     this->recording_extension = dlg.recording_extension;
     this->record_data_image = dlg.record_data_image;
     this->record_all_chemicals = dlg.record_all_chemicals;
-        
+
+    if (dlg.record_3D_surface) // temporary measure
+    {
+        wxMessageBox(_("Not yet supported."));
+        return;
+    }
+
     this->iRecordingFrame = 0;
     this->is_recording = true;
 }
