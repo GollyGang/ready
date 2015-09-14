@@ -45,6 +45,7 @@ namespace ID
         AddMyPatterns,
         ImportMesh,
         ExportMesh,
+        ImportImage,
         ExportImage,
         SaveCompact,
 

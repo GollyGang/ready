@@ -27,6 +27,7 @@
 #include "vtk_pipeline.hpp"
 #include "dialogs.hpp"
 #include "RecordingDialog.hpp"
+#include "ImportImageDialog.hpp"
 
 // readybase:
 #include <utils.hpp>
@@ -118,6 +119,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(ID::SaveCompact, MyFrame::OnSaveCompact)
     EVT_MENU(ID::ImportMesh, MyFrame::OnImportMesh)
     EVT_MENU(ID::ExportMesh, MyFrame::OnExportMesh)
+    EVT_MENU(ID::ImportImage, MyFrame::OnImportImage)
+    EVT_UPDATE_UI(ID::ImportImage, MyFrame::OnUpdateImportImage)
     EVT_MENU(ID::ExportImage, MyFrame::OnExportImage)
     EVT_UPDATE_UI(ID::ExportImage, MyFrame::OnUpdateExportImage)
     EVT_MENU(ID::Screenshot, MyFrame::OnScreenshot)
@@ -333,6 +336,8 @@ void MyFrame::InitializeMenus()
         menu->AppendSeparator();
         menu->Append(ID::ImportMesh, _("Import Mesh...") + GetAccelerator(DO_IMPORTMESH), _("Import a mesh"));
         menu->Append(ID::ExportMesh, _("Export Mesh...") + GetAccelerator(DO_EXPORTMESH), _("Export the mesh"));
+        menu->AppendSeparator();
+        menu->Append(ID::ImportImage, _("Import Image...") + GetAccelerator(DO_IMPORTIMAGE), _("Import the image"));
         menu->Append(ID::ExportImage, _("Export Image...") + GetAccelerator(DO_EXPORTIMAGE), _("Export the image"));
         menu->AppendSeparator();
         menu->Append(wxID_SAVE, _("Save Pattern...") + GetAccelerator(DO_SAVE), _("Save the current pattern"));
@@ -2638,6 +2643,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::ReloadFromDisk,            DO_RELOAD);
         SetAccelerator(mbar, ID::ImportMesh,                DO_IMPORTMESH);
         SetAccelerator(mbar, ID::ExportMesh,                DO_EXPORTMESH);
+        SetAccelerator(mbar, ID::ImportImage,               DO_IMPORTIMAGE);
         SetAccelerator(mbar, ID::ExportImage,               DO_EXPORTIMAGE);
         SetAccelerator(mbar, wxID_SAVE,                     DO_SAVE);
         SetAccelerator(mbar, ID::SaveCompact,               DO_SAVECOMPACT);
@@ -2714,6 +2720,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_RELOAD:         cmdid = ID::ReloadFromDisk; break;
         case DO_IMPORTMESH:     cmdid = ID::ImportMesh; break;
         case DO_EXPORTMESH:     cmdid = ID::ExportMesh; break;
+        case DO_IMPORTIMAGE:    cmdid = ID::ImportImage; break;
         case DO_EXPORTIMAGE:    cmdid = ID::ExportImage; break;
         case DO_SAVE:           cmdid = wxID_SAVE; break;
         case DO_SAVECOMPACT:    cmdid = ID::SaveCompact; break;
@@ -3320,6 +3327,26 @@ void MyFrame::SaveCurrentMesh(const wxString& mesh_filename)
 void MyFrame::OnReloadFromDisk(wxCommandEvent &event)
 {
     this->OpenFile(this->system->GetFilename());
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnImportImage(wxCommandEvent &event)
+{
+    ImportImageDialog dlg(this, 
+                          this->system->GetNumberOfChemicals(),
+                          this->render_settings.GetProperty("low").GetFloat(),
+                          this->render_settings.GetProperty("high").GetFloat());
+    if (dlg.ShowModal() != wxID_OK) return;
+    // TODO: read the image, convert to greyscale, overwrite the selected chemical
+    wxMessageBox(_("Not yet implemented."));
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateImportImage(wxUpdateUIEvent& event)
+{
+    event.Enable(this->system->GetArenaDimensionality() == 2);
 }
 
 // ---------------------------------------------------------------------

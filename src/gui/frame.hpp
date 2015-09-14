@@ -97,6 +97,8 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnPreferences(wxCommandEvent& event);
         void OnImportMesh(wxCommandEvent& event);
         void OnExportMesh(wxCommandEvent& event);
+        void OnImportImage(wxCommandEvent& event);
+        void OnUpdateImportImage(wxUpdateUIEvent& event);
         void OnExportImage(wxCommandEvent& event);
         void OnUpdateExportImage(wxUpdateUIEvent& event);
         void OnQuit(wxCommandEvent& event);

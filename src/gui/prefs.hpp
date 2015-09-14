@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2013, 2015 The Ready Bunch
 
     This file is part of Ready.
 
@@ -102,6 +102,7 @@ typedef enum
     DO_FIT,                      // fit pattern
     DO_FULLSCREEN,               // full screen
     DO_GENPATT,                  // generate pattern
+    DO_IMPORTIMAGE,              // import an image...
     DO_IMPORTMESH,               // import a mesh...
     DO_NEWPATT,                  // new pattern
     DO_OPENPATT,                 // open pattern...
