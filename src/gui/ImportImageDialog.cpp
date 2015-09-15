@@ -46,7 +46,7 @@ ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float 
 
     wxBoxSizer* hbox1 = new wxBoxSizer(wxHORIZONTAL);
     {
-        this->filename_edit = new wxTextCtrl(this, wxID_ANY);
+        this->filename_edit = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
         this->filename_edit->SetMinSize(wxSize(400, -1));
         hbox1->Add(this->filename_edit, 1, wxEXPAND | wxRIGHT, 10);
         wxButton *change_folder_button = new wxButton(this, wxID_ANY, _("..."));
@@ -128,16 +128,30 @@ void ImportImageDialog::OnChangeFilename(wxCommandEvent& event)
 
 bool ImportImageDialog::TransferDataFromWindow()
 {
+    const wxString errorCaption = _("Error in dialog");
+    const int errorStyle = wxOK | wxCENTRE | wxICON_ERROR;
     this->image_filename = this->filename_edit->GetValue();
+    if (this->image_filename.IsEmpty()) {
+        wxMessageBox(_("No filename entered."), errorCaption, errorStyle);
+        return false;
+    }
     this->iTargetChemical = this->chemical_combo->GetSelection();
-    if (!this->in_low_edit->GetValue().ToDouble(&this->in_low))
+    if (!this->in_low_edit->GetValue().ToDouble(&this->in_low)) {
+        wxMessageBox(_("Cannot convert value to number."), errorCaption, errorStyle);
         return false;
-    if (!this->in_high_edit->GetValue().ToDouble(&this->in_high))
+    }
+    if (!this->in_high_edit->GetValue().ToDouble(&this->in_high)) {
+        wxMessageBox(_("Cannot convert value to number."), errorCaption, errorStyle);
         return false;
-    if (!this->out_low_edit->GetValue().ToDouble(&this->out_low))
+    }
+    if (!this->out_low_edit->GetValue().ToDouble(&this->out_low)) {
+        wxMessageBox(_("Cannot convert value to number."), errorCaption, errorStyle);
         return false;
-    if (!this->out_high_edit->GetValue().ToDouble(&this->out_high))
+    }
+    if (!this->out_high_edit->GetValue().ToDouble(&this->out_high)) {
+        wxMessageBox(_("Cannot convert value to number."), errorCaption, errorStyle);
         return false;
+    }
     return true;
 }
 
