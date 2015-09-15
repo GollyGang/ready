@@ -23,8 +23,6 @@ before 0.x release:
 - NKS rules from pp 163-166
 - floating-point speed reporting
 - progress indicator on loading large patterns
-- image import (user can specify how colors map onto chemicals), import Robert's patterns?
-  (cool use: error-diffusion for binarizing grayscale: http://youtu.be/xoJDTPRqI6o)
 - programmable colouring (R,G,B channels, or something that uses less memory (second opencl pass?))
 - add Help files for Info Panel, etc.?
 - progress indicator for mesh generators?
