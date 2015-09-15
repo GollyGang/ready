@@ -64,6 +64,7 @@ class ImageRD : public AbstractRD
 
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
+        virtual void SetFrom2DImage(int iChemical, vtkImageData *im);
         virtual bool Is2DImageAvailable() const { return true; }
 
         virtual float GetValue(float x,float y,float z,const Properties& render_settings);

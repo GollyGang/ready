@@ -62,11 +62,18 @@
 using namespace std;
 
 // VTK:
+#include <vtkBMPReader.h>
 #include <vtkCellArray.h>
 #include <vtkCellPicker.h>
+#include <vtkImageLuminance.h>
+#include <vtkImageReader2.h>
+#include <vtkImageResize.h>
+#include <vtkImageShiftScale.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkJPEGReader.h>
 #include <vtkJPEGWriter.h>
 #include <vtkOBJReader.h>
+#include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -3338,15 +3345,50 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
                           this->render_settings.GetProperty("low").GetFloat(),
                           this->render_settings.GetProperty("high").GetFloat());
     if (dlg.ShowModal() != wxID_OK) return;
-    // TODO: read the image, convert to greyscale, overwrite the selected chemical
-    wxMessageBox(_("Not yet implemented."));
+
+    wxString ext = wxFileName(dlg.image_filename).GetExt();
+    vtkSmartPointer<vtkImageReader2> reader;
+    if (ext.IsSameAs("png", false)) reader = vtkSmartPointer<vtkPNGReader>::New();
+    else if (ext.IsSameAs("jpg", false) || ext.IsSameAs("jpeg", false)) reader = vtkSmartPointer<vtkJPEGReader>::New();
+    else if (ext.IsSameAs("bmp", false)) reader = vtkSmartPointer<vtkBMPReader>::New();
+    else {
+        wxMessageBox(_("Unsupported extension: ") + ext, _("Error reading image file"), wxICON_ERROR);
+        return;
+    }
+    reader->SetFileName(dlg.image_filename.c_str());
+
+    // for now we convert the image to grayscale
+    vtkSmartPointer<vtkImageLuminance> to_gray = vtkSmartPointer<vtkImageLuminance>::New();
+    to_gray->SetInputConnection(reader->GetOutputPort());
+
+    // apply the maths requested
+    vtkSmartPointer<vtkImageShiftScale> to_range = vtkSmartPointer<vtkImageShiftScale>::New();
+    to_range->SetInputConnection(to_gray->GetOutputPort());
+    float scale = (dlg.out_high - dlg.out_low) / (dlg.in_high - dlg.in_low);
+    float shift = dlg.out_low / scale - dlg.in_low;
+    to_range->SetShift(shift);
+    to_range->SetScale(scale);
+    to_range->SetOutputScalarType(this->system->GetDataType());
+
+    // scale to the correct size
+    vtkSmartPointer<vtkImageResize> resize = vtkSmartPointer<vtkImageResize>::New();
+    resize->SetInputConnection(to_range->GetOutputPort());
+    resize->SetOutputDimensions(this->system->GetX(), this->system->GetY(), this->system->GetZ());
+    // TODO: obey 3D slice direction when resizing a 2D image for a 3D volume?
+    resize->Update();
+
+    // overwrite the requested chemical
+    this->system->SetFrom2DImage(dlg.iTargetChemical, resize->GetOutput());
+
+    this->is_running = false;
+    this->UpdateWindows();
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnUpdateImportImage(wxUpdateUIEvent& event)
 {
-    event.Enable(this->system->GetArenaDimensionality() == 2);
+    event.Enable(this->system->Is2DImageAvailable());
 }
 
 // ---------------------------------------------------------------------

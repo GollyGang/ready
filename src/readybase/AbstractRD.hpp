@@ -137,7 +137,9 @@ class AbstractRD
 
         /// Retrieve the current 2D plane as a vtkImageData.
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const =0;
-        /// Indicates whether GetAs2DImage() can be called. 
+        /// Sets the values for a certain chemical from an image
+        virtual void SetFrom2DImage(int iChemical, vtkImageData *im) = 0;
+        /// Indicates whether GetAs2DImage() and SetFrom2DImage() can be called. 
         virtual bool Is2DImageAvailable() const =0;
 
         /// Retreive the dimensionality of the system volume, irrespective of the cells within it.

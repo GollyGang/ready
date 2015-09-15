@@ -1373,6 +1373,23 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
 
 // --------------------------------------------------------------------------------
 
+void ImageRD::SetFrom2DImage(int iChemical, vtkImageData *im)
+{
+    if (this->images.front()->GetDimensions()[0] != im->GetDimensions()[0] ||
+        this->images.front()->GetDimensions()[1] != im->GetDimensions()[1] ||
+        this->images.front()->GetDimensions()[2] != im->GetDimensions()[2] ||
+        im->GetPointData()->GetNumberOfComponents() != 1 ||
+        im->GetPointData()->GetNumberOfArrays() != 1) 
+    {
+           throw runtime_error("ImageRD::SetFrom2DImage : size mismatch");
+    }
+    this->images[iChemical]->GetPointData()->DeepCopy(im->GetPointData());
+    this->images[iChemical]->Modified();
+    this->undo_stack.clear();
+}
+
+// --------------------------------------------------------------------------------
+
 float ImageRD::GetValue(float x,float y,float z,const Properties& render_settings)
 {
     const int X = this->images.front()->GetDimensions()[0];

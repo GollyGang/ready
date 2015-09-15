@@ -20,7 +20,9 @@
 #include "dialogs.hpp"
 #include "IDs.hpp"
 #include "prefs.hpp"
-#include "utils.hpp"
+
+// readybase:
+#include <utils.hpp>
 
 // wxWidgets:
 #include <wx/filename.h>
@@ -53,6 +55,8 @@ ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float 
         change_folder_button->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ImportImageDialog::OnChangeFilename, this);
         hbox1->Add(change_folder_button, 0, wxLEFT | wxRIGHT, 0);
     }
+
+    wxStaticText* convert_label = new wxStaticText(this, wxID_STATIC, _("(will be converted to grayscale if not already)"));
 
     wxBoxSizer* hbox2 = new wxBoxSizer(wxHORIZONTAL);
     {
@@ -97,6 +101,7 @@ ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float 
     vbox->AddSpacer(12);
     vbox->Add(source_label, 0, wxLEFT | wxRIGHT, 10);
     vbox->Add(hbox1, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
+    vbox->Add(convert_label, 0, wxLEFT | wxRIGHT, 10);
     vbox->AddSpacer(10);
     vbox->Add(hbox2, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
     vbox->AddSpacer(10);
@@ -116,7 +121,7 @@ void ImportImageDialog::OnChangeFilename(wxCommandEvent& event)
                          _("Choose an image file to import"),
                          wxEmptyString,
                          wxEmptyString,
-                         _("Image files (*.jpg;*.png)|*.jpg;*.jpeg;*.png"),
+                         _("Image files (*.jpg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp"),
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     if (opendlg.ShowModal() != wxID_OK) 
         return;

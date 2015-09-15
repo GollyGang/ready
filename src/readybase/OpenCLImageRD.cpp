@@ -140,6 +140,14 @@ void OpenCLImageRD::CopyFromImage(vtkImageData* im)
 
 // ----------------------------------------------------------------------------------------------------------------
 
+void OpenCLImageRD::SetFrom2DImage(int iChemical, vtkImageData *im)
+{
+    ImageRD::SetFrom2DImage(iChemical, im);
+    this->need_write_to_opencl_buffers = true;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::GenerateInitialPattern()
 {
     ImageRD::GenerateInitialPattern();

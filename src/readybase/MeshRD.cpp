@@ -929,7 +929,14 @@ void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) c
 
 // ---------------------------------------------------------------------
 
-float MeshRD::GetValue(float x,float y,float z,const Properties& render_settings)
+void MeshRD::SetFrom2DImage(int iChemical, vtkImageData *im)
+{
+    throw runtime_error("MeshRD::SetFrom2DImage() : no 2D image available");
+}
+
+// ---------------------------------------------------------------------
+
+float MeshRD::GetValue(float x, float y, float z, const Properties& render_settings)
 {
     this->CreateCellLocatorIfNeeded();
 
