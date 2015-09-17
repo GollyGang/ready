@@ -279,6 +279,7 @@ set( OTHER_FILES
   resources/Cursors/pencil-cursor.png
   resources/Cursors/brush-cursor.png
   resources/Cursors/picker-cursor.png
+  Scripts/Blender/import_obj_sequence.py
 )
 
 #-------------------------------------------VTK----------------------------------------------
