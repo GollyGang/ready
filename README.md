@@ -12,8 +12,8 @@ Download Ready 0.7 here:
 
 We're working on the next version, which includes two new features:
   * Import of images, so you can use a photo as the initial conditions of a pattern
-  * Export of a sequence of OBJ files, for animating a 3D mesh.
-For now these features are only in the [0.7.2 release](https://github.com/GollyGang/ready/releases) or later 
+  * Export of a sequence of OBJ files, for animating a 3D mesh.<br>
+For now these features are only in the [0.7.2 release](https://github.com/GollyGang/ready/releases) or later.
 
 More details on the [releases tab](https://github.com/GollyGang/ready/releases).
 
