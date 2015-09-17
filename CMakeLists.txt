@@ -125,6 +125,7 @@ set( PATTERN_FILES
   Patterns/CPU-only/grayscott_2D.vti 
   Patterns/CPU-only/grayscott_3D.vti
   Patterns/FitzHugh-Nagumo/tip-splitting.vti 
+  Patterns/FitzHugh-Nagumo/tip-splitting_3D.vti
   Patterns/FitzHugh-Nagumo/spiral_turbulence.vti
   Patterns/FitzHugh-Nagumo/pulsate.vti 
   Patterns/FitzHugh-Nagumo/squid_axon.vti
