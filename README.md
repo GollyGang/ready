@@ -10,6 +10,11 @@ Download Ready 0.7 here:
   * [Linux 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-32bit.zip))
   * [Source](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Source.zip)
 
+We're working on the next version, which includes two new features:
+  * Import of images, so you can use a photo as the initial conditions of a pattern
+  * Export of a sequence of OBJ files, for animating a 3D mesh.
+For now these features are only in the [0.7.2 release](https://github.com/GollyGang/ready/releases) or later 
+
 More details on the [releases tab](https://github.com/GollyGang/ready/releases).
 
 [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
