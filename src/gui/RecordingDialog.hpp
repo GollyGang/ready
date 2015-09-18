@@ -43,6 +43,8 @@ class RecordingDialog : public wxDialog
         bool record_data_image;
         bool record_all_chemicals;
         bool record_3D_surface;
+        bool should_decimate;
+        double target_reduction;
 
     protected:
 
@@ -60,6 +62,8 @@ class RecordingDialog : public wxDialog
         wxComboBox *extension_combo;
         wxTextCtrl *folder_edit;
         wxTextCtrl *filename_prefix_edit;
+        wxCheckBox *should_decimate_check;
+        wxTextCtrl *target_reduction_edit;
 
     private:
 

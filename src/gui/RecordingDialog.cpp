@@ -85,6 +85,19 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
         this->extension_combo->SetSelection(0);
         hbox2->Add(this->extension_combo,0,wxLEFT | wxRIGHT,0);
     }
+
+    wxBoxSizer* hbox3 = new wxBoxSizer(wxHORIZONTAL);
+    {
+        this->should_decimate_check = new wxCheckBox(this, wxID_ANY, _("Reduce triangle count to"));
+        this->should_decimate_check->SetValue(true);
+        this->should_decimate_check->Enable(false);
+        hbox3->Add(this->should_decimate_check, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10);
+        this->target_reduction_edit = new wxTextCtrl(this, wxID_ANY, _("20"));
+        this->target_reduction_edit->Enable(false);
+        hbox3->Add(this->target_reduction_edit, 0, wxRIGHT, 10);
+        hbox3->Add(new wxStaticText(this, wxID_STATIC, _("%")), 0, wxALIGN_CENTER_VERTICAL, 10);
+    }
+
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
     
     // position the controls
@@ -105,6 +118,8 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
     vbox->AddSpacer(10);
     vbox->Add(filenames_label, 0, wxLEFT | wxRIGHT, 10);
     vbox->Add(hbox2, 0, wxEXPAND | wxLEFT | wxRIGHT, 10);
+    vbox->AddSpacer(12);
+    vbox->Add(hbox3, 0, wxLEFT | wxRIGHT, 10);
     vbox->AddSpacer(12);
     vbox->Add(buttbox, 1, wxGROW | wxTOP | wxBOTTOM, 10);
 
@@ -133,6 +148,8 @@ bool RecordingDialog::Validate()
             return false;
         }
     }
+    if (!this->target_reduction_edit->GetValue().ToDouble(&this->target_reduction))
+        return false;
     return wxDialog::Validate();
 }
     
@@ -146,6 +163,8 @@ bool RecordingDialog::TransferDataFromWindow()
     this->record_3D_surface = (this->source_combo->GetValue() == this->source_3D_surface);
     recordingdir = this->folder_edit->GetValue(); // save folder in prefs
     this->recording_prefix = string(this->folder_edit->GetValue().mb_str()) + "/" + string(this->filename_prefix_edit->GetValue().mb_str());
+    this->should_decimate = this->should_decimate_check->GetValue();
+    this->target_reduction_edit->GetValue().ToDouble(&this->target_reduction);
     // TODO: save other settings in prefs too, if wanted
     return true;
 }
@@ -168,11 +187,15 @@ void RecordingDialog::OnSourceSelectionChange(wxCommandEvent& event)
     {
         this->extension_combo->AppendString(_(".obj"));
         this->extension_combo->AppendString(_(".vtp"));
+        this->should_decimate_check->Enable(true);
+        this->target_reduction_edit->Enable(true);
     }
     else
     {
         this->extension_combo->AppendString(_(".png"));
         this->extension_combo->AppendString(_(".jpg"));
+        this->should_decimate_check->Enable(false);
+        this->target_reduction_edit->Enable(false);
     }
     this->extension_combo->SetSelection(0);
 }

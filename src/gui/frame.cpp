@@ -77,6 +77,8 @@ using namespace std;
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkQuadricDecimation.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
@@ -3267,15 +3269,30 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
         _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (mesh_filename.empty()) return; // user cancelled
 
-    SaveCurrentMesh(mesh_filename);
+    SaveCurrentMesh(mesh_filename,false,0.0);
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::SaveCurrentMesh(const wxString& mesh_filename)
+void MyFrame::SaveCurrentMesh(const wxString& mesh_filename, bool should_decimate, double targetReduction)
 {
-    vtkSmartPointer<vtkPolyData> pd = vtkSmartPointer<vtkPolyData>::New();
-    this->system->GetAsMesh(pd,this->render_settings);
+    vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
+    this->system->GetAsMesh(mesh,this->render_settings);
+
+    if (should_decimate)
+    {
+        vtkSmartPointer<vtkQuadricDecimation> dec = vtkSmartPointer<vtkQuadricDecimation>::New();
+        dec->SetInputData(mesh);
+        dec->SetTargetReduction(targetReduction);
+        dec->Update();
+        mesh->DeepCopy(dec->GetOutput());
+    }
+
+    vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+    normals->SetInputData(mesh);
+    normals->SplittingOff();
+    normals->Update();
+    vtkPolyData* pd = normals->GetOutput();
 
     if(mesh_filename.EndsWith(_T("obj")))
     {
@@ -3459,8 +3476,8 @@ void MyFrame::RecordFrame()
     {
         // save the 3D mesh
         oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
-        SaveCurrentMesh(wxString(oss.str().c_str()));
-    }
+        SaveCurrentMesh(wxString(oss.str().c_str()), this->recording_should_decimate, this->recording_target_reduction);
+    } 
     else
     {
         vtkSmartPointer<vtkImageWriter> writer;
@@ -3559,6 +3576,8 @@ void MyFrame::OnRecordFrames(wxCommandEvent &event)
     this->record_data_image = dlg.record_data_image;
     this->record_all_chemicals = dlg.record_all_chemicals;
     this->record_3D_surface = dlg.record_3D_surface;
+    this->recording_should_decimate = dlg.should_decimate;
+    this->recording_target_reduction = 1.0 - dlg.target_reduction / 100.0; // convert from target percentage to proportion reduction
 
     this->iRecordingFrame = 0;
     this->is_recording = true;

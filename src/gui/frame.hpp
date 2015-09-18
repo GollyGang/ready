@@ -207,7 +207,7 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
-        void SaveCurrentMesh(const wxString& mesh_filename);
+        void SaveCurrentMesh(const wxString& mesh_filename, bool should_decimate, double targetReduction);
 
     private:
 
@@ -245,9 +245,10 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool speed_data_available;
 
         // used when recording frames to disk
-        bool is_recording,record_data_image,record_all_chemicals,record_3D_surface;
+        bool is_recording,record_data_image,record_all_chemicals,record_3D_surface,recording_should_decimate;
         std::string recording_prefix,recording_extension;
         int iRecordingFrame;
+        float recording_target_reduction;
 
         static const int MAX_TIMESTEPS_PER_RENDER = 1e8;
 
