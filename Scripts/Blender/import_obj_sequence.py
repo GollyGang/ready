@@ -32,9 +32,12 @@
 import bpy
 import glob
 
-path = 'c:/Tim/Ready_frames/*.obj'      # <------- Change this to the folder with your OBJ files
+path = 'c:/Ready_frames/*.obj'      # <------- Change this to the folder with your OBJ files
 
 obj_files = glob.glob( path )
+
+if len(obj_files)==0:
+    print('ERROR: No files in path: ' + path)
 
 for iObj,fn in enumerate(obj_files):
 
