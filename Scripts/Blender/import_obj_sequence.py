@@ -21,9 +21,11 @@
 
 # Usage:
 # In Blender, change one of the panels into a Text Editor (using the icon on the left with the up/down arrow)
-# Hit 'New', paste in the script, and hit 'Run Script'
-# It should load all the OBJ files it found and make them visible in sequence.
-# (If the script gives errors, use Window > Toggle System Console to see them)
+# Hit 'New' and paste in the script.
+# Edit the 'path' string to be the folder where your OBJ files live.
+# Hit 'Run Script'
+# It should load all the OBJ files it found and add keyframes for them.
+# (If the script gives errors, use Window > Toggle System Console to see them.)
 # Hit the 'Play animation' button in the Timeline panel and your mesh should start animating.
 # Set up the camera and lighting and use Render > Render animation.
 
@@ -38,6 +40,11 @@ obj_files = glob.glob( path )
 
 if len(obj_files)==0:
     print('ERROR: No files in path: ' + path)
+    
+if bpy.data.materials.get("Material") is not None:
+    mat = bpy.data.materials["Material"]
+else:
+    mat = bpy.data.materials.new(name="Material")
 
 for iObj,fn in enumerate(obj_files):
 
@@ -59,3 +66,6 @@ for iObj,fn in enumerate(obj_files):
     ob.keyframe_insert(data_path="hide", frame=iKeyFrame-1)
     ob.keyframe_insert(data_path="hide_render", frame=iKeyFrame+1)
     ob.keyframe_insert(data_path="hide", frame=iKeyFrame+1)
+
+    # assign the same material to all frames
+    ob.data.materials.append(mat)
