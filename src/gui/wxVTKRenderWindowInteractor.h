@@ -95,7 +95,7 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
                                 const wxSize &size = wxDefaultSize,
                                 long style = wxWANTS_CHARS | wxNO_FULL_REPAINT_ON_RESIZE,
                                 const wxString &name = wxPanelNameStr);
-    vtkTypeRevisionMacro(wxVTKRenderWindowInteractor,vtkRenderWindowInteractor);
+    vtkTypeMacro(wxVTKRenderWindowInteractor,vtkRenderWindowInteractor);
     static wxVTKRenderWindowInteractor * New();
     void PrintSelf(ostream& os, vtkIndent indent);
 

@@ -61,7 +61,7 @@ void MeshGenerators::GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid *m
 
     // push the vertices out into the shape of a sphere
     const float scale = 100.0f; // we make the sphere larger to make <pixel> access more useful
-    vtkFloatingPointType p[3];
+    double p[3];
     for(int i=0;i<mesh->GetNumberOfPoints();i++)
     {
         mesh->GetPoint(i,p);

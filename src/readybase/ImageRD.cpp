@@ -531,7 +531,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     
     float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
 
-    vtkFloatingPointType offset[3] = {0,0,0};
+    double offset[3] = {0,0,0};
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -871,7 +871,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     if(slice_3D)
     {
         vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-        vtkFloatingPointType *bounds = image->GetBounds();
+        double *bounds = image->GetBounds();
         plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
                          slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
                          slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);

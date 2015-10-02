@@ -402,7 +402,23 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-if( ${VTK_MAJOR_VERSION} GREATER 5 )
+if( ${VTK_MAJOR_VERSION} GREATER 5 AND ${VTK_MINOR_VERSION} GREATER 2)
+  target_link_libraries( 
+    readybase 
+    vtkCommonCore 
+    vtkFiltersExtraction
+    vtkFiltersGeometry
+    vtkFiltersModeling
+    vtkFiltersTexture
+    vtkInteractionStyle
+    vtkIOImage 
+    vtkIOXML 
+    vtkRenderingCore 
+    vtkRenderingAnnotation 
+    vtkRenderingFreeType 
+    vtkRenderingOpenGL 
+  )
+elseif( ${VTK_MAJOR_VERSION} GREATER 5 )
   target_link_libraries( 
     readybase 
     vtkCommonCore 

@@ -152,7 +152,7 @@ void MeshRD::GenerateInitialPattern()
 
     vtkIdType npts,*pts;
     float cp[3];
-    vtkFloatingPointType *bounds = this->mesh->GetBounds();
+    double *bounds = this->mesh->GetBounds();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
         this->mesh->GetCellPoints(iCell,npts,pts);
@@ -411,7 +411,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     if(slice_3D)
     {
         vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-        vtkFloatingPointType *bounds = this->mesh->GetBounds();
+        double *bounds = this->mesh->GetBounds();
         plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
                          slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
                          slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
@@ -910,8 +910,8 @@ void MeshRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) cons
 
 int MeshRD::GetArenaDimensionality() const
 {
-    vtkFloatingPointType epsilon = 1e-4;
-    vtkFloatingPointType *bounds = this->mesh->GetBounds();
+    double epsilon = 1e-4;
+    double *bounds = this->mesh->GetBounds();
     int dimensionality = 0;
     for(int xyz=0;xyz<3;xyz++)
         if(bounds[xyz*2+1]-bounds[xyz*2+0] > epsilon)
