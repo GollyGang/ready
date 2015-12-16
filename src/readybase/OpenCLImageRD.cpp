@@ -44,6 +44,14 @@ OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device,int data_type
 
 // ----------------------------------------------------------------------------------------------------------------
 
+OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device, cl_context externalContext)
+    : ImageRD(data_type)
+	, OpenCL_MixIn(opencl_platform,opencl_device,externalContext)
+{
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
@@ -220,6 +228,16 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::ReadFromOpenCLBuffers : buffer reading failed: ");
     }
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+{
+  // read from opencl buffers into our image
+	const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+	cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][chemical_id], CL_TRUE, 0, MEM_SIZE, dest, 0, NULL, NULL);
+  //throwOnError(ret,"OpenCLImageRD::GetFromOpenCLBuffers : buffer reading failed: ");
 }
 
 // ----------------------------------------------------------------------------------------------------------------

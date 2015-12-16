@@ -28,7 +28,8 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
     public:
 
         OpenCLImageRD(int opencl_platform,int opencl_device,int data_type);
-
+		OpenCLImageRD(int opencl_platform,int opencl_device, cl_context externalContext);
+		
         virtual bool HasEditableFormula() const { return true; }
 
         virtual void GenerateInitialPattern();
@@ -45,7 +46,8 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual void Undo();
         virtual void Redo();
-
+		virtual void GetFromOpenCLBuffers( float* dest, int chemical_id );
+		
     protected:
 
         virtual void CopyFromImage(vtkImageData* im);

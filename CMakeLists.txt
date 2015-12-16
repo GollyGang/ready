@@ -38,6 +38,15 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
+set( PLUGIN_BUILD "NO" CACHE BOOL "Set this to True to switch to building the readybase library for use with plugins. Please note: the regular GUI binaries 'ready' and 'rdy' will NOT be built when this mode is selected." )
+
+set( PLUGIN_HOUDINI_NAME readyHoudini ) # houdini plugin
+
+set( MAKE_LINKABLE_LIB ${PLUGIN_BUILD} )
+if( MAKE_LINKABLE_LIB )
+	add_definitions( -D__EXTERNAL_OPENCL__ )
+endif()
+
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
@@ -85,6 +94,10 @@ include_directories( src/gui )
 
 set( CMD_SOURCES      # code used for the command-line version
   src/cmd/main.cpp
+)
+
+set( PLUGIN_HOUDINI_SOURCES
+	src/plugin/houdini/readyHoudini.C
 )
 
 set( RESOURCES
@@ -387,6 +400,9 @@ if( USE_SSE )
     endif()
   else()
     add_definitions( -msse2 -ffast-math )
+	if( MAKE_LINKABLE_LIB )
+		add_definitions( -fPIC )
+	endif()
   endif()
   add_definitions( -DUSE_SSE )
 endif()
@@ -416,7 +432,8 @@ if( ${VTK_MAJOR_VERSION} GREATER 5 AND ${VTK_MINOR_VERSION} GREATER 2)
     vtkRenderingCore 
     vtkRenderingAnnotation 
     vtkRenderingFreeType 
-    vtkRenderingOpenGL 
+#    vtkRenderingOpenGL 
+    vtkRenderingOpenGL2 
   )
 elseif( ${VTK_MAJOR_VERSION} GREATER 5 )
   target_link_libraries( 
@@ -432,19 +449,31 @@ elseif( ${VTK_MAJOR_VERSION} GREATER 5 )
     vtkRenderingCore 
     vtkRenderingAnnotation 
     vtkRenderingFreeType 
-    vtkRenderingFreeTypeOpenGL 
+	vtkRenderingOpenGL
+#    vtkRenderingFreeTypeOpenGL 
   )
 else()
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
 endif()
 
-# create command-line utility
-add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase )
+# The build for the linked library for houdini plugin linkage doesn't link nicely
+# with the cmdline or gui builds, so if plugin-build mode is enabled, omit them.
+if( NOT PLUGIN_BUILD )
+	# create command-line utility
+	add_executable( ${CMD_NAME} ${CMD_SOURCES} )
+	target_link_libraries( ${CMD_NAME} readybase )
 
-# create GUI application
-add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
-target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
+	# create GUI application
+	add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
+	target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
+else()
+	# Untested switch to .dll extension for windows.
+	# if ( UNIX OR APPLE )
+	# 	add_library( ${PLUGIN_HOUDINI_NAME}.so SHARED ${PLUGIN_HOUDINI_SOURCES} )
+	# else( WIN32 )
+	# 	add_library( ${PLUGIN_HOUDINI_NAME}.dll SHARED ${PLUGIN_HOUDINI_SOURCES} )
+	# endif()
+endif()
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
@@ -472,6 +501,101 @@ if( CMAKE_COMPILER_IS_GNUCXX )
   set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl" )                 # allow dynamic linking (found needed on Gentoo)
 endif()
 
+#-------------------------------------------Build_Plugin(s)-------------------------------------------
+
+if( PLUGIN_BUILD )
+	# Build ALL the PLUGINS!!!!!
+	# Just houdini for now, but other builds would be most welcome!
+	
+	# Example hcustom command to build the plugin (which worked at least once!):
+	# hcustom src/plugin/houdini/readyHoudini.C -g -lOpenCL -Isrc/readybase -I/usr/include/vtk-6.1 -L~/dev/vtk/vtk.git/lib -L./ -lreadybase -lvtkCommonCore -lvtkIOXML -lvtkInteractionStyle -lvtkRenderingFreeType -lvtkRenderingOpenGL
+
+	# Please Note: To see debug logging while houdini tries to load the dso, set this environment variable to true:
+	#   HOUDINI_DSO_ERROR=1
+			
+	# Set the project name:
+	project( ${PLUGIN_HOUDINI_NAME} )
+	
+	# Include a houdini-finding cmake module: HoudiniConfig.cmake (C/o Dan Bethell).
+	set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Ready_SOURCE_DIR}/src/plugin/houdini )
+	find_package( Houdini )
+	
+	include_directories( ${Houdini_INCLUDE_DIR} )
+	# message( "Houdini_INCLUDE_DIR is: " ${Houdini_INCLUDE_DIR} )
+	
+    include_directories( ${HDK_INCLUDE_DIRS} )
+	link_directories( ${HDK_LIBRARY_DIRS} )	
+	# include( ${VTK_USE_FILE} )
+	
+	# Use SideFx's hcustom command to save compiler & linker flags into variables
+	execute_process(COMMAND hcustom -c
+                	OUTPUT_VARIABLE HOUDINI_COMPILE_FLAGS
+                	OUTPUT_STRIP_TRAILING_WHITESPACE)
+					
+	# message(STATUS "HOUDINI_COMPILE_FLAGS = ${HOUDINI_COMPILE_FLAGS}")
+
+	execute_process(COMMAND hcustom -m
+                	OUTPUT_VARIABLE HOUDINI_LINK_FLAGS
+                	OUTPUT_STRIP_TRAILING_WHITESPACE)
+					
+	# message(STATUS " HOUDINI_LINK_FLAGS = ${HOUDINI_LINK_FLAGS}")
+
+	
+	add_definitions(-DMAKING_DSO
+                -D_BACKWARD_BACKWARD_WARNING_H # this stops the HDK causing a backwards include warning
+                -DFEC_STATIC -DFECS_STATIC
+                -Wno-deprecated)
+
+	if (APPLE)
+		set(LTYPE MODULE)
+	else (APPLE)
+		set(LTYPE SHARED)
+	endif (APPLE)
+
+	# Tell cmake to buid the DSO:
+	add_library( ${PLUGIN_HOUDINI_NAME} ${LTYPE} src/plugin/houdini/readyHoudini.C )
+	
+	target_link_libraries( ${PLUGIN_HOUDINI_NAME} ${VTK_LIBRARIES} )
+	
+	# We get missing symbols in the plugin if we don't make sure that we have vtkRenderingFreeTypeOpenGL linked in readybase:
+	# target_link_libraries( readybase ) # vtkRenderingFreeTypeOpenGL vtkFiltersModeling )
+	# maybe not now ..
+	
+	target_link_libraries( ${PLUGIN_HOUDINI_NAME} readybase ) 
+	# vtkRenderingFreeTypeOpenGL vtkFiltersModeling)
+	target_link_libraries( ${PLUGIN_HOUDINI_NAME} ${VTK_LIBRARIES})
+	
+	# add_definitions( "-lboost_system -L./ -lOpenCL -Isrc/readybase -lreadybase -lvtkCommonCore -lvtkIOXML -lvtkInteractionStyle -lvtkRenderingFreeType -lvtkRenderingOpenGL -lGLU -lGL -lX11 -lXext -lXi" )
+	add_definitions( "-lboost_system -L./ -lOpenCL -lGLU -lGL -lX11 -lXext -lXi" )
+	
+	# Houdini doesn't want the DSO to have "lib" as it's prefix
+	set_target_properties( ${PLUGIN_HOUDINI_NAME} 
+	  PROPERTIES 
+	  OUTPUT_NAME ${PLUGIN_HOUDINI_NAME}
+	  COMPILE_FLAGS "-fdiagnostics-show-option ${HOUDINI_COMPILE_FLAGS} "
+	  # LINK_FLAGS "-lvtkRenderingFreeTypeOpenGL"
+	  PREFIX "")
+
+	# Unfortunately cmake's MODULE library type generates a ".so" file on OSX
+	# although we explicitly switched it to 'SHARED' earlier.. 
+	# this is currently untested on mac platform!!
+	# if (APPLE)
+	#	set_target_properties(${PLUGIN_HOUDINI_NAME} PROPERTIES SUFFIX ".dylib")
+	# endif (APPLE)
+	
+	# Finally, tell cmake where to put the results:
+	message( STATUS "Destination for houdini plugin will be: " $ENV{HIH}/dso )
+	set( CMAKE_INSTALL_MESSAGE ALWAYS )
+	
+	# Install the directory first, as it may not yet exist
+	install(DIRECTORY DESTINATION $ENV{HIH}/dso )
+	
+	set( CMAKE_INSTALL_PREFIX $ENV{HIH} )
+	
+	# Install the shared-object:
+	install(TARGETS ${PLUGIN_HOUDINI_NAME} DESTINATION dso )
+endif()
+
 #----------------------------------------doxygen------------------------------------------------
 
 find_package( Doxygen )
@@ -487,13 +611,17 @@ endif()
 #----------------------------------------install------------------------------------------------
 
 # put Ready in the root of the installation folder instead of in "bin"
-install( TARGETS ${APP_NAME} DESTINATION "." )      # (add ${CMD_NAME} if we want to distribute the command-line version too)
+if( NOT PLUGIN_BUILD )
+	install( TARGETS ${APP_NAME} DESTINATION "." )      # (add ${CMD_NAME} if we want to distribute the command-line version too)
+endif()
 
 # install our source files, resource files, pattern files, help files and text files
-foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${CMD_SOURCES} ${RESOURCES} ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
-  get_filename_component( path_name "${source_file}" PATH )
-  install( FILES "${source_file}" DESTINATION ${path_name} )
-endforeach()
+if( NOT PLUGIN_BUILD )
+	foreach( source_file ${BASE_SOURCES} ${GUI_SOURCES} ${CMD_SOURCES} ${RESOURCES} ${PATTERN_FILES} ${HELP_FILES} ${OTHER_FILES} )
+	  get_filename_component( path_name "${source_file}" PATH )
+	  install( FILES "${source_file}" DESTINATION ${path_name} )
+	endforeach()
+endif()
 
 #----------------------------------------package----------------------------------------------
 

@@ -1544,6 +1544,13 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
 
 // --------------------------------------------------------------------------------
 
+void ImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+{
+	//do nothing for now, TODO (in inheriting classes...), provide an implementation.
+}
+
+// --------------------------------------------------------------------------------
+
 void ImageRD::FlipPaintAction(PaintAction& cca)
 {
     float *pCell = static_cast<float*>(this->GetImage(cca.iChemical)->GetScalarPointer()) + cca.iCell;
