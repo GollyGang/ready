@@ -87,13 +87,15 @@ class AbstractRD
         std::string GetParameterName(int iParam) const;
         float GetParameterValue(int iParam) const;
         float GetParameterValueByName(const std::string& name) const;
+		void SetParameterValueByName(const std::string& name, float value);
+        void QueueReloadFormula();
         bool IsParameter(const std::string& name) const;
         virtual void AddParameter(const std::string& name,float val);
         virtual void DeleteParameter(int iParam);
         virtual void DeleteAllParameters();
         virtual void SetParameterName(int iParam,const std::string& s);
         virtual void SetParameterValue(int iParam,float val);
-
+		
         /// Should the user be asked if they want to save this pattern?
         bool IsModified() const { return this->is_modified; }
         void SetModified(bool m);
@@ -151,6 +153,9 @@ class AbstractRD
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings) =0;
         /// Set the value of all cells within radius r of a given location. The radius is expressed as a proportion of the diagonal of the bounding box.
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) =0;
+#if defined( __EXTERNAL_OPENCL__ )        
+		virtual void GetFromOpenCLBuffers( float* dest, int chemical_id )=0;
+#endif
 
         bool CanUndo() const; ///< Returns true if there is anything to undo.
         bool CanRedo() const; ///< Returns true if there is anything to redo.

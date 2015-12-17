@@ -70,9 +70,27 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     for(int i=0;i<NC;i++)
     {
         kernel_source << "__global " << this->data_type_string << "4 *" << GetChemicalName(i) << "_out";
-        if(i<NC-1)
-            kernel_source << ",";
+        //if(i<NC-1)
+		// always add the comma as the parameters come next:
+        kernel_source << ",";
     }
+	
+	// Test for adding args, this becomes the 11th arg (index 10) in a 5-reagent system:
+	// kernel_source << ", float test_argument";
+	// example to set this:
+		// float testval = 0.0002;
+		// ret = clSetKernelArg(this->kernel, 10, sizeof(float), &testval);
+		
+	// Add all parameters as arguments:
+	for(int i=0;i<(int)this->parameters.size();i++)
+	{
+        kernel_source << this->data_type_string << " " << this->parameters[i].first;
+		if( i < this->parameters.size() - 1 ) 
+		{
+			kernel_source << ", ";
+		}
+	}
+	
     // output the first part of the body
     kernel_source << ")\n{\n" <<
         indent << "const int index_x = get_global_id(0);\n" << 
@@ -212,6 +230,8 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     }
     else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
     {
+		//cout << "VERTEX_NEIGHBORS with laplacian\n";
+		
         const int NDIRS = 8;
         const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw"};
         // output the Laplacian part of the body
@@ -542,9 +562,12 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     for(int iC=0;iC<NC;iC++)
         kernel_source << indent << this->data_type_string << "4 delta_" << GetChemicalName(iC) << " = 0.0" << this->data_type_suffix << ";\n";
     kernel_source << "\n";
+
     // the parameters (assume all float for now)
-    for(int i=0;i<(int)this->parameters.size();i++)
-        kernel_source << indent << this->data_type_string << "4 " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
+	// Now declared as arguments to the kernel above, so they can be changed without recompiling.
+    //for(int i=0;i<(int)this->parameters.size();i++)
+    //    kernel_source << indent << this->data_type_string << "4 " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
+		
     kernel_source << "\n";
     // the formula
     istringstream iss(formula);
@@ -554,6 +577,10 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         getline(iss,s);
         kernel_source << indent << s << "\n";
     }
+	
+	// TEST for extra arg:
+	// kernel_source << indent << "b = b + test_argument;\n";
+	
     // the last part of the kernel
     kernel_source << "\n";
     for(int iC=0;iC<NC;iC++)

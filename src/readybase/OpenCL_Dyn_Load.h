@@ -74,17 +74,18 @@ extern "C" {
     typedef cl_uint             cl_event_info;
     typedef cl_uint             cl_command_type;
     typedef cl_uint             cl_profiling_info;
-
+	
+#ifndef __OPENCL_H
     typedef struct _cl_image_format {
         cl_channel_order        image_channel_order;
         cl_channel_type         image_channel_data_type;
     } cl_image_format;
 
-
     typedef struct _cl_buffer_region {
         size_t                  origin;
         size_t                  size;
     } cl_buffer_region;
+#endif
 
     /**************************************************************************/
 
@@ -978,7 +979,7 @@ extern "C" {
 //
     typedef CL_API_ENTRY void * CL_API_CALL __clGetExtensionFunctionAddress(const char * /* func_name */) CL_API_SUFFIX__VERSION_1_0;
 
-
+#ifndef __OPENCL_H
     extern __clGetPlatformIDs                   *clGetPlatformIDs;
     extern __clGetPlatformInfo                  *clGetPlatformInfo;
     extern __clGetDeviceIDs                     *clGetDeviceIDs;
@@ -1052,7 +1053,7 @@ extern "C" {
     extern __clEnqueueWaitForEvents             *clEnqueueWaitForEvents;
     extern __clEnqueueBarrier                   *clEnqueueBarrier;
     extern __clGetExtensionFunctionAddress      *clGetExtensionFunctionAddress;
-
+#endif
 /// Loads the OpenCL library if available
 ///
 /// This function must be called prior to calling anu other cl*() function

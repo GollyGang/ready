@@ -84,7 +84,8 @@ class Properties : public XML_Object
         Properties(std::string set_name) : XML_Object(NULL),set_name(set_name) {}
         void OverwriteFromXML(vtkXMLDataElement* node);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
+		
+		
         int GetNumberOfProperties() const { return (int)this->properties.size(); }
         const Property& GetProperty(int i) const { return this->properties[i]; }
         const Property& GetProperty(const std::string& name) const;
@@ -92,6 +93,7 @@ class Properties : public XML_Object
         void AddProperty(Property p);
         bool IsProperty(const std::string& name);
         void DeleteAllProperties() { this->properties.clear(); }
+		void SetDefaultRenderSettings();
 
     protected:
     

@@ -44,10 +44,20 @@ OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device,int data_type
 
 // ----------------------------------------------------------------------------------------------------------------
 
+OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device, cl_context externalContext)
+    : ImageRD(data_type)
+	, OpenCL_MixIn(opencl_platform,opencl_device,externalContext)
+{
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
-
+	
+	cout << "Kernel reloading!\n";
+	
     cl_int ret;
 
     // create the program
@@ -55,6 +65,7 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     const char *source = this->kernel_source.c_str();
     size_t source_size = this->kernel_source.length();
     clReleaseProgram(this->program);
+	// cout << "Kernel source:\n" << this->kernel_source << "\n\n";
     this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
@@ -196,10 +207,24 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
             for(int ic=0;ic<NC;ic++)
             {
                 // a_in, b_in, ... a_out, b_out ...
+				//cout << "Setting kernel buffer arg with index: " << io*NC+ic << "\n";
                 ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[iBuffer][ic]);
                 throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
             }
         }
+		
+		// This worked to set a value without recompiling the kernel:
+		//float testval = this->parameters[0].second;
+		//cout << "testval is: " << testval << "\n";
+		//ret = clSetKernelArg(this->kernel, 10, sizeof(float), &testval);
+		
+		for(int ip=0;ip<(int)this->parameters.size();ip++)
+		{
+			ret = clSetKernelArg(this->kernel, 2*NC + ip, sizeof(float), &this->parameters[ip].second );
+			// cout << "arg index: " << 2*NC + ip << " name: " << this->parameters[ip].first << " val: " << this->parameters[ip].second << "\n";
+			throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
+		}
+		
         ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, NULL, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed: ");
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
@@ -220,6 +245,16 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::ReadFromOpenCLBuffers : buffer reading failed: ");
     }
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+{
+  // read from opencl buffers into our image
+	const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+	cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][chemical_id], CL_TRUE, 0, MEM_SIZE, dest, 0, NULL, NULL);
+  //throwOnError(ret,"OpenCLImageRD::GetFromOpenCLBuffers : buffer reading failed: ");
 }
 
 // ----------------------------------------------------------------------------------------------------------------
