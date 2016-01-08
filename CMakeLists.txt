@@ -48,29 +48,32 @@ if( MAKE_LINKABLE_LIB )
 endif()
 
 # Had some VTK linking differences that appeared to be needed on a Gentoo build (by Dan Wills) but not a Win10 nor Ubuntu one (by Tim Hutton).
-# Seems like it might be environment specific, but for now we wish to switch those defs on only when build on Gentoo is detected.
+# Seems like it might be environment specific, but it was suggested that we may wish to switch those defs on only when build on Gentoo is detected.
 #
-# I noticed looking at the vtk ccmake, that there's a variable called:
+# I have since noticed looking at the vtk ccmake, that there's a variable called:
 # VTK_RENDERING_BACKEND=OpenGL2
 # That looks pretty telling..
+# Additionally we can let vtk say how to link it using the VTK_LIBRARIES variable.
 #
-# So for the mean time, we need to get the Distro ID string:
-# .. we can get the string 'Gentoo' (and other strings on other distros) from this command: 'lsb_release -is'
+# To do that we need to get the Distro ID string:
+# .. we can get the string, for example 'Gentoo' (and other strings on other distros) from this command: 'lsb_release -is'
+
+# This'll run when we are in linux:
+# if( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 
 set( GENTOO_BUILD 0 )
-if( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
+if( UNIX )
 	# On this system the binary for this command was /usr/bin/lsb_release
-	# but I suppose there's no need to assume that it will be at that exact path.
+	# but I suppose there's no need to assume that it will be at that exact path on all distros.
 	# so, just rely on the env to find it:
 	execute_process( COMMAND "lsb_release" "-is" OUTPUT_VARIABLE NAME_FROM_LSB_COMMAND )
 	string( STRIP ${NAME_FROM_LSB_COMMAND} NAME_STRIPPED )
-	# message( STATUS "Got result:" ${NAME_STRIPPED} )
 	if( ${NAME_STRIPPED} STREQUAL "Gentoo" )
 		set( GENTOO_BUILD 1 )
 	endif()
 	
-	# Initially built this by getting the contents of a standard 'lsb-release' file.. 
-	# .. not sure what's really better. This did work fine, the above just seemed simpler.
+	# Initially did this by getting the contents of a standard 'lsb-release' file.. 
+	# .. not sure what's really better. This did work fine, the above just seemed simpler and less path-specific.
 	#if( EXISTS "/etc/lsb-release" )
 	#	file( STRINGS "/etc/lsb-release" NAME_FROM_LSB_RELEASE )
 	#	string(REGEX REPLACE "(=\")([a-zA-Z]+)(\"$)" "\\1;\\2;\\3" NAME_LIST_SPLIT "${NAME_FROM_LSB_RELEASE}")
@@ -82,8 +85,9 @@ if( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 	#endif()
 endif()
 
+# Problems werent Gentoo specific, so we probably don't need to 
 if( ${GENTOO_BUILD} )
-	message(STATUS "Gentoo build." )
+  message(STATUS "Gentoo build." )
 endif()
 
 #-------------------------------------------source files----------------------------------------------
@@ -457,46 +461,53 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-if( ${VTK_MAJOR_VERSION} GREATER 5 AND ${VTK_MINOR_VERSION} GREATER 2)
-  target_link_libraries( 
-    readybase 
-    vtkCommonCore 
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersTexture
-    vtkInteractionStyle
-    vtkIOImage 
-    vtkIOXML 
-    vtkRenderingCore 
-    vtkRenderingAnnotation 
-    vtkRenderingFreeType 
-  )
-  # When building on Gentoo (as a temporary measure), switch to the OpenGL2 variant of this link target:
-  if( ${GENTOO_BUILD} )
-	target_link_libraries( readybase vtkRenderingOpenGL2 )
-  else()
-  	target_link_libraries( readybase vtkRenderingOpenGL )
-  endif()
-  
+
+# if( ( ${VTK_MAJOR_VERSION} EQUAL 6 ) AND (${VTK_MAJOR_VERSION} GREATER 2) )
+# 	message(STATUS "VTK >= 6.2!")
+# 	target_link_libraries( readybase ${VTK_LIBRARIES} )
+# else
+
+if( DEFINED VTK_RENDERING_BACKEND AND ${VTK_RENDERING_BACKEND} STREQUAL "OpenGL2" )
+ 	message(STATUS "VTK backend OpenGL2 Detected, using new-style VTK linkage.")
+	# Simple way to link VTK, let it define the lib names:
+ 	target_link_libraries( readybase ${VTK_LIBRARIES} )
+elseif( ${VTK_MAJOR_VERSION} GREATER 5 AND ${VTK_MINOR_VERSION} GREATER 2)
+	message(STATUS "VTK greater-than 5.2!")
+   	target_link_libraries( 
+      readybase 
+      vtkCommonCore 
+      vtkFiltersExtraction
+      vtkFiltersGeometry
+      vtkFiltersModeling
+      vtkFiltersTexture
+      vtkInteractionStyle
+      vtkIOImage 
+      vtkIOXML 
+      vtkRenderingCore 
+      vtkRenderingAnnotation 
+      vtkRenderingFreeType 
+	  vtkRenderingOpenGL 
+	)
 elseif( ${VTK_MAJOR_VERSION} GREATER 5 )
-  target_link_libraries( 
-    readybase 
-    vtkCommonCore 
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersTexture
-    vtkInteractionStyle
-    vtkIOImage 
-    vtkIOXML 
-    vtkRenderingCore 
-    vtkRenderingAnnotation 
-    vtkRenderingFreeType 
-    vtkRenderingFreeTypeOpenGL 
-  )
+	message(STATUS "VTK greater-than 5.0!")
+	target_link_libraries( 
+      readybase 
+      vtkCommonCore 
+      vtkFiltersExtraction
+      vtkFiltersGeometry
+      vtkFiltersModeling
+      vtkFiltersTexture
+      vtkInteractionStyle
+      vtkIOImage 
+      vtkIOXML 
+      vtkRenderingCore 
+      vtkRenderingAnnotation 
+      vtkRenderingFreeType 
+      vtkRenderingFreeTypeOpenGL 
+	)
 else()
-  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
+	message(STATUS "VTK less-than 5.0")
+	target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
 endif()
 
 # The build for the linked library for houdini plugin linkage doesn't link nicely
