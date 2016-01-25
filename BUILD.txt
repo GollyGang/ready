@@ -1,7 +1,7 @@
 Dependencies: 
-0) CMake: www.cmake.org
-1) VTK (latest, or at least 6.0.*): www.vtk.org
-2) wxWidgets (latest, or at least 2.9.2): www.wxwidgets.org
+0) CMake (latest version, or at least 3.3): www.cmake.org
+1) VTK (latest version, or at least 6.2): www.vtk.org
+2) wxWidgets (latest version, or at least 2.9.2): www.wxwidgets.org
 3) any OpenCL SDK.
 
 Ready uses CMake for pre-build setup. You might need to read some CMake
@@ -143,48 +143,36 @@ make package_source
 
 =========================== MacOS =================================
 
-1. To avoid the error "-- Could NOT find wxWidgets (missing:  wxWidgets_FOUND)", 
-   manually build and install wxWidgets 2.9 even if you already have an 
-   wxWidgets that works for other projects:
+1. Build wxWidgets (assuming you've downloaded and unpacked the source tar ball
+   for wxWidgets 3.0.2 from https://www.wxwidgets.org/downloads/):
 
- cd
- cd devt    # A directory for things I download and build but do not checkout/modify/checkin
- svn checkout http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wx-trunk
- cd wx-trunk
- mkdir build-osx
- cd build-osx
- ../configure --enable-unicode --disable-shared --with-osx_cocoa
- make    # Take a nap, it'll be a while
- sudo make install
+cd /path/to/wxWidgets-3.0.2
+mkdir build-osx
+cd build-osx
+../configure --enable-unicode --disable-shared --with-osx_cocoa
+make   # take a nap, it'll be a while
+sudo make install
 
-2. If you have not already done do, build VTK 6.2 (no install is needed in this
-   case because we supply the option "-DVTK_DIR:PATH=$HOME/devt/VTK/build" when 
-   cmake'ing Ready)
+2. Build VTK (assuming you've downloaded and unzipped VTK-6.3.0.zip from
+   http://www.vtk.org/download/):
 
- cd
- cd devt    # A directory for things I download and build but do not checkout/modify/checkin
- curl 'http://www.vtk.org/files/release/6.2/vtk-6.2.0.tar.gz' > vtk-6.2.0.tar.gz
- gunzip vtk-6.2.0.tar.gz
- tar -xvf vtk-6.2.0.tar        # (creates directory ./VTK)
- cd VTK
- mkdir build
- cd build
- cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF
- make     # This also takes some time
+cd /path/to/VTK-6.3.0
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF
+make   # this also takes some time
 
-3. Then do this to get, configure and build Ready (assuming VTK was built in 
-   ~/devt/VTK as shown above):
+3. Build Ready:
 
- cd
- cd proj    # A directory for projects I am "working on"
- svn checkout https://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion --username $MYEMAIL
- #
- # Or if not a project member do:
- # svn checkout http://reaction-diffusion.googlecode.com/svn/trunk/ reaction-diffusion-read-only
- # And substitute "reaction-diffusion-read-only" for "reaction-diffusion" in the following
- #
- mkdir Ready_gui_build
- cd Ready_gui_build
- cmake ../reaction-diffusion/Ready -DVTK_DIR:PATH=$HOME/devt/VTK/build
- make
- open Ready.app
+cd ~   # or some other directory
+git clone https://github.com/GollyGang/ready.git
+cd ready
+mkdir build
+cd build
+cmake .. -DVTK_DIR:PATH=/path/to/VTK-6.3.0/build
+make
+open Ready.app
+
+Optional commands for packaging Ready:
+make package
+make package_source
