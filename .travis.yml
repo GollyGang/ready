@@ -1,6 +1,10 @@
 sudo: required
 dist: trusty
 
+branches:
+  only:
+    - gh-pages
+
 addons:
   apt:
     packages:
