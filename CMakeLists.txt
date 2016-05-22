@@ -428,11 +428,15 @@ elseif( ${VTK_MAJOR_VERSION} GREATER 5 )
     vtkFiltersTexture
     vtkInteractionStyle
     vtkIOImage 
+    vtkIOMPIImage
+    vtkIOMPIParallel
     vtkIOXML 
     vtkRenderingCore 
     vtkRenderingAnnotation 
-    vtkRenderingFreeType 
+    vtkRenderingFreeType
+    vtkRenderingFreeTypeFontConfig
     vtkRenderingFreeTypeOpenGL 
+    vtkRenderingMatplotlib
   )
 else()
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
