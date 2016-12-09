@@ -1,4 +1,4 @@
-#  Copyright 2011-2015 The Ready Bunch
+#  Copyright 2011-2016 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -16,7 +16,7 @@
 #  along with Ready. If not, see <http://www.gnu.org/licenses/>.
 #
 #--------------------------------------------------------------------------
-    
+
 cmake_minimum_required( VERSION 2.6 )
 cmake_policy( SET CMP0003 NEW )
 if(POLICY CMP0043)
@@ -58,7 +58,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/overlays.hpp                  src/readybase/overlays.cpp
   src/readybase/Properties.hpp                src/readybase/Properties.cpp
   src/readybase/utils.hpp                     src/readybase/utils.cpp
-  src/readybase/OpenCL_Dyn_Load.h             src/readybase/OpenCL_Dyn_Load.c 
+  src/readybase/OpenCL_Dyn_Load.h             src/readybase/OpenCL_Dyn_Load.c
   src/readybase/MeshGenerators.hpp            src/readybase/MeshGenerators.cpp
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp
   src/readybase/scene_items.hpp               src/readybase/scene_items.cpp
@@ -70,8 +70,8 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/wxutils.hpp                      src/gui/wxutils.cpp
   src/gui/dialogs.hpp                      src/gui/dialogs.cpp
   src/gui/prefs.hpp                        src/gui/prefs.cpp
-  src/gui/app.hpp                          src/gui/app.cpp 
-  src/gui/frame.hpp                        src/gui/frame.cpp 
+  src/gui/app.hpp                          src/gui/app.cpp
+  src/gui/frame.hpp                        src/gui/frame.cpp
   src/gui/HelpPanel.hpp                    src/gui/HelpPanel.cpp
   src/gui/InfoPanel.hpp                    src/gui/InfoPanel.cpp
   src/gui/PatternsPanel.hpp                src/gui/PatternsPanel.cpp
@@ -89,13 +89,13 @@ set( CMD_SOURCES      # code used for the command-line version
 
 set( RESOURCES
   resources/ready.rc
-  resources/appicon.ico 
-  resources/appicon16.ico 
-  resources/appicon32.ico 
-  resources/appicon48.ico 
+  resources/appicon.ico
+  resources/appicon16.ico
+  resources/appicon32.ico
+  resources/appicon48.ico
   resources/appicon.xpm
   resources/Info.plist.in
-  resources/app.icns 
+  resources/app.icns
   resources/file.icns
 )
 include_directories( resources )
@@ -104,10 +104,10 @@ set( PATTERN_FILES
   Patterns/Meinhardt1982/stripes.vti       Patterns/Meinhardt1982/zebra.vtu
   Patterns/advection.vti
   Patterns/bilaplacian_interpolation.vti
-  Patterns/Schlogl.vti 
-  Patterns/heat_equation.vti 
+  Patterns/Schlogl.vti
+  Patterns/heat_equation.vti
   Patterns/Turing1952/spots.vti            Patterns/Turing1952/spots_noisy.vti
-  Patterns/kernel_test.vti 
+  Patterns/kernel_test.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti
   Patterns/bunny.vtu
@@ -121,25 +121,25 @@ set( PATTERN_FILES
   Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
   Patterns/SmoothLife2011/gaussian-smoothlife.vti
   Patterns/Purwins1999/glider.vti          Patterns/Purwins1999/glider_3D.vti      Patterns/Purwins1999/multiGlider.vti
-  Patterns/CPU-only/grayscott_1D.vti 
-  Patterns/CPU-only/grayscott_2D.vti 
+  Patterns/CPU-only/grayscott_1D.vti
+  Patterns/CPU-only/grayscott_2D.vti
   Patterns/CPU-only/grayscott_3D.vti
-  Patterns/FitzHugh-Nagumo/tip-splitting.vti 
+  Patterns/FitzHugh-Nagumo/tip-splitting.vti
   Patterns/FitzHugh-Nagumo/tip-splitting_3D.vti
   Patterns/FitzHugh-Nagumo/spiral_turbulence.vti
-  Patterns/FitzHugh-Nagumo/pulsate.vti 
+  Patterns/FitzHugh-Nagumo/pulsate.vti
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
   Patterns/Gray-Scott/Lesmes_noisy.vti
   Patterns/Gray-Scott/noisy_solitons_mitosis.vti
   Patterns/Gray-Scott/parameter-map.vti
   Patterns/Gray-Scott/Pearson1993.vti
-  Patterns/Gray-Scott/self-replicating_spots.vti 
+  Patterns/Gray-Scott/self-replicating_spots.vti
   Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti
   Patterns/Gray-Scott/U-Skate/Munafo_glider.vti
   Patterns/Gray-Scott/U-Skate/o-ring_2D.vti
   Patterns/CellularAutomata/Bays_3D.vti
-  Patterns/CellularAutomata/Conway_life.vti 
+  Patterns/CellularAutomata/Conway_life.vti
   Patterns/CellularAutomata/life_torus.vtu
   Patterns/CellularAutomata/larger-than-life.vti
   Patterns/CellularAutomata/Buss_hex.vtu
@@ -172,7 +172,7 @@ set( PATTERN_FILES
   Patterns/Pennybacker2013/spots.vti Patterns/Pennybacker2013/stripes.vti
   Patterns/Pennybacker2013/parameter_map.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots.vti
-  Patterns/Experiments/DanWills/cglrd_ramps_example.vti  
+  Patterns/Experiments/DanWills/cglrd_ramps_example.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_moreLifelike.vti
   Patterns/Experiments/DanWills/grayscott-historyWaveDC_solitonsAndWorms_init.vti
@@ -225,22 +225,22 @@ set( PATTERN_FILES
 
 set( HELP_FILES
   Help/about.gif              Help/about.html
-  Help/action.html            Help/credits.html 
-  Help/file.html              Help/help.html 
-  Help/mouse.html             Help/quickstart.html 
-  Help/tips.html              Help/changes.html 
-  Help/edit.html              Help/formats.html 
-  Help/index.html             Help/problems.html 
+  Help/action.html            Help/credits.html
+  Help/file.html              Help/help.html
+  Help/mouse.html             Help/quickstart.html
+  Help/tips.html              Help/changes.html
+  Help/edit.html              Help/formats.html
+  Help/index.html             Help/problems.html
   Help/view.html              Help/introduction.html
 )
 
 set( OTHER_FILES
-  ./README.txt 
-  ./COPYING.txt 
-  ./TODO.txt 
-  ./BUILD.txt 
-  ./CMakeLists.txt 
-  src/FindOpenCL.cmake 
+  ./README.txt
+  ./COPYING.txt
+  ./TODO.txt
+  ./BUILD.txt
+  ./CMakeLists.txt
+  src/FindOpenCL.cmake
   src/Doxyfile.in
   resources/logo.png
   resources/Icons/22px/icon-pointer.png
@@ -352,17 +352,17 @@ include_directories( ${OPENCL_INCLUDE_DIRS} )
 if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
-  
+
 #---------------copy installation files to build folder (helps with testing)--------------------
 
 foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
-  add_custom_command( 
+  add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${file}"
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}/${file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${file}"
   )
   list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${file}" )
-endforeach() 
+endforeach()
 
 add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
@@ -402,44 +402,61 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-if( ${VTK_MAJOR_VERSION} GREATER 5 AND ${VTK_MINOR_VERSION} GREATER 2)
-  target_link_libraries( 
-    readybase 
-    vtkCommonCore 
+if( ${VTK_MAJOR_VERSION} LESS 6 )
+  # VTK 5.x
+  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
+elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} LESS 3)
+  # VTK 6.0.x - 6.2.x
+  target_link_libraries(
+    readybase
+    vtkCommonCore
     vtkFiltersExtraction
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
     vtkInteractionStyle
-    vtkIOImage 
-    vtkIOXML 
-    vtkRenderingCore 
-    vtkRenderingAnnotation 
-    vtkRenderingFreeType 
-    vtkRenderingOpenGL 
-  )
-elseif( ${VTK_MAJOR_VERSION} GREATER 5 )
-  target_link_libraries( 
-    readybase 
-    vtkCommonCore 
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersTexture
-    vtkInteractionStyle
-    vtkIOImage 
-    vtkIOMPIImage
-    vtkIOMPIParallel
-    vtkIOXML 
-    vtkRenderingCore 
-    vtkRenderingAnnotation 
+    vtkIOImage
+    vtkIOXML
+    vtkRenderingCore
+    vtkRenderingAnnotation
     vtkRenderingFreeType
-    vtkRenderingFreeTypeFontConfig
-    vtkRenderingFreeTypeOpenGL 
-    vtkRenderingMatplotlib
+    vtkRenderingFreeTypeOpenGL
+  )
+elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} GREATER 2)
+  # VTK 6.3.x - 6.x.y
+  target_link_libraries(
+    readybase
+    vtkCommonCore
+    vtkFiltersExtraction
+    vtkFiltersGeometry
+    vtkFiltersModeling
+    vtkFiltersTexture
+    vtkInteractionStyle
+    vtkIOImage
+    vtkIOXML
+    vtkRenderingCore
+    vtkRenderingAnnotation
+    vtkRenderingFreeType
+    vtkRenderingOpenGL
   )
 else()
-  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
+  # VTK 7.0.x -
+  target_link_libraries(
+    readybase
+    vtkCommonCore
+    vtkFiltersExtraction
+    vtkFiltersGeometry
+    vtkFiltersModeling
+    vtkFiltersTexture
+    vtkInteractionStyle
+    vtkIOImage
+    vtkIOGeometry
+    vtkIOXML
+    vtkRenderingCore
+    vtkRenderingAnnotation
+    vtkRenderingFreeType
+    vtkRenderingOpenGL2
+  )
 endif()
 
 # create command-line utility
@@ -457,11 +474,11 @@ if( APPLE )
     COMMAND echo -n "APPLReDy" >Ready.app/Contents/PkgInfo
   )
   add_dependencies( ${APP_NAME} app_bundle )
-   
+
   # copy *.icns files into Resources directory inside .app bundle
   set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/app.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
   set_source_files_properties( ${CMAKE_SOURCE_DIR}/resources/file.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources )
-   
+
   # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
 endif()
@@ -505,15 +522,15 @@ if( APPLE )
   set( CPACK_SYSTEM_NAME "Mac" )  # nicer than "Darwin"
 elseif( UNIX )
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( CPACK_SYSTEM_NAME "Linux-64bit" )  
+    set( CPACK_SYSTEM_NAME "Linux-64bit" )
   else()
-    set( CPACK_SYSTEM_NAME "Linux-32bit" )  
+    set( CPACK_SYSTEM_NAME "Linux-32bit" )
   endif()
 elseif( WIN32)
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    set( CPACK_SYSTEM_NAME "Windows-64bit" )  
+    set( CPACK_SYSTEM_NAME "Windows-64bit" )
   else()
-    set( CPACK_SYSTEM_NAME "Windows-32bit" )  
+    set( CPACK_SYSTEM_NAME "Windows-32bit" )
   endif()
 endif()
 if( NOT USE_SSE )
