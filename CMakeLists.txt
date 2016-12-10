@@ -402,6 +402,9 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
+if( APPLE OR UNIX )
+  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
+endif()
 if( ${VTK_MAJOR_VERSION} LESS 6 )
   # VTK 5.x
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
@@ -421,6 +424,7 @@ elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} LESS 3)
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRenderingFreeTypeOpenGL
+    ${EXTRA_VTK_LIBS}
   )
 elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} GREATER 2)
   # VTK 6.3.x - 6.x.y
@@ -438,6 +442,7 @@ elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} GREATER 2)
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRenderingOpenGL
+    ${EXTRA_VTK_LIBS}
   )
 else()
   # VTK 7.0.x -
@@ -456,6 +461,7 @@ else()
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRenderingOpenGL2
+    ${EXTRA_VTK_LIBS}
   )
 endif()
 
