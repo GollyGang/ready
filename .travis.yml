@@ -26,7 +26,7 @@ before_script:
     - mkdir build-gtk
     - cd build-gtk
     - ../configure --with-gtk --disable-shared --enable-unicode --with-opengl --with-zlib=builtin --with-libpng=builtin --with-libjpeg=builtin --with-libtiff=builtin
-    - make -s
+    - travis_wait make -s
     - cd ../../ready
     - mkdir build
     - cd build
