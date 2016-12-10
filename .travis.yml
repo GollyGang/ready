@@ -12,6 +12,7 @@ addons:
     - ocl-icd-opencl-dev
     - libgtk2.0-dev
     - libpython2.7-dev
+    - libpq-dev
 
 language: cpp
 
