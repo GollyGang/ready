@@ -1,28 +1,28 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="4">
 
     <description>
         The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the 
-        wave function for some quantum state. Here a wave packet travels through empty space until it reaches an energy barrier. Despite having less energy than the barrier, there is a non-zero
-        probability of the particle passing through, due to 'quantum tunnelling'.
+        wave function for some quantum state. Here a wave packet travels through empty space until it reaches a high energy barrier with two slits. Some
+        of the energy is reflected back but the rest makes a distinctive interference pattern.
         
         In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. A fixed energy background is given by 'c'.
-        The probability density is shown in 'd'.
+        The probability density is shown in 'd', with the energy barrier overlaid.
         
         By changing the values of parameter 'potential' and then using 'Generate Initial Pattern' from the 'Action' menu you can change the height
         of the barrier. Or you can paint directly into 'c'.
     </description>
 
-    <rule type="formula" name="Schrodinger equation" wrap="0">
+    <rule type="formula" name="Schrodinger equation">
         
       <param name="timestep">    0.001    </param>
-      <param name="potential">   3        </param>
+      <param name="potential">   4        </param>
 
       <formula number_of_chemicals="4">
         delta_a = -laplacian_b - c*b;
         delta_b =  laplacian_a + c*a;
-        d = a*a + b*b;
+        d = a*a + b*b + c;
       </formula>
       
     </rule>
@@ -31,7 +31,7 @@
         
       <overlay chemical="d">
         <overwrite />
-        <gaussian height="1" sigma="0.03">
+        <gaussian height="1" sigma="0.05">
           <point3D x="0.2" y="0.5" z="0.5" />
         </gaussian>
         <everywhere />
@@ -41,7 +41,7 @@
         <overwrite />
         <sine amplitude="1" phase="0">
           <point3D x="0" y="0" z="0" />
-          <point3D x="0.03" y="0" z="0" />
+          <point3D x="0.05" y="0" z="0" />
         </sine>
         <everywhere />
       </overlay>
@@ -51,7 +51,7 @@
         <overwrite />
         <sine amplitude="1" phase="1.5708">
           <point3D x="0" y="0" z="0" />
-          <point3D x="0.03" y="0" z="0" />
+          <point3D x="0.05" y="0" z="0" />
         </sine>
         <everywhere />
       </overlay>
@@ -61,41 +61,57 @@
         <overwrite />
         <parameter name="potential" />
         <rectangle>
-          <point3d x="0.4" y="0.4" z="0.4" />
-          <point3d x="0.45" y="0.6" z="0.6" />
+          <point3d x="0.5" y="0.0" z="0.2" />
+          <point3d x="0.52" y="0.4" z="0.8" />
+        </rectangle>
+        <rectangle>
+          <point3d x="0.5" y="0.44" z="0.2" />
+          <point3d x="0.52" y="0.56" z="0.8" />
+        </rectangle>
+        <rectangle>
+          <point3d x="0.5" y="0.6" z="0.2" />
+          <point3d x="0.52" y="1.0" z="0.8" />
         </rectangle>
       </overlay>
-      
+            
       <overlay chemical="d"><multiply /><other_chemical chemical="d" /><everywhere /></overlay>
-      
+
+      <overlay chemical="d">
+        <add />
+        <other_chemical chemical="c" />
+        <everywhere />
+      </overlay>
+            
     </initial_pattern_generator>
     
     <render_settings>
        <active_chemical value="d" />
-       <show_displacement_mapped_surface value="true" />
-       <color_displacement_mapped_surface value="false" />
-       <low value="-1" />
-       <high value="1" />
+       <show_multiple_chemicals value="false" />
+       <show_displacement_mapped_surface value="false" />
+       <color_displacement_mapped_surface value="true" />
+       <low value="-0.1" />
+       <high value="0.04" />
        <vertical_scale_1D value="100" />
-       <vertical_scale_2D value="100" />
-       <timesteps_per_render value="1024" />
+       <vertical_scale_2D value="10" />
+       <timesteps_per_render value="256" />
+       <show_phase_plot value="false" />
     </render_settings>
     
   </RD>
-  <ImageData WholeExtent="0 511 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
-  <Piece Extent="0 511 0 0 0 0">
+  <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 127 0 127 0 0">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
       <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+        AgAAAACAAAAAAAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
     </PointData>
     <CellData>

@@ -4,13 +4,11 @@
 
     <description>
         The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the 
-        wave function for some quantum state. For a travelling particle, the magnitude of the wave packet describes the probability that the particle 
-        will be found at each location.
-
-        Here a wave packet travels through empty space. Over time the probability spreads out, because of uncertainty in its initial momentum.
+        wave function for some quantum state. Here a wave packet travels through empty space. Over time the probability spreads out, because of
+        uncertainty in its initial momentum.
         
         In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. 
-        The magnitude is shown in 'c' but doesn't affect the system.
+        The probability density is shown in 'c'.
         
         Derivation:
         
@@ -23,6 +21,8 @@
         hence:
         &lt;tt&gt;&lt;pre&gt;da/dt = -Im(Laplacian(x)) = -Laplacian(b)
         db/dt =  Re(Laplacian(x)) =  Laplacian(a)&lt;/pre&gt;&lt;/tt&gt;
+        
+        c = a&lt;sup&gt;2&lt;/sup&gt; + b&lt;sup&gt;2&lt;/sup&gt;
     </description>
 
     <rule type="formula" name="Schrodinger equation">
@@ -32,7 +32,7 @@
       <formula number_of_chemicals="3">
         delta_a = -laplacian_b;
         delta_b =  laplacian_a;
-        c = hypot( a, b );
+        c = a*a + b*b;
       </formula>
       
     </rule>
@@ -66,7 +66,9 @@
         <everywhere />
       </overlay>
       <overlay chemical="b"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
-      
+
+      <overlay chemical="c"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
+
     </initial_pattern_generator>
     
     <render_settings>

@@ -120,7 +120,7 @@ set( PATTERN_FILES
   Patterns/Brusselator.vti
   Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
   Patterns/SmoothLife2011/gaussian-smoothlife.vti
-  Patterns/Purwins1999/glider.vti          Patterns/Purwins1999/glider_3D.vti      Patterns/Purwins1999/multiGlider.vti
+  Patterns/Purwins1999/glider.vti              Patterns/Purwins1999/glider_3D.vti          Patterns/Purwins1999/multiGlider.vti
   Patterns/CPU-only/grayscott_1D.vti
   Patterns/CPU-only/grayscott_2D.vti
   Patterns/CPU-only/grayscott_3D.vti
@@ -166,7 +166,7 @@ set( PATTERN_FILES
   Patterns/Yang2006/jumping.vti   Patterns/Yang2006/jumping_cGL.vti
   Patterns/Schrodinger1926/packet.vti             Patterns/Schrodinger1926/packet_reflect.vti
   Patterns/Schrodinger1926/packet_pass.vti        Patterns/Schrodinger1926/quantum_tunnelling.vti
-  Patterns/Schrodinger1926/packet_reflect2D.vti
+  Patterns/Schrodinger1926/packet_reflect2D.vti   Patterns/Schrodinger1926/two_slit.vti
   Patterns/Froese2014/Froese2014_Fig3.vti
   Patterns/Pennybacker2013/phyllotaxis_fibonacci.vti Patterns/Pennybacker2013/phyllotaxis_hexagons.vti
   Patterns/Pennybacker2013/spots.vti Patterns/Pennybacker2013/stripes.vti

@@ -4,13 +4,11 @@
     
     <description>
         The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the 
-        wave function for some quantum state. For a travelling particle, the magnitude of the wave packet describes the probability that the particle 
-        will be found at each location.
-
-        Here a wave packet travels through empty space until it reaches a low energy barrier, which it is able to pass over.
+        wave function for some quantum state. Here a wave packet travels through empty space until it reaches a low energy barrier, which it is able to
+        pass over.
         
         In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. A fixed energy background is given by 'c'.
-        The magnitude is shown in 'd' but doesn't affect the system.
+        The probability density is shown in 'd'.
         
         By changing the values of parameter 'potential' and then using 'Generate Initial Pattern' from the 'Action' menu you can change the height
         of the barrier. Or you can paint directly into 'c'.
@@ -24,7 +22,7 @@
       <formula number_of_chemicals="4">
         delta_a = -laplacian_b - c*b;
         delta_b =  laplacian_a + c*a;
-        d = hypot( a, b );
+        d = a*a + b*b;
       </formula>
       
     </rule>
@@ -64,10 +62,12 @@
         <parameter name="potential" />
         <rectangle>
           <point3d x="0.4" y="0.4" z="0.4" />
-          <point3d x="0.5" y="0.6" z="0.6" />
+          <point3d x="0.45" y="0.6" z="0.6" />
         </rectangle>
       </overlay>
       
+      <overlay chemical="d"><multiply /><other_chemical chemical="d" /><everywhere /></overlay>
+
     </initial_pattern_generator>
     
     <render_settings>
