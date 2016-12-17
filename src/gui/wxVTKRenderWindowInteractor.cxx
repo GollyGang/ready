@@ -63,32 +63,7 @@
 #endif
 
 #ifdef __WXGTK__
- #include <gdk/gdkx.h> // GDK_WINDOW_XWINDOW is found here in wxWidgets 2.8.0
- #include "gdk/gdkprivate.h"
- 
- #if wxCHECK_VERSION(2, 9, 0)
-  // thanks to: http://thomasfischer.biz/?p=382
-  #include <gtk/gtk.h>
-  #include <wx/gtk/private/win_gtk.h>
-  #define piz(wxwin) WX_PIZZA((wxwin)->m_wxwindow)
-  #define GetXWindow(wxwin) (wxwin)->m_wxwindow ? \
-        GDK_WINDOW_XWINDOW(((GtkWidget*)piz(wxwin))->window) : \
-        GDK_WINDOW_XWINDOW((wxwin)->m_widget->window)
- #else
-  #if wxCHECK_VERSION(2, 8, 0)
-   #ifdef __WXGTK20__
-    #include <wx/gtk/win_gtk.h>
-   #else
-    #include <wx/gtk1/win_gtk.h>
-   #endif
-  #else
-   #include <wx/gtk/win_gtk.h>
-  #endif
- 
-  #define GetXWindow(wxwin) (wxwin)->m_wxwindow ? \
-                          GDK_WINDOW_XWINDOW(GTK_PIZZA((wxwin)->m_wxwindow)->bin_window) : \
-                          GDK_WINDOW_XWINDOW((wxwin)->m_widget->window)
- #endif
+ #include <gdk/gdkx.h>
 #endif
 
 #ifdef __WXX11__
@@ -414,7 +389,9 @@ long wxVTKRenderWindowInteractor::GetHandleHack()
 
     // Find and return the actual X-Window.
 #if defined(__WXGTK__) || defined(__WXX11__)
-    return (long)GetXWindow(this);
+	GtkWidget* widget = this->GetHandle();
+	Window win = gdk_x11_drawable_get_xid(gtk_widget_get_window(widget));
+    return win;
 #endif
 
 //#ifdef __WXMOTIF__
