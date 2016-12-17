@@ -63,7 +63,8 @@
 #endif
 
 #ifdef __WXGTK__
- #include <gdk/gdkx.h>
+  #include <gdk/gdkx.h>
+  #include <gtk/gtk.h>
 #endif
 
 #ifdef __WXX11__
