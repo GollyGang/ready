@@ -101,39 +101,18 @@ C) Build Ready:
 
 =========================== Linux =================================
 
-On Debian, install: libgtk2.0-dev, libxt-dev, ocl-icd-opencl-dev, libglu1-mesa-dev.
+On Debian/Ubuntu install some packages:
+
+sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev
+
 On other distros I'm not sure - please let us know!
-Download source for: VTK, wxWidgets.
 
-A) Build VTK:
-
-cd VTK
-mkdir bin
-cd bin
-ccmake ..
-"c" (configure)
- - Set BUILD_TESTING to off (we don't need it).
- - Set BUILD_SHARED_LIBS to off (so we can distribute easily)
- - Set CMAKE_BUILD_TYPE to: Release
-"g" (generate)
-make
-
-B) Build wxWidgets:
-
-cd wxWidgets
-mkdir build-gtk
-cd build-gtk
-../configure --with-gtk --disable-shared --enable-unicode --with-opengl --with-zlib=builtin --with-libpng=builtin --with-libjpeg=builtin --with-libtiff=builtin
-make
-
-C) Build Ready:
+A) Build Ready:
 
 mkdir Ready_build
 cd Ready_build
 ccmake ../Ready_source_folder
 (configure, generate)
-(set VTK_DIR to the build folder of VTK. e.g. VTK/bin)
-(set wxWidgets_CONFIG_EXECUTABLE to e.g. wxWidgets/build-gtk/wx-config)
 make
 
 Optional, for packaging:
