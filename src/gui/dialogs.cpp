@@ -31,9 +31,9 @@ MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString
     wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
     #ifdef __WXMAC__
         // need bigger font on Mac, and need to specify facename to get Monaco instead of Courier
-        wxFont font(12, wxMODERN, wxNORMAL, wxNORMAL, false, wxT("Monaco"));
+        wxFont font(12, wxFONTFAMILY_MODERN,   wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Monaco"));
     #else
-        wxFont font(10, wxTELETYPE, wxFONTSTYLE_NORMAL, wxNORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
+        wxFont font(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
     #endif
     wxTextCtrl *text = new wxTextCtrl(this,wxID_ANY,message,wxDefaultPosition,wxDefaultSize,
         wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP);
@@ -251,9 +251,9 @@ MultiLineDialog::MultiLineDialog(wxWindow *parent,
                                 wxDefaultPosition, wxSize(100,50), wxTE_MULTILINE | wxTE_PROCESS_TAB);
     #ifdef __WXMAC__
         // need bigger font on Mac, and need to specify facename to get Monaco instead of Courier
-        wxFont font(12, wxMODERN, wxNORMAL, wxNORMAL, false, wxT("Monaco"));
+        wxFont font(12, wxFONTFAMILY_MODERN,   wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Monaco"));
     #else
-        wxFont font(10, wxTELETYPE, wxFONTSTYLE_NORMAL, wxNORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
+        wxFont font(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
     #endif
     m_textctrl->SetFont(font);
     
