@@ -11,8 +11,7 @@ addons:
     - libvtk6-dev
     - ocl-icd-opencl-dev
     - libgtk2.0-dev
-    - libpython2.7-dev
-    - libpq-dev
+    - libwxgtk3.0-dev
 
 language: cpp
 
@@ -20,18 +19,8 @@ compiler:
     - gcc
 
 before_script:  
-    - cd ..
-    - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.tar.bz2
-    - tar xf wxWidgets-3.1.0.tar.bz2
-    - cd wxWidgets-3.1.0/
-    - mkdir build-gtk
-    - cd build-gtk
-    - ../configure --with-gtk --disable-shared --enable-unicode --with-opengl --with-zlib=builtin --with-libpng=builtin --with-libjpeg=builtin --with-libtiff=builtin
-    - travis_wait make -s
-    - cd ../../ready
     - mkdir build
     - cd build
-    - cmake -DwxWidgets_CONFIG_EXECUTABLE=../../wxWidgets-3.1.0/build-gtk/wx-config ..
+    - cmake ..
 
 script: make 
-
