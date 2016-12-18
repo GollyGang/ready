@@ -299,6 +299,7 @@ if(WIN32)
   set(GUI_EXECUTABLE WIN32)
 else()
   if(APPLE)
+    add_definistion("-stdlib=libc++")
     SET(GUI_EXECUTABLE MACOSX_BUNDLE)
     IF(VTK_USE_COCOA)
       SET_SOURCE_FILES_PROPERTIES(
