@@ -39,6 +39,7 @@ Press coverage:
 
 Citations:
 
+  *  John G. Maisey and John S. S. Denton. ["Dermal Denticle Patterning in the Cretaceous Hybodont Shark Tribodus limae (Euselachii, Hybodontiformes), and Its Implications for the Evolution of Patterning in the Chondrichthyan Dermal Skeleton"](http://www.bioone.org/doi/full/10.1080/02724634.2016.1179200) Journal of Vertebrate Paleontology 36(5):e1179200, 2016 doi: http://dx.doi.org/10.1080/02724634.2016.1179200
   * Nathanael Aubert and Olaf Witkowski. ["Reaction-Diffusion Risk: Chemical Signaling in a Conquest Game"](https://www.cs.york.ac.uk/nature/ecal2015/late-breaking/164.pdf) Late Breaking Proceedings of the European Conference on Artificial Life 2015, pp. 29-30, 2015.
   * Kaier Wang, Moira L. Steyn-Ross, D. Alistair Steyn-Ross, Marcus T. Wilson, Jamie W. Sleigh, Yoichi Shiraishi. ["Simulations of pattern dynamics for reaction-diffusion systems via SIMULINK"](http://www.biomedcentral.com/1752-0509/8/45) BMC Systems Biology 8(14), 2014.
   * Aubert, Nathanaël, Clément Mosca, Teruo Fujii, Masami Hagiya, and Yannick Rondelez. ["Computer-assisted design for scaling up systems based on DNA reaction networks"](http://www.yannick-rondelez.com/wp-content/uploads/2014/03/Untitled-37758-1.pdf) Journal of The Royal Society Interface 11, no. 93, 2014.
