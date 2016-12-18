@@ -407,8 +407,8 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-if( false )
- # This *should* work but causes problems on Debian 8 and Travis-CI
+if( EXISTS "/etc/redhat-release" )
+ # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
  target_link_libraries( readybase ${VTK_LIBRARIES} )
 else()
  if( APPLE OR UNIX )
