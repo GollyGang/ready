@@ -1,22 +1,25 @@
-sudo: required
-dist: trusty
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      dist: trusty
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk6-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
 
 branches:
   only:
     - gh-pages
-
-addons:
-  apt:
-    packages:
-    - libvtk6-dev
-    - ocl-icd-opencl-dev
-    - libgtk2.0-dev
-    - libwxgtk3.0-dev
-
-language: cpp
-
-compiler:  
-    - gcc
 
 before_script:  
     - mkdir build
