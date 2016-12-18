@@ -305,7 +305,7 @@ else()
         src/gui/wxVTKRenderWindowInteractor.cxx
         PROPERTIES COMPILE_FLAGS "-ObjC++")
     ENDIF(VTK_USE_COCOA)
-  else)
+  else()
     find_package(PkgConfig)
     pkg_check_modules(GTK2 gtk+-2.0)
     if(GTK2_FOUND)
