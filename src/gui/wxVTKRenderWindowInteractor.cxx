@@ -390,8 +390,13 @@ long wxVTKRenderWindowInteractor::GetHandleHack()
 
     // Find and return the actual X-Window.
 #if defined(__WXGTK__) || defined(__WXX11__)
-    GtkWidget* widget = this->GetHandle();
-    Window win = gdk_x11_drawable_get_xid(gtk_widget_get_window(widget));
+    GtkWidget* gtk_widget = this->GetHandle();
+    GdkWindow* gdk_window = gtk_widget_get_window(gtk_widget);
+  #if GTK_MAJOR_VERSION >= 3
+    Window win = gdk_x11_window_get_xid(gdk_window);
+  #else
+    Window win = gdk_x11_drawable_get_xid(gdk_window);
+  #endif
     return win;
 #endif
 

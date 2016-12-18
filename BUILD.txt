@@ -101,13 +101,17 @@ C) Build Ready:
 
 =========================== Linux =================================
 
-On Debian/Ubuntu install some packages:
+A) Dependencies: 
 
+On Debian/Ubuntu:
 sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev
+
+On Fedora:
+sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers
 
 On other distros I'm not sure - please let us know!
 
-A) Build Ready:
+B) Build Ready:
 
 mkdir Ready_build
 cd Ready_build

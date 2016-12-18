@@ -295,25 +295,30 @@ endif()
 #-------------------------------------------wxVTK----------------------------------------------
 
 # The following allows you to access wxGLCanvas for GTK
-IF(WIN32)
-  SET(GUI_EXECUTABLE WIN32)
-ELSE(WIN32)
-  IF(APPLE)
+if(WIN32)
+  set(GUI_EXECUTABLE WIN32)
+else()
+  if(APPLE)
     SET(GUI_EXECUTABLE MACOSX_BUNDLE)
     IF(VTK_USE_COCOA)
       SET_SOURCE_FILES_PROPERTIES(
         src/gui/wxVTKRenderWindowInteractor.cxx
         PROPERTIES COMPILE_FLAGS "-ObjC++")
     ENDIF(VTK_USE_COCOA)
-  ELSE(APPLE)
-    # CMake 2.6:
-    FIND_PACKAGE(PkgConfig)
-    pkg_check_modules (GTK2 gtk+-2.0)
-    INCLUDE_DIRECTORIES(${GTK2_INCLUDE_DIRS})
-    LINK_LIBRARIES(${GTK2_LIBRARIES})
+  else)
+    find_package(PkgConfig)
+    pkg_check_modules(GTK2 gtk+-2.0)
+    if(GTK2_FOUND)
+      include_directories(${GTK2_INCLUDE_DIRS})
+      link_libraries(${GTK2_LIBRARIES})
+    else()
+      pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+      include_directories(${GTK3_INCLUDE_DIRS})
+      link_librarier(${GTK3_LIBRARIES})
+    endif()
     SET(WXGLCANVASLIBS "gl")
-  ENDIF(APPLE)
-ENDIF(WIN32)
+  endif()
+endif()
 
 #-------------------------------------------wxWidgets----------------------------------------------
 
