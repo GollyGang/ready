@@ -299,7 +299,8 @@ if(WIN32)
   set(GUI_EXECUTABLE WIN32)
 else()
   if(APPLE)
-    add_definitions("-stdlib=libc++")
+    set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++") # experimental
+    set(CMAKE_EXE_LINKER_FLAGS "-stdlib=libc++") # experimental
     SET(GUI_EXECUTABLE MACOSX_BUNDLE)
     IF(VTK_USE_COCOA)
       SET_SOURCE_FILES_PROPERTIES(
