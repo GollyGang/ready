@@ -18,7 +18,7 @@ matrix:
       compiler: clang
       before_install:
         - brew update
-        - brew install vtk wxmac
+        - brew install homebrew/science/vtk wxmac
 
 branches:
   only:
