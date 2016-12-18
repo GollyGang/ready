@@ -17,8 +17,8 @@ matrix:
       osx_image: xcode7.3
       compiler: clang
       before_install:
-        brew update
-        brew install vtk wxmac
+        - brew update
+        - brew install vtk wxmac
 
 branches:
   only:
