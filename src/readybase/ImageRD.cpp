@@ -1,4 +1,4 @@
-/*  Copyright 2011-2013, 2015 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -224,6 +224,13 @@ void ImageRD::CopyFromImage(vtkImageData* im)
         throw runtime_error("ImageRD::CopyFromImage : chemical count mismatch");
 
     this->undo_stack.clear();
+}
+
+// ---------------------------------------------------------------------
+
+void ImageRD::CopyFromMesh(vtkUnstructuredGrid* mesh)
+{
+    // TODO
 }
 
 // ---------------------------------------------------------------------

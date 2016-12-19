@@ -3139,40 +3139,12 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnImportMesh(wxCommandEvent& event)
+bool MyFrame::LoadMesh(const wxString& mesh_filename, vtkUnstructuredGrid* ug)
 {
-    // possible uses:
-    // 1. as MeshRD (to run RD on surface, or internally between 3d cells)
-    //    - will need to ask user for other pattern to duplicate formula etc. from, or whether to define this later
-    // 2. as representation of a binary image for ImageRD (e.g. import a 3D logo, then run tip-splitting from that seed)
-    //    - will need to ask for an existing pattern to load the image into, and whether to clear that image first
-    //    - will need to ask which chemical(s) to affect, and at what level (overlays engine)
-
-    wxString mesh_filename = wxFileSelector(_("Import a mesh:"),wxEmptyString,wxEmptyString,wxEmptyString,
-        _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"),wxFD_OPEN);
-    if(mesh_filename.empty()) return; // user cancelled
-
-    /*
-    wxArrayString choices;
-    choices.Add(_("Run a pattern on the surface of this mesh"));
-    choices.Add(_("Paint this pattern into a 3D volume image"));
-    int ret = wxGetSingleChoiceIndex(_("What would you like to do with the mesh?"),_("Select one of these options:"),choices);
-    if(ret==-1) return; // user cancelled
-
-    if(ret!=0) { wxMessageBox(_("Not yet implemented.")); return; } // TODO
-    */
-
-    // at some point we would want the user to decide what data type to use on the imported mesh
-    const int data_type = VTK_FLOAT;
-    
-    MeshRD *mesh_sys;
-    
-    try 
+    try
     {
-        if(mesh_filename.EndsWith(_T("vtp")))
+        if (mesh_filename.EndsWith(_T("vtp")))
         {
-            if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-
             wxBusyCursor busy;
 
             this->InitializeDefaultRenderSettings();
@@ -3182,19 +3154,11 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
             vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
             vtp_reader->SetFileName(mesh_filename.mb_str());
             vtp_reader->Update();
-            if(this->is_opencl_available)
-                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-            else
-                mesh_sys = new GrayScottMeshRD();
-            vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
             ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
-            ug->SetCells(VTK_POLYGON,vtp_reader->GetOutput()->GetPolys());
-            mesh_sys->CopyFromMesh(ug);
+            ug->SetCells(VTK_POLYGON, vtp_reader->GetOutput()->GetPolys());
         }
-        else if(mesh_filename.EndsWith(_T("vtu")))
+        else if (mesh_filename.EndsWith(_T("vtu")))
         {
-            if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-
             wxBusyCursor busy;
 
             this->InitializeDefaultRenderSettings();
@@ -3204,16 +3168,10 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
             vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
             vtu_reader->SetFileName(mesh_filename.mb_str());
             vtu_reader->Update();
-            if(this->is_opencl_available)
-                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-            else
-                mesh_sys = new GrayScottMeshRD();
-            mesh_sys->CopyFromMesh(vtu_reader->GetOutput());
+            ug->DeepCopy(vtu_reader->GetOutput());
         }
-        else if(mesh_filename.EndsWith(_T("obj")))
+        else if (mesh_filename.EndsWith(_T("obj")))
         {
-            if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-        
             wxBusyCursor busy;
 
             this->InitializeDefaultRenderSettings();
@@ -3221,35 +3179,96 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
             this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
             // temporarily turn off internationalisation, to avoid string-to-float conversion issues
-            char *old_locale = setlocale(LC_NUMERIC,"C");
-            
+            char *old_locale = setlocale(LC_NUMERIC, "C");
+
             vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
             obj_reader->SetFileName(mesh_filename.mb_str());
             obj_reader->Update();
-            if(this->is_opencl_available)
-                mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-            else
-                mesh_sys = new GrayScottMeshRD();
-            vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
             ug->SetPoints(obj_reader->GetOutput()->GetPoints());
-            ug->SetCells(VTK_POLYGON,obj_reader->GetOutput()->GetPolys());
-            mesh_sys->CopyFromMesh(ug);
-            
+            ug->SetCells(VTK_POLYGON, obj_reader->GetOutput()->GetPolys());
+
             // restore the old locale
-            setlocale(LC_NUMERIC,old_locale);
+            setlocale(LC_NUMERIC, old_locale);
         }
         else
         {
-            wxMessageBox(_("Unsupported file type")); 
-            return; 
+            wxMessageBox(_("Unsupported file type"));
+            return false;
         }
     }
-    catch(...)
+    catch (...)
     {
-        wxMessageBox(_("Unknown problem importing mesh")); 
-        return; 
+        wxMessageBox(_("Unknown problem importing mesh"));
+        return false;
     }
+    return true;
+}
 
+void MyFrame::OnImportMesh(wxCommandEvent& event)
+{
+    // possible uses:
+    // 1. as MeshRD (to run RD on surface, or internally between 3d cells)
+    //    - will need to ask user for other pattern to duplicate formula etc. from, or whether to define this later
+    // 2. as representation of a binary image for ImageRD (e.g. import a 3D logo, then run tip-splitting from that seed)
+    //    - will need to ask for an existing pattern to load the image into, and whether to clear that image first
+    //    - will need to ask which chemical(s) to affect, and at what level (overlays engine)
+
+    wxString mesh_filename = wxFileSelector(_("Import a mesh:"), wxEmptyString, wxEmptyString, wxEmptyString,
+        _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"), wxFD_OPEN);
+    if (mesh_filename.empty()) return; // user cancelled
+
+    vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    bool ok = LoadMesh(mesh_filename, ug);
+    if (!ok) return;
+
+    wxArrayString choices;
+    choices.Add(_("Run a pattern on the surface of this mesh"));
+    choices.Add(_("Paint this pattern into a 3D volume image"));
+    int choice = wxGetSingleChoiceIndex(_("What would you like to do with the mesh?"), _("Select one of these options:"), choices);
+    if (choice == -1) return; // user cancelled
+
+    if (UserWantsToCancelWhenAskedIfWantsToSave()) return;
+
+    switch (choice)
+    {
+        default:
+        case 0: MakeDefaultMeshSystemFromMesh(ug); break;
+        case 1: MakeDefaultImageSystemFromMesh(ug); break;
+    }
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
+{
+    // at some point we would want the user to decide what data type to use in the image
+    const int data_type = VTK_FLOAT;
+
+    ImageRD *image_sys;
+    if (this->is_opencl_available)
+        image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
+    else
+        image_sys = new GrayScottImageRD();
+    image_sys->CopyFromMesh(ug);
+    image_sys->SetNumberOfChemicals(2);
+    image_sys->CreateDefaultInitialPatternGenerator();
+    image_sys->GenerateInitialPattern();
+    this->SetCurrentRDSystem(image_sys);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug)
+{
+    // at some point we would want the user to decide what data type to use on the imported mesh
+    const int data_type = VTK_FLOAT;
+    
+    MeshRD *mesh_sys;
+    if (this->is_opencl_available)
+        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+    else
+        mesh_sys = new GrayScottMeshRD();
+    mesh_sys->CopyFromMesh(ug);
     mesh_sys->SetNumberOfChemicals(2);
     mesh_sys->CreateDefaultInitialPatternGenerator();
     mesh_sys->GenerateInitialPattern();

@@ -1,4 +1,4 @@
-/*  Copyright 2011-2013, 2015 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -25,6 +25,7 @@
 class vtkImageData;
 class vtkAssignAttribute;
 class vtkRearrangeFields;
+class vtkUnstructuredGrid;
 
 /// Base class for image-based systems.
 class ImageRD : public AbstractRD
@@ -54,6 +55,7 @@ class ImageRD : public AbstractRD
         virtual void BlankImage();
         void GetImage(vtkImageData* im) const;
         virtual void CopyFromImage(vtkImageData* im);
+        virtual void CopyFromMesh(vtkUnstructuredGrid* mesh);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 

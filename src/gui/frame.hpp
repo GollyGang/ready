@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -35,6 +35,9 @@ class wxVTKRenderWindowInteractor;
 // readybase
 #include "Properties.hpp"
 class AbstractRD;
+
+// VTK:
+class vtkUnstructuredGrid;
 
 /// The wxFrame-derived top-level window for the Ready GUI.
 class MyFrame : public wxFrame, public IPaintHandler
@@ -204,6 +207,10 @@ class MyFrame : public wxFrame, public IPaintHandler
         void UpdateToolbars();
         void SetStatusBarText();
         void RecordFrame();
+
+        bool LoadMesh(const wxString& filename, vtkUnstructuredGrid* ug);
+        void MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug);
+        void MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug);
 
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
