@@ -3145,12 +3145,6 @@ bool MyFrame::LoadMesh(const wxString& mesh_filename, vtkUnstructuredGrid* ug)
     {
         if (mesh_filename.EndsWith(_T("vtp")))
         {
-            wxBusyCursor busy;
-
-            this->InitializeDefaultRenderSettings();
-            this->render_settings.GetProperty("slice_3D").SetBool(false);
-            this->render_settings.GetProperty("active_chemical").SetChemical("b");
-
             vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
             vtp_reader->SetFileName(mesh_filename.mb_str());
             vtp_reader->Update();
@@ -3159,12 +3153,6 @@ bool MyFrame::LoadMesh(const wxString& mesh_filename, vtkUnstructuredGrid* ug)
         }
         else if (mesh_filename.EndsWith(_T("vtu")))
         {
-            wxBusyCursor busy;
-
-            this->InitializeDefaultRenderSettings();
-            this->render_settings.GetProperty("slice_3D").SetBool(false);
-            this->render_settings.GetProperty("active_chemical").SetChemical("b");
-
             vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
             vtu_reader->SetFileName(mesh_filename.mb_str());
             vtu_reader->Update();
@@ -3172,12 +3160,6 @@ bool MyFrame::LoadMesh(const wxString& mesh_filename, vtkUnstructuredGrid* ug)
         }
         else if (mesh_filename.EndsWith(_T("obj")))
         {
-            wxBusyCursor busy;
-
-            this->InitializeDefaultRenderSettings();
-            this->render_settings.GetProperty("slice_3D").SetBool(false);
-            this->render_settings.GetProperty("active_chemical").SetChemical("b");
-
             // temporarily turn off internationalisation, to avoid string-to-float conversion issues
             char *old_locale = setlocale(LC_NUMERIC, "C");
 
@@ -3204,6 +3186,8 @@ bool MyFrame::LoadMesh(const wxString& mesh_filename, vtkUnstructuredGrid* ug)
     return true;
 }
 
+// ---------------------------------------------------------------------
+
 void MyFrame::OnImportMesh(wxCommandEvent& event)
 {
     // possible uses:
@@ -3217,10 +3201,6 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"), wxFD_OPEN);
     if (mesh_filename.empty()) return; // user cancelled
 
-    vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    bool ok = LoadMesh(mesh_filename, ug);
-    if (!ok) return;
-
     wxArrayString choices;
     choices.Add(_("Run a pattern on the surface of this mesh"));
     choices.Add(_("Paint this pattern into a 3D volume image"));
@@ -3228,6 +3208,16 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     if (choice == -1) return; // user cancelled
 
     if (UserWantsToCancelWhenAskedIfWantsToSave()) return;
+
+    wxBusyCursor busy;
+
+    vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    bool ok = LoadMesh(mesh_filename, ug);
+    if (!ok) return;
+
+    this->InitializeDefaultRenderSettings();
+    this->render_settings.GetProperty("slice_3D").SetBool(false);
+    this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
     switch (choice)
     {
@@ -3241,6 +3231,11 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
 void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
 {
+    // TODO: ask user for these
+    const size_t num_chemicals = 2;
+    const size_t target_chemical = 1;
+    const size_t largest_dimension = 32;
+
     // at some point we would want the user to decide what data type to use in the image
     const int data_type = VTK_FLOAT;
 
@@ -3249,10 +3244,10 @@ void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
         image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
     else
         image_sys = new GrayScottImageRD();
-    image_sys->CopyFromMesh(ug);
-    image_sys->SetNumberOfChemicals(2);
+    image_sys->CopyFromMesh(ug, num_chemicals, target_chemical, largest_dimension);
+    //image_sys->SetNumberOfChemicals(2);
     image_sys->CreateDefaultInitialPatternGenerator();
-    image_sys->GenerateInitialPattern();
+    //image_sys->GenerateInitialPattern();
     this->SetCurrentRDSystem(image_sys);
 }
 

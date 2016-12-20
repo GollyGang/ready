@@ -55,6 +55,7 @@ using namespace std;
 #include <vtkImageMapper.h>
 #include <vtkImageMirrorPad.h>
 #include <vtkImageReslice.h>
+#include <vtkImageStencil.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageToStructuredPoints.h>
 #include <vtkImageWrapPad.h>
@@ -70,6 +71,7 @@ using namespace std;
 #include <vtkPointSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkPolyDataToImageStencil.h>
 #include <vtkProperty.h>
 #include <vtkProperty2D.h>
 #include <vtkRearrangeFields.h>
@@ -83,6 +85,7 @@ using namespace std;
 #include <vtkThreshold.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkWarpScalar.h>
 #include <vtkWarpVector.h>
@@ -228,9 +231,49 @@ void ImageRD::CopyFromImage(vtkImageData* im)
 
 // ---------------------------------------------------------------------
 
-void ImageRD::CopyFromMesh(vtkUnstructuredGrid* mesh)
+void ImageRD::CopyFromMesh(
+    vtkUnstructuredGrid* mesh,
+    const int num_chemicals,
+    const size_t target_chemical,
+    const size_t largest_dimension)
 {
-    // TODO
+    // decide the size of the image
+    mesh->ComputeBounds();
+    double bounds[6];
+    mesh->GetBounds(bounds);
+    const double mesh_size[3] = { bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4] };
+    const float max_mesh_size = std::max(mesh_size[0], std::max(mesh_size[1], mesh_size[2]));
+    const float scale = (largest_dimension-1) / max_mesh_size;
+    int image_size[3];
+    for(size_t xyz = 0; xyz < 3; ++xyz)
+    {
+        image_size[xyz] = 1;
+        while( image_size[xyz] < mesh_size[xyz] * scale )
+        {
+            image_size[xyz] <<= 1;
+        }
+    }
+    AllocateImages(image_size[0], image_size[1], image_size[2], num_chemicals, this->GetDataType());
+    BlankImage();
+
+    // write data into the image
+    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+    transform->Scale(scale, scale, scale);
+    transform->Translate(-bounds[0], -bounds[2], -bounds[4]);
+    vtkSmartPointer<vtkTransformFilter> transform_filter = vtkSmartPointer<vtkTransformFilter>::New();
+    transform_filter->SetTransform(transform);
+    transform_filter->SetInputData(mesh);
+    vtkSmartPointer<vtkGeometryFilter> get_surface = vtkSmartPointer<vtkGeometryFilter>::New();
+    get_surface->SetInputConnection(transform_filter->GetOutputPort());
+    vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+    pol2stenc->SetInputConnection(get_surface->GetOutputPort());
+    vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
+    imgstenc->SetInputData(this->images[target_chemical]);
+    imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
+    imgstenc->ReverseStencilOn();
+    imgstenc->SetBackgroundValue(1.0f);
+    imgstenc->Update();
+    this->images[target_chemical]->DeepCopy(imgstenc->GetOutput());
 }
 
 // ---------------------------------------------------------------------

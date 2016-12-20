@@ -55,7 +55,11 @@ class ImageRD : public AbstractRD
         virtual void BlankImage();
         void GetImage(vtkImageData* im) const;
         virtual void CopyFromImage(vtkImageData* im);
-        virtual void CopyFromMesh(vtkUnstructuredGrid* mesh);
+        virtual void CopyFromMesh(
+            vtkUnstructuredGrid* mesh,
+            const int num_chemicals,
+            const size_t target_chemical,
+            const size_t largest_dimension);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 

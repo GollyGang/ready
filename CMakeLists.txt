@@ -426,6 +426,7 @@ else()
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
+    vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
     vtkIOXML
@@ -444,6 +445,7 @@ else()
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
+    vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
     vtkIOXML
@@ -462,6 +464,7 @@ else()
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
+    vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
     vtkIOGeometry
