@@ -53,7 +53,7 @@ class MeshRD : public AbstractRD
         virtual int GetNumberOfCells() const;
 
         virtual void GenerateInitialPattern();
-        virtual void BlankImage();
+        virtual void BlankImage(float value = 0.0f);
         virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();

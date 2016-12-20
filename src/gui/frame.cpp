@@ -3231,10 +3231,34 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
 void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
 {
-    // TODO: ask user for these
-    const size_t num_chemicals = 2;
-    const size_t target_chemical = 1;
-    const size_t largest_dimension = 32;
+    IntegerDialog nc_dlg(this, _("Number of chemicals in new volume image"), _("Number of chemicals:"),
+        2, 1, 20, wxDefaultPosition, wxDefaultSize);
+    if (nc_dlg.ShowModal() != wxID_OK) return;
+    const size_t num_chemicals = nc_dlg.GetValue();
+
+    wxArrayString choices;
+    for (size_t i = 0; i<num_chemicals; i++)
+        choices.Add(GetChemicalName(i));
+    wxSingleChoiceDialog tc_dlg(this, _("Select the chemical to write the volume into:"), _("Select target chemical"),
+        choices);
+    tc_dlg.SetSelection(0);
+    if (tc_dlg.ShowModal() != wxID_OK) return;
+    const size_t target_chemical = tc_dlg.GetSelection();
+
+    IntegerDialog ld_dlg(this, _("Largest dimension of the new volume image"), _("Largest dimension:"),
+        64, 1, 1024, wxDefaultPosition, wxDefaultSize);
+    if (ld_dlg.ShowModal() != wxID_OK) return;
+    const size_t largest_dimension = ld_dlg.GetValue();
+
+    FloatDialog inval_dlg(this, _("Value to set inside the mesh"), _("Value inside:"),
+        1.0f, wxDefaultPosition, wxDefaultSize);
+    if (inval_dlg.ShowModal() != wxID_OK) return;
+    const float value_inside = inval_dlg.GetValue();
+
+    FloatDialog outval_dlg(this, _("Value to set outside the mesh"), _("Value outside:"),
+        0.0f, wxDefaultPosition, wxDefaultSize);
+    if (outval_dlg.ShowModal() != wxID_OK) return;
+    const float value_outside = outval_dlg.GetValue();
 
     // at some point we would want the user to decide what data type to use in the image
     const int data_type = VTK_FLOAT;
@@ -3244,10 +3268,8 @@ void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
         image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
     else
         image_sys = new GrayScottImageRD();
-    image_sys->CopyFromMesh(ug, num_chemicals, target_chemical, largest_dimension);
-    //image_sys->SetNumberOfChemicals(2);
+    image_sys->CopyFromMesh(ug, num_chemicals, target_chemical, largest_dimension, value_inside, value_outside);
     image_sys->CreateDefaultInitialPatternGenerator();
-    //image_sys->GenerateInitialPattern();
     this->SetCurrentRDSystem(image_sys);
 }
 

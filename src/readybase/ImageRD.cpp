@@ -235,7 +235,9 @@ void ImageRD::CopyFromMesh(
     vtkUnstructuredGrid* mesh,
     const int num_chemicals,
     const size_t target_chemical,
-    const size_t largest_dimension)
+    const size_t largest_dimension,
+    const float value_inside,
+    const float value_outside)
 {
     // decide the size of the image
     mesh->ComputeBounds();
@@ -254,7 +256,7 @@ void ImageRD::CopyFromMesh(
         }
     }
     AllocateImages(image_size[0], image_size[1], image_size[2], num_chemicals, this->GetDataType());
-    BlankImage();
+    BlankImage(value_outside);
 
     // write data into the image
     vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
@@ -271,7 +273,7 @@ void ImageRD::CopyFromMesh(
     imgstenc->SetInputData(this->images[target_chemical]);
     imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
     imgstenc->ReverseStencilOn();
-    imgstenc->SetBackgroundValue(1.0f);
+    imgstenc->SetBackgroundValue(value_inside);
     imgstenc->Update();
     this->images[target_chemical]->DeepCopy(imgstenc->GetOutput());
 }
@@ -350,11 +352,11 @@ void ImageRD::GenerateInitialPattern()
 
 // ---------------------------------------------------------------------
 
-void ImageRD::BlankImage()
+void ImageRD::BlankImage(float value)
 {
     for(int iImage=0;iImage<(int)this->images.size();iImage++)
     {
-        this->images[iImage]->GetPointData()->GetScalars()->FillComponent(0,0.0);
+        this->images[iImage]->GetPointData()->GetScalars()->FillComponent(0, value);
         this->images[iImage]->Modified();
     }
     this->timesteps_taken = 0;

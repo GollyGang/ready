@@ -1,4 +1,4 @@
-/*  Copyright 2011-2013, 2015 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -104,7 +104,7 @@ class AbstractRD
         void SetFilename(const std::string& s);
 
         virtual void GenerateInitialPattern() =0;
-        virtual void BlankImage() =0;
+        virtual void BlankImage(float value = 0.0f) =0;
 
         /// Create a generator suitable for Gray-Scott, so that new patterns can start working immediately.
         void CreateDefaultInitialPatternGenerator();
