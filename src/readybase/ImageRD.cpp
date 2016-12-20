@@ -260,8 +260,10 @@ void ImageRD::CopyFromMesh(
 
     // write data into the image
     vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+    transform->PostMultiply();
+    transform->Translate(-(bounds[0] + bounds[1]) / 2.0, -(bounds[2] + bounds[3]) / 2.0, -(bounds[4] + bounds[5]) / 2.0); // center at origin
     transform->Scale(scale, scale, scale);
-    transform->Translate(-bounds[0], -bounds[2], -bounds[4]);
+    transform->Translate(image_size[0] / 2, image_size[1] / 2, image_size[2] / 2); // center in volume
     vtkSmartPointer<vtkTransformFilter> transform_filter = vtkSmartPointer<vtkTransformFilter>::New();
     transform_filter->SetTransform(transform);
     transform_filter->SetInputData(mesh);
