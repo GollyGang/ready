@@ -53,6 +53,7 @@ Please cite Ready as:
     https://github.com/GollyGang/ready
 
 Blog coverage:
+  * The Christev Creative, April 2015: "[Negative Worms in Reaction Diffusion](https://christevcreative.com/2015/04/17/negative-worms-in-reaction-diffusion/)"
   * Tim's blog, December 2012: "[Ready 0.5](http://ferkeltongs.livejournal.com/36454.html)"
   * GPU Science, September 2012: "[Reaction-Diffusion by the Gray-Scott Model with OpenCL](http://gpuscience.com/physicalscience/reaction-diffusion-by-the-gray-scott-model-with-opencl/)"
   * Complex Projective 4-Space, August 2012: "[Are you Ready?](https://cp4space.wordpress.com/2012/08/24/are-you-ready/)"
