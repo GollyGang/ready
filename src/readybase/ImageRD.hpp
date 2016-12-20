@@ -1,4 +1,4 @@
-/*  Copyright 2011-2013, 2015 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -25,6 +25,7 @@
 class vtkImageData;
 class vtkAssignAttribute;
 class vtkRearrangeFields;
+class vtkUnstructuredGrid;
 
 /// Base class for image-based systems.
 class ImageRD : public AbstractRD
@@ -51,9 +52,16 @@ class ImageRD : public AbstractRD
         virtual void SetNumberOfChemicals(int n);
 
         virtual void GenerateInitialPattern();
-        virtual void BlankImage();
+        virtual void BlankImage(float value = 0.0f);
         void GetImage(vtkImageData* im) const;
         virtual void CopyFromImage(vtkImageData* im);
+        virtual void CopyFromMesh(
+            vtkUnstructuredGrid* mesh,
+            const int num_chemicals,
+            const size_t target_chemical,
+            const size_t largest_dimension,
+            const float value_inside,
+            const float value_outside);
         virtual void SaveStartingPattern();
         virtual void RestoreStartingPattern();
 

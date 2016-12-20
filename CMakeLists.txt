@@ -26,7 +26,7 @@ endif(POLICY CMP0043)
 
 project( Ready )
 
-set( READY_VERSION 0.7.2 )   # check matches Help/about.html
+set( READY_VERSION 0.8 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
@@ -426,6 +426,7 @@ else()
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
+    vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
     vtkIOXML
@@ -444,6 +445,7 @@ else()
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
+    vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
     vtkIOXML
@@ -462,6 +464,7 @@ else()
     vtkFiltersGeometry
     vtkFiltersModeling
     vtkFiltersTexture
+    vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
     vtkIOGeometry

@@ -188,11 +188,11 @@ void MeshRD::GenerateInitialPattern()
 
 // ---------------------------------------------------------------------
 
-void MeshRD::BlankImage()
+void MeshRD::BlankImage(float value)
 {
     for(int iChem=0;iChem<this->n_chemicals;iChem++)
     {
-        this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str())->FillComponent(0,0.0);
+        this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str())->FillComponent(0, value);
     }
     this->mesh->Modified();
     this->undo_stack.clear();
