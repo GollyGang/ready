@@ -40,7 +40,7 @@
         </overwrite>
         <white_noise low="0.6" high="1">
         </white_noise>
-        <circle radius="0.2">
+        <circle radius="0.1">
           <point3D x="0.5" y="0.5" z="0.5">
           </point3D>
         </circle>
