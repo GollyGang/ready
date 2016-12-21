@@ -10,10 +10,10 @@
         1.0
       </param>
       <param name="D_a">
-        0.09
+        0.12
       </param>
       <param name="D_b">
-        0.045
+        0.06
       </param>
       <param name="k">
         0.055
@@ -35,13 +35,31 @@
         <everywhere>
         </everywhere>
       </overlay>
+      <overlay chemical="a">
+        <overwrite>
+        </overwrite>
+        <white_noise low="0.3" high="1.0">
+        </white_noise>
+        <circle radius="0.17">
+          <point3D x="0.45" y="0.502" z="0.495">
+          </point3D>
+        </circle>
+        <circle radius="0.1">
+          <point3D x="0.72" y="0.5" z="0.487">
+          </point3D>
+        </circle>
+      </overlay>
       <overlay chemical="b">
         <overwrite>
         </overwrite>
-        <white_noise low="0.6" high="1">
+        <white_noise low="0.0" high="0.5">
         </white_noise>
+        <circle radius="0.17">
+          <point3D x="0.45" y="0.502" z="0.495">
+          </point3D>
+        </circle>
         <circle radius="0.1">
-          <point3D x="0.5" y="0.5" z="0.5">
+          <point3D x="0.72" y="0.5" z="0.487">
           </point3D>
         </circle>
       </overlay>
