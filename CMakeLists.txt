@@ -109,7 +109,7 @@ set( PATTERN_FILES
   Patterns/Turing1952/spots.vti            Patterns/Turing1952/spots_noisy.vti
   Patterns/kernel_test.vti
   Patterns/parameter_modulation_demo.vti
-  Patterns/parameter_modulation_demo2.vti
+  Patterns/parameter_modulation_demo2.vti  Patterns/parameter_modulation_demo2_3D.vti
   Patterns/bunny.vtu
   Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
@@ -169,7 +169,7 @@ set( PATTERN_FILES
   Patterns/Schrodinger1926/packet_reflect2D.vti   Patterns/Schrodinger1926/two_slit.vti
   Patterns/Froese2014/Froese2014_Fig3.vti
   Patterns/Pennybacker2013/phyllotaxis_fibonacci.vti Patterns/Pennybacker2013/phyllotaxis_hexagons.vti
-  Patterns/Pennybacker2013/spots.vti Patterns/Pennybacker2013/stripes.vti
+  Patterns/Pennybacker2013/spots.vti                 Patterns/Pennybacker2013/stripes.vti
   Patterns/Pennybacker2013/parameter_map.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots.vti
   Patterns/Experiments/DanWills/cglrd_ramps_example.vti
