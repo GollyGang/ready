@@ -163,11 +163,11 @@ void MeshRD::GenerateInitialPattern()
                 cp[xyz] += this->mesh->GetPoint(pts[iPt])[xyz]-bounds[xyz*2+0];
         for(int xyz=0;xyz<3;xyz++)
             cp[xyz] /= npts;
-        for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
+        for(size_t iOverlay=0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
         {
-            Overlay* overlay = this->initial_pattern_generator[iOverlay];
+            const Overlay& overlay = this->initial_pattern_generator.GetOverlay(iOverlay);
 
-            int iC = overlay->GetTargetChemical();
+            int iC = overlay.GetTargetChemical();
             if(iC<0 || iC>=this->GetNumberOfChemicals())
                 continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                 //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
@@ -179,7 +179,7 @@ void MeshRD::GenerateInitialPattern()
                 vals[i] = this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str())->GetComponent( iCell, 0 );
                 if(i==iC) val = vals[i];
             }
-            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent( iCell, 0, overlay->Apply(vals,this,cp[0],cp[1],cp[2]) );
+            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent( iCell, 0, overlay.Apply(vals,this,cp[0],cp[1],cp[2]) );
         }
     }
     this->mesh->Modified();

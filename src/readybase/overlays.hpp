@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#ifndef __OVERLAYS__
+#define __OVERLAYS__
+
 // STL:
 #include <string>
 #include <vector>
@@ -64,3 +67,5 @@ class Overlay : public XML_Object
         Overlay();          ///< not implemented
         Overlay(Overlay&);  ///< not implemented
 };
+
+#endif

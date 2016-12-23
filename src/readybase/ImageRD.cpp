@@ -329,11 +329,11 @@ void ImageRD::GenerateInitialPattern()
         {
             for(int x=0;x<X;x++)
             {
-                for(int iOverlay=0;iOverlay<(int)this->initial_pattern_generator.size();iOverlay++)
+                for(size_t iOverlay=0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
                 {
-                    Overlay* overlay = this->initial_pattern_generator[iOverlay];
+                    const Overlay& overlay = this->initial_pattern_generator.GetOverlay(iOverlay);
 
-                    int iC = overlay->GetTargetChemical();
+                    int iC = overlay.GetTargetChemical();
                     if(iC<0 || iC>=this->GetNumberOfChemicals())
                         continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                         //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
@@ -342,7 +342,7 @@ void ImageRD::GenerateInitialPattern()
                     vector<double> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
                         vals[i] = this->GetImage(i)->GetScalarComponentAsDouble(x,y,z,0);
-                    this->GetImage(iC)->SetScalarComponentFromDouble(x,y,z,0,overlay->Apply(vals,this,x,y,z));
+                    this->GetImage(iC)->SetScalarComponentFromDouble(x,y,z,0,overlay.Apply(vals,this,x,y,z));
                 }
             }
         }

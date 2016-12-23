@@ -50,7 +50,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source)
     this->SetRuleName(source.GetRuleName());
     this->SetDescription(source.GetDescription());
 
-    this->ReadInitialPatternGeneratorFromXML(source.GetAsXML(false)->FindNestedElementWithName("initial_pattern_generator"));
+    this->initial_pattern_generator.ReadFromXML(source.GetAsXML(false)->FindNestedElementWithName("initial_pattern_generator"));
 
     // TODO: copy starting pattern?
 }

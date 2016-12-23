@@ -1,4 +1,4 @@
-/*  Copyright 2011-2015 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -109,12 +109,12 @@ template <> bool from_string<string> (const string& s,string& val)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string GetChemicalName(int i)
+string GetChemicalName(size_t i)
 { 
     if(i<26)
-        return string(1,'a'+i); 
+        return string( 1, 'a' + static_cast<char>(i) ); 
     else if(i<26*27)
-        return GetChemicalName(i/26-1)+GetChemicalName(i%26);
+        return GetChemicalName(i/26-1) + GetChemicalName(i%26);
     throw runtime_error("GetChemicalName: out of range");
 }
 

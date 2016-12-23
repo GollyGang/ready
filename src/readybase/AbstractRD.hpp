@@ -19,6 +19,7 @@
 #define __ABSTRACTRD__
 
 // local:
+#include "InitialPatternGenerator.hpp"
 class Overlay;
 class Properties;
 
@@ -199,7 +200,7 @@ class AbstractRD
         std::string data_type_string;
         std::string data_type_suffix;
 
-        std::vector<Overlay*> initial_pattern_generator;
+        InitialPatternGenerator initial_pattern_generator;
 
         std::vector<std::pair<std::string,float> > parameters;
 
@@ -235,9 +236,6 @@ class AbstractRD
 
         /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;
-
-        void ClearInitialPatternGenerator();
-        void ReadInitialPatternGeneratorFromXML(vtkXMLDataElement* node);
 
         virtual void FlipPaintAction(PaintAction& cca) =0; ///< Undo/redo this paint action.
         void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.

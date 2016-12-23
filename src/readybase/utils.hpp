@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -66,7 +66,7 @@ void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val
         throw std::runtime_error(to_string(e->GetName())+" : failed to read required attribute: "+name);
 } 
 
-std::string GetChemicalName(int i); ///< a, b, c, ... z, aa, ab, ...
+std::string GetChemicalName(size_t i); ///< a, b, c, ... z, aa, ab, ...
 int IndexFromChemicalName(const std::string& s);
 
 /// Read a multiline string, outputting whitespace-trimmed lines.
