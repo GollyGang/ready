@@ -12,9 +12,18 @@ Big picture issues:
 - Scripting support
 - use FFT for speed?
 
+before 0.8 release:
+- merge houdini branch
+- IPG with transparency, allowing only part of the saved pattern to be overwritten (John Denton wanted this)
+- allow operations on chemicals: swap, duplicate
+- issue #7: changing number of chemicals shouldn't clear all
+- issue #14: change default gray-scott system to use 'K' instead of 'k' to avoid name collision
+- issue #8: kernels don't need to be power-of-2, so don't enforce
+- issue #9: add SDK links and more help to OpenCL error message
+- issue #2: need to copy with unicode in file paths
+
 before 0.x release:
 
-- IPG with transparency, allowing only part of the saved pattern to be overwritten (John Denton wanted this)
 - merged phase plot and graph for 1D patterns: plot graph at right angles, to e.g. show Schroedinger as a corkscrew
 - fix panning issue on complex scenes (e.g. Bays_3D.vti)
 - new fill types: perlin noise (vtkPerlinNoise), conical gradient
