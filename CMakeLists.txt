@@ -17,12 +17,9 @@
 #
 #--------------------------------------------------------------------------
 
-cmake_minimum_required( VERSION 2.6 )
+cmake_minimum_required( VERSION 3.1 FATAL_ERROR)
 cmake_policy( SET CMP0003 NEW )
-if(POLICY CMP0043)
-  # policy not known to older versions ...
-  cmake_policy(SET CMP0043 NEW)
-endif(POLICY CMP0043)
+cmake_policy( SET CMP0043 NEW )
 
 project( Ready )
 
@@ -408,6 +405,10 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
+set_property(TARGET readybase PROPERTY CXX_STANDARD 11)
+set_property(TARGET readybase PROPERTY CXX_STANDARD_REQUIRED ON)
+
+# link VTK into readybase
 if( EXISTS "/etc/redhat-release" )
  # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
  target_link_libraries( readybase ${VTK_LIBRARIES} )
@@ -478,6 +479,7 @@ else()
   )
  endif()
 endif()
+
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
 target_link_libraries( ${CMD_NAME} readybase )
