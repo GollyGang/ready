@@ -1,4 +1,4 @@
-/*  Copyright 2011, 2012, 2013 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -37,11 +37,11 @@ FormulaOpenCLMeshRD::FormulaOpenCLMeshRD(int opencl_platform,int opencl_device,i
     this->AddParameter("timestep",1.0f);
     this->AddParameter("D_a",0.082f);
     this->AddParameter("D_b",0.041f);
-    this->AddParameter("k",0.06f);
+    this->AddParameter("K",0.06f);
     this->AddParameter("F",0.035f);
     this->SetFormula("\
-delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\n\
-delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;");
+delta_a = D_a * laplacian_a - a*b*b + F*(1.0" + this->data_type_suffix + "-a);\n\
+delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;");
 }
 
 // -------------------------------------------------------------------------
