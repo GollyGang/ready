@@ -19,13 +19,14 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 #include "overlays.hpp"
 
 // STL:
-#include <memory>
 #include <vector>
 
 /// Generates image/mesh patterns by drawing a series of overlays.
 class InitialPatternGenerator
 {
     public:
+
+        ~InitialPatternGenerator();
 
         void ReadFromXML(vtkXMLDataElement* node);
         vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
@@ -38,5 +39,7 @@ class InitialPatternGenerator
 
     private:
 
-        std::vector<std::unique_ptr<Overlay>> overlays;
+        void RemoveAllOverlays();
+
+        std::vector<Overlay*> overlays; // TODO: use unique_ptr when C++11-compatible VTK is available on target platforms
 };

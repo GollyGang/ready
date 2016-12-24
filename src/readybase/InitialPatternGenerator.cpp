@@ -18,13 +18,33 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 // Local:
 #include "InitialPatternGenerator.hpp"
 
+InitialPatternGenerator::~InitialPatternGenerator()
+{
+    RemoveAllOverlays();
+}
+
+// ---------------------------------------------------------------------
+
+void InitialPatternGenerator::RemoveAllOverlays()
+{
+    for (size_t i = 0; i < this->overlays.size(); i++)
+    {
+        delete this->overlays[i];
+    }
+    this->overlays.clear();
+}
+
+// ---------------------------------------------------------------------
+
 void InitialPatternGenerator::ReadFromXML(vtkXMLDataElement* node)
 {
-    this->overlays.clear();
+    this->RemoveAllOverlays();
     if (node) // IPG is optional in the XML, default is none
     {
-        for(int i = 0; i < node->GetNumberOfNestedElements(); i++)
-            this->overlays.push_back(std::make_unique<Overlay>(node->GetNestedElement(i)));
+        for (int i = 0; i < node->GetNumberOfNestedElements(); i++)
+        {
+            this->overlays.push_back(new Overlay(node->GetNestedElement(i)));
+        }
     }
 }
 
@@ -37,7 +57,9 @@ vtkSmartPointer<vtkXMLDataElement> InitialPatternGenerator::GetAsXML(bool genera
     ipg->SetName("initial_pattern_generator");
     ipg->SetAttribute("apply_when_loading", generate_initial_pattern_when_loading ? "true" : "false");
     for (size_t i = 0; i < this->overlays.size(); i++)
+    {
         ipg->AddNestedElement(this->overlays[i]->GetAsXML());
+    }
     return ipg;
 }
 
@@ -45,7 +67,7 @@ vtkSmartPointer<vtkXMLDataElement> InitialPatternGenerator::GetAsXML(bool genera
 
 void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_chemicals)
 {
-    this->overlays.clear();
+    RemoveAllOverlays();
 
     // this is ungainly, will need to improve later when we allow the user to edit the IPG through the Info Pane
     vtkSmartPointer<vtkXMLDataElement> ow = vtkSmartPointer<vtkXMLDataElement>::New();
@@ -62,7 +84,7 @@ void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_ch
     ov1->AddNestedElement(ow);
     ov1->AddNestedElement(c1);
     ov1->AddNestedElement(ew);
-    this->overlays.push_back(std::make_unique<Overlay>(ov1));
+    this->overlays.push_back(new Overlay(ov1));
 
     vtkSmartPointer<vtkXMLDataElement> wn = vtkSmartPointer<vtkXMLDataElement>::New();
     wn->SetName("white_noise");
@@ -90,6 +112,6 @@ void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_ch
         ov->AddNestedElement(ow);
         ov->AddNestedElement(wn);
         ov->AddNestedElement(r);
-        this->overlays.push_back(std::make_unique<Overlay>(ov));
+        this->overlays.push_back(new Overlay(ov));
     }
 }
