@@ -18,7 +18,7 @@ before 0.8 release:
 - allow operations on chemicals: swap, duplicate
 - issue #7: changing number of chemicals shouldn't clear all
 - issue #9: add SDK links and more help to OpenCL error message
-- issue #2: need to copy with unicode in file paths
+- issue #2: need to cope with unicode in file paths
 
 before 0.x release:
 
