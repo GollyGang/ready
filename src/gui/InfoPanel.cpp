@@ -788,6 +788,21 @@ void InfoPanel::ChangeDimensions()
         newy = dialog.GetY();
         newz = dialog.GetZ();
         if (newx == oldx && newy == oldy && newz == oldz) break;
+        const bool not_all_powers_of_two = newx&(newx - 1) || newy&(newy - 1) || newz&(newz - 1);
+        if (sys->GetRuleType() == "formula" && not_all_powers_of_two)
+        {
+            wxMessageBox(_("For efficient wrap-around in OpenCL we require all the dimensions to be powers of 2"));
+            continue;
+        }
+        else if (sys->GetRuleType() == "kernel" && not_all_powers_of_two)
+        {
+            int answer = wxMessageBox(
+                _("Check the kernel to see if it supports dimensions that are not powers of 2"), 
+                _("WARNING: Dimensions are not all powers of 2"),
+                wxOK | wxCANCEL);
+            if (answer == wxCANCEL)
+                continue;
+        }
         if(frame->SetDimensions(newx, newy, newz)) break;
     } while(true);
 }

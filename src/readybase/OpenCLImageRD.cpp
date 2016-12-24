@@ -166,8 +166,6 @@ void OpenCLImageRD::BlankImage()
 
 void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
-    if(x&(x-1) || y&(y-1) || z&(z-1))
-        throw runtime_error("OpenCLImageRD::AllocateImages : for wrap-around in OpenCL we require all the dimensions to be powers of 2");
     ImageRD::AllocateImages(x,y,z,nc,data_type);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();

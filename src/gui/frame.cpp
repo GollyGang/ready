@@ -3007,6 +3007,10 @@ bool MyFrame::SetDimensions(int x,int y,int z)
                 "x" << this->system->GetBlockSizeY() << "x" << this->system->GetBlockSizeZ() << ")";
             throw runtime_error(oss.str().c_str());
         }
+        if( this->system->GetRuleType()=="formula" && ( x&(x - 1) || y&(y - 1) || z&(z - 1) ) )
+        {
+            return false; // for wrap-around in OpenCL we require all the dimensions to be powers of 2
+        }
         // rearrange the dimensions (for visualization we need the z to be 1 for 2D images, and both y and z to be 1 for 1D images)
         if( (x==1 && (y>1 || z>1)) || (y==1 && z>1) )
         {
