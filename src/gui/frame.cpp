@@ -1,4 +1,4 @@
-/*  Copyright 2011-2013, 2015 The Ready Bunch
+/*  Copyright 2011-2016 The Ready Bunch
 
     This file is part of Ready.
 
@@ -46,11 +46,12 @@
 #include "appicon16.xpm"
 
 // wxWidgets:
-#include <wx/filename.h>
 #include <wx/dir.h>
 #include <wx/dnd.h>
+#include <wx/filename.h>
+#include <wx/filesys.h>
 #if wxUSE_TOOLTIPS
-   #include "wx/tooltip.h"
+   #include <wx/tooltip.h>
 #endif
 
 // wxVTK: (local copy)
@@ -923,6 +924,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     int unused_value = 0;
     wxString filename;
     wxString extension,folder;
+    const char* filename_cstr;
     folder = screenshotdir;
     do {
         filename = default_filename_root;
@@ -941,7 +943,13 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
         wxFileName::SplitPath(filename,&folder,NULL,&extension);
         if(extension!=_T("png") && extension!=_T("jpg"))
         {
-            wxMessageBox(_("Unsupported format"));
+            wxMessageBox(_("Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+            accepted = false;
+        }
+        filename_cstr = filename.mb_str();
+        if (strlen(filename_cstr) == 0)
+        {
+            wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
             accepted = false;
         }
     } while(!accepted);
@@ -954,7 +962,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     vtkSmartPointer<vtkImageWriter> writer;
     if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
     else if(extension==_T("jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-    writer->SetFileName(filename.mb_str());
+    writer->SetFileName(filename_cstr);
     writer->SetInputConnection(screenshot->GetOutputPort());
     writer->Write();
 }
@@ -972,6 +980,12 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 
     wxDirDialog dirdlg(this, _("Choose your pattern folder"), userdir, wxDD_NEW_DIR_BUTTON);
     if (dirdlg.ShowModal() == wxID_OK) {
+        const char* filename_cstr = dirdlg.GetPath().mb_str();
+        if (strlen(filename_cstr) == 0)
+        {
+            wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+            return;
+        }
         userdir = dirdlg.GetPath();
         this->patterns_panel->BuildTree();
     }
@@ -2218,7 +2232,7 @@ void MyFrame::OnOpenPattern(wxCommandEvent& event)
     if(opendlg.ShowModal() == wxID_OK) {
         wxFileName fullpath( opendlg.GetPath() );
         opensavedir = fullpath.GetPath();
-        OpenFile( opendlg.GetPath() );
+        OpenFile(fullpath.GetPath());
     }
 }
 
@@ -2226,6 +2240,13 @@ void MyFrame::OnOpenPattern(wxCommandEvent& event)
 
 void MyFrame::OpenFile(const wxString& path, bool remember)
 {
+    const char* filename_cstr = path.mb_str();
+    if (strlen(filename_cstr) == 0)
+    {
+        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+        return;
+    }
+
     if (IsHTMLFile(path)) {
         // show HTML file in help pane
         this->help_panel->ShowHelp(path);
@@ -2247,7 +2268,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
 
     if(!wxFileExists(path))
     {
-        wxMessageBox(_("File doesn't exist: ")+path);
+        wxMessageBox(_("File doesn't exist: ")+path, _("Error"), wxOK | wxCENTER | wxICON_ERROR);
         return;
     }
 
@@ -2264,7 +2285,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     try
     {
         this->InitializeDefaultRenderSettings();
-        target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
+        target_system = SystemFactory::CreateFromFile(filename_cstr,this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(target_system);
     }
     catch(const exception& e)
@@ -3205,6 +3226,13 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"), wxFD_OPEN);
     if (mesh_filename.empty()) return; // user cancelled
 
+    const char* filename_cstr = mesh_filename.mb_str();
+    if (strlen(filename_cstr) == 0)
+    {
+        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+        return;
+    }
+
     wxArrayString choices;
     choices.Add(_("Run a pattern on the surface of this mesh"));
     choices.Add(_("Paint this pattern into a 3D volume image"));
@@ -3309,6 +3337,13 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
         _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (mesh_filename.empty()) return; // user cancelled
 
+    const char* filename_cstr = mesh_filename.mb_str();
+    if (strlen(filename_cstr) == 0)
+    {
+        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+        return;
+    }
+
     SaveCurrentMesh(mesh_filename,false,0.0);
 }
 
@@ -3403,6 +3438,13 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
                           this->render_settings.GetProperty("high").GetFloat());
     if (dlg.ShowModal() != wxID_OK) return;
 
+    const char* filename_cstr = dlg.image_filename.mb_str();
+    if (strlen(filename_cstr) == 0)
+    {
+        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+        return;
+    }
+
     wxString ext = wxFileName(dlg.image_filename).GetExt();
     vtkSmartPointer<vtkImageReader2> reader;
     if (ext.IsSameAs("png", false)) reader = vtkSmartPointer<vtkPNGReader>::New();
@@ -3412,7 +3454,7 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
         wxMessageBox(_("Unsupported extension: ") + ext, _("Error reading image file"), wxICON_ERROR);
         return;
     }
-    reader->SetFileName(dlg.image_filename.c_str());
+    reader->SetFileName(filename_cstr);
 
     // for now we convert the image to grayscale
     vtkSmartPointer<vtkImageLuminance> to_gray = vtkSmartPointer<vtkImageLuminance>::New();
@@ -3457,6 +3499,7 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     const wxString default_filename_ext = _T("png");
     int unused_value = 0;
     wxString filename;
+    const char* filename_cstr;
     wxString extension,folder;
     folder = screenshotdir;
     do {
@@ -3476,7 +3519,13 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
         wxFileName::SplitPath(filename,&folder,NULL,&extension);
         if(extension!=_T("png") && extension!=_T("jpg"))
         {
-            wxMessageBox(_("Unsupported format"));
+            wxMessageBox(_("Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+            accepted = false;
+        }
+        filename_cstr = filename.mb_str();
+        if (strlen(filename_cstr) == 0)
+        {
+            wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
             accepted = false;
         }
     } while(!accepted);
@@ -3486,7 +3535,7 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     vtkSmartPointer<vtkImageWriter> writer;
     if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
     else if(extension==_T("jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-    writer->SetFileName(filename.mb_str());
+    writer->SetFileName(filename_cstr);
     vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
     system->GetAs2DImage(image,this->render_settings);
     #if VTK_MAJOR_VERSION >= 6
@@ -3993,6 +4042,13 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
 {
     wxString filename = SavePatternDialog();
     if(filename.empty()) return;
+
+    const char* filename_cstr = filename.mb_str();
+    if (strlen(filename_cstr) == 0)
+    {
+        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+        return;
+    }
 
     wxBusyCursor busy;
 
