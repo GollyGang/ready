@@ -23,26 +23,26 @@
     <key>CFBundleShortVersionString</key>
     <string>VERSION</string>
     <key>CFBundleGetInfoString</key>
-    <string>Ready version VERSION, Copyright 2011, 2012 The Ready Bunch</string>
+    <string>Ready version VERSION, Copyright 2011-2016 The Ready Bunch</string>
     <key>LSRequiresCarbon</key>
     <true/>
     <key>CFBundleDocumentTypes</key>
     <array>
-		  <dict>
+          <dict>
             <key>CFBundleTypeName</key>
             <string>Ready Pattern File</string>
             <key>CFBundleTypeIconFile</key>
             <string>file.icns</string>
             <key>CFBundleTypeExtensions</key>
             <array>
-            	 <string>vti</string>
-            	 <string>vtu</string>
+                 <string>vti</string>
+                 <string>vtu</string>
             </array>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>LSIsAppleDefaultForType</key>
             <true/>
-		  </dict>
+          </dict>
         <dict>
             <key>CFBundleTypeName</key>
             <string>Pattern File</string>
