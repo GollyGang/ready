@@ -2232,7 +2232,7 @@ void MyFrame::OnOpenPattern(wxCommandEvent& event)
     if(opendlg.ShowModal() == wxID_OK) {
         wxFileName fullpath( opendlg.GetPath() );
         opensavedir = fullpath.GetPath();
-        OpenFile(fullpath.GetPath());
+        OpenFile(opendlg.GetPath());
     }
 }
 
