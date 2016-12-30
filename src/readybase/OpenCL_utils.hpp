@@ -77,4 +77,6 @@ namespace OpenCL_utils
 
     /// Throws a std::runtime_error with a descriptive message of the OpenCL error code.
     void throwOnError(cl_int ret,const char* message);
+
+    const char* GetOpenCLInstallationHints();
 }

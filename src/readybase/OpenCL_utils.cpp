@@ -602,3 +602,22 @@ const char* OpenCL_utils::GetDeviceInfoIdAsString(cl_device_info i)
 }
 
 // ---------------------------------------------------------------------------------------------------------
+
+const char* OpenCL_utils::GetOpenCLInstallationHints()
+{
+    return
+        "This requires OpenCL, which has not been detected on your system.\n\n"
+        "OpenCL allows Ready to take advantage of the many-core architectures on\n"
+        "graphics cards and modern CPUs. OpenCL also allows rules to be written in\n"
+        "a text format and compiled on the fly. It is available on every operating\n"
+        "system, so please install it to get the most out of Ready. (One exception:\n"
+        "If your OS is running in a virtual machine then it may not be possible to\n"
+        "get OpenCL working.)\n\n"
+        "Links:\n"
+        "https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/\n"
+        "https://wiki.tiker.net/OpenCLHowTo (for Linux)\n\n"
+        "Without OpenCL you can load the files in the 'CPU-only' folder. Or use\n"
+        "File > New Pattern or File > Import Mesh to make new examples.";
+}
+// -------------------------------------------------------------------------------------------------------------
+

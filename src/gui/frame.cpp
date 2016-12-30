@@ -1377,13 +1377,16 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     }
     catch(const exception& e)
     {
-        wxMessageBox(_("OpenCL not available: ")+
-            wxString(e.what(),wxConvUTF8));
+        MonospaceMessageBox((_("OpenCL not available: ")+
+            wxString(e.what(),wxConvUTF8)+
+            _("\n\n")+
+            wxString(OpenCL_utils::GetOpenCLInstallationHints(),wxConvUTF8)),_("Error"), wxART_ERROR);
         return;
     }
     catch(...)
     {
-        wxMessageBox(_("OpenCL not available"));
+        MonospaceMessageBox((_("OpenCL not available:\n\n")+
+            wxString(OpenCL_utils::GetOpenCLInstallationHints(), wxConvUTF8)), _("Error"), wxART_ERROR);
         return;
     }
     for(int ip=0;ip<np;ip++)
