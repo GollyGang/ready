@@ -28,6 +28,7 @@
 #include "dialogs.hpp"
 #include "RecordingDialog.hpp"
 #include "ImportImageDialog.hpp"
+#include "MakeNewSystem.hpp"
 
 // readybase:
 #include <utils.hpp>
@@ -39,7 +40,6 @@
 #include <FormulaOpenCLMeshRD.hpp>
 #include <FullKernelOpenCLImageRD.hpp>
 #include <FullKernelOpenCLMeshRD.hpp>
-#include <MeshGenerators.hpp>
 #include <SystemFactory.hpp>
 
 // local resources:
@@ -64,20 +64,17 @@ using namespace std;
 
 // VTK:
 #include <vtkBMPReader.h>
-#include <vtkCellArray.h>
 #include <vtkCellPicker.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageReader2.h>
 #include <vtkImageResize.h>
 #include <vtkImageShiftScale.h>
-#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkJPEGReader.h>
 #include <vtkJPEGWriter.h>
 #include <vtkOBJReader.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkPointData.h>
-#include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkRendererCollection.h>
@@ -308,7 +305,7 @@ MyFrame::MyFrame(const wxString& title)
         this->OpenFile(initfile);
     } else {
         // create new pattern
-        this->InitializeDefaultRenderSettings();
+        this->InitializeDefaultRenderSettings(this->render_settings);
         GrayScottImageRD *s = new GrayScottImageRD();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
@@ -1525,7 +1522,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     // ask user what type of dataset to generate:
     enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
         BodyCentredCubic, FaceCentredCubic, Diamond, HyperbolicPlane, HyperbolicSpace }; // TODO: tetrahedral grid (different kinds)
-    int sel;
+    GenType sel;
     {
         const int N_CHOICES = 18;
         wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
@@ -1533,661 +1530,41 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
             _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay honeycomb (tetrahedra)"), 
             _("Body-centred cubic honeycomb (truncated octahedra)"), _("Face-centred cubic honeycomb (rhombic dodecahedra)"), 
-            _("Diamond honeycomb (triakis truncated tetrahedra)"),_("Hyperbolic plane tiling"),_("Hyperbolic space tiling") };
-        wxSingleChoiceDialog dlg(this,_("Select a pattern type:"),_("New Pattern"),N_CHOICES,dataset_types);
+            _("Diamond honeycomb (triakis truncated tetrahedra)"), _("Hyperbolic plane tiling"), _("Hyperbolic space tiling") };
+        wxSingleChoiceDialog dlg(this, _("Select a pattern type:"), _("New Pattern"), N_CHOICES, dataset_types);
         dlg.SetSelection(1); // default selection
-        dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
+        dlg.SetSize(wxDefaultCoord, 130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
         if(dlg.ShowModal()!=wxID_OK) return;
-        sel = dlg.GetSelection();
+        sel = static_cast<GenType>( dlg.GetSelection() );
     }
 
-    // we'll need to restore current render settings if user decides not to create a new pattern
-    // or some sort of error occurs
-    Properties previous_render_settings = this->render_settings;
+    this->SetStatusText(_("Generating..."));
 
-    // perhaps at some point we will want this to be determined by the user
-    const int data_type = VTK_FLOAT;
-    
-    this->InitializeDefaultRenderSettings();
     AbstractRD *sys;
-    try 
+    Properties new_render_settings("render_settings");
+    this->InitializeDefaultRenderSettings(new_render_settings);
+    try
     {
         switch(sel)
         {
-            case Image1D:
-            {
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating image..."));
-                ImageRD *image_sys;
-                if(this->is_opencl_available)
-                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
-                else
-                    image_sys = new GrayScottImageRD();
-                image_sys->SetDimensionsAndNumberOfChemicals(128,1,1,2);
-                sys = image_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
-                break;
-            }
-            case Image2D:
-            {
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating image..."));
-                ImageRD *image_sys;
-                if(this->is_opencl_available)
-                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
-                else
-                    image_sys = new GrayScottImageRD();
-                image_sys->SetDimensionsAndNumberOfChemicals(128,128,1,2);
-                sys = image_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
-                break;
-            }
-            case Image3D:
-            {
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating image..."));
-                ImageRD *image_sys;
-                if(this->is_opencl_available)
-                    image_sys = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
-                else
-                    image_sys = new GrayScottImageRD();
-                image_sys->SetDimensionsAndNumberOfChemicals(32,32,32,2);
-                sys = image_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
-                break;
-            }
-            case GeoSphere:
-            {
-                int divs;
-                {
-                    const int N_CHOICES = 6;
-                    int div_choices[N_CHOICES] = {2,3,4,5,6,7};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],20<<(div_choices[i]*2));
-                    wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Geodesic sphere options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    divs = div_choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetGeodesicSphere(divs,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                break;
-            }
-            case Torus:
-            {
-                int nx,ny;
-                {
-                    const int N_CHOICES = 4;
-                    int x_choices[N_CHOICES] = {100,160,200,500};
-                    int y_choices[N_CHOICES] = {125,200,250,625};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%dx%d - %d cells",x_choices[i],y_choices[i],x_choices[i]*y_choices[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the resolution:"),_("Torus tiling options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(2); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    nx = x_choices[dlg.GetSelection()];
-                    ny = y_choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTorus(nx,ny,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                break;
-            }
-            case TriMesh:
-            {
-                int n;
-                {
-                    const int N_CHOICES = 5;
-                    int choices[N_CHOICES] = {30,50,100,200,500};
-                    int cells[N_CHOICES] = {1682,4802,19602,79202,498002};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d cells",cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Triangular mesh options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(1); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    n = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetTriangularMesh(n,n,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(n<100);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            case HexMesh:
-            {
-                int n;
-                {
-                    const int N_CHOICES = 4;
-                    int choices[N_CHOICES] = {100,150,200,500};
-                    int cells[N_CHOICES] = {3185,7326,13068,82668};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d cells",cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Hexagonal mesh options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    n = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHexagonalMesh(n,n,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(n<200);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            case Rhombille:
-            {
-                int n;
-                {
-                    const int N_CHOICES = 5;
-                    int choices[N_CHOICES] = {50,75,100,150,200};
-                    int cells[N_CHOICES] = {2304,5367,9555,21978,39204};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d cells",cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Rhombille mesh options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    n = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRhombilleTiling(n,n,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(n<100);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            case PenroseP3:
-            {
-                int divs;
-                {
-                    const int N_CHOICES = 8;
-                    int div_choices[N_CHOICES] = {5,7,8,9,10,11,12,13};
-                    int cells[N_CHOICES] = {430,3010,7920,20800,54560,143010,374680,981370};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(1); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    divs = div_choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetPenroseTiling(divs,0,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(divs<9);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            case PenroseP2:
-            {
-                int divs;
-                {
-                    const int N_CHOICES = 8;
-                    int div_choices[N_CHOICES] = {5,6,7,8,9,10,11,12};
-                    int cells[N_CHOICES] = {705,1855,4885,12845,33705,88355,231515,606445};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d subdivisions - %d cells",div_choices[i],cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of subdivisions:"),_("Penrose tiling options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(2); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    divs = div_choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetPenroseTiling(divs,1,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(divs<8);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                wxMessageBox(_("There's a problem with rendering concave polygons in OpenGL, so the display might be slightly corrupted."));
-                break;
-            }
-            case Del2D:
-            {
-                int npts;
-                {
-                    const int N_CHOICES = 5;
-                    int choices[N_CHOICES] = {1000,2000,5000,10000,20000};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d cells",choices[i]*2); // (rough approximation)
-                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Delaunay 2D mesh options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(1); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    npts = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomDelaunay2D(npts,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(npts<5000);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            case Vor2D:
-            {
-                int npts;
-                {
-                    const int N_CHOICES = 5;
-                    int choices[N_CHOICES] = {1000,2000,10000,20000,50000};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d cells",choices[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of cells:"),_("Voronoi 2D mesh options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(1); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    npts = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomVoronoi2D(npts,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(npts<10000);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            case Del3D:
-            {
-                int npts;
-                {
-                    const int N_CHOICES = 5;
-                    int choices[N_CHOICES] = {500,1000,1500,2000,5000};
-                    wxString div_descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        div_descriptions[i] = wxString::Format("%d points - approximately %d cells",choices[i],choices[i]*6);
-                    wxSingleChoiceDialog dlg(this,_("Select the mesh size:"),_("Delaunay 3D mesh options"),N_CHOICES,div_descriptions);
-                    dlg.SetSelection(1); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    npts = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetRandomDelaunay3D(npts,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
-                break;
-            }
-            case BodyCentredCubic:
-            {
-                int side;
-                {
-                    const int N_CHOICES = 3;
-                    int choices[N_CHOICES] = {5,10,20};
-                    int cells[N_CHOICES] = {189,1729,14859};
-                    wxString descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        descriptions[i] = wxString::Format("%d cells",cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Body-centred cubic honeycomb options"),N_CHOICES,descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    side = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetBodyCentredCubicHoneycomb(side,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(true);
-                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            break;
-            case FaceCentredCubic:
-            {
-                int side;
-                {
-                    const int N_CHOICES = 3;
-                    int choices[N_CHOICES] = {5,10,20};
-                    int cells[N_CHOICES] = {500,4000,32000};
-                    wxString descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        descriptions[i] = wxString::Format("%d cells",cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Face-centred cubic honeycomb options"),N_CHOICES,descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    side = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetFaceCentredCubicHoneycomb(side,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(true);
-                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            break;
-            case Diamond:
-            {
-                int side;
-                {
-                    const int N_CHOICES = 3;
-                    int choices[N_CHOICES] = {5,10,20};
-                    int cells[N_CHOICES] = {250,2000,16000};
-                    wxString descriptions[N_CHOICES];
-                    for(int i=0;i<N_CHOICES;i++)
-                        descriptions[i] = wxString::Format("%d cells",cells[i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the grid size:"),_("Diamond honeycomb options"),N_CHOICES,descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+N_CHOICES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    side = choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetDiamondCells(side,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(true);
-                this->render_settings.GetProperty("slice_3D_axis").SetAxis("y");
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                break;
-            }
-            break;
-            case HyperbolicPlane:
-            {
-                // choose the tessellation
-                int schlafli1, schlafli2;
-                {
-                    // sensible choices: {3,7+},{4,5+},{5,4+},{6,4+},{7+,3+}
-                    const int s1_min = 3;
-                    const int s_max = 8;
-                    const int s2_min[s_max+1] = { 0, 0, 0, 7, 5, 4, 4, 3, 3 };
-                    const wxString polygons[s_max+1] = { _(""), _(""), _(""), _("triangles"), _("squares"), _("pentagons"), _("hexagons"), _("heptagons"), _("octagons") }; 
-                    wxArrayString descriptions;
-                    vector<pair<int,int> > choices;
-                    for(int s1 = s1_min; s1 <= s_max; ++s1 ) {
-                        for( int s2 = s2_min[s1]; s2 <= s_max; ++s2 ) {
-                            descriptions.Add( wxString::Format( _("{%d,%d} - %d %s around each vertex"), s1, s2, s2, polygons[s1] ) );
-                            choices.push_back( make_pair( s1, s2 ) );
-                        }
-                    }
-                    wxSingleChoiceDialog dlg(this,_("Select the tiling:"),_("Hyperbolic plane options"),descriptions);
-                    dlg.SetSelection(0); // default selection
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    schlafli1 = choices[dlg.GetSelection()].first;
-                    schlafli2 = choices[dlg.GetSelection()].second;
-                }
-                int levels = 30 / schlafli1; // make this a user option?
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHyperbolicPlaneTiling(schlafli1,schlafli2,levels,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(false);
-                this->render_settings.GetProperty("show_bounding_box").SetBool(true);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                this->render_settings.GetProperty("timesteps_per_render").SetInt(1);
-                break;
-            }
-            break;
-            case HyperbolicSpace:
-            {
-                const int NUM_TESSELLATION_TYPES = 4;
-                // choose the tessellation
-                int tessellationType, schlafli1, schlafli2, schlafli3;
-                {
-                    wxString descriptions[NUM_TESSELLATION_TYPES] = { "{4,3,5} : order-5 cubic honeycomb", "{5,3,4} : order-4 dodecahedral honeycomb", 
-                        "{5,3,5} : order-5 dodecahedral honeycomb",  "{3,5,3} : icosahedral honeycomb" };
-                    wxSingleChoiceDialog dlg(this,_("Select the tessellation required:"),_("Hyperbolic space tessellation options"),NUM_TESSELLATION_TYPES,descriptions);
-                    dlg.SetSelection(0); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+NUM_TESSELLATION_TYPES*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    tessellationType = dlg.GetSelection();
-                    switch( tessellationType ) {
-                        case 0: schlafli1 = 4; schlafli2 = 3; schlafli3 = 5; break;
-                        case 1: schlafli1 = 5; schlafli2 = 3; schlafli3 = 4; break;
-                        case 2: schlafli1 = 5; schlafli2 = 3; schlafli3 = 5; break;
-                        case 3: schlafli1 = 3; schlafli2 = 5; schlafli3 = 3; break;
-                    }
-                }
-                // choose the recursion depth
-                int levels;
-                {
-                    const int MAX_CHOICES = 7;
-                    int level_choices[MAX_CHOICES] = {1,2,3,4,5,6,7};
-                    int cells[NUM_TESSELLATION_TYPES][MAX_CHOICES] = {
-                        {7,37,163,661,2643,10497,41505}, // {4,3,5} : https://oeis.org/A247308
-                        {13,115,927,7329,57741,0,0},     // {5,3,4}
-                        {13,145,1537,16129,0,0,0},       // {5,3,5}
-                        {21,281,3493,42963,0,0,0}        // {3,5,3}
-                    };
-                    int num_choices[NUM_TESSELLATION_TYPES] = { 7, 5, 4, 4 };
-                    wxArrayString level_descriptions;
-                    level_descriptions.resize( num_choices[ tessellationType ] );
-                    for( int i = 0; i < num_choices[ tessellationType ]; ++i )
-                        level_descriptions[i] = wxString::Format("%d levels - %d cells",level_choices[i],cells[tessellationType][i]);
-                    wxSingleChoiceDialog dlg(this,_("Select the number of levels:"),_("Hyperbolic space tessellation options"),
-                        level_descriptions);
-                    dlg.SetSelection(2); // default selection
-                    dlg.SetSize(wxDefaultCoord,130+num_choices[ tessellationType ]*20); // increase dlg height so we see all choices without having to scroll
-                    if(dlg.ShowModal()!=wxID_OK) {
-                        this->render_settings = previous_render_settings;
-                        return;
-                    }
-                    levels = level_choices[dlg.GetSelection()];
-                }
-                wxBusyCursor busy;
-                this->SetStatusText(_("Generating mesh..."));
-                vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-                MeshGenerators::GetHyperbolicSpaceTessellation(schlafli1,schlafli2,schlafli3,levels,mesh,2,data_type);
-                MeshRD *mesh_sys;
-                if(this->is_opencl_available)
-                    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
-                else
-                    mesh_sys = new GrayScottMeshRD();
-                mesh_sys->CopyFromMesh(mesh);
-                sys = mesh_sys;
-                this->render_settings.GetProperty("active_chemical").SetChemical("b");
-                this->render_settings.GetProperty("slice_3D").SetBool(true);
-                this->render_settings.GetProperty("show_bounding_box").SetBool(true);
-                this->render_settings.GetProperty("show_cell_edges").SetBool(true);
-                this->render_settings.GetProperty("use_image_interpolation").SetBool(false);
-                this->render_settings.GetProperty("timesteps_per_render").SetInt(1);
-                break;
-            }
-            break;
-            default:
-            {
-                wxMessageBox(_("Not currently supported"));
-                this->render_settings = previous_render_settings;
-                return;
-            }
+            case Image1D:          sys = MakeNewImage1D(this->is_opencl_available,opencl_platform,opencl_device,new_render_settings); break;
+            case Image2D:          sys = MakeNewImage2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Image3D:          sys = MakeNewImage3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GeoSphere:        sys = MakeNewGeodesicSphere(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Torus:            sys = MakeNewTorus(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case TriMesh:          sys = MakeNewTriangularMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case HexMesh:          sys = MakeNewHexagonalMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Rhombille:        sys = MakeNewRhombilleTiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case PenroseP3:        sys = MakeNewPenroseP3Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case PenroseP2:        sys = MakeNewPenroseP2Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Del2D:            sys = MakeNewDelaunay2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Vor2D:            sys = MakeNewVoronoi2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Del3D:            sys = MakeNewDelaunay3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case BodyCentredCubic: sys = MakeNewBodyCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case FaceCentredCubic: sys = MakeNewFaceCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case Diamond:          sys = MakeNewDiamondHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case HyperbolicPlane:  sys = MakeNewHyperbolicPlane(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case HyperbolicSpace:  sys = MakeNewHyperbolicSpace(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
         }
     }
     catch(const exception& e)
@@ -2195,17 +1572,22 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         wxString message = _("Failed to create new pattern. Error:\n\n");
         message += wxString(e.what(),wxConvUTF8);
         MonospaceMessageBox(message,_("Error creating new pattern"),wxART_ERROR);
-        this->render_settings = previous_render_settings;
         return;
     }
     catch(...)
     {
         wxString message = _("Failed to create new pattern.");
         MonospaceMessageBox(message,_("Error creating pattern"),wxART_ERROR);
-        this->render_settings = previous_render_settings;
         return;
     }
+
+    if (sys == NULL)
+    {
+        return; // user cancelled
+    }
     
+    this->render_settings = new_render_settings;
+
     wxBusyCursor busy;
     this->SetStatusText(_("Generating data values..."));
     sys->CreateDefaultInitialPatternGenerator();
@@ -2284,7 +1666,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     Properties previous_render_settings = this->render_settings;
     try
     {
-        this->InitializeDefaultRenderSettings();
+        this->InitializeDefaultRenderSettings(this->render_settings);
         target_system = SystemFactory::CreateFromFile(filename_cstr,this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(target_system);
     }
@@ -2940,34 +2322,34 @@ void MyFrame::OnChar(wxKeyEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::InitializeDefaultRenderSettings()
+void MyFrame::InitializeDefaultRenderSettings(Properties& props)
 {
-    this->render_settings.DeleteAllProperties();
-    this->render_settings.AddProperty(Property("surface_color","color",1.0f,1.0f,1.0f)); // RGB [0,1]
-    this->render_settings.AddProperty(Property("color_low","color",0.0f,0.0f,1.0f));
-    this->render_settings.AddProperty(Property("color_high","color",1.0f,0.0f,0.0f));
-    this->render_settings.AddProperty(Property("show_color_scale",true));
-    this->render_settings.AddProperty(Property("show_multiple_chemicals",true));
-    this->render_settings.AddProperty(Property("active_chemical","chemical","a"));
-    this->render_settings.AddProperty(Property("low",0.0f));
-    this->render_settings.AddProperty(Property("high",1.0f));
-    this->render_settings.AddProperty(Property("vertical_scale_1D",30.0f));
-    this->render_settings.AddProperty(Property("vertical_scale_2D",15.0f));
-    this->render_settings.AddProperty(Property("contour_level",0.25f));
-    this->render_settings.AddProperty(Property("use_wireframe",false));
-    this->render_settings.AddProperty(Property("show_cell_edges",false));
-    this->render_settings.AddProperty(Property("show_bounding_box",true));
-    this->render_settings.AddProperty(Property("slice_3D",true));
-    this->render_settings.AddProperty(Property("slice_3D_axis","axis","z"));
-    this->render_settings.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
-    this->render_settings.AddProperty(Property("show_displacement_mapped_surface",true));
-    this->render_settings.AddProperty(Property("color_displacement_mapped_surface",true));
-    this->render_settings.AddProperty(Property("use_image_interpolation",true));
-    this->render_settings.AddProperty(Property("timesteps_per_render",100));
-    this->render_settings.AddProperty(Property("show_phase_plot",false));
-    this->render_settings.AddProperty(Property("phase_plot_x_axis","chemical","a"));
-    this->render_settings.AddProperty(Property("phase_plot_y_axis","chemical","b"));
-    this->render_settings.AddProperty(Property("phase_plot_z_axis","chemical","c"));
+    props.DeleteAllProperties();
+    props.AddProperty(Property("surface_color","color",1.0f,1.0f,1.0f)); // RGB [0,1]
+    props.AddProperty(Property("color_low","color",0.0f,0.0f,1.0f));
+    props.AddProperty(Property("color_high","color",1.0f,0.0f,0.0f));
+    props.AddProperty(Property("show_color_scale",true));
+    props.AddProperty(Property("show_multiple_chemicals",true));
+    props.AddProperty(Property("active_chemical","chemical","a"));
+    props.AddProperty(Property("low",0.0f));
+    props.AddProperty(Property("high",1.0f));
+    props.AddProperty(Property("vertical_scale_1D",30.0f));
+    props.AddProperty(Property("vertical_scale_2D",15.0f));
+    props.AddProperty(Property("contour_level",0.25f));
+    props.AddProperty(Property("use_wireframe",false));
+    props.AddProperty(Property("show_cell_edges",false));
+    props.AddProperty(Property("show_bounding_box",true));
+    props.AddProperty(Property("slice_3D",true));
+    props.AddProperty(Property("slice_3D_axis","axis","z"));
+    props.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
+    props.AddProperty(Property("show_displacement_mapped_surface",true));
+    props.AddProperty(Property("color_displacement_mapped_surface",true));
+    props.AddProperty(Property("use_image_interpolation",true));
+    props.AddProperty(Property("timesteps_per_render",100));
+    props.AddProperty(Property("show_phase_plot",false));
+    props.AddProperty(Property("phase_plot_x_axis","chemical","a"));
+    props.AddProperty(Property("phase_plot_y_axis","chemical","b"));
+    props.AddProperty(Property("phase_plot_z_axis","chemical","c"));
     // TODO: allow user to change defaults
 }
 
@@ -3247,7 +2629,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     bool ok = LoadMesh(mesh_filename, ug);
     if (!ok) return;
 
-    this->InitializeDefaultRenderSettings();
+    this->InitializeDefaultRenderSettings(this->render_settings);
     this->render_settings.GetProperty("slice_3D").SetBool(false);
     this->render_settings.GetProperty("active_chemical").SetChemical("b");
 

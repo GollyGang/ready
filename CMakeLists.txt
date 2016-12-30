@@ -81,6 +81,7 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/wxVTKRenderWindowInteractor.h    src/gui/wxVTKRenderWindowInteractor.cxx
   src/gui/RecordingDialog.hpp              src/gui/RecordingDialog.cpp
   src/gui/ImportImageDialog.hpp            src/gui/ImportImageDialog.cpp
+  src/gui/MakeNewSystem.hpp                src/gui/MakeNewSystem.cpp
 )
 include_directories( src/gui )
 
