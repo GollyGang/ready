@@ -64,6 +64,7 @@ using namespace std;
 
 // VTK:
 #include <vtkBMPReader.h>
+#include <vtkCellArray.h>
 #include <vtkCellPicker.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageReader2.h>
