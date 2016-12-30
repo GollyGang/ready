@@ -230,17 +230,6 @@ END_EVENT_TABLE()
 
 // ---------------------------------------------------------------------
 
-const char* MyFrame::opencl_not_available_message = 
-    "This file requires OpenCL, which has not been detected on your system.\n\n"
-    "OpenCL allows Ready to take advantage of the many-core architectures on\n"
-    "graphics cards and modern CPUs. OpenCL also allows rules to be written in\n"
-    "a text format and compiled on the fly. It is available on every operating\n"
-    "system, so please install it to get the most out of Ready. (If your OS is\n"
-    "running in a virtual machine then it may not be possible to get OpenCL\n"
-    "working.)\n\n"
-    "You can load the files in the 'CPU-only' folder, which don't use OpenCL. Or\n"
-    "use File > New Pattern or File > Import Mesh to make new examples.";
-
 const float MyFrame::brush_sizes[] = {0.02f,0.05f,0.1f};
 
 // ---------------------------------------------------------------------

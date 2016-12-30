@@ -40,6 +40,22 @@ using namespace std;
 
 // -------------------------------------------------------------------------------------------------------------
 
+const char* opencl_not_available_message =
+"This file requires OpenCL, which has not been detected on your system.\n\n"
+"OpenCL allows Ready to take advantage of the many-core architectures on\n"
+"graphics cards and modern CPUs. OpenCL also allows rules to be written in\n"
+"a text format and compiled on the fly. It is available on every operating\n"
+"system, so please install it to get the most out of Ready. (One exception:\n"
+"If your OS is running in a virtual machine then it may not be possible to\n"
+"get OpenCL working.)\n\n"
+"Links:\n"
+"https://streamcomputing.eu/blog/2015-03-16/how-to-install-opencl-on-windows/\n"
+"https://wiki.tiker.net/OpenCLHowTo\n\n"
+"Without OpenCL you can load the files in the 'CPU-only' folder. Or use\n"
+"File > New Pattern or File > Import Mesh to make new examples.";
+
+// -------------------------------------------------------------------------------------------------------------
+
 AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
                                     Properties &render_settings,bool &warn_to_update);
 
@@ -112,13 +128,13 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     else if(type=="formula")
     {
         if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
+            throw runtime_error(opencl_not_available_message);
         image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
         if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
+            throw runtime_error(opencl_not_available_message);
         image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device,data_type);
     }
     else throw runtime_error("Unsupported rule type: "+type);
@@ -175,13 +191,13 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     else if(type=="formula")
     {
         if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
+            throw runtime_error(opencl_not_available_message);
         mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
         if(!is_opencl_available) 
-            throw runtime_error("Pattern requires OpenCL");
+            throw runtime_error(opencl_not_available_message);
         mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device,data_type);
     }
     else throw runtime_error("Unsupported rule type: "+type);

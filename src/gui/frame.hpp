@@ -263,8 +263,6 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         bool fullscreen;    // in full screen mode?
         bool is_opencl_available;
-        
-        static const char *opencl_not_available_message;
 
         // toolbar things
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
