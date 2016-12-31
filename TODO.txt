@@ -14,7 +14,6 @@ Big picture issues:
 
 before 0.8 release:
 - merge houdini branch
-- IPG with transparency, allowing only part of the saved pattern to be overwritten (John Denton wanted this)
 - allow operations on chemicals: swap, duplicate
 - issue #7: changing number of chemicals shouldn't clear all
 

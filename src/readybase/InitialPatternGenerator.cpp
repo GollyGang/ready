@@ -18,6 +18,16 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 // Local:
 #include "InitialPatternGenerator.hpp"
 
+// STL:
+#include <string>
+
+InitialPatternGenerator::InitialPatternGenerator()
+    : zero_first(true)
+{
+}
+
+// ---------------------------------------------------------------------
+
 InitialPatternGenerator::~InitialPatternGenerator()
 {
     RemoveAllOverlays();
@@ -41,6 +51,10 @@ void InitialPatternGenerator::ReadFromXML(vtkXMLDataElement* node)
     this->RemoveAllOverlays();
     if (node) // IPG is optional in the XML, default is none
     {
+        const char *zero_first_str = node->GetAttribute("zero_first");
+        if (zero_first_str && std::string(zero_first_str) == "false")
+            this->zero_first = false;
+
         for (int i = 0; i < node->GetNumberOfNestedElements(); i++)
         {
             this->overlays.push_back(new Overlay(node->GetNestedElement(i)));
@@ -56,6 +70,7 @@ vtkSmartPointer<vtkXMLDataElement> InitialPatternGenerator::GetAsXML(bool genera
     vtkSmartPointer<vtkXMLDataElement> ipg = vtkSmartPointer<vtkXMLDataElement>::New();
     ipg->SetName("initial_pattern_generator");
     ipg->SetAttribute("apply_when_loading", generate_initial_pattern_when_loading ? "true" : "false");
+    ipg->SetAttribute("zero_first", this->zero_first ? "true" : "false");
     for (size_t i = 0; i < this->overlays.size(); i++)
     {
         ipg->AddNestedElement(this->overlays[i]->GetAsXML());

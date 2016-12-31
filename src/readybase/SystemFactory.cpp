@@ -136,10 +136,11 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     int nc = image->GetNumberOfScalarComponents() * image->GetPointData()->GetNumberOfArrays();
     image_system->SetDimensions(dim[0],dim[1],dim[2]);
     image_system->SetNumberOfChemicals(nc);
-    if(reader->ShouldGenerateInitialPatternWhenLoading())
+    image_system->CopyFromImage(image);
+    if (reader->ShouldGenerateInitialPatternWhenLoading())
+    {
         image_system->GenerateInitialPattern();
-    else
-        image_system->CopyFromImage(image);
+    }
 
     return image_system;
 }

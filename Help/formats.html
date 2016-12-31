@@ -243,11 +243,11 @@ __kernel void rd_compute(__global float *a_in,__global float *b_in,__global floa
     laplacian_b *= 4.0f;
 
     // parameters:
-    float timestep = 1.000000f;
-    float D_a = 0.082000f;
-    float D_b = 0.041000f;
-    float k = 0.060000f;
-    float F = 0.035000f;
+    float timestep = 1.0f;
+    float D_a = 0.082f;
+    float D_b = 0.041f;
+    float k = 0.06f;
+    float F = 0.035f;
 
     // update step (Gray-Scott)
     float delta_a = 0.0f;
@@ -266,7 +266,8 @@ See the pattern files for more examples.
 The initial pattern generator is a way to describe typical reaction-diffusion starting conditions. The Schlogl rule (<a href="edit:Patterns/Schlogl.vti">edit</a>/<a href="open:Patterns/Schlogl.vti">open</a>), for example, can be initialized with low-amplitude random noise.
 <p>Attributes:
 <ul>
-<li><tt>apply_when_loading</tt> (optional) : "true" if the initial pattern generator should overwrite the data when the file is loaded.
+<li><tt>apply_when_loading</tt> (optional) : "true" if the initial pattern generator should overwrite the data when the file is loaded. Default: "true"
+<li><tt>zero_first</tt> (optional) : "true" if the values should be set to zero before applying. Default: "true"
 </ul>
 <p>Contains:
 <ul>
@@ -275,8 +276,7 @@ The initial pattern generator is a way to describe typical reaction-diffusion st
 
 <h4><a name="overlay"></a><b>&lt;overlay&gt;</b></h4>
 
-Each overlay changes the values of a single chemical. Overlays apply in the order given in the file, 
-from a starting point where every chemical is zero. 
+Each overlay changes the values of a single chemical. Overlays apply in the order given in the file. 
 
 <p>Attributes:
 <ul>

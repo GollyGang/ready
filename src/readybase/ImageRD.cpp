@@ -317,7 +317,9 @@ void ImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 
 void ImageRD::GenerateInitialPattern()
 {
-    this->BlankImage();
+    if (this->initial_pattern_generator.ShouldZeroFirst()) {
+        this->BlankImage();
+    }
 
     const int X = this->images.front()->GetDimensions()[0];
     const int Y = this->images.front()->GetDimensions()[1];

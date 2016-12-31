@@ -26,6 +26,7 @@ class InitialPatternGenerator
 {
     public:
 
+        InitialPatternGenerator();
         ~InitialPatternGenerator();
 
         void ReadFromXML(vtkXMLDataElement* node);
@@ -36,10 +37,12 @@ class InitialPatternGenerator
 
         /// Create a generator suitable for Gray-Scott, so that new patterns can start working immediately.
         void CreateDefaultInitialPatternGenerator(size_t num_chemicals);
+        bool ShouldZeroFirst() const { return this->zero_first; }
 
     private:
 
         void RemoveAllOverlays();
 
         std::vector<Overlay*> overlays; // TODO: use unique_ptr when C++11-compatible VTK is available on target platforms
+        bool zero_first;
 };

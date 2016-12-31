@@ -27,7 +27,7 @@
       
     </rule>
     
-    <initial_pattern_generator apply_when_loading="true">
+    <initial_pattern_generator apply_when_loading="true" zero_first="false">
       <overlay chemical="a">
         <overwrite />
         <gaussian height="4" sigma="0.05">

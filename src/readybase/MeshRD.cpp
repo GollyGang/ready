@@ -148,7 +148,9 @@ void MeshRD::SaveFile(const char* filename,const Properties& render_settings,boo
 
 void MeshRD::GenerateInitialPattern()
 {
-    this->BlankImage();
+    if (this->initial_pattern_generator.ShouldZeroFirst()) {
+        this->BlankImage();
+    }
 
     vtkIdType npts,*pts;
     float cp[3];
