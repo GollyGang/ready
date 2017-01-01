@@ -24,6 +24,7 @@
     #include <wx/wx.h>
 #endif
 #include <wx/artprov.h>
+#include <wx/filename.h>
 #include <wx/string.h>
 
 #if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
@@ -90,3 +91,6 @@ bool CopyTextToClipboard(const wxString& text);
 
 // strip trailing zeros
 wxString FormatFloat(float f,int mdp=6);
+
+// converts a wxFileName to a wxString, using the short form if needed as a workaround for unicode characters
+wxString FileNameToString(const wxFileName& filename);

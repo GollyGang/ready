@@ -222,3 +222,13 @@ wxString FormatFloat(float f,int mdp)
     }
     return result;
 }
+
+wxString FileNameToString(const wxFileName& filename)
+{
+    // if unicode characters in path, use the short form
+    wxString path = filename.GetFullPath();
+    if (strlen(path.mb_str()) > 0) {
+        return path;
+    }
+    return filename.GetShortPath();
+}

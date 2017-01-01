@@ -967,12 +967,6 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 
     wxDirDialog dirdlg(this, _("Choose your pattern folder"), userdir, wxDD_NEW_DIR_BUTTON);
     if (dirdlg.ShowModal() == wxID_OK) {
-        const char* filename_cstr = dirdlg.GetPath().mb_str();
-        if (strlen(filename_cstr) == 0)
-        {
-            wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-            return;
-        }
         userdir = dirdlg.GetPath();
         this->patterns_panel->BuildTree();
     }
@@ -1613,14 +1607,9 @@ void MyFrame::OnOpenPattern(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OpenFile(const wxString& path, bool remember)
+void MyFrame::OpenFile(const wxString& raw_path, bool remember)
 {
-    const char* filename_cstr = path.mb_str();
-    if (strlen(filename_cstr) == 0)
-    {
-        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-        return;
-    }
+    wxString path = FileNameToString(raw_path);
 
     if (IsHTMLFile(path)) {
         // show HTML file in help pane
@@ -1660,7 +1649,7 @@ void MyFrame::OpenFile(const wxString& path, bool remember)
     try
     {
         this->InitializeDefaultRenderSettings(this->render_settings);
-        target_system = SystemFactory::CreateFromFile(filename_cstr,this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
+        target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(target_system);
     }
     catch(const exception& e)
@@ -2600,13 +2589,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     wxString mesh_filename = wxFileSelector(_("Import a mesh:"), wxEmptyString, wxEmptyString, wxEmptyString,
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"), wxFD_OPEN);
     if (mesh_filename.empty()) return; // user cancelled
-
-    const char* filename_cstr = mesh_filename.mb_str();
-    if (strlen(filename_cstr) == 0)
-    {
-        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-        return;
-    }
+    mesh_filename = FileNameToString(mesh_filename);
 
     wxArrayString choices;
     choices.Add(_("Run a pattern on the surface of this mesh"));
@@ -2812,15 +2795,10 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
                           this->render_settings.GetProperty("low").GetFloat(),
                           this->render_settings.GetProperty("high").GetFloat());
     if (dlg.ShowModal() != wxID_OK) return;
+    wxFileName filename = dlg.image_filename;
+    const char* filename_cstr = FileNameToString(filename).mb_str();
+    wxString ext = filename.GetExt();
 
-    const char* filename_cstr = dlg.image_filename.mb_str();
-    if (strlen(filename_cstr) == 0)
-    {
-        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-        return;
-    }
-
-    wxString ext = wxFileName(dlg.image_filename).GetExt();
     vtkSmartPointer<vtkImageReader2> reader;
     if (ext.IsSameAs("png", false)) reader = vtkSmartPointer<vtkPNGReader>::New();
     else if (ext.IsSameAs("jpg", false) || ext.IsSameAs("jpeg", false)) reader = vtkSmartPointer<vtkJPEGReader>::New();
