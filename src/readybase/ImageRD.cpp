@@ -37,6 +37,7 @@ using namespace std;
 #include <vtkActor.h>
 #include <vtkAssignAttribute.h>
 #include <vtkCamera.h>
+#include <vtkCaptionActor2D.h>
 #include <vtkCellData.h>
 #include <vtkCellDataToPointData.h>
 #include <vtkContourFilter.h>
@@ -80,7 +81,8 @@ using namespace std;
 #include <vtkRendererCollection.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSmartPointer.h>
-#include <vtkTextActor3D.h>
+#include <vtkTextActor.h>
+#include <vtkTextProperty.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkThreshold.h>
 #include <vtkTransform.h>
@@ -488,13 +490,22 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         
         if(this->GetNumberOfChemicals()>1)
         {
-            vtkSmartPointer<vtkTextActor3D> label = vtkSmartPointer<vtkTextActor3D>::New();
-            label->SetInput(GetChemicalName(iChem).c_str());
-            const float text_label_offset = 20.0f;
-            label->SetPosition(-text_label_offset,image_offset-image_height,0);
-            label->PickableOff();
-            label->SetScale(image_height/10.0);
-            pRenderer->AddActor(label);
+            vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
+            captionActor->SetAttachmentPoint(-image_height, image_offset - image_height/2, 0);
+            captionActor->SetPosition(0, 0);
+            captionActor->SetCaption(GetChemicalName(iChem).c_str());
+            captionActor->BorderOff();
+            captionActor->LeaderOff();
+            captionActor->SetPadding(0);
+            captionActor->GetCaptionTextProperty()->SetJustificationToLeft();
+            captionActor->GetCaptionTextProperty()->BoldOff();
+            captionActor->GetCaptionTextProperty()->ShadowOff();
+            captionActor->GetCaptionTextProperty()->ItalicOff();
+            captionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
+            captionActor->GetCaptionTextProperty()->SetFontSize(16);
+            captionActor->GetCaptionTextProperty()->SetVerticalJustificationToCentered();
+            captionActor->GetTextActor()->SetTextScaleModeToNone();
+            pRenderer->AddActor(captionActor);
         }
     }
 
@@ -718,12 +729,23 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         // add a text label
         if(this->GetNumberOfChemicals()>1)
         {
-            vtkSmartPointer<vtkTextActor3D> label = vtkSmartPointer<vtkTextActor3D>::New();
-            label->SetInput(GetChemicalName(iChem).c_str());
-            const float text_label_offset = 20.0f;
-            label->SetPosition(offset[0]+this->GetX()/2,offset[1]-text_label_offset,offset[2]);
-            label->PickableOff();
-            pRenderer->AddActor(label);
+            const float text_label_offset = 5.0 + max(this->GetX(), this->GetY()) / 20.0f;
+            vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
+            captionActor->SetAttachmentPoint(offset[0] + this->GetX() / 2, offset[1] - text_label_offset, offset[2]);
+            captionActor->SetPosition(0, 0);
+            captionActor->SetCaption(GetChemicalName(iChem).c_str());
+            captionActor->BorderOff();
+            captionActor->LeaderOff();
+            captionActor->SetPadding(0);
+            captionActor->GetCaptionTextProperty()->SetJustificationToLeft();
+            captionActor->GetCaptionTextProperty()->BoldOff();
+            captionActor->GetCaptionTextProperty()->ShadowOff();
+            captionActor->GetCaptionTextProperty()->ItalicOff();
+            captionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
+            captionActor->GetCaptionTextProperty()->SetFontSize(16);
+            captionActor->GetCaptionTextProperty()->SetVerticalJustificationToCentered();
+            captionActor->GetTextActor()->SetTextScaleModeToNone();
+            pRenderer->AddActor(captionActor);
         }
 
         offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
