@@ -2339,11 +2339,9 @@ void MyFrame::InitializeDefaultRenderSettings(Properties& props)
 
 void MyFrame::SetNumberOfChemicals(int n)
 {
-    bool had_error = true;
     try 
     {
         this->system->SetNumberOfChemicals(n);
-        had_error = false;
     }
     catch(const exception& e)
     {
@@ -2353,22 +2351,7 @@ void MyFrame::SetNumberOfChemicals(int n)
     {
         wxMessageBox(_("Changing the number of chemicals caused an unknown error"));
     }
-    if(!had_error) // don't want to plague the user with error messages, one will do for now
-    {
-        try
-        {
-            this->system->GenerateInitialPattern();
-        }
-        catch(const exception& e)
-        {
-            MonospaceMessageBox(_("Generating an initial pattern caused an error:\n\n")+wxString(e.what(),wxConvUTF8),_("Error"),wxART_ERROR);
-        }
-        catch(...)
-        {
-            wxMessageBox(_("Generating an initial pattern caused an unknown error"));
-        }
-    }
-    // (we allow the user to proceed because they might now want to change other things to match)
+    // (we allow the user to proceed because they might now want to change the formula/kernel to match)
 
     // limit active_chemical to legal range
     int ic = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());

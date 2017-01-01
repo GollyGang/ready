@@ -51,6 +51,7 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
         virtual void CopyFromImage(vtkImageData* im);
 
         virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
+        virtual void SetNumberOfChemicals(int n);
 
         virtual void InternalUpdate(int n_steps);
 

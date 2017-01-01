@@ -55,6 +55,8 @@ void OpenCLMeshRD::SetNumberOfChemicals(int n)
 {
     MeshRD::SetNumberOfChemicals(n);
     this->need_reload_formula = true;
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
     this->CreateOpenCLBuffers();
 }
 
@@ -219,6 +221,8 @@ void OpenCLMeshRD::CreateOpenCLBuffers()
     const size_t NBORS_WEIGHTS_SIZE = sizeof(float) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_weights = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_WEIGHTS_SIZE, NULL, &ret);
     throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : neighbor_weights buffer creation failed: ");
+
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------

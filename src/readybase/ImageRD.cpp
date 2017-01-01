@@ -1203,7 +1203,24 @@ void ImageRD::SetDimensions(int x, int y, int z)
 
 void ImageRD::SetNumberOfChemicals(int n)
 {
-    this->AllocateImages(this->GetX(),this->GetY(),this->GetZ(),n,this->data_type);
+    if (n == this->n_chemicals) {
+        return;
+    }
+    if (n > this->n_chemicals)
+    {
+        while (this->images.size() < n) {
+            this->images.push_back( AllocateVTKImage(this->GetX(), this->GetY(), this->GetZ(), this->data_type) );
+            this->images.back()->GetPointData()->GetScalars()->FillComponent(0, 0.0);
+        }
+    }
+    else {
+        while (this->images.size() > n) {
+            this->images.back()->Delete();
+            this->images.pop_back();
+        }
+    }
+    this->n_chemicals = n;
+    this->is_modified = true;
 }
 
 // ---------------------------------------------------------------------

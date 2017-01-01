@@ -103,26 +103,36 @@ void MeshRD::Update(int n_steps)
     this->timesteps_taken += n_steps;
 
     this->mesh->Modified();
+    this->is_modified = true;
 }
 
 // ---------------------------------------------------------------------
 
 void MeshRD::SetNumberOfChemicals(int n)
 {
-    for(int iChem=0;iChem<this->n_chemicals;iChem++)
-    {
-        this->mesh->GetCellData()->RemoveArray(GetChemicalName(iChem).c_str());
+    if (n == this->n_chemicals) {
+        return;
+    }
+    if (n > this->n_chemicals) {
+        while (this->mesh->GetCellData()->GetNumberOfArrays() < n) {
+            vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take(vtkDataArray::CreateDataArray(this->data_type));
+            scalars->SetNumberOfComponents(1);
+            scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
+            std::string cn = GetChemicalName(this->mesh->GetCellData()->GetNumberOfArrays());
+            scalars->SetName(cn.c_str());
+            scalars->FillComponent(0, 0.0f);
+            this->mesh->GetCellData()->AddArray(scalars);
+        }
+    }
+    else {
+        while (this->mesh->GetCellData()->GetNumberOfArrays() > n) {
+            std::string cn = GetChemicalName(this->mesh->GetCellData()->GetNumberOfArrays()-1);
+            this->mesh->GetCellData()->RemoveArray(cn.c_str());
+        }
     }
     this->n_chemicals = n;
-    for(int iChem=0;iChem<this->n_chemicals;iChem++)
-    {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( this->data_type ) );
-        scalars->SetNumberOfComponents(1);
-        scalars->SetNumberOfTuples(this->mesh->GetNumberOfCells());
-        scalars->SetName(GetChemicalName(iChem).c_str());
-        scalars->FillComponent(0,0.0f);
-        this->mesh->GetCellData()->AddArray(scalars);
-    }
+    this->mesh->Modified();
+    this->is_modified = true;
 }
 
 // ---------------------------------------------------------------------
@@ -185,6 +195,7 @@ void MeshRD::GenerateInitialPattern()
         }
     }
     this->mesh->Modified();
+    this->is_modified = true;
     this->timesteps_taken = 0;
 }
 
@@ -197,6 +208,7 @@ void MeshRD::BlankImage(float value)
         this->mesh->GetCellData()->GetArray(GetChemicalName(iChem).c_str())->FillComponent(0, value);
     }
     this->mesh->Modified();
+    this->is_modified = true;
     this->undo_stack.clear();
 }
 
@@ -227,6 +239,7 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 {
     this->undo_stack.clear();
     this->mesh->DeepCopy(mesh2);
+    this->is_modified = true;
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
 
     if(this->cell_locator)
@@ -667,6 +680,7 @@ void MeshRD::SaveStartingPattern()
 void MeshRD::RestoreStartingPattern()
 {
     this->CopyFromMesh(this->starting_pattern);
+    this->is_modified = true;
     this->timesteps_taken = 0;
 }
 
@@ -973,6 +987,7 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
     this->StorePaintAction(iChemical,iCell,old_val);
     this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str())->SetComponent( iCell, 0, val );
     this->mesh->Modified();
+    this->is_modified = true;
 }
 
 // --------------------------------------------------------------------------------
@@ -1009,6 +1024,7 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
         }
     }
     this->mesh->Modified();
+    this->is_modified = true;
 }
 
 // --------------------------------------------------------------------------------
@@ -1032,6 +1048,7 @@ void MeshRD::FlipPaintAction(PaintAction& cca)
     cca.val = old_val;
     cca.done = !cca.done;
     this->mesh->Modified();
+    this->is_modified = true;
 }
 
 // --------------------------------------------------------------------------------

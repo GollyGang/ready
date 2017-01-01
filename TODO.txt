@@ -15,7 +15,6 @@ Big picture issues:
 before 0.8 release:
 - merge houdini branch
 - allow operations on chemicals: swap, duplicate
-- issue #7: changing number of chemicals shouldn't clear all
 
 before 0.x release:
 

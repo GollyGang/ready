@@ -109,6 +109,8 @@ void OpenCLImageRD::CreateOpenCLBuffers()
             throwOnError(ret,"OpenCLImageRD::CreateOpenCLBuffers : buffer creation failed: ");
         }
     }
+
+    this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
@@ -171,7 +173,17 @@ void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
     this->CreateOpenCLBuffers();
-    this->need_write_to_opencl_buffers = true;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
+void OpenCLImageRD::SetNumberOfChemicals(int n)
+{
+    ImageRD::SetNumberOfChemicals(n);
+    this->need_reload_formula = true;
+    this->ReloadContextIfNeeded();
+    this->ReloadKernelIfNeeded();
+    this->CreateOpenCLBuffers();
 }
 
 // ----------------------------------------------------------------------------------------------------------------
