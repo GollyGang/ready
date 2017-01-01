@@ -1819,7 +1819,7 @@ wxPanel* PrefsDialog::CreateFilePrefs(wxWindow* parent)
     spin1->SetFocus();
     spin1->SetSelection(ALL_TEXT);
 
-    topSizer->Add(vbox, 1, wxGROW | wxALIGN_CENTER | wxALL, 5);
+    topSizer->Add(vbox, 1, wxGROW | wxALL, 5);
     panel->SetSizer(topSizer);
     topSizer->Fit(panel);
     return panel;
@@ -1852,7 +1852,7 @@ wxPanel* PrefsDialog::CreateEditPrefs(wxWindow* parent)
     erasecheck->SetValue(repaint_to_erase);
     beepcheck->SetValue(allowbeep);
 
-    topSizer->Add(vbox, 1, wxGROW | wxALIGN_CENTER | wxALL, 5);
+    topSizer->Add(vbox, 1, wxGROW | wxALL, 5);
     panel->SetSizer(topSizer);
     topSizer->Fit(panel);
     return panel;
@@ -1883,7 +1883,7 @@ wxPanel* PrefsDialog::CreateViewPrefs(wxWindow* parent)
     toolcheck->SetValue(showtips);
 #endif
 
-    topSizer->Add(vbox, 1, wxGROW | wxALIGN_CENTER | wxALL, 5);
+    topSizer->Add(vbox, 1, wxGROW | wxALL, 5);
     panel->SetSizer(topSizer);
     topSizer->Fit(panel);
     return panel;
@@ -1905,7 +1905,7 @@ wxPanel* PrefsDialog::CreateActionPrefs(wxWindow* parent)
     vbox->AddSpacer(5);
     vbox->Add(notebox, 0, wxALIGN_CENTER, LRGAP);
 
-    topSizer->Add(vbox, 1, wxGROW | wxALIGN_CENTER | wxALL, 5);
+    topSizer->Add(vbox, 1, wxGROW | wxALL, 5);
     panel->SetSizer(topSizer);
     topSizer->Fit(panel);
     return panel;
@@ -1997,7 +1997,7 @@ wxPanel* PrefsDialog::CreateKeyboardPrefs(wxWindow* parent)
     keycombo->SetFocus();
     keycombo->SetSelection(ALL_TEXT);
 
-    topSizer->Add(vbox, 1, wxGROW | wxALIGN_CENTER | wxALL, 5);
+    topSizer->Add(vbox, 1, wxGROW | wxALL, 5);
     panel->SetSizer(topSizer);
     topSizer->Fit(panel);
     return panel;

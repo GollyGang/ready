@@ -91,7 +91,7 @@ ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float 
 
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = buttbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);

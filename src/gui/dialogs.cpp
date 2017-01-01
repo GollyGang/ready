@@ -94,7 +94,7 @@ XYZIntDialog::XYZIntDialog(wxWindow* parent, const wxString& title,
     
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = buttbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);
@@ -187,7 +187,7 @@ XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
     
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = buttbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);
@@ -341,7 +341,7 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
     
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = buttbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);
@@ -408,7 +408,7 @@ StringDialog::StringDialog(wxWindow* parent, const wxString& title,
     
     // position the controls
     wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
-    stdhbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    stdhbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = stdhbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);
@@ -554,7 +554,7 @@ IntegerDialog::IntegerDialog(wxWindow* parent,
     
     // position the controls
     wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
-    stdhbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    stdhbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = stdhbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);
@@ -624,7 +624,7 @@ FloatDialog::FloatDialog(wxWindow* parent, const wxString& title,
     
     // position the controls
     wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
-    stdhbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    stdhbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = stdhbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);

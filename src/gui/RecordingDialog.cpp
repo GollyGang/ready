@@ -102,7 +102,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
     
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
-    buttbox->Add(stdbutts, 1, wxGROW | wxALIGN_CENTER_VERTICAL | wxRIGHT, STDHGAP);
+    buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
     wxSize minsize = buttbox->GetMinSize();
     if (minsize.GetWidth() < 250) {
         minsize.SetWidth(250);
