@@ -98,7 +98,7 @@ bool MyApp::OnInit()
     srand((unsigned int)time(NULL));
 
     // get current working directory before calling SetAppDirectory
-    wxString initdir = wxFileName::GetCwd();
+    wxString initdir = wxGetCwd();
     if (initdir.Last() != wxFILE_SEP_PATH) initdir += wxFILE_SEP_PATH;
     
     // make sure current working directory contains application otherwise
@@ -106,8 +106,21 @@ bool MyApp::OnInit()
     SetAppDirectory( wxString(argv[0]).mb_str(wxConvLocal) );
     
     // now set global readydir for use elsewhere
-    readydir = wxFileName::GetCwd();
-    if (readydir.Last() != wxFILE_SEP_PATH) readydir += wxFILE_SEP_PATH;
+    #ifdef __WXMAC__
+        // wxGetCwd() is not reliable on Mac OS 10.12
+        readydir = wxStandardPaths::Get().GetExecutablePath();
+        int suffix = readydir.Find(wxT("/Contents/MacOS/"));
+        if (suffix == wxNOT_FOUND) {
+            readydir = wxGetCwd();      // hope for the best
+        } else {
+            readydir = readydir.Truncate(suffix);
+            // now remove "*.app" from end of path
+            readydir = readydir.Truncate(readydir.Find('/',true) + 1);
+        }
+    #else
+        readydir = wxGetCwd();
+        if (readydir.Last() != wxFILE_SEP_PATH) readydir += wxFILE_SEP_PATH;
+    #endif
     
     ::wxInitAllImageHandlers(); // make sure we can handle all sorts of images
 
