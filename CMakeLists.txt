@@ -413,9 +413,9 @@ if( EXISTS "/etc/redhat-release" )
  # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
  target_link_libraries( readybase ${VTK_LIBRARIES} )
 else()
- ###AKT if( APPLE OR UNIX )
- ###AKT  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
- ###AKT endif()
+ if( UNIX AND NOT APPLE )
+  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
+ endif()
  if( ${VTK_MAJOR_VERSION} LESS 6 )
   # VTK 5.x
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
