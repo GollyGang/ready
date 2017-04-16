@@ -104,19 +104,22 @@ C) Build Ready:
 A) Dependencies: 
 
 On Debian/Ubuntu:
-sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev
+sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev cmake-curses-gui build-essential git
 
 On Fedora:
 sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers
 
 On other distros I'm not sure - please let us know!
 
-B) Build Ready:
+B) Download and build Ready:
 
-mkdir Ready_build
-cd Ready_build
-ccmake ../Ready_source_folder
-(configure, generate)
+mkdir Ready
+cd Ready
+git clone https://github.com/GollyGang/ready.git
+mkdir build
+cd build
+ccmake ../ready
+('c' to configure, 'g' to generate)
 make
 
 Optional, for packaging:
