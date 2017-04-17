@@ -107,7 +107,7 @@ On Debian/Ubuntu:
 sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev cmake-curses-gui build-essential git
 
 On Fedora:
-sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers
+sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers gcc-c++
 
 On other distros I'm not sure - please let us know!
 
