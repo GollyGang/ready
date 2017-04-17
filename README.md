@@ -8,8 +8,8 @@ Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
 Download Ready 0.8 here: 
   * [Windows 64 bit](https://github.com/GollyGang/ready/releases/download/0.8/Ready-0.8-Windows-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.8/Ready-0.8-Windows-32bit.zip))
-  * [MacOS (10.6+)](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Mac.zip)
-  * Linux: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt)
+  * MacOS (10.6+): [dmg](https://github.com/GollyGang/ready/releases/download/0.8/Ready-0.8-Mac.dmg)[zip](https://github.com/GollyGang/ready/releases/download/0.8/Ready-0.8-Mac.zip)
+  * Linux: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt) 
 
 More details on the [releases tab](https://github.com/GollyGang/ready/releases).
 
