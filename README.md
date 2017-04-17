@@ -6,17 +6,10 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.7 here: 
-  * [Windows 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Windows-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Windows-32bit.zip))
+Download Ready 0.8 here: 
+  * [Windows 64 bit](https://github.com/GollyGang/ready/releases/download/0.8/Ready-0.8-Windows-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.8/Ready-0.8-Windows-32bit.zip))
   * [MacOS (10.6+)](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Mac.zip)
-  * [Linux 64 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-64bit.zip) ([32 bit](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Linux-32bit.zip))
-  * [Source](https://github.com/GollyGang/ready/releases/download/0.7/Ready-0.7-Source.zip)
-
-We're working on the next version, which includes two new features:
-  * Import of images, so you can use a photo as the initial conditions of a pattern
-  * Export of a sequence of OBJ files, for animating a 3D mesh.
-
-For now these features are only in the [0.7.2 release](https://github.com/GollyGang/ready/releases) or later.
+  * Linux: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt)
 
 More details on the [releases tab](https://github.com/GollyGang/ready/releases).
 
