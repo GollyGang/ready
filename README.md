@@ -32,6 +32,7 @@ Press coverage:
 
 Citations:
 
+  * David H. Ackley , Elena S. Ackley. ["The ulam Programming Language for Artificial Life"](http://www.mitpressjournals.org/doi/pdf/10.1162/ARTL_a_00212) Artificial Life. Nov 2016, Vol. 22, No. 4: 431-450.
   * Kawamata I., Yoshizawa S., Takabatake F., Sugawara K., Murata S. ["Discrete DNA Reaction-Diffusion Model for Implementing Simple Cellular Automaton"](https://link.springer.com/chapter/10.1007/978-3-319-41312-9_14) In: Amos M., CONDON A. (eds) Unconventional Computation and Natural Computation. UCNC 2016. Lecture Notes in Computer Science, vol 9726. Springer, Cham.
   * Shigeki Akiyama and Katsunobu Imai, ["The corona limit of Penrose tilings is a regular decagon"](http://math.tsukuba.ac.jp/~akiyama/papers/automata2016.pdf), Lecture Note in Computer Science 9664, M. Cook and T. Neary (Eds.): AUTOMATA 2016, pp. 35–48, 2016. DOI: 10.1007/978-3-319-39300-1
   * John G. Maisey and John S. S. Denton. ["Dermal Denticle Patterning in the Cretaceous Hybodont Shark Tribodus limae (Euselachii, Hybodontiformes), and Its Implications for the Evolution of Patterning in the Chondrichthyan Dermal Skeleton"](http://www.bioone.org/doi/full/10.1080/02724634.2016.1179200) Journal of Vertebrate Paleontology 36(5):e1179200, 2016 doi: http://dx.doi.org/10.1080/02724634.2016.1179200
