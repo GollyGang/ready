@@ -37,7 +37,6 @@
             {
                 for(int sy=y-R; sy&lt;=y+R; sy++)
                 {
-                    if(sx==x &amp;&amp; sy==y) continue;
                     int tx = (sx+X) &amp; (X-1); // wrap
                     int ty = (sy+Y) &amp; (Y-1); // wrap
                     if( round( a_in[ X*(Y*z+ty)+tx ] ) == 1 )
