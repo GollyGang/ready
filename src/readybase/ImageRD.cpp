@@ -1269,9 +1269,7 @@ void ImageRD::SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc)
 
 int ImageRD::GetNumberOfCells() const
 {
-    return this->images.front()->GetDimensions()[0] * 
-        this->images.front()->GetDimensions()[1] * 
-        this->images.front()->GetDimensions()[2];
+    return this->GetX() * this->GetY() * this->GetZ();
 }
 
 // ---------------------------------------------------------------------
@@ -1522,9 +1520,9 @@ void ImageRD::SetFrom2DImage(int iChemical, vtkImageData *im)
 
 float ImageRD::GetValue(float x,float y,float z,const Properties& render_settings)
 {
-    const int X = this->images.front()->GetDimensions()[0];
-    const int Y = this->images.front()->GetDimensions()[1];
-    const int Z = this->images.front()->GetDimensions()[2];
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
 
     // which chemical was clicked-on?
     float offset_x = 0.0f;
@@ -1565,9 +1563,9 @@ float ImageRD::GetValue(float x,float y,float z,const Properties& render_setting
 
 void ImageRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
-    const int X = this->images.front()->GetDimensions()[0];
-    const int Y = this->images.front()->GetDimensions()[1];
-    const int Z = this->images.front()->GetDimensions()[2];
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
 
     // which chemical was clicked-on?
     float offset_x = 0.0f;
@@ -1613,9 +1611,9 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
 
 void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
 {
-    const int X = this->images.front()->GetDimensions()[0];
-    const int Y = this->images.front()->GetDimensions()[1];
-    const int Z = this->images.front()->GetDimensions()[2];
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
 
     // which chemical was clicked-on?
     float offset_x = 0.0f;

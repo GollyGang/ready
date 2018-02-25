@@ -997,9 +997,30 @@ void MeshRD::SetFrom2DImage(int iChemical, vtkImageData *im)
 
 float MeshRD::GetValue(float x, float y, float z, const Properties& render_settings)
 {
+    const double X = this->GetX();
+    const double Y = this->GetY();
+    const double Z = this->GetZ();
+
     this->CreateCellLocatorIfNeeded();
 
-    double p[3]={x,y,z},cp[3],dist2;
+    // which chemical was clicked-on?
+    float offset_x = 0.0f;
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iChemical;
+    if(show_multiple_chemicals)
+    {
+        // detect which chemical was drawn on from the click position
+        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+        offset_x = iChemical * (X+this->xgap);
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    }
+
+    double p[3]={x-offset_x,y,z},cp[3],dist2;
     vtkIdType iCell;
     int subId;
     this->cell_locator->FindClosestPoint(p,cp,iCell,subId,dist2);
@@ -1007,7 +1028,6 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
     if(iCell<0)
         return 0.0f;
 
-    int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     return this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str())->GetComponent( iCell, 0 );
 }
 
@@ -1015,9 +1035,30 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
 
 void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
+    const double X = this->GetX();
+    const double Y = this->GetY();
+    const double Z = this->GetZ();
+
     this->CreateCellLocatorIfNeeded();
 
-    double p[3]={x,y,z},cp[3],dist2;
+    // which chemical was clicked-on?
+    float offset_x = 0.0f;
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iChemical;
+    if(show_multiple_chemicals)
+    {
+        // detect which chemical was drawn on from the click position
+        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+        offset_x = iChemical * (X+this->xgap);
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    }
+
+    double p[3]={x-offset_x,y,z},cp[3],dist2;
     vtkIdType iCell;
     int subId;
     this->cell_locator->FindClosestPoint(p,cp,iCell,subId,dist2);
@@ -1025,7 +1066,6 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
     if(iCell<0)
         return;
 
-    int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float old_val = this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str())->GetComponent( iCell, 0 );
     this->StorePaintAction(iChemical,iCell,old_val);
     this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str())->SetComponent( iCell, 0, val );
@@ -1037,18 +1077,37 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
 
 void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings)
 {
+    const double X = this->GetX();
+    const double Y = this->GetY();
+    const double Z = this->GetZ();
+
     this->CreateCellLocatorIfNeeded();
 
-    double *dataset_bbox = this->mesh->GetBounds();
-    r *= hypot3(dataset_bbox[1]-dataset_bbox[0],dataset_bbox[3]-dataset_bbox[2],dataset_bbox[5]-dataset_bbox[4]);
+    // which chemical was clicked-on?
+    float offset_x = 0.0f;
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iChemical;
+    if(show_multiple_chemicals)
+    {
+        // detect which chemical was drawn on from the click position
+        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap))); 
+        iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
+        offset_x = iChemical * (X+this->xgap);
+    }
+    else
+    {
+        // only one chemical is shown, must be that one
+        iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    }
 
-    double bbox[6]={x-r,x+r,y-r,y+r,z-r,z+r};
+    r *= hypot3(X,Y,Z);
+
+    double bbox[6]={x-offset_x-r,x-offset_x+r,y-r,y+r,z-r,z+r};
     vtkSmartPointer<vtkIdList> cells = vtkSmartPointer<vtkIdList>::New();
     this->cell_locator->FindCellsWithinBounds(bbox,cells);
 
-    double p[3] = {x,y,z};
+    double p[3] = {x-offset_x,y,z};
 
-    int iChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     for(vtkIdType i=0;i<cells->GetNumberOfIds();i++)
     {
         int iCell = cells->GetId(i);
