@@ -54,25 +54,25 @@ AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_av
 {
     // temporarily turn off internationalisation, to avoid string-to-float conversion issues
     char *old_locale = setlocale(LC_NUMERIC,"C");
-    
+
     vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
     bool parallel;
     int data_structure_type = generic_reader->ReadOutputType(filename,parallel);
     AbstractRD *system;
     switch(data_structure_type)
     {
-        case VTK_IMAGE_DATA: 
+        case VTK_IMAGE_DATA:
             system = CreateFromImageDataFile(filename,is_opencl_available,opencl_platform,opencl_device,
-                render_settings,warn_to_update); 
+                render_settings,warn_to_update);
             break;
-        case VTK_UNSTRUCTURED_GRID: 
+        case VTK_UNSTRUCTURED_GRID:
             system = CreateFromUnstructuredGridFile(filename,is_opencl_available,opencl_platform,opencl_device,
-                render_settings,warn_to_update); 
+                render_settings,warn_to_update);
             break;
-        default: 
+        default:
             throw runtime_error("Unsupported data type or file read error");
     }
-    
+
     // restore the old locale
     setlocale(LC_NUMERIC,old_locale);
 
@@ -107,18 +107,18 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     {
         if(name=="Gray-Scott")
             image_system = new GrayScottImageRD();
-        else 
+        else
             throw runtime_error("Unsupported inbuilt implementation: "+name);
     }
     else if(type=="formula")
     {
-        if(!is_opencl_available) 
+        if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
         image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
-        if(!is_opencl_available) 
+        if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
         image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device,data_type);
     }
@@ -126,7 +126,7 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
 
     // render settings
-    vtkSmartPointer<vtkXMLDataElement> xml_render_settings = 
+    vtkSmartPointer<vtkXMLDataElement> xml_render_settings =
         reader->GetRDElement()->FindNestedElementWithName("render_settings");
     if(xml_render_settings) // optional
         render_settings.OverwriteFromXML(xml_render_settings);
@@ -171,18 +171,18 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     {
         if(name=="Gray-Scott")
             mesh_system = new GrayScottMeshRD();
-        else 
+        else
             throw runtime_error("Unsupported inbuilt implementation: "+name);
     }
     else if(type=="formula")
     {
-        if(!is_opencl_available) 
+        if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
         mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
-        if(!is_opencl_available) 
+        if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
         mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device,data_type);
     }
@@ -192,7 +192,7 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
 
     mesh_system->CopyFromMesh(ugrid);
     // render settings
-    vtkSmartPointer<vtkXMLDataElement> xml_render_settings = 
+    vtkSmartPointer<vtkXMLDataElement> xml_render_settings =
         reader->GetRDElement()->FindNestedElementWithName("render_settings");
     if(xml_render_settings) // optional
         render_settings.OverwriteFromXML(xml_render_settings);

@@ -271,7 +271,7 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
     rd->SetIntAttribute("format_version",4);
-    // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.) 
+    // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.)
 
     // description
     vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
@@ -367,7 +367,7 @@ void AbstractRD::Redo()
     do
     {
         this->FlipPaintAction(*it);
-        if(it->last_of_group) 
+        if(it->last_of_group)
             break;
         it++;
     } while(it!=this->undo_stack.end());

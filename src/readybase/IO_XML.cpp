@@ -68,7 +68,7 @@ string RD_XMLImageReader::GetName()
 
 bool RD_XMLImageReader::ShouldGenerateInitialPatternWhenLoading()
 {
-    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = 
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator =
         this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
     if(!initial_pattern_generator) return false; // (element is optional, defaults to false)
     const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
@@ -114,7 +114,7 @@ string RD_XMLUnstructuredGridReader::GetName()
 
 bool RD_XMLUnstructuredGridReader::ShouldGenerateInitialPatternWhenLoading()
 {
-    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator = 
+    vtkSmartPointer<vtkXMLDataElement> initial_pattern_generator =
         this->GetRDElement()->FindNestedElementWithName("initial_pattern_generator");
     if(!initial_pattern_generator) return false; // (element is optional, defaults to false)
     const char *s = initial_pattern_generator->GetAttribute("apply_when_loading");
@@ -136,9 +136,9 @@ vtkXMLDataElement* RD_XMLUnstructuredGridReader::GetRDElement()
 
 // ================================================================================
 
-void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system) 
-{ 
-    this->system = rd_system; 
+void RD_XMLImageWriter::SetSystem(const ImageRD* rd_system)
+{
+    this->system = rd_system;
 }
 
 // --------------------------------------------------------------------------------
@@ -153,9 +153,9 @@ int RD_XMLImageWriter::WritePrimaryElement(ostream& os,vtkIndent indent)
 
 // ================================================================================
 
-void RD_XMLUnstructuredGridWriter::SetSystem(const MeshRD* rd_system) 
-{ 
-    this->system = rd_system; 
+void RD_XMLUnstructuredGridWriter::SetSystem(const MeshRD* rd_system)
+{
+    this->system = rd_system;
 }
 
 // ---------------------------------------------------------------------

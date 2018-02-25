@@ -509,7 +509,7 @@ void GetKeyAction(char* value)
     }
 
     // test for some deprecated actions
-    /* 
+    /*
     if (action.id == DO_NOTHING) {
         if (strcmp(p, "Swap Cell Colors") == 0) action.id = DO_INVERT;
     }
@@ -920,7 +920,7 @@ void SavePrefs()
     fprintf(f, "opencl_device=%d\n", opencl_device);
 
     SaveKeyActions(f);
-    
+
     fprintf(f, "info_font_size=%d (%d..%d)\n", infofontsize, minfontsize, maxfontsize);
     fprintf(f, "help_font_size=%d (%d..%d)\n", helpfontsize, minfontsize, maxfontsize);
     fprintf(f, "text_dlg_wd=%d\n", textdlgwd);
@@ -1129,7 +1129,7 @@ void InitPaths()
     if ( !wxFileExists(prefspath) ) {
         prefspath = datadir + PREFS_NAME;
     }
-    
+
     patterndir = readydir + PATT_DIR;
 
     recordingdir = _T(".");
@@ -1239,7 +1239,7 @@ void GetPrefs()
 
         } else if (strcmp(keyword, "show_tips") == 0)   { showtips = value[0] == '1';
         } else if (strcmp(keyword, "repaint_to_erase") == 0)  { repaint_to_erase = value[0] == '1';
-        } else if (strcmp(keyword, "current_brush_size") == 0) { 
+        } else if (strcmp(keyword, "current_brush_size") == 0) {
             sscanf(value, "%d", &current_brush_size);
             current_brush_size = std::min(2,std::max(0,current_brush_size));
         } else if (strcmp(keyword, "allow_beep") == 0)  { allowbeep = value[0] == '1';
@@ -1252,7 +1252,7 @@ void GetPrefs()
         } else if (strcmp(keyword, "choose_dir") == 0)     { GetRelPath(value, choosedir);
         } else if (strcmp(keyword, "user_dir") == 0)       { GetRelPath(value, userdir);
         } else if (strcmp(keyword, "recording_dir") == 0)  { GetRelPath(value, recordingdir);
-        
+
         } else if (strcmp(keyword, "text_editor") == 0) {
             texteditor = wxString(value,wxConvLocal);
 
@@ -2221,13 +2221,13 @@ bool PrefsDialog::ValidatePage()
     if (currpage == FILE_PAGE) {
         if ( BadSpinVal(PREF_MAX_PATTERNS, 1, ID::MAX_RECENT, _("Maximum number of recent patterns")) )
             return false;
-    
+
     } else if (currpage == EDIT_PAGE) {
         // no spin ctrls on this page
-    
+
     } else if (currpage == VIEW_PAGE) {
         // no spin ctrls on this page
-    
+
     } else if (currpage == ACTION_PAGE) {
         // no spin ctrls on this page
 
@@ -2316,15 +2316,15 @@ bool ChangePrefs(const wxString& page)
     for (int key = 0; key < MAX_KEYCODES; key++)
         for (int modset = 0; modset < MAX_MODS; modset++)
             savekeyaction[key][modset] = keyaction[key][modset];
-    
+
     MyFrame* frameptr = wxGetApp().currframe;
-    
+
     PrefsDialog dialog(frameptr, page);
 
     bool result;
     if (dialog.ShowModal() == wxID_OK) {
         // TransferDataFromWindow has validated and updated all global prefs
-        
+
         // if a keyboard shortcut changed then update menu item accelerators
         for (int key = 0; key < MAX_KEYCODES; key++)
             for (int modset = 0; modset < MAX_MODS; modset++)
@@ -2351,7 +2351,7 @@ bool ChangePrefs(const wxString& page)
 
         result = false;
     }
-    
+
     frameptr->UpdateMenuAccelerators();
 
     return result;

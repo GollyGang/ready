@@ -72,7 +72,7 @@ void MeshGenerators::GetGeodesicSphere(int n_subdivisions,vtkUnstructuredGrid *m
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -112,7 +112,7 @@ void MeshGenerators::GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chem
             pts->InsertNextPoint(p2);
             // rotate the transform further for next time
             r2->RotateZ(360.0/ny);
-            // make a quad 
+            // make a quad
             cells->InsertNextCell(4);
             cells->InsertCellPoint(x*ny+y);
             cells->InsertCellPoint(x*ny+(y+1)%ny);
@@ -127,7 +127,7 @@ void MeshGenerators::GetTorus(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chem
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -185,7 +185,7 @@ void MeshGenerators::GetTriangularMesh(int nx,int ny,vtkUnstructuredGrid* mesh,i
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -225,8 +225,8 @@ void MeshGenerators::GetRhombilleTiling(int nx,int ny,vtkUnstructuredGrid* mesh,
                 cells->InsertCellPoint((y+1)*nx+x-1); // e
                 cells->InsertCellPoint(y*nx+x-1);     // center
                 cells->InsertNextCell(4);
-                cells->InsertCellPoint((y+1)*nx+x-1); // e 
-                cells->InsertCellPoint((y+1)*nx+x);   // f 
+                cells->InsertCellPoint((y+1)*nx+x-1); // e
+                cells->InsertCellPoint((y+1)*nx+x);   // f
                 cells->InsertCellPoint(y*nx+x);       // a
                 cells->InsertCellPoint(y*nx+x-1);     // center
             }
@@ -257,7 +257,7 @@ void MeshGenerators::GetRhombilleTiling(int nx,int ny,vtkUnstructuredGrid* mesh,
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -313,7 +313,7 @@ void MeshGenerators::GetHexagonalMesh(int nx,int ny,vtkUnstructuredGrid* mesh,in
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -355,7 +355,7 @@ int SplitEdge(const Tri &tri,int i1,int i2,double &x, double &y,TPairIndex &edge
     else
     {
         int iP = pts->InsertNextPoint(x,y,0);
-        edge_splits[edge] = iP; 
+        edge_splits[edge] = iP;
         return iP;
     }
 }
@@ -393,11 +393,11 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
         double p2[3] = { scale*cos(angle2), scale*sin(angle2), 0 };
         switch(type) {
             default:
-            case RHOMBI: 
-                red_tris[iCurrentBuffer].push_back(Tri(0,0,0,p1[0],p1[1],1+i1,p2[0],p2[1],1+i2)); 
+            case RHOMBI:
+                red_tris[iCurrentBuffer].push_back(Tri(0,0,0,p1[0],p1[1],1+i1,p2[0],p2[1],1+i2));
                 break;
-            case DARTS_AND_KITES: 
-                red_tris[iCurrentBuffer].push_back(Tri(p1[0],p1[1],1+i1,0,0,0,p2[0],p2[1],1+i2)); 
+            case DARTS_AND_KITES:
+                red_tris[iCurrentBuffer].push_back(Tri(p1[0],p1[1],1+i1,0,0,0,p2[0],p2[1],1+i2));
                 break;
         }
     }
@@ -488,14 +488,14 @@ void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructure
             }
         }
     }
-    
+
     mesh->SetPoints(pts);
     mesh->SetCells(VTK_POLYGON,cells);
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -535,7 +535,7 @@ void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -666,7 +666,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -679,7 +679,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
 
 void MeshGenerators::GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid *mesh,int n_chems,int data_type)
 {
-    // TODO: we could make any number of shapes here but we need a more general mechanism, 
+    // TODO: we could make any number of shapes here but we need a more general mechanism,
     // e.g. input a closed surface, scatter points inside, tetrahedralize
 
     // make a tetrahedral mesh by delaunay tetrahedralization on a point cloud
@@ -698,7 +698,7 @@ void MeshGenerators::GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid *mesh,
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -712,19 +712,19 @@ void MeshGenerators::GetRandomDelaunay3D(int n_points,vtkUnstructuredGrid *mesh,
 void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems,int data_type)
 {
     // a truncated octahedron
-    const double coords[24][3] = { 
+    const double coords[24][3] = {
         {0,1,2}, {0,-1,2}, {0,1,-2}, {0,-1,-2},   // 0,1,2,3
         {0,2,1}, {0,-2,1}, {0,2,-1}, {0,-2,-1},   // 4,5,6,7
         {1,0,2}, {-1,0,2}, {1,0,-2}, {-1,0,-2},   // 8,9,10,11
         {1,2,0}, {-1,2,0}, {1,-2,0}, {-1,-2,0},   // 12,13,14,15
         {2,0,1}, {-2,0,1}, {2,0,-1}, {-2,0,-1},   // 16,17,18,19
         {2,1,0}, {-2,1,0}, {2,-1,0}, {-2,-1,0} }; // 20,21,22,23
-    const int hex_faces[8][6] = { 
-        {0,8,16,20,12,4}, {2,6,12,20,18,10}, 
-        {1,5,14,22,16,8}, {3,10,18,22,14,7}, 
+    const int hex_faces[8][6] = {
+        {0,8,16,20,12,4}, {2,6,12,20,18,10},
+        {1,5,14,22,16,8}, {3,10,18,22,14,7},
         {0,4,13,21,17,9}, {2,11,19,21,13,6},
         {1,9,17,23,15,5}, {3,7,15,23,19,11} }; // xyz positive or negative: +++, ++-, +-+, +--, -++, -+-, --+, ---
-    const int square_faces[6][4] = { 
+    const int square_faces[6][4] = {
         {16,22,18,20}, {17,21,19,23}, {4,12,6,13},
         {5,15,7,14}, {0,9,1,8}, {2,10,3,11} }; // x=2, x=-2, y=2, y=-2, z=2, z=-2
 
@@ -740,8 +740,8 @@ void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
                 vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 vector<vtkIdType> pointIds,faceStream;
                 vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-                for(int i=0;i<24;i++) 
-                    pointIds.push_back(points->InsertNextPoint( coords[i][0]+x*4+(z%2)*2, 
+                for(int i=0;i<24;i++)
+                    pointIds.push_back(points->InsertNextPoint( coords[i][0]+x*4+(z%2)*2,
                         coords[i][1]+y*4+(z%2)*2, coords[i][2]+z*2)); // body-centred
                 for(int i=0;i<8;i++) {
                     faceStream.push_back(6);
@@ -769,7 +769,7 @@ void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -783,12 +783,12 @@ void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
 void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* mesh,int n_chems,int data_type)
 {
     // a rhombic dodecahedron
-    const double coords[14][3] = { 
+    const double coords[14][3] = {
         {-2,0,0},{2,0,0},{0,-2,0},{0,2,0},{0,0,-2},{0,0,2}, // 0,1,2,3,4,5,
         {-1,-1,-1},{-1,-1,1},{-1,1,-1},{-1,1,1}, // 6,7,8,9
         {1,-1,-1},{1,-1,1},{1,1,-1},{1,1,1} // 10,11,12,13
     };
-    const int faces[12][4] = { 
+    const int faces[12][4] = {
         {0,7,5,9},{9,5,13,3},{13,5,11,1},{5,7,2,11},
         {0,6,2,7},{0,9,3,8},{0,8,4,6},{2,6,4,10},
         {3,12,4,8},{1,10,4,12},{1,11,2,10},{1,12,3,13}
@@ -806,8 +806,8 @@ void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
                 vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 vector<vtkIdType> pointIds,faceStream;
                 vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-                for(int i=0;i<14;i++) 
-                    pointIds.push_back(points->InsertNextPoint( coords[i][0]+x*2+(z%2)*2, 
+                for(int i=0;i<14;i++)
+                    pointIds.push_back(points->InsertNextPoint( coords[i][0]+x*2+(z%2)*2,
                         coords[i][1]+y*4+(x%2)*2, coords[i][2]+z*2)); // face-centred
                 for(int i=0;i<12;i++) {
                     faceStream.push_back(4);
@@ -830,7 +830,7 @@ void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -846,7 +846,7 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
     // a triakis truncated tetrahedron: 16 points, 4 hexagonal faces, 12 triangular faces
     const double RR2 = 1.0 / sqrt(2.0); // reciprocal of root 2
     const double third = 1.0 / 3.0;
-    const double coords[16][3] = { 
+    const double coords[16][3] = {
         //{-1,0,-RR2}, {1,0,-RR2}, {0,-1,RR2}, {0,1,RR2},          // (tips of the original tetrahedron)
         {-2*third,0,-2*third*RR2}, {2*third,0,-2*third*RR2},       // 0, 1
         {0,-2*third,2*third*RR2}, {0,2*third,2*third*RR2},         // 2, 3 (centroids of the snipped-off tetrahedra)
@@ -874,7 +874,7 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
                 vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
                 vector<vtkIdType> pointIds,faceStream;
                 vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-                for(int i=0;i<16;i++) 
+                for(int i=0;i<16;i++)
                 {
                     double offset[3] = { x*(1+third), y*(1+third), (z/2)*RR2*(1+third) + (z%2)*2*third*RR2 };
                     double mx=0.0,my=0.0;
@@ -888,13 +888,13 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
                     else
                         pointIds.push_back(points->InsertNextPoint( -coords[i][1] + offset[1] + mx, coords[i][0] + offset[0] + 2*third + my, coords[i][2] + offset[2] ));
                 }
-                for(int i=0;i<4;i++) 
+                for(int i=0;i<4;i++)
                 {
                     faceStream.push_back(6);
                     for(int j=0;j<6;j++)
                         faceStream.push_back(hex_faces[i][j]);
                 }
-                for(int i=0;i<12;i++) 
+                for(int i=0;i<12;i++)
                 {
                     faceStream.push_back(3);
                     for(int j=0;j<3;j++)
@@ -917,7 +917,7 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -1023,7 +1023,7 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
         vector<vtkIdType> pointIds;
         vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
         double centroid[3] = {0,0,0};
-        for(int iV = 0; iV < num_vertices; ++iV ) { 
+        for(int iV = 0; iV < num_vertices; ++iV ) {
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( size_t iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
             {
@@ -1057,12 +1057,12 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
     }
 
     append->Update();
-    mesh->DeepCopy(append->GetOutput()); 
+    mesh->DeepCopy(append->GetOutput());
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());
@@ -1200,7 +1200,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
         vector<vtkIdType> pointIds;
         vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
         double centroid[3] = {0,0,0};
-        for(int iV = 0; iV < num_vertices; ++iV ) { 
+        for(int iV = 0; iV < num_vertices; ++iV ) {
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( size_t iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
             {
@@ -1219,7 +1219,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
         if( point_locator->IsInsertedPoint( centroid ) < 0 )
         {
             vector<vtkIdType> faceStream;
-            for(int iF = 0; iF < num_faces; ++iF ) 
+            for(int iF = 0; iF < num_faces; ++iF )
             {
                 faceStream.push_back( num_vertices_per_face );
                 for(int j = 0; j < num_vertices_per_face; ++j )
@@ -1237,12 +1237,12 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
     }
 
     append->Update();
-    mesh->DeepCopy(append->GetOutput()); 
+    mesh->DeepCopy(append->GetOutput());
 
     // allocate the chemicals arrays
     for(int iChem=0;iChem<n_chems;iChem++)
     {
-        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );        
+        vtkSmartPointer<vtkDataArray> scalars = vtkSmartPointer<vtkDataArray>::Take( vtkDataArray::CreateDataArray( data_type ) );
         scalars->SetNumberOfComponents(1);
         scalars->SetNumberOfTuples(mesh->GetNumberOfCells());
         scalars->SetName(GetChemicalName(iChem).c_str());

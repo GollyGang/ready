@@ -79,16 +79,16 @@ float frand(float lower,float upper)
 
 // ---------------------------------------------------------------------------------------------------------
 
-double hypot2(double x,double y) 
-{ 
-    return sqrt(x*x+y*y); 
+double hypot2(double x,double y)
+{
+    return sqrt(x*x+y*y);
 }
 
 // ---------------------------------------------------------------------------------------------------------
 
-double hypot3(double x,double y,double z) 
-{ 
-    return sqrt(x*x+y*y+z*z); 
+double hypot3(double x,double y,double z)
+{
+    return sqrt(x*x+y*y+z*z);
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -101,18 +101,18 @@ float* vtk_at(float* origin,int x,int y,int z,int X,int Y)
 
 // ---------------------------------------------------------------------------------------------------------
 
-template <> bool from_string<string> (const string& s,string& val) 
-{ 
+template <> bool from_string<string> (const string& s,string& val)
+{
     val = s;
     return true;
-} 
+}
 
 // ---------------------------------------------------------------------------------------------------------
 
 string GetChemicalName(size_t i)
-{ 
+{
     if(i<26)
-        return string( 1, 'a' + static_cast<char>(i) ); 
+        return string( 1, 'a' + static_cast<char>(i) );
     else if(i<26*27)
         return GetChemicalName(i/26-1) + GetChemicalName(i%26);
     throw runtime_error("GetChemicalName: out of range");

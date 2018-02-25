@@ -46,7 +46,7 @@ GrayScottImageRD::GrayScottImageRD()
 void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
     // N.B. this class is hardwired for Gray-Scott using floats, so data_type is ignored
-    if(nc!=2) throw runtime_error("GrayScottImageRD::AllocateImages : this implementation is for 2 chemicals only"); 
+    if(nc!=2) throw runtime_error("GrayScottImageRD::AllocateImages : this implementation is for 2 chemicals only");
     ImageRD::AllocateImages(x,y,z,2,VTK_FLOAT);
     // also allocate our buffer images
     this->DeleteBuffers();
@@ -87,17 +87,17 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
     for(int iStep=0;iStep<n_steps;iStep++)
     {
         float *old_a,*new_a,*old_b,*new_b;
-        switch(iStep%2) 
+        switch(iStep%2)
         {
-            case 0: old_a = static_cast<float*>(this->images[0]->GetScalarPointer()); 
-                    old_b = static_cast<float*>(this->images[1]->GetScalarPointer()); 
-                    new_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer()); 
-                    new_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer()); 
+            case 0: old_a = static_cast<float*>(this->images[0]->GetScalarPointer());
+                    old_b = static_cast<float*>(this->images[1]->GetScalarPointer());
+                    new_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer());
+                    new_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer());
                     break;
-            case 1: old_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer()); 
-                    old_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer()); 
-                    new_a = static_cast<float*>(this->images[0]->GetScalarPointer()); 
-                    new_b = static_cast<float*>(this->images[1]->GetScalarPointer()); 
+            case 1: old_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer());
+                    old_b = static_cast<float*>(this->buffer_images[1]->GetScalarPointer());
+                    new_a = static_cast<float*>(this->images[0]->GetScalarPointer());
+                    new_b = static_cast<float*>(this->images[1]->GetScalarPointer());
                     break;
         }
         for(int z=0;z<Z;z++)
@@ -144,17 +144,17 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
                     // 7-point stencil:
                     float dda = *vtk_at(old_a,x,y_prev,z,X,Y) +
                                 *vtk_at(old_a,x,y_next,z,X,Y) +
-                                *vtk_at(old_a,x_prev,y,z,X,Y) + 
+                                *vtk_at(old_a,x_prev,y,z,X,Y) +
                                 *vtk_at(old_a,x_next,y,z,X,Y) +
-                                *vtk_at(old_a,x,y,z_prev,X,Y) + 
+                                *vtk_at(old_a,x,y,z_prev,X,Y) +
                                 *vtk_at(old_a,x,y,z_next,X,Y) - 6*aval;
                     float ddb = *vtk_at(old_b,x,y_prev,z,X,Y) +
                                 *vtk_at(old_b,x,y_next,z,X,Y) +
-                                *vtk_at(old_b,x_prev,y,z,X,Y) + 
+                                *vtk_at(old_b,x_prev,y,z,X,Y) +
                                 *vtk_at(old_b,x_next,y,z,X,Y) +
-                                *vtk_at(old_b,x,y,z_prev,X,Y) + 
+                                *vtk_at(old_b,x,y,z_prev,X,Y) +
                                 *vtk_at(old_b,x,y,z_next,X,Y) - 6*bval;
-     
+
                     // compute the new rate of change of a and b
                     float da = D_a * dda - aval*bval*bval + F*(1-aval);
                     float db = D_b * ddb + aval*bval*bval - (F+k)*bval;

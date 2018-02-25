@@ -81,7 +81,7 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
     kernel_source << indent << "int _offset = index_x * max_neighbors;\n";
     kernel_source << indent << "for(int _i=0;_i<max_neighbors;_i++)\n" << indent << "{\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << indent << "laplacian_" << GetChemicalName(i) << " += " << GetChemicalName(i) 
+        kernel_source << indent << indent << "laplacian_" << GetChemicalName(i) << " += " << GetChemicalName(i)
                       << "_in[neighbor_indices[_offset+_i]] * neighbor_weights[_offset+_i];\n";
     kernel_source << indent << "}\n";
     for(int i=0;i<NC;i++)

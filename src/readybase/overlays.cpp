@@ -45,7 +45,7 @@ class BaseOperation : public XML_Object
         virtual void Apply(double& target,double value) const =0;
 
     protected:
-        
+
         /// can construct from an XML node
         BaseOperation(vtkXMLDataElement* node) : XML_Object(node) {}
 };
@@ -68,7 +68,7 @@ class BaseFill : public XML_Object
         /// can construct from an XML node
         BaseFill(vtkXMLDataElement* node) : XML_Object(node) {}
 };
- 
+
 /// Base class for different shapes that we can draw onto the RD system.
 class BaseShape : public XML_Object
 {
@@ -105,7 +105,7 @@ Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node), op(NULL), fill(NUL
         vtkXMLDataElement *subnode = node->GetNestedElement(i_nested);
         // is this an operation element?
         pOp = BaseOperation::New(subnode);
-        if(pOp) { 
+        if(pOp) {
             this->op = pOp; // TODO: check if already supplied
             continue; // (save time parsing as other types)
         }
@@ -165,15 +165,15 @@ double Overlay::Apply(vector<double> vals,AbstractRD* system,float x,float y,flo
 class Point3D : public XML_Object
 {
     public:
-    
+
         Point3D(vtkXMLDataElement *node);
-        
+
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
         static const char* GetTypeName() { return "point3D"; }
 
     public:
-    
+
         float x,y,z;
 };
 
@@ -615,9 +615,9 @@ class Everywhere : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const 
-        { 
-            return true; 
+        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        {
+            return true;
         }
 };
 
@@ -654,10 +654,10 @@ class Rectangle : public BaseShape
             {
                 default:
                 case 1: return rel_x>=this->a->x && rel_x<=this->b->x;
-                case 2: return rel_x>=this->a->x && rel_x<=this->b->x && 
+                case 2: return rel_x>=this->a->x && rel_x<=this->b->x &&
                                rel_y>=this->a->y && rel_y<=this->b->y;
-                case 3: return rel_x>=this->a->x && rel_x<=this->b->x && 
-                               rel_y>=this->a->y && rel_y<=this->b->y && 
+                case 3: return rel_x>=this->a->x && rel_x<=this->b->x &&
+                               rel_y>=this->a->y && rel_y<=this->b->y &&
                                rel_z>=this->a->z && rel_z<=this->b->z;
             }
         }

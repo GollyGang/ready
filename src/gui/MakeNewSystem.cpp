@@ -713,6 +713,6 @@ AbstractRD* MakeNewHyperbolicSpace(const bool is_opencl_available, const int ope
     render_settings.GetProperty("use_image_interpolation").SetBool(false);
     render_settings.GetProperty("timesteps_per_render").SetInt(1);
     return mesh_sys;
-}            
-            
+}
+
 // ---------------------------------------------------------------------

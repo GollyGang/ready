@@ -211,7 +211,7 @@ void OpenCLMeshRD::CreateOpenCLBuffers()
             throwOnError(ret,"OpenCLMeshRD::CreateOpenCLBuffers : data buffer creation failed: ");
         }
     }
-    
+
     // create a buffer for the indices of the neighbors of each cell
     const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     this->clBuffer_cell_neighbor_indices = clCreateBuffer(this->context, CL_MEM_READ_ONLY, NBORS_INDICES_SIZE, NULL, &ret);

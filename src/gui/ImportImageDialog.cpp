@@ -37,7 +37,7 @@ END_EVENT_TABLE()
 
 // -----------------------------------------------------------------------------------------------
 
-ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float low, float high) 
+ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float low, float high)
     : wxDialog(parent,wxID_ANY,_("Import an image"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     // create the controls
@@ -117,13 +117,13 @@ ImportImageDialog::ImportImageDialog(wxWindow *parent, int num_chemicals, float 
 
 void ImportImageDialog::OnChangeFilename(wxCommandEvent& event)
 {
-    wxFileDialog opendlg(this, 
+    wxFileDialog opendlg(this,
                          _("Choose an image file to import"),
                          wxEmptyString,
                          wxEmptyString,
                          _("Image files (*.jpg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp"),
                          wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-    if (opendlg.ShowModal() != wxID_OK) 
+    if (opendlg.ShowModal() != wxID_OK)
         return;
 
     this->filename_edit->SetValue(opendlg.GetPath());

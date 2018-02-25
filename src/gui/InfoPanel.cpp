@@ -78,9 +78,9 @@ class HtmlInfo : public wxHtmlWindow
 
         virtual void OnLinkClicked(const wxHtmlLinkInfo& link);
         virtual void OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y);
-        
+
         void ClearStatus();  // clear pane's status line
-        
+
         void SetFontSizes(int size);
         void ChangeFontSizes(int size);
 
@@ -99,10 +99,10 @@ class HtmlInfo : public wxHtmlWindow
         void OnHtmlCellClicked(wxHtmlCellEvent& event);
 
     private:
-        
+
         MyFrame* frame;
         InfoPanel* panel;
-        
+
         bool editlink;          // open clicked file in editor?
         int scroll_x,scroll_y;  // remember the scroll position
 
@@ -177,7 +177,7 @@ void HtmlInfo::OnHtmlCellClicked(wxHtmlCellEvent& event)
     wxHtmlCell* cell = event.GetCell();
     int x = event.GetPoint().x;
     int y = event.GetPoint().y;
-    
+
     wxHtmlLinkInfo* link = cell->GetLink(x,y);
     if (link) {
         // set linkrect to avoid bug in wxHTML if click was in outer edge of link
@@ -261,7 +261,7 @@ void HtmlInfo::OnSize(wxSizeEvent& event)
 
     RestoreScrollPos();
     Thaw();
-    
+
     // prevent wxHtmlWindow::OnSize being called again
     event.Skip(false);
 }
@@ -306,11 +306,11 @@ BEGIN_EVENT_TABLE(InfoPanel, wxPanel)
     EVT_BUTTON (ID::BiggerButton,   InfoPanel::OnBiggerButton)
 END_EVENT_TABLE()
 
-InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id) 
+InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
     : wxPanel(parent,id), frame(parent)
 {
     html = new HtmlInfo(this, frame, wxID_ANY);
-    
+
     html->SetBorders(0);
     html->SetFontSizes(infofontsize);
 
@@ -342,7 +342,7 @@ InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
     vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
     vbox->Add(html, 1, wxEXPAND | wxALIGN_TOP, 0);
     SetSizer(vbox);
-    
+
     UpdateButtons();
 
     // install event handlers to detect keyboard shortcuts when html window has focus
@@ -363,7 +363,7 @@ void InfoPanel::Update(const AbstractRD* const system)
 {
     // build HTML string to display current parameters
     wxString contents;
-    
+
     contents += wxT("<html><body><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
 
     rownum = 0;
@@ -380,7 +380,7 @@ void InfoPanel::Update(const AbstractRD* const system)
 
     contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system->GetNumberOfChemicals()),
                           system->HasEditableNumberOfChemicals());
-    
+
     for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
     {
         contents += AppendRow(system->GetParameterName(iParam), system->GetParameterName(iParam),
@@ -400,12 +400,12 @@ void InfoPanel::Update(const AbstractRD* const system)
         formula.Replace(wxT("\r"), wxT("<br>"));
         formula.Replace(wxT("\n"), wxT("<br>"));
         // convert whitespace to &nbsp; so we can use the <code> block
-        formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;")); 
+        formula.Replace(wxT("  "), wxT("&nbsp;&nbsp;"));
         // (This is a bit of a hack. We only want to keep the leading whitespace on each line, and since &ensp; is not supported we
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        if(system->GetRuleType()=="kernel") 
+        if(system->GetRuleType()=="kernel")
             contents += AppendRow(kernel_label, kernel_label, formula, system->HasEditableFormula(), true);
         else
             contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
@@ -431,7 +431,7 @@ void InfoPanel::Update(const AbstractRD* const system)
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                         system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
                                         system->HasEditableBlockSize());*/
-                                            
+
     if(system->HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
 
@@ -444,7 +444,7 @@ void InfoPanel::Update(const AbstractRD* const system)
     contents += _("Render settings:");
     contents += wxT("</h5></center>");
     contents += wxT("<table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
-    
+
     rownum = 1;     // nicer if 1st render setting has gray background
 
     const Properties& render_settings = frame->GetRenderSettings();
@@ -477,7 +477,7 @@ void InfoPanel::Update(const AbstractRD* const system)
     }
 
     contents += _T("</table></body></html>");
-    
+
     html->SaveScrollPos();
     html->Freeze();             // prevent flicker
     html->SetPage(contents);
@@ -492,7 +492,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
 {
     wxString result = (rownum & 1) ? _T("<tr bgcolor=\"#F0F0F0\">") : _T("<tr>");
     rownum++;
-    
+
     if (is_multiline) {
         result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
         result += print_label;
@@ -516,7 +516,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
         }
         result += _T("</td>");
     }
-    
+
     if (is_editable) {
         result += _T("<td valign=top align=right><a href=\"");
         result += change_prefix;
@@ -528,7 +528,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
         result += _T("<td></td>");
     }
     result += _T("<td width=3></td></tr>");
-    
+
     if (is_multiline) {
         // put text in a new row that spans all columns
         result += (rownum & 1) ? _T("<tr>") : _T("<tr bgcolor=\"#F0F0F0\">");
@@ -536,7 +536,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
         result += value;
         result += _T("<br></td><td width=3></td></tr>");
     }
-    
+
     return result;
 }
 
@@ -557,7 +557,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         pos.x -= dlgwd + 20;
 
         ParameterDialog dialog(frame, false, setting, oldval, pos, wxSize(dlgwd,-1));
-        
+
         if (dialog.ShowModal() == wxID_OK)
         {
             newval = dialog.GetValue();
@@ -578,7 +578,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         pos.x -= dlgwd + 20;
 
         ParameterDialog dialog(frame, false, setting, oldval, pos, wxSize(dlgwd,-1));
-        
+
         if (dialog.ShowModal() == wxID_OK)
         {
             newval = dialog.GetValue();
@@ -627,8 +627,8 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         choices.Add(_T("z"));
         wxSingleChoiceDialog dlg(this,_("Axis:"),_("Select axis"),choices);
         int iAxis=0;
-        if(prop.GetAxis()=="x") iAxis=0; 
-        else if(prop.GetAxis()=="y") iAxis=1; 
+        if(prop.GetAxis()=="x") iAxis=0;
+        else if(prop.GetAxis()=="y") iAxis=1;
         else if(prop.GetAxis()=="z") iAxis=2;
         dlg.SetSelection(iAxis);
         if(dlg.ShowModal()!=wxID_OK) return;
@@ -654,7 +654,7 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
         Warning(_("Bug in ChangeParameter! Unknown parameter: ") + parameter);
         return;
     }
-    
+
     wxString newname;
     float newval;
     float oldval = sys->GetParameterValue(iParam);
@@ -666,7 +666,7 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
     pos.x -= dlgwd + 20;
 
     ParameterDialog dialog(frame, can_edit_name, parameter, oldval, pos, wxSize(dlgwd,-1));
-    
+
     if (dialog.ShowModal() == wxID_OK)
     {
         newname = can_edit_name ? dialog.GetName() : parameter;
@@ -682,7 +682,7 @@ void InfoPanel::ChangeRuleName()
 {
     wxString oldname(frame->GetCurrentRDSystem()->GetRuleName().c_str(),wxConvUTF8);
     wxString newname;
-    
+
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
     int dlgwd = 300;
@@ -703,7 +703,7 @@ void InfoPanel::ChangeDescription()
     wxString newtext;
 
     MultiLineDialog dialog(frame, _("Change description"), _("Enter the new description:"), oldtext);
-    
+
     // best to center potentially large dialog box
     dialog.SetSize(textdlgwd, textdlght);
     dialog.Centre();
@@ -727,7 +727,7 @@ void InfoPanel::ChangeFormula()
 
     wxString code_type(frame->GetCurrentRDSystem()->GetRuleType().c_str(),wxConvUTF8);
     MultiLineDialog dialog(frame, _("Change ")+code_type, _("Enter the new ")+code_type+_T(":"), oldcode);
-    
+
     // best to center potentially large dialog box
     dialog.SetSize(textdlgwd, textdlght);
     dialog.Centre();
@@ -750,7 +750,7 @@ void InfoPanel::ChangeNumChemicals()
 
     int oldnum = frame->GetCurrentRDSystem()->GetNumberOfChemicals();
     int newnum;
-    
+
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
     int dlgwd = 300;
@@ -760,7 +760,7 @@ void InfoPanel::ChangeNumChemicals()
                     oldnum, 1, MAX_CHEMICALS, &newnum,
                     pos, wxSize(dlgwd,wxDefaultCoord)) )
     {
-        if (newnum != oldnum) 
+        if (newnum != oldnum)
             frame->SetNumberOfChemicals(newnum);
     }
 }
@@ -797,7 +797,7 @@ void InfoPanel::ChangeDimensions()
         else if (sys->GetRuleType() == "kernel" && not_all_powers_of_two)
         {
             int answer = wxMessageBox(
-                _("Check the kernel to see if it supports dimensions that are not powers of 2"), 
+                _("Check the kernel to see if it supports dimensions that are not powers of 2"),
                 _("WARNING: Dimensions are not all powers of 2"),
                 wxOK | wxCANCEL);
             if (answer == wxCANCEL)
@@ -823,7 +823,7 @@ void InfoPanel::ChangeBlockSize()
     pos.x -= dlgwd + 20;
 
     XYZIntDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
-    
+
     if (dialog.ShowModal() == wxID_OK)
     {
         newx = dialog.GetX();
@@ -921,7 +921,7 @@ void InfoPanel::UpdateButtons()
 {
     smallerbutt->Enable( infofontsize > minfontsize );
     biggerbutt->Enable( infofontsize < maxfontsize );
-    
+
     html->ClearStatus();
     html->SetFocus();       // for keyboard shortcuts
 }
@@ -962,14 +962,14 @@ bool InfoPanel::DoKey(int key, int mods)
             return false;
         }
     }
-    
+
     // now do keyboard shortcuts specific to this pane
     if ( mods == wxMOD_NONE ) {
         // there are none at the moment, and probably safer to keep things that way
         // otherwise it can get confusing if the user assigns a keyboard shortcut
         // that conflicts with one hard-wired here
     }
-    
+
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;

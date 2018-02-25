@@ -155,10 +155,10 @@ int SaveChanges(const wxString& query, const wxString& msg)
         wxMessageDialog dialog(wxGetActiveWindow(), msg, query,
                                wxCENTER | wxNO_DEFAULT | wxYES_NO | wxCANCEL |
                                wxICON_INFORMATION);
-        
+
         // change button order to what Mac users expect to see
         dialog.SetYesNoCancelLabels("Cancel", "Save", "Don't Save");
-       
+
         switch ( dialog.ShowModal() )
         {
             case wxID_YES:    return wxCANCEL;  // Cancel

@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
     InitializeDefaultRenderSettings(render_settings);
 
     AbstractRD *system;
-    try 
+    try
     {
         // read the file
         cout << "Loading file...\n";

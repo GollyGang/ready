@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
-    
+
 // local:
 #include "InteractorStylePainter.hpp"
 
@@ -82,9 +82,9 @@ void InteractorStylePainter::OnMouseMove()
 
 // ------------------------------------------------------------------------------------------------
 
-void InteractorStylePainter::SetPaintHandler(IPaintHandler* ph) 
-{ 
-    this->paint_handler = ph; 
+void InteractorStylePainter::SetPaintHandler(IPaintHandler* ph)
+{
+    this->paint_handler = ph;
 }
 
 // ------------------------------------------------------------------------------------------------

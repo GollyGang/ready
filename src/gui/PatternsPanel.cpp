@@ -33,11 +33,11 @@ BEGIN_EVENT_TABLE(PatternsPanel, wxPanel)
     EVT_TREE_SEL_CHANGED(wxID_TREECTRL, PatternsPanel::OnTreeSelChanged)
 END_EVENT_TABLE()
 
-PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id) 
+PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
     : wxPanel(parent,id), frame(parent)
 {
     edit_file = false;
-    
+
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
     patternctrl = NULL;    // for 1st call of OnTreeSelChanged
@@ -81,7 +81,7 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         // reduce indent a lot on Windows
         treectrl->SetIndent(4);
     #endif
-    
+
     BuildTree();
 
     // install event handler to detect clicking on a file
@@ -100,7 +100,7 @@ void PatternsPanel::AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTre
     if (dir.Last() == wxFILE_SEP_PATH) dir.Truncate(dir.Length()-1);
     wxDirItemData* diritem = new wxDirItemData(dir, dir, true);
     wxTreeItemId id = treectrl->AppendItem(root, dir.AfterLast(wxFILE_SEP_PATH), 0, 0, diritem);
-    
+
     // expand the root item
     if ( diritem->HasFiles() || diritem->HasSubDirs() ) {
         treectrl->SetItemHasChildren(id);
@@ -114,7 +114,7 @@ void PatternsPanel::BuildTree()
     wxTreeCtrl* treectrl = patternctrl->GetTreeCtrl();
     wxTreeItemId root = patternctrl->GetRootId();
     treectrl->DeleteChildren(root);
-   
+
     if ( wxFileName::DirExists(patterndir) ) {
         // append Ready's pattern folder as first child of root
         AppendDir(patterndir, treectrl, root);
@@ -149,16 +149,16 @@ void PatternsPanel::OnTreeClick(wxMouseEvent& event)
         event.Skip();
         return;
     }
-    
+
     // set global flag for testing in OnTreeSelChanged
     edit_file = event.ControlDown() || event.RightDown();
-    
+
     // check for click in an already selected item
     if (id == treectrl->GetSelection()) {
         // force a selection change so OnTreeSelChanged gets called
         treectrl->Unselect();
     }
-    
+
     treectrl->SelectItem(id);
     treectrl->SetFocus();
     // OnTreeSelChanged will be called -- don't call event.Skip()
@@ -167,7 +167,7 @@ void PatternsPanel::OnTreeClick(wxMouseEvent& event)
 void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
 {
     if (patternctrl == NULL) return;   // ignore 1st call
-        
+
     wxTreeItemId id = event.GetItem();
     if (!id.IsOk()) return;
 
@@ -179,7 +179,7 @@ void PatternsPanel::OnTreeSelChanged(wxTreeEvent& event)
     } else if (edit_file) {
         // open file in text editor
         frame->EditFile(filepath);
-    
+
     } else {
         // user clicked on a pattern/html/txt file
         frame->OpenFile(filepath);
@@ -201,7 +201,7 @@ bool PatternsPanel::DoKey(int key, int mods)
             return false;
         }
     }
-    
+
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;

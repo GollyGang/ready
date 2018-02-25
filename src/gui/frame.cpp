@@ -262,7 +262,7 @@ MyFrame::MyFrame(const wxString& title)
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
     this->aui_mgr.SetManagedWindow(this);
-    
+
     GetPrefs();     // must be called before InitializeMenus
 
     this->InitializeMenus();
@@ -271,7 +271,7 @@ MyFrame::MyFrame(const wxString& title)
 
     CreateStatusBar(1);
     SetStatusText(_("Ready"));
-    
+
     this->is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
 
     this->InitializePatternsPane();
@@ -623,7 +623,7 @@ bool DnDFile::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
         SetForegroundWindow( (HWND)frameptr->GetHandle() );
     #endif
     frameptr->Raise();
-   
+
     size_t numfiles = filenames.GetCount();
     for ( size_t n = 0; n < numfiles; n++ ) {
         frameptr->OpenFile(filenames[n]);
@@ -666,7 +666,7 @@ void MyFrame::LoadSettings()
     // use global info set by GetPrefs()
     this->SetPosition(wxPoint(mainx,mainy));
     this->SetSize(mainwd,mainht);
-    if (auilayout.length() > 0 
+    if (auilayout.length() > 0
         && currversion > 1)  // one-off fix for issue of IDs being used as names
         this->aui_mgr.LoadPerspective(auilayout);
 }
@@ -772,9 +772,9 @@ void MyFrame::OnSelectAll(wxCommandEvent& event)
 void MyFrame::OnFullScreen(wxCommandEvent& event)
 {
     static bool restorestatus;  // restore the status bar?
-    
+
     wxStatusBar* statusbar = GetStatusBar();
-    
+
     if (!fullscreen) {
         // save current location and size for use in SavePrefs
         wxRect r = GetRect();
@@ -810,7 +810,7 @@ void MyFrame::OnFullScreen(wxCommandEvent& event)
         // restore saved perspective
         this->aui_mgr.LoadPerspective(auilayout);
     }
-    
+
     this->aui_mgr.Update();
 }
 
@@ -896,7 +896,7 @@ void MyFrame::OnSize(wxSizeEvent& event)
 
     // trigger a redraw
     if(this->pVTKWindow) this->pVTKWindow->Refresh(false);
-    
+
     // need this to move and resize status bar in Mac app
     event.Skip();
 }
@@ -1001,13 +1001,13 @@ void MyFrame::UpdateWindowTitle()
         // just show file's name, not full path
         name = name.AfterLast(wxFILE_SEP_PATH);
     }
-    
+
     if (this->system->IsModified()) {
         // prepend asterisk to indicate the current system has been modified
         // (this is consistent with Golly and other Win/Linux apps)
         name = _T("*") + name;
     }
-    
+
     #ifdef __WXMAC__
         // Mac apps don't show app name in window title
         this->SetTitle(name);
@@ -1034,11 +1034,11 @@ void MyFrame::OnStep(wxCommandEvent& event)
 {
     if (this->is_running)
         return;
-    
+
     if (this->system->GetTimestepsTaken() == 0)
     {
         this->system->SaveStartingPattern();
-    
+
         // reset the initial number of steps used by system->Update in OnIdle
         num_steps = 50;
         // 50 is half the initial timesteps_per_render value used in most
@@ -1047,12 +1047,12 @@ void MyFrame::OnStep(wxCommandEvent& event)
 
     try
     {
-        if (event.GetId() == ID::Step1) 
+        if (event.GetId() == ID::Step1)
         {
             this->system->Update(1);
             this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
-        } 
-        else if (event.GetId() == ID::StepN) 
+        }
+        else if (event.GetId() == ID::StepN)
         {
             // timesteps_per_render might be huge, so don't do this:
             // this->system->Update(this->render_settings.GetProperty("timesteps_per_render").GetInt());
@@ -1071,7 +1071,7 @@ void MyFrame::OnStep(wxCommandEvent& event)
     {
         wxMessageBox(_("An unknown error occurred when running the simulation"));
     }
-    
+
     this->SetStatusBarText();
     Refresh(false);
 }
@@ -1096,12 +1096,12 @@ void MyFrame::OnRunStop(wxCommandEvent& event)
     }
     this->UpdateToolbars();
     Refresh(false);
-    
+
     if (this->is_running) {
         if (this->system->GetTimestepsTaken() == 0)
         {
             this->system->SaveStartingPattern();
-    
+
             // reset the initial number of steps used by system->Update in OnIdle
             num_steps = 50;
             // 50 is half the initial timesteps_per_render value used in most
@@ -1133,14 +1133,14 @@ void MyFrame::OnUpdateRunStop(wxUpdateUIEvent& event)
 
 void MyFrame::UpdateToolbars()
 {
-    this->action_toolbar->FindTool(ID::RunStop)->SetBitmap( 
+    this->action_toolbar->FindTool(ID::RunStop)->SetBitmap(
         this->is_running ? wxBitmap(this->icons_folder + _T("media-playback-pause_red.png"),wxBITMAP_TYPE_PNG)
                          : wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG) );
-    
-    this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp( 
+
+    this->action_toolbar->FindTool(ID::RunStop)->SetShortHelp(
         this->is_running ? _("Stop running the simulation")
                          : _("Start running the simulation") );
-    this->action_toolbar->FindTool(ID::RunStop)->SetLabel( 
+    this->action_toolbar->FindTool(ID::RunStop)->SetLabel(
         this->is_running ? _("Stop")
                          : _("Run") );
     this->action_toolbar->FindControl(ID::TimestepsPerRender)->SetLabel( wxString::Format(_T("%d"),
@@ -1164,7 +1164,7 @@ void MyFrame::UpdateToolbars()
 
 void MyFrame::OnReset(wxCommandEvent& event)
 {
-    if(this->system->GetTimestepsTaken() > 0) 
+    if(this->system->GetTimestepsTaken() > 0)
     {
         // restore pattern and other info saved by SaveStartingPattern() which
         // was called in OnStep/OnRunStop when GetTimestepsTaken() was 0
@@ -1205,7 +1205,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         // do NOT do this in the Win app (buttons in Info/Help pane won't work)
         if (this->IsActive()) this->CheckFocus();
     #endif
-    
+
     // we drive our simulation loop via idle events
     if (this->is_running)
     {
@@ -1219,10 +1219,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             // do final steps of this rendering phase
             temp_steps = timesteps_per_render - steps_since_last_render;
         }
-        
+
         double time_before = get_time_in_seconds();
-        
-        try 
+
+        try
         {
             this->system->Update(temp_steps);
             this->pVTKWindow->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCameraClippingRange();
@@ -1241,9 +1241,9 @@ void MyFrame::OnIdle(wxIdleEvent& event)
             this->UpdateToolbars();
             wxMessageBox(_("An unknown error occurred when running the simulation"));
         }
-        
+
         double time_diff = get_time_in_seconds() - time_before;
-        
+
         // note that we don't change num_steps if temp_steps < num_steps
         if (num_steps == temp_steps) {
             // if the above system->Update was quick then we'll use more steps in the next call,
@@ -1256,10 +1256,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
                 if (num_steps < 1) num_steps = 1;
             }
         }
-        
+
         this->computation_time_since_last_render += time_diff;
         steps_since_last_render += temp_steps;
-        
+
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
             int n_cells = this->system->GetNumberOfCells();
@@ -1286,10 +1286,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
             if(this->is_recording)
                 this->RecordFrame();
-       
+
             this->pVTKWindow->Refresh(false);
             this->SetStatusBarText();
-            
+
             if (do_one_render) {
                 // user selected Step by N so stop now
                 this->is_running = false;
@@ -1302,10 +1302,10 @@ void MyFrame::OnIdle(wxIdleEvent& event)
                 this->computation_time_since_last_render = 0.0;
             }
         }
-        
+
         event.RequestMore(); // trigger another idle event
     }
-    
+
     event.Skip();
 }
 
@@ -1321,7 +1321,7 @@ void MyFrame::SetStatusBarText()
     {
         txt << wxString::Format(_T("  -   %.0f"),this->smoothed_timesteps_per_second)
             << _(" timesteps per second");
-        txt << _T("   ( ") 
+        txt << _T("   ( ")
             << wxString::Format(_T("%.1f"),this->percentage_spent_rendering)
             << _("% of time spent rendering )");
     }
@@ -1365,7 +1365,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     wxArrayString choices;
     int iOldSelection;
     int np;
-    try 
+    try
     {
         np = OpenCL_utils::GetNumberOfPlatforms();
     }
@@ -1443,7 +1443,7 @@ void MyFrame::OnHelp(wxCommandEvent& event)
             wxMessageBox(_("Bug: Unexpected ID in OnHelp!"));
             return;
     }
-    
+
     wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
     if(pane.IsOk() && !pane.IsShown()) {
         pane.Show();
@@ -1461,7 +1461,7 @@ wxString MyFrame::SavePatternDialog()
 
     wxString extension(this->system->GetFileExtension().c_str(),wxConvUTF8);
     wxString extension_description = _("Extended VTK files (*.")+extension +_T(")|*.")+extension;
-    
+
     wxFileDialog savedlg(this, _("Specify the pattern filename"), opensavedir, currname,
                          extension_description,
                          wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
@@ -1474,7 +1474,7 @@ wxString MyFrame::SavePatternDialog()
         opensavedir = fullpath.GetPath();
         filename = savedlg.GetPath();
     }
-    
+
     return filename;
 }
 
@@ -1505,18 +1505,18 @@ void MyFrame::SaveFile(const wxString& path)
 void MyFrame::OnNewPattern(wxCommandEvent& event)
 {
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
-    
+
     // ask user what type of dataset to generate:
     enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
         BodyCentredCubic, FaceCentredCubic, Diamond, HyperbolicPlane, HyperbolicSpace }; // TODO: tetrahedral grid (different kinds)
     GenType sel;
     {
         const int N_CHOICES = 18;
-        wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"), 
+        wxString dataset_types[N_CHOICES] = { _("1D image strip"), _("2D image"), _("3D image volume"),
             _("Geodesic sphere"), _("Torus"), _("Triangular mesh"), _("Hexagonal mesh"),
             _("Rhombille tiling"), _("Penrose tiling (rhombi)"), _("Penrose tiling (darts and kites)"),
-            _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay honeycomb (tetrahedra)"), 
-            _("Body-centred cubic honeycomb (truncated octahedra)"), _("Face-centred cubic honeycomb (rhombic dodecahedra)"), 
+            _("Random 2D Delaunay mesh (triangles)"), _("Random 2D Voronoi mesh"), _("Random 3D Delaunay honeycomb (tetrahedra)"),
+            _("Body-centred cubic honeycomb (truncated octahedra)"), _("Face-centred cubic honeycomb (rhombic dodecahedra)"),
             _("Diamond honeycomb (triakis truncated tetrahedra)"), _("Hyperbolic plane tiling"), _("Hyperbolic space tiling") };
         wxSingleChoiceDialog dlg(this, _("Select a pattern type:"), _("New Pattern"), N_CHOICES, dataset_types);
         dlg.SetSelection(1); // default selection
@@ -1572,7 +1572,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     {
         return; // user cancelled
     }
-    
+
     this->render_settings = new_render_settings;
 
     wxBusyCursor busy;
@@ -1614,16 +1614,16 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
     if (IsHTMLFile(path)) {
         // show HTML file in help pane
         this->help_panel->ShowHelp(path);
-    
+
         wxAuiPaneInfo &pane = this->aui_mgr.GetPane(PaneName(ID::HelpPane));
         if(pane.IsOk() && !pane.IsShown()) {
             pane.Show();
             this->aui_mgr.Update();
         }
-        
+
         return;
     }
-    
+
     if (IsTextFile(path)) {
         // open text file in user's preferred text editor
         EditFile(path);
@@ -1639,7 +1639,7 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     if(remember) AddRecentPattern(path);
-    
+
     wxBeginBusyCursor();
 
     // load pattern file
@@ -1741,7 +1741,7 @@ void MyFrame::AddRecentPattern(const wxString& inpath)
             id = ID::OpenRecent + maxpatterns;
         }
     }
-    
+
     // path exists in patternSubMenu
     if ( id > ID::OpenRecent + 1 ) {
         // move path to start of menu
@@ -1761,7 +1761,7 @@ void MyFrame::AddRecentPattern(const wxString& inpath)
         item = patternSubMenu->FindItem(id);
         item->SetText(path);
     }
-    
+
     wxMenuBar* mbar = GetMenuBar();
     if (mbar) mbar->Enable(ID::OpenRecent, numpatterns > 0);
 }
@@ -1857,11 +1857,11 @@ void MyFrame::EditFile(const wxString& path)
         ChooseTextEditor(this, texteditor);
         if (texteditor.IsEmpty()) return;
     }
-    
+
     // execute a command to open given file in user's preferred text editor
     wxString cmd = wxString::Format(wxT("\"%s\" \"%s\""), texteditor.c_str(), path.c_str());
     long result = wxExecute(cmd, wxEXEC_ASYNC);
-    
+
 #if defined(__WXMSW__)
     // on Windows, wxExecute returns 0 if cmd fails
     if (result == 0)
@@ -1946,7 +1946,7 @@ void MyFrame::SetFormula(std::string s)
 bool MyFrame::UserWantsToCancelWhenAskedIfWantsToSave()
 {
     if(this->system == NULL || !this->system->IsModified()) return false;
-    
+
     int ret = SaveChanges(_("Save the current system?"),_("If you don't save, your changes will be lost."));
     if(ret==wxCANCEL) return true;
     if(ret==wxNO) return false;
@@ -2030,7 +2030,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, wxID_ABOUT,                    DO_ABOUT);
         SetAccelerator(mbar, wxID_PREFERENCES,              DO_PREFS);
         SetAccelerator(mbar, wxID_EXIT,                     DO_QUIT);
-        
+
         // file menu
         SetAccelerator(mbar, wxID_NEW,                      DO_NEWPATT);
         SetAccelerator(mbar, wxID_OPEN,                     DO_OPENPATT);
@@ -2044,7 +2044,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Screenshot,                DO_SCREENSHOT);
         SetAccelerator(mbar, ID::RecordFrames,              DO_RECORDFRAMES);
         SetAccelerator(mbar, ID::AddMyPatterns,             DO_ADDPATTS);
-        
+
         // edit menu
         SetAccelerator(mbar, wxID_UNDO,                     DO_UNDO);
         SetAccelerator(mbar, wxID_REDO,                     DO_REDO);
@@ -2060,7 +2060,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::BrushSizeSmall,            DO_BRUSHSMALL);
         SetAccelerator(mbar, ID::BrushSizeMedium,           DO_BRUSHMEDIUM);
         SetAccelerator(mbar, ID::BrushSizeLarge,            DO_BRUSHLARGE);
-        
+
         // view menu
         SetAccelerator(mbar, ID::FullScreen,                DO_FULLSCREEN);
         SetAccelerator(mbar, ID::FitPattern,                DO_FIT);
@@ -2073,7 +2073,7 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::PaintToolbar,              DO_PAINTTOOLBAR);
         SetAccelerator(mbar, ID::RestoreDefaultPerspective, DO_RESTORE);
         SetAccelerator(mbar, ID::ChangeActiveChemical,      DO_CHEMICAL);
-        
+
         // actions menu
         SetAccelerator(mbar, ID::Step1,                     DO_STEP1);
         SetAccelerator(mbar, ID::StepN,                     DO_STEPN);
@@ -2099,15 +2099,15 @@ void MyFrame::ProcessKey(int key, int modifiers)
 {
     int cmdid = 0;
     action_info action = FindAction(key, modifiers);
-    
+
     switch (action.id)
     {
         case DO_NOTHING:        // any unassigned key (including escape) turns off full screen mode
                                 if (fullscreen) cmdid = ID::FullScreen; break;
-        
+
         case DO_OPENFILE:       OpenFile(action.file);
                                 return;
-        
+
         // File menu
         case DO_NEWPATT:        cmdid = wxID_NEW; break;
         case DO_OPENPATT:       cmdid = wxID_OPEN; break;
@@ -2123,7 +2123,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_ADDPATTS:       cmdid = ID::AddMyPatterns; break;
         case DO_PREFS:          cmdid = wxID_PREFERENCES; break;
         case DO_QUIT:           cmdid = wxID_EXIT; break;
-        
+
         // Edit menu
         case DO_UNDO:           cmdid = wxID_UNDO; break;
         case DO_REDO:           cmdid = wxID_REDO; break;
@@ -2139,7 +2139,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_BRUSHSMALL:     cmdid = ID::BrushSizeSmall; break;
         case DO_BRUSHMEDIUM:    cmdid = ID::BrushSizeMedium; break;
         case DO_BRUSHLARGE:     cmdid = ID::BrushSizeLarge; break;
-        
+
         // View menu
         case DO_FULLSCREEN:     cmdid = ID::FullScreen; break;
         case DO_FIT:            cmdid = ID::FitPattern; break;
@@ -2152,7 +2152,7 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_PAINTTOOLBAR:   cmdid = ID::PaintToolbar; break;
         case DO_RESTORE:        cmdid = ID::RestoreDefaultPerspective; break;
         case DO_CHEMICAL:       cmdid = ID::ChangeActiveChemical; break;
-        
+
         // Action menu
         case DO_STEP1:          cmdid = ID::Step1; break;
         case DO_STEPN:          cmdid = ID::StepN; break;
@@ -2169,13 +2169,13 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_CONVERTTOKERNEL:cmdid = ID::ConvertToFullKernel; break;
         case DO_DEVICE:         cmdid = ID::SelectOpenCLDevice; break;
         case DO_OPENCL:         cmdid = ID::OpenCLDiagnostics; break;
-        
+
         // Help menu
         case DO_ABOUT:          cmdid = wxID_ABOUT; break;
-        
+
         default:                Warning(_("Bug detected in ProcessKey!"));
     }
-   
+
     if (cmdid != 0) {
         wxCommandEvent cmdevent(wxEVT_COMMAND_MENU_SELECTED, cmdid);
         cmdevent.SetEventObject(this);
@@ -2208,7 +2208,7 @@ void MyFrame::OnKeyDown(wxKeyEvent& event)
             return;
         }
     #endif
-    
+
     #ifdef __WXMSW__
         // on Windows, OnChar is NOT called for some ctrl-key combos like
         // ctrl-0..9 or ctrl-alt-key, so we call OnChar ourselves
@@ -2261,7 +2261,7 @@ void MyFrame::OnChar(wxKeyEvent& event)
             if (key >= 'A' && key <= 'Z') key += 32;  // convert A..Z to a..z
         }
     }
-    
+
     #ifdef __WXGTK__
         if (realkey == -666) {
             // OnKeyDown saw that shift-space was pressed but for some reason
@@ -2270,13 +2270,13 @@ void MyFrame::OnChar(wxKeyEvent& event)
             mods = wxMOD_SHIFT;
         }
     #endif
-    
+
     if (this->pVTKWindow->HasFocus()) {
         ProcessKey(key, mods);
         // don't call default handler (wxVTKRenderWindowInteractor::OnChar)
         return;
     }
-    
+
     if (this->patterns_panel->TreeHasFocus()) {
         // process keyboard shortcut for patterns panel
         if (this->patterns_panel->DoKey(key, mods)) return;
@@ -2284,7 +2284,7 @@ void MyFrame::OnChar(wxKeyEvent& event)
         event.Skip();
         return;
     }
-    
+
     if (this->info_panel->HtmlHasFocus()) {
         // process keyboard shortcut for info panel
         if (this->info_panel->DoKey(key, mods)) return;
@@ -2292,7 +2292,7 @@ void MyFrame::OnChar(wxKeyEvent& event)
         event.Skip();
         return;
     }
-    
+
     if (this->help_panel->HtmlHasFocus()) {
         // process keyboard shortcut for help panel
         if (this->help_panel->DoKey(key, mods)) return;
@@ -2339,7 +2339,7 @@ void MyFrame::InitializeDefaultRenderSettings(Properties& props)
 
 void MyFrame::SetNumberOfChemicals(int n)
 {
-    try 
+    try
     {
         this->system->SetNumberOfChemicals(n);
     }
@@ -2365,13 +2365,13 @@ void MyFrame::SetNumberOfChemicals(int n)
 
 bool MyFrame::SetDimensions(int x,int y,int z)
 {
-    try 
+    try
     {
         if(x<1 || y<1 || z<1) throw runtime_error("Dimensions must be at least 1");
         if( x%this->system->GetBlockSizeX() || y%this->system->GetBlockSizeY() || z%this->system->GetBlockSizeZ() )
         {
             ostringstream oss;
-            oss << "Dimensions must be a multiple of the current block size (" << this->system->GetBlockSizeX() << 
+            oss << "Dimensions must be a multiple of the current block size (" << this->system->GetBlockSizeX() <<
                 "x" << this->system->GetBlockSizeY() << "x" << this->system->GetBlockSizeZ() << ")";
             throw runtime_error(oss.str().c_str());
         }
@@ -2430,7 +2430,7 @@ void MyFrame::RenderSettingsChanged()
     Property& prop = this->render_settings.GetProperty("timesteps_per_render");
     if (prop.GetInt() < 1) prop.SetInt(1);
     if (prop.GetInt() > MAX_TIMESTEPS_PER_RENDER) prop.SetInt(MAX_TIMESTEPS_PER_RENDER);
-    
+
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
@@ -2652,7 +2652,7 @@ void MyFrame::MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug)
 {
     // at some point we would want the user to decide what data type to use on the imported mesh
     const int data_type = VTK_FLOAT;
-    
+
     MeshRD *mesh_sys;
     if (this->is_opencl_available)
         mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
@@ -2721,8 +2721,8 @@ void MyFrame::SaveCurrentMesh(const wxString& mesh_filename, bool should_decimat
         if(pd->GetPointData()->GetNormals())
         {
             for(vtkIdType iPt=0;iPt<pd->GetNumberOfPoints();iPt++)
-                out << "vn " << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[0] << " " 
-                    << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[1] << " " 
+                out << "vn " << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[0] << " "
+                    << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[1] << " "
                     << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[2] << "\n";
         }
         vtkIdType npts,*pts;
@@ -2757,8 +2757,8 @@ void MyFrame::SaveCurrentMesh(const wxString& mesh_filename, bool should_decimat
     }
     else
     {
-        wxMessageBox(_("Unsupported file type")); 
-        return; 
+        wxMessageBox(_("Unsupported file type"));
+        return;
     }
 }
 
@@ -2773,7 +2773,7 @@ void MyFrame::OnReloadFromDisk(wxCommandEvent &event)
 
 void MyFrame::OnImportImage(wxCommandEvent &event)
 {
-    ImportImageDialog dlg(this, 
+    ImportImageDialog dlg(this,
                           this->system->GetNumberOfChemicals(),
                           this->render_settings.GetProperty("low").GetFloat(),
                           this->render_settings.GetProperty("high").GetFloat());
@@ -2902,7 +2902,7 @@ void MyFrame::RecordFrame()
         // save the 3D mesh
         oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
         SaveCurrentMesh(wxString(oss.str().c_str()), this->recording_should_decimate, this->recording_target_reduction);
-    } 
+    }
     else
     {
         vtkSmartPointer<vtkImageWriter> writer;
@@ -2973,7 +2973,7 @@ void MyFrame::RecordFrame()
             this->render_settings.GetProperty("active_chemical").SetChemical(remember_chemical);
         }
     }
-    
+
     this->iRecordingFrame++;
 }
 

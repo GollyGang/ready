@@ -39,7 +39,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
                                  bool is_2D_data_available,
                                  bool are_multiple_chemicals_available,
                                  bool default_is_2D_data,
-                                 bool is_3D_surface_available) 
+                                 bool is_3D_surface_available)
     : wxDialog(parent,wxID_ANY,_("Recording settings"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
     , source_current_view(_("current view"))
     , source_2D_data(_("2D data"))
@@ -49,7 +49,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
     // create the controls
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
     SetSizer(vbox);
-    
+
     wxStaticText* source_label = new wxStaticText(this, wxID_STATIC, _("Image source:"));
     this->source_combo = new wxComboBox(this, ID::SourceCombo, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY);
     this->source_combo->AppendString(this->source_current_view);
@@ -99,7 +99,7 @@ RecordingDialog::RecordingDialog(wxWindow *parent,
     }
 
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
     buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -152,7 +152,7 @@ bool RecordingDialog::Validate()
         return false;
     return wxDialog::Validate();
 }
-    
+
 // -----------------------------------------------------------------------------------------------
 
 bool RecordingDialog::TransferDataFromWindow()

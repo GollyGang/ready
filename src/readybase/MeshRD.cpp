@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
-    
+
 // local:
 #include "IO_XML.hpp"
 #include "MeshRD.hpp"
@@ -298,7 +298,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
-    
+
     double offset[3] = {0,0,0};
 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
@@ -392,7 +392,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             mapper->ScalarVisibilityOff();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
-            actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
+            actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
             actor->GetProperty()->SetAmbient(0.1);
             actor->GetProperty()->SetDiffuse(0.7);
             actor->GetProperty()->SetSpecular(0.2);
@@ -507,7 +507,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
-            actor->GetProperty()->SetColor(0,0,0);  
+            actor->GetProperty()->SetColor(0,0,0);
             actor->GetProperty()->SetAmbient(1);
 
             actor->PickableOff();
@@ -536,7 +536,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             captionActor->GetTextActor()->SetTextScaleModeToNone();
             pRenderer->AddActor(captionActor);
         }
-        
+
         offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
     }
 
@@ -565,7 +565,7 @@ void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float h
     iChemX = max( 0, min( iChemX, this->GetNumberOfChemicals()-1 ) );
     iChemY = max( 0, min( iChemY, this->GetNumberOfChemicals()-1 ) );
     iChemZ = max( 0, min( iChemZ, this->GetNumberOfChemicals()-1 ) );
-    
+
     vtkSmartPointer<vtkPointSource> points = vtkSmartPointer<vtkPointSource>::New();
     points->SetNumberOfPoints(this->GetNumberOfCells());
     points->SetRadius(0);
@@ -840,7 +840,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                         add_if_new(neighbors,nbor);
                     }
                 }
-            }        
+            }
             break;
             case FACE_NEIGHBORS:
             {
@@ -1010,7 +1010,7 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap))); 
+        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
         offset_x = iChemical * (X+this->xgap);
     }
@@ -1024,7 +1024,7 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
     vtkIdType iCell;
     int subId;
     this->cell_locator->FindClosestPoint(p,cp,iCell,subId,dist2);
-    
+
     if(iCell<0)
         return 0.0f;
 
@@ -1048,7 +1048,7 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap))); 
+        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
         offset_x = iChemical * (X+this->xgap);
     }
@@ -1062,7 +1062,7 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
     vtkIdType iCell;
     int subId;
     this->cell_locator->FindClosestPoint(p,cp,iCell,subId,dist2);
-    
+
     if(iCell<0)
         return;
 
@@ -1090,7 +1090,7 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap))); 
+        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
         offset_x = iChemical * (X+this->xgap);
     }

@@ -25,7 +25,7 @@
 
 // -----------------------------------------------------------------------------
 
-MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon) 
+MonospaceMessageBox::MonospaceMessageBox(const wxString& message, const wxString& title, const wxArtID& icon)
      : wxDialog(NULL,wxID_ANY,title,wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER)
 {
     wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
@@ -60,11 +60,11 @@ XYZIntDialog::XYZIntDialog(wxWindow* parent, const wxString& title,
                      const wxPoint& pos, const wxSize& size)
 {
     Create(parent, wxID_ANY, title, pos, size);
-    
+
     // create the controls
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
     SetSizer(vbox);
-    
+
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, _("Enter new X, Y, Z values:"));
 
     xbox = new wxTextCtrl(this, wxID_ANY, wxString::Format(wxT("%d"),inx), wxDefaultPosition, wxSize(50,wxDefaultCoord));
@@ -74,24 +74,24 @@ XYZIntDialog::XYZIntDialog(wxWindow* parent, const wxString& title,
     wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
     hbox->AddStretchSpacer(1);
-    
+
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("X = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->Add(xbox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    
+
     hbox->AddStretchSpacer(1);
-    
+
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Y = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->Add(ybox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    
+
     hbox->AddStretchSpacer(1);
-    
+
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Z = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->Add(zbox, 0, wxALIGN_CENTER_VERTICAL, 0);
 
     hbox->AddStretchSpacer(1);
-    
+
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
     buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -110,7 +110,7 @@ XYZIntDialog::XYZIntDialog(wxWindow* parent, const wxString& title,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    
+
     if (pos == wxDefaultPosition) Centre();
     if (size != wxDefaultSize) SetSize(size);
 
@@ -153,11 +153,11 @@ XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
                      const wxPoint& pos, const wxSize& size)
 {
     Create(parent, wxID_ANY, title, pos, size);
-    
+
     // create the controls
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
     SetSizer(vbox);
-    
+
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, _("Enter new X, Y, Z values:"));
 
     xbox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inx), wxDefaultPosition, wxSize(50,wxDefaultCoord));
@@ -167,24 +167,24 @@ XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
     wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
     hbox->AddStretchSpacer(1);
-    
+
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("X = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->Add(xbox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    
+
     hbox->AddStretchSpacer(1);
-    
+
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Y = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->Add(ybox, 0, wxALIGN_CENTER_VERTICAL, 0);
-    
+
     hbox->AddStretchSpacer(1);
-    
+
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT("Z = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->Add(zbox, 0, wxALIGN_CENTER_VERTICAL, 0);
 
     hbox->AddStretchSpacer(1);
-    
+
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
     buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -203,7 +203,7 @@ XYZFloatDialog::XYZFloatDialog(wxWindow* parent, const wxString& title,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    
+
     if (pos == wxDefaultPosition) Centre();
     if (size != wxDefaultSize) SetSize(size);
 
@@ -256,7 +256,7 @@ MultiLineDialog::MultiLineDialog(wxWindow *parent,
         wxFont font(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, _T("Monospace"), wxFONTENCODING_DEFAULT);
     #endif
     m_textctrl->SetFont(font);
-    
+
     // allow people to use small dialog if they wish
     // m_textctrl->SetMinSize(wxSize(800,500));
 
@@ -311,11 +311,11 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
                                  const wxPoint& pos, const wxSize& size)
 {
     Create(parent, wxID_ANY, _("Change parameter"), pos, size);
-    
+
     // create the controls
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
     SetSizer(vbox);
-    
+
     wxString prompt = can_edit_name ? _("Enter a new name and/or a new value:")
                                     : _("Enter a new value:");
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
@@ -332,13 +332,13 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
     }
 
     hbox->Add(new wxStaticText(this, wxID_STATIC, wxT(" = ")), 0, wxALIGN_CENTER_VERTICAL, 0);
-    
+
     valuebox = new wxTextCtrl(this, wxID_ANY, FormatFloat(inval));
     hbox->Add(valuebox, 0, wxALIGN_CENTER_VERTICAL, 0);
     hbox->AddStretchSpacer(1);
-    
+
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* buttbox = new wxBoxSizer(wxHORIZONTAL);
     buttbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -357,7 +357,7 @@ ParameterDialog::ParameterDialog(wxWindow* parent, bool can_edit_name,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    
+
     if (pos == wxDefaultPosition) Centre();
     if (size != wxDefaultSize) SetSize(size);
 
@@ -405,7 +405,7 @@ StringDialog::StringDialog(wxWindow* parent, const wxString& title,
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
 
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
     stdhbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -424,7 +424,7 @@ StringDialog::StringDialog(wxWindow* parent, const wxString& title,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    
+
     if (pos == wxDefaultPosition) Centre();
     if (size != wxDefaultSize) SetSize(size);
 
@@ -487,7 +487,7 @@ class MySpinCtrl : public wxSpinCtrl
 void IntegerDialog::OnSpinCtrlChar(wxKeyEvent& event)
 {
     int key = event.GetKeyCode();
-    
+
     if (event.CmdDown()) {
         // allow handling of cmd-x/v/etc
         event.Skip();
@@ -547,11 +547,11 @@ IntegerDialog::IntegerDialog(wxWindow* parent,
                                             wxPoint(-1000,-1000), wxDefaultSize);
         hidden->SetValue(666);
     #endif
-    
+
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
 
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
     stdhbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -621,7 +621,7 @@ FloatDialog::FloatDialog(wxWindow* parent, const wxString& title,
     wxStaticText* promptlabel = new wxStaticText(this, wxID_STATIC, prompt);
 
     wxSizer* stdbutts = CreateButtonSizer(wxOK | wxCANCEL);
-    
+
     // position the controls
     wxBoxSizer* stdhbox = new wxBoxSizer(wxHORIZONTAL);
     stdhbox->Add(stdbutts, 1, wxGROW | wxRIGHT, STDHGAP);
@@ -640,7 +640,7 @@ FloatDialog::FloatDialog(wxWindow* parent, const wxString& title,
 
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
-    
+
     if (pos == wxDefaultPosition) Centre();
     if (size != wxDefaultSize) SetSize(size);
 

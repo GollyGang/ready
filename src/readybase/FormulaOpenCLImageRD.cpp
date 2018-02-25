@@ -75,7 +75,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     }
     // output the first part of the body
     kernel_source << ")\n{\n" <<
-        indent << "const int index_x = get_global_id(0);\n" << 
+        indent << "const int index_x = get_global_id(0);\n" <<
         indent << "const int index_y = get_global_id(1);\n" <<
         indent << "const int index_z = get_global_id(2);\n" <<
         indent << "const int X = get_global_size(0);\n" <<
@@ -94,7 +94,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         if(this->wrap)
             kernel_source <<
                 indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = (index_x+1) & (X-1);\n" << 
+                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
                 indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
                 indent << "const int yp1 = (index_y+1) & (Y-1);\n" <<
                 indent << "const int zm1 = (index_z-1+Z) & (Z-1);\n" <<
@@ -121,15 +121,15 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << 
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" <<
                 chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w + " << chem << "_fore.x + " << chem << "_back.x,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x + " << chem << "_fore.y + " << chem << "_back.y,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_up.z + " << chem << ".w + " << chem << "_down.z + " << chem << ".y + " << chem << "_fore.z + " << chem << "_back.z,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_up.w + " << chem << "_right.x + " << chem << "_down.w + " << chem << ".z + " << chem << "_fore.w + " << chem << "_back.w) + _K0*" << chem << ";\n";
-        } 
+        }
         //                 (x y z w)                               up
         //       (x y z w) [x y z w] (x y z w)        =     left    .   right      (plus fore and back in the 3rd dimension)
         //                 (x y z w)                              down
@@ -169,9 +169,9 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 << chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w,\n";
             kernel_source << indent <<
                 chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_up.z + " << chem << ".w + " << chem << "_down.z + " << chem << ".y,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_up.w + " << chem << "_right.x + " << chem << "_down.w + " << chem << ".z) + _K0*" << chem << ";\n";
         }
         //                 (x y z w)                               up
@@ -247,24 +247,24 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << 
-                chem << "_n.x*_K1 + " << chem << "_n.y*_K2 + " << chem << ".y*_K1 + " << chem << "_s.y*_K2 + " 
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" <<
+                chem << "_n.x*_K1 + " << chem << "_n.y*_K2 + " << chem << ".y*_K1 + " << chem << "_s.y*_K2 + "
                 << chem << "_s.x*_K1 + " << chem << "_sw.w*_K2 + " << chem << "_w.w*_K1 + " << chem << "_nw.w*_K2,\n";
-            kernel_source << indent << 
-                chem << "_n.y*_K1 + " << chem << "_n.z*_K2 + " << chem << ".z*_K1 + " << chem << "_s.z*_K2 + " 
+            kernel_source << indent <<
+                chem << "_n.y*_K1 + " << chem << "_n.z*_K2 + " << chem << ".z*_K1 + " << chem << "_s.z*_K2 + "
                 << chem << "_s.y*_K1 + " << chem << "_s.x*_K2 + " << chem << ".x*_K1 + " << chem << "_n.x*_K2,\n";
-            kernel_source << indent << 
-                chem << "_n.z*_K1 + " << chem << "_n.w*_K2 + " << chem << ".w*_K1 + " << chem << "_s.w*_K2 + " 
+            kernel_source << indent <<
+                chem << "_n.z*_K1 + " << chem << "_n.w*_K2 + " << chem << ".w*_K1 + " << chem << "_s.w*_K2 + "
                 << chem << "_s.z*_K1 + " << chem << "_s.y*_K2 + " << chem << ".y*_K1 + " << chem << "_n.y*_K2,\n";
-            kernel_source << indent << 
-                chem << "_n.w*_K1 + " << chem << "_ne.x*_K2 + " << chem << "_e.x*_K1 + " << chem << "_se.x*_K2 + " 
-                << chem << "_s.w*_K1 + " << chem << "_s.z*_K2 + " << chem << ".z*_K1 + " << chem << "_n.z*_K2 ) + " 
+            kernel_source << indent <<
+                chem << "_n.w*_K1 + " << chem << "_ne.x*_K2 + " << chem << "_e.x*_K1 + " << chem << "_se.x*_K2 + "
+                << chem << "_s.w*_K1 + " << chem << "_s.z*_K2 + " << chem << ".z*_K1 + " << chem << "_n.z*_K2 ) + "
                 << chem << "*_K0;\n";
         }
         //       (x y z w) (x y z w) (x y z w)           nw   n   ne
         //       (x y z w) [x y z w] (x y z w)    =       w   .   e
         //       (x y z w) (x y z w) (x y z w)           sw   s   se
-    } 
+    }
     else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1 && this->neighborhood_weight_type==EQUAL)
     {
         const int NDIRS = 8;
@@ -301,23 +301,23 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         for(int iC=0;iC<NC;iC++)
         {
             string chem = GetChemicalName(iC);
-            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" << 
+            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" <<
                 chem << "_n.x + " << chem << "_n.y + " << chem << ".y + " << chem << "_s.y + " << chem << "_s.x + " << chem << "_sw.w + " << chem << "_w.w + " << chem << "_nw.w,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_n.y + " << chem << "_n.z + " << chem << ".z + " << chem << "_s.z + " << chem << "_s.y + " << chem << "_s.x + " << chem << ".x + " << chem << "_n.x,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_n.z + " << chem << "_n.w + " << chem << ".w + " << chem << "_s.w + " << chem << "_s.z + " << chem << "_s.y + " << chem << ".y + " << chem << "_n.y,\n";
-            kernel_source << indent << 
+            kernel_source << indent <<
                 chem << "_n.w + " << chem << "_ne.x + " << chem << "_e.x + " << chem << "_se.x + " << chem << "_s.w + " << chem << "_s.z + " << chem << ".z + " << chem << "_n.z" <<
                     ")*_K1 + _K0*" << chem << ";\n";
         }
         //       (x y z w) (x y z w) (x y z w)           nw   n   ne
         //       (x y z w) [x y z w] (x y z w)    =       w   .   e
         //       (x y z w) (x y z w) (x y z w)           sw   s   se
-    } 
+    }
     else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
     {
-        // 19-point stencil, following: 
+        // 19-point stencil, following:
         // Dowle, Mantel & Barkley (1997) "Fast simulations of waves in three-dimensional excitable media"
         // Int. J. Bifurcation and Chaos, 7(11): 2529-2545.
         const int NDIRS = 18;
@@ -372,7 +372,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(\n";
             // x:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " <<
                 chem << "_s.x + " << chem << "_w.w + " << chem << "_u.x) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.x + " << chem << "_d.y + " << chem << "_ds.x + " << chem << "_dw.w + " <<
@@ -380,7 +380,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 chem << "_un.x + " << chem << "_u.y + " << chem << "_us.x + " << chem << "_uw.w) * _K2 ,        // x\n";
             // y:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.y + " << chem << "_n.y + " << chem << ".z + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.y + " << chem << "_n.y + " << chem << ".z + " <<
                 chem << "_s.y + " << chem << ".x + " << chem << "_u.y) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.y + " << chem << "_d.z + " << chem << "_ds.y + " << chem << "_d.x + " <<
@@ -388,7 +388,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 chem << "_un.y + " << chem << "_u.z + " << chem << "_us.y + " << chem << "_u.x) * _K2 ,         // y\n";
             // z:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.z + " << chem << "_n.z + " << chem << ".w + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.z + " << chem << "_n.z + " << chem << ".w + " <<
                 chem << "_s.z + " << chem << ".y + " << chem << "_u.z) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.z + " << chem << "_d.w + " << chem << "_ds.z + " << chem << "_d.y + " <<
@@ -396,7 +396,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 chem << "_un.z + " << chem << "_u.w + " << chem << "_us.z + " << chem << "_u.y) * _K2 ,      // z\n";
             // w:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.w + " << chem << "_n.w + " << chem << "_e.x + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.w + " << chem << "_n.w + " << chem << "_e.x + " <<
                 chem << "_s.w + " << chem << ".z + " << chem << "_u.w) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.w + " << chem << "_de.x + " << chem << "_ds.w + " << chem << "_d.z + " <<
@@ -406,15 +406,15 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             kernel_source << indent << indent << " + " << chem << " * _K0;\n";
         }
         //              down                                                              up
-        //            (x y z w)             (x y z w) (x y z w) (x y z w)             (x y z w)                        dn            nw   n   ne          un     
+        //            (x y z w)             (x y z w) (x y z w) (x y z w)             (x y z w)                        dn            nw   n   ne          un
         //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
-        //            (x y z w)             (x y z w) (x y z w) (x y z w)             (x y z w)                        ds            sw   s   se          us     
-    } 
+        //            (x y z w)             (x y z w) (x y z w) (x y z w)             (x y z w)                        ds            sw   s   se          us
+    }
     else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
     {
         // 27-point stencil, following:
         // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions"
-        // Int. J. Num. Meth. Eng. 
+        // Int. J. Num. Meth. Eng.
         // (Equation 22)
         const int NDIRS = 26;
         const string dir[NDIRS]={"n","ne","e","se","s","sw","w","nw","d","dn","dne","de","dse","ds","dsw","dw","dnw",
@@ -478,7 +478,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(\n";
             // x:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.x + " << chem << "_n.x + " << chem << ".y + " <<
                 chem << "_s.x + " << chem << "_w.w + " << chem << "_u.x) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.x + " << chem << "_d.y + " << chem << "_ds.x + " << chem << "_dw.w + " <<
@@ -489,7 +489,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 chem << "_unw.w + " << chem << "_un.y + " << chem << "_us.y + " << chem << "_usw.w) * _K3 ,     // x\n";
             // y:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.y + " << chem << "_n.y + " << chem << ".z + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.y + " << chem << "_n.y + " << chem << ".z + " <<
                 chem << "_s.y + " << chem << ".x + " << chem << "_u.y) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.y + " << chem << "_d.z + " << chem << "_ds.y + " << chem << "_d.x + " <<
@@ -500,7 +500,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 chem << "_un.x + " << chem << "_un.z + " << chem << "_us.z + " << chem << "_us.x) * _K3 ,         // y\n";
             // z:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.z + " << chem << "_n.z + " << chem << ".w + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.z + " << chem << "_n.z + " << chem << ".w + " <<
                 chem << "_s.z + " << chem << ".y + " << chem << "_u.z) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.z + " << chem << "_d.w + " << chem << "_ds.z + " << chem << "_d.y + " <<
@@ -511,7 +511,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 chem << "_un.y + " << chem << "_un.w + " << chem << "_us.w + " << chem << "_us.y) * _K3 ,         // z\n";
             // w:
             // first collect the 6 face-neighbors:
-            kernel_source << indent << indent << "(" << chem << "_d.w + " << chem << "_n.w + " << chem << "_e.x + " << 
+            kernel_source << indent << indent << "(" << chem << "_d.w + " << chem << "_n.w + " << chem << "_e.x + " <<
                 chem << "_s.w + " << chem << ".z + " << chem << "_u.w) * _K1 +\n";
             // then collect the 12 edge-neighbors
             kernel_source << indent << indent << "(" << chem << "_dn.w + " << chem << "_de.x + " << chem << "_ds.w + " << chem << "_d.z + " <<
@@ -527,7 +527,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dnw   dn  dne      nw   n   ne     unw   un  une
         //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
         //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dsw   ds  dse      sw   s   se     usw   us  use
-    } 
+    }
     else
     {
         ostringstream oss;

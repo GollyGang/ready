@@ -50,9 +50,9 @@ class HtmlView : public wxHtmlWindow
 
         virtual void OnLinkClicked(const wxHtmlLinkInfo& link);
         virtual void OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y);
-        
+
         void ClearStatus();  // clear help pane's status line
-        
+
         void SetFontSizes(int size);
         void ChangeFontSizes(int size);
 
@@ -65,10 +65,10 @@ class HtmlView : public wxHtmlWindow
         void OnMouseMotion(wxMouseEvent& event);
         void OnMouseLeave(wxMouseEvent& event);
         void OnMouseDown(wxMouseEvent& event);
-        
+
         MyFrame* frame;
         HelpPanel* panel;
-        
+
         bool editlink;       // open clicked file in editor?
         wxRect linkrect;     // rect for cell containing link
 
@@ -135,7 +135,7 @@ void HtmlView::OnLinkClicked(const wxHtmlLinkInfo& link)
 void HtmlView::OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y)
 {
     if (inAbout || cell == NULL) return;
-    
+
     wxHtmlLinkInfo* link = cell->GetLink(x,y);
     if (link) {
         wxString href = link->GetHref();
@@ -173,7 +173,7 @@ void HtmlView::OnMouseLeave(wxMouseEvent& event)
 void HtmlView::ClearStatus()
 {
     if (inAbout) return;
-    
+
     panel->SetStatus(wxEmptyString);
     linkrect = wxRect(0,0,0,0);
 }
@@ -202,7 +202,7 @@ void HtmlView::OnSize(wxSizeEvent& event)
         LoadPage(currpage);         // reload page
         Scroll(x, y);               // scroll to old position
     }
-    
+
     // prevent wxHtmlWindow::OnSize being called again
     event.Skip(false);
 }
@@ -238,13 +238,13 @@ void HtmlView::ChangeFontSizes(int size)
     GetViewStart(&x, &y);
     SetFontSizes(size);
     Scroll(x, y);
-    
+
     // this hack fixes display bug when size increases so that scroll bar appears
     // (curiously, we don't see any such bug in InfoPanel)
     wxRect r = GetRect();
     SetSize(r.x, r.y, r.width-1, r.height);
     SetSize(r);
-    
+
     panel->UpdateHelpButtons();
 }
 
@@ -260,11 +260,11 @@ BEGIN_EVENT_TABLE(HelpPanel, wxPanel)
     EVT_BUTTON (ID::BiggerButton,   HelpPanel::OnBiggerButton)
 END_EVENT_TABLE()
 
-HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id) 
+HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     : wxPanel(parent,id), frame(parent)
 {
     html = new HtmlView(this, frame, wxID_ANY);
-    
+
     html->SetFontSizes(helpfontsize);
 
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
@@ -304,7 +304,7 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     vbox->Add(hbox, 0, wxALL | wxEXPAND | wxALIGN_TOP, 0);
     vbox->Add(html, 1, wxEXPAND | wxALIGN_TOP, 0);
     SetSizer(vbox);
-         
+
     // prevent HtmlView::OnSize calling LoadPage twice
     html->canreload = false;
     ShowHelp(helphome);
@@ -322,7 +322,7 @@ void HelpPanel::ShowHelp(const wxString& filepath)
     if (filepath == SHOW_KEYBOARD_SHORTCUTS) {
         // build HTML string to display current keyboard shortcuts
         wxString contents = GetShortcutTable();
-        
+
         // write contents to file and call LoadPage so that back/forwards buttons work
         wxString htmlfile = tempdir + SHOW_KEYBOARD_SHORTCUTS;
         wxFile outfile(htmlfile, wxFile::write);
@@ -340,12 +340,12 @@ void HelpPanel::ShowHelp(const wxString& filepath)
         // safer to prepend location of app
         wxString fullpath = readydir + filepath;
         html->LoadPage(fullpath);
-    
+
     } else {
         // assume full path or local link
         html->LoadPage(filepath);
     }
-    
+
     UpdateHelpButtons();
 }
 
@@ -396,13 +396,13 @@ void HelpPanel::UpdateHelpButtons()
 {
     backbutt->Enable( html->HistoryCanBack() );
     forwbutt->Enable( html->HistoryCanForward() );
-    
+
     // check for title used in helphome
     contbutt->Enable( html->GetOpenedPageTitle() != _("Ready Help: Contents") );
-    
+
     smallerbutt->Enable( helpfontsize > minfontsize );
     biggerbutt->Enable( helpfontsize < maxfontsize );
-    
+
     html->ClearStatus();
     html->SetFocus();       // for keyboard shortcuts
 }
@@ -443,7 +443,7 @@ bool HelpPanel::DoKey(int key, int mods)
             return false;
         }
     }
-    
+
     // now do keyboard shortcuts specific to help pane
     if ( mods == wxMOD_NONE ) {
         if ( key == '[' ) {
@@ -459,7 +459,7 @@ bool HelpPanel::DoKey(int key, int mods)
             return true;
         }
     }
-    
+
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;
@@ -471,7 +471,7 @@ void ShowAboutBox()
 {
     wxBoxSizer* topsizer = new wxBoxSizer(wxVERTICAL);
     wxDialog dlg(wxGetApp().currframe, wxID_ANY, wxString(_("About Ready")));
-    
+
     HtmlView* html = new HtmlView(&dlg, wxGetApp().currframe, wxID_ANY, wxDefaultPosition,
                                   #if wxCHECK_VERSION(2,9,0)
                                       // work around SetSize bug below
@@ -486,20 +486,20 @@ void ShowAboutBox()
         html->SetFontSizes(13);
     #endif
     html->LoadPage(readydir + _("Help/about.html"));
-    
+
     // avoid HtmlView::OnSize calling LoadPage
     html->canreload = false;
-    
+
     // this call seems to be ignored in wx 2.9.x
     html->SetSize(html->GetInternalRepresentation()->GetWidth(),
                   html->GetInternalRepresentation()->GetHeight());
-    
+
     topsizer->Add(html, 1, wxALL, 10);
 
     wxButton* okbutt = new wxButton(&dlg, wxID_OK, _("OK"));
     okbutt->SetDefault();
     topsizer->Add(okbutt, 0, wxBOTTOM | wxALIGN_CENTER, 10);
-    
+
     dlg.SetSizer(topsizer);
     topsizer->Fit(&dlg);
     dlg.Centre();

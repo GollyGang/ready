@@ -100,24 +100,24 @@ bool MyApp::OnInit()
     // get current working directory before calling SetAppDirectory
     wxString initdir = wxGetCwd();
     if (initdir.Last() != wxFILE_SEP_PATH) initdir += wxFILE_SEP_PATH;
-    
+
     // make sure current working directory contains application otherwise
     // we can't open Help files
     SetAppDirectory( wxString(argv[0]).mb_str(wxConvLocal) );
-    
+
     // now set global readydir for use elsewhere
     readydir = wxGetCwd();
     if (readydir.Last() != wxFILE_SEP_PATH) readydir += wxFILE_SEP_PATH;
-    
+
     ::wxInitAllImageHandlers(); // make sure we can handle all sorts of images
 
     currframe = new MyFrame(_("Ready"));
-    
+
     // prefs file has now been loaded
     if (maximize) currframe->Maximize(true);
     currframe->Show(true);
     SetTopWindow(currframe);
-   
+
     // argc is > 1 if command line has one or more pattern files
     for (int n = 1; n < argc; n++) {
         wxFileName filename(argv[n]);
@@ -132,7 +132,7 @@ bool MyApp::OnInit()
 
 // homepage for doxygen docs:
 
-/*! \mainpage 
+/*! \mainpage
  *
  * The links above can be used to explore the classes and source code files.
  *
@@ -147,7 +147,7 @@ bool MyApp::OnInit()
  *  * <a href="http://www.vtk.org/doc/nightly/html/classes.html">VTK</a>
  *  * <a href="http://docs.wxwidgets.org/trunk/classes.html">wxWidgets</a>
  *
- * \section homepage_sec Homepage: 
+ * \section homepage_sec Homepage:
  *
  * <https://github.com/GollyGang/ready>
  *

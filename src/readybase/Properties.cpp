@@ -24,7 +24,7 @@
 using namespace std;
 
 void Property::ReadFromXML(vtkXMLDataElement* node)
-{    
+{
     if(this->type=="float")
         read_required_attribute(node,"value",this->f1);
     else if(this->type=="int")
@@ -83,7 +83,7 @@ vtkSmartPointer<vtkXMLDataElement> Property::GetAsXML() const
 // ==============================================================================================
 
 void Properties::OverwriteFromXML(vtkXMLDataElement *node)
-{    
+{
     this->set_name = string(node->GetName());
     for(int i=0;i<node->GetNumberOfNestedElements();i++)
     {

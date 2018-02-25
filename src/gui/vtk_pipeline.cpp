@@ -42,7 +42,7 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
 {
     assert(pVTKWindow);
     assert(system);
-    
+
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer;
     if(pVTKWindow->GetRenderWindow()->GetRenderers()->GetNumberOfItems()>0)
@@ -54,12 +54,12 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
     {
         pRenderer = vtkSmartPointer<vtkRenderer>::New();
         pVTKWindow->GetRenderWindow()->AddRenderer(pRenderer); // connect it to the window
-        
+
         // set the background color
         pRenderer->GradientBackgroundOn();
         pRenderer->SetBackground(0,0.4,0.6);
         pRenderer->SetBackground2(0,0.2,0.3);
-        
+
         // change the interactor style to a trackball
         vtkSmartPointer<vtkInteractorStyleTrackballCamera> is = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
         pVTKWindow->SetInteractorStyle(is);
@@ -74,7 +74,7 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
         {
             camera->SetPosition(-3,3,10); // move off-axis to look more natural
         }
-        else if( system->GetArenaDimensionality()==2 
+        else if( system->GetArenaDimensionality()==2
                 && render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
                 && system->GetFileExtension()!="vtu" )
         {

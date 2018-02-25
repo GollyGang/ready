@@ -38,7 +38,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_de
 
 // ---------------------------------------------------------------------------------------------------------
 
-FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source) 
+FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source)
     : OpenCLMeshRD(source.GetPlatform(),source.GetDevice(),source.GetDataType())
 {
     this->SetFormula(source.GetKernel());
