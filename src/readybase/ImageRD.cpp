@@ -529,7 +529,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         mapper->SetInputConnection(warp->GetOutputPort());
         mapper->ScalarVisibilityOff();
-        mapper->ImmediateModeRenderingOn();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
         actor->GetProperty()->SetAmbient(1);
@@ -675,7 +674,6 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             else
                 mapper->SetInputConnection(normals->GetOutputPort());
             mapper->ScalarVisibilityOff();
-            mapper->ImmediateModeRenderingOn();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
             actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
@@ -712,7 +710,6 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
 
                 vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
                 mapper->SetInputConnection(edges->GetOutputPort());
-                mapper->ImmediateModeRenderingOn();
 
                 vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
                 actor->SetMapper(mapper);
@@ -833,7 +830,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->ImmediateModeRenderingOn();
 
         vtkImageData *image = this->GetImage(iChem);
         int *extent = image->GetExtent();
@@ -942,7 +938,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             mapper->SetInputConnection(edges->GetOutputPort());
-            mapper->ImmediateModeRenderingOn();
 
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
@@ -976,7 +971,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
                 cutter->SetInputConnection(merge_datasets->GetOutputPort());
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             mapper->SetInputConnection(cutter->GetOutputPort());
-            mapper->ImmediateModeRenderingOn();
             mapper->SetLookupTable(lut);
             mapper->UseLookupTableScalarRangeOn();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
@@ -1151,7 +1145,6 @@ void ImageRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection(transFilter->GetOutputPort());
     mapper->ScalarVisibilityOff();
-    mapper->ImmediateModeRenderingOn();
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
     actor->GetProperty()->SetAmbient(1);

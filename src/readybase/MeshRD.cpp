@@ -307,7 +307,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         {
             // add the mesh actor
             vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-            mapper->ImmediateModeRenderingOn();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
             if(use_wireframe && !slice_3D) // full wireframe mode: all internal edges
@@ -387,7 +386,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             surface->SetValue(0,contour_level);
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             mapper->SetInputConnection(surface->GetOutputPort());
-            mapper->ImmediateModeRenderingOn();
             mapper->ScalarVisibilityOff();
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
@@ -455,7 +453,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             cutter->SetCutFunction(plane);
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             mapper->SetInputConnection(cutter->GetOutputPort());
-            mapper->ImmediateModeRenderingOn();
             if(use_image_interpolation)
             {
                 vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
@@ -502,7 +499,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 
             vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             mapper->SetInputConnection(edges->GetOutputPort());
-            mapper->ImmediateModeRenderingOn();
 
             vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
             actor->SetMapper(mapper);
@@ -649,7 +645,6 @@ void MeshRD::AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float h
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     mapper->SetInputConnection(transFilter->GetOutputPort());
     mapper->ScalarVisibilityOff();
-    mapper->ImmediateModeRenderingOn();
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
     actor->GetProperty()->SetAmbient(1);
