@@ -1605,6 +1605,7 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
     this->StorePaintAction(iChemical,iCell,old_val);
     this->GetImage(iChemical)->SetScalarComponentFromFloat(ix,iy,iz,0,val);
     this->images[iChemical]->Modified();
+    this->is_modified = true;
 }
 
 // --------------------------------------------------------------------------------
@@ -1668,6 +1669,7 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
         }
     }
     this->images[iChemical]->Modified();
+    this->is_modified = true;
 }
 
 // --------------------------------------------------------------------------------

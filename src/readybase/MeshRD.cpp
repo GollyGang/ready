@@ -106,7 +106,6 @@ void MeshRD::Update(int n_steps)
     this->timesteps_taken += n_steps;
 
     this->mesh->Modified();
-    this->is_modified = true;
 }
 
 // ---------------------------------------------------------------------
