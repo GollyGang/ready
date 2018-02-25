@@ -799,6 +799,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     render_settings.GetProperty("color_high").GetColor(r,g,b);
     vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
+    bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
@@ -815,126 +816,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->ImmediateModeRenderingOn();
-
-    vtkImageData *image = this->GetImage(iActiveChemical);
-    int *extent = image->GetExtent();
-
-    // we first convert the image from point data to cell data, to match the users expectations
-
-    vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
-    #if VTK_MAJOR_VERSION >= 6
-        pad->SetInputData(image);
-    #else
-        pad->SetInput(image);
-    #endif
-    pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
-
-    // move the pixel values (stored in the point data) to cell data
-    vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
-    #if VTK_MAJOR_VERSION >= 6
-        prearrange_fields->SetInputData(image);
-    #else
-        prearrange_fields->SetInput(image);
-    #endif
-    prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
-        vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
-
-    // get the image scalars name from the first array
-    prearrange_fields->Update();
-    const char *scalars_array_name = prearrange_fields->GetOutput()->GetCellData()->GetArray(0)->GetName();
-
-    // mark the new cell data array as the active attribute
-    vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-    assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
-    assign_attribute->Assign(scalars_array_name, vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
-
-    // save the filters so we can perform a manual update step on the pipeline in Update() (TODO: work out how to do this properly)
-    this->rearrange_fields_filter = prearrange_fields;
-    this->assign_attribute_filter = assign_attribute;
-
-    vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
-    merge_datasets->SetGeometryConnection(pad->GetOutputPort());
-    merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
-
-    vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New(); // (only used if needed)
-    to_point_data->SetInputConnection(merge_datasets->GetOutputPort());
-
-    if(use_image_interpolation)
-    {
-        // turns the 3d grid of sampled values into a polygon mesh for rendering,
-        // by making a surface that contours the volume at a specified level    
-        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInputConnection(to_point_data->GetOutputPort());
-        surface->SetValue(0,contour_level);
-        mapper->SetInputConnection(surface->GetOutputPort());
-        mapper->ScalarVisibilityOff();
-    }
-    else
-    {
-        // render as cubes, Minecraft-style
-        vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
-        threshold->SetInputConnection(merge_datasets->GetOutputPort());
-        threshold->SetInputArrayToProcess(0, 0, 0,
-            vtkDataObject::FIELD_ASSOCIATION_CELLS,
-            vtkDataSetAttributes::SCALARS);
-        threshold->ThresholdByUpper(contour_level);
-
-        vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
-        geometry->SetInputConnection(threshold->GetOutputPort());
-
-        mapper->SetInputConnection(geometry->GetOutputPort());
-    }
-
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-    actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
-    actor->GetProperty()->SetAmbient(0.1);
-    actor->GetProperty()->SetDiffuse(0.5);
-    actor->GetProperty()->SetSpecular(0.4);
-    actor->GetProperty()->SetSpecularPower(10);
-    if(use_wireframe)
-        actor->GetProperty()->SetRepresentationToWireframe();
-    if(show_cell_edges && !use_image_interpolation)
-    {
-        actor->GetProperty()->EdgeVisibilityOn();
-        actor->GetProperty()->SetEdgeColor(0,0,0);
-    }
-    vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
-    actor->SetBackfaceProperty(bfprop);
-    bfprop->SetColor(0.7,0.6,0.55);
-    bfprop->SetAmbient(0.1);
-    bfprop->SetDiffuse(0.5);
-    bfprop->SetSpecular(0.4);
-    bfprop->SetSpecularPower(10);
-
-    // add the actor to the renderer's scene
-    actor->PickableOff(); // not sure about this - sometimes it is nice to paint on the contoured surface too, for 3d sculpting
-    pRenderer->AddActor(actor);
-
-    // add the bounding box
-    if(show_bounding_box)
-    {
-        vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
-
-        vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
-        edges->SetInputConnection(box->GetOutputPort());
-
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(edges->GetOutputPort());
-        mapper->ImmediateModeRenderingOn();
-
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(0,0,0);  
-        actor->GetProperty()->SetAmbient(1);
-        actor->PickableOff();
-
-        pRenderer->AddActor(actor);
-    }
-
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
     lut->SetRampToLinear();
@@ -945,40 +826,195 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     lut->SetValueRange(low_val, high_val);
     lut->Build();
 
-    // add a 2D slice too
-    if(slice_3D)
+    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    
+    double offset[3] = {0,0,0};
+
+    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
-        vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-        double *bounds = image->GetBounds();
-        plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
-                         slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
-                         slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
-        if(slice_3D_axis=="x")
-            plane->SetNormal(1,0,0);
-        else if(slice_3D_axis=="y")
-            plane->SetNormal(0,1,0);
-        else
-            plane->SetNormal(0,0,1);
-        vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
-        cutter->SetCutFunction(plane);
-        if(use_image_interpolation)
-            cutter->SetInputConnection(to_point_data->GetOutputPort());
-        else
-            cutter->SetInputConnection(merge_datasets->GetOutputPort());
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(cutter->GetOutputPort());
         mapper->ImmediateModeRenderingOn();
-        mapper->SetLookupTable(lut);
-        mapper->UseLookupTableScalarRangeOn();
+
+        vtkImageData *image = this->GetImage(iChem);
+        int *extent = image->GetExtent();
+
+        // we first convert the image from point data to cell data, to match the users expectations
+
+        vtkSmartPointer<vtkImageWrapPad> pad = vtkSmartPointer<vtkImageWrapPad>::New();
+        #if VTK_MAJOR_VERSION >= 6
+            pad->SetInputData(image);
+        #else
+            pad->SetInput(image);
+        #endif
+        pad->SetOutputWholeExtent(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
+
+        // move the pixel values (stored in the point data) to cell data
+        vtkSmartPointer<vtkRearrangeFields> prearrange_fields = vtkSmartPointer<vtkRearrangeFields>::New();
+        #if VTK_MAJOR_VERSION >= 6
+            prearrange_fields->SetInputData(image);
+        #else
+            prearrange_fields->SetInput(image);
+        #endif
+        prearrange_fields->AddOperation(vtkRearrangeFields::MOVE,vtkDataSetAttributes::SCALARS,
+            vtkRearrangeFields::POINT_DATA,vtkRearrangeFields::CELL_DATA);
+
+        // get the image scalars name from the first array
+        prearrange_fields->Update();
+        const char *scalars_array_name = prearrange_fields->GetOutput()->GetCellData()->GetArray(0)->GetName();
+
+        // mark the new cell data array as the active attribute
+        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+        assign_attribute->SetInputConnection(prearrange_fields->GetOutputPort());
+        assign_attribute->Assign(scalars_array_name, vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+
+        // save the filters so we can perform a manual update step on the pipeline in Update() (TODO: work out how to do this properly)
+        this->rearrange_fields_filter = prearrange_fields;
+        this->assign_attribute_filter = assign_attribute;
+
+        vtkSmartPointer<vtkMergeFilter> merge_datasets = vtkSmartPointer<vtkMergeFilter>::New();
+        merge_datasets->SetGeometryConnection(pad->GetOutputPort());
+        merge_datasets->SetScalarsConnection(assign_attribute->GetOutputPort());
+
+        vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New(); // (only used if needed)
+        to_point_data->SetInputConnection(merge_datasets->GetOutputPort());
+
+        if(use_image_interpolation)
+        {
+            // turns the 3d grid of sampled values into a polygon mesh for rendering,
+            // by making a surface that contours the volume at a specified level    
+            vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+            surface->SetInputConnection(to_point_data->GetOutputPort());
+            surface->SetValue(0,contour_level);
+            mapper->SetInputConnection(surface->GetOutputPort());
+            mapper->ScalarVisibilityOff();
+        }
+        else
+        {
+            // render as cubes, Minecraft-style
+            vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
+            threshold->SetInputConnection(merge_datasets->GetOutputPort());
+            threshold->SetInputArrayToProcess(0, 0, 0,
+                vtkDataObject::FIELD_ASSOCIATION_CELLS,
+                vtkDataSetAttributes::SCALARS);
+            threshold->ThresholdByUpper(contour_level);
+
+            vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
+            geometry->SetInputConnection(threshold->GetOutputPort());
+
+            mapper->SetInputConnection(geometry->GetOutputPort());
+        }
+
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->GetProperty()->LightingOff();
-        if(show_cell_edges)
+        actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
+        actor->GetProperty()->SetAmbient(0.1);
+        actor->GetProperty()->SetDiffuse(0.5);
+        actor->GetProperty()->SetSpecular(0.4);
+        actor->GetProperty()->SetSpecularPower(10);
+        if(use_wireframe)
+            actor->GetProperty()->SetRepresentationToWireframe();
+        if(show_cell_edges && !use_image_interpolation)
         {
             actor->GetProperty()->EdgeVisibilityOn();
-            actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+            actor->GetProperty()->SetEdgeColor(0,0,0);
         }
+        vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+        actor->SetBackfaceProperty(bfprop);
+        bfprop->SetColor(0.7,0.6,0.55);
+        bfprop->SetAmbient(0.1);
+        bfprop->SetDiffuse(0.5);
+        bfprop->SetSpecular(0.4);
+        bfprop->SetSpecularPower(10);
+        actor->SetPosition(offset);
+
+        // add the actor to the renderer's scene
+        actor->PickableOff(); // not sure about this - sometimes it is nice to paint on the contoured surface too, for 3d sculpting
         pRenderer->AddActor(actor);
+
+        // add the bounding box
+        if(show_bounding_box)
+        {
+            vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
+            box->SetBounds(extent[0],extent[1]+1,extent[2],extent[3]+1,extent[4],extent[5]+1);
+
+            vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+            edges->SetInputConnection(box->GetOutputPort());
+
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(edges->GetOutputPort());
+            mapper->ImmediateModeRenderingOn();
+
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetColor(0,0,0);  
+            actor->GetProperty()->SetAmbient(1);
+            actor->SetPosition(offset);
+            actor->PickableOff();
+
+            pRenderer->AddActor(actor);
+        }
+
+        // add a 2D slice too
+        if(slice_3D)
+        {
+            vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+            double *bounds = image->GetBounds();
+            plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
+                             slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
+                             slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
+            if(slice_3D_axis=="x")
+                plane->SetNormal(1,0,0);
+            else if(slice_3D_axis=="y")
+                plane->SetNormal(0,1,0);
+            else
+                plane->SetNormal(0,0,1);
+            vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+            cutter->SetCutFunction(plane);
+            if(use_image_interpolation)
+                cutter->SetInputConnection(to_point_data->GetOutputPort());
+            else
+                cutter->SetInputConnection(merge_datasets->GetOutputPort());
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(cutter->GetOutputPort());
+            mapper->ImmediateModeRenderingOn();
+            mapper->SetLookupTable(lut);
+            mapper->UseLookupTableScalarRangeOn();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->LightingOff();
+            if(show_cell_edges)
+            {
+                actor->GetProperty()->EdgeVisibilityOn();
+                actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+            }
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
+        }
+
+        // add a text label
+        if(this->GetNumberOfChemicals()>1)
+        {
+            const float text_label_offset = 5.0 + max(this->GetX(), this->GetY()) / 20.0f;
+            vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
+            captionActor->SetAttachmentPoint(offset[0] + this->GetX() / 2, offset[1] - text_label_offset, offset[2]);
+            captionActor->SetPosition(0, 0);
+            captionActor->SetCaption(GetChemicalName(iChem).c_str());
+            captionActor->BorderOff();
+            captionActor->LeaderOff();
+            captionActor->SetPadding(0);
+            captionActor->GetCaptionTextProperty()->SetJustificationToLeft();
+            captionActor->GetCaptionTextProperty()->BoldOff();
+            captionActor->GetCaptionTextProperty()->ShadowOff();
+            captionActor->GetCaptionTextProperty()->ItalicOff();
+            captionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
+            captionActor->GetCaptionTextProperty()->SetFontSize(16);
+            captionActor->GetCaptionTextProperty()->SetVerticalJustificationToCentered();
+            captionActor->GetTextActor()->SetTextScaleModeToNone();
+            pRenderer->AddActor(captionActor);
+        }
+
+        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
     }
 
     // also add a scalar bar to show how the colors correspond to values
