@@ -274,9 +274,9 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
     // description
     vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
     description->SetName("description");
-	string desc = this->GetDescription();
-	desc = ReplaceAllSubstrings(desc, "\n", "\n      "); // indent the lines
-	description->SetCharacterData(desc.c_str(), (int)desc.length());
+    string desc = this->GetDescription();
+    desc = ReplaceAllSubstrings(desc, "\n", "\n      "); // indent the lines
+    description->SetCharacterData(desc.c_str(), (int)desc.length());
     rd->AddNestedElement(description);
 
     // rule

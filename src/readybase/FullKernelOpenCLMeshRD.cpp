@@ -96,10 +96,10 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML(bool generat
     vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
     kernel->SetName("kernel");
     kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-	string f = this->GetFormula();
-	f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
-	kernel->SetCharacterData(f.c_str(), (int)f.length());
-	rule->AddNestedElement(kernel);
+    string f = this->GetFormula();
+    f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
+    kernel->SetCharacterData(f.c_str(), (int)f.length());
+    rule->AddNestedElement(kernel);
 
     return rd;
 }

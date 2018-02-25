@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
-    
+
 // local:
 #include "scene_items.hpp"
 
@@ -34,9 +34,9 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
     scalar_bar->SetHeight(0.15);
     scalar_bar->SetPosition(0.25,0.01);
     scalar_bar->SetMaximumHeightInPixels(80);
-	// workaround for http://www.paraview.org/Bug/view.php?id=14561
-	scalar_bar->SetTitle("M");
-	scalar_bar->GetTitleTextProperty()->SetOpacity(0);
-	scalar_bar->SetTitleRatio(0.7);
-	pRenderer->AddActor2D(scalar_bar);
+    // workaround for http://www.paraview.org/Bug/view.php?id=14561
+    scalar_bar->SetTitle("M");
+    scalar_bar->GetTitleTextProperty()->SetOpacity(0);
+    scalar_bar->SetTitleRatio(0.7);
+    pRenderer->AddActor2D(scalar_bar);
 }

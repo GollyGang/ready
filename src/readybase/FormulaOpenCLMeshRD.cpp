@@ -139,10 +139,10 @@ vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLMeshRD::GetAsXML(bool generate_i
     vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
     formula->SetName("formula");
     formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-	string f = this->GetFormula();
-	f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
-	formula->SetCharacterData(f.c_str(), (int)f.length());
-	rule->AddNestedElement(formula);
+    string f = this->GetFormula();
+    f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
+    formula->SetCharacterData(f.c_str(), (int)f.length());
+    rule->AddNestedElement(formula);
 
     return rd;
 }

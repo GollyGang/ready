@@ -134,32 +134,32 @@ int IndexFromChemicalName(const string& s)
 string trim_multiline_string(const char* s)
 {
     istringstream iss(s);
-	string item;
-	vector<string> vs;
-	size_t minLeadingWhitespace = SIZE_MAX;
+    string item;
+    vector<string> vs;
+    size_t minLeadingWhitespace = SIZE_MAX;
     while(getline(iss, item, '\n'))
     {
         size_t leadingWhitespace = item.find_first_not_of(" \t");
         if(leadingWhitespace!=string::npos)
         {
-			minLeadingWhitespace = min(minLeadingWhitespace, leadingWhitespace);
-			vs.push_back( item );
+            minLeadingWhitespace = min(minLeadingWhitespace, leadingWhitespace);
+            vs.push_back( item );
         }
-		else
-		{
-			if( !vs.empty() && !vs.back().empty() )
-				vs.push_back("");
-		}
+        else
+        {
+            if( !vs.empty() && !vs.back().empty() )
+                vs.push_back("");
+        }
     }
     ostringstream oss;
     for( size_t i=0; i < vs.size(); i++ )
     {
-		item = vs[i];
-		if( item.size() > minLeadingWhitespace)
-			oss << item.substr(minLeadingWhitespace);
+        item = vs[i];
+        if( item.size() > minLeadingWhitespace)
+            oss << item.substr(minLeadingWhitespace);
         if( i < vs.size()-1 )
             oss << "\n";
-	}
+    }
     return oss.str();
 }
 
@@ -177,12 +177,12 @@ void InterpolateInHSV(const float r1,const float g1,const float b1,const float r
 
 string ReplaceAllSubstrings(string subject, const string& search, const string& replace)
 {
-	size_t pos = 0;
-	while ((pos = subject.find(search, pos)) != string::npos) {
-		subject.replace(pos, search.length(), replace);
-		pos += replace.length();
-	}
-	return subject;
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != string::npos) {
+        subject.replace(pos, search.length(), replace);
+        pos += replace.length();
+    }
+    return subject;
 }
 
 // ---------------------------------------------------------------------------------------------------------

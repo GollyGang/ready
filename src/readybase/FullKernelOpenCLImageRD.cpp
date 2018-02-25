@@ -111,9 +111,9 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML(bool genera
     kernel->SetIntAttribute("block_size_x",this->block_size[0]);
     kernel->SetIntAttribute("block_size_y",this->block_size[1]);
     kernel->SetIntAttribute("block_size_z",this->block_size[2]);
-	string f = this->GetFormula();
-	f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
-	kernel->SetCharacterData(f.c_str(), (int)f.length());
+    string f = this->GetFormula();
+    f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
+    kernel->SetCharacterData(f.c_str(), (int)f.length());
     rule->AddNestedElement(kernel);
 
     return rd;

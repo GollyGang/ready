@@ -1017,7 +1017,7 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
 
     for( size_t iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
     {
-		vector<int>& sphere_list = sphere_lists[iSphereList];
+        vector<int>& sphere_list = sphere_lists[iSphereList];
         // make a cell by reflecting the starting cell in the order listed
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         vector<vtkIdType> pointIds;
@@ -1027,9 +1027,9 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( size_t iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
             {
-				int iSphere = sphere_list[iSphereEntry];
+                int iSphere = sphere_list[iSphereEntry];
                 sphereInversion( p, sphere_centers[iSphere], R, p );
-			}
+            }
             pointIds.push_back( points->InsertNextPoint( p ) );
             centroid[0]+=p[0];
             centroid[1]+=p[1];
@@ -1194,7 +1194,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
 
     for( size_t iSphereList = 0; iSphereList < sphere_lists.size(); ++iSphereList )
     {
-		vector<int>& sphere_list = sphere_lists[iSphereList];
+        vector<int>& sphere_list = sphere_lists[iSphereList];
         // make a cell by reflecting the starting cell in the order listed
         vtkSmartPointer<vtkUnstructuredGrid> ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
         vector<vtkIdType> pointIds;
@@ -1204,9 +1204,9 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
             double p[3] = { vertex_coords[iV][0], vertex_coords[iV][1], vertex_coords[iV][2] };
             for( size_t iSphereEntry = 0; iSphereEntry < sphere_list.size(); ++iSphereEntry )
             {
-				int iSphere = sphere_list[iSphereEntry];
+                int iSphere = sphere_list[iSphereEntry];
                 sphereInversion( p, sphere_centers[iSphere], R, p );
-			}
+            }
             pointIds.push_back( points->InsertNextPoint( p ) );
             centroid[0]+=p[0];
             centroid[1]+=p[1];
