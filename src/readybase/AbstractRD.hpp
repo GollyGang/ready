@@ -232,7 +232,9 @@ class AbstractRD
         std::map<TWeight,std::string> canonical_neighborhood_weight_identifiers;
         std::map<std::string,TWeight> recognized_neighborhood_weight_identifiers;
 
-    protected: // functions
+        double xgap,ygap;           /// spatial separation for rendering multiple chemicals
+
+        protected: // functions
 
         /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;

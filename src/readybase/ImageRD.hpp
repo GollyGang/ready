@@ -86,7 +86,6 @@ class ImageRD : public AbstractRD
         // we save the starting pattern, to allow the user to reset
         vtkImageData *starting_pattern;
 
-        double xgap,ygap;           /// spatial separation for rendering multiple chemicals
         double image_top1D;        /// topmost location of the 1D image strips
         double image_ratio1D;     /// proportions of the 1D image strips
 

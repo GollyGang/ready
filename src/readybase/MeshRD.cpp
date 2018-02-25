@@ -26,6 +26,7 @@
 // VTK:
 #include <vtkActor.h>
 #include <vtkAssignAttribute.h>
+#include <vtkCaptionActor2D.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkCellDataToPointData.h>
@@ -53,6 +54,8 @@
 #include <vtkRenderer.h>
 #include <vtkReverseSense.h>
 #include <vtkScalarBarActor.h>
+#include <vtkTextActor.h>
+#include <vtkTextProperty.h>
 #include <vtkThreshold.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
@@ -250,6 +253,8 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
 
     this->ComputeCellNeighbors(this->neighborhood_type,this->neighborhood_range,
         this->neighborhood_weight_type);
+
+    this->xgap = this->GetX() * 0.05;
 }
 
 // ---------------------------------------------------------------------
@@ -264,9 +269,9 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     render_settings.GetProperty("color_high").GetColor(r,g,b);
     vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
-    string activeChemical = render_settings.GetProperty("active_chemical").GetChemical();
-    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
+    int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
@@ -291,40 +296,167 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     lut->SetValueRange(low_val,high_val);
     lut->Build();
 
-    if(this->mesh->GetCellType(0)==VTK_POLYGON)
+    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    
+    double offset[3] = {0,0,0};
+
+    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
-        // add the mesh actor
-        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-        mapper->ImmediateModeRenderingOn();
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        if(use_wireframe && !slice_3D) // full wireframe mode: all internal edges
+        string chem = GetChemicalName(iChem);
+        if(this->mesh->GetCellType(0)==VTK_POLYGON)
         {
-            // explicitly extract the edges - the default mapper only shows the outside surface
-            vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
-            #if VTK_MAJOR_VERSION >= 6
-                edges->SetInputData(this->mesh);
-            #else
-                edges->SetInput(this->mesh);
-            #endif
-            mapper->SetInputConnection(edges->GetOutputPort());
-            mapper->SetScalarModeToUseCellFieldData();
+            // add the mesh actor
+            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+            mapper->ImmediateModeRenderingOn();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            if(use_wireframe && !slice_3D) // full wireframe mode: all internal edges
+            {
+                // explicitly extract the edges - the default mapper only shows the outside surface
+                vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+                #if VTK_MAJOR_VERSION >= 6
+                    edges->SetInputData(this->mesh);
+                #else
+                    edges->SetInput(this->mesh);
+                #endif
+                mapper->SetInputConnection(edges->GetOutputPort());
+                mapper->SetScalarModeToUseCellFieldData();
+            }
+            else if(slice_3D) // partial wireframe mode: only external surface edges
+            {
+                vtkSmartPointer<vtkGeometryFilter> geom = vtkSmartPointer<vtkGeometryFilter>::New();
+                #if VTK_MAJOR_VERSION >= 6
+                    geom->SetInputData(this->mesh);
+                #else
+                    geom->SetInput(this->mesh);
+                #endif
+                vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+                edges->SetInputConnection(geom->GetOutputPort());
+                mapper->SetInputConnection(edges->GetOutputPort());
+                mapper->SetScalarModeToUseCellFieldData();
+            }
+            else // non-wireframe mode: shows filled external surface
+            {
+                if(use_image_interpolation)
+                {
+                    vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+                    #if VTK_MAJOR_VERSION >= 6
+                        to_point_data->SetInputData(this->mesh);
+                    #else
+                        to_point_data->SetInput(this->mesh);
+                    #endif
+                    mapper->SetInputConnection(to_point_data->GetOutputPort());
+                    mapper->SetScalarModeToUsePointFieldData();
+                }
+                else
+                {
+                    #if VTK_MAJOR_VERSION >= 6
+                        mapper->SetInputData(this->mesh);
+                    #else
+                        mapper->SetInput(this->mesh);
+                    #endif
+                    mapper->SetScalarModeToUseCellFieldData();
+                }
+                if(show_cell_edges)
+                {
+                    actor->GetProperty()->EdgeVisibilityOn();
+                    actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+                }
+            }
+            mapper->SelectColorArray(chem.c_str());
+            mapper->SetLookupTable(lut);
+            mapper->UseLookupTableScalarRangeOn();
+
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
         }
-        else if(slice_3D) // partial wireframe mode: only external surface edges
+        else if(use_image_interpolation)
         {
-            vtkSmartPointer<vtkGeometryFilter> geom = vtkSmartPointer<vtkGeometryFilter>::New();
+            // show a contour
+            vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
             #if VTK_MAJOR_VERSION >= 6
-                geom->SetInputData(this->mesh);
+                assign_attribute->SetInputData(this->mesh);
             #else
-                geom->SetInput(this->mesh);
+                assign_attribute->SetInput(this->mesh);
             #endif
-            vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
-            edges->SetInputConnection(geom->GetOutputPort());
-            mapper->SetInputConnection(edges->GetOutputPort());
-            mapper->SetScalarModeToUseCellFieldData();
+            assign_attribute->Assign(chem.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+            vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+            to_point_data->SetInputConnection(assign_attribute->GetOutputPort());
+            vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
+            surface->SetInputConnection(to_point_data->GetOutputPort());
+            surface->SetValue(0,contour_level);
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(surface->GetOutputPort());
+            mapper->ImmediateModeRenderingOn();
+            mapper->ScalarVisibilityOff();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
+            actor->GetProperty()->SetAmbient(0.1);
+            actor->GetProperty()->SetDiffuse(0.7);
+            actor->GetProperty()->SetSpecular(0.2);
+            actor->GetProperty()->SetSpecularPower(3);
+            if(use_wireframe)
+                actor->GetProperty()->SetRepresentationToWireframe();
+            /*vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
+            actor->SetBackfaceProperty(bfprop);
+            bfprop->SetColor(0.3,0.3,0.3);
+            bfprop->SetAmbient(0.3);
+            bfprop->SetDiffuse(0.6);
+            bfprop->SetSpecular(0.1);*/ // TODO: re-enable this if can get correct normals
+            actor->PickableOff();
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
         }
-        else // non-wireframe mode: shows filled external surface
+        else // visualise the cells
         {
+            vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
+            #if VTK_MAJOR_VERSION >= 6
+                assign_attribute->SetInputData(this->mesh);
+            #else
+                assign_attribute->SetInput(this->mesh);
+            #endif
+            assign_attribute->Assign(chem.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
+            vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
+            threshold->SetInputConnection(assign_attribute->GetOutputPort());
+            threshold->ThresholdByUpper(contour_level);
+            vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
+            mapper->SetInputConnection(threshold->GetOutputPort());
+            mapper->SetLookupTable(lut);
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            if(show_cell_edges)
+            {
+                actor->GetProperty()->EdgeVisibilityOn();
+                actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+            }
+            if(use_wireframe)
+                actor->GetProperty()->SetRepresentationToWireframe();
+            actor->PickableOff();
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
+        }
+
+        // add a slice
+        if(slice_3D)
+        {
+            vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+            double *bounds = this->mesh->GetBounds();
+            plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
+                             slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
+                             slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
+            if(slice_3D_axis=="x")
+                plane->SetNormal(1,0,0);
+            else if(slice_3D_axis=="y")
+                plane->SetNormal(0,1,0);
+            else
+                plane->SetNormal(0,0,1);
+            vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+            cutter->SetCutFunction(plane);
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(cutter->GetOutputPort());
+            mapper->ImmediateModeRenderingOn();
             if(use_image_interpolation)
             {
                 vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
@@ -333,174 +465,85 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
                 #else
                     to_point_data->SetInput(this->mesh);
                 #endif
-                mapper->SetInputConnection(to_point_data->GetOutputPort());
+                cutter->SetInputConnection(to_point_data->GetOutputPort());
                 mapper->SetScalarModeToUsePointFieldData();
             }
             else
             {
                 #if VTK_MAJOR_VERSION >= 6
-                    mapper->SetInputData(this->mesh);
+                    cutter->SetInputData(this->mesh);
                 #else
-                    mapper->SetInput(this->mesh);
+                    cutter->SetInput(this->mesh);
                 #endif
                 mapper->SetScalarModeToUseCellFieldData();
             }
+            mapper->SelectColorArray(chem.c_str());
+            mapper->SetLookupTable(lut);
+            mapper->UseLookupTableScalarRangeOn();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->LightingOff();
             if(show_cell_edges)
             {
                 actor->GetProperty()->EdgeVisibilityOn();
                 actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
             }
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
         }
-        mapper->SelectColorArray(activeChemical.c_str());
-        mapper->SetLookupTable(lut);
-        mapper->UseLookupTableScalarRangeOn();
 
-        pRenderer->AddActor(actor);
-    }
-    else if(use_image_interpolation)
-    {
-        // show a contour
-        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        #if VTK_MAJOR_VERSION >= 6
-            assign_attribute->SetInputData(this->mesh);
-        #else
-            assign_attribute->SetInput(this->mesh);
-        #endif
-        assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
-        vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
-        to_point_data->SetInputConnection(assign_attribute->GetOutputPort());
-        vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-        surface->SetInputConnection(to_point_data->GetOutputPort());
-        surface->SetValue(0,contour_level);
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(surface->GetOutputPort());
-        mapper->ImmediateModeRenderingOn();
-        mapper->ScalarVisibilityOff();
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);  
-        actor->GetProperty()->SetAmbient(0.1);
-        actor->GetProperty()->SetDiffuse(0.7);
-        actor->GetProperty()->SetSpecular(0.2);
-        actor->GetProperty()->SetSpecularPower(3);
-        if(use_wireframe)
-            actor->GetProperty()->SetRepresentationToWireframe();
-        /*vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
-        actor->SetBackfaceProperty(bfprop);
-        bfprop->SetColor(0.3,0.3,0.3);
-        bfprop->SetAmbient(0.3);
-        bfprop->SetDiffuse(0.6);
-        bfprop->SetSpecular(0.1);*/ // TODO: re-enable this if can get correct normals
-        actor->PickableOff();
-        pRenderer->AddActor(actor);
-    }
-    else // visualise the cells
-    {
-        vtkSmartPointer<vtkAssignAttribute> assign_attribute = vtkSmartPointer<vtkAssignAttribute>::New();
-        #if VTK_MAJOR_VERSION >= 6
-            assign_attribute->SetInputData(this->mesh);
-        #else
-            assign_attribute->SetInput(this->mesh);
-        #endif
-        assign_attribute->Assign(activeChemical.c_str(), vtkDataSetAttributes::SCALARS, vtkAssignAttribute::CELL_DATA);
-        vtkSmartPointer<vtkThreshold> threshold = vtkSmartPointer<vtkThreshold>::New();
-        threshold->SetInputConnection(assign_attribute->GetOutputPort());
-        threshold->ThresholdByUpper(contour_level);
-        vtkSmartPointer<vtkDataSetMapper> mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-        mapper->SetInputConnection(threshold->GetOutputPort());
-        mapper->SetLookupTable(lut);
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        if(show_cell_edges)
+        // add the bounding box
+        if(show_bounding_box)
         {
-            actor->GetProperty()->EdgeVisibilityOn();
-            actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
-        }
-        if(use_wireframe)
-            actor->GetProperty()->SetRepresentationToWireframe();
-        actor->PickableOff();
-        pRenderer->AddActor(actor);
-    }
+            vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
+            box->SetBounds(this->mesh->GetBounds());
 
-    // add a slice
-    if(slice_3D)
-    {
-        vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
-        double *bounds = this->mesh->GetBounds();
-        plane->SetOrigin(slice_3D_position*(bounds[1]-bounds[0])+bounds[0],
-                         slice_3D_position*(bounds[3]-bounds[2])+bounds[2],
-                         slice_3D_position*(bounds[5]-bounds[4])+bounds[4]);
-        if(slice_3D_axis=="x")
-            plane->SetNormal(1,0,0);
-        else if(slice_3D_axis=="y")
-            plane->SetNormal(0,1,0);
-        else
-            plane->SetNormal(0,0,1);
-        vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
-        cutter->SetCutFunction(plane);
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(cutter->GetOutputPort());
-        mapper->ImmediateModeRenderingOn();
-        if(use_image_interpolation)
-        {
-            vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
-            #if VTK_MAJOR_VERSION >= 6
-                to_point_data->SetInputData(this->mesh);
-            #else
-                to_point_data->SetInput(this->mesh);
-            #endif
-            cutter->SetInputConnection(to_point_data->GetOutputPort());
-            mapper->SetScalarModeToUsePointFieldData();
+            vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
+            edges->SetInputConnection(box->GetOutputPort());
+
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(edges->GetOutputPort());
+            mapper->ImmediateModeRenderingOn();
+
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetColor(0,0,0);  
+            actor->GetProperty()->SetAmbient(1);
+
+            actor->PickableOff();
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
         }
-        else
+
+        // add a text label
+        if(this->GetNumberOfChemicals()>1)
         {
-            #if VTK_MAJOR_VERSION >= 6
-                cutter->SetInputData(this->mesh);
-            #else
-                cutter->SetInput(this->mesh);
-            #endif
-            mapper->SetScalarModeToUseCellFieldData();
+            const float text_label_offset = this->GetX()*0.05 + max(this->GetX(), this->GetY()) / 20.0f;
+            vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
+            captionActor->SetAttachmentPoint(this->mesh->GetBounds()[0] + offset[0] + this->GetX() / 2, this->mesh->GetBounds()[2] + offset[1] - text_label_offset, this->mesh->GetBounds()[4] + offset[2]);
+            captionActor->SetPosition(0, 0);
+            captionActor->SetCaption(chem.c_str());
+            captionActor->BorderOff();
+            captionActor->LeaderOff();
+            captionActor->SetPadding(0);
+            captionActor->GetCaptionTextProperty()->SetJustificationToLeft();
+            captionActor->GetCaptionTextProperty()->BoldOff();
+            captionActor->GetCaptionTextProperty()->ShadowOff();
+            captionActor->GetCaptionTextProperty()->ItalicOff();
+            captionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
+            captionActor->GetCaptionTextProperty()->SetFontSize(16);
+            captionActor->GetCaptionTextProperty()->SetVerticalJustificationToCentered();
+            captionActor->GetTextActor()->SetTextScaleModeToNone();
+            pRenderer->AddActor(captionActor);
         }
-        mapper->SelectColorArray(activeChemical.c_str());
-        mapper->SetLookupTable(lut);
-        mapper->UseLookupTableScalarRangeOn();
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->LightingOff();
-        if(show_cell_edges)
-        {
-            actor->GetProperty()->EdgeVisibilityOn();
-            actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
-        }
-        pRenderer->AddActor(actor);
+        
+        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
     }
 
     // also add a scalar bar to show how the colors correspond to values
     if(show_color_scale)
     {
         AddScalarBar(pRenderer,lut);
-    }
-
-    // add the bounding box
-    if(show_bounding_box)
-    {
-        vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-        box->SetBounds(this->mesh->GetBounds());
-
-        vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
-        edges->SetInputConnection(box->GetOutputPort());
-
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(edges->GetOutputPort());
-        mapper->ImmediateModeRenderingOn();
-
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetColor(0,0,0);  
-        actor->GetProperty()->SetAmbient(1);
-
-        actor->PickableOff();
-        pRenderer->AddActor(actor);
     }
 
     // add a phase plot

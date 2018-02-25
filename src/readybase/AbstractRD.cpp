@@ -28,6 +28,8 @@ using namespace std;
 // ---------------------------------------------------------------------
 
 AbstractRD::AbstractRD(int data_type)
+    : xgap(5.0)
+    , ygap(20.0)
 {
     this->timesteps_taken = 0;
     this->need_reload_formula = true;

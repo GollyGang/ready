@@ -97,8 +97,6 @@ using namespace std;
 
 ImageRD::ImageRD(int data_type) 
     : AbstractRD(data_type)
-    , xgap(5.0)
-    , ygap(20.0)
     , image_top1D(2.0)
     , image_ratio1D(30.0)
 {
@@ -488,6 +486,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         actor->GetProperty()->LightingOff();
         pRenderer->AddActor(actor);
         
+        // add a text label
         if(this->GetNumberOfChemicals()>1)
         {
             vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
