@@ -1538,7 +1538,7 @@ float ImageRD::GetValue(float x,float y,float z,const Properties& render_setting
         iChemical = int(floor((- y + this->image_top1D + image_height)/(image_height*2))); 
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
     }
-    else if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
         iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
@@ -1581,7 +1581,7 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
         iChemical = int(floor((- y + this->image_top1D + image_height)/(image_height*2))); 
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
     }
-    else if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
         iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
@@ -1629,7 +1629,7 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
         iChemical = int(floor((- y + this->image_top1D + image_height)/(image_height*2))); 
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
     }
-    else if(show_multiple_chemicals && this->GetArenaDimensionality()==2)
+    else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
         iChemical = int(floor((x+this->xgap/2)/(X+this->xgap))); 
