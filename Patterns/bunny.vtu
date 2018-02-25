@@ -14,12 +14,12 @@
       <param name="timestep">   1       </param>
       <param name="D_a">        0.082   </param>
       <param name="D_b">        0.041   </param>
-      <param name="k">          0.06    </param>
+      <param name="K">          0.06    </param>
       <param name="F">          0.035   </param>
       
       <formula number_of_chemicals="2">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
-        delta_b = D_b * laplacian_b + a*b*b - (F+k)*b;
+        delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;
       </formula>
       
     </rule>

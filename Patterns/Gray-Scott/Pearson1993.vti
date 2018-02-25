@@ -5,8 +5,8 @@
     <description>
       John E. Pearson (1993) &quot;&lt;a href=&quot;http://jaguar.biologie.hu-berlin.de/~wolfram/pages/seminar_theoretische_biologie_2007/literatur/schaber/Pearson1993Science261.pdf&quot;&gt;Complex Patterns in a Simple System&lt;/a&gt;&quot; Science 261(5118):189-192.
       
-      Change the parameters k and F to explore the systems that John Pearson described. The supplied 
-      settings (k=0.06, F=0.04) correspond to his picture 'theta' in Fig. 2.
+      Change the parameters K and F to explore the systems that John Pearson described. The supplied 
+      settings (K=0.06, F=0.04) correspond to his picture 'theta' in Fig. 2.
       
       In this pattern we include the delta_x parameter, which determines the scale of the simulation. 
       In other patterns we often merge this value into the diffusion coefficients, for simplicity. 
@@ -21,11 +21,11 @@
       <param name="delta_x">         0.009765625    </param>
       <param name="D_a">             0.00002        </param>
       <param name="D_b">             0.00001        </param>
-      <param name="k">               0.060          </param>
+      <param name="K">               0.060          </param>
       <param name="F">               0.040          </param>
       <formula number_of_chemicals="2">
         delta_a = D_a * laplacian_a / (delta_x*delta_x) - a*b*b + F*(1.0f-a);
-        delta_b = D_b * laplacian_b / (delta_x*delta_x) + a*b*b - (F+k)*b;
+        delta_b = D_b * laplacian_b / (delta_x*delta_x) + a*b*b - (F+K)*b;
       </formula>
       
     </rule>

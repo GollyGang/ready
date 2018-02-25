@@ -15,7 +15,7 @@
       <param name="D_b">
         0.06
       </param>
-      <param name="k">
+      <param name="K">
         0.055
       </param>
       <param name="F">
@@ -23,7 +23,7 @@
       </param>
       <formula number_of_chemicals="3">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
-        delta_b = D_b * laplacian_b + a*b*b - (F+k+c*0.035f)*b;
+        delta_b = D_b * laplacian_b + a*b*b - (F+K+c*0.035f)*b;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true">
