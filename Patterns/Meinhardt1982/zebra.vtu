@@ -125,8 +125,9 @@
         <color_low r="0" g="0" b="0" />
         <color_high r="1" g="1" b="1" />
         <show_color_scale value="false" />
-		<timesteps_per_render value="32" />
+        <timesteps_per_render value="32" />
         <slice_3D value="false" />
+        <show_multiple_chemicals value="false" />
     </render_settings>
     
   </RD>

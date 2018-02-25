@@ -44,6 +44,7 @@
         <low value="-1" />
         <high value="1" />
         <slice_3D value="false" />
+        <show_multiple_chemicals value="false" />
     </render_settings>
     
   </RD>

@@ -51,6 +51,7 @@
     <render_settings>
       <active_chemical value="b" />
       <slice_3D value="false" />
+      <show_multiple_chemicals value="false" />
     </render_settings>
   
   </RD>

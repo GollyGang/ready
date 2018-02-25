@@ -115,7 +115,7 @@
       <color_low r="1" g="0" b="0" />
       <color_high r="1" g="0" b="1" />
       <show_color_scale value="false" />
-      <show_multiple_chemicals value="true" />
+      <show_multiple_chemicals value="false" />
       <active_chemical value="b" />
       <low value="0" />
       <high value="0.45" />
