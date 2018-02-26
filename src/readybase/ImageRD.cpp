@@ -428,6 +428,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
     bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
@@ -487,7 +488,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         pRenderer->AddActor(actor);
 
         // add a text label
-        if(this->GetNumberOfChemicals()>1)
+        if(show_chemical_label && this->GetNumberOfChemicals()>1)
         {
             vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
             captionActor->SetAttachmentPoint(-image_height, image_offset - image_height/2, 0);
@@ -589,6 +590,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
@@ -723,7 +725,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
         }
 
         // add a text label
-        if(this->GetNumberOfChemicals()>1)
+        if(show_chemical_label && this->GetNumberOfChemicals()>1)
         {
             const float text_label_offset = 5.0 + max(this->GetX(), this->GetY()) / 20.0f;
             vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();
@@ -807,6 +809,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
@@ -986,7 +989,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         }
 
         // add a text label
-        if(this->GetNumberOfChemicals()>1)
+        if(show_chemical_label && this->GetNumberOfChemicals()>1)
         {
             const float text_label_offset = 5.0 + max(this->GetX(), this->GetY()) / 20.0f;
             vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();

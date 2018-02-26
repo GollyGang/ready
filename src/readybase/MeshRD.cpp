@@ -274,6 +274,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
     bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
+    bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
@@ -511,7 +512,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
         }
 
         // add a text label
-        if(this->GetNumberOfChemicals()>1)
+        if(show_chemical_label && this->GetNumberOfChemicals()>1)
         {
             const float text_label_offset = this->GetX()*0.05 + max(this->GetX(), this->GetY()) / 20.0f;
             vtkSmartPointer<vtkCaptionActor2D> captionActor = vtkSmartPointer<vtkCaptionActor2D>::New();

@@ -2321,6 +2321,7 @@ void MyFrame::InitializeDefaultRenderSettings(Properties& props)
     props.AddProperty(Property("use_wireframe",false));
     props.AddProperty(Property("show_cell_edges",false));
     props.AddProperty(Property("show_bounding_box",true));
+    props.AddProperty(Property("show_chemical_label",true));
     props.AddProperty(Property("slice_3D",true));
     props.AddProperty(Property("slice_3D_axis","axis","z"));
     props.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]

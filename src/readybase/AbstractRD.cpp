@@ -200,7 +200,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
     // check whether we should warn the user that they need to update Ready
     {
         read_required_attribute(rd,"format_version",i);
-        warn_to_update = (i>4);
+        warn_to_update = (i>5);
         // (we will still proceed and try to read the file but it might fail or give poor results)
     }
 
@@ -270,7 +270,7 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
 {
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
-    rd->SetIntAttribute("format_version",4);
+    rd->SetIntAttribute("format_version",5);
     // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.)
 
     // description
