@@ -108,7 +108,7 @@ class AbstractRD
         virtual void BlankImage(float value = 0.0f) =0;
 
         /// Create a generator suitable for Gray-Scott, so that new patterns can start working immediately.
-        void CreateDefaultInitialPatternGenerator();
+        void CreateDefaultInitialPatternGenerator(size_t num_chemicals);
 
         virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings) =0;
         virtual void SaveStartingPattern() =0;

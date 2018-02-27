@@ -1577,7 +1577,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     wxBusyCursor busy;
     this->SetStatusText(_("Generating data values..."));
-    sys->CreateDefaultInitialPatternGenerator();
+    sys->CreateDefaultInitialPatternGenerator(sys->GetNumberOfChemicals());
     sys->GenerateInitialPattern();
     this->SetCurrentRDSystem(sys);
 
@@ -2570,7 +2570,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     //    - will need to ask for an existing pattern to load the image into, and whether to clear that image first
     //    - will need to ask which chemical(s) to affect, and at what level (overlays engine)
 
-    wxString mesh_filename = wxFileSelector(_("Import a mesh:"), wxEmptyString, wxEmptyString, wxEmptyString,
+    wxString mesh_filename = wxFileSelector(_("Import a mesh:"), wxEmptyString, _("bunny.vtu"), wxEmptyString,
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"), wxFD_OPEN);
     if (mesh_filename.empty()) return; // user cancelled
     mesh_filename = FileNameToString(mesh_filename);
@@ -2605,45 +2605,58 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
 
 void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
 {
-    IntegerDialog nc_dlg(this, _("Number of chemicals in new volume image"), _("Number of chemicals:"),
-        2, 1, 20, wxDefaultPosition, wxDefaultSize);
-    if (nc_dlg.ShowModal() != wxID_OK) return;
-    const size_t num_chemicals = nc_dlg.GetValue();
-
-    wxArrayString choices;
-    for (size_t i = 0; i<num_chemicals; i++)
-        choices.Add(GetChemicalName(i));
-    wxSingleChoiceDialog tc_dlg(this, _("Select the chemical to write the volume into:"), _("Select target chemical"),
-        choices);
-    tc_dlg.SetSelection(0);
-    if (tc_dlg.ShowModal() != wxID_OK) return;
-    const size_t target_chemical = tc_dlg.GetSelection();
-
-    IntegerDialog ld_dlg(this, _("Largest dimension of the new volume image"), _("Largest dimension:"),
-        64, 1, 1024, wxDefaultPosition, wxDefaultSize);
-    if (ld_dlg.ShowModal() != wxID_OK) return;
-    const size_t largest_dimension = ld_dlg.GetValue();
-
-    FloatDialog inval_dlg(this, _("Value to set inside the mesh"), _("Value inside:"),
-        1.0f, wxDefaultPosition, wxDefaultSize);
-    if (inval_dlg.ShowModal() != wxID_OK) return;
-    const float value_inside = inval_dlg.GetValue();
-
-    FloatDialog outval_dlg(this, _("Value to set outside the mesh"), _("Value outside:"),
-        0.0f, wxDefaultPosition, wxDefaultSize);
-    if (outval_dlg.ShowModal() != wxID_OK) return;
-    const float value_outside = outval_dlg.GetValue();
-
-    // at some point we would want the user to decide what data type to use in the image
-    const int data_type = VTK_FLOAT;
+    size_t num_chemicals = 2;
+    size_t target_chemical = 1;
+    size_t largest_dimension = 64;
+    float value_inside = 0.0f;
+    float value_outside = 1.0f;
 
     ImageRD *image_sys;
     if (this->is_opencl_available)
+    {
+        IntegerDialog nc_dlg(this, _("Number of chemicals in new volume image"), _("Number of chemicals:"),
+            3, 1, 20, wxDefaultPosition, wxDefaultSize);
+        if (nc_dlg.ShowModal() != wxID_OK) return;
+        num_chemicals = nc_dlg.GetValue();
+
+        wxArrayString choices;
+        for (size_t i = 0; i<num_chemicals; i++)
+            choices.Add(GetChemicalName(i));
+        wxSingleChoiceDialog tc_dlg(this, _("Select the chemical to write the volume into:"), _("Select target chemical"),
+            choices);
+        tc_dlg.SetSelection(2);
+        if (tc_dlg.ShowModal() != wxID_OK) return;
+        target_chemical = tc_dlg.GetSelection();
+
+        IntegerDialog ld_dlg(this, _("Largest dimension of the new volume image"), _("Largest dimension:"),
+            32, 1, 1024, wxDefaultPosition, wxDefaultSize);
+        if (ld_dlg.ShowModal() != wxID_OK) return;
+        largest_dimension = ld_dlg.GetValue();
+
+        FloatDialog inval_dlg(this, _("Value to set inside the mesh"), _("Value inside:"),
+            0.1f, wxDefaultPosition, wxDefaultSize);
+        if (inval_dlg.ShowModal() != wxID_OK) return;
+        value_inside = inval_dlg.GetValue();
+
+        FloatDialog outval_dlg(this, _("Value to set outside the mesh"), _("Value outside:"),
+            0.5f, wxDefaultPosition, wxDefaultSize);
+        if (outval_dlg.ShowModal() != wxID_OK) return;
+        value_outside = outval_dlg.GetValue();
+
+        // at some point we would want the user to decide what data type to use in the image
+        const int data_type = VTK_FLOAT;
+
         image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
-    else
+        image_sys->SetFormula("delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\ndelta_b = D_b * laplacian_b + a*b*b - (F+K+c*0.035f)*b;");
+    }
+    else {
         image_sys = new GrayScottImageRD();
+    }
+
     image_sys->CopyFromMesh(ug, num_chemicals, target_chemical, largest_dimension, value_inside, value_outside);
-    image_sys->CreateDefaultInitialPatternGenerator();
+    image_sys->CreateDefaultInitialPatternGenerator(2);
+    image_sys->GenerateInitialPattern();
+    this->render_settings.GetProperty("timesteps_per_render").SetInt(16);
     this->SetCurrentRDSystem(image_sys);
 }
 
@@ -2661,7 +2674,7 @@ void MyFrame::MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug)
         mesh_sys = new GrayScottMeshRD();
     mesh_sys->CopyFromMesh(ug);
     mesh_sys->SetNumberOfChemicals(2);
-    mesh_sys->CreateDefaultInitialPatternGenerator();
+    mesh_sys->CreateDefaultInitialPatternGenerator(2);
     mesh_sys->GenerateInitialPattern();
     this->SetCurrentRDSystem(mesh_sys);
 }

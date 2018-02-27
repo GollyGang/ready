@@ -309,9 +309,9 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
 
 // ---------------------------------------------------------------------
 
-void AbstractRD::CreateDefaultInitialPatternGenerator()
+void AbstractRD::CreateDefaultInitialPatternGenerator(size_t num_chemicals)
 {
-    this->initial_pattern_generator.CreateDefaultInitialPatternGenerator(this->GetNumberOfChemicals());
+    this->initial_pattern_generator.CreateDefaultInitialPatternGenerator(num_chemicals);
 }
 
 // ---------------------------------------------------------------------
