@@ -399,8 +399,9 @@ if( USE_SSE )
 endif()
 
 if( APPLE )
-  # support Mac OS 10.5 or later
-  add_definitions( -mmacosx-version-min=10.5 )
+  # support Mac OS 10.7 or later
+  add_definitions( -mmacosx-version-min=10.7 )
+  set(CMAKE_CXX_FLAGS "-std=c++0x -stdlib=libc++")
 endif()
 if( APPLE OR UNIX )
   # use same settings as in makefiles
@@ -457,8 +458,8 @@ else()
     vtkRenderingOpenGL
     ${EXTRA_VTK_LIBS}
   )
- else()
-  # VTK 7.0.x -
+ elseif( ${VTK_MAJOR_VERSION} EQUAL 7)
+  # VTK 7.x
   target_link_libraries(
     readybase
     vtkCommonCore
@@ -477,6 +478,30 @@ else()
     vtkRenderingOpenGL2
     ${EXTRA_VTK_LIBS}
   )
+ else()
+  # VTK 8.0 -
+  target_link_libraries(
+    readybase
+    vtkCommonCore
+    vtkFiltersExtraction
+    vtkFiltersGeometry
+    vtkFiltersModeling
+    vtkFiltersTexture
+    vtkImagingColor
+    vtkImagingStencil
+    vtkInteractionStyle
+    vtkInteractionWidgets
+    vtkIOImage
+    vtkIOGeometry
+    vtkIOXML
+    vtkRenderingCore
+    vtkRenderingAnnotation
+    vtkRenderingFreeType
+    vtkRenderingGL2PSOpenGL2
+    vtkRenderingOpenGL2
+    ${EXTRA_VTK_LIBS}
+  )
+
  endif()
 endif()
 # create command-line utility
