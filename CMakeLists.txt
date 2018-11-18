@@ -484,8 +484,8 @@ endif()
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
 target_link_libraries( ${CMD_NAME} readybase boost_program_options)
 
-# Link boost >1.65 (the improvements to the 'rdy' binary will not build without it).
-find_package( Boost 1.65 COMPONENTS program_options REQUIRED )
+# Link boost >1.50 (the improvements to the 'rdy' binary will not build without it).
+find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
 target_link_libraries( ${CMD_NAME} Boost::program_options )
 
 # create GUI application
