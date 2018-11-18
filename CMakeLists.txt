@@ -423,9 +423,9 @@ if( EXISTS "/etc/redhat-release" )
  # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
  target_link_libraries( readybase ${VTK_LIBRARIES} )
 else()
- #if( UNIX AND NOT APPLE )
- # set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
- #endif()
+ if( UNIX AND NOT APPLE )
+  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
+ endif()
  if( ${VTK_MAJOR_VERSION} LESS 6 )
   # VTK 5.x
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
@@ -464,7 +464,7 @@ else()
     vtkRenderingCore
     vtkRenderingAnnotation
     vtkRenderingFreeType
-    vtkRenderingOpenGL2
+    vtkRenderingOpenGL
     ${EXTRA_VTK_LIBS}
   )
  else()
@@ -492,7 +492,7 @@ endif()
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES})
+target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
