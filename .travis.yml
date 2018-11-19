@@ -14,11 +14,11 @@ matrix:
             - libgtk2.0-dev
             - libwxgtk3.0-dev
             - libboost-all-dev
-  allow_failures:
     - os: osx
       before_install:
         - brew update
         - brew install homebrew/science/vtk wxmac boost
+    - os: windows
 
 branches:
   only:
