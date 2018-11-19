@@ -16,11 +16,11 @@ matrix:
             - libboost-all-dev
     - os: osx
       before_install:
-        - brew update
         - brew install vtk wxmac boost
     - os: windows
       before_install:
-        - choco install wxwidgets
+        - choco install wxwidgets boost-msvc-12
+        - wget https://www.vtk.org/files/release/8.1/VTK-8.1.2.zip
 
 branches:
   only:
