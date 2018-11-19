@@ -22,7 +22,7 @@ matrix:
         - choco install wxwidgets boost-msvc-12
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - CMAKE_HINTS=-DVTK_DIR=$PWD/VTK
+        - CMAKE_HINTS=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
 
 branches:
   only:
