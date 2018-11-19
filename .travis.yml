@@ -27,7 +27,7 @@ matrix:
         - ls
         - mkdir VTK
         - cd VTK
-        - cmake ..\VTK-8.1.2
+        - cmake ../VTK-8.1.2
         - cmake --build .
 
 branches:
