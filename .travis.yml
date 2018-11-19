@@ -26,6 +26,7 @@ matrix:
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_DIR=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
         - WX_DIR=-DwxWidgets_ROOT_DIR=/c/wxWidgets-3.1.0
+        - WX_LIB_DIR=-DwxWidgets_LIB_DIR=/c/wxWidgets-3.1.0/lib/vc_lib
 
 branches:
   only:
@@ -34,6 +35,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $VTK_DIR $WX_DIR ..
+    - cmake $VTK_DIR $WX_DIR $WX_LIB_DIR ..
 
 script: make 
