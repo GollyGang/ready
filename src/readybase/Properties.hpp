@@ -79,12 +79,11 @@ class Property : public XML_Object
 /// A set of Property instances that can be saved/loaded to/from XML.
 class Properties : public XML_Object
 {
-    public: 
+    public:
 
         Properties(std::string set_name) : XML_Object(NULL),set_name(set_name) {}
         void OverwriteFromXML(vtkXMLDataElement* node);
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
-
 
         int GetNumberOfProperties() const { return (int)this->properties.size(); }
         const Property& GetProperty(int i) const { return this->properties[i]; }
@@ -94,9 +93,9 @@ class Properties : public XML_Object
         bool IsProperty(const std::string& name);
         void DeleteAllProperties() { this->properties.clear(); }
         void SetDefaultRenderSettings();
-		
+
     protected:
-    
+
         std::vector<Property> properties;
         std::string set_name; ///< used for saving to XML
 };

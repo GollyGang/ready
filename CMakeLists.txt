@@ -360,6 +360,16 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
 
+#-------------------------------------------Boost-----------------------------------------------
+
+if(WIN32)
+  set(Boost_USE_STATIC_LIBS        ON)
+  set(Boost_USE_MULTITHREADED      ON)
+  set(Boost_USE_STATIC_RUNTIME     ON)
+endif()
+find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
+include_directories( ${Boost_INCLUDE_DIRS} )
+
 #---------------copy installation files to build folder (helps with testing)--------------------
 
 foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
@@ -413,9 +423,9 @@ if( EXISTS "/etc/redhat-release" )
  # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
  target_link_libraries( readybase ${VTK_LIBRARIES} )
 else()
- #if( UNIX AND NOT APPLE )
- # set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
- #endif()
+ if( UNIX AND NOT APPLE )
+  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
+ endif()
  if( ${VTK_MAJOR_VERSION} LESS 6 )
   # VTK 5.x
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
@@ -454,7 +464,7 @@ else()
     vtkRenderingCore
     vtkRenderingAnnotation
     vtkRenderingFreeType
-    vtkRenderingOpenGL2
+    vtkRenderingOpenGL
     ${EXTRA_VTK_LIBS}
   )
  else()
@@ -482,11 +492,7 @@ endif()
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase boost_program_options)
-
-# Link boost >1.50 (the improvements to the 'rdy' binary will not build without it).
-find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
-target_link_libraries( ${CMD_NAME} Boost::program_options )
+target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )

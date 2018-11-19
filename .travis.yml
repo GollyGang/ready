@@ -13,12 +13,12 @@ matrix:
             - ocl-icd-opencl-dev
             - libgtk2.0-dev
             - libwxgtk3.0-dev
+            - libboost-all-dev
   allow_failures:
     - os: osx
       before_install:
         - brew update
-        - brew install homebrew/science/vtk wxmac
-
+        - brew install homebrew/science/vtk wxmac boost
 
 branches:
   only:
