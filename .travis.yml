@@ -21,14 +21,12 @@ matrix:
       before_install:
         - choco install wxwidgets boost-msvc-12
         - wget https://www.vtk.org/files/release/8.1/VTK-8.1.2.zip
-        - ls
         - 7z x VTK-8.1.2.zip
-        - pwd
-        - ls
-        - mkdir VTK
-        - cd VTK
+        - mkdir VTK_build
+        - cd VTK_build
         - cmake ../VTK-8.1.2
         - cmake --build .
+        - cd ..
 
 branches:
   only:
