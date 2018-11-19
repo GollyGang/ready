@@ -29,6 +29,10 @@ matrix:
         - 7z x -oWX -y wxMSW-3.1.1_vc140_ReleaseDLL.7z
         - WX_DIR=-DwxWidgets_ROOT_DIR=$PWD/WX
         - WX_LIB_DIR=-DwxWidgets_LIB_DIR=$PWD/WX/lib/vc140_dll
+        - echo $WX_DIR
+        - ls $WX_DIR
+        - echo $WX_LIB_DIR
+        - ls $WX_LIB_DIR
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_DIR=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
