@@ -19,14 +19,22 @@ matrix:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install vtk wxmac boost
     - os: windows
       before_install:
-        - choco install wxwidgets boost-msvc-12
-        - ls /c/wxWidgets-3.1.0
-        - ls /c/wxWidgets-3.1.0/lib
+        - choco install boost-msvc-12
+        - mkdir WX
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxWidgets-3.1.1-headers.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_Dev.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_ReleaseDLL.7z
+        - 7z x -oWX -y wxWidgets-3.1.1-headers.7z
+        - 7z x -oWX -y wxMSW-3.1.1_vc140_Dev.7z
+        - 7z x -oWX -y wxMSW-3.1.1_vc140_ReleaseDLL.7z
+        - ls WX
+        - ls WX/lib
+        - ls WX/lib/vc140_dll
+        - WX_DIR=-DwxWidgets_ROOT_DIR=$PWD/WX
+        - WX_LIB_DIR=-DwxWidgets_LIB_DIR=/c/wxWidgets-3.1.0/lib/vc140_dll
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_DIR=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
-        - WX_DIR=-DwxWidgets_ROOT_DIR=/c/wxWidgets-3.1.0
-        - WX_LIB_DIR=-DwxWidgets_LIB_DIR=/c/wxWidgets-3.1.0/lib/vc_dll
 
 branches:
   only:
