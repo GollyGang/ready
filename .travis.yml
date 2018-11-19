@@ -20,9 +20,12 @@ matrix:
     - os: windows
       before_install:
         - choco install wxwidgets boost-msvc-12
+        - ls /c
+        - ls
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - CMAKE_HINTS=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+        - VTK_DIR=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+        - WX_DIR=-DwxWidgets_ROOT_DIR=/c/wxWidgets-3.1.0
 
 branches:
   only:
@@ -31,6 +34,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $CMAKE_HINTS ..
+    - cmake $VTK_DIR $WX_DIR ..
 
 script: make 
