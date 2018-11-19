@@ -135,3 +135,33 @@ bool Properties::IsProperty(const std::string& name)
     }
     return false;
 }
+
+void Properties::SetDefaultRenderSettings( )
+{
+    this->DeleteAllProperties();
+    this->AddProperty( Property("surface_color","color",1.0f,1.0f,1.0f) ); // RGB [0,1]
+    this->AddProperty( Property("color_low","color",0.0f,0.0f,1.0f) );
+    this->AddProperty( Property("color_high","color",1.0f,0.0f,0.0f) );
+    this->AddProperty( Property("show_color_scale",true) );
+    this->AddProperty( Property("show_multiple_chemicals",true) );
+    this->AddProperty( Property("active_chemical","chemical","a") );
+    this->AddProperty( Property("low",0.0f) );
+    this->AddProperty( Property("high",1.0f) );
+    this->AddProperty( Property("vertical_scale_1D",30.0f) );
+    this->AddProperty( Property("vertical_scale_2D",15.0f) );
+    this->AddProperty( Property("contour_level",0.25f) );
+    this->AddProperty( Property("use_wireframe",false) );
+    this->AddProperty( Property("show_cell_edges",false) );
+    this->AddProperty( Property("show_bounding_box",true) );
+    this->AddProperty( Property("slice_3D",true) );
+    this->AddProperty( Property("slice_3D_axis","axis","z") );
+    this->AddProperty( Property("slice_3D_position",0.5f) ); // [0,1]
+    this->AddProperty( Property("show_displacement_mapped_surface",true) );
+    this->AddProperty( Property("color_displacement_mapped_surface",true) );
+    this->AddProperty( Property("use_image_interpolation",true) );
+    this->AddProperty( Property("timesteps_per_render",100) );
+    this->AddProperty( Property("show_phase_plot",false) );
+    this->AddProperty( Property("phase_plot_x_axis","chemical","a") );
+    this->AddProperty( Property("phase_plot_y_axis","chemical","b") );
+    this->AddProperty( Property("phase_plot_z_axis","chemical","c") );
+}

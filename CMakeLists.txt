@@ -360,6 +360,16 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
 endif()
 
+#-------------------------------------------Boost-----------------------------------------------
+
+if(WIN32)
+  set(Boost_USE_STATIC_LIBS        ON)
+  set(Boost_USE_MULTITHREADED      ON)
+  set(Boost_USE_STATIC_RUNTIME     ON)
+endif()
+find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
+include_directories( ${Boost_INCLUDE_DIRS} )
+
 #---------------copy installation files to build folder (helps with testing)--------------------
 
 foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
@@ -479,9 +489,10 @@ else()
   )
  endif()
 endif()
+
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase )
+target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )

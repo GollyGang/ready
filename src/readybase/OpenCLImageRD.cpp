@@ -234,6 +234,16 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
 
 // ----------------------------------------------------------------------------------------------------------------
 
+void OpenCLImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+{
+    // read from opencl buffers into our image
+    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
+    cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][chemical_id], CL_TRUE, 0, MEM_SIZE, dest, 0, NULL, NULL);
+    throwOnError(ret,"OpenCLImageRD::GetFromOpenCLBuffers : buffer reading failed: ");
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::TestFormula(std::string program_string)
 {
     this->TestKernel(this->AssembleKernelSourceFromFormula(program_string));

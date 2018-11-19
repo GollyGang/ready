@@ -3,6 +3,7 @@ Dependencies:
 1) VTK (latest version, or at least 6.2): www.vtk.org
 2) wxWidgets (latest version, or at least 2.9.2): www.wxwidgets.org
 3) any OpenCL SDK.
+4) Boost > 1.50
 
 Ready uses CMake for pre-build setup. You might need to read some CMake
 documentation first to get the hang of it.
@@ -32,7 +33,12 @@ B) Build wxWidgets:
     nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 TARGET_CPU=AMD64
     nmake -f makefile.vc BUILD=debug RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=1 DEBUG_FLAG=1 TARGET_CPU=AMD64
 
-C) Build Ready:
+C) Build Boost:
+ - Follow instructions at http://boost.org and build with static runtime:
+    bootstrap
+    .\b2 link=static runtime-link=static
+
+D) Build Ready:
  - Run CMake and make a separate build folder for Ready.
  - Set wxWidgets_ROOT_DIR to your wxWidgets installation folder, if
    CMake didn't find the right version automatically.
@@ -44,6 +50,7 @@ C) Build Ready:
     C:/CUDA/lib/OpenCL.lib, or C:/CUDA/lib64/OpenCL.lib for 64-bit.
  - Set OPENCL_INCLUDE_DIRS to e.g.
     C:/CUDA/include
+ - Set Boost_INCLUDE_DIR to e.g. C:/boost_1_68_0
  - Generate, then open the resulting Ready.sln and build the Debug and
    Release targets. Set Ready as the "StartUp Project" to have it run
    by default.
@@ -76,7 +83,12 @@ B) Build wxWidgets:
    For 64-bit: (in a 64-bit Visual Studio command prompt)
     nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 TARGET_CPU=AMD64
 
-C) Build Ready:
+C) Build Boost:
+ - Follow instructions at http://boost.org and build with static runtime:
+    bootstrap
+    .\b2 link=static runtime-link=static
+
+D) Build Ready:
  - Open a 32/64-bit Visual Studio command prompt and type: cmake-gui
  - Create a target build folder, and select NMake Makefiles as the
    generator.
@@ -89,6 +101,7 @@ C) Build Ready:
     C:/CUDA/lib/OpenCL.lib, or C:/CUDA/lib64/OpenCL.lib for 64-bit.
  - Set OPENCL_INCLUDE_DIRS to e.g.
     C:/CUDA/include
+ - Set Boost_INCLUDE_DIR to e.g. C:/boost_1_68_0
  - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and
    similar. Change all occurences of /MD to /MT, and /MDd to /MTd.
    This ensures that the C runtime is statically-linked.
@@ -104,10 +117,10 @@ C) Build Ready:
 A) Dependencies: 
 
 On Debian/Ubuntu:
-sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev cmake-curses-gui build-essential git
+sudo apt-get install libgtk2.0-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk6-dev libwxgtk3.0-dev cmake-curses-gui build-essential git libboost-all-dev
 
 On Fedora:
-sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers gcc-c++
+sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers gcc-c++ boost-devel
 
 On other distros I'm not sure - please let us know!
 
@@ -147,7 +160,15 @@ cd build
 cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF
 make   # this also takes some time
 
-3. Build Ready:
+3. Install Boost
+
+Follow instructions at http://boost.org or elsewhere, depending on your preferred tools.
+
+E.g. with homebrew: 
+
+brew install boost
+
+4. Build Ready:
 
 cd ~   # or some other directory
 git clone https://github.com/GollyGang/ready.git

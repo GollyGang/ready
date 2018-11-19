@@ -79,7 +79,7 @@ class Property : public XML_Object
 /// A set of Property instances that can be saved/loaded to/from XML.
 class Properties : public XML_Object
 {
-    public: 
+    public:
 
         Properties(std::string set_name) : XML_Object(NULL),set_name(set_name) {}
         void OverwriteFromXML(vtkXMLDataElement* node);
@@ -92,9 +92,10 @@ class Properties : public XML_Object
         void AddProperty(Property p);
         bool IsProperty(const std::string& name);
         void DeleteAllProperties() { this->properties.clear(); }
+        void SetDefaultRenderSettings();
 
     protected:
-    
+
         std::vector<Property> properties;
         std::string set_name; ///< used for saving to XML
 };
