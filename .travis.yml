@@ -17,19 +17,12 @@ matrix:
     - os: osx
       before_install:
         - brew install vtk wxmac boost
-  allow_failures:
     - os: windows
       before_install:
         - choco install wxwidgets boost-msvc-12
-        - pushd .
-        - wget https://www.vtk.org/files/release/8.1/VTK-8.1.2.zip
-        - 7z x VTK-8.1.2.zip
-        - mkdir VTK_build
-        - cd VTK_build
-        - cmake ../VTK-8.1.2
-        - cmake --build .
-        - CMAKE_HINTS=-DVTK_DIR=$PWD
-        - popd
+        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
+        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
+        - CMAKE_HINTS=-DVTK_DIR=$PWD/VTK
 
 branches:
   only:
