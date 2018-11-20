@@ -27,11 +27,11 @@ matrix:
         - 7z x -oWX -y wxWidgets-3.1.1-headers.7z
         - 7z x -oWX -y wxMSW-3.1.1_vc140_Dev.7z
         - 7z x -oWX -y wxMSW-3.1.1_vc140_ReleaseDLL.7z
-        - wxWidgets_ROOT_DIR=$PWD/WX
-        - wxWidgets_LIB_DIR=$PWD/WX/lib/vc140_dll
+        - WX_HINT=-DwxWidgets_ROOT_DIR=$PWD/WX
+        - WX_LIB_HINT=-DwxWidgets_LIB_DIR=$PWD/WX/lib/vc140_dll
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - VTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+        - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
 
 branches:
   only:
@@ -40,6 +40,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake $VTK_HINT $WX_LIB_HINT ..
 
 script: make 
