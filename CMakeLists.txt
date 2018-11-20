@@ -339,8 +339,6 @@ FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
 
 IF( wxWidgets_FOUND )
   INCLUDE( ${wxWidgets_USE_FILE} )
-ELSE()
-  MESSAGE( FATAL_ERROR "Cannot build the executable without wxWidgets. Please set the wxWidgets variables." )
 ENDIF()
 
 if( WIN32 )
@@ -519,9 +517,11 @@ endif()
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
 target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
-# create GUI application
-add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
-target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
+if( wxWidgets_FOUND )
+  # create GUI application
+  add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
+  target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
+endif()
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle

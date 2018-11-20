@@ -16,20 +16,23 @@ matrix:
             - libboost-all-dev
     - os: osx
       before_install:
-        - brew install vtk wxmac boost
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install vtk wxmac boost
   allow_failures:
     - os: windows
       before_install:
-        - choco install wxwidgets boost-msvc-12
-        - pushd .
-        - wget https://www.vtk.org/files/release/8.1/VTK-8.1.2.zip
-        - 7z x VTK-8.1.2.zip
-        - mkdir VTK_build
-        - cd VTK_build
-        - cmake ../VTK-8.1.2
-        - cmake --build .
-        - CMAKE_HINTS=-DVTK_DIR=$PWD
-        - popd
+        - choco install boost-msvc-12 opencl-intel-cpu-runtime
+        - mkdir WX
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxWidgets-3.1.1-headers.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_Dev.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_ReleaseDLL.7z
+        - 7z x -oWX -y wxWidgets-3.1.1-headers.7z
+        - 7z x -oWX -y wxMSW-3.1.1_vc140_Dev.7z
+        - 7z x -oWX -y wxMSW-3.1.1_vc140_ReleaseDLL.7z
+        - WX_HINT=-DwxWidgets_ROOT_DIR=$PWD/WX
+        - WX_LIB_HINT=-DwxWidgets_LIB_DIR=$PWD/WX/lib/vc140_dll
+        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
+        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
+        - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
 
 branches:
   only:
@@ -38,6 +41,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $CMAKE_HINTS ..
+    - cmake $VTK_HINT $WX_LIB_HINT ..
 
 script: make 
