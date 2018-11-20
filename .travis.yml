@@ -17,6 +17,7 @@ matrix:
     - os: osx
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install vtk wxmac boost
+  allow_failures:
     - os: windows
       before_install:
         - choco install boost-msvc-12 opencl-intel-cpu-runtime
