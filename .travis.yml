@@ -19,7 +19,7 @@ matrix:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install vtk wxmac boost
     - os: windows
       before_install:
-        - choco install boost-msvc-12
+        - choco install boost-msvc-12 opencl-intel-cpu-runtime
         - mkdir WX
         - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxWidgets-3.1.1-headers.7z
         - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_Dev.7z
