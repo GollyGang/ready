@@ -36,7 +36,8 @@ B) Build wxWidgets:
 C) Build Boost:
  - Follow instructions at http://boost.org and build with static runtime:
     bootstrap
-    .\b2 link=static runtime-link=static
+    b2 -j8 toolset=msvc-14.0 address-model=64 architecture=x86 link=static threading=multi runtime-link=static --build-type=complete stage
+    (example for 64-bit build using VS2015)
 
 D) Build Ready:
  - Run CMake and make a separate build folder for Ready.
@@ -86,7 +87,8 @@ B) Build wxWidgets:
 C) Build Boost:
  - Follow instructions at http://boost.org and build with static runtime:
     bootstrap
-    .\b2 link=static runtime-link=static
+    b2 -j8 toolset=msvc-14.0 address-model=64 architecture=x86 link=static threading=multi runtime-link=static --build-type=complete stage
+    (example for 64-bit build using VS2015)
 
 D) Build Ready:
  - Open a 32/64-bit Visual Studio command prompt and type: cmake-gui
