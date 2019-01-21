@@ -15,7 +15,7 @@
             int num_neighbors = 0;
             for(int i = 0; i &lt; max_neighbors; i++)
             {
-                num_neighbors += a_in[neighbor_indices[offset+i]] &gt; 0.5f ? 1 : 0;
+                num_neighbors += (neighbor_weights[offset+i] &gt; 0.0f &amp;&amp; a_in[neighbor_indices[offset+i]] &gt; 0.5f ) ? 1 : 0;
             }
             a_out[index_x] = (num_neighbors == 3) ? 1.0f : 0.0f;
         }
@@ -24,16 +24,8 @@
     <initial_pattern_generator apply_when_loading="true" zero_first="true">
       <overlay chemical="a">
         <overwrite/>
-        <constant value="0"/>
-        <everywhere/>
-      </overlay>
-      <overlay chemical="a">
-        <overwrite/>
         <white_noise low="0" high="1"/>
-        <rectangle>
-          <point3D x="0.1" y="0.1" z="0.1"/>
-          <point3D x="0.9" y="0.9" z="0.9"/>
-        </rectangle>
+        <everywhere/>
       </overlay>
     </initial_pattern_generator>
     <render_settings>
