@@ -524,9 +524,9 @@ AbstractRD* MakeNewFaceCentredCubicHoneycomb(const bool is_opencl_available, con
 
     int side;
     {
-        const int N_CHOICES = 3;
-        int choices[N_CHOICES] = { 5,10,20 };
-        int cells[N_CHOICES] = { 500,4000,32000 };
+        const int N_CHOICES = 4;
+        int choices[N_CHOICES] = { 5,10,15,20 };
+        int cells[N_CHOICES] = { 500,4000,13500,32000 };
         wxString descriptions[N_CHOICES];
         for (int i = 0; i<N_CHOICES; i++)
             descriptions[i] = wxString::Format("%d cells", cells[i]);
