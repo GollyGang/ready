@@ -156,6 +156,7 @@ set( PATTERN_FILES
   Patterns/CellularAutomata/PenroseTilings/Goucher_loops.vtu
   Patterns/CellularAutomata/Salt/salt2D_demo.vti
   Patterns/CellularAutomata/Salt/salt3D_circular330.vti
+  Patterns/CellularAutomata/FCC3333/random.vtu
   Patterns/Yang2002/Yang_1.vti    Patterns/Yang2002/Yang_2b.vti  Patterns/Yang2002/Yang_2c.vti
   Patterns/Yang2002/Yang_2d.vti   Patterns/Yang2002/Yang_3a.vti  Patterns/Yang2002/Yang_3b.vti
   Patterns/Yang2002/Yang_3c.vti   Patterns/Yang2002/Yang_3d.vti  Patterns/Yang2002/Yang_4.vti
