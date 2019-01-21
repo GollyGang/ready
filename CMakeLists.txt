@@ -20,9 +20,11 @@
 cmake_minimum_required( VERSION 2.6 )
 cmake_policy( SET CMP0003 NEW )
 if(POLICY CMP0043)
-  # policy not known to older versions ...
   cmake_policy(SET CMP0043 NEW)
-endif(POLICY CMP0043)
+endif()
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
 
 project( Ready )
 
@@ -335,7 +337,7 @@ elseif(UNIX)
 endif()
 
 # wxWidgets is required to build the project
-FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base )
+FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
 
 IF( wxWidgets_FOUND )
   INCLUDE( ${wxWidgets_USE_FILE} )
