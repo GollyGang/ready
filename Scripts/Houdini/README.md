@@ -1,19 +1,16 @@
-Rdy Houdini
-===============================================
+# Rdy Houdini
 
-==About==
+## About
 
 'Rdy Houdini' is a set of Houdini Digital Assets (HDAs) that import Ready VTI files into Houdini, as a 2D Volume/voxel-based Dop object and Gas OpenCL-based Solver. It mostly imports VTI's that use Formula mode, and a couple that use Full Kernel mode have worked as well (so far, more supported RD types TBA).
 
 The hdanc files will ship with Ready, and they rely on new revisions to the 'rdy' command binary, which will soon be available in an official Ready release.
 
-
-==Pre-Release==
+### Pre-Release
 
 Before the new rdy revisions are released in a Ready release you can still clone the github repo and build rdy yourself, and this should hopefully be no way near as hard (or have so many dependencies) as building the old readyHoudini plugin used to be, thank goodness! After that there is a 'Ready Install Path' parameter on the 'RD Object' node in Houdini that you can point to the root of the Ready/rdy build to find the rdy binary.
 
-
-==Operation==
+## Operation
 
 These HDAs call the rdy command (via the python subprocess module) to extract the properties of a ready simulation-scene (VTI) file, and then use the output of the command to import the simulation as a native Houdini simulation setup that does the RD stages using Gas OpenCL Dop nodes. Once imported, the scene should still function whether the VTI is present or not (ie it should be directly shareable with others, as long as the HDAs are embedded (see the Config Tab on Asset Manager in Houdini for Embedding options)). 
 
@@ -33,8 +30,7 @@ Some settings are provided (on the 'RD Object' node) that you can use to perturb
 
 Extra fields can also be applied at each substep of the simulation if desired. For example you could 'collide' the (2D) sim with another Houdini object by building a 2D collision mask volume from it that has the same dimensions and resolution as the sim, then importing the field to Dops and tuning-in the application of it to the reagents. There are many interesting possibilities here!
 
-
-==Getting Started==
+## Getting Started
 
 To get started with Rdy Houdini, first make sure that you have a recent (at least 17.0) version of Houdini installed: The free/learning (Apprentice), Indie or Education editions (which you can get from www.sidefx.com) are a perfect host for the present state of these tools. Indeed the supplied digital assets are all hdanc format (Houdini Digital Asset Non-Commercial), so if you import them in a commercial Houdini session it will become non-commercial. 
 
@@ -44,30 +40,27 @@ Once Houdini is running (or perhaps do this before you run it, read ahead..), ge
 
 Alternatively, you can also install the HDAs by using 'File->Import->Houdini Digital Asset' to import the hdanc files from the Ready path directly into the current scene, one file at a time. This is not the recommended method because it will only make the HDAs available in the current hipnc file (and its ancestors) - it will not make the HDAs available to you in any new hipnc files. If you do install them in this way, you might want to think about turning on the option to embed HDAs (Asset Manager->Config) so that the scene still functions in the case that the Ready HDA path is not present for any reason in the future, or if you want to be able to send the scene to someone.
 
-
-==HDA Code==
+## HDA Code
 
 The main code that drives the Rdy Houdini HDAs is contained in the 'HDA Module' sections of their type properties. To see or modify the code, check out the Scripts tab. (On the node's right-click menu, choose 'Type Properties..' theb go to the 'Scripts' Tab). If you find that you want to change anything, you can unlock the HDA definition, and edit the code, press apply, and then save (and ideally lock) the HDA. (To allow editing of an HDA, right-click on the node, and select 'Allow Editing of Contents'). You will be prompted about unlocking the definition if you try to apply changes from the 'Edit Type Properties' window if the definition is locked. You must make sure that the actual hdanc files are not read-only in either case!
 
+## Using the Digital Assets
 
-==Using the Digital Assets==
+Once you have the HDAs installed into Houdini, in /obj (or in an Object context) you should be able to drop a new node of type 'RD Template'. Drop one of these and press the 'Extract' button on its parameter pane to extract its contents and turn it into an editable Subnet, so that the settings can be adjusted.
 
-Once you have the HDAs installed into Houdini, in /obj (or any Object context) you should be able to drop a new node of type 'RD Template'. Drop one of these and press the 'Extract' button on its parameters to turn it into an editable Subnet. 
+The result will contain the following *Object* nodes:
 
-The result should contain:
+- A Dopnet called *dopnet_rd* - This contains the RD simulation.
+- A Geometry called *geo_mergeSim* - In which the sim is merged back into Sops and made ready for display and/or rendering or whatever else you want to cook up with it!
+- A Matnet called *matnet_basicShader* - That has a 'Constant Smoke' Material inside that is used for Mantra rendering.
+- A Camera called *cam_ortho_unit* - To view the sim through, it is set to orthographic view and points directly at the sim.
+- A Ropnet called *ropnet_outputs* - Containing some examples of how to use the above nodes to produce geometry or image file outputs.
 
+The best view of the sim is not from inside the dopnet (where it generally looks very bright, grayscale and data-y). However inside the dopnet is where the central control is (on the rd_object node), so before diving in, you may wish to --pin the view-- of the Scene Viewer when the post-processed sim geo is visible (for example in the root of the 'rd_template' Subnet), before diving into the dopnet.
 
-* A Dopnet Object - Containing the RD simulation.
+To tune the look of the resulting simulation, you can look to the node called 'rd_object_post_process' inside 'geo_mergeSim' in the template.
 
-* A Geometry Object - In which the sim is merged back into Sops and made ready for display and/or rendering or whatever else you want to cook up!
-
-* A Light - So that the Mantra render is not black.
-
-* A Camera - Orthographic, pointing directly at, and showing the result of the whole simulation (if square, which is the default).
-
-* A Ropnet - Containing some examples of how to use the above nodes to produce geometry or image file output.
-
-====Loading VTI Files====
+### Loading VTI Files
 
 If you want to load new VTI files you will find a 'VTI File' parameter on the 'RD Object' node inside dop subnet: 'dopnet_rd' in the template.
 
@@ -78,35 +71,35 @@ To load a new VTI file, press the 'File Chooser' button to the right of the VTI 
 Not all types of VTI will work yet, only ones that define 2D-voxel simulations that use 'Formula' mode, and a few (definitely not all!) that use 'Full Kernel' mode. We are planning to eventually support more Ready VTI types. It would also be nice to be able to write back to VTI from Houdini too, but currently it is exclusively a VTI importer, not an exporter.
 
 
-====Load VTIs When on First Frame Of Sim====
+### Load VTIs When on First Frame Of Sim
 
 At the moment it is important to load new VTIs when you are on the first frame of the simulation (in other words after rewinding!). If you forget to do that and things are not working, you may be able to first rewind and then use the 'Force Reload' button to hopefully help get things working again. There are still probably buggy edge-cases so no guarantees about what it will load or do.
 
 
-==Node Types==
+##Node Types
 
 The node-types provided by the HDAs are:
 
-=== RD Template Object===
+### RD Template Object
 
 The 'RD Template' Object can be dropped and the 'Unpack' button pressed to turn it into a regular unlocked subnet.
 
 
-=== RD Object Dop ===
+### RD Object Dop
 
 Defined by Dop_rd_object.hdanc
 
 This object manages the importing of VTI file data and the creation of the initial Dop Object (that has type 'rd_object'). The rdy command is called when a new VTI is picked and its info is imported, but the output of it is cached otherwise (unless forced to reload). Several convenience functions are built in here as well, such as the ability to re-aquire the min/max range-fitting values from the reagent fields on a linked 'RD Post Process' Sop downstream (this can also be done on the post-process by pressing the 'Get Maxes and Mins' button.)
 
 
-=== RD Solver Dop ===
+### RD Solver Dop
 
 Defined by Dop_rd_object.hdanc
 
 This Dop node implements the retrieval of the initial-state on the first frame of the sim, as well as switching between formula mode and full-kernel mode depending on the loaded VTI.
 
 
-=== RD Post Process Sop ===
+### RD Post Process Sop
 
 Defined by Sop_rd_object_post_process.hdanc
 
@@ -115,6 +108,6 @@ This node is where the reagent values from the simulation can be remapped (to a 
 It also makes a second version of the fields with increased resolution (by scale, default 4x using any of the Volume Resample filters) which you can get from the second output of the RD Post Process Sop.
 
 
-== Help! ==
+## Help!
 
-If you are motivated but got stuck somewhere, totally send me an email!: gdanzo@gmail.com
+If you are motivated to play with this but got stuck somewhere, totally send me an email!: gdanzo@gmail.com
