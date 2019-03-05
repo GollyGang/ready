@@ -107,6 +107,9 @@ This node is where the reagent values from the simulation can be remapped (to a 
 
 It also makes a second version of the fields with increased resolution (by scale, default 4x using any of the Volume Resample filters) which you can get from the second output of the RD Post Process Sop.
 
+### Tooltips
+
+Help has been added to nearly all of the parameters of the provided Digital Assets, you can hover over each parameter label to see it.
 
 ## Help!
 
