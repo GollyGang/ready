@@ -76,7 +76,7 @@ Not all types of VTI will work yet, only ones that define 2D-voxel simulations t
 At the moment it is important to load new VTIs when you are on the first frame of the simulation (in other words after rewinding!). If you forget to do that and things are not working, you may be able to first rewind and then use the 'Force Reload' button to hopefully help get things working again. There are still probably buggy edge-cases so no guarantees about what it will load or do.
 
 
-##Node Types
+## Node Types
 
 The node-types provided by the HDAs are:
 
