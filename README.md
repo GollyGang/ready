@@ -32,6 +32,7 @@ Press coverage:
 
 [Citations:](https://scholar.google.com/scholar?oi=bibs&hl=en&cites=17960091338602715353)
 
+  * Thies H. Büscher, Mikhail Kryuchkov, Vladimir L. Katanaev and Stanislav N. Gorb ["Versatility of Turing patterns potentiates rapid evolution in tarsal attachment microstructures of stick and leaf insects (Phasmatodea)"](https://doi.org/10.1098/rsif.2018.0281) J. R. Soc. Interface 15, 2018.
   * David H. Ackley , Elena S. Ackley. ["The ulam Programming Language for Artificial Life"](http://www.mitpressjournals.org/doi/pdf/10.1162/ARTL_a_00212) Artificial Life. Nov 2016, Vol. 22, No. 4: 431-450.
   * Kawamata I., Yoshizawa S., Takabatake F., Sugawara K., Murata S. ["Discrete DNA Reaction-Diffusion Model for Implementing Simple Cellular Automaton"](https://link.springer.com/chapter/10.1007/978-3-319-41312-9_14) In: Amos M., CONDON A. (eds) Unconventional Computation and Natural Computation. UCNC 2016. Lecture Notes in Computer Science, vol 9726. Springer, Cham.
   * Shigeki Akiyama and Katsunobu Imai, ["The corona limit of Penrose tilings is a regular decagon"](http://math.tsukuba.ac.jp/~akiyama/papers/automata2016.pdf), Lecture Note in Computer Science 9664, M. Cook and T. Neary (Eds.): AUTOMATA 2016, pp. 35–48, 2016. DOI: 10.1007/978-3-319-39300-1
