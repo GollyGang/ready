@@ -19,13 +19,20 @@ For questions, [join our mailing list](https://groups.google.com/forum/#!forum/r
 
 Screenshots:
 
-![![](https://lh4.googleusercontent.com/-_M9NwfsZOEU/Uo3nISJFpXI/AAAAAAAAIQE/8dt59x8IDvc/s144/yang2006.png)](https://lh4.googleusercontent.com/-_M9NwfsZOEU/Uo3nISJFpXI/AAAAAAAAIQE/8dt59x8IDvc/s144/yang2006.png)
-![![](https://lh3.googleusercontent.com/-tbp9Y42reJg/Uo3nFECRvkI/AAAAAAAAIPI/0vv38WYrLSU/s144/mccabe.png)](https://lh3.googleusercontent.com/-tbp9Y42reJg/Uo3nFECRvkI/AAAAAAAAIPI/0vv38WYrLSU/s144/mccabe.png)
-![![](https://lh5.googleusercontent.com/-jvk-BzbFNlU/Uo3nB1Qsl8I/AAAAAAAAIO0/GTilEpY19GY/s144/brusselator.png)](https://lh5.googleusercontent.com/-jvk-BzbFNlU/Uo3nB1Qsl8I/AAAAAAAAIO0/GTilEpY19GY/s144/brusselator.png)
-![![](https://lh5.googleusercontent.com/-VwhGWIHCfxw/Uo3nH-SAaxI/AAAAAAAAIP8/mpzSvTXUxxw/s144/wills_orbits.png)](https://lh5.googleusercontent.com/-VwhGWIHCfxw/Uo3nH-SAaxI/AAAAAAAAIP8/mpzSvTXUxxw/s144/wills_orbits.png)
-[![](https://lh6.googleusercontent.com/-IR42YCbSsqw/UCKFmoEFkpI/AAAAAAAAF8A/UblNhiOtHUE/s144/s1.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324570878481042)
-[![](https://lh3.googleusercontent.com/-1xtb7dTldiI/UCKFmpVe0kI/AAAAAAAAF8A/ZF4En9R1fDo/s144/s10.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324571219874370)
-[![](https://lh3.googleusercontent.com/-ABZodETVJQU/UCKFm1SN6qI/AAAAAAAAF8A/Ci97Nk3NCtE/s144/s2.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324574427409058) [![](https://lh6.googleusercontent.com/-3dUT0moQmH4/UCKFnQn-yAI/AAAAAAAAF8A/Lvchlc1rM0g/s144/s3.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324581766449154) [![](https://lh4.googleusercontent.com/-lehLT1C23bA/UCKFp816pRI/AAAAAAAAF8A/8rBqL9faxLs/s144/s4.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324627995796754) [![](https://lh4.googleusercontent.com/-AYzUA8X_bvg/UCKFoJW95GI/AAAAAAAAF8A/M8XwkJd7Bas/s144/s5.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324596995908706) [![](https://lh3.googleusercontent.com/-44R8OEzf5tM/UCKFqosqQgI/AAAAAAAAF8A/m66wxKJEU1Y/s144/s6.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324639768134146) [![](https://lh4.googleusercontent.com/-sEO5LXvey7A/UCKFot3bczI/AAAAAAAAF8A/hL-YSctyIVw/s144/s7.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324606795739954) [![](https://lh6.googleusercontent.com/-_bn7sCqhWsk/UCKFpOJLHrI/AAAAAAAAF8A/TlwMnccOfGI/s144/s8.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324615460101810) [![](https://lh5.googleusercontent.com/-s5MB5t_28VM/UCKFtbXdluI/AAAAAAAAF8A/JXuQDNxCyhQ/s144/s9.png)](https://picasaweb.google.com/110214848059767137292/Ready04Screenshots#5774324687729170146)
+<img src="https://user-images.githubusercontent.com/647092/69561331-1ab03f00-0fa5-11ea-9b8e-d669a6211633.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561501-64008e80-0fa5-11ea-9181-3b34bff17bd9.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561550-7975b880-0fa5-11ea-82e2-8a9da40d1606.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561588-8e524c00-0fa5-11ea-979d-8a4c221badb0.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561625-a2964900-0fa5-11ea-987b-90a2bf2fc907.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561697-bb066380-0fa5-11ea-957a-567808338c44.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561739-cd809d00-0fa5-11ea-9ff5-8c0c9aa32fcc.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561773-df624000-0fa5-11ea-84d2-4d816739d071.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561881-0e78b180-0fa6-11ea-9a14-0e1705e454ff.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561922-1f292780-0fa6-11ea-913c-445897712915.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69561972-30723400-0fa6-11ea-8ba3-058085fba7f3.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69562023-43850400-0fa6-11ea-8c66-b5cea5bcc1ac.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69562068-55ff3d80-0fa6-11ea-8a7e-79d86ef80abf.png" height="100px"></img>
+<img src="https://user-images.githubusercontent.com/647092/69562095-66171d00-0fa6-11ea-966f-730fb5126bc2.png" height="100px"></img>
 
 Press coverage:
   * New Scientist, August 2012: "[First gliders navigate ever-changing Penrose universe](http://www.newscientist.com/article/dn22134-first-gliders-navigate-everchanging-penrose-universe.html)"
