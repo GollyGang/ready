@@ -23,7 +23,7 @@
     <key>CFBundleShortVersionString</key>
     <string>VERSION</string>
     <key>CFBundleGetInfoString</key>
-    <string>Ready version VERSION, Copyright 2011-2018 The Ready Bunch</string>
+    <string>Ready version VERSION, Copyright 2011-2019 The Ready Bunch</string>
     <key>LSRequiresCarbon</key>
     <true/>
     <key>CFBundleDocumentTypes</key>
