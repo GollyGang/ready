@@ -28,7 +28,7 @@ endif()
 
 project( Ready )
 
-set( READY_VERSION 0.8.1 )   # check matches Help/about.html
+set( READY_VERSION 0.9 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
