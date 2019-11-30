@@ -83,6 +83,7 @@ using namespace std;
 #include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
+#include <vtkTexture.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkThreshold.h>
 #include <vtkTransform.h>
