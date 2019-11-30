@@ -123,8 +123,6 @@
   EVT_SIZE        (wxVTKRenderWindowInteractor::OnSize)
 END_EVENT_TABLE()
 
-vtkInstantiatorNewMacro(wxVTKRenderWindowInteractor)
-
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
 static int wxvtk_attributes[]={
   WX_GL_DOUBLEBUFFER,
