@@ -190,6 +190,15 @@ set( PATTERN_FILES
   Patterns/Experiments/DanWills/orbits_epochs.vti
   Patterns/Experiments/DanWills/grayscott-historyWaveDC_dualPhaseSolitonWormFlow.vti
   Patterns/Experiments/DanWills/heat-equation-boiling-history-wave_glidersUnstable.vti
+  Patterns/Experiments/DanWills/grayscott-historyWaveDC_fibrousHistoryFill_wavePartition_init2.vti
+  Patterns/Experiments/DanWills/grayscott-historyWave_ddd_bubbleDynasties_init.vti
+  Patterns/Experiments/DanWills/grayscott-historyWave_temporalWeb_mgsz_init.vti
+  Patterns/Experiments/DanWills/grayscott-withWaveCoupling_ddd_cauli_init.vti
+  Patterns/Experiments/DanWills/grayscott-evolvingMask_ddd_frothierEchoes_init.vti
+  Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms-wiggletrains_init.vti
+  Patterns/Experiments/DanWills/orbits_nova_ddd_chicken_init.vti
+  Patterns/Experiments/DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti
+  Patterns/Experiments/DanWills/orbits_ddd_epochs_init.djw.vti
   Patterns/Experiments/SimonGladman/vermiformSolitons.vti
   Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/CornusAmmonis/MandelbrotWorms.vti
@@ -287,6 +296,11 @@ set( OTHER_FILES
   resources/Cursors/brush-cursor.png
   resources/Cursors/picker-cursor.png
   Scripts/Blender/import_obj_sequence.py
+  Scripts/Houdini/Dop_rd_object.hdanc
+  Scripts/Houdini/Dop_rd_solver.hdanc
+  Scripts/Houdini/Object_rd_template_object.hdanc
+  Scripts/Houdini/README.md
+  Scripts/Houdini/Sop_rd_object_post_process.hdanc
 )
 
 #-------------------------------------------VTK----------------------------------------------
