@@ -1,12 +1,18 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
-  
+
     <description>
-        Self-replicating spots in one dimension. This example uses an inbuilt implementation
-        (currently only Gray-Scott is available) and so the formula cannot be edited.
+        Self-replicating spots in one dimension. The Gray-Scott formula is:
+
+        delta_a = D_a * laplacian_a - a*b*b + F*(1-a)&lt;br&gt;
+        delta_b = D_b * laplacian_b + a*b*b - (F+K)*b
+
+        Change the parameters below to see how they affect the pattern.
+
+        This example uses a hard-coded implementation and so the formula cannot be edited. In other patterns you can edit the formula as well.
     </description>
-          
+
     <rule type="inbuilt" name="Gray-Scott">
       <param name="timestep">1.0</param>
       <param name="D_a">0.082</param>
@@ -14,11 +20,16 @@
       <param name="k">0.06</param>
       <param name="F">0.035</param>
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
         <overlay chemical="a">
             <overwrite />
             <constant value="1" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="b">
+            <overwrite />
+            <constant value="0" />
             <everywhere />
         </overlay>
         <overlay chemical="b">
@@ -38,11 +49,11 @@
             </rectangle>
         </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
         <active_chemical value="b" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 127 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 0 0 0">
