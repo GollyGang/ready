@@ -43,10 +43,7 @@
         <overlay chemical="a">
             <subtract />
             <other_chemical chemical="b" />
-            <rectangle>
-                <point3D x="0.2" y="0.2" z="0.6" />
-                <point3D x="0.4" y="0.5" z="0.8" />
-            </rectangle>
+            <everywhere />
         </overlay>
     </initial_pattern_generator>
 
