@@ -120,6 +120,7 @@
       <low value="0" />
       <high value="0.45" />
       <contour_level value="0.25" />
+      <invert_contour_cap value="true" />
       <slice_3D_axis value="z" />
       <slice_3D_position value="0.05" />
       <timesteps_per_render value="1000" />

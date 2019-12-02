@@ -150,6 +150,8 @@ void Properties::SetDefaultRenderSettings( )
     this->AddProperty( Property("vertical_scale_1D",30.0f) );
     this->AddProperty( Property("vertical_scale_2D",15.0f) );
     this->AddProperty( Property("contour_level",0.25f) );
+    this->AddProperty( Property("cap_contour",true) );
+    this->AddProperty( Property("invert_contour_cap",false) );
     this->AddProperty( Property("use_wireframe",false) );
     this->AddProperty( Property("show_cell_edges",false) );
     this->AddProperty( Property("show_bounding_box",true) );
