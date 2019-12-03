@@ -24,6 +24,16 @@
 // wxWidgets:
 #include <wx/clipbrd.h>     // for wxTheClipboard
 
+// VTK:
+#include <vtkBMPReader.h>
+#include <vtkDataArray.h>
+#include <vtkImageData.h>
+#include <vtkImageReader2.h>
+#include <vtkJPEGReader.h>
+#include <vtkPNGReader.h>
+#include <vtkPointData.h>
+#include <vtkSmartPointer.h>
+
 // -----------------------------------------------------------------------------
 
 void Note(const wxString& msg)
@@ -223,6 +233,8 @@ wxString FormatFloat(float f,int mdp)
     return result;
 }
 
+// -----------------------------------------------------------------------------
+
 wxString FileNameToString(const wxFileName& filename)
 {
     // if unicode characters in path, use the short form
@@ -232,3 +244,26 @@ wxString FileNameToString(const wxFileName& filename)
     }
     return filename.GetShortPath();
 }
+
+// -----------------------------------------------------------------------------
+
+void GetScalarRangeFromImage(wxFileName filename, double range[2])
+{
+    wxBusyCursor busy;
+
+    // load the image just to retrieve the input range
+    vtkSmartPointer<vtkImageReader2> reader;
+    wxString ext = filename.GetExt();
+    if (ext.IsSameAs("png", false)) reader = vtkSmartPointer<vtkPNGReader>::New();
+    else if (ext.IsSameAs("jpg", false) || ext.IsSameAs("jpeg", false)) reader = vtkSmartPointer<vtkJPEGReader>::New();
+    else if (ext.IsSameAs("bmp", false)) reader = vtkSmartPointer<vtkBMPReader>::New();
+    else {
+        wxMessageBox(_("Unsupported extension: ") + ext, _("Error reading image file"), wxICON_ERROR);
+        return;
+    }
+    reader->SetFileName(FileNameToString(filename).mb_str());
+    reader->Update();
+    reader->GetOutput()->GetPointData()->GetScalars()->GetRange(range);
+}
+
+// -----------------------------------------------------------------------------

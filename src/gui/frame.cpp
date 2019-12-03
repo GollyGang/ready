@@ -66,6 +66,7 @@ using namespace std;
 #include <vtkBMPReader.h>
 #include <vtkCellArray.h>
 #include <vtkCellPicker.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageReader2.h>
 #include <vtkImageResize.h>
@@ -2789,16 +2790,31 @@ void MyFrame::OnReloadFromDisk(wxCommandEvent &event)
 
 void MyFrame::OnImportImage(wxCommandEvent &event)
 {
+    wxFileDialog opendlg(this,
+        _("Choose an image file to import"),
+        wxEmptyString,
+        wxEmptyString,
+        _("Image files (*.jpg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp"),
+        wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (opendlg.ShowModal() != wxID_OK)
+        return;
+
+    double scalar_range[2];
+    GetScalarRangeFromImage(opendlg.GetPath(), scalar_range);
+
     ImportImageDialog dlg(this,
+                          opendlg.GetPath(),
                           this->system->GetNumberOfChemicals(),
+                          IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical()),
+                          scalar_range[0],
+                          scalar_range[1],
                           this->render_settings.GetProperty("low").GetFloat(),
                           this->render_settings.GetProperty("high").GetFloat());
     if (dlg.ShowModal() != wxID_OK) return;
     wxFileName filename = dlg.image_filename;
-    const char* filename_cstr = FileNameToString(filename).mb_str();
-    wxString ext = filename.GetExt();
 
     vtkSmartPointer<vtkImageReader2> reader;
+    wxString ext = filename.GetExt();
     if (ext.IsSameAs("png", false)) reader = vtkSmartPointer<vtkPNGReader>::New();
     else if (ext.IsSameAs("jpg", false) || ext.IsSameAs("jpeg", false)) reader = vtkSmartPointer<vtkJPEGReader>::New();
     else if (ext.IsSameAs("bmp", false)) reader = vtkSmartPointer<vtkBMPReader>::New();
@@ -2806,7 +2822,7 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
         wxMessageBox(_("Unsupported extension: ") + ext, _("Error reading image file"), wxICON_ERROR);
         return;
     }
-    reader->SetFileName(filename_cstr);
+    reader->SetFileName(FileNameToString(filename).mb_str());
 
     // for now we convert the image to grayscale
     vtkSmartPointer<vtkImageLuminance> to_gray = vtkSmartPointer<vtkImageLuminance>::New();
