@@ -33,7 +33,7 @@ B) Build wxWidgets:
 C) Build Boost:
  - Open a 64-bit command prompt, e.g. "x64 Native Tools Command Prompt for VS 2019":
     bootstrap
-    b2 -j8 toolset=msvc-14.2 address-model=64 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a stage
+    b2 -j8 toolset=msvc-14.2 address-model=64 architecture=x86 link=static threading=multi runtime-link=static variant=release,debug --build-type=complete -a stage
     (example for 64-bit build using VS2019)
     (ignore that the output says "default address-model: 32-bit")
 

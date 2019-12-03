@@ -137,6 +137,7 @@ set( PATTERN_FILES
   Patterns/Gray-Scott/Lesmes_noisy.vti
   Patterns/Gray-Scott/noisy_solitons_mitosis.vti
   Patterns/Gray-Scott/parameter-map.vti
+  Patterns/Gray-Scott/parameter-map_3D.vti
   Patterns/Gray-Scott/Pearson1993.vti
   Patterns/Gray-Scott/self-replicating_spots.vti
   Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti

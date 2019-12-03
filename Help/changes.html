@@ -16,19 +16,25 @@
 <li>Mac app requires Mac OS 10.9 or later. Retina screens are now supported (no more fuzzy text).
 <li>Fix: Option to show multiple chemicals now works with 3D images and meshes too.
 <li>Improvement: The rdy command line utility accepts more arguments and can print VTI contents in text form for pipeing to other apps.
+<li>New <a href="formats.html#render_settings">render settings</a>:
+  <ul>
+    <li><b>cap_contour</b> Whether to close the holes where the contours meet the boundary.
+    <li><b>invert_contour_cap</b> If true, closes the contour holes on the other side.
+  </ul>
 <li>New patterns:
   <ul>
     <li><a href="open:Patterns/CellularAutomata/FCC3333/random.vtu">FCC3333/random.vtu</a>, a simple rule on a rhombic dodecahedral honeycomb.
     <li><a href="open:Patterns/CellularAutomata/FCC3333/glider.vtu">FCC3333/glider.vtu</a>, a glider in that rule.
-	<li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWaveDC_fibrousHistoryFill_wavePartition_init2.vti">DanWills/grayscott-historyWaveDC_fibrousHistoryFill_wavePartition_init2.vti</a>, A hot mess of gray-scott-ness (augmented with history and wave).
-	<li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWave_ddd_bubbleDynasties_init.vti">DanWills/grayscott-historyWave_ddd_bubbleDynasties_init.vti</a>, Complex waves and bubble-spiral-dynasties.
-	<li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWave_temporalWeb_mgsz_init.vti">DanWills/grayscott-historyWave_temporalWeb_mgsz_init.vti</a>, Dynamic organic-looking-web formation (through budding) and slightly spirally propagation.
-	<li><a href="open:Patterns/Experiments/DanWills/grayscott-withWaveCoupling_ddd_cauli_init.vti">DanWills/grayscott-withWaveCoupling_ddd_cauli_init.vti</a>, Branchy dividing solitons/short wavefronts leave super-diffuse and wave-attenuated 'history' wakes.
-	<li><a href="open:Patterns/Experiments/DanWills/grayscott-evolvingMask_ddd_frothierEchoes_init.vti">DanWills/grayscott-evolvingMask_ddd_frothierEchoes_init.vti</a>, Soliton gliders form inside the active region and spread out, dividing continuously to fill the space. Once space is filled the solitons continue to propagate randomly, splitting and annihlating to maintain an overall density. The wave reagents are a bit 'frothy'.
-	<li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms-wiggletrains_init.vti">DanWills/grayscott-historyWave_fuseWorms-wiggletrains_init.vti</a>, Soliton gliders form from a subset of initial nucleation sites. Solitons continue to propagate through space whilst dividing and tending to follow existing soliton trails.
-	<li><a href="open:Patterns/Experiments/DanWills/orbits_nova_ddd_chicken_init.vti">DanWills/orbits_nova_ddd_chicken_init.vti</a>, Orbits-fractal-based formula showing a nice looking repeated structure-formation-and-destruction behaviour on a quite long (25k timesteps) cycle.
-	<li><a href="open:Patterns/Experiments/DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti">DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti</a>, Discovered while tweaking the Orbits (fractal-inspired) formula, this appears to almost emulate a discrete automata at the core of its continuous dynamics. Comparisons could be drawn to the 'star-wars' CA in golly, but a bit more spaceshippy.
-	<li><a href="open:Patterns/Experiments/DanWills/orbits_ddd_epochs_init.djw.vti">DanWills/orbits_ddd_epochs_init.djw.vti</a>, This Mandelbrot/Julia-step inspired formula and parameters shows some fascinating and bizarre behaviour where over a huge time period (150k timesteps) fields of 'stars' form, merge and expire and then are eventually re-generated in complex wavefronts.
+    <li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWaveDC_fibrousHistoryFill_wavePartition_init2.vti">DanWills/grayscott-historyWaveDC_fibrousHistoryFill_wavePartition_init2.vti</a>, A hot mess of gray-scott-ness (augmented with history and wave).
+    <li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWave_ddd_bubbleDynasties_init.vti">DanWills/grayscott-historyWave_ddd_bubbleDynasties_init.vti</a>, Complex waves and bubble-spiral-dynasties.
+    <li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWave_temporalWeb_mgsz_init.vti">DanWills/grayscott-historyWave_temporalWeb_mgsz_init.vti</a>, Dynamic organic-looking-web formation (through budding) and slightly spirally propagation.
+    <li><a href="open:Patterns/Experiments/DanWills/grayscott-withWaveCoupling_ddd_cauli_init.vti">DanWills/grayscott-withWaveCoupling_ddd_cauli_init.vti</a>, Branchy dividing solitons/short wavefronts leave super-diffuse and wave-attenuated 'history' wakes.
+    <li><a href="open:Patterns/Experiments/DanWills/grayscott-evolvingMask_ddd_frothierEchoes_init.vti">DanWills/grayscott-evolvingMask_ddd_frothierEchoes_init.vti</a>, Soliton gliders form inside the active region and spread out, dividing continuously to fill the space. Once space is filled the solitons continue to propagate randomly, splitting and annihlating to maintain an overall density. The wave reagents are a bit 'frothy'.
+    <li><a href="open:Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms-wiggletrains_init.vti">DanWills/grayscott-historyWave_fuseWorms-wiggletrains_init.vti</a>, Soliton gliders form from a subset of initial nucleation sites. Solitons continue to propagate through space whilst dividing and tending to follow existing soliton trails.
+    <li><a href="open:Patterns/Experiments/DanWills/orbits_nova_ddd_chicken_init.vti">DanWills/orbits_nova_ddd_chicken_init.vti</a>, Orbits-fractal-based formula showing a nice looking repeated structure-formation-and-destruction behaviour on a quite long (25k timesteps) cycle.
+    <li><a href="open:Patterns/Experiments/DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti">DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti</a>, Discovered while tweaking the Orbits (fractal-inspired) formula, this appears to almost emulate a discrete automata at the core of its continuous dynamics. Comparisons could be drawn to the 'star-wars' CA in golly, but a bit more spaceshippy.
+    <li><a href="open:Patterns/Experiments/DanWills/orbits_ddd_epochs_init.djw.vti">DanWills/orbits_ddd_epochs_init.djw.vti</a>, This Mandelbrot/Julia-step inspired formula and parameters shows some fascinating and bizarre behaviour where over a huge time period (150k timesteps) fields of 'stars' form, merge and expire and then are eventually re-generated in complex wavefronts.
+    <li><a href="open:Patterns/Gray-Scott/parameter-map_3D.vti">Gray-Scott/parameter-map_3D.vti</a>, A 3D version of the Gray-Scott parameter map, showing how the parameters affect the patterns generated in 3D.
   </ul>
 </ul>
 

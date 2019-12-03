@@ -2318,6 +2318,8 @@ void MyFrame::InitializeDefaultRenderSettings(Properties& props)
     props.AddProperty(Property("vertical_scale_1D",30.0f));
     props.AddProperty(Property("vertical_scale_2D",15.0f));
     props.AddProperty(Property("contour_level",0.25f));
+    props.AddProperty(Property("cap_contour",true));
+    props.AddProperty(Property("invert_contour_cap", false));
     props.AddProperty(Property("use_wireframe",false));
     props.AddProperty(Property("show_cell_edges",false));
     props.AddProperty(Property("show_bounding_box",true));
