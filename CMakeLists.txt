@@ -557,6 +557,9 @@ if( APPLE )
   # remove unreachable functions and data, and don't add debug info (reduces app size by about 12MB)
   target_link_libraries( ${APP_NAME} -Wl,-dead_strip -Wl,-S )
 
+  # horrible hack to avoid Undefined symbol "___isPlatformVersionAtLeast" using wxMac 3.1.3 on Mojave
+  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a" )
+
   # tell linker that we support Mac OS 10.9+
   set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.9" )
 endif()
