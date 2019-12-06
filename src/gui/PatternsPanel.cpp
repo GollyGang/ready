@@ -129,6 +129,11 @@ void PatternsPanel::BuildTree()
     wxTreeItemIdValue cookie;
     wxTreeItemId id = treectrl->GetFirstChild(root, cookie);
     if (id.IsOk()) treectrl->SelectItem(id);
+    
+    #if defined(__WXMAC__) && wxCHECK_VERSION(3,1,3)
+        // wxTR_HIDE_ROOT is needed to hide the "Sections" directory
+        treectrl->SetWindowStyle(wxTR_DEFAULT_STYLE | wxTR_HIDE_ROOT);
+    #endif
 }
 
 void PatternsPanel::OnTreeClick(wxMouseEvent& event)

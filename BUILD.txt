@@ -33,7 +33,7 @@ B) Build wxWidgets:
 C) Build Boost:
  - Open a 64-bit command prompt, e.g. "x64 Native Tools Command Prompt for VS 2019":
     bootstrap
-    b2 -j8 toolset=msvc-14.2 address-model=64 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a stage
+    b2 -j8 toolset=msvc-14.2 address-model=64 architecture=x86 link=static threading=multi runtime-link=static variant=release,debug --build-type=complete -a stage
     (example for 64-bit build using VS2019)
     (ignore that the output says "default address-model: 32-bit")
 
@@ -142,12 +142,12 @@ make package_source
 =========================== MacOS =================================
 
 1. Build wxWidgets (assuming you've downloaded and unpacked the source tar ball
-   for wxWidgets 3.0.2 from https://www.wxwidgets.org/downloads/):
+   for wxWidgets 3.1.3 from https://www.wxwidgets.org/downloads/):
 
-cd /path/to/wxWidgets-3.0.2
+cd /path/to/wxWidgets-3.1.3
 mkdir build-osx
 cd build-osx
-../configure --enable-unicode --disable-shared --with-osx_cocoa
+../configure --enable-unicode --disable-shared --with-osx_cocoa --with-macosx-version-min=10.9
 make   # take a nap, it'll be a while
 sudo make install
 
@@ -157,7 +157,7 @@ sudo make install
 cd /path/to/VTK-6.3.0
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF
+cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.9
 make   # this also takes some time
 
 3. Install Boost

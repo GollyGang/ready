@@ -26,6 +26,8 @@
     <string>Ready version VERSION, Copyright 2011-2019 The Ready Bunch</string>
     <key>LSRequiresCarbon</key>
     <true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
     <key>CFBundleDocumentTypes</key>
     <array>
           <dict>

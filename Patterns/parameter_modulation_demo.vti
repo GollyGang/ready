@@ -3,10 +3,14 @@
   <RD format_version="2">
     <description>
         Using an extra chemical (c) to modulate the parameters of a Gray-Scott system.
+
+        You can paint into chemical 'c' to change the behavior of the pattern.
+
+        Or use File > Import Image... and draw an image onto chemical 'c'.
     </description>
 
     <rule type="formula" name="Gray-Scott" wrap="0">
-        
+
       <param name="timestep"> 1.0    </param>
       <param name="D_a">      0.082  </param>
       <param name="D_b">      0.041  </param>
@@ -17,9 +21,9 @@
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = D_b * laplacian_b + a*b*b - (F+K-c*0.005f)*b;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -63,12 +67,12 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
       <active_chemical value="b" />
       <show_displacement_mapped_surface value="false" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 127 0 127 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 127 0 0">

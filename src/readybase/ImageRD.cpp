@@ -49,6 +49,7 @@ using namespace std;
 #include <vtkGeometryFilter.h>
 #include <vtkImageActor.h>
 #include <vtkImageAppendComponents.h>
+#include <vtkImageConstantPad.h>
 #include <vtkImageData.h>
 #include <vtkImageDataGeometryFilter.h>
 #include <vtkImageExtractComponents.h>
@@ -801,6 +802,8 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+    bool cap_contour = render_settings.GetProperty("cap_contour").GetBool();
+    bool invert_contour_cap = render_settings.GetProperty("invert_contour_cap").GetBool();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool slice_3D = render_settings.GetProperty("slice_3D").GetBool();
     string slice_3D_axis = render_settings.GetProperty("slice_3D_axis").GetAxis();
@@ -883,8 +886,27 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             // turns the 3d grid of sampled values into a polygon mesh for rendering,
             // by making a surface that contours the volume at a specified level
             vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-            surface->SetInputConnection(to_point_data->GetOutputPort());
+            if(cap_contour)
+            {
+                // pad outside the volume with zero so that the contour caps the ends instead of leaving holes
+                vtkSmartPointer<vtkImageConstantPad> cap_pad = vtkSmartPointer<vtkImageConstantPad>::New();
+                cap_pad->SetInputConnection(to_point_data->GetOutputPort());
+                cap_pad->SetOutputWholeExtent(extent[0] - 1, extent[1] + 2, extent[2] - 1, extent[3] + 2, extent[4] - 1, extent[5] + 2);
+                if (invert_contour_cap)
+                {
+                    cap_pad->SetConstant(high + (high-low));
+                }
+                else
+                {
+                    cap_pad->SetConstant(low + (low - high));
+                }
+                surface->SetInputConnection(cap_pad->GetOutputPort());
+            }
+            else {
+                surface->SetInputConnection(to_point_data->GetOutputPort());
+            }
             surface->SetValue(0,contour_level);
+
             mapper->SetInputConnection(surface->GetOutputPort());
             mapper->ScalarVisibilityOff();
         }

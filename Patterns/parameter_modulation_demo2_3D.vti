@@ -85,7 +85,7 @@
       </color_high>
       <show_color_scale value="true">
       </show_color_scale>
-      <show_multiple_chemicals value="true">
+      <show_multiple_chemicals value="false">
       </show_multiple_chemicals>
       <active_chemical value="b">
       </active_chemical>
@@ -99,6 +99,7 @@
       </vertical_scale_2D>
       <contour_level value="0.25">
       </contour_level>
+      <cap_contour value="false" />
       <use_wireframe value="false">
       </use_wireframe>
       <show_cell_edges value="false">

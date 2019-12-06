@@ -29,7 +29,7 @@ class ImportImageDialog : public wxDialog
 {
     public:
 
-        ImportImageDialog(wxWindow *parent, int num_chemicals, float low, float high);
+        ImportImageDialog(wxWindow *parent, wxString filename, int num_chemicals, int i_target_chemical, float in_low, float in_high, float out_low, float out_high);
 
         bool TransferDataFromWindow();  /// called when user hits OK
     

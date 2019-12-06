@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
-      
+
     <description>
-        The Gray-Scott rule in three dimensions. This example uses an inbuilt implementation
-        (currently only Gray-Scott is available) and so the formula cannot be edited.
+        The Gray-Scott rule in three dimensions. The formula is:
+
+        delta_a = D_a * laplacian_a - a*b*b + F*(1-a)&lt;br&gt;
+        delta_b = D_b * laplacian_b + a*b*b - (F+K)*b
+
+        Change the parameters below to see how they affect the pattern.
+
+        This example uses a hard-coded implementation and so the formula cannot be edited. In other patterns you can edit the formula as well.
     </description>
-      
-    <rule type="inbuilt" name="Gray-Scott">
+
+    <rule type="inbuilt" name="Gray-Scott" wrap="0">
       <param name="timestep">1.0</param>
       <param name="D_a">
         0.082
@@ -22,7 +28,7 @@
         0.035
       </param>
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
         <overlay chemical="a">
             <overwrite />
@@ -31,27 +37,30 @@
         </overlay>
         <overlay chemical="b">
             <overwrite />
+            <constant value="0" />
+            <everywhere />
+        </overlay>
+        <overlay chemical="b">
+            <overwrite />
             <white_noise low="0" high="1" />
             <rectangle>
                 <point3D x="0.2" y="0.2" z="0.3" />
-                <point3D x="0.4" y="0.5" z="0.5" />
+                <point3D x="0.6" y="0.5" z="0.5" />
             </rectangle>
         </overlay>
         <overlay chemical="a">
             <subtract />
             <other_chemical chemical="b" />
-            <rectangle>
-                <point3D x="0.2" y="0.2" z="0.3" />
-                <point3D x="0.4" y="0.5" z="0.5" />
-            </rectangle>
+            <everywhere />
         </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
         <active_chemical value="b" />
-        <slice_3D_position value="0.4" />
+        <show_multiple_chemicals value="false" />
+        <slice_3D_position value="0.1" />
     </render_settings>
-    
+
   </RD>
 
   <ImageData WholeExtent="0 29 0 24 0 19" Origin="0 0 0" Spacing="1 1 1">
