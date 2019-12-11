@@ -11,8 +11,8 @@ matrix:
           packages:
             - libvtk7-dev
             - ocl-icd-opencl-dev
-            - libgtk2.0-dev
-            - libwxgtk3.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
             - libboost-all-dev
     - os: linux
       sudo: required
