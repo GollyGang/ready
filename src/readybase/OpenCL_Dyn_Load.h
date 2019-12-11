@@ -21,6 +21,7 @@
 // (dynamic loading of OpenCL is not necessary with Mac OS 10.6+)
 #define _OPENCL_DYN_LOAD_H
 
+#define CL_TARGET_OPENCL_VERSION 110
 #include <CL/cl_platform.h>
 
 #ifdef __cplusplus
