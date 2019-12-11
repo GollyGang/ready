@@ -4,6 +4,18 @@ matrix:
   include:
     - os: linux
       sudo: required
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
+            - libboost-all-dev
+    - os: linux
+      sudo: required
       dist: trusty
       compiler: gcc
       addons:
