@@ -490,10 +490,14 @@ else()
   target_link_libraries(
     readybase
     vtkCommonCore
+    vtkFiltersCore
     vtkFiltersExtraction
     vtkFiltersGeometry
     vtkFiltersModeling
+    vtkFiltersParallelDIY2
+    vtkFiltersSources
     vtkFiltersTexture
+    vtkImagingColor
     vtkImagingStencil
     vtkInteractionStyle
     vtkIOImage
