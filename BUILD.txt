@@ -132,7 +132,6 @@ git clone https://github.com/GollyGang/ready.git
 mkdir build
 cd build
 cmake ../ready -DCMAKE_BUILD_TYPE=Release ..
-('c' to configure, 'g' to generate)
 make
 
 Optional, for packaging:
