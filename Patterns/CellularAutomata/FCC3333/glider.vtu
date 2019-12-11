@@ -3,11 +3,19 @@
   <RD format_version="5">
     <description>
       A cellular automaton on a face centred cubic (FCC) lattice, with the simple rule: each cell is alive in the next generation if it has three live neighbors in the previous generation.
-      
-      Discovered by Brian D. Eubanks
-      
+
+      Described by Carter Bays in a 1987 paper: &lt;a href=&quot;http://www.complex-systems.com/pdf/01-3-1.pdf&quot;&gt;Candidates for the Game of Life in Three Dimensions&lt;/a&gt;
+
       In this pattern a glider appears. It travels until it hits the edge of the grid, since wrap-around is not implemented here.
-      
+
+      Golly has a script called 3D.lua that lets you explore this CA. If you copy the following lines to the clipboard and then select Open Clipboard from the File menu you'll see the two gliders:
+
+      &lt;tt&gt;
+        3D version=1 size=30 pos=13,12,14
+        x=5 y=7 z=2 rule=3D3/3H
+        boboo$bobo4$3boo$3bo/bobo$oboo4$bobo$bboo!
+      &lt;/tt&gt;
+
     </description>
     <rule name="FCC3333" type="kernel" neighborhood_type="face" neighborhood_range="1" neighborhood_weight="laplacian">
       <kernel number_of_chemicals="1">
@@ -18,12 +26,12 @@
             int num_neighbors = 0;
             for(int i = 0; i &lt; max_neighbors; i++)
             {
-        
+
                 num_neighbors += (neighbor_weights[offset+i] &gt; 0.0f &amp;&amp; a_in[neighbor_indices[offset+i]] &gt; 0.5f ) ? 1 : 0;
             }
             a_out[index_x] = (num_neighbors == 3) ? 1.0f : 0.0f;
         }
-        
+
       </kernel>
     </rule>
     <initial_pattern_generator apply_when_loading="false" zero_first="false">
