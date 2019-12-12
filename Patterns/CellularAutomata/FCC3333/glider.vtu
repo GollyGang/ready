@@ -11,8 +11,8 @@
       Golly has a script called 3D.lua that lets you explore this CA. If you copy the following lines to the clipboard and then select Open Clipboard from the File menu you'll see the two gliders:
 
       &lt;tt&gt;
-        3D version=1 size=30 pos=13,12,14
-        x=5 y=7 z=2 rule=3D3/3H
+        3D version=1 size=30 pos=13,12,14&lt;br&gt;
+        x=5 y=7 z=2 rule=3D3/3H&lt;br&gt;
         boboo$bobo4$3boo$3bo/bobo$oboo4$bobo$bboo!
       &lt;/tt&gt;
 
