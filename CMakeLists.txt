@@ -392,7 +392,7 @@ include_directories( ${Boost_INCLUDE_DIRS} )
 foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${file}"
-    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}/${file}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${file}" "${CMAKE_CURRENT_BINARY_DIR}/${file}"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${file}"
   )
   list( APPEND files_dest "${CMAKE_CURRENT_BINARY_DIR}/${file}" )
