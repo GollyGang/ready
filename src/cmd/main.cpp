@@ -45,12 +45,12 @@ void InitializeDefaultRenderSettings(Properties &render_settings);
         It responds to various commandline arguments to load and print out parts of the system,
         and can also still be used (like it used to work) to iterate the system to a specified number
         of steps, and save it to a new vti file.
-        
-        The various print options can facilitate the import of ready simulations into other applications, (such 
+
+        The various print options can facilitate the import of ready simulations into other applications, (such
         as Houdini), without the need to actually link the ready libraries. This includes reagent initial-states,
         (via -m), be ready for some large lumps of text on stdout when using that argument.
-        
-        Please let the Ready team (especially Dan Wills) know if there is something that you wish to print 
+
+        Please let the Ready team (especially Dan Wills) know if there is something that you wish to print
         that currently isn't supported.
 */
 // -------------------------------------------------------------------------------------------------------------
@@ -63,10 +63,10 @@ int main(int argc,char *argv[])
 {
     // Declare the (boost/program_options) supported options.
     po::options_description desc("Options");
-    
+
     std::string vti_in;
     std::string vti_out;
-    
+
     std::string blurb = "Ready commandline utility that uses readybase as a processing (and data-retrieval) back-end.\n"
                         "\n"
                         "It responds to various commandline arguments to load and print out parts of the system,\n"
@@ -79,7 +79,7 @@ int main(int argc,char *argv[])
                         "\n"
                         "Please let the Ready team (especially Dan Wills) know if there is something that you wish to print\n"
                         "that currently isn't supported.\n";
-    
+
     desc.add_options()
         ("help,h", "Print the help message")
         // Went to 0 iterations by default. Need to provide option for flags
@@ -98,7 +98,7 @@ int main(int argc,char *argv[])
         ("opencl-platform,l", po::value<int>(), "OpenCL platform number (Currently will crash if incorrect!)")
         ("opencl-device,g", po::value<int>(), "OpenCL device number (Currently will crash if incorrect!)")
         ("verbose,v", po::bool_switch()->default_value(false), "Verbose output.");
-  
+
     po::variables_map vm;
     try {
         po::store( po::parse_command_line( argc, argv, desc ), vm );
@@ -115,7 +115,7 @@ int main(int argc,char *argv[])
             return 1;
         }
     }
-    
+
     int numiter = 1000;
     bool print_kernel = false;
     bool print_formula = false;
@@ -128,7 +128,7 @@ int main(int argc,char *argv[])
     bool verbose = false;
     int opencl_platform = 0;
     int opencl_device = 0;
-    
+
     if ( vm.count("help") )
     {
         cout << "\n" << blurb << "\n";
@@ -144,97 +144,97 @@ int main(int argc,char *argv[])
             cout << "Verbose was enabled.\n";
         }
     }
-    
+
     if ( vm.count("num-iterations") )
     {
         numiter = vm["num-iterations"].as<int>();
-        if (verbose) 
+        if (verbose)
         {
             cout << "Num Iterations was set to: " << vm["num-iterations"].as<int>() << ".\n";
         }
     } else {
-        if (verbose) 
+        if (verbose)
         {
             cout << "Num Iterations was not set (default is 1000).\n";
         }
     }
-    
+
     if ( vm.count("print-kernel") )
     {
         print_kernel = vm["print-kernel"].as<bool>();
     }
-    
+
     if ( vm.count("print-formula") )
     {
         print_formula = vm["print-formula"].as<bool>();
     }
-    
+
     if ( vm.count("print-rule-info") )
     {
         print_rule_info = vm["print-rule-info"].as<bool>();
     }
-    
+
     if ( vm.count("print-reagent-info") )
     {
         print_reagent_info = vm["print-reagent-info"].as<bool>();
     }
-    
+
     if ( vm.count("print-parameter-info") )
     {
         print_parameter_info = vm["print-parameter-info"].as<bool>();
     }
-    
+
     if ( vm.count("print-render-settings") )
     {
         print_render_settings = vm["print-render-settings"].as<bool>();
     }
-    
+
     if ( vm.count("print-formula-description") )
     {
         print_formula_description = vm["print-formula-description"].as<bool>();
     }
-    
+
     if ( vm.count("print-initial-state-images") )
     {
         print_initial_state_images = vm["print-initial-state-images"].as<bool>();
     }
-    
+
     if ( vm.count("vti-in") )
     {
-        if (verbose) 
+        if (verbose)
         {
             cout << "VTI-in flag detected!\n";
         }
     }
-    
+
     if ( vm.count("vti-out") )
     {
-        if (verbose) 
+        if (verbose)
         {
             cout << "VTI-out flag detected!\n";
         }
     }
-    
+
     if ( vm.count("opencl-platform") )
     {
         opencl_platform = vm["opencl-platform"].as<int>();
-        if (verbose) 
+        if (verbose)
         {
             cout << "OpenCl platform was set to: " << opencl_platform << ".\n";
         }
     }
-    
+
     if ( vm.count("opencl-device") )
     {
         opencl_device = vm["opencl-device"].as<int>();
-        if (verbose) 
+        if (verbose)
         {
             cout << "OpenCl device was set to: " << opencl_device << ".\n";
         }
     }
-    
+
     bool is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
-    
+
     if( is_opencl_available )
     {
         if (verbose)
@@ -245,12 +245,12 @@ int main(int argc,char *argv[])
         // Still print (despite not verbose) since it's a warning:
         cout << "Warning: OpenCL not found! (This may not bode well for what's about to happen..).\n";
     }
-    
+
     Properties render_settings("render_settings");
     InitializeDefaultRenderSettings(render_settings);
 
     AbstractRD *system;
-    try 
+    try
     {
         // Read the file
         if (verbose)
@@ -259,20 +259,20 @@ int main(int argc,char *argv[])
         }
         bool warn_to_update;
         try {
-            system = SystemFactory::CreateFromFile( vti_in.c_str(), is_opencl_available, opencl_platform, 
+            system = SystemFactory::CreateFromFile( vti_in.c_str(), is_opencl_available, opencl_platform,
                                                     opencl_device, render_settings, warn_to_update );
             if (verbose)
             {
                 cout << "Loaded VTI: " << vti_in.c_str() << "\n";
             }
-            
+
             system->Update( 0 );
             if (verbose)
             {
                 cout << "System updated to zeroth step..\n";
             }
-                            
-            if ( print_reagent_info ) 
+
+            if ( print_reagent_info )
             {
                 int num_chemicals = system->GetNumberOfChemicals();
                 int xres = system->GetX();
@@ -291,7 +291,7 @@ int main(int argc,char *argv[])
                 cout << "================================\n";
             }
 
-            if ( print_kernel ) 
+            if ( print_kernel )
             {
                 cout << "\n";
                 cout << "Kernel source:\n";
@@ -299,8 +299,8 @@ int main(int argc,char *argv[])
                 cout << system->GetKernel();
                 cout << "================================\n";
             }
-            
-            if ( print_formula ) 
+
+            if ( print_formula )
             {
                 cout << "\n";
                 cout << "Kernel formula:\n";
@@ -309,7 +309,7 @@ int main(int argc,char *argv[])
                 cout << system->GetFormula();
                 cout << "================================\n";
             }
-            
+
             if ( print_rule_info )
             {
                 cout << "\n";
@@ -326,7 +326,7 @@ int main(int argc,char *argv[])
             if ( print_parameter_info )
             {
                 int nparams = system->GetNumberOfParameters();
-                
+
                 cout << "\n";
                 cout << "Parameter info:\n";
                 cout << "================================\n";
@@ -338,27 +338,27 @@ int main(int argc,char *argv[])
                 }
                 cout << "================================\n";
             }
-            
+
             if ( print_render_settings )
             {
                 cout << "\n";
                 cout << "Render settings:\n";
                 cout << "================================\n";
-                
+
                 // A good example cast, left as a relic:
                 //AbstractRD* rdPlayer = dynamic_cast<AbstractRD*>(system);
-                //FormulaOpenCLImageRD* rdPlayer = dynamic_cast<FormulaOpenCLImageRD*>(system);                
+                //FormulaOpenCLImageRD* rdPlayer = dynamic_cast<FormulaOpenCLImageRD*>(system);
                 //Properties *render_settings = rdPlayer->render_settings;
-                
+
                 int num_properties = render_settings.GetNumberOfProperties();
                 cout << "Number of properties is: " << num_properties << "\n";
                 for (int i=0;i<num_properties;i++)
                 {
                     Property this_property = render_settings.GetProperty( i );
-                    
+
                     std::string property_name = this_property.GetName();
                     std::string property_type = this_property.GetType();
-                    
+
                     cout << "    name: " << property_name << ", type: " << property_type << ", value:";
                     if (property_type == "int")
                     {
@@ -384,7 +384,7 @@ int main(int argc,char *argv[])
                 }
                 cout << "================================\n";
             }
-            
+
             if ( print_formula_description )
             {
                 cout << "\n";
@@ -393,7 +393,7 @@ int main(int argc,char *argv[])
                 cout << system->GetDescription();
                 cout << "================================\n";
             }
-            
+
             if ( print_initial_state_images )
             {
                 int num_chemicals = system->GetNumberOfChemicals();
@@ -402,28 +402,28 @@ int main(int argc,char *argv[])
                 cout << "================================\n";
                 // I'm just going to gloss over numberOfScalarComponents for the moment! (just hope it's always 1 or above!)
                 // so given that, in theory num_chemicals and nc should be equal!
-                
+
                 // Update to get everything initialised (and copy in the initial states)..
                 system->Update(0);
-                
+
                 for ( int ix=0; ix < num_chemicals; ix++ )
                 {
                     cout << "\n";
                     cout << "nchem: " << ix << "\n";
                     OpenCLImageRD *isystem = dynamic_cast< OpenCLImageRD* >(system);
-                    
+
                     cout << "xres=" << system->GetX() << "\n";
                     cout << "yres=" << system->GetY() << "\n";
                     cout << "zres=" << system->GetZ() << "\n";
-                    
+
                     // not in bytes!
                     unsigned long reagent_block_size = system->GetX() * system->GetY() * system->GetZ();
-                    
+
                     cout << "Reagent block size is: " << reagent_block_size << "\n";
                     unique_ptr<float[]> rd_data(new float[reagent_block_size]);
 
                     isystem->GetFromOpenCLBuffers( rd_data.get(), ix );
-                    
+
                     cout << "\nRD data for reagent " << ix << ": [ ";
                     for (unsigned long rix=0; rix<reagent_block_size; rix++)
                     {
@@ -438,13 +438,13 @@ int main(int argc,char *argv[])
                 cout << "================================\n";
             }
         } catch(const exception& e) {
-            cout << "Error creating system!:\n" << e.what() << "\n"; 
+            cout << "Error creating system!:\n" << e.what() << "\n";
 
             /* TODO: find equivalent of backtrace that works on all supported platforms
             void* callstack[128];
             int i, frames = backtrace( callstack, 128 );
             char** strs = backtrace_symbols( callstack, frames );
-            for (i = 0; i < frames; ++i) 
+            for (i = 0; i < frames; ++i)
             {
                 printf( "%s\n", strs[i] );
             }
@@ -452,10 +452,10 @@ int main(int argc,char *argv[])
             */
             cout << "Ignoring exception.\n";
         }
-        
+
         if( warn_to_update )
             cout << "This pattern was created with a newer version of Ready. You should update your copy.\n";
-        
+
         if ( numiter > 0 )
         {
             cout << "Run the simulation for " << numiter << " steps...\n";
@@ -474,7 +474,7 @@ int main(int argc,char *argv[])
             } else {
                 cout << "Output file not specified, not saving anything.\n";
             }
-        } else { 
+        } else {
             if (verbose)
             {
                 cout << "Zero iterations, simulation skipped.\n";
