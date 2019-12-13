@@ -420,9 +420,9 @@ int main(int argc,char *argv[])
                     unsigned long reagent_block_size = system->GetX() * system->GetY() * system->GetZ();
                     
                     cout << "Reagent block size is: " << reagent_block_size << "\n";
-                    float *rd_data = new float[reagent_block_size];
-                    
-                    isystem->GetFromOpenCLBuffers( rd_data, ix );
+                    unique_ptr<float[]> rd_data(new float[reagent_block_size]);
+
+                    isystem->GetFromOpenCLBuffers( rd_data.get(), ix );
                     
                     cout << "\nRD data for reagent " << ix << ": [ ";
                     for (unsigned long rix=0; rix<reagent_block_size; rix++)
@@ -434,7 +434,6 @@ int main(int argc,char *argv[])
                         }
                     }
                     cout << " ]\n";
-                    delete rd_data;
                 }
                 cout << "================================\n";
             }
