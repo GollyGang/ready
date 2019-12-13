@@ -90,7 +90,7 @@ class RD_XMLImageWriter : public vtkXMLImageDataWriter
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
 
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
+        virtual int WritePrimaryElement(ostream& os,vtkIndent indent) override;
 
     protected:
 
@@ -119,7 +119,7 @@ class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
 
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent);
+        virtual int WritePrimaryElement(ostream& os,vtkIndent indent) override;
 
     protected:
 
