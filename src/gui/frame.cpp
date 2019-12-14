@@ -3169,6 +3169,8 @@ void MyFrame::LeftMouseDown(int x, int y)
     {
         switch(this->CurrentCursor)
         {
+            case POINTER:
+                break; // (VTK will handle the control of the viewpoint)
             case PENCIL:
             {
                 if (repaint_to_erase && this->current_paint_value == this->system->GetValue(p[0],p[1],p[2],this->render_settings)) {
@@ -3262,6 +3264,8 @@ void MyFrame::MouseMove(int x, int y)
     {
         switch(this->CurrentCursor)
         {
+            case POINTER:
+                break; // (VTK will handle the control of the viewpoint)
             case PENCIL:
             {
                 if (erasing) {
