@@ -115,15 +115,15 @@ void FormulaOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_to
     if(!rule) throw runtime_error("rule node not found in file");
 
     // formula:
-    vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
-    if(!xml_formula) throw runtime_error("formula node not found in file");
+    vtkSmartPointer<vtkXMLDataElement> formula_element = rule->FindNestedElementWithName("formula");
+    if(!formula_element) throw runtime_error("formula node not found in file");
 
     // number_of_chemicals:
-    read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
+    read_required_attribute(formula_element,"number_of_chemicals",this->n_chemicals);
 
-    string formula = trim_multiline_string(xml_formula->GetCharacterData());
-    this->TestFormula(formula); // will throw on error
-    this->SetFormula(formula); // (won't throw yet)
+    string formula_string = trim_multiline_string(formula_element->GetCharacterData());
+    this->TestFormula(formula_string); // will throw on error
+    this->SetFormula(formula_string); // (won't throw yet)
 }
 
 // -------------------------------------------------------------------------
@@ -136,13 +136,13 @@ vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLMeshRD::GetAsXML(bool generate_i
     if(!rule) throw runtime_error("rule node not found");
 
     // formula
-    vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
-    formula->SetName("formula");
-    formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    string f = this->GetFormula();
-    f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
-    formula->SetCharacterData(f.c_str(), (int)f.length());
-    rule->AddNestedElement(formula);
+    vtkSmartPointer<vtkXMLDataElement> formula_element = vtkSmartPointer<vtkXMLDataElement>::New();
+    formula_element->SetName("formula");
+    formula_element->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+    string formula_string = this->GetFormula();
+    formula_string = ReplaceAllSubstrings(formula_string, "\n", "\n        "); // indent the lines
+    formula_element->SetCharacterData(formula_string.c_str(), (int)formula_string.length());
+    rule->AddNestedElement(formula_element);
 
     return rd;
 }

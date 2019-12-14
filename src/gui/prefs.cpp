@@ -427,9 +427,9 @@ void GetKeyAction(char* value)
             else if (len > 1) {
                 if ((start[0] == 'f' || start[0] == 'F') && start[1] >= '1' && start[1] <= '9') {
                     // we have a function key
-                    char* p = &start[1];
+                    char* fn = &start[1];
                     int num;
-                    sscanf(p, "%d", &num);
+                    sscanf(fn, "%d", &num);
                     if (num >= 1 && num <= 24) key = IK_F1 + num - 1;
                 }
                 else {
@@ -1001,8 +1001,9 @@ void linereader::setfile(FILE* f) {
 
 int linereader::close() {
      if (fp) {
-        return fclose(fp);
-        fp = 0;
+        const int ret = fclose(fp);
+        fp = NULL;
+        return ret;
     }
     return 0;
 }
@@ -2137,7 +2138,7 @@ void PrefsDialog::OnButton(wxCommandEvent& event)
 
 void PrefsDialog::OnCheckBoxClicked(wxCommandEvent& event)
 {
-    int id = event.GetId();
+    //int id = event.GetId();
 
     // no need???
 }

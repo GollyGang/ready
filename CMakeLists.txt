@@ -408,6 +408,13 @@ foreach( var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE
   string( REGEX REPLACE "/MD" "/MT" ${var} "${${var}}" )
 endforeach()
 
+# we would like to build without warnings but we're not there yet
+if (MSVC)
+  #add_compile_options(/W4)
+else()
+  #add_compile_options(-Wall -Wextra -pedantic)
+endif()
+
 set( USE_SSE "YES" CACHE BOOL "Set to false if your CPU doesn't have SSE support.")
 if( USE_SSE )
   # enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed

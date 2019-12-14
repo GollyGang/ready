@@ -218,9 +218,11 @@ bool XYZFloatDialog::TransferDataFromWindow()
 {
     double x,y,z;
     bool ok = this->xbox->GetValue().ToDouble(&x) && this->ybox->GetValue().ToDouble(&y) && this->zbox->GetValue().ToDouble(&z);
-    this->xval = x;
-    this->yval = y;
-    this->zval = z;
+    if (ok) {
+        this->xval = x;
+        this->yval = y;
+        this->zval = z;
+    }
     return ok;
 }
 

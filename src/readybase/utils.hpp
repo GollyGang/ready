@@ -78,7 +78,7 @@ class XML_Object
 {
     public:
 
-        XML_Object(const vtkXMLDataElement* node) {}
+        XML_Object(const vtkXMLDataElement* /*node*/) {}
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
 };
 

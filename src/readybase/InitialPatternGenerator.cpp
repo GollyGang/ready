@@ -80,7 +80,7 @@ vtkSmartPointer<vtkXMLDataElement> InitialPatternGenerator::GetAsXML(bool genera
 
 // ---------------------------------------------------------------------
 
-void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_chemicals)
+void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t /*num_chemicals*/)
 {
     RemoveAllOverlays();
 

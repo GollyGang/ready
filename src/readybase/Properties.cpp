@@ -28,13 +28,14 @@ void Property::ReadFromXML(vtkXMLDataElement* node)
     if(this->type=="float")
         read_required_attribute(node,"value",this->f1);
     else if(this->type=="int")
-        read_required_attribute(node,"value",this->i);
+        read_required_attribute(node,"value",this->int_value);
     else if(this->type=="bool")
     {
-        read_required_attribute(node,"value",this->s);
-        if(this->s=="true") this->b = true;
-        else if(this->s=="false") this->b = false;
-        else throw runtime_error("Property::ReadFromXML : unrecognised bool value: "+this->s);
+        string s;
+        read_required_attribute(node,"value",s);
+        if(s=="true") this->bool_value = true;
+        else if(s=="false") this->bool_value = false;
+        else throw runtime_error("Property::ReadFromXML : unrecognised bool value: "+s);
     }
     else if(this->type=="color")
     {
@@ -44,14 +45,14 @@ void Property::ReadFromXML(vtkXMLDataElement* node)
     }
     else if(this->type=="chemical")
     {
-        read_required_attribute(node,"value",this->s);
-        IndexFromChemicalName(this->s);
+        read_required_attribute(node,"value",this->string_value);
+        IndexFromChemicalName(this->string_value);
     }
     else if(this->type=="axis")
     {
-        read_required_attribute(node,"value",this->s);
-        if(this->s != "x" && this->s != "y" && this->s != "z")
-            throw runtime_error("Property::ReadFromXML : unrecognised axis: "+this->s);
+        read_required_attribute(node,"value",this->string_value);
+        if(this->string_value != "x" && this->string_value != "y" && this->string_value != "z")
+            throw runtime_error("Property::ReadFromXML : unrecognised axis: "+this->string_value);
     }
     else throw runtime_error("Property::ReadFromXML : unrecognised type: "+this->type);
 }
@@ -63,9 +64,9 @@ vtkSmartPointer<vtkXMLDataElement> Property::GetAsXML() const
     if(this->type=="float")
         node->SetFloatAttribute("value",this->f1);
     else if(this->type=="int")
-        node->SetIntAttribute("value",this->i);
+        node->SetIntAttribute("value",this->int_value);
     else if(this->type=="bool")
-        node->SetAttribute("value",this->b?"true":"false");
+        node->SetAttribute("value",this->bool_value ?"true":"false");
     else if(this->type=="color")
     {
         node->SetFloatAttribute("r",f1);
@@ -73,9 +74,9 @@ vtkSmartPointer<vtkXMLDataElement> Property::GetAsXML() const
         node->SetFloatAttribute("b",f3);
     }
     else if(this->type=="chemical")
-        node->SetAttribute("value",this->s.c_str());
+        node->SetAttribute("value",this->string_value.c_str());
     else if(this->type=="axis")
-        node->SetAttribute("value",this->s.c_str());
+        node->SetAttribute("value",this->string_value.c_str());
     else throw runtime_error("Property::GetAsXML : unrecognised type: "+this->type);
     return node;
 }

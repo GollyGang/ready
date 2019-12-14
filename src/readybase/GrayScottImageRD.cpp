@@ -43,7 +43,7 @@ GrayScottImageRD::GrayScottImageRD()
     this->AddParameter("F",0.035f);
 }
 
-void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
+void GrayScottImageRD::AllocateImages(int x,int y,int z,int nc,int /*type*/)
 {
     // N.B. this class is hardwired for Gray-Scott using floats, so data_type is ignored
     if(nc!=2) throw runtime_error("GrayScottImageRD::AllocateImages : this implementation is for 2 chemicals only");
@@ -89,6 +89,7 @@ void GrayScottImageRD::InternalUpdate(int n_steps)
         float *old_a,*new_a,*old_b,*new_b;
         switch(iStep%2)
         {
+            default:
             case 0: old_a = static_cast<float*>(this->images[0]->GetScalarPointer());
                     old_b = static_cast<float*>(this->images[1]->GetScalarPointer());
                     new_a = static_cast<float*>(this->buffer_images[0]->GetScalarPointer());

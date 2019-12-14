@@ -1263,7 +1263,6 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
-            int n_cells = this->system->GetNumberOfCells();
             if (this->computation_time_since_last_render == 0.0)
                 this->computation_time_since_last_render = 0.000001;  // unlikely, but play safe
             double time_since_last_render = time_before - this->time_at_last_render;
@@ -1364,7 +1363,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
 {
     // TODO: merge this with GetOpenCL diagnostics?
     wxArrayString choices;
-    int iOldSelection;
+    int iOldSelection = -1;
     int np;
     try
     {
@@ -1396,6 +1395,7 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
             choices.Add(s);
         }
     }
+    if (iOldSelection < 0) throw runtime_error("OnSelectOpenCLDevice: current OpenCL platform/device not found");
     wxSingleChoiceDialog dlg(this,_("Select the OpenCL device to use:"),_("Select OpenCL device"),
         choices);
     dlg.SetSelection(iOldSelection);
@@ -1403,7 +1403,6 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     int iNewSelection = dlg.GetSelection();
     if(iNewSelection != iOldSelection)
         wxMessageBox(_("The selected device will be used the next time an OpenCL pattern is loaded."));
-    int dc = 0;
     for(int ip=0;ip<np;ip++)
     {
         int nd = OpenCL_utils::GetNumberOfDevices(ip);
@@ -1528,7 +1527,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     this->SetStatusText(_("Generating..."));
 
-    AbstractRD *sys;
+    AbstractRD *sys = NULL;
     Properties new_render_settings("render_settings");
     this->InitializeDefaultRenderSettings(new_render_settings);
     try
@@ -3442,7 +3441,7 @@ void MyFrame::OnConvertToFullKernel(wxCommandEvent& event)
         {
             sys = new FullKernelOpenCLMeshRD(*dynamic_cast<OpenCLMeshRD*>(this->system));
         }
-        else wxMessageBox(_T("Internal error: unrecognised file extension"));
+        else throw runtime_error("Internal error: unrecognised file extension");
     }
     catch(const exception& e)
     {

@@ -308,7 +308,7 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD * /*system*/,vector<double> /*vals*/,float /*x*/,float /*y*/,float /*z*/) const
         {
             return this->value;
         }
@@ -339,7 +339,7 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD* /*system*/, vector<double> vals, float /*x*/, float /*y*/, float /*z*/) const
         {
             if(this->iOtherChemical < 0 || this->iOtherChemical >= (int)vals.size())
                 throw runtime_error("OtherChemical:GetValue : chemical out of range");
@@ -370,7 +370,7 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD* system, vector<double> /*vals*/, float /*x*/, float /*y*/, float /*z*/) const
         {
             return system->GetParameterValueByName(this->parameter_name.c_str());
         }
@@ -401,7 +401,7 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(AbstractRD* /*system*/, vector<double> /*vals*/, float /*x*/, float /*y*/, float /*z*/) const
         {
             return frand(this->low,this->high);
         }
@@ -615,7 +615,7 @@ class Everywhere : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        virtual bool IsInside(float /*x*/,float /*y*/,float /*z*/,float /*X*/,float /*Y*/,float /*Z*/,int /*dimensionality*/) const
         {
             return true;
         }
@@ -736,7 +736,7 @@ class Pixel : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        virtual bool IsInside(float x, float y, float z, float /*X*/, float /*Y*/, float /*Z*/, int dimensionality) const
         {
             switch(dimensionality)
             {

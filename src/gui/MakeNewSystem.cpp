@@ -670,6 +670,7 @@ AbstractRD* MakeNewHyperbolicSpace(const bool is_opencl_available, const int ope
             case 1: schlafli1 = 5; schlafli2 = 3; schlafli3 = 4; break;
             case 2: schlafli1 = 5; schlafli2 = 3; schlafli3 = 5; break;
             case 3: schlafli1 = 3; schlafli2 = 5; schlafli3 = 3; break;
+            default: throw runtime_error("MakeNewHyperbolicSpace: tessellationType out of range");
         }
     }
     // choose the recursion depth

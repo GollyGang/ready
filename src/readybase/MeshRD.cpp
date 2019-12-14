@@ -139,14 +139,14 @@ void MeshRD::SetNumberOfChemicals(int n)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::SaveFile(const char* filename,const Properties& render_settings,bool generate_initial_pattern_when_loading) const
+void MeshRD::SaveFile(const char* fn,const Properties& render_settings,bool generate_initial_pattern_when_loading) const
 {
     vtkSmartPointer<RD_XMLUnstructuredGridWriter> iw = vtkSmartPointer<RD_XMLUnstructuredGridWriter>::New();
     iw->SetSystem(this);
     iw->SetRenderSettings(&render_settings);
     if(generate_initial_pattern_when_loading)
         iw->GenerateInitialPatternWhenLoading();
-    iw->SetFileName(filename);
+    iw->SetFileName(fn);
     iw->SetDataModeToBinary(); // workaround for http://www.vtk.org/Bug/view.php?id=13382
     #if VTK_MAJOR_VERSION >= 6
         iw->SetInputData(this->mesh);
@@ -750,7 +750,7 @@ bool IsEdgeNeighbor(vtkUnstructuredGrid *grid,vtkIdType iCell1,vtkIdType iCell2)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type)
+void MeshRD::ComputeCellNeighbors(TNeighborhood nhood_type,int range,TWeight weight_type)
 {
     // TODO: for now we treat LAPLACIAN weights the same as EQUAL weights, not sure what to do with this on arbitrary meshes
     if(range!=1)
@@ -769,7 +769,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
         vector<TNeighbor> neighbors;
         this->mesh->GetCellPoints(iCell,ptIds);
         vtkIdType npts = ptIds->GetNumberOfIds();
-        switch(neighborhood_type)
+        switch(nhood_type)
         {
             case VERTEX_NEIGHBORS: // neighbors share a vertex
             {
@@ -976,14 +976,14 @@ int MeshRD::GetArenaDimensionality() const
 
 // ---------------------------------------------------------------------
 
-void MeshRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) const
+void MeshRD::GetAs2DImage(vtkImageData * /*out*/,const Properties& /*render_settings*/) const
 {
     throw runtime_error("MeshRD::GetAs2DImage() : no 2D image available");
 }
 
 // ---------------------------------------------------------------------
 
-void MeshRD::SetFrom2DImage(int iChemical, vtkImageData *im)
+void MeshRD::SetFrom2DImage(int /*iChemical*/, vtkImageData * /*im*/)
 {
     throw runtime_error("MeshRD::SetFrom2DImage() : no 2D image available");
 }
@@ -1150,9 +1150,9 @@ void MeshRD::FlipPaintAction(PaintAction& cca)
 
 // --------------------------------------------------------------------------------
 
-void MeshRD::GetMesh(vtkUnstructuredGrid* mesh) const
+void MeshRD::GetMesh(vtkUnstructuredGrid* m) const
 {
-    mesh->DeepCopy(this->mesh);
+    m->DeepCopy(this->mesh);
 }
 
 // --------------------------------------------------------------------------------

@@ -192,13 +192,9 @@ void AbstractRD::SetFilename(const string& s)
 
 void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
 {
-    string str;
-    const char *s;
-    float f;
-    int i;
-
     // check whether we should warn the user that they need to update Ready
     {
+        int i;
         read_required_attribute(rd,"format_version",i);
         warn_to_update = (i>5);
         // (we will still proceed and try to read the file but it might fail or give poor results)
@@ -208,11 +204,12 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
     if(!rule) throw runtime_error("rule node not found in file");
 
     // rule_name:
+    string str;
     read_required_attribute(rule,"name",str);
     this->SetRuleName(str);
 
     // wrap-around
-    s = rule->GetAttribute("wrap");
+    const char* s = rule->GetAttribute("wrap");
     if(!s) this->wrap = true;
     else this->wrap = (string(s)=="1");
 
@@ -245,13 +242,13 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
     {
         vtkSmartPointer<vtkXMLDataElement> node = rule->GetNestedElement(i);
         if(string(node->GetName())!="param") continue;
-        string name;
         s = node->GetAttribute("name");
         if(!s) throw runtime_error("Failed to read param attribute: name");
-        name = trim_multiline_string(s);
+        string name = trim_multiline_string(s);
         s = node->GetCharacterData();
+        float f;
         if(!s || !from_string(s,f)) throw runtime_error("Failed to read param value");
-        this->AddParameter(name,f);
+        this->AddParameter(name, f);
     }
 
     // description:
@@ -274,12 +271,12 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
     // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.)
 
     // description
-    vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
-    description->SetName("description");
+    vtkSmartPointer<vtkXMLDataElement> descr = vtkSmartPointer<vtkXMLDataElement>::New();
+    descr->SetName("description");
     string desc = this->GetDescription();
     desc = ReplaceAllSubstrings(desc, "\n", "\n      "); // indent the lines
-    description->SetCharacterData(desc.c_str(), (int)desc.length());
-    rd->AddNestedElement(description);
+    descr->SetCharacterData(desc.c_str(), (int)desc.length());
+    rd->AddNestedElement(descr);
 
     // rule
     vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();

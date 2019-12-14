@@ -1119,7 +1119,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
     // define the central cell
     int num_vertices;
     int num_faces;
-    int num_vertices_per_face;
+    int num_vertices_per_face = 0;
     vector<vector<double> > vertex_coords;
     vector<vector<int> > faces;
     vector<vector<double> > sphere_centers;
