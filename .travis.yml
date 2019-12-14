@@ -21,7 +21,7 @@ matrix:
       addons:
         apt:
           packages:
-            - libvtk7-dev
+            - libvtk6-dev
             - ocl-icd-opencl-dev
             - libgtk2.0-dev
             - libwxgtk3.0-dev
