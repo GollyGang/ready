@@ -422,7 +422,7 @@ int main(int argc,char *argv[])
                     cout << "Reagent block size is: " << reagent_block_size << "\n";
                     float* rd_data = new float[reagent_block_size];
 
-                    isystem->GetFromOpenCLBuffers( rd_data.get(), ix );
+                    isystem->GetFromOpenCLBuffers( rd_data, ix );
 
                     cout << "\nRD data for reagent " << ix << ": [ ";
                     for (unsigned long rix=0; rix<reagent_block_size; rix++)
