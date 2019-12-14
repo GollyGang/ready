@@ -97,21 +97,21 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
                                 const wxString &name = wxPanelNameStr);
     vtkTypeMacro(wxVTKRenderWindowInteractor,vtkRenderWindowInteractor);
     static wxVTKRenderWindowInteractor * New();
-    void PrintSelf(ostream& os, vtkIndent indent);
+    void PrintSelf(ostream& os, vtkIndent indent) override;
 
     //destructor
     ~wxVTKRenderWindowInteractor();
 
     // vtkRenderWindowInteractor overrides
-    void Initialize();
-    void Enable();
-    bool Enable(bool enable);
-    void Disable();
-    void Start();
-    void UpdateSize(int x, int y);
-    int CreateTimer(int timertype);
-    int DestroyTimer();
-    void TerminateApp() {};
+    void Initialize() override;
+    void Enable() override;
+    bool Enable(bool enable) override;
+    void Disable() override;
+    void Start() override;
+    void UpdateSize(int x, int y) override;
+    int CreateTimer(int timertype) override;
+    int DestroyTimer() override;
+    void TerminateApp()  override {};
 
     // event handlers
     void OnPaint(wxPaintEvent &event);
@@ -134,7 +134,7 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
     void OnTimer(wxTimerEvent &event);
     void OnSize(wxSizeEvent &event);
 
-    void Render();
+    void Render() override;
     void SetRenderWhenDisabled(int newValue);
 
     // Description:
@@ -153,8 +153,8 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
 
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
   protected:
-    virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration);
-    virtual int InternalDestroyTimer(int platformTimerId);
+    virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
+    virtual int InternalDestroyTimer(int platformTimerId) override;
 #endif
 
   protected:

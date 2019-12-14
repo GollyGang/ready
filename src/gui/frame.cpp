@@ -823,7 +823,7 @@ void MyFrame::OnFitPattern(wxCommandEvent& event)
     vtkRenderWindow* renWin = this->pVTKWindow->GetRenderWindow();
     renWin->GetRenderers()->InitTraversal();
     vtkRenderer *ren;
-    while(ren = renWin->GetRenderers()->GetNextItem())
+    while((ren = renWin->GetRenderers()->GetNextItem()))
         ren->ResetCamera();
     this->Refresh(false);
 }
