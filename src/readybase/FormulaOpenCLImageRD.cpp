@@ -46,7 +46,7 @@ delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;");
 
 // -------------------------------------------------------------------------
 
-std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula_string) const
+std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     const string indent = "    ";
     const int NC = this->GetNumberOfChemicals();
@@ -547,7 +547,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << this->data_type_string << "4 " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
     kernel_source << "\n";
     // the formula
-    istringstream iss(formula_string);
+    istringstream iss(formula);
     string s;
     while(iss.good())
     {
@@ -578,9 +578,9 @@ void FormulaOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_t
     // number_of_chemicals:
     read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
 
-    string formula_string = trim_multiline_string(xml_formula->GetCharacterData());
-    //this->TestFormula(formula_string); // will throw on error
-    this->SetFormula(formula_string); // (won't throw yet)
+    string formula = trim_multiline_string(xml_formula->GetCharacterData());
+    //this->TestFormula(formula); // will throw on error
+    this->SetFormula(formula); // (won't throw yet)
 }
 
 // -------------------------------------------------------------------------
@@ -593,13 +593,13 @@ vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML(bool generate_
     if(!rule) throw runtime_error("rule node not found");
 
     // formula
-    vtkSmartPointer<vtkXMLDataElement> formula_element = vtkSmartPointer<vtkXMLDataElement>::New();
-    formula_element->SetName("formula");
-    formula_element->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+    vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
+    formula->SetName("formula");
+    formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
     string f = this->GetFormula();
     f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
-    formula_element->SetCharacterData(f.c_str(), (int)f.length());
-    rule->AddNestedElement(formula_element);
+    formula->SetCharacterData(f.c_str(), (int)f.length());
+    rule->AddNestedElement(formula);
 
     return rd;
 }

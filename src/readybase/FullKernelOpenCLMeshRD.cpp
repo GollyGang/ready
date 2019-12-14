@@ -43,9 +43,9 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source)
 {
     this->SetFormula(source.GetKernel());
 
-    vtkSmartPointer<vtkUnstructuredGrid> mesh_ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    source.GetMesh(mesh_ug);
-    this->CopyFromMesh(mesh_ug);
+    vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    source.GetMesh(mesh);
+    this->CopyFromMesh(mesh);
 
     this->SetRuleName(source.GetRuleName());
     this->SetDescription(source.GetDescription());
@@ -57,9 +57,9 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string formula_string) const
+string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
-    return formula_string; // here the formula is a full OpenCL kernel
+    return formula; // here the formula is a full OpenCL kernel
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -72,16 +72,16 @@ void FullKernelOpenCLMeshRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn
     if(!rule) throw runtime_error("rule node not found in file");
 
     // kernel:
-    vtkSmartPointer<vtkXMLDataElement> kernel_element = rule->FindNestedElementWithName("kernel");
-    if(!kernel_element) throw runtime_error("kernel node not found in file");
-    string formula_string = trim_multiline_string(kernel_element->GetCharacterData());
+    vtkSmartPointer<vtkXMLDataElement> xml_kernel = rule->FindNestedElementWithName("kernel");
+    if(!xml_kernel) throw runtime_error("kernel node not found in file");
+    string formula = trim_multiline_string(xml_kernel->GetCharacterData());
 
     // number_of_chemicals:
-    read_required_attribute(kernel_element,"number_of_chemicals",this->n_chemicals);
+    read_required_attribute(xml_kernel,"number_of_chemicals",this->n_chemicals);
 
     // do this last, because it requires everything else to be set up first
-    this->TestFormula(formula_string); // will throw on error but won't set
-    this->SetFormula(formula_string); // will set but won't throw
+    this->TestFormula(formula); // will throw on error but won't set
+    this->SetFormula(formula); // will set but won't throw
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -93,13 +93,13 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLMeshRD::GetAsXML(bool generat
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");
 
-    vtkSmartPointer<vtkXMLDataElement> kernel_element = vtkSmartPointer<vtkXMLDataElement>::New();
-    kernel_element->SetName("kernel");
-    kernel_element->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    string formula_string = this->GetFormula();
-    formula_string = ReplaceAllSubstrings(formula_string, "\n", "\n        "); // indent the lines
-    kernel_element->SetCharacterData(formula_string.c_str(), (int)formula_string.length());
-    rule->AddNestedElement(kernel_element);
+    vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
+    kernel->SetName("kernel");
+    kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+    string f = this->GetFormula();
+    f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
+    kernel->SetCharacterData(f.c_str(), (int)f.length());
+    rule->AddNestedElement(kernel);
 
     return rd;
 }

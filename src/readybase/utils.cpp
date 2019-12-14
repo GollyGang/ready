@@ -45,7 +45,7 @@ using namespace std;
     #include <sys/types.h>
     #include <winsock.h>
     // http://www.linuxjournal.com/article/5574
-    void gettimeofday(struct timeval* t,void* /*timezone*/)
+    void gettimeofday(struct timeval* t,void* timezone)
     {
         struct _timeb timebuffer;
         #if _MSC_VER < 1400

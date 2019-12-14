@@ -66,9 +66,9 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD& source)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula_string) const
+string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
-    return formula_string; // here the formula is a full OpenCL kernel
+    return formula; // here the formula is a full OpenCL kernel
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ void FullKernelOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &war
     // kernel:
     vtkSmartPointer<vtkXMLDataElement> xml_kernel = rule->FindNestedElementWithName("kernel");
     if(!xml_kernel) throw runtime_error("kernel node not found in file");
-    string formula_string = trim_multiline_string(xml_kernel->GetCharacterData());
+    string formula = trim_multiline_string(xml_kernel->GetCharacterData());
     read_required_attribute(xml_kernel,"block_size_x",this->block_size[0]);
     read_required_attribute(xml_kernel,"block_size_y",this->block_size[1]);
     read_required_attribute(xml_kernel,"block_size_z",this->block_size[2]);
@@ -92,8 +92,8 @@ void FullKernelOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &war
     read_required_attribute(xml_kernel,"number_of_chemicals",this->n_chemicals);
 
     // do this last, because it requires everything else to be set up first
-    this->TestFormula(formula_string); // will throw on error but won't set
-    this->SetFormula(formula_string); // will set but won't throw
+    this->TestFormula(formula); // will throw on error but won't set
+    this->SetFormula(formula); // will set but won't throw
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -105,16 +105,16 @@ vtkSmartPointer<vtkXMLDataElement> FullKernelOpenCLImageRD::GetAsXML(bool genera
     vtkSmartPointer<vtkXMLDataElement> rule = rd->FindNestedElementWithName("rule");
     if(!rule) throw runtime_error("rule node not found");
 
-    vtkSmartPointer<vtkXMLDataElement> kernel_element = vtkSmartPointer<vtkXMLDataElement>::New();
-    kernel_element->SetName("kernel");
-    kernel_element->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
-    kernel_element->SetIntAttribute("block_size_x",this->block_size[0]);
-    kernel_element->SetIntAttribute("block_size_y",this->block_size[1]);
-    kernel_element->SetIntAttribute("block_size_z",this->block_size[2]);
+    vtkSmartPointer<vtkXMLDataElement> kernel = vtkSmartPointer<vtkXMLDataElement>::New();
+    kernel->SetName("kernel");
+    kernel->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+    kernel->SetIntAttribute("block_size_x",this->block_size[0]);
+    kernel->SetIntAttribute("block_size_y",this->block_size[1]);
+    kernel->SetIntAttribute("block_size_z",this->block_size[2]);
     string f = this->GetFormula();
     f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
-    kernel_element->SetCharacterData(f.c_str(), (int)f.length());
-    rule->AddNestedElement(kernel_element);
+    kernel->SetCharacterData(f.c_str(), (int)f.length());
+    rule->AddNestedElement(kernel);
 
     return rd;
 }

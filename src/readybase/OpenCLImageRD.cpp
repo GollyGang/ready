@@ -51,9 +51,9 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     cl_int ret;
 
     // create the program
-    const string kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
-    const char *source = kernel_source.c_str();
-    size_t source_size = kernel_source.length();
+    this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
+    const char *source = this->kernel_source.c_str();
+    size_t source_size = this->kernel_source.length();
     clReleaseProgram(this->program);
     this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
@@ -158,17 +158,17 @@ void OpenCLImageRD::GenerateInitialPattern()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::BlankImage(float value)
+void OpenCLImageRD::BlankImage()
 {
-    ImageRD::BlankImage(value);
+    ImageRD::BlankImage();
     this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int type)
+void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
-    ImageRD::AllocateImages(x,y,z,nc,type);
+    ImageRD::AllocateImages(x,y,z,nc,data_type);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();

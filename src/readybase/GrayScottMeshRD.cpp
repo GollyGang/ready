@@ -88,9 +88,9 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
             ddb = 0.0f;
             for(int iNeighbor=0;iNeighbor<this->max_neighbors;iNeighbor++)
             {
-                int iCellNeighbor = iCell*this->max_neighbors + iNeighbor;
-                neighbor_index = this->cell_neighbor_indices[iCellNeighbor];
-                diffusion_coefficient = this->cell_neighbor_weights[iCellNeighbor];
+                int k = iCell*this->max_neighbors + iNeighbor;
+                neighbor_index = this->cell_neighbor_indices[k];
+                diffusion_coefficient = this->cell_neighbor_weights[k];
                 dda += source_a->GetValue(neighbor_index) * diffusion_coefficient;
                 ddb += source_b->GetValue(neighbor_index) * diffusion_coefficient;
             }

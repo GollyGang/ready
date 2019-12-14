@@ -284,13 +284,13 @@ void ImageRD::CopyFromMesh(
 
 // ---------------------------------------------------------------------
 
-void ImageRD::AllocateImages(int x,int y,int z,int nc,int type)
+void ImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 {
     this->DeallocateImages();
     this->n_chemicals = nc;
     this->images.resize(nc);
     for(int i=0;i<nc;i++)
-        this->images[i] = AllocateVTKImage(x,y,z,type);
+        this->images[i] = AllocateVTKImage(x,y,z,data_type);
     this->is_modified = true;
     this->undo_stack.clear();
 }
@@ -342,6 +342,7 @@ void ImageRD::GenerateInitialPattern()
                         continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                         //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
+                    double val = this->GetImage(iC)->GetScalarComponentAsDouble(x,y,z,0);
                     vector<double> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
                         vals[i] = this->GetImage(i)->GetScalarComponentAsDouble(x,y,z,0);
@@ -423,10 +424,14 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
+    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
+    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
+    bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
@@ -577,6 +582,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
+    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
@@ -612,54 +618,54 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
         // pass the image through the lookup table
-        vtkSmartPointer<vtkImageMapToColors> image_colors = vtkSmartPointer<vtkImageMapToColors>::New();
-        image_colors->SetLookupTable(lut);
+        vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
+        image_mapper->SetLookupTable(lut);
         #if VTK_MAJOR_VERSION >= 6
-            image_colors->SetInputData(this->GetImage(iChem));
+            image_mapper->SetInputData(this->GetImage(iChem));
         #else
-            image_colors->SetInput(this->GetImage(iChem));
+            image_mapper->SetInput(this->GetImage(iChem));
         #endif
 
         // will convert the x*y 2D image to a x*y grid of quads
-        vtkSmartPointer<vtkPlaneSource> plane_source = vtkSmartPointer<vtkPlaneSource>::New();
-        plane_source->SetXResolution(this->GetX());
-        plane_source->SetYResolution(this->GetY());
-        plane_source->SetOrigin(0,0,0);
-        plane_source->SetPoint1(this->GetX(),0,0);
-        plane_source->SetPoint2(0,this->GetY(),0);
+        vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+        plane->SetXResolution(this->GetX());
+        plane->SetYResolution(this->GetY());
+        plane->SetOrigin(0,0,0);
+        plane->SetPoint1(this->GetX(),0,0);
+        plane->SetPoint2(0,this->GetY(),0);
 
-        vtkSmartPointer<vtkTexture> image_texture = vtkSmartPointer<vtkTexture>::New();
-        image_texture->SetInputConnection(image_colors->GetOutputPort());
+        vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+        texture->SetInputConnection(image_mapper->GetOutputPort());
         if(use_image_interpolation)
-            image_texture->InterpolateOn();
-        vtkSmartPointer<vtkPolyDataMapper> image_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        image_mapper->SetInputConnection(plane_source->GetOutputPort());
+            texture->InterpolateOn();
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(plane->GetOutputPort());
 
-        vtkSmartPointer<vtkActor> image_actor = vtkSmartPointer<vtkActor>::New();
-        image_actor->SetMapper(image_mapper);
-        image_actor->SetPosition(offset);
-        image_actor->SetTexture(image_texture);
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->SetPosition(offset);
+        actor->SetTexture(texture);
         if(show_cell_edges)
-            image_actor->GetProperty()->EdgeVisibilityOn();
-        image_actor->GetProperty()->SetEdgeColor(0,0,0);
-        image_actor->GetProperty()->LightingOff();
-        pRenderer->AddActor(image_actor);
+            actor->GetProperty()->EdgeVisibilityOn();
+        actor->GetProperty()->SetEdgeColor(0,0,0);
+        actor->GetProperty()->LightingOff();
+        pRenderer->AddActor(actor);
 
         if(show_displacement_mapped_surface)
         {
-            vtkSmartPointer<vtkImageDataGeometryFilter> image_plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
             #if VTK_MAJOR_VERSION >= 6
-                image_plane->SetInputData(this->GetImage(iChem));
+                plane->SetInputData(this->GetImage(iChem));
             #else
-                image_plane->SetInput(this->GetImage(iChem));
+                plane->SetInput(this->GetImage(iChem));
             #endif
             vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
-            warp->SetInputConnection(image_plane->GetOutputPort());
+            warp->SetInputConnection(plane->GetOutputPort());
             warp->SetScaleFactor(scaling);
             vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
             normals->SetInputConnection(warp->GetOutputPort());
             normals->SplittingOff();
-            vtkSmartPointer<vtkPolyDataMapper> dms_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
             if(color_displacement_mapped_surface)
             {
                 vtkSmartPointer<vtkTextureMapToPlane> tmap = vtkSmartPointer<vtkTextureMapToPlane>::New();
@@ -667,34 +673,34 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
                 tmap->SetPoint1(this->GetX(),0,0);
                 tmap->SetPoint2(0,this->GetY(),0);
                 tmap->SetInputConnection(normals->GetOutputPort());
-                dms_mapper->SetInputConnection(tmap->GetOutputPort());
+                mapper->SetInputConnection(tmap->GetOutputPort());
             }
             else
-                dms_mapper->SetInputConnection(normals->GetOutputPort());
-            dms_mapper->ScalarVisibilityOff();
-            vtkSmartPointer<vtkActor> dms_actor = vtkSmartPointer<vtkActor>::New();
-            dms_actor->SetMapper(dms_mapper);
-            dms_actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
-            dms_actor->GetProperty()->SetAmbient(0.1);
-            dms_actor->GetProperty()->SetDiffuse(0.7);
-            dms_actor->GetProperty()->SetSpecular(0.2);
-            dms_actor->GetProperty()->SetSpecularPower(3);
+                mapper->SetInputConnection(normals->GetOutputPort());
+            mapper->ScalarVisibilityOff();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
+            actor->GetProperty()->SetAmbient(0.1);
+            actor->GetProperty()->SetDiffuse(0.7);
+            actor->GetProperty()->SetSpecular(0.2);
+            actor->GetProperty()->SetSpecularPower(3);
             if(use_wireframe)
-                dms_actor->GetProperty()->SetRepresentationToWireframe();
-            dms_actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
-            dms_actor->PickableOff();
-            pRenderer->AddActor(dms_actor);
+                actor->GetProperty()->SetRepresentationToWireframe();
+            actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
+            actor->PickableOff();
+            pRenderer->AddActor(actor);
 
             // add the color image as the texture of the displacement-mapped surface
             if(color_displacement_mapped_surface)
             {
-                vtkSmartPointer<vtkTexture> dms_texture = vtkSmartPointer<vtkTexture>::New();
-                dms_texture->SetInputConnection(image_mapper->GetOutputPort());
+                vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+                texture->SetInputConnection(image_mapper->GetOutputPort());
                 if(use_image_interpolation)
-                    dms_texture->InterpolateOn();
+                    texture->InterpolateOn();
                 else
-                    dms_texture->InterpolateOn();
-                dms_actor->SetTexture(dms_texture);
+                    texture->InterpolateOn();
+                actor->SetTexture(texture);
             }
 
             // add the bounding box
@@ -706,11 +712,11 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
                 vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
                 edges->SetInputConnection(box->GetOutputPort());
 
-                vtkSmartPointer<vtkPolyDataMapper> bb_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-                bb_mapper->SetInputConnection(edges->GetOutputPort());
+                vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+                mapper->SetInputConnection(edges->GetOutputPort());
 
                 vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-                actor->SetMapper(bb_mapper);
+                actor->SetMapper(mapper);
                 actor->GetProperty()->SetColor(0,0,0);
                 actor->GetProperty()->SetAmbient(1);
                 actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
@@ -830,6 +836,8 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
+        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
         vtkImageData *image = this->GetImage(iChem);
         int *extent = image->GetExtent();
 
@@ -873,7 +881,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
         vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New(); // (only used if needed)
         to_point_data->SetInputConnection(merge_datasets->GetOutputPort());
 
-        vtkSmartPointer<vtkPolyDataMapper> contour_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         if(use_image_interpolation)
         {
             // turns the 3d grid of sampled values into a polygon mesh for rendering,
@@ -900,8 +907,8 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             }
             surface->SetValue(0,contour_level);
 
-            contour_mapper->SetInputConnection(surface->GetOutputPort());
-            contour_mapper->ScalarVisibilityOff();
+            mapper->SetInputConnection(surface->GetOutputPort());
+            mapper->ScalarVisibilityOff();
         }
         else
         {
@@ -916,35 +923,35 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
             geometry->SetInputConnection(threshold->GetOutputPort());
 
-            contour_mapper->SetInputConnection(geometry->GetOutputPort());
+            mapper->SetInputConnection(geometry->GetOutputPort());
         }
 
-        vtkSmartPointer<vtkActor> contour_actor = vtkSmartPointer<vtkActor>::New();
-        contour_actor->SetMapper(contour_mapper);
-        contour_actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
-        contour_actor->GetProperty()->SetAmbient(0.1);
-        contour_actor->GetProperty()->SetDiffuse(0.5);
-        contour_actor->GetProperty()->SetSpecular(0.4);
-        contour_actor->GetProperty()->SetSpecularPower(10);
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+        actor->GetProperty()->SetColor(surface_r,surface_g,surface_b);
+        actor->GetProperty()->SetAmbient(0.1);
+        actor->GetProperty()->SetDiffuse(0.5);
+        actor->GetProperty()->SetSpecular(0.4);
+        actor->GetProperty()->SetSpecularPower(10);
         if(use_wireframe)
-            contour_actor->GetProperty()->SetRepresentationToWireframe();
+            actor->GetProperty()->SetRepresentationToWireframe();
         if(show_cell_edges && !use_image_interpolation)
         {
-            contour_actor->GetProperty()->EdgeVisibilityOn();
-            contour_actor->GetProperty()->SetEdgeColor(0,0,0);
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(0,0,0);
         }
         vtkSmartPointer<vtkProperty> bfprop = vtkSmartPointer<vtkProperty>::New();
-        contour_actor->SetBackfaceProperty(bfprop);
+        actor->SetBackfaceProperty(bfprop);
         bfprop->SetColor(0.7,0.6,0.55);
         bfprop->SetAmbient(0.1);
         bfprop->SetDiffuse(0.5);
         bfprop->SetSpecular(0.4);
         bfprop->SetSpecularPower(10);
-        contour_actor->SetPosition(offset);
+        actor->SetPosition(offset);
 
         // add the actor to the renderer's scene
-        contour_actor->PickableOff(); // not sure about this - sometimes it is nice to paint on the contoured surface too, for 3d sculpting
-        pRenderer->AddActor(contour_actor);
+        actor->PickableOff(); // not sure about this - sometimes it is nice to paint on the contoured surface too, for 3d sculpting
+        pRenderer->AddActor(actor);
 
         // add the bounding box
         if(show_bounding_box)
@@ -955,17 +962,17 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
             edges->SetInputConnection(box->GetOutputPort());
 
-            vtkSmartPointer<vtkPolyDataMapper> bb_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-            bb_mapper->SetInputConnection(edges->GetOutputPort());
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(edges->GetOutputPort());
 
-            vtkSmartPointer<vtkActor> bb_actor = vtkSmartPointer<vtkActor>::New();
-            bb_actor->SetMapper(bb_mapper);
-            bb_actor->GetProperty()->SetColor(0,0,0);
-            bb_actor->GetProperty()->SetAmbient(1);
-            bb_actor->SetPosition(offset);
-            bb_actor->PickableOff();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->SetColor(0,0,0);
+            actor->GetProperty()->SetAmbient(1);
+            actor->SetPosition(offset);
+            actor->PickableOff();
 
-            pRenderer->AddActor(bb_actor);
+            pRenderer->AddActor(actor);
         }
 
         // add a 2D slice too
@@ -988,20 +995,20 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
                 cutter->SetInputConnection(to_point_data->GetOutputPort());
             else
                 cutter->SetInputConnection(merge_datasets->GetOutputPort());
-            vtkSmartPointer<vtkPolyDataMapper> slice_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-            slice_mapper->SetInputConnection(cutter->GetOutputPort());
-            slice_mapper->SetLookupTable(lut);
-            slice_mapper->UseLookupTableScalarRangeOn();
-            vtkSmartPointer<vtkActor> slice_actor = vtkSmartPointer<vtkActor>::New();
-            slice_actor->SetMapper(slice_mapper);
-            slice_actor->GetProperty()->LightingOff();
+            vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+            mapper->SetInputConnection(cutter->GetOutputPort());
+            mapper->SetLookupTable(lut);
+            mapper->UseLookupTableScalarRangeOn();
+            vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+            actor->SetMapper(mapper);
+            actor->GetProperty()->LightingOff();
             if(show_cell_edges)
             {
-                slice_actor->GetProperty()->EdgeVisibilityOn();
-                slice_actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
+                actor->GetProperty()->EdgeVisibilityOn();
+                actor->GetProperty()->SetEdgeColor(0,0,0); // could be a user option
             }
-            slice_actor->SetPosition(offset);
-            pRenderer->AddActor(slice_actor);
+            actor->SetPosition(offset);
+            pRenderer->AddActor(actor);
         }
 
         // add a text label
@@ -1392,7 +1399,7 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
 
 // ---------------------------------------------------------------------
 
-void ImageRD::SaveFile(const char* fn,const Properties& render_settings,bool generate_initial_pattern_when_loading) const
+void ImageRD::SaveFile(const char* filename,const Properties& render_settings,bool generate_initial_pattern_when_loading) const
 {
     // convert the image to named arrays
     vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
@@ -1411,7 +1418,7 @@ void ImageRD::SaveFile(const char* fn,const Properties& render_settings,bool gen
     iw->SetRenderSettings(&render_settings);
     if(generate_initial_pattern_when_loading)
         iw->GenerateInitialPatternWhenLoading();
-    iw->SetFileName(fn);
+    iw->SetFileName(filename);
     iw->SetDataModeToBinary(); // (to match MeshRD::SaveFile())
     #if VTK_MAJOR_VERSION >= 6
         iw->SetInputData(im);

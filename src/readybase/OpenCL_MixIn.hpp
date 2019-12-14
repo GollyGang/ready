@@ -75,6 +75,8 @@ class OpenCL_MixIn
         std::vector<cl_mem> buffers[2];
         int iCurrentBuffer;
 
+        std::string kernel_source;
+
     private:
 
         int iPlatform,iDevice;
