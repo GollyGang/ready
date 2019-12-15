@@ -33,14 +33,12 @@ matrix:
       before_install:
         - choco install boost-msvc-12 opencl-intel-cpu-runtime
         - mkdir WX
-        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxWidgets-3.1.1-headers.7z
-        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_Dev.7z
-        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.1/wxMSW-3.1.1_vc140_ReleaseDLL.7z
-        - 7z x -oWX -y wxWidgets-3.1.1-headers.7z
-        - 7z x -oWX -y wxMSW-3.1.1_vc140_Dev.7z
-        - 7z x -oWX -y wxMSW-3.1.1_vc140_ReleaseDLL.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3-headers.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxMSW-3.1.3_vc14x_Dev.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxMSW-3.1.3_vc14x_ReleaseDLL.7z
+        - 7z x -oWX -y *.7z
         - WX_HINT=-DwxWidgets_ROOT_DIR=$PWD/WX
-        - WX_LIB_HINT=-DwxWidgets_LIB_DIR=$PWD/WX/lib/vc140_dll
+        - WX_LIB_HINT=-DwxWidgets_LIB_DIR=$PWD/WX/lib/vc14x_dll/
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
