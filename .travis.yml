@@ -40,7 +40,7 @@ matrix:
         - 7z x -oWX -y wxMSW-3.1.3_vc14x_ReleaseDLL.7z
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - cmake -G"Visual Studio 15 2017" -DwxWidgets_LIB_DIR:PATH=$PWD/WX/lib/vc14x_dll -DwxWidgets_ROOT_DIR:PATH=$PWD/WX -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
+        - cmake -G"Visual Studio 15 2017" -DwxWidgets_ROOT_DIR:PATH=$PWD/WX -DwxWidgets_LIB_DIR:PATH=$PWD/WX/lib/vc14x_dll -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
         - choco install boost-msvc-12 opencl-intel-cpu-runtime
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/WX/build
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
