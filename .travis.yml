@@ -4,6 +4,13 @@ matrix:
   include:
     - os: windows
       before_install:
+        # Install OpenCL sdk
+        - NUGETDIR="C:/NUGET"
+        - choco install nuget.commandline
+        - nuget install opencl-nug -Version 0.777.77 -OutputDirectory $NUGETDIR
+        - OCL_ROOT="$NUGETDIR/opencl-nug.0.777.77/build/native"
+        - ls $OCL_ROOT
+        # Set up nmake:
         - export VSVER=2017
         - export MSVER=14.16.27023
         - export SDKVER=10.0.17763.0
@@ -28,6 +35,7 @@ matrix:
         - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
+        # Build wxWidgets from source:
         - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
         - tar xvf wxWidgets-3.1.3.tar.bz2
         - cd wxWidgets-3.1.3/build/msw
@@ -35,11 +43,9 @@ matrix:
         - cd ../../..
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
+        # Install Boost
         - choco install boost-msvc-12
-        - set NUGETDIR=C:\NUGET
-        - nuget install opencl-nug -Version 0.777.77 -OutputDirectory %NUGETDIR%
-        - dir %NUGETDIR%\opencl-nug.0.777.77\build\native\
-        - set OCL_ROOT=%NUGETDIR%\opencl-nug.0.777.77\build\native
+        # Install VTK binaries
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
