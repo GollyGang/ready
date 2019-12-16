@@ -617,8 +617,15 @@ bool DnDFile::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
 
     // bring app to front
     #ifdef __WXMAC__
-        ProcessSerialNumber process;
-        if ( GetCurrentProcess(&process) == noErr ) SetFrontProcess(&process);
+        #if wxCHECK_VERSION(3,1,3)
+            // use wxExecute to avoid deprecated calls
+            wxString app = readydir + wxT("Ready.app");
+            wxString cmd = wxString::Format(wxT("\"%s\""), app.c_str());
+            wxExecute(cmd, wxEXEC_ASYNC);
+        #else
+            ProcessSerialNumber process;
+            if ( GetCurrentProcess(&process) == noErr ) SetFrontProcess(&process);
+        #endif
     #endif
     #ifdef __WXMSW__
         SetForegroundWindow( (HWND)frameptr->GetHandle() );
