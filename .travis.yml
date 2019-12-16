@@ -35,8 +35,11 @@ matrix:
         - cd ../../..
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
-#        - cmake -DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/ -DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
-        - choco install boost-msvc-12 opencl-intel-cpu-runtime
+        - choco install boost-msvc-12
+        - set NUGETDIR=C:\NUGET
+        - nuget install opencl-nug -Version 0.777.77 -OutputDirectory %NUGETDIR%
+        - dir %NUGETDIR%\opencl-nug.0.777.77\build\native\
+        - set OCL_ROOT=%NUGETDIR%\opencl-nug.0.777.77\build\native
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
