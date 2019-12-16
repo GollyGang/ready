@@ -9,9 +9,8 @@ matrix:
         - choco install nuget.commandline
         - nuget install opencl-nug -Version 0.777.77 -OutputDirectory $NUGETDIR
         - OCL_ROOT="$NUGETDIR/opencl-nug.0.777.77/build/native"
-        - ls $OCL_ROOT/include
         - OCL_INCLUDE=-DOPENCL_INCLUDE_DIRS:PATH=$OCL_ROOT/include
-        - OCL_LIB=-DOPENCL_INCLUDE_DIRS:PATH=$OCL_ROOT/lib/x86/OpenCL.lib
+        - OCL_LIB=-DOPENCL_LIB_DIR:PATH=$OCL_ROOT/lib/x86/
         # Set up nmake:
         - export VSVER=2017
         - export MSVER=14.16.27023
