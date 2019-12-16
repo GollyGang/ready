@@ -271,11 +271,11 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
     // add buttons at top of html window
-    backbutt = new wxButton(this, ID::BackButton, _("<"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
-    forwbutt = new wxButton(this, ID::ForwardButton, _(">"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
+    backbutt = new wxButton(this, ID::BackButton, _("<"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+    forwbutt = new wxButton(this, ID::ForwardButton, _(">"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
     contbutt = new wxButton(this, ID::ContentsButton, _("Contents"));
-    smallerbutt = new wxButton(this, ID::SmallerButton, _("-"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
-    biggerbutt = new wxButton(this, ID::BiggerButton, _("+"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
+    smallerbutt = new wxButton(this, ID::SmallerButton, _("-"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+    biggerbutt = new wxButton(this, ID::BiggerButton, _("+"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
     #ifdef __WXMAC__
         // nicer to use smaller buttons -- also do for Win/Linux???
@@ -287,10 +287,10 @@ HelpPanel::HelpPanel(MyFrame* parent, wxWindowID id)
     #endif
 
     hbox->Add(backbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
-    hbox->Add(forwbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
+    hbox->Add(forwbutt, 0, wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
     hbox->Add(contbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
     hbox->Add(smallerbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
-    hbox->Add(biggerbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
+    hbox->Add(biggerbutt, 0, wxRIGHT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
 
     status = new wxStaticText(this, wxID_STATIC, wxEmptyString);
     #ifdef __WXMAC__

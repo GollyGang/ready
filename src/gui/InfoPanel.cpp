@@ -318,8 +318,8 @@ InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
     wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 
     // add buttons at top of html window
-    smallerbutt = new wxButton(this, ID::SmallerButton, _("-"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
-    biggerbutt = new wxButton(this, ID::BiggerButton, _("+"), wxDefaultPosition, wxSize(30,wxDefaultCoord));
+    smallerbutt = new wxButton(this, ID::SmallerButton, _("-"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+    biggerbutt = new wxButton(this, ID::BiggerButton, _("+"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
     #ifdef __WXMAC__
         // nicer to use smaller buttons -- also do for Win/Linux???
@@ -328,7 +328,7 @@ InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
     #endif
 
     hbox->Add(smallerbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
-    hbox->Add(biggerbutt, 0, wxLEFT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
+    hbox->Add(biggerbutt, 0, wxRIGHT | wxTOP | wxBOTTOM | wxALIGN_LEFT, 10);
 
     status = new wxStaticText(this, wxID_STATIC, wxEmptyString);
     #ifdef __WXMAC__
