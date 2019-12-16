@@ -8,7 +8,7 @@ matrix:
         - choco install boost-msvc-12 --x86
         - ls C:/local/boost_1_58_0
         - BOOST_ROOT=-DBOOST_ROOT:PATH=/C/local/boost_1_58_0
-        - BOOST_LIB=-DBOOST_LIBRARYDIR=/C/local/boost_1_58_0/lib64-msvc-12.0
+        - BOOST_LIB=-DBOOST_LIBRARYDIR=/C/local/boost_1_58_0/lib32-msvc-12.0
         # Install OpenCL sdk
         - NUGETDIR="C:/NUGET"
         - choco install nuget.commandline
