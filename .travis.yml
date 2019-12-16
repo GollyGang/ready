@@ -4,6 +4,11 @@ matrix:
   include:
     - os: windows
       before_install:
+        # Install Boost
+        - choco install boost-msvc-12 --x86
+        - ls C:/local/boost_1_57_0
+        - BOOST_ROOT=-DBOOST_ROOT:PATH=C:/local/boost_1_58_0
+        - BOOST_LIB=-DBOOST_LIBRARYDIR=C:/local/boost_1_57_0/lib64-msvc-12.0
         # Install OpenCL sdk
         - NUGETDIR="C:/NUGET"
         - choco install nuget.commandline
@@ -44,9 +49,6 @@ matrix:
         - cd ../../..
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
-        # Install Boost
-        - choco install boost-msvc-12 --x86
-        - BOOST_ROOT=-DBOOST_ROOT:PATH=C:/local/boost_1_58_0
         # Install VTK binaries
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
@@ -87,6 +89,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT ..
+    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_LIB ..
 
 script: make 
