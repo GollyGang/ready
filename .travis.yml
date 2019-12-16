@@ -30,15 +30,11 @@ matrix:
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
         - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
         - tar xvf wxWidgets-3.1.3.tar.bz2
-        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
-        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/WX/build
-        - ls
-        - ls wxWidgets-3.1.3
         - cd wxWidgets-3.1.3/build/msw
         - nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
         - cd ../../..
-        - cmake -DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/ -DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
+        - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
+#        - cmake -DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/ -DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
         - choco install boost-msvc-12 opencl-intel-cpu-runtime
         - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
