@@ -33,6 +33,7 @@ matrix:
         - cd wxWidgets-3.1.3/build/msw
         - nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
         - cd ../../..
+        - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
 #        - cmake -DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/ -DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
         - choco install boost-msvc-12 opencl-intel-cpu-runtime
@@ -75,6 +76,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $VTK_HINT $WX_LIB_HINT ..
+    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT ..
 
 script: make 
