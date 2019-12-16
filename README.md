@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/GollyGang/ready.svg?branch=gh-pages)](https://travis-ci.org/GollyGang/ready)
-
-## Ready ##
+## Ready &emsp; &emsp; &emsp; [![Build Status](https://travis-ci.com/GollyGang/ready.svg?branch=gh-pages)](https://travis-ci.com/GollyGang/ready)
 
 Ready is a program for exploring [continuous](http://www.wolframscience.com/nksonline/section-4.8) and discrete cellular automata, including [reaction-diffusion](http://mrob.com/pub/comp/xmorphia/) systems, on grids and arbitrary meshes. [OpenCL](http://en.wikipedia.org/wiki/OpenCL) is used as the computation engine, to take advantage of the [many-core architectures](http://herbsutter.com/welcome-to-the-jungle/) on graphics cards and modern CPUs. OpenCL also allows rules to be written in a text format and compiled on the fly. Ready supports a compact [XML](http://en.wikipedia.org/wiki/XML)-based file format so that images and rules can be shared easily.
 
