@@ -4,11 +4,15 @@ matrix:
   include:
     - os: windows
       before_install:
-        # Install Boost
-        - choco install boost-msvc-12 --x86
-        - ls /C/local/boost_1_58_0/lib32-msvc-12.0
-        - BOOST_ROOT=-DBOOST_ROOT:PATH=/C/local/boost_1_58_0
-        - BOOST_LIB=-DBOOST_LIBRARYDIR=/C/local/boost_1_58_0/lib32-msvc-12.0
+        # Build Boost
+        - wget -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
+        - tar xzvf boost_1_64_0.tar.gz
+        - cd boost_1_64_0/
+        - ./bootstrap.sh -with-libraries=program_options
+        - ./b2 -j8 toolset=msvc-14.1 address-model=32 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a -d0 stage
+        - cd ..
+        - ls boost_1_64_0/stage
+        - BOOST_ROOT=-DBOOST_ROOT:PATH=$PWD/boost_1_64_0/stage
         # Install OpenCL sdk
         - NUGETDIR="C:/NUGET"
         - choco install nuget.commandline
@@ -89,6 +93,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT $BOOST_LIB ..
+    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT ..
 
 script: make 
