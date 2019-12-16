@@ -2,6 +2,26 @@ language: cpp
 
 matrix:
   include:
+    - os: windows
+      before_install:
+        - mkdir WX
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3-headers.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxMSW-3.1.3_vc14x_Dev.7z
+        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxMSW-3.1.3_vc14x_ReleaseDLL.7z
+        - 7z x -oWX -y wxWidgets-3.1.3-headers.7z
+        - 7z x -oWX -y wxMSW-3.1.3_vc14x_Dev.7z
+        - 7z x -oWX -y wxMSW-3.1.3_vc14x_ReleaseDLL.7z
+        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
+        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
+        - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/WX/build
+        - ls WX
+        - pwd
+        - cmake -DwxWidgets_ROOT_DIR:PATH=WX -DwxWidgets_LIB_DIR:PATH=WX/lib/vc14x_dll -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
+        - choco install boost-msvc-12 opencl-intel-cpu-runtime
+        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
+        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
+        - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+allow_failures:
     - os: linux
       sudo: required
       dist: bionic
@@ -29,23 +49,6 @@ matrix:
     - os: osx
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install vtk wxmac boost
-    - os: windows
-      before_install:
-        - mkdir WX
-        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3-headers.7z
-        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxMSW-3.1.3_vc14x_Dev.7z
-        - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxMSW-3.1.3_vc14x_ReleaseDLL.7z
-        - 7z x -oWX -y wxWidgets-3.1.3-headers.7z
-        - 7z x -oWX -y wxMSW-3.1.3_vc14x_Dev.7z
-        - 7z x -oWX -y wxMSW-3.1.3_vc14x_ReleaseDLL.7z
-        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
-        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/WX/build
-        - cmake -G"Visual Studio 15 2017" -DwxWidgets_ROOT_DIR:PATH=$PWD/WX -DwxWidgets_LIB_DIR:PATH=$PWD/WX/lib/vc14x_dll -DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1 .
-        - choco install boost-msvc-12 opencl-intel-cpu-runtime
-        - wget https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
-        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
-        - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
 
 branches:
   only:
