@@ -6,7 +6,7 @@ matrix:
       before_install:
         # Install Boost
         - choco install boost-msvc-12 --x86
-        - ls C:/local/boost_1_58_0
+        - ls /C/local/boost_1_58_0/lib32-msvc-12.0
         - BOOST_ROOT=-DBOOST_ROOT:PATH=/C/local/boost_1_58_0
         - BOOST_LIB=-DBOOST_LIBRARYDIR=/C/local/boost_1_58_0/lib32-msvc-12.0
         # Install OpenCL sdk
@@ -89,6 +89,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_LIB ..
+    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT $BOOST_LIB ..
 
 script: make 
