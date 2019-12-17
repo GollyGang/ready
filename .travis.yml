@@ -68,18 +68,6 @@ matrix:
             - libgtk-3-dev
             - libwxgtk3.0-gtk3-dev
             - libboost-program-options-dev
-    - os: linux
-      sudo: required
-      dist: trusty
-      compiler: gcc
-      addons:
-        apt:
-          packages:
-            - libvtk6-dev
-            - ocl-icd-opencl-dev
-            - libgtk2.0-dev
-            - libwxgtk3.0-dev
-            - libboost-program-options-dev
     - os: osx
       addons:
         homebrew:
