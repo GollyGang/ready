@@ -12,7 +12,7 @@ matrix:
         - ./b2 -j8 toolset=msvc-14.1 address-model=32 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a -d0
         - cd ..
         - ls boost_1_64_0/
-        - ls boost_1_64_0/lib
+        - ls boost_1_64_0/stage/lib
         - BOOST_ROOT=-DBOOST_ROOT:PATH=$PWD/boost_1_64_0
         # Install OpenCL sdk
         - NUGETDIR="C:/NUGET"
