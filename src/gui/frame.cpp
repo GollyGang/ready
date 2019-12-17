@@ -2856,6 +2856,7 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
     this->system->SetFrom2DImage(dlg.iTargetChemical, resize->GetOutput());
 
     this->is_running = false;
+    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
     this->UpdateWindows();
 }
 
