@@ -953,6 +953,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
 
     vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
     screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
+    screenshot->ReadFrontBufferOff();
 
     vtkSmartPointer<vtkImageWriter> writer;
     if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
