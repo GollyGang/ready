@@ -2775,7 +2775,7 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
         #endif
         wxFileOutputStream to_file(mesh_filename.GetFullPath());
         wxTextOutputStream out(to_file);
-        writer->SetWriteToOutputString(true);
+        writer->SetWriteToOutputString(true); // workaround because VTK doesn't yet allow unicode filepaths
         writer->Write();
         out << writer->GetOutputString();
     }
