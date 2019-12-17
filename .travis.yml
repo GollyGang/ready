@@ -6,12 +6,12 @@ matrix:
       before_install:
         # Build Boost
         - wget -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
-        - tar xzvf boost_1_64_0.tar.gz
+        - tar xzf boost_1_64_0.tar.gz
         - cd boost_1_64_0/
         - ./bootstrap.sh -with-libraries=program_options
         - ./b2 -j8 toolset=msvc-14.1 address-model=32 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a -d0 stage
         - cd ..
-        - ls boost_1_64_0/stage
+        - ls boost_1_64_0/stage/lib
         - BOOST_ROOT=-DBOOST_ROOT:PATH=$PWD/boost_1_64_0/stage
         # Install OpenCL sdk
         - NUGETDIR="C:/NUGET"
@@ -47,9 +47,9 @@ matrix:
         - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
         # Build wxWidgets from source:
         - wget https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
-        - tar xvf wxWidgets-3.1.3.tar.bz2
+        - tar xf wxWidgets-3.1.3.tar.bz2
         - cd wxWidgets-3.1.3/build/msw
-        - nmake -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+        - nmake /C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
         - cd ../../..
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
