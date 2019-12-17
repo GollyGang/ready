@@ -57,7 +57,6 @@ matrix:
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
     - os: linux
-      sudo: required
       dist: bionic
       compiler: gcc
       addons:
@@ -67,6 +66,17 @@ matrix:
             - ocl-icd-opencl-dev
             - libgtk-3-dev
             - libwxgtk3.0-gtk3-dev
+            - libboost-program-options-dev
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk6-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
             - libboost-program-options-dev
     - os: osx
       addons:
