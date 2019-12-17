@@ -2525,32 +2525,32 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-bool MyFrame::LoadMesh(const wxString& mesh_filename, vtkUnstructuredGrid* ug)
+bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
 {
     try
     {
-        if (mesh_filename.EndsWith(_T("vtp")))
+        if (mesh_filename.GetExt().Lower()==_T("vtp"))
         {
             vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-            vtp_reader->SetFileName(mesh_filename.mb_str());
+            vtp_reader->SetFileName(mesh_filename.GetFullPath().mb_str());
             vtp_reader->Update();
             ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
             ug->SetCells(VTK_POLYGON, vtp_reader->GetOutput()->GetPolys());
         }
-        else if (mesh_filename.EndsWith(_T("vtu")))
+        else if (mesh_filename.GetExt().Lower()==_T("vtu"))
         {
             vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
-            vtu_reader->SetFileName(mesh_filename.mb_str());
+            vtu_reader->SetFileName(mesh_filename.GetFullPath().mb_str());
             vtu_reader->Update();
             ug->DeepCopy(vtu_reader->GetOutput());
         }
-        else if (mesh_filename.EndsWith(_T("obj")))
+        else if (mesh_filename.GetExt().Lower() ==_T("obj"))
         {
             // temporarily turn off internationalisation, to avoid string-to-float conversion issues
             char *old_locale = setlocale(LC_NUMERIC, "C");
 
             vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
-            obj_reader->SetFileName(mesh_filename.mb_str());
+            obj_reader->SetFileName(mesh_filename.GetFullPath().mb_str());
             obj_reader->Update();
             ug->SetPoints(obj_reader->GetOutput()->GetPoints());
             ug->SetCells(VTK_POLYGON, obj_reader->GetOutput()->GetPolys());
@@ -2730,7 +2730,7 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
     normals->Update();
     vtkPolyData* pd = normals->GetOutput();
 
-    if(mesh_filename.GetExt() == _T("obj"))
+    if(mesh_filename.GetExt().Lower() == _T("obj"))
     {
         wxBusyCursor busy;
         wxFileOutputStream to_file(mesh_filename.GetFullPath());
@@ -2764,7 +2764,7 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
             out << "\n";
         }
     }
-    else if(mesh_filename.GetExt() == _T("vtp"))
+    else if(mesh_filename.GetExt().Lower() == _T("vtp"))
     {
         wxBusyCursor busy;
         vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();

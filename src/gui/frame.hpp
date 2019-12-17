@@ -209,7 +209,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void SetStatusBarText();
         void RecordFrame();
 
-        bool LoadMesh(const wxString& filename, vtkUnstructuredGrid* ug);
+        bool LoadMesh(const wxFileName& filename, vtkUnstructuredGrid* ug);
         void MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug);
         void MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug);
 
