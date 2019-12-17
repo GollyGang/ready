@@ -11,8 +11,6 @@ matrix:
         - ./bootstrap.sh -with-libraries=program_options
         - ./b2 -j8 toolset=msvc-14.1 address-model=32 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a -d0
         - cd ..
-        - ls boost_1_64_0/
-        - ls boost_1_64_0/stage/lib
         - BOOST_ROOT=-DBOOST_ROOT:PATH=$PWD/boost_1_64_0
         # Install OpenCL SDK
         - NUGETDIR="C:/NUGET"
@@ -21,36 +19,11 @@ matrix:
         - OCL_ROOT="$NUGETDIR/opencl-nug.0.777.77/build/native"
         - OCL_INCLUDE=-DOPENCL_INCLUDE_DIRS:PATH=$OCL_ROOT/include
         - OCL_LIB=-DOPENCL_LIBRARIES:PATH=$OCL_ROOT/lib/x86/OpenCL.lib
-        # Set up nmake in order to build wxWidgets:
-        - export VSVER=2017
-        - export MSVER=14.16.27023
-        - export SDKVER=10.0.17763.0
-        - export FRAMEVER=4.0.30319
-        - export NETFXVER=4.6.1
-        - export WKITVER=10.0.17134.0
-        - export TOOLSVER=BuildTools
-        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/VC/VCPackages:$PATH
-        - export PATH=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/$WKITVER/x64:$PATH
-        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x64:$PATH
-        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x86:$PATH
-        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/CommonExtensions/Microsoft/TestWindow
-        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/MSBuild/Current/bin/Roslyn
-        - export INCLUDE=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/$TOOLSVER/VC/Tools/MSVC/$MSVER/include
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/$WKITVER/ucrt
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/ucrt
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/shared
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/um
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/winrt
-        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/cppwinrt
-        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/ATLMFC/lib/x86
-        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
-        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
-        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
         # Build wxWidgets:
         - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
         - tar xf wxWidgets-3.1.3.tar.bz2 > NUL
         - cd wxWidgets-3.1.3/build/msw
-        - nmake -C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+        - mingw64-make -j 8 -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
         - cd ../../..
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
