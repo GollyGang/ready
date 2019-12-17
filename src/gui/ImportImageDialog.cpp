@@ -72,7 +72,7 @@ ImportImageDialog::ImportImageDialog(wxWindow *parent, wxString filename, int nu
         for (int i = 0; i < num_chemicals; ++i)
             this->chemical_combo->AppendString(GetChemicalName(i));
         this->chemical_combo->SetSelection(i_target_chemical);
-        hbox2->Add(chemical_combo, 0, wxLEFT | wxRIGHT, STDHGAP);
+        hbox2->Add(chemical_combo, 1, wxLEFT | wxRIGHT, STDHGAP);
     }
 
     wxBoxSizer* hbox3 = new wxBoxSizer(wxHORIZONTAL);
