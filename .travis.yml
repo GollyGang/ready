@@ -9,10 +9,11 @@ matrix:
         - tar xzf boost_1_64_0.tar.gz > NUL
         - cd boost_1_64_0/
         - ./bootstrap.sh -with-libraries=program_options
-        - ./b2 -j8 toolset=msvc-14.1 address-model=32 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a -d0 stage
+        - ./b2 -j8 toolset=msvc-14.1 address-model=32 architecture=x86 link=static threading=multi runtime-link=static release --build-type=complete -a -d0
         - cd ..
-        - ls boost_1_64_0/stage/lib
-        - BOOST_ROOT=-DBOOST_ROOT:PATH=$PWD/boost_1_64_0/stage
+        - ls boost_1_64_0/
+        - ls boost_1_64_0/lib
+        - BOOST_ROOT=-DBOOST_ROOT:PATH=$PWD/boost_1_64_0
         # Install OpenCL sdk
         - NUGETDIR="C:/NUGET"
         - choco install nuget.commandline
@@ -49,7 +50,7 @@ matrix:
         - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
         - tar xf wxWidgets-3.1.3.tar.bz2 > NUL
         - cd wxWidgets-3.1.3/build/msw
-        - nmake -C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+        - nmake -C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0 > NUL
         - cd ../../..
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
