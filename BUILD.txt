@@ -131,7 +131,7 @@ cd Ready
 git clone https://github.com/GollyGang/ready.git
 mkdir build
 cd build
-cmake ../ready -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release ../ready
 make
 
 Optional, for packaging:
@@ -156,7 +156,7 @@ sudo make install
 cd /path/to/VTK-8.2.0
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.9
+cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.9 .. 
 make   # this also takes some time
 
 3. Install Boost
@@ -169,12 +169,12 @@ brew install boost
 
 4. Build Ready:
 
-cd ~   # or some other directory
+mkdir Ready
+cd Ready
 git clone https://github.com/GollyGang/ready.git
-cd ready
 mkdir build
 cd build
-cmake .. -DVTK_DIR:PATH=/path/to/VTK-8.2.0/build
+cmake -DVTK_DIR:PATH=/path/to/VTK-8.2.0/build -DCMAKE_BUILD_TYPE:STRING=Release ../ready
 make
 open Ready.app
 
