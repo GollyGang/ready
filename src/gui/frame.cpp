@@ -53,6 +53,8 @@
 #if wxUSE_TOOLTIPS
    #include <wx/tooltip.h>
 #endif
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
 
 // wxVTK: (local copy)
 #include "wxVTKRenderWindowInteractor.h"
@@ -2703,19 +2705,12 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
         _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (mesh_filename.empty()) return; // user cancelled
 
-    const char* filename_cstr = mesh_filename.mb_str();
-    if (strlen(filename_cstr) == 0)
-    {
-        wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-        return;
-    }
-
     SaveCurrentMesh(mesh_filename,false,0.0);
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::SaveCurrentMesh(const wxString& mesh_filename, bool should_decimate, double targetReduction)
+void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decimate, double targetReduction)
 {
     vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
     this->system->GetAsMesh(mesh,this->render_settings);
@@ -2735,10 +2730,11 @@ void MyFrame::SaveCurrentMesh(const wxString& mesh_filename, bool should_decimat
     normals->Update();
     vtkPolyData* pd = normals->GetOutput();
 
-    if(mesh_filename.EndsWith(_T("obj")))
+    if(mesh_filename.GetExt() == _T("obj"))
     {
         wxBusyCursor busy;
-        ofstream out(mesh_filename.mb_str());
+        wxFileOutputStream to_file(mesh_filename.GetFullPath());
+        wxTextOutputStream out(to_file);
         out << "# Output from Ready - https://github.com/GollyGang/ready\n";
         pd->BuildCells();
         for(vtkIdType iPt=0;iPt<pd->GetNumberOfPoints();iPt++)
@@ -2758,27 +2754,30 @@ void MyFrame::SaveCurrentMesh(const wxString& mesh_filename, bool should_decimat
             if(pd->GetPointData()->GetNormals())
             {
                 for(vtkIdType iPt=0;iPt<npts;iPt++)
-                    out << " " << pts[iPt]+1 << "//" << pts[iPt]+1; // (OBJ indices are 1-based)
+                    out << " " << wxInt32(pts[iPt]+1) << "//" << wxInt32(pts[iPt]+1); // (OBJ indices are 1-based)
             }
             else
             {
                 for(vtkIdType iPt=0;iPt<npts;iPt++)
-                    out << " " << pts[iPt]+1; // (OBJ indices are 1-based)
+                    out << " " << wxInt32(pts[iPt]+1); // (OBJ indices are 1-based)
             }
             out << "\n";
         }
     }
-    else if(mesh_filename.EndsWith(_T("vtp")))
+    else if(mesh_filename.GetExt() == _T("vtp"))
     {
         wxBusyCursor busy;
         vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-        writer->SetFileName(mesh_filename.mb_str());
         #if VTK_MAJOR_VERSION >= 6
             writer->SetInputData(pd);
         #else
             writer->SetInput(pd);
         #endif
+        wxFileOutputStream to_file(mesh_filename.GetFullPath());
+        wxTextOutputStream out(to_file);
+        writer->SetWriteToOutputString(true);
         writer->Write();
+        out << writer->GetOutputString();
     }
     else
     {

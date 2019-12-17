@@ -24,6 +24,7 @@
     #include <wx/wx.h>
 #endif
 #include <wx/aui/aui.h>
+#include <wx/filename.h>
 
 // local:
 class PatternsPanel;
@@ -214,7 +215,7 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         wxString SavePatternDialog();   // return empty path if user cancels
         void SaveFile(const wxString& path);
-        void SaveCurrentMesh(const wxString& mesh_filename, bool should_decimate, double targetReduction);
+        void SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decimate, double targetReduction);
 
     private:
 
