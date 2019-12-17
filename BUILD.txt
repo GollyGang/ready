@@ -150,10 +150,10 @@ cd build-osx
 make   # take a nap, it'll be a while
 sudo make install
 
-2. Build VTK (assuming you've downloaded and unzipped VTK-6.3.0.zip from
+2. Build VTK (assuming you've downloaded and unzipped VTK-8.2.0.zip from
    http://www.vtk.org/download/):
 
-cd /path/to/VTK-6.3.0
+cd /path/to/VTK-8.2.0
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.9
@@ -174,7 +174,7 @@ git clone https://github.com/GollyGang/ready.git
 cd ready
 mkdir build
 cd build
-cmake .. -DVTK_DIR:PATH=/path/to/VTK-6.3.0/build
+cmake .. -DVTK_DIR:PATH=/path/to/VTK-8.2.0/build
 make
 open Ready.app
 
