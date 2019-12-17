@@ -94,6 +94,6 @@ branches:
 before_script:  
     - mkdir build
     - cd build
-    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT ..
+    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT -DCMAKE_BUILD_TYPE=Release ..
 
 script: cmake --build . 
