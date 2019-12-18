@@ -2548,11 +2548,18 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
         }
         else if (mesh_filename.GetExt().Lower() ==_T("obj"))
         {
+            wxString source_filename(mesh_filename.GetFullPath());
+            if(strlen(mesh_filename.GetFullPath().mb_str())==0) {
+                // unicode characters in path, copy to temp file and read from there
+                source_filename = wxFileName::CreateTempFileName("");
+                wxCopyFile(mesh_filename.GetFullPath(), source_filename);
+                wxMessageBox(_T("Duplicated to ")+source_filename);
+            }
             // temporarily turn off internationalisation, to avoid string-to-float conversion issues
             char *old_locale = setlocale(LC_NUMERIC, "C");
 
             vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
-            obj_reader->SetFileName(mesh_filename.GetFullPath().mb_str());
+            obj_reader->SetFileName(source_filename.mb_str());
             obj_reader->Update();
             ug->SetPoints(obj_reader->GetOutput()->GetPoints());
             ug->SetCells(VTK_POLYGON, obj_reader->GetOutput()->GetPolys());
