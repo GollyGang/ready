@@ -2553,7 +2553,6 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
                 // unicode characters in path, copy to temp file and read from there
                 source_filename = wxFileName::CreateTempFileName("");
                 wxCopyFile(mesh_filename.GetFullPath(), source_filename);
-                wxMessageBox(_T("Duplicated to ")+source_filename);
             }
             // temporarily turn off internationalisation, to avoid string-to-float conversion issues
             char *old_locale = setlocale(LC_NUMERIC, "C");
