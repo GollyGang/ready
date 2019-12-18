@@ -2533,7 +2533,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
         {
             vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
             vtp_reader->ReadFromInputStringOn();
-            vtp_reader->SetInputString(ReadEntireFile(mesh_filename).ToStdString(wxConvUTF8)); // UTF8 is the default character encoding for XML documents
+            vtp_reader->SetInputString(ReadEntireFile(mesh_filename).ToStdString());
             vtp_reader->Update();
             ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
             ug->SetCells(VTK_POLYGON, vtp_reader->GetOutput()->GetPolys());
@@ -2542,7 +2542,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
         {
             vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
             vtu_reader->ReadFromInputStringOn();
-            vtu_reader->SetInputString(ReadEntireFile(mesh_filename).ToStdString(wxConvUTF8)); // UTF8 is the default character encoding for XML documents
+            vtu_reader->SetInputString(ReadEntireFile(mesh_filename).ToStdString());
             vtu_reader->Update();
             ug->DeepCopy(vtu_reader->GetOutput());
         }
