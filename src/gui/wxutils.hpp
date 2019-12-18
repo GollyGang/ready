@@ -95,5 +95,8 @@ wxString FormatFloat(float f,int mdp=6);
 // converts a wxFileName to a wxString, using the short form if needed as a workaround for unicode characters
 wxString FileNameToString(const wxFileName& filename);
 
+// reads an entire file into a string
+wxString ReadEntireFile(const wxFileName& filename);
+
 // load an image file and extract its min and max scalar values
 void GetScalarRangeFromImage(wxFileName filename, double range[2]);

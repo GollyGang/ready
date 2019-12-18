@@ -22,7 +22,8 @@
 #include "dialogs.hpp"
 
 // wxWidgets:
-#include <wx/clipbrd.h>     // for wxTheClipboard
+#include <wx/clipbrd.h>
+#include <wx/ffile.h>
 
 // VTK:
 #include <vtkBMPReader.h>
@@ -235,7 +236,7 @@ wxString FormatFloat(float f,int mdp)
 
 // -----------------------------------------------------------------------------
 
-wxString FileNameToString(const wxFileName& filename)
+wxString FileNameToString(const wxFileName& filename) // TODO: this only helps on Windows when reading from a file
 {
     // if unicode characters in path, use the short form
     wxString path = filename.GetFullPath();
@@ -243,6 +244,19 @@ wxString FileNameToString(const wxFileName& filename)
         return path;
     }
     return filename.GetShortPath();
+}
+
+// -----------------------------------------------------------------------------
+
+wxString ReadEntireFile(const wxFileName& filename)
+{
+    wxFFile file(filename.GetFullPath());
+    if (!file.IsOpened()) {
+        throw std::runtime_error("Failed to open file for reading");
+    }
+    wxString file_content;
+    file.ReadAll(&file_content);
+    return file_content;
 }
 
 // -----------------------------------------------------------------------------
