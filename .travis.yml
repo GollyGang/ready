@@ -99,8 +99,8 @@ matrix:
             - wxmac
             - boost
     - os: osx
-      osx_image: xcode6.4
-      name: MacOS_10.10_xcode6.4
+      osx_image: xcode8
+      name: MacOS_10.11_xcode7.3.1
       addons:
         homebrew:
           packages:
