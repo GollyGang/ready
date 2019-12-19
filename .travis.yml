@@ -3,7 +3,7 @@ language: cpp
 matrix:
   include:
     - os: windows
-      name: Windows_vtk8
+      name: Windows_vtk8.1.2_wx3.1.3
       before_install:
         # Build Boost (just program_options, for speed)
         - wget -q -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
@@ -58,7 +58,7 @@ matrix:
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
     - os: linux
-      name: Ubuntu_18.04_gtk3_vtk7
+      name: Ubuntu_18.04_gtk3_vtk7_wx3.0.4
       dist: bionic
       compiler: gcc
       addons:
@@ -70,7 +70,7 @@ matrix:
             - libwxgtk3.0-gtk3-dev
             - libboost-program-options-dev
     - os: linux
-      name: Ubuntu_16.04_gtk2_vtk6
+      name: Ubuntu_16.04_gtk2_vtk6_wx3.0.2
       dist: xenial
       compiler: gcc
       addons:
@@ -83,7 +83,7 @@ matrix:
             - libboost-program-options-dev
     - os: osx
       osx_image: xcode11.3
-      name: MacOS_10.14_xcode11.3
+      name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
       addons:
         homebrew:
           packages:
@@ -91,7 +91,16 @@ matrix:
             - wxmac
             - boost
     - os: osx
-      name: MacOS_10.13_xcode9.4.1
+      name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
+      addons:
+        homebrew:
+          packages:
+            - vtk
+            - wxmac
+            - boost
+    - os: osx
+      osx_image: xcode6.4
+      name: MacOS_10.10_xcode6.4
       addons:
         homebrew:
           packages:
