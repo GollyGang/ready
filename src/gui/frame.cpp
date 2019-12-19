@@ -975,7 +975,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     // write the bytes to the image file
     wxFileOutputStream to_file(filename.GetFullPath());
     wxDataOutputStream out(to_file);
-    for (vtkIdType i = 0; i < bytes->GetNumberOfValues(); i++) {
+    for (vtkIdType i = 0; i < bytes->GetNumberOfTuples(); i++) {
         out.Write8(bytes->GetValue(i));
     }
 }
