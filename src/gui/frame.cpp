@@ -53,7 +53,6 @@
 #if wxUSE_TOOLTIPS
    #include <wx/tooltip.h>
 #endif
-#include <wx/datstrm.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 
@@ -70,6 +69,7 @@ using namespace std;
 #include <vtkCellArray.h>
 #include <vtkCellPicker.h>
 #include <vtkDoubleArray.h>
+#include <vtkImageChangeInformation.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageReader2.h>
 #include <vtkImageResize.h>
@@ -916,33 +916,10 @@ void MyFrame::OnSize(wxSizeEvent& event)
 
 void MyFrame::OnScreenshot(wxCommandEvent& event)
 {
-    wxFileName filename;
-    // iterate until we find an unused filename in the default folder
-    {
-        int suffix_value = 0;
-        do {
-            filename.Assign(
-                screenshotdir,
-                wxString::Format(_("Ready_screenshot_%04d"), suffix_value++),
-                _("png"));
-        } while (filename.FileExists());
-    }
+    wxFileName filename = FindUnusedFilename(screenshotdir, _("Ready_screenshot_%04d.png"));
 
-    // ask the user for confirmation
-    while(true)
-    {
-        filename = wxFileSelector(
-            _("Specify the screenshot filename"),
-            filename.GetPath(),
-            filename.GetName(),
-            filename.GetExt(),
-            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
-            wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-        if(filename.GetFullPath().empty()) return; // user cancelled
-        if (filename.GetExt().Lower() == _("png") || filename.GetExt().Lower() == _("jpg"))
-            break;
-        wxMessageBox(_("Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-    }
+    if (!AskUserWhereToSaveImage(filename))
+        return; // user cancelled
 
     screenshotdir = filename.GetPath(); // default to this folder next time
 
@@ -950,34 +927,7 @@ void MyFrame::OnScreenshot(wxCommandEvent& event)
     screenshot->SetInput(this->pVTKWindow->GetRenderWindow());
     screenshot->ReadFrontBufferOff();
 
-    // write the image file into memory
-    // (this is a workaround because VTK doesn't yet support unicode in filenames)
-    vtkSmartPointer<vtkUnsignedCharArray> bytes;
-    if (filename.GetExt().Lower() == _("png")) {
-        vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
-        writer->SetInputConnection(screenshot->GetOutputPort());
-        writer->WriteToMemoryOn();
-        writer->Write();
-        bytes = writer->GetResult();
-    }
-    else if (filename.GetExt().Lower() == _("jpg")) {
-        vtkSmartPointer<vtkJPEGWriter> writer = vtkSmartPointer<vtkJPEGWriter>::New();
-        writer->SetInputConnection(screenshot->GetOutputPort());
-        writer->WriteToMemoryOn();
-        writer->Write();
-        bytes = writer->GetResult();
-    }
-    else {
-        wxMessageBox(_("Internal error: Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-        return;
-    }
-
-    // write the bytes to the image file
-    wxFileOutputStream to_file(filename.GetFullPath());
-    wxDataOutputStream out(to_file);
-    for (vtkIdType i = 0; i < bytes->GetNumberOfTuples(); i++) {
-        out.Write8(bytes->GetValue(i));
-    }
+    WriteImageToFile(screenshot->GetOutputPort(), filename);
 }
 
 // ---------------------------------------------------------------------
@@ -2902,58 +2852,23 @@ void MyFrame::OnUpdateImportImage(wxUpdateUIEvent& event)
 
 void MyFrame::OnExportImage(wxCommandEvent &event)
 {
-    // find an unused filename
-    const wxString default_filename_root = _("Ready_image_");
-    const wxString default_filename_ext = _T("png");
-    int unused_value = 0;
-    wxString filename;
-    const char* filename_cstr;
-    wxString extension,folder;
-    folder = screenshotdir;
-    do {
-        filename = default_filename_root;
-        filename << wxString::Format(_("%04d."),unused_value) << default_filename_ext;
-        unused_value++;
-    } while(::wxFileExists(folder+_T("/")+filename));
+    wxFileName filename = FindUnusedFilename(screenshotdir, _("Ready_image_%04d.png"));
 
-    // ask the user for confirmation
-    bool accepted = true;
-    do {
-        filename = wxFileSelector(_("Specify the image filename"),folder,filename,default_filename_ext,
-            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
-            wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-        if(filename.empty()) return; // user cancelled
-        // validate
-        wxFileName::SplitPath(filename,&folder,NULL,&extension);
-        if(extension!=_T("png") && extension!=_T("jpg"))
-        {
-            wxMessageBox(_("Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-            accepted = false;
-        }
-        filename_cstr = filename.mb_str();
-        if (strlen(filename_cstr) == 0)
-        {
-            wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
-            accepted = false;
-        }
-    } while(!accepted);
+    if (!AskUserWhereToSaveImage(filename))
+        return; // user cancelled
 
-    screenshotdir = folder;
+    screenshotdir = filename.GetPath(); // default to this location next time
 
-    vtkSmartPointer<vtkImageWriter> writer;
-    if(extension==_T("png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
-    else if(extension==_T("jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
-    writer->SetFileName(filename_cstr);
+    vtkSmartPointer<vtkImageChangeInformation> passthrough = vtkSmartPointer<vtkImageChangeInformation>::New();
     vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
-    system->GetAs2DImage(image,this->render_settings);
-    #if VTK_MAJOR_VERSION >= 6
-        writer->SetInputData(image);
-    #else
-        writer->SetInput(image);
-    #endif
-    writer->Write();
+    system->GetAs2DImage(image, this->render_settings);
+#if VTK_MAJOR_VERSION >= 6
+    passthrough->SetInputData(image);
+#else
+    passthrough->SetInput(image);
+#endif
 
-    // TODO: merge with OnSaveScreenshot
+    WriteImageToFile(passthrough->GetOutputPort(), filename);
 }
 
 // ---------------------------------------------------------------------

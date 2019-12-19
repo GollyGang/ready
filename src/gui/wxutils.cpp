@@ -23,7 +23,10 @@
 
 // wxWidgets:
 #include <wx/clipbrd.h>
+#include <wx/datstrm.h>
 #include <wx/ffile.h>
+#include <wx/txtstrm.h>
+#include <wx/wfstream.h>
 
 // VTK:
 #include <vtkBMPReader.h>
@@ -31,9 +34,12 @@
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkJPEGReader.h>
+#include <vtkJPEGWriter.h>
 #include <vtkPNGReader.h>
+#include <vtkPNGWriter.h>
 #include <vtkPointData.h>
 #include <vtkSmartPointer.h>
+#include <vtkUnsignedCharArray.h>
 
 // -----------------------------------------------------------------------------
 
@@ -257,6 +263,80 @@ wxString ReadEntireFile(const wxFileName& filename)
     wxString file_content;
     file.ReadAll(&file_content);
     return file_content;
+}
+
+// -----------------------------------------------------------------------------
+
+wxFileName FindUnusedFilename(const wxString& folder, const wxString& format)
+{
+    int suffix_value = 0;
+    while(true)
+    {
+        const wxFileName filename(folder, wxString::Format(format, suffix_value++));
+        if (!filename.FileExists())
+            return filename;
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+bool AskUserWhereToSaveImage(wxFileName& filename)
+{
+    while (true)
+    {
+        filename = wxFileSelector(
+            _("Specify the image filename"),
+            filename.GetPath(),
+            filename.GetName(),
+            filename.GetExt(),
+            _("PNG files (*.png)|*.png|JPG files (*.jpg)|*.jpg"),
+            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        if (filename.GetFullPath().empty())
+            return false; // user cancelled
+        if (filename.GetExt().Lower() == _("png") || filename.GetExt().Lower() == _("jpg"))
+            return true;
+        wxMessageBox(_("Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void WriteImageToFile(vtkAlgorithmOutput* image, const wxFileName& filename)
+{
+    // write the image into memory
+    // (this is a workaround because VTK doesn't yet support unicode in filenames)
+    vtkSmartPointer<vtkUnsignedCharArray> bytes;
+    if (filename.GetExt().Lower() == _("png")) {
+        vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
+        writer->SetInputConnection(image);
+        writer->WriteToMemoryOn();
+        writer->Write();
+        bytes = writer->GetResult();
+    }
+    else if (filename.GetExt().Lower() == _("jpg")) {
+        vtkSmartPointer<vtkJPEGWriter> writer = vtkSmartPointer<vtkJPEGWriter>::New();
+        writer->SetInputConnection(image);
+        writer->WriteToMemoryOn();
+        writer->Write();
+        bytes = writer->GetResult();
+    }
+    else {
+        wxMessageBox(_("Internal error: Unsupported format"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
+        return;
+    }
+
+    WriteBytesToFile(bytes, filename);
+}
+
+// -----------------------------------------------------------------------------
+
+void WriteBytesToFile(vtkUnsignedCharArray* bytes, const wxFileName& filename)
+{
+    wxFileOutputStream to_file(filename.GetFullPath());
+    wxDataOutputStream out(to_file);
+    for (vtkIdType i = 0; i < bytes->GetNumberOfTuples(); i++) {
+        out.Write8(bytes->GetValue(i));
+    }
 }
 
 // -----------------------------------------------------------------------------

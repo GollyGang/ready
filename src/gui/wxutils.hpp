@@ -27,6 +27,10 @@
 #include <wx/filename.h>
 #include <wx/string.h>
 
+// VTK:
+class vtkAlgorithmOutput;
+class vtkUnsignedCharArray;
+
 #if defined(__WXMAC__) && wxCHECK_VERSION(2,9,0)
     // wxMOD_CONTROL has been changed to mean Command key down
     #define wxMOD_CONTROL wxMOD_RAW_CONTROL
@@ -97,6 +101,18 @@ wxString FileNameToString(const wxFileName& filename);
 
 // reads an entire file into a string
 wxString ReadEntireFile(const wxFileName& filename);
+
+// finds a filename folder+wxString::Format(format,integer) that doesn't have an associated file
+wxFileName FindUnusedFilename(const wxString& folder, const wxString& format);
+
+// asks the user where to save a PNG or JPEG image, return false if they cancelled
+bool AskUserWhereToSaveImage(wxFileName& filename);
+
+// writes the GetOutputPort() of an image algorithm to the specified file
+void WriteImageToFile(vtkAlgorithmOutput* image, const wxFileName& filename);
+
+// writes an array of raw bytes to the specified file
+void WriteBytesToFile(vtkUnsignedCharArray* bytes, const wxFileName& filename);
 
 // load an image file and extract its min and max scalar values
 void GetScalarRangeFromImage(wxFileName filename, double range[2]);
