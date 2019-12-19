@@ -70,8 +70,8 @@ matrix:
             - libwxgtk3.0-gtk3-dev
             - libboost-program-options-dev
     - os: linux
-      name: Ubuntu_18.04_gtk2_vtk6
-      dist: bionic
+      name: Ubuntu_16.04_gtk2_vtk6
+      dist: xenial
       compiler: gcc
       addons:
         apt:
@@ -82,7 +82,16 @@ matrix:
             - libwxgtk3.0-dev
             - libboost-program-options-dev
     - os: osx
-      name: MacOS_10.14
+      osx_image: xcode11.3
+      name: MacOS_10.14_xcode11.3
+      addons:
+        homebrew:
+          packages:
+            - vtk
+            - wxmac
+            - boost
+    - os: osx
+      name: MacOS_10.13_xcode9.4.1
       addons:
         homebrew:
           packages:
