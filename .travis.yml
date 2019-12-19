@@ -98,16 +98,6 @@ matrix:
             - vtk
             - wxmac
             - boost
-    - os: osx
-      osx_image: xcode8
-      name: MacOS_10.11_xcode7.3.1
-      addons:
-        homebrew:
-          update: true
-          packages:
-            - vtk
-            - wxmac
-            - boost
 
 branches:
   only:
