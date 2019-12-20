@@ -20,14 +20,11 @@ matrix:
         - OCL_ROOT="$NUGETDIR/opencl-nug.0.777.77/build/native"
         - OCL_INCLUDE=-DOPENCL_INCLUDE_DIRS:PATH=$OCL_ROOT/include
         - OCL_LIB=-DOPENCL_LIBRARIES:PATH=$OCL_ROOT/lib/x86/OpenCL.lib
-        # Set up msbuild
-        - MSBUILD_PATH="/C/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
-        - export PATH=$PATH:$MSBUILD_PATH
         # Build wxWidgets
         - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
         - tar xf wxWidgets-3.1.3.tar.bz2 > NUL
-        - set _CL_=/MT
-        - MSBuild.exe -p:Configuration=Release -m -v:quiet wxWidgets-3.1.3/build/msw/wx_vc14.sln
+        - cmake -DwxBUILD_SHARED=false -DwxBUILD_USE_STATIC_RUNTIME=true -DCMAKE_BUILD_TYPE=Release .
+        - cmake --build . --config Release --parallel 8
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
         # Install VTK binaries
