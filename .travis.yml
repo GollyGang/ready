@@ -26,7 +26,8 @@ matrix:
         # Build wxWidgets
         - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
         - tar xf wxWidgets-3.1.3.tar.bz2 > NUL
-        - MSBuild.exe -p:Configuration=Release -m:8 wxWidgets-3.1.3/build/msw/wx_vc14.sln
+        - set _CL_=/MT
+        - MSBuild.exe -p:Configuration=Release -m -v:quiet wxWidgets-3.1.3/build/msw/wx_vc14.sln
         - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
         - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
         # Install VTK binaries
