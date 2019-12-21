@@ -109,9 +109,9 @@ int main(int argc,char *argv[])
             cout << "\nIt looks like one of the required arguments is missing or malformed:\n";
             cout << e.what() << "\n\n";
             cout << "Here's the help:\n";
-			cout << "\n" << blurb << "\n";
-    	    cout << "\n" << desc << "\n";
-	        return 1;
+            cout << "\n" << blurb << "\n";
+            cout << "\n" << desc << "\n";
+            return 1;
         } else {
             cout << "\n" << blurb << "\n";
             cout << "\n" << desc << "\n";
