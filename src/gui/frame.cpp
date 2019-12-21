@@ -3369,8 +3369,7 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
     wxString filename = SavePatternDialog();
     if(filename.empty()) return;
 
-    const char* filename_cstr = filename.mb_str();
-    if (strlen(filename_cstr) == 0)
+    if (strlen(filename.mb_str()) == 0)
     {
         wxMessageBox(_("Unsupported characters in path"), _("Error"), wxOK | wxCENTER | wxICON_ERROR);
         return;
