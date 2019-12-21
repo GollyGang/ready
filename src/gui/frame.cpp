@@ -2568,7 +2568,6 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     wxString mesh_filename = wxFileSelector(_("Import a mesh:"), wxEmptyString, _("bunny.vtu"), wxEmptyString,
         _("Supported mesh formats (*.obj;*.vtu;*.vtp)|*.obj;*.vtu;*.vtp"), wxFD_OPEN);
     if (mesh_filename.empty()) return; // user cancelled
-    mesh_filename = FileNameToString(mesh_filename);
 
     wxArrayString choices;
     choices.Add(_("Run a pattern on the surface of this mesh"));
