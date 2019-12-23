@@ -121,6 +121,7 @@ sudo apt-get install libgtk-3-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev 
 
 On Fedora:
 sudo dnf install vtk-devel wxGTK3-devel ocl-icd-devel opencl-headers gcc-c++ boost-devel
+(and for recent versions of Fedora you will need to start Ready using 'GDK_BACKEND=x11 ./ready')
 
 On other distros I'm not sure - please let us know!
 
