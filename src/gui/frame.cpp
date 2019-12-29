@@ -2383,6 +2383,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
         wxMessageBox(_("Dimensions not permitted"));
         return false;
     }
+    this->system->BlankImage();
     this->system->GenerateInitialPattern();
     InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
     this->UpdateWindows();
