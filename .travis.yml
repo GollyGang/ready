@@ -81,6 +81,18 @@ matrix:
             - libgtk2.0-dev
             - libwxgtk3.0-dev
             - libboost-program-options-dev
+    - os: linux
+      name: Ubuntu_16.04_gtk2_vtk5_wx3.0.2
+      dist: xenial
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk5-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
+            - libboost-program-options-dev
     - os: osx
       osx_image: xcode11.3
       name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
