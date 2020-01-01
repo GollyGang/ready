@@ -116,18 +116,12 @@
       </vertical_scale_2D>
       <contour_level value="0.25">
       </contour_level>
-      <cap_contour value="true">
-      </cap_contour>
-      <invert_contour_cap value="false">
-      </invert_contour_cap>
       <use_wireframe value="false">
       </use_wireframe>
       <show_cell_edges value="false">
       </show_cell_edges>
       <show_bounding_box value="true">
       </show_bounding_box>
-      <show_chemical_label value="true">
-      </show_chemical_label>
       <slice_3D value="true">
       </slice_3D>
       <slice_3D_axis value="z">
