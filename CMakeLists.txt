@@ -200,6 +200,7 @@ set( PATTERN_FILES
   Patterns/Experiments/DanWills/orbits_nova_ddd_chicken_init.vti
   Patterns/Experiments/DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti
   Patterns/Experiments/DanWills/orbits_ddd_epochs_init.djw.vti
+  Patterns/Experiments/DanWills/grayscott-sharpenTweak_cellTrailDetail_512px_init.vti
   Patterns/Experiments/SimonGladman/vermiformSolitons.vti
   Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/CornusAmmonis/MandelbrotWorms.vti
@@ -441,9 +442,9 @@ if( EXISTS "/etc/redhat-release" )
  # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
  target_link_libraries( readybase ${VTK_LIBRARIES} )
 else()
- if( UNIX AND NOT APPLE )
-  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
- endif()
+# if( UNIX AND NOT APPLE )
+#  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
+# endif()
  if( ${VTK_MAJOR_VERSION} LESS 6 )
   # VTK 5.x
   target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
@@ -494,7 +495,7 @@ else()
     vtkFiltersExtraction
     vtkFiltersGeometry
     vtkFiltersModeling
-    vtkFiltersParallelDIY2
+#    vtkFiltersParallelDIY2
     vtkFiltersSources
     vtkFiltersTexture
     vtkImagingColor
