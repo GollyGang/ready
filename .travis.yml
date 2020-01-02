@@ -58,7 +58,7 @@ matrix:
         - 7z x VTK-8.1.2_msvc14_x86_shared.7z
         - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
         # Specify where the output will appear
-        - BIN_FOLDER=Release
+        - BIN_FOLDER=Release/
     - os: linux
       name: Ubuntu_18.04_gtk3_vtk7_wx3.0.4
       dist: bionic
@@ -112,7 +112,6 @@ before_script:
 
 script:
   - cmake --build . --config Release
-  - cd ./$BIN_FOLDER
-  - pwd
   - ls
-  - ./rdy -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
+  - ls $BIN_FOLDER
+  - ./"$BIN_FOLDER"rdy -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
