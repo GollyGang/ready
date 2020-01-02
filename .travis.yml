@@ -114,7 +114,10 @@ before_script:
   - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT -DCMAKE_BUILD_TYPE=Release ..
 
 script:
+  # Test that the code builds on this platform
   - cmake --build . --config Release
+  # Test that rdy works on this platform
   - PATTERNS_FOLDER=$PWD
   - cd ./$BIN_FOLDER
   - if [ "$TRAVIS_OS_NAME" = "linux" ]||[ "$TRAVIS_OS_NAME" = "osx" ]; then ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v; fi
+  # (Currently on this Windows platform on Travis it fails to load some shared libraries, so this test is conditional.)
