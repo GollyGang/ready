@@ -117,6 +117,4 @@ script:
   - cmake --build . --config Release
   - PATTERNS_FOLDER=$PWD
   - cd ./$BIN_FOLDER
-  - if ! [ "$TRAVIS_OS_NAME" == "windows" ]; then
-      ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
-    fi
+  - ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
