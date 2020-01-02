@@ -20,7 +20,6 @@ matrix:
         - OCL_ROOT="$NUGETDIR/opencl-nug.0.777.77/build/native"
         - OCL_INCLUDE=-DOPENCL_INCLUDE_DIRS:PATH=$OCL_ROOT/include
         - OCL_LIB=-DOPENCL_LIBRARIES:PATH=$OCL_ROOT/lib/x86/OpenCL.lib
-        - export PATH=$OCL_ROOT/bin:$PATH
         # Set up nmake in order to build wxWidgets
         - export VSVER=2017
         - export MSVER=14.16.27023
@@ -117,4 +116,6 @@ script:
   - cmake --build . --config Release
   - PATTERNS_FOLDER=$PWD
   - cd ./$BIN_FOLDER
+  - ls
+  - ls $PATTERNS_FOLDER
   - ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
