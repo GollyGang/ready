@@ -104,10 +104,8 @@ branches:
     - gh-pages
 
 before_script:  
-  - mkdir build
-  - cd build
-  - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT -DCMAKE_BUILD_TYPE=Release ..
+    - mkdir build
+    - cd build
+    - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT -DCMAKE_BUILD_TYPE=Release ..
 
-script:
-  - cmake --build . --config Release
-  - ./rdy -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
+script: cmake --build . --config Release
