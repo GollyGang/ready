@@ -110,4 +110,7 @@ before_script:
 
 script:
   - cmake --build . --config Release
+  - ls
+  - ./rdy
+  - ./Ready
   - ./rdy -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
