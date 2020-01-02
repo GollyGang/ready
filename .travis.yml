@@ -112,8 +112,6 @@ before_script:
 
 script:
   - cmake --build . --config Release
-  - PATTERNS_FOLDER=$PWD
-  - cd ./$BIN_FOLDER
   - ls
-  - ls $PATTERNS_FOLDER
-  - ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
+  - ls $BIN_FOLDER
+  - ./"$BIN_FOLDER"rdy -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
