@@ -25,8 +25,9 @@
 #include <map>
 
 // VTK:
-#include <vtkXMLDataElement.h>
+#include <vtkCommand.h>
 #include <vtkSmartPointer.h>
+#include <vtkXMLDataElement.h>
 
 double get_time_in_seconds();
 
@@ -86,5 +87,26 @@ class XML_Object
 void InterpolateInHSV(const float r1,const float g1,const float b1,const float r2,const float g2,const float b2,const float u,float& r,float& g,float& b);
 
 std::string ReplaceAllSubstrings(std::string subject, const std::string& search, const std::string& replace);
+
+class ThrowOnErrorObserver : public vtkCommand
+{
+public:
+    static ThrowOnErrorObserver* New()
+    {
+        return new ThrowOnErrorObserver;
+    }
+    virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void* calldata)
+    {
+        switch (event)
+        {
+        case vtkCommand::ErrorEvent:
+            throw std::runtime_error(static_cast<char*>(calldata));
+            break;
+        case vtkCommand::WarningEvent:
+            // (could handle somehow)
+            break;
+        }
+    }
+};
 
 #endif

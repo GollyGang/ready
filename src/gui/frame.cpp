@@ -2493,6 +2493,8 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
 
 bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
 {
+    bool all_ok = true;
+    vtkObject::GlobalWarningDisplayOn(); // handling errors in this section
     try
     {
         if (mesh_filename.GetExt().Lower()==_T("vtp"))
@@ -2500,6 +2502,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
             vtkSmartPointer<vtkXMLPolyDataReader> vtp_reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
             vtp_reader->ReadFromInputStringOn();
             vtp_reader->SetInputString(ReadEntireFile(mesh_filename).ToStdString());
+            vtp_reader->AddObserver(vtkCommand::ErrorEvent, vtkSmartPointer<ThrowOnErrorObserver>::New());
             vtp_reader->Update();
             ug->SetPoints(vtp_reader->GetOutput()->GetPoints());
             ug->SetCells(VTK_POLYGON, vtp_reader->GetOutput()->GetPolys());
@@ -2509,6 +2512,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
             vtkSmartPointer<vtkXMLUnstructuredGridReader> vtu_reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
             vtu_reader->ReadFromInputStringOn();
             vtu_reader->SetInputString(ReadEntireFile(mesh_filename).ToStdString());
+            vtu_reader->AddObserver(vtkCommand::ErrorEvent, vtkSmartPointer<ThrowOnErrorObserver>::New());
             vtu_reader->Update();
             ug->DeepCopy(vtu_reader->GetOutput());
         }
@@ -2530,7 +2534,9 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
 
                 vtkSmartPointer<vtkOBJReader> obj_reader = vtkSmartPointer<vtkOBJReader>::New();
                 obj_reader->SetFileName(source_filename.mb_str());
+                obj_reader->AddObserver(vtkCommand::ErrorEvent, vtkSmartPointer<ThrowOnErrorObserver>::New());
                 obj_reader->Update();
+
                 ug->SetPoints(obj_reader->GetOutput()->GetPoints());
                 ug->SetCells(VTK_POLYGON, obj_reader->GetOutput()->GetPolys());
 
@@ -2543,16 +2549,21 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
         }
         else
         {
-            wxMessageBox(_("Unsupported file type"));
-            return false;
+            throw runtime_error("Unsupported file type");
         }
+    }
+    catch (exception e)
+    {
+        wxMessageBox(_("Error importing mesh: ") + e.what(), _("Error"), wxOK | wxICON_ERROR);
+        all_ok = false;
     }
     catch (...)
     {
-        wxMessageBox(_("Unknown problem importing mesh"));
-        return false;
+        wxMessageBox(_("Unknown problem importing mesh"), _("Error"), wxOK | wxICON_ERROR);
+        all_ok = false;
     }
-    return true;
+    vtkObject::GlobalWarningDisplayOff(); // (turn off again to avoid message window appearing)
+    return all_ok;
 }
 
 // ---------------------------------------------------------------------
