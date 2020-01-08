@@ -445,10 +445,7 @@ else()
  if( UNIX AND NOT APPLE )
   set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
  endif()
- if( ${VTK_MAJOR_VERSION} LESS 6 )
-  # VTK 5.x
-  target_link_libraries( readybase vtkCommon vtkGraphics vtkIO vtkRendering vtkHybrid )
- elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} LESS 3)
+ if( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} LESS 3)
   # VTK 6.0.x - 6.2.x
   target_link_libraries(
     readybase

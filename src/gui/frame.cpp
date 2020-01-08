@@ -2761,11 +2761,7 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
     {
         wxBusyCursor busy;
         vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-        #if VTK_MAJOR_VERSION >= 6
-            writer->SetInputData(pd);
-        #else
-            writer->SetInput(pd);
-        #endif
+        writer->SetInputData(pd);
         wxFileOutputStream to_file(mesh_filename.GetFullPath());
         wxTextOutputStream out(to_file);
         writer->SetWriteToOutputString(true); // workaround because VTK doesn't yet allow unicode filepaths
@@ -2873,11 +2869,7 @@ void MyFrame::OnExportImage(wxCommandEvent &event)
     vtkSmartPointer<vtkImageChangeInformation> passthrough = vtkSmartPointer<vtkImageChangeInformation>::New();
     vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
     system->GetAs2DImage(image, this->render_settings);
-#if VTK_MAJOR_VERSION >= 6
     passthrough->SetInputData(image);
-#else
-    passthrough->SetInput(image);
-#endif
 
     WriteImageToFile(passthrough->GetOutputPort(), filename);
 }
@@ -2927,11 +2919,7 @@ void MyFrame::RecordFrame()
 
                     vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
                     this->system->GetAs2DImage(image, this->render_settings);
-                    #if VTK_MAJOR_VERSION >= 6
-                      writer->SetInputData(image);
-                    #else
-                      writer->SetInput(image);
-                    #endif
+                    writer->SetInputData(image);
                     if (chemical_number < num_chems - 1) //write all but the last one as it will get written by the code below.
                     {
                         writer->SetFileName(oss.str().c_str());
@@ -2946,11 +2934,7 @@ void MyFrame::RecordFrame()
                 oss << this->recording_prefix << setfill('0') << setw(6) << this->iRecordingFrame << this->recording_extension;
                 vtkSmartPointer<vtkImageData> image = vtkSmartPointer<vtkImageData>::New();
                 this->system->GetAs2DImage(image, this->render_settings);
-                #if VTK_MAJOR_VERSION >= 6
-                  writer->SetInputData(image);
-                #else
-                  writer->SetInput(image);
-                #endif
+                writer->SetInputData(image);
             }
         }
         else // take a screenshot of the current view
