@@ -523,11 +523,7 @@ void MeshGenerators::GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,
     poly->SetPoints(pts);
     poly->SetPolys(cells);
     vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
-    #if VTK_MAJOR_VERSION >= 6
-        del->SetInputData(poly);
-    #else
-        del->SetInput(poly);
-    #endif
+    del->SetInputData(poly);
     del->Update();
     mesh->SetPoints(del->GetOutput()->GetPoints());
     mesh->SetCells(VTK_POLYGON,del->GetOutput()->GetPolys());
@@ -566,11 +562,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
         old_poly->SetPoints(pts);
         old_poly->SetPolys(cells);
         vtkSmartPointer<vtkDelaunay2D> del = vtkSmartPointer<vtkDelaunay2D>::New();
-        #if VTK_MAJOR_VERSION >= 6
-            del->SetInputData(old_poly);
-        #else
-            del->SetInput(old_poly);
-        #endif
+        del->SetInputData(old_poly);
         del->Update();
         old_poly->DeepCopy(del->GetOutput());
         old_poly->BuildLinks();
@@ -653,11 +645,7 @@ void MeshGenerators::GetRandomVoronoi2D(int n_points,vtkUnstructuredGrid *mesh,i
     poly->SetPoints(pts);
     poly->SetPolys(new_cells);
     vtkSmartPointer<vtkCleanPolyData> clean = vtkSmartPointer<vtkCleanPolyData>::New();
-    #if VTK_MAJOR_VERSION >= 6
-        clean->SetInputData(poly);
-    #else
-        clean->SetInput(poly);
-    #endif
+    clean->SetInputData(poly);
     clean->PointMergingOff();
     clean->Update();
     mesh->SetPoints(clean->GetOutput()->GetPoints());
@@ -755,11 +743,7 @@ void MeshGenerators::GetBodyCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
                 }
                 ug->InsertNextCell(VTK_POLYHEDRON,24,&pointIds.front(),14,&faceStream.front());
                 ug->SetPoints(points);
-                #if VTK_MAJOR_VERSION >= 6
-                    append->AddInputData(ug);
-                #else
-                    append->AddInput(ug);
-                #endif
+                append->AddInputData(ug);
             }
         }
     }
@@ -816,11 +800,7 @@ void MeshGenerators::GetFaceCentredCubicHoneycomb(int side,vtkUnstructuredGrid* 
                 }
                 ug->InsertNextCell(VTK_POLYHEDRON,14,&pointIds.front(),12,&faceStream.front());
                 ug->SetPoints(points);
-                #if VTK_MAJOR_VERSION >= 6
-                    append->AddInputData(ug);
-                #else
-                    append->AddInput(ug);
-                #endif
+                append->AddInputData(ug);
             }
         }
     }
@@ -902,11 +882,7 @@ void MeshGenerators::GetDiamondCells(int side,vtkUnstructuredGrid *mesh,int n_ch
                 }
                 ug->InsertNextCell(VTK_POLYHEDRON,16,&pointIds.front(),16,&faceStream.front());
                 ug->SetPoints(points);
-                #if VTK_MAJOR_VERSION >= 6
-                    append->AddInputData(ug);
-                #else
-                    append->AddInput(ug);
-                #endif
+                append->AddInputData(ug);
             }
         }
     }
@@ -1047,11 +1023,7 @@ void MeshGenerators::GetHyperbolicPlaneTiling(int schlafli1,int schlafli2,int nu
                 faceStream.push_back( faces[j] );
             ug->InsertNextCell(VTK_POLYGON,num_vertices,&pointIds.front(),1,&faceStream.front());
             ug->SetPoints(points);
-            #if VTK_MAJOR_VERSION >= 6
-                append->AddInputData(ug);
-            #else
-                append->AddInput(ug);
-            #endif
+            append->AddInputData(ug);
             point_locator->InsertNextPoint( centroid );
         }
     }
@@ -1227,11 +1199,7 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
             }
             ug->InsertNextCell(VTK_POLYHEDRON,num_vertices,&pointIds.front(),num_faces,&faceStream.front());
             ug->SetPoints(points);
-            #if VTK_MAJOR_VERSION >= 6
-                append->AddInputData(ug);
-            #else
-                append->AddInput(ug);
-            #endif
+            append->AddInputData(ug);
             point_locator->InsertNextPoint( centroid );
         }
     }
