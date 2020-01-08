@@ -268,14 +268,23 @@ void ImageRD::CopyFromMesh(
     transform->Translate(image_size[0] / 2, image_size[1] / 2, image_size[2] / 2); // center in volume
     vtkSmartPointer<vtkTransformFilter> transform_filter = vtkSmartPointer<vtkTransformFilter>::New();
     transform_filter->SetTransform(transform);
-    transform_filter->SetInputData(mesh);
+    #if VTK_MAJOR_VERSION >= 6
+        transform_filter->SetInputData(mesh);
+    #else
+        transform_filter->SetInput(mesh);
+    #endif
     vtkSmartPointer<vtkGeometryFilter> get_surface = vtkSmartPointer<vtkGeometryFilter>::New();
     get_surface->SetInputConnection(transform_filter->GetOutputPort());
     vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
     pol2stenc->SetInputConnection(get_surface->GetOutputPort());
     vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
-    imgstenc->SetInputData(this->images[target_chemical]);
-    imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
+    #if VTK_MAJOR_VERSION >= 6
+        imgstenc->SetInputData(this->images[target_chemical]);
+        imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
+#else
+        imgstenc->SetInput(this->images[target_chemical]);
+        imgstenc->SetStencil(pol2stenc->GetOutput());
+#endif
     imgstenc->ReverseStencilOn();
     imgstenc->SetBackgroundValue(value_inside);
     imgstenc->Update();
