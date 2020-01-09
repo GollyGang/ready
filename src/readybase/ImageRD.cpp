@@ -35,7 +35,9 @@ using namespace std;
 
 // VTK:
 #include <vtkActor.h>
+#include <vtkAppendPolyData.h>
 #include <vtkAssignAttribute.h>
+#include <vtkBox.h>
 #include <vtkCamera.h>
 #include <vtkCaptionActor2D.h>
 #include <vtkCellData.h>
@@ -46,6 +48,7 @@ using namespace std;
 #include <vtkCutter.h>
 #include <vtkDataSetMapper.h>
 #include <vtkExtractEdges.h>
+#include <vtkExtractPolyDataGeometry.h>
 #include <vtkGeometryFilter.h>
 #include <vtkImageActor.h>
 #include <vtkImageAppendComponents.h>
@@ -847,7 +850,13 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             // turns the 3d grid of sampled values into a polygon mesh for rendering,
             // by making a surface that contours the volume at a specified level
             vtkSmartPointer<vtkContourFilter> surface = vtkSmartPointer<vtkContourFilter>::New();
-            if(cap_contour)
+            surface->SetInputConnection(to_point_data->GetOutputPort());
+            surface->SetValue(0, contour_level);
+
+            vtkSmartPointer<vtkAppendPolyData> append = vtkSmartPointer<vtkAppendPolyData>::New();
+            append->AddInputConnection(surface->GetOutputPort());
+
+            if (cap_contour)
             {
                 // pad outside the volume with zero so that the contour caps the ends instead of leaving holes
                 vtkSmartPointer<vtkImageConstantPad> cap_pad = vtkSmartPointer<vtkImageConstantPad>::New();
@@ -855,20 +864,37 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
                 cap_pad->SetOutputWholeExtent(extent[0] - 1, extent[1] + 2, extent[2] - 1, extent[3] + 2, extent[4] - 1, extent[5] + 2);
                 if (invert_contour_cap)
                 {
-                    cap_pad->SetConstant(high + (high-low));
+                    cap_pad->SetConstant(high + (high - low));
                 }
                 else
                 {
                     cap_pad->SetConstant(low + (low - high));
                 }
-                surface->SetInputConnection(cap_pad->GetOutputPort());
-            }
-            else {
-                surface->SetInputConnection(to_point_data->GetOutputPort());
-            }
-            surface->SetValue(0,contour_level);
 
-            mapper->SetInputConnection(surface->GetOutputPort());
+                // again make the same contour surface
+                vtkSmartPointer<vtkContourFilter> cap_surface = vtkSmartPointer<vtkContourFilter>::New();
+                cap_surface->SetInputConnection(cap_pad->GetOutputPort());
+                cap_surface->SetValue(0, contour_level);
+
+                // clip away the internal parts of the volume, to leave only the caps
+                vtkSmartPointer<vtkBox> box = vtkSmartPointer<vtkBox>::New();
+                double* bounds = image->GetBounds();
+                box->SetBounds(bounds[0], bounds[1] + 1, bounds[2], bounds[3] + 1, bounds[4], bounds[5] + 1);
+                vtkSmartPointer<vtkExtractPolyDataGeometry> gf = vtkSmartPointer<vtkExtractPolyDataGeometry>::New();
+                gf->SetInputConnection(cap_surface->GetOutputPort());
+                gf->SetImplicitFunction(box);
+                gf->SetExtractInside(0);
+
+                // throw away the normals from the volume, to leave flat sharp normals on the caps
+                vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+                normals->SetInputConnection(gf->GetOutputPort());
+                normals->SetFeatureAngle(5);
+
+                // add the caps to the scene with their own normals
+                append->AddInputConnection(normals->GetOutputPort());
+            }
+
+            mapper->SetInputConnection(append->GetOutputPort());
             mapper->ScalarVisibilityOff();
         }
         else
