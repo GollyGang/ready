@@ -403,10 +403,14 @@ add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
 #-------------------------------- build ------------------------------------------------------
 
-# ensure we link the C runtime statically (N.B. still appears as /MD in the CMake gui but ignore this)
-# see: http://www.cmake.org/Wiki/CMake_FAQ#Dynamic_Replace
-foreach( var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO )
-  string( REGEX REPLACE "/MD" "/MT" ${var} "${${var}}" )
+# link the C runtime statically
+set( FLAG_VARS
+  CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+  CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+)
+foreach( flag_var ${FLAG_VARS} )
+  string( REGEX REPLACE "/MD" "/MT" new_flags "${${flag_var}}" )
+  set( ${flag_var} "${new_flags}" CACHE STRING "" FORCE )
 endforeach()
 
 set( USE_SSE "YES" CACHE BOOL "Set to false if your CPU doesn't have SSE support.")

@@ -102,9 +102,6 @@ D) Build Ready:
  - Set OPENCL_INCLUDE_DIRS to e.g.
     C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v10.2/include
  - Set Boost_INCLUDE_DIR to e.g. C:/boost_1_71_0
- - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and
-   similar. Change all occurences of /MD to /MT, and /MDd to /MTd.
-   This ensures that the C runtime is statically-linked.
  - Configure, Generate, then exit CMake.
  - Build Ready:
     nmake
