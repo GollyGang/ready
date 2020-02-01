@@ -49,6 +49,8 @@ class Property : public XML_Object
         Property(const std::string& name,const std::string& type,const std::string& c)
             : XML_Object(NULL), name(name), type(type), s(c) {}
 
+        virtual ~Property() {}
+
         std::string GetName() const { return this->name; }
         std::string GetType() const { return this->type; }
 
