@@ -701,9 +701,9 @@ class Circle : public BaseShape
             switch(dimensionality)
             {
                 default:
-                case 1: return sqrt(pow(x-cx,2.0)) < abs_radius;
-                case 2: return sqrt(pow(x-cx,2.0)+pow(y-cy,2.0)) < abs_radius;
-                case 3: return sqrt(pow(x-cx,2.0)+pow(y-cy,2.0)+pow(z-cz,2.0)) < abs_radius;
+                case 1: return sqrt(pow(x-cx, 2)) < abs_radius;
+                case 2: return sqrt(pow(x-cx, 2)+pow(y-cy, 2)) < abs_radius;
+                case 3: return sqrt(pow(x-cx, 2)+pow(y-cy, 2)+pow(z-cz, 2)) < abs_radius;
             }
         }
 

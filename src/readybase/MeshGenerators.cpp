@@ -360,7 +360,8 @@ int SplitEdge(const Tri &tri,int i1,int i2,double &x, double &y,TPairIndex &edge
     }
 }
 
-void MeshGenerators::GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems,int data_type)
+// workaround for LLVM/Clang issue: lld-link : error : undefined symbol: __powidf2
+void MeshGenerators::GetPenroseTiling(/*int*/double n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems,int data_type)
 {
     // Many thanks to Jeff Preshing: http://preshing.com/20110831/penrose-tiling-explained
 
@@ -908,7 +909,7 @@ void sphereInversion( const double p[3], const vector<double>& q, const double r
 {
     //  reflect p in the sphere radius r center q
     const double r2 = r*r;
-    const double pq2 = pow(p[0]-q[0],2.0) + pow(p[1]-q[1],2.0) + pow(p[2]-q[2],2.0);
+    const double pq2 = pow(p[0]-q[0], 2) + pow(p[1]-q[1], 2) + pow(p[2]-q[2], 2);
     const double f = r2 / pq2;
     p_out[0] = q[0] + f * ( p[0] - q[0] );
     p_out[1] = q[1] + f * ( p[1] - q[1] );

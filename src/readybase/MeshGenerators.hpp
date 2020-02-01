@@ -37,7 +37,8 @@ namespace MeshGenerators
     void GetRhombilleTiling(int nx,int ny,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
 
     /// Make a planar Penrose tiling, using either rhombi (type=0) or darts and kites (type=1).
-    void GetPenroseTiling(int n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
+    void GetPenroseTiling(/*int*/double n_subdivisions,int type,vtkUnstructuredGrid* mesh,int n_chems,int data_type);
+    // (workaround for LLVM/Clang issue: lld-link : error : undefined symbol: __powidf2)
 
     /// Make a 2D Delaunay triangulation from a random set of points
     void GetRandomDelaunay2D(int n_points,vtkUnstructuredGrid *mesh,int n_chems,int data_type);
