@@ -158,7 +158,7 @@ void OpenCLImageRD::GenerateInitialPattern()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::BlankImage()
+void OpenCLImageRD::BlankImage(float value)
 {
     ImageRD::BlankImage();
     this->need_write_to_opencl_buffers = true;
