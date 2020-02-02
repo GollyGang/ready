@@ -65,7 +65,9 @@ matrix:
     - os: linux
       name: Ubuntu_18.04_gtk3_vtk7_wx3.0.4
       dist: bionic
-      compiler: gcc
+      compiler:
+        - clang
+        - gcc
       addons:
         apt:
           packages:
