@@ -11,7 +11,7 @@ Download Ready 0.9 here:
 
 Linux: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L115) 
 
-[Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
+[Online help](https://gollygang.github.io/ready/Help/index.html), [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
 For questions, [join our mailing list](https://groups.google.com/forum/#!forum/reaction-diffusion). Or you can email [tim.hutton@gmail.com](mailto:tim.hutton@gmail.com).
 
