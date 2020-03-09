@@ -238,6 +238,7 @@ set( PATTERN_FILES
   Patterns/NumericalMethods/advection_RungeKutta4_double.vti
   Patterns/NumericalMethods/advection_staggeredLeapfrog_double.vti
   Patterns/Guo2014/guo.vti
+  Patterns/Maginu1975/maginu_parameter_map.vti
 )
 
 set( HELP_FILES
