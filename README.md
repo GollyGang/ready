@@ -71,7 +71,6 @@ Other packages:
   * [CAPOW](http://www.cs.sjsu.edu/~rucker/capow/)
 
 Wanted rules: (help needed)
-  * K. Maginu, "Reaction-diffusion equation describing morphogenesis I. waveform stability of stationary wave solutions in a one dimensional model", Math. Biosci. 27:1/2 (1975), 17–98 http://dx.doi.org/10.1016/0025-5564(75)90026-7
   * L.Decker 2003, derived from Maginu's (from TexRD)
   * L.Decker 2002, derived from Ginzburg-Landau (from TexRD)
   * L.Decker 1998, derived from Brusselator (from TexRD)
