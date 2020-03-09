@@ -111,6 +111,7 @@ set( PATTERN_FILES
   Patterns/Schlogl.vti
   Patterns/heat_equation.vti
   Patterns/Turing1952/spots.vti            Patterns/Turing1952/spots_noisy.vti
+  Patterns/Turing1952/turing_parameter_map.vti
   Patterns/kernel_test.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti  Patterns/parameter_modulation_demo2_3D.vti
