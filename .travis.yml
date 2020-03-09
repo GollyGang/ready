@@ -103,6 +103,7 @@ matrix:
       name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
       addons:
         homebrew:
+          update: true
           packages:
             - vtk
             - wxmac
@@ -111,6 +112,7 @@ matrix:
       name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
       addons:
         homebrew:
+          update: true
           packages:
             - vtk
             - wxmac
