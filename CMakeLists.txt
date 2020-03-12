@@ -135,6 +135,7 @@ set( PATTERN_FILES
   Patterns/FitzHugh-Nagumo/pulsate.vti
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
+  Patterns/FitzHugh-Nagumo/FHN_parameter_map.vti
   Patterns/Gray-Scott/Lesmes_noisy.vti
   Patterns/Gray-Scott/noisy_solitons_mitosis.vti
   Patterns/Gray-Scott/parameter-map.vti
