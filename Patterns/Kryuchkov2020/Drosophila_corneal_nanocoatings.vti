@@ -2,7 +2,7 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="5">
     <description>
-      A 3D reaction-diffusion model of corneal nanocoatings in Drosophila (fruit flies). Published in Kryuchkov et al. (2020), Nature.
+      A 3D reaction-diffusion model of corneal nanocoatings in Drosophila (fruit flies).
     </description>
     <rule name="Kryuchkov2020" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <param name="aa">
