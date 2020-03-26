@@ -245,6 +245,7 @@ set( PATTERN_FILES
   Patterns/RosenzweigMacArthur1963/hk_parameter_map.vti
   Patterns/RosenzweigMacArthur1963/hm_parameter_map.vti
   Patterns/RosenzweigMacArthur1963/predator-prey.vti
+  Patterns/RosenzweigMacArthur1963/predator-prey_1D.vti
 )
 
 set( HELP_FILES
