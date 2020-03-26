@@ -242,6 +242,9 @@ set( PATTERN_FILES
   Patterns/Guo2014/guo.vti
   Patterns/Maginu1975/maginu_parameter_map.vti
   Patterns/Kryuchkov2020/Drosophila_corneal_nanocoatings.vti
+  Patterns/RosenzweigMacArthur1963/hk_parameter_map.vti
+  Patterns/RosenzweigMacArthur1963/hm_parameter_map.vti
+  Patterns/RosenzweigMacArthur1963/predator-prey.vti
 )
 
 set( HELP_FILES
