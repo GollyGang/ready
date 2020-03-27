@@ -335,12 +335,9 @@ find_package( VTK
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRenderingOpenGL2
+  REQUIRED
 )
-if( VTK_FOUND )
-  include( ${VTK_USE_FILE} )
-else()
-  message(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK variables.")
-endif()
+include( ${VTK_USE_FILE} )
 
 #-------------------------------------------wxVTK----------------------------------------------
 
