@@ -316,12 +316,28 @@ set( OTHER_FILES
 
 #-------------------------------------------VTK----------------------------------------------
 
-find_package( VTK )
-if( VTK_FOUND )
-  include( ${VTK_USE_FILE} )
-else()
-  message(FATAL_ERROR "Cannot build the executable without VTK. Please set the VTK variables.")
-endif()
+find_package( VTK
+  COMPONENTS
+    vtkCommonCore
+    vtkFiltersCore
+    vtkFiltersExtraction
+    vtkFiltersGeometry
+    vtkFiltersModeling
+    vtkFiltersSources
+    vtkFiltersTexture
+    vtkImagingColor
+    vtkImagingStencil
+    vtkInteractionStyle
+    vtkIOImage
+    vtkIOGeometry
+    vtkIOXML
+    vtkRenderingCore
+    vtkRenderingAnnotation
+    vtkRenderingFreeType
+    vtkRenderingOpenGL2
+  REQUIRED
+)
+include( ${VTK_USE_FILE} )
 
 #-------------------------------------------wxVTK----------------------------------------------
 
@@ -451,101 +467,7 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-if( EXISTS "/etc/redhat-release" )
- # This *should* work everywhere but causes problems on Debian 8 and Travis-CI
- target_link_libraries( readybase ${VTK_LIBRARIES} )
-else()
- if( UNIX AND NOT APPLE )
-  set( EXTRA_VTK_LIBS vtkIOMPIImage vtkIOMPIParallel vtkRenderingFreeTypeFontConfig vtkRenderingMatplotlib )
- endif()
- if( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} LESS 3)
-  # VTK 6.0.x - 6.2.x
-  target_link_libraries(
-    readybase
-    vtkCommonCore
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersTexture
-    vtkImagingStencil
-    vtkInteractionStyle
-    vtkIOImage
-    vtkIOXML
-    vtkRenderingCore
-    vtkRenderingAnnotation
-    vtkRenderingFreeType
-    vtkRenderingFreeTypeOpenGL
-    ${EXTRA_VTK_LIBS}
-  )
- elseif( ${VTK_MAJOR_VERSION} EQUAL 6 AND ${VTK_MINOR_VERSION} GREATER 2)
-  # VTK 6.3.x - 6.x.y
-  target_link_libraries(
-    readybase
-    vtkCommonCore
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersTexture
-    vtkImagingStencil
-    vtkInteractionStyle
-    vtkIOImage
-    vtkIOXML
-    vtkRenderingCore
-    vtkRenderingAnnotation
-    vtkRenderingFreeType
-    vtkRenderingOpenGL
-    ${EXTRA_VTK_LIBS}
-  )
- elseif( ${VTK_MAJOR_VERSION} EQUAL 7)
-  # VTK 7.x
-  target_link_libraries(
-    readybase
-    vtkCommonCore
-    vtkFiltersCore
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersParallelDIY2
-    vtkFiltersSources
-    vtkFiltersTexture
-    vtkImagingColor
-    vtkImagingStencil
-    vtkInteractionStyle
-    vtkIOImage
-    vtkIOGeometry
-    vtkIOXML
-    vtkRenderingCore
-    vtkRenderingAnnotation
-    vtkRenderingFreeType
-    vtkRenderingOpenGL2
-    ${EXTRA_VTK_LIBS}
-  )
- else()
-  # VTK 8.0 -
-  target_link_libraries(
-    readybase
-    vtkCommonCore
-    vtkFiltersExtraction
-    vtkFiltersGeometry
-    vtkFiltersModeling
-    vtkFiltersTexture
-    vtkImagingColor
-    vtkImagingStencil
-    vtkInteractionStyle
-    vtkInteractionWidgets
-    vtkIOImage
-    vtkIOGeometry
-    vtkIOXML
-    vtkRenderingCore
-    vtkRenderingAnnotation
-    vtkRenderingFreeType
-    vtkRenderingGL2PSOpenGL2
-    vtkRenderingOpenGL2
-    ${EXTRA_VTK_LIBS}
-  )
-
- endif()
-endif()
+target_link_libraries( readybase ${VTK_LIBRARIES} )
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
