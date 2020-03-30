@@ -23,9 +23,10 @@
             const float dt = 0.0001;
             const float tau = 0.0003;
             const float epsilonbar = 0.01;
-            const float k = 1.8;
+            const float k = 1.8;               // how feathery should the snowflakes be?
             const float delta = 0.01;
-            const float anisotropy = 7.0;
+            const float anisotropy = 7.0;      // how many arms should the snowflakes have?
+            const float rotate = 0.1;          // rotate the anisotropy
             const float alpha = 0.9;
             const float gamma = 10.0;
             const float teq = 1.0;
@@ -96,11 +97,11 @@
             float laplacian_phi = (2.0 * (a_n + a_e + a_s + a_w) + a_nw + a_ne + a_se + a_sw - 12.0*a)/(3.0*dx*dx);
             float laplacian_t   = (2.0 * (b_n + b_e + b_s + b_w) + b_nw + b_ne + b_se + b_sw - 12.0*b)/(3.0*dx*dx);
 
-            float angl   = atan2(grad_phi_y,   grad_phi_x) + 0.1;
-            float angl_n = atan2(grad_phi_n_y, grad_phi_n_x) + 0.1;
-            float angl_e = atan2(grad_phi_e_y, grad_phi_e_x) + 0.1;
-            float angl_s = atan2(grad_phi_s_y, grad_phi_s_x) + 0.1;
-            float angl_w = atan2(grad_phi_w_y, grad_phi_w_x) + 0.1;
+            float angl   = atan2(grad_phi_y,   grad_phi_x) + rotate;
+            float angl_n = atan2(grad_phi_n_y, grad_phi_n_x) + rotate;
+            float angl_e = atan2(grad_phi_e_y, grad_phi_e_x) + rotate;
+            float angl_s = atan2(grad_phi_s_y, grad_phi_s_x) + rotate;
+            float angl_w = atan2(grad_phi_w_y, grad_phi_w_x) + rotate;
 
             float epsilon   = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl ) );
             float epsilon_n = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl_n ) );
