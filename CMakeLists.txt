@@ -247,6 +247,7 @@ set( PATTERN_FILES
   Patterns/RosenzweigMacArthur1963/predator-prey.vti
   Patterns/RosenzweigMacArthur1963/predator-prey_1D.vti
   Patterns/LotkaVolterra1926/Lotka-Volterra.vti
+  Patterns/Kobayashi1993/dendrites.vti
 )
 
 set( HELP_FILES
