@@ -75,6 +75,8 @@ class MeshRD : public AbstractRD
 
         void GetMesh(vtkUnstructuredGrid* mesh) const;
 
+        virtual int GetMemorySize() const;
+
     protected: // functions
 
         /// work out which cells are neighbors of each other

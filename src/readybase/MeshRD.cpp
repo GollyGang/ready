@@ -1096,3 +1096,13 @@ void MeshRD::GetMesh(vtkUnstructuredGrid* mesh) const
 }
 
 // --------------------------------------------------------------------------------
+
+int MeshRD::GetMemorySize() const
+{
+    const size_t DATA_SIZE = this->n_chemicals * this->data_type_size * this->mesh->GetNumberOfCells();
+    const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;
+    const size_t NBORS_WEIGHTS_SIZE = sizeof(float) * this->mesh->GetNumberOfCells() * this->max_neighbors;
+    return DATA_SIZE + NBORS_INDICES_SIZE + NBORS_WEIGHTS_SIZE;
+}
+
+// --------------------------------------------------------------------------------

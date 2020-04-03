@@ -172,6 +172,9 @@ class AbstractRD
         /// Change the data type used for storing values (VTK_FLOAT or VTK_DOUBLE)
         void SetDataType(int type);
 
+        /// Returns the total memory size that will need to be transferred to the GPU
+        virtual int GetMemorySize() const =0;
+
     protected: // typedefs
 
         enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };

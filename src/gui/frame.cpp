@@ -1301,6 +1301,7 @@ void MyFrame::SetStatusBarText()
             << wxString::Format(_T("%.1f"),this->percentage_spent_rendering)
             << _("% of time spent rendering )");
     }
+    //txt << " GPU mem: " << this->system->GetMemorySize()/(1024*1024) << " MB";
     SetStatusText(txt);
 }
 
