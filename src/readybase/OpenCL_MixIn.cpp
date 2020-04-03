@@ -169,7 +169,7 @@ void OpenCL_MixIn::TestKernel(std::string kernel_source)
     throwOnError(ret,"OpenCL_MixIn::TestKernel : Failed to create program with source: ");
 
     // build the program
-    ret = clBuildProgram(temp_program,1,&this->device_id,"",NULL,NULL);
+    ret = clBuildProgram(temp_program,1,&this->device_id,"-cl-denorms-are-zero -cl-fast-relaxed-math",NULL,NULL);
     if(ret != CL_SUCCESS)
     {
         size_t build_log_length = 0;
