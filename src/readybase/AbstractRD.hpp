@@ -143,7 +143,7 @@ class AbstractRD
         /// Indicates whether GetAs2DImage() and SetFrom2DImage() can be called. 
         virtual bool Is2DImageAvailable() const =0;
 
-        /// Retreive the dimensionality of the system volume, irrespective of the cells within it.
+        /// Retrieve the dimensionality of the system volume, irrespective of the cells within it.
         virtual int GetArenaDimensionality() const =0;
 
         /// Retrieve the value at a given location.
