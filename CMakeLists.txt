@@ -249,6 +249,7 @@ set( PATTERN_FILES
   Patterns/LotkaVolterra1926/Lotka-Volterra.vti
   Patterns/Kobayashi1993/dendrites.vti
   Patterns/Kobayashi1993/laplacian_growth.vti    Patterns/Kobayashi1993/laplacian_growth_3D.vti
+  Patterns/Morosov2008/Fig2.vti      Patterns/Morosov2008/Fig4.vti      Patterns/Morosov2008/Fig5678_delta_map.vti
 )
 
 set( HELP_FILES
