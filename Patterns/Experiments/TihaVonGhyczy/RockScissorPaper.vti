@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <RD format_version="5">
+    <description>
+      Rock, scissor, paper. Cyclical predation. A eats B, B eats C, C eats A.
+    </description>
+    <rule name="RockScissorPaper" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+      <param name="timestep">
+        0.050000
+      </param>
+      <param name="g">
+        0.080000
+      </param>
+      <param name="m">
+        3.000000
+      </param>
+      <param name="k">
+        1.000000
+      </param>
+      <formula number_of_chemicals="3">
+        delta_a = k*laplacian_a + g*a*(1.0f-a) + m*(a*b - c*a);
+        delta_b = k*laplacian_b + g*b*(1.0f-b) + m*(b*c - a*b);
+        delta_c = k*laplacian_c + g*c*(1.0f-c) + m*(c*a - b*c);
+      </formula>
+    </rule>
+    <initial_pattern_generator apply_when_loading="true" zero_first="false">
+      <overlay chemical="a">
+        <overwrite/>
+        <white_noise low="0" high="0.5"/>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite/>
+        <white_noise low="0" high="0.5"/>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="c">
+        <overwrite/>
+        <white_noise low="0" high="0.5"/>
+        <everywhere/>
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1"/>
+      <color_low r="0.278431" g="0.321569" b="0.360784"/>
+      <color_high r="0.996078" g="0.968628" b="0.913726"/>
+      <show_color_scale value="true"/>
+      <show_multiple_chemicals value="false"/>
+      <active_chemical value="a"/>
+      <low value="0"/>
+      <high value="2"/>
+      <vertical_scale_1D value="30"/>
+      <vertical_scale_2D value="15"/>
+      <contour_level value="0.25"/>
+      <cap_contour value="true"/>
+      <invert_contour_cap value="false"/>
+      <use_wireframe value="false"/>
+      <show_cell_edges value="false"/>
+      <show_bounding_box value="true"/>
+      <show_chemical_label value="true"/>
+      <slice_3D value="true"/>
+      <slice_3D_axis value="z"/>
+      <slice_3D_position value="0.5"/>
+      <show_displacement_mapped_surface value="false"/>
+      <color_displacement_mapped_surface value="false"/>
+      <use_image_interpolation value="true"/>
+      <timesteps_per_render value="8"/>
+      <show_phase_plot value="false"/>
+      <phase_plot_x_axis value="a"/>
+      <phase_plot_y_axis value="b"/>
+      <phase_plot_z_axis value="c"/>
+    </render_settings>
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
