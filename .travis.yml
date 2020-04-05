@@ -112,8 +112,8 @@ matrix:
     #        - libwxgtk3.0-dev
     #        - libboost-program-options-dev
     - os: osx
-      osx_image: xcode11.3
-      name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
+      osx_image: xcode11.2
+      name: MacOS_10.14_xcode11.2_vtk8.2.0_wx3.0.4
       addons:
         homebrew:
           update: true
