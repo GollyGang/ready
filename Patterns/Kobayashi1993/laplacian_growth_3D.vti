@@ -8,7 +8,7 @@
 
       &apos;a&apos; is the &apos;phase field&apos;, which changes from 0=liquid to 1=solid. &apos;b&apos; is the temperature.
 
-      Change parameter &apos;k&apos; between 0.8 and 2.5 to change the shape of the dendrites.
+      Change parameter &apos;k&apos; between 0.8 and 5.0 to change the shape of the dendrites.
 
     </description>
     <rule name="Dendrites" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
