@@ -3,19 +3,19 @@
   <RD format_version="5">
     <description>
       Kobayashi, R. (1993) &quot;Modeling and numerical simulations of dendritic crystal growth&quot; Physica D: Nonlinear Phenomena, 63(3-4), 410-423.
-
+      
       This version is without the anisotropy term and just models the &apos;Laplacian growth&apos;.
-
+      
       &apos;a&apos; is the &apos;phase field&apos;, which changes from 0=liquid to 1=solid. &apos;b&apos; is the temperature.
-
-      Change parameter &apos;k&apos; between 0.8 and 5.0 to change the shape of the dendrites.
+      
+      Change parameter &apos;k&apos; between 0.8 and 5 to change the shape of the dendrites.
     </description>
     <rule name="Laplacian Growth" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
       <param name="k">
-        2.5
+        3.500000
       </param>
       <formula number_of_chemicals="2">
-        const float timestep = 0.0001;
+        const float timestep = 0.00015;
         const float dx = 0.03;
         const float dy = 0.03;
         const float tau = 0.0003;
@@ -23,9 +23,10 @@
         const float alpha = 0.9;
         const float gamma = 10.0;
         const float teq = 1.0;
-        const float D_a = epsilonbar*epsilonbar/(dx*dx*tau);
-        const float D_b = 1.0/(dx*dx);
-
+        const float D = 1.5;
+        const float D_a = D*epsilonbar*epsilonbar/(dx*dx*tau);
+        const float D_b = D/(dx*dx);
+        
         float4 m = (float4)(alpha / M_PI) * atan(gamma *(teq-b));
         delta_a = D_a*laplacian_a + a*(1.0f-a)*(a-0.5f+m)/tau;
         delta_b = D_b*laplacian_b + k*delta_a;
@@ -39,37 +40,22 @@
       </overlay>
       <overlay chemical="a">
         <add/>
-        <constant value="0.99"/>
-        <rectangle>
-          <point3D x="0" y="0" z="0"/>
-          <point3D x="1" y="0.01" z="1"/>
-        </rectangle>
-      </overlay>
-      <overlay chemical="a">
-        <add/>
-        <constant value="1"/>
-        <circle radius="0.03">
-          <point3D x="0.2" y="0.02" z="0.3"/>
-        </circle>
-      </overlay>
-      <overlay chemical="a">
-        <add/>
-        <constant value="1"/>
-        <circle radius="0.03">
-          <point3D x="0.6" y="0.02" z="0.4"/>
-        </circle>
-      </overlay>
-      <overlay chemical="a">
-        <add/>
-        <constant value="1"/>
-        <circle radius="0.03">
-          <point3D x="0.3" y="0.02" z="0.8"/>
+        <white_noise low="0.4" high="0.5"/>
+        <circle radius="0.1">
+          <point3D x="1.0" y="0.0" z="0.0"/>
         </circle>
       </overlay>
       <overlay chemical="b">
         <overwrite/>
         <white_noise low="-1" high="1"/>
         <everywhere/>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite/>
+        <constant value="1"/>
+        <circle radius="0.12">
+          <point3D x="1.0" y="0.0" z="0.0"/>
+        </circle>
       </overlay>
     </initial_pattern_generator>
     <render_settings>
@@ -96,7 +82,7 @@
       <show_displacement_mapped_surface value="false"/>
       <color_displacement_mapped_surface value="false"/>
       <use_image_interpolation value="true"/>
-      <timesteps_per_render value="32"/>
+      <timesteps_per_render value="8"/>
       <show_phase_plot value="false"/>
       <phase_plot_x_axis value="a"/>
       <phase_plot_y_axis value="b"/>
