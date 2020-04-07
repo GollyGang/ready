@@ -4,12 +4,14 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.9 here: 
+Download Ready 0.10.1 here: 
 
-[![image](https://user-images.githubusercontent.com/647092/71315570-985a5400-2458-11ea-8625-656ba47e42b5.png)](https://github.com/GollyGang/ready/releases/download/0.9/Ready-0.9-Windows-64bit.zip)
-[![image](https://user-images.githubusercontent.com/647092/71315595-33ebc480-2459-11ea-8e2f-340068b06b76.png)](https://github.com/GollyGang/ready/releases/download/0.9/Ready-0.9-Mac.dmg)
+[![image](https://user-images.githubusercontent.com/647092/71315570-985a5400-2458-11ea-8625-656ba47e42b5.png)](https://github.com/GollyGang/ready/releases/download/0.10.1/Ready-0.10.1-Windows-64bit.zip)
+<!--[![image](https://user-images.githubusercontent.com/647092/71315595-33ebc480-2459-11ea-8e2f-340068b06b76.png)](https://github.com/GollyGang/ready/releases/download/0.9/Ready-0.9-Mac.dmg)-->
 
-Linux: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L115) 
+MacOS: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L139) (please ask if you want binaries)
+
+Linux: build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L112) (please ask if you want binaries)
 
 [Online help](https://gollygang.github.io/ready/Help/index.html), [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
