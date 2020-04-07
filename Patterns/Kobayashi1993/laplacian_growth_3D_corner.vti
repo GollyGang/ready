@@ -69,7 +69,7 @@
       <high value="1"/>
       <vertical_scale_1D value="30"/>
       <vertical_scale_2D value="15"/>
-      <contour_level value="0.25"/>
+      <contour_level value="0.5"/>
       <cap_contour value="true"/>
       <invert_contour_cap value="false"/>
       <use_wireframe value="false"/>
