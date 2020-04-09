@@ -122,16 +122,17 @@ matrix:
     #        - vtk
     #        - wxmac
     #        - boost
-    - os: osx
-      osx_image: xcode11.2
-      name: MacOS_10.14_xcode11.2_vtk8.2.0_wx3.0.4
-      addons:
-        homebrew:
-          update: true
-          packages:
-            - vtk
-            - wxmac
-            - boost
+    # disabled xcode11.2 build which Travis-CI seems to have broken
+    #- os: osx
+    #  osx_image: xcode11.2
+    #  name: MacOS_10.14_xcode11.2_vtk8.2.0_wx3.0.4
+    #  addons:
+    #    homebrew:
+    #      update: true
+    #      packages:
+    #        - vtk
+    #        - wxmac
+    #        - boost
     - os: osx
       name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
       addons:
