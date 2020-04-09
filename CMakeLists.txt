@@ -462,7 +462,7 @@ endif()
 if( APPLE )
   # support Mac OS 10.9 or later
   add_definitions( -mmacosx-version-min=10.9 )
-  set(CMAKE_CXX_FLAGS "-std=c++0x -stdlib=libc++")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++ -Wno-nullability-completeness-on-arrays")
 endif()
 if( APPLE OR UNIX )
   # use same settings as in makefiles

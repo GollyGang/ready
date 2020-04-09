@@ -25,6 +25,8 @@
         const float teq = 1.0;
         const float D_a = epsilonbar*epsilonbar/(dx*dx*tau);
         const float D_b = 1.0/(dx*dx);
+            
+        #define M_PI 3.14159265358979323846   // needed for MacOS
 
         float4 m = (float4)(alpha / M_PI) * atan(gamma *(teq-b));
         delta_a = D_a*laplacian_a + a*(1.0f-a)*(a-0.5f+m)/tau;

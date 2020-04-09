@@ -90,7 +90,11 @@ using namespace std;
 #include <vtkXMLPolyDataWriter.h>
 
 #ifdef __WXMAC__
-    #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
+    #if wxCHECK_VERSION(3,1,3)
+        // don't include Carbon.h (causes problems with Xcode 11.x)
+    #else
+        #include <Carbon/Carbon.h>  // for GetCurrentProcess, etc
+    #endif
 #endif
 
 #if wxCHECK_VERSION(2,9,0)
@@ -1843,8 +1847,13 @@ void MyFrame::EditFile(const wxString& path)
     // on Windows, wxExecute returns 0 if cmd fails
     if (result == 0)
 #elif defined(__WXMAC__)
-    // on Mac, wxExecute returns -1 if cmd succeeds (bug, or wx docs are wrong)
-    if (result != -1)
+    #if wxCHECK_VERSION(3,1,3)
+        // in 3.1.3+ wxExecute returns -1 if cmd fails (pid if success)
+        if (result == -1)
+    #else
+        // pre 3.1.3, wxExecute returns -1 if cmd succeeds (bug, or wx docs are wrong)
+        if (result != -1)
+    #endif
 #elif defined(__WXGTK__)
     // on Linux, wxExecute always returns a +ve number (pid?) if cmd fails OR succeeds (sheesh!)
     // but if it fails an error message appears in shell window

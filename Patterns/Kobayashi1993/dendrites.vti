@@ -17,6 +17,8 @@
 
             // a = phi
             // b = temperature (t)
+            
+            #define M_PI 3.14159265358979323846   // needed for MacOS
 
             const float dx = 0.03;
             const float dy = 0.03;
