@@ -22,7 +22,7 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 #include <string>
 
 InitialPatternGenerator::InitialPatternGenerator()
-    : zero_first(false)
+    : zero_first(true)
 {
 }
 
