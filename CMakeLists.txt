@@ -25,6 +25,9 @@ endif()
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW)
 endif()
+if(POLICY CMP0057)
+  cmake_policy(SET CMP0057 NEW)
+endif()
 
 project( Ready )
 
@@ -344,6 +347,30 @@ find_package( VTK
 )
 include( ${VTK_USE_FILE} )
 
+#-------------------------------------------wxWidgets----------------------------------------------
+
+if( APPLE )
+  # on Mac OS X it's better to use locally installed wxWidgets headers and libs
+  # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
+  set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
+  set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
+elseif(UNIX)
+  # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
+  set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
+endif()
+
+# wxWidgets is required to build the project
+if(UNIX AND NOT APPLE)
+  SET(WXGLCANVASLIBS "gl")
+endif()
+FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
+INCLUDE( ${wxWidgets_USE_FILE} )
+
+if( WIN32 )
+  # prevent link errors with wxMSW 2.9.x
+  add_definitions( -DwxDEBUG_LEVEL=0 )
+endif()
+
 #-------------------------------------------wxVTK----------------------------------------------
 
 # The following allows you to access wxGLCanvas for GTK
@@ -359,41 +386,18 @@ else()
     ENDIF(VTK_USE_COCOA)
   else()
     find_package(PkgConfig)
-    pkg_check_modules(GTK2 QUIET gtk+-2.0)
-    if(GTK2_FOUND)
+    if("-lwx_gtk2u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
+      pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
       include_directories(${GTK2_INCLUDE_DIRS})
       link_libraries(${GTK2_LIBRARIES})
-    else()
+    elseif("-lwx_gtk3u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
       pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
       include_directories(${GTK3_INCLUDE_DIRS})
       link_libraries(${GTK3_LIBRARIES})
+    else()
+      message(FATAL_ERROR "Didn't find -lwx_gtk2u_core-3.0 or -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES - unable to detect GTK version to use: ${wxWidgets_LIBRARIES}")
     endif()
-    SET(WXGLCANVASLIBS "gl")
   endif()
-endif()
-
-#-------------------------------------------wxWidgets----------------------------------------------
-
-if( APPLE )
-  # on Mac OS X it's better to use locally installed wxWidgets headers and libs
-  # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
-  set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
-  set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
-elseif(UNIX)
-  # remove -rdynamic from link options on Linux to reduce size by about 1.2MB
-  set( CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "" )
-endif()
-
-# wxWidgets is required to build the project
-FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
-
-IF( wxWidgets_FOUND )
-  INCLUDE( ${wxWidgets_USE_FILE} )
-ENDIF()
-
-if( WIN32 )
-  # prevent link errors with wxMSW 2.9.x
-  add_definitions( -DwxDEBUG_LEVEL=0 )
 endif()
 
 #-------------------------------------------OpenCL----------------------------------------------
@@ -478,11 +482,9 @@ target_link_libraries( readybase ${VTK_LIBRARIES} )
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
 target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
-if( wxWidgets_FOUND )
-  # create GUI application
-  add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
-  target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
-endif()
+# create GUI application
+add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
+target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle

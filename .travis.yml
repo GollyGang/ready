@@ -98,6 +98,47 @@ matrix:
             - libgtk2.0-dev
             - libwxgtk3.0-dev
             - libboost-program-options-dev
+    # check that the build works when both gtk2 and 3 are installed
+    - os: linux
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG1_g2g3w2w3
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-dev
+            - libwxgtk3.0-gtk3-dev
+            - libboost-program-options-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG2_g2g3w2
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-dev
+            - libboost-program-options-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG3_g2g3w3
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
+            - libboost-program-options-dev
     # disabled vtk6 support pending a workaround for the vtkRenderingOpenGL(2) issue
     #- os: linux
     #  name: Ubuntu_16.04_gtk2_vtk6_wx3.0.2
