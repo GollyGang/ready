@@ -100,7 +100,7 @@ matrix:
             - libboost-program-options-dev
     # debugging build failures when both gtk2 and 3 were installed
     - os: linux
-      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG2
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG1_g2g3w2w3
       dist: bionic
       compiler: gcc
       addons:
@@ -114,7 +114,7 @@ matrix:
             - libwxgtk3.0-gtk3-dev
             - libboost-program-options-dev
     - os: linux
-      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG2
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG2_g2g3w2
       dist: bionic
       compiler: gcc
       addons:
@@ -127,7 +127,7 @@ matrix:
             - libwxgtk3.0-dev
             - libboost-program-options-dev
     - os: linux
-      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG3
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG3_g2g3w3
       dist: bionic
       compiler: gcc
       addons:
