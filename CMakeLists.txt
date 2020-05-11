@@ -386,10 +386,15 @@ endif()
 
 # wxWidgets is required to build the project
 FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
+INCLUDE( ${wxWidgets_USE_FILE} )
 
-IF( wxWidgets_FOUND )
-  INCLUDE( ${wxWidgets_USE_FILE} )
-ENDIF()
+# debug
+message("wxWidgets_INCLUDE_DIRS: ${wxWidgets_INCLUDE_DIRS}")
+message("wxWidgets_LIBRARIES: ${wxWidgets_LIBRARIES}")
+message("wxWidgets_LIBRARY_DIRS: ${wxWidgets_LIBRARY_DIRS}")
+message("wxWidgets_DEFINITIONS: ${wxWidgets_DEFINITIONS}")
+message("wxWidgets_DEFINITIONS_DEBUG: ${wxWidgets_DEFINITIONS_DEBUG}")
+message("wxWidgets_CXX_FLAGS: ${wxWidgets_CXX_FLAGS}")
 
 if( WIN32 )
   # prevent link errors with wxMSW 2.9.x
@@ -478,11 +483,9 @@ target_link_libraries( readybase ${VTK_LIBRARIES} )
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
 target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
-if( wxWidgets_FOUND )
-  # create GUI application
-  add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
-  target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
-endif()
+# create GUI application
+add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
+target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
 
 if( APPLE )
   # create Info.plist (using Info.plist.in) and PkgInfo files inside .app bundle
