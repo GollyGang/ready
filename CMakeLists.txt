@@ -366,13 +366,13 @@ endif()
 FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
 INCLUDE( ${wxWidgets_USE_FILE} )
 
-# debug
+# check that we know which version of GTK to use
 if("-lwx_gtk2u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
     message("Found -lwx_gtk2u_core-3.0 in wxWidgets_LIBRARIES - wx is using GTK2")
 elseif("-lwx_gtk3u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
     message("Found -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES - wx is using GTK3")
 else()
-    message("Didn't find -lwx_gtk2u_core-3.0 or -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES")
+    message(FATAL_ERROR "Didn't find -lwx_gtk2u_core-3.0 or -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES - unable to detect GTK version to use: ${wxWidgets_LIBRARIES}")
 endif()
 
 if( WIN32 )

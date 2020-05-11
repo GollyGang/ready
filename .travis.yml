@@ -98,7 +98,7 @@ matrix:
             - libgtk2.0-dev
             - libwxgtk3.0-dev
             - libboost-program-options-dev
-    # debugging build failures when both gtk2 and 3 were installed
+    # check that the build works when both gtk2 and 3 are installed
     - os: linux
       name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG1_g2g3w2w3
       dist: bionic
