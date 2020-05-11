@@ -347,36 +347,6 @@ find_package( VTK
 )
 include( ${VTK_USE_FILE} )
 
-#-------------------------------------------wxVTK----------------------------------------------
-
-# The following allows you to access wxGLCanvas for GTK
-if(WIN32)
-  set(GUI_EXECUTABLE WIN32)
-else()
-  if(APPLE)
-    SET(GUI_EXECUTABLE MACOSX_BUNDLE)
-    IF(VTK_USE_COCOA)
-      SET_SOURCE_FILES_PROPERTIES(
-        src/gui/wxVTKRenderWindowInteractor.cxx
-        PROPERTIES COMPILE_FLAGS "-ObjC++")
-    ENDIF(VTK_USE_COCOA)
-  else()
-    #find_package(PkgConfig)
-    #pkg_check_modules(GTK2 QUIET gtk+-2.0)
-    #if(GTK2_FOUND)
-    #  message("Using GTK2")
-    #  include_directories(${GTK2_INCLUDE_DIRS})
-    #  link_libraries(${GTK2_LIBRARIES})
-    #else()
-    #  pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-    #  include_directories(${GTK3_INCLUDE_DIRS})
-    #  link_libraries(${GTK3_LIBRARIES})
-    #  message("Using GTK3")
-    #endif()
-    SET(WXGLCANVASLIBS "gl")
-  endif()
-endif()
-
 #-------------------------------------------wxWidgets----------------------------------------------
 
 if( APPLE )
@@ -394,16 +364,10 @@ FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQU
 INCLUDE( ${wxWidgets_USE_FILE} )
 
 # debug
-message("wxWidgets_INCLUDE_DIRS: ${wxWidgets_INCLUDE_DIRS}")
-message("wxWidgets_LIBRARIES: ${wxWidgets_LIBRARIES}")
-message("wxWidgets_LIBRARY_DIRS: ${wxWidgets_LIBRARY_DIRS}")
-message("wxWidgets_DEFINITIONS: ${wxWidgets_DEFINITIONS}")
-message("wxWidgets_DEFINITIONS_DEBUG: ${wxWidgets_DEFINITIONS_DEBUG}")
-message("wxWidgets_CXX_FLAGS: ${wxWidgets_CXX_FLAGS}")
 if("-lwx_gtk2u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
-    message("Found -lwx_gtk2u_core-3.0 in wxWidgets_LIBRARIES")
+    message("Found -lwx_gtk2u_core-3.0 in wxWidgets_LIBRARIES - wx is using GTK2")
 elseif("-lwx_gtk3u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
-    message("Found -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES")
+    message("Found -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES - wx is using GTK3")
 else()
     message("Didn't find -lwx_gtk2u_core-3.0 or -lwx_gtk3u_core-3.0 in wxWidgets_LIBRARIES")
 endif()
@@ -411,6 +375,34 @@ endif()
 if( WIN32 )
   # prevent link errors with wxMSW 2.9.x
   add_definitions( -DwxDEBUG_LEVEL=0 )
+endif()
+
+#-------------------------------------------wxVTK----------------------------------------------
+
+# The following allows you to access wxGLCanvas for GTK
+if(WIN32)
+  set(GUI_EXECUTABLE WIN32)
+else()
+  if(APPLE)
+    SET(GUI_EXECUTABLE MACOSX_BUNDLE)
+    IF(VTK_USE_COCOA)
+      SET_SOURCE_FILES_PROPERTIES(
+        src/gui/wxVTKRenderWindowInteractor.cxx
+        PROPERTIES COMPILE_FLAGS "-ObjC++")
+    ENDIF(VTK_USE_COCOA)
+  else()
+    find_package(PkgConfig)
+    if("-lwx_gtk2u_core-3.0" IN_LIST wxWidgets_LIBRARIES)
+      pkg_check_modules(GTK2 REQUIRED gtk+-2.0)
+      include_directories(${GTK2_INCLUDE_DIRS})
+      link_libraries(${GTK2_LIBRARIES})
+    else()
+      pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+      include_directories(${GTK3_INCLUDE_DIRS})
+      link_libraries(${GTK3_LIBRARIES})
+    endif()
+    SET(WXGLCANVASLIBS "gl")
+  endif()
 endif()
 
 #-------------------------------------------OpenCL----------------------------------------------
