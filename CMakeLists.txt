@@ -360,6 +360,9 @@ elseif(UNIX)
 endif()
 
 # wxWidgets is required to build the project
+if(UNIX AND NOT APPLE)
+  SET(WXGLCANVASLIBS "gl")
+endif()
 FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
 INCLUDE( ${wxWidgets_USE_FILE} )
 
@@ -401,7 +404,6 @@ else()
       include_directories(${GTK3_INCLUDE_DIRS})
       link_libraries(${GTK3_LIBRARIES})
     endif()
-    SET(WXGLCANVASLIBS "gl")
   endif()
 endif()
 
