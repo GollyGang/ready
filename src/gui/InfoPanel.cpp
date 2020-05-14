@@ -124,7 +124,7 @@ END_EVENT_TABLE()
 void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
 {
     wxString url = link.GetHref();
-    if ( url.StartsWith(wxT("http:")) || url.StartsWith(wxT("mailto:")) ) {
+    if (url.StartsWith(wxT("http:")) || url.StartsWith(wxT("https:")) || url.StartsWith(wxT("mailto:"))) {
         // pass http/mailto URL to user's preferred browser/emailer
         if ( !wxLaunchDefaultBrowser(url) )
             Warning(_("Could not open URL in browser!"));
