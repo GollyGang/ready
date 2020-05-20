@@ -183,7 +183,9 @@ set( PATTERN_FILES
   Patterns/Pennybacker2013/phyllotaxis_fibonacci.vti Patterns/Pennybacker2013/phyllotaxis_hexagons.vti
   Patterns/Pennybacker2013/spots.vti                 Patterns/Pennybacker2013/stripes.vti
   Patterns/Pennybacker2013/parameter_map.vti
+  Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots.vti
+  Patterns/Experiments/TimHutton/mutually-catalytic_spots_2.vti
   Patterns/Experiments/DanWills/cglrd_ramps_example.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_moreLifelike.vti
@@ -207,7 +209,6 @@ set( PATTERN_FILES
   Patterns/Experiments/DanWills/orbits_ddd_epochs_init.djw.vti
   Patterns/Experiments/DanWills/grayscott-sharpenTweak_cellTrailDetail_512px_init.vti
   Patterns/Experiments/SimonGladman/vermiformSolitons.vti
-  Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/CornusAmmonis/MandelbrotWorms.vti
   Patterns/Experiments/CornusAmmonis/mutually-catalytic-pinwheels.vti
   Patterns/Experiments/CornusAmmonis/mutually-catalytic-spots-second-order-sobel.vti
