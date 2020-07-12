@@ -273,6 +273,9 @@ MyFrame::MyFrame(const wxString& title)
     #else
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
+    #ifdef __WXMSW__
+        this->aui_mgr.SetFlags(wxAUI_MGR_LIVE_RESIZE);
+    #endif
     this->aui_mgr.SetManagedWindow(this);
 
     GetPrefs();     // must be called before InitializeMenus
