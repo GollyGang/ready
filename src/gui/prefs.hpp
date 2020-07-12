@@ -128,9 +128,11 @@ typedef enum
     DO_PATTERNS,                 // show patterns pane
     DO_SELALL,                   // select all
     DO_DEVICE,                   // select OpenCL device...
+    DO_BRUSHEXTRASMALL,          // select extra small brush
     DO_BRUSHSMALL,               // select small brush
     DO_BRUSHMEDIUM,              // select medium brush
     DO_BRUSHLARGE,               // select large brush
+    DO_BRUSHEXTRALARGE,          // select extra large brush
     DO_OPENCL,                   // show OpenCL diagnostics...
     DO_ACTIONTOOLBAR,            // show action toolbar
     DO_FILETOOLBAR,              // show file toolbar

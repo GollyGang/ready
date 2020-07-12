@@ -164,12 +164,16 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::Brush, MyFrame::OnUpdateSelectBrushTool)
     EVT_MENU(ID::Picker, MyFrame::OnSelectPickerTool)
     EVT_UPDATE_UI(ID::Picker, MyFrame::OnUpdateSelectPickerTool)
+    EVT_MENU(ID::BrushSizeExtraSmall, MyFrame::OnBrushSizeExtraSmall)
+    EVT_UPDATE_UI(ID::BrushSizeExtraSmall, MyFrame::OnUpdateBrushSizeExtraSmall)
     EVT_MENU(ID::BrushSizeSmall, MyFrame::OnBrushSizeSmall)
     EVT_UPDATE_UI(ID::BrushSizeSmall, MyFrame::OnUpdateBrushSizeSmall)
     EVT_MENU(ID::BrushSizeMedium, MyFrame::OnBrushSizeMedium)
     EVT_UPDATE_UI(ID::BrushSizeMedium, MyFrame::OnUpdateBrushSizeMedium)
     EVT_MENU(ID::BrushSizeLarge, MyFrame::OnBrushSizeLarge)
     EVT_UPDATE_UI(ID::BrushSizeLarge, MyFrame::OnUpdateBrushSizeLarge)
+    EVT_MENU(ID::BrushSizeExtraLarge, MyFrame::OnBrushSizeExtraLarge)
+    EVT_UPDATE_UI(ID::BrushSizeExtraLarge, MyFrame::OnUpdateBrushSizeExtraLarge)
     // view menu
     EVT_MENU(ID::FullScreen, MyFrame::OnFullScreen)
     EVT_MENU(ID::FitPattern, MyFrame::OnFitPattern)
@@ -238,7 +242,7 @@ END_EVENT_TABLE()
 
 // ---------------------------------------------------------------------
 
-const float MyFrame::brush_sizes[] = {0.02f,0.05f,0.1f};
+const float MyFrame::brush_sizes[] = {0.002f, 0.005f, 0.01f, 0.02f, 0.05f};
 
 // ---------------------------------------------------------------------
 
@@ -382,9 +386,11 @@ void MyFrame::InitializeMenus()
         menu->AppendRadioItem(ID::Picker, _("Select Color Picker") + GetAccelerator(DO_PICKER), _("Select color picker tool"));
         menu->AppendSeparator();
         wxMenu* brush_size_menu = new wxMenu;
+        brush_size_menu->AppendCheckItem(ID::BrushSizeExtraSmall,_("Extra small") + GetAccelerator(DO_BRUSHEXTRASMALL),_("Select the extra small brush"));
         brush_size_menu->AppendCheckItem(ID::BrushSizeSmall,_("Small") + GetAccelerator(DO_BRUSHSMALL),_("Select the small brush"));
         brush_size_menu->AppendCheckItem(ID::BrushSizeMedium,_("Medium") + GetAccelerator(DO_BRUSHMEDIUM),_("Select the medium brush"));
         brush_size_menu->AppendCheckItem(ID::BrushSizeLarge,_("Large") + GetAccelerator(DO_BRUSHLARGE),_("Select the large brush"));
+        brush_size_menu->AppendCheckItem(ID::BrushSizeExtraLarge,_("Extra large") + GetAccelerator(DO_BRUSHEXTRALARGE),_("Select the extra large brush"));
         menu->AppendSubMenu(brush_size_menu,_("Brush Size"),_("Choose the size of brush"));
         menuBar->Append(menu, _("&Edit"));
     }
@@ -2043,9 +2049,11 @@ void MyFrame::UpdateMenuAccelerators()
         SetAccelerator(mbar, ID::Pencil,                    DO_PENCIL);
         SetAccelerator(mbar, ID::Brush,                     DO_BRUSH);
         SetAccelerator(mbar, ID::Picker,                    DO_PICKER);
+        SetAccelerator(mbar, ID::BrushSizeExtraSmall,       DO_BRUSHEXTRASMALL);
         SetAccelerator(mbar, ID::BrushSizeSmall,            DO_BRUSHSMALL);
         SetAccelerator(mbar, ID::BrushSizeMedium,           DO_BRUSHMEDIUM);
         SetAccelerator(mbar, ID::BrushSizeLarge,            DO_BRUSHLARGE);
+        SetAccelerator(mbar, ID::BrushSizeExtraLarge,       DO_BRUSHEXTRALARGE);
 
         // view menu
         SetAccelerator(mbar, ID::FullScreen,                DO_FULLSCREEN);
@@ -2122,9 +2130,11 @@ void MyFrame::ProcessKey(int key, int modifiers)
         case DO_PENCIL:         cmdid = ID::Pencil; break;
         case DO_BRUSH:          cmdid = ID::Brush; break;
         case DO_PICKER:         cmdid = ID::Picker; break;
+        case DO_BRUSHEXTRASMALL:cmdid = ID::BrushSizeExtraSmall; break;
         case DO_BRUSHSMALL:     cmdid = ID::BrushSizeSmall; break;
         case DO_BRUSHMEDIUM:    cmdid = ID::BrushSizeMedium; break;
         case DO_BRUSHLARGE:     cmdid = ID::BrushSizeLarge; break;
+        case DO_BRUSHEXTRALARGE:cmdid = ID::BrushSizeExtraLarge; break;
 
         // View menu
         case DO_FULLSCREEN:     cmdid = ID::FullScreen; break;
@@ -3328,44 +3338,72 @@ void MyFrame::OnChangeCurrentColor(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnBrushSizeSmall(wxCommandEvent& event)
+void MyFrame::OnBrushSizeExtraSmall(wxCommandEvent& event)
 {
     current_brush_size = 0;
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnUpdateBrushSizeSmall(wxUpdateUIEvent& event)
+void MyFrame::OnUpdateBrushSizeExtraSmall(wxUpdateUIEvent& event)
 {
-    event.Check(current_brush_size==0);
+    event.Check(current_brush_size == 0);
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnBrushSizeMedium(wxCommandEvent& event)
+void MyFrame::OnBrushSizeSmall(wxCommandEvent& event)
 {
     current_brush_size = 1;
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnUpdateBrushSizeMedium(wxUpdateUIEvent& event)
+void MyFrame::OnUpdateBrushSizeSmall(wxUpdateUIEvent& event)
 {
-    event.Check(current_brush_size==1);
+    event.Check(current_brush_size == 1);
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnBrushSizeLarge(wxCommandEvent& event)
+void MyFrame::OnBrushSizeMedium(wxCommandEvent& event)
 {
     current_brush_size = 2;
 }
 
 // ---------------------------------------------------------------------
 
-void MyFrame::OnUpdateBrushSizeLarge(wxUpdateUIEvent& event)
+void MyFrame::OnUpdateBrushSizeMedium(wxUpdateUIEvent& event)
 {
     event.Check(current_brush_size==2);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnBrushSizeLarge(wxCommandEvent& event)
+{
+    current_brush_size = 3;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateBrushSizeLarge(wxUpdateUIEvent& event)
+{
+    event.Check(current_brush_size==3);
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnBrushSizeExtraLarge(wxCommandEvent& event)
+{
+    current_brush_size = 4;
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::OnUpdateBrushSizeExtraLarge(wxUpdateUIEvent& event)
+{
+    event.Check(current_brush_size==4);
 }
 
 // ---------------------------------------------------------------------

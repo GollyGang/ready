@@ -343,9 +343,11 @@ const char* GetActionName(action_id action)
         case DO_PENCIL:         return "Select Pencil Tool";
         case DO_BRUSH:          return "Select Brush Tool";
         case DO_PICKER:         return "Select Color Picker Tool";
+        case DO_BRUSHEXTRASMALL:return "Select Extra Small Brush";
         case DO_BRUSHSMALL:     return "Select Small Brush";
         case DO_BRUSHMEDIUM:    return "Select Medium Brush";
         case DO_BRUSHLARGE:     return "Select Large Brush";
+        case DO_BRUSHEXTRALARGE:return "Select Extra Large Brush";
         // View menu
         case DO_FULLSCREEN:     return "Full Screen";
         case DO_FIT:            return "Fit Pattern";
