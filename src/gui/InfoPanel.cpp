@@ -493,6 +493,18 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     wxString result = (rownum & 1) ? _T("<tr bgcolor=\"#F0F0F0\">") : _T("<tr>");
     rownum++;
 
+    if (is_editable) {
+        result += _T("<td valign=top align=right><a href=\"");
+        result += change_prefix;
+        result += label;
+        result += _T("\">");
+        result += _("edit");
+        result += _T("</a></td>");
+    }
+    else {
+        result += _T("<td></td>");
+    }
+
     if (is_multiline) {
         result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
         result += print_label;
@@ -517,16 +529,6 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
         result += _T("</td>");
     }
 
-    if (is_editable) {
-        result += _T("<td valign=top align=right><a href=\"");
-        result += change_prefix;
-        result += label;
-        result += _T("\">");
-        result += _("edit");
-        result += _T("</a></td>");
-    } else {
-        result += _T("<td></td>");
-    }
     result += _T("<td width=3></td></tr>");
 
     if (is_multiline) {
