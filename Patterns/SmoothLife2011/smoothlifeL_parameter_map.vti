@@ -6,7 +6,7 @@
       &lt;a href=&quot;http://arxiv.org/abs/1111.1567&quot;&gt;PDF&lt;/a&gt;,
       &lt;a href=&quot;http://sourceforge.net/projects/smoothlife/&quot;&gt;software&lt;/a&gt;.
 
-      In this version the parameters s1 and s2 vary across the image, showing how of the behavior changes with different parameters. Edit the kernel
+      In this version the parameters b2 and s2 vary across the image, showing how of the behavior changes with different parameters. Edit the kernel
       to change the range of the parameters, or to use different ones.
       
     </description>
