@@ -136,15 +136,15 @@ Optional, for packaging:
 make package
 make package_source
 
-=========================== MacOS =================================
+=========================== macOS =================================
 
 1. Build wxWidgets (assuming you've downloaded and unpacked the source tar ball
-   for wxWidgets 3.1.3 from https://www.wxwidgets.org/downloads/):
+   for wxWidgets 3.1.4 from https://www.wxwidgets.org/downloads/):
 
-cd /path/to/wxWidgets-3.1.3
-mkdir build-osx
-cd build-osx
-../configure --enable-unicode --disable-shared --with-osx_cocoa --with-macosx-version-min=10.9
+cd /path/to/wxWidgets-3.1.4
+mkdir build-macos
+cd build-macos
+../configure --enable-unicode --disable-shared --with-osx_cocoa --with-macosx-version-min=10.10
 make   # take a nap, it'll be a while
 sudo make install
 
@@ -154,7 +154,7 @@ sudo make install
 cd /path/to/VTK-8.2.0
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.9 .. 
+cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.10 ..
 make   # this also takes some time
 
 3. Install Boost

@@ -35,7 +35,7 @@ set( READY_VERSION 0.10.1 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
-  # app names are usually capitalized on Mac OS X and Windows
+  # app names are usually capitalized on macOS and Windows
   set( APP_NAME Ready )
 else()
   # Linux binaries are usually all lowercase
@@ -352,8 +352,7 @@ include( ${VTK_USE_FILE} )
 #-------------------------------------------wxWidgets----------------------------------------------
 
 if( APPLE )
-  # on Mac OS X it's better to use locally installed wxWidgets headers and libs
-  # (the pre-installed stuff tends to be out of date; eg. 10.6 has wxMac 2.8.8 and it's a 32-bit debug build)
+  # on macOS it's best to use locally installed wxWidgets headers and libs
   set( wxWidgets_CONFIG_EXECUTABLE /usr/local/bin/wx-config )
   set( wxWidgets_wxrc_EXECUTABLE /usr/local/bin/wxrc )         # not used, but no harm leaving it in
 elseif(UNIX)
@@ -411,7 +410,7 @@ set( CMAKE_MODULE_PATH ${Ready_SOURCE_DIR}/src )
 find_package( OpenCL REQUIRED )
 include_directories( ${OPENCL_INCLUDE_DIRS} )
 if( APPLE )
-  link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available (might need to rethink for versions before 10.6)
+  link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available
 endif()
 
 #-------------------------------------------Boost-----------------------------------------------
@@ -467,8 +466,8 @@ if( USE_SSE )
 endif()
 
 if( APPLE )
-  # support Mac OS 10.9 or later
-  add_definitions( -mmacosx-version-min=10.9 )
+  # support macOS 10.10 or later
+  add_definitions( -mmacosx-version-min=10.10 )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++ -Wno-nullability-completeness-on-arrays")
 endif()
 if( APPLE OR UNIX )
@@ -506,8 +505,8 @@ if( APPLE )
   # horrible hack to avoid Undefined symbol "___isPlatformVersionAtLeast" using wxMac 3.1.3 on Mojave
   # set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a" )
 
-  # tell linker that we support Mac OS 10.9+
-  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.9" )
+  # tell linker that we support macOS 10.10+
+  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.10" )
 endif()
 
 # avoid security warnings
