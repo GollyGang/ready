@@ -94,6 +94,11 @@ bool MyApp::OnInit()
         return false;
 
     SetAppName(_("Ready"));    // for use in Warning/Fatal dialogs
+    
+#ifdef __WXMAC__
+    // avoid Show Tab Bar etc appearing in View menu
+    OSXEnableAutomaticTabbing(false);
+#endif
 
     srand((unsigned int)time(NULL));
 
