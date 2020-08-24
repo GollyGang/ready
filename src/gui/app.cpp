@@ -95,7 +95,7 @@ bool MyApp::OnInit()
 
     SetAppName(_("Ready"));    // for use in Warning/Fatal dialogs
     
-#ifdef __WXMAC__
+#if defined(__WXMAC__) && wxCHECK_VERSION(3,1,4)
     // avoid Show Tab Bar etc appearing in View menu
     OSXEnableAutomaticTabbing(false);
 #endif
