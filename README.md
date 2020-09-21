@@ -39,6 +39,7 @@ Press coverage:
 
 [Citations:](https://scholar.google.com/scholar?oi=bibs&hl=en&cites=17960091338602715353)
 
+  * Mikhail Kryuchkov, Oleksii Bilousov, Jannis Lehmann, Manfred Fiebig & Vladimir L. Katanaev ["Reverse and forward engineering of Drosophila corneal nanocoatings"](https://www.nature.com/articles/s41586-020-2707-9) Nature, volume 585, pages 383–389, 2020.
   * Thies H. Büscher, Mikhail Kryuchkov, Vladimir L. Katanaev and Stanislav N. Gorb ["Versatility of Turing patterns potentiates rapid evolution in tarsal attachment microstructures of stick and leaf insects (Phasmatodea)"](https://doi.org/10.1098/rsif.2018.0281) J. R. Soc. Interface 15, 2018.
   * David H. Ackley , Elena S. Ackley. ["The ulam Programming Language for Artificial Life"](http://www.mitpressjournals.org/doi/pdf/10.1162/ARTL_a_00212) Artificial Life. Nov 2016, Vol. 22, No. 4: 431-450.
   * Kawamata I., Yoshizawa S., Takabatake F., Sugawara K., Murata S. ["Discrete DNA Reaction-Diffusion Model for Implementing Simple Cellular Automaton"](https://link.springer.com/chapter/10.1007/978-3-319-41312-9_14) In: Amos M., CONDON A. (eds) Unconventional Computation and Natural Computation. UCNC 2016. Lecture Notes in Computer Science, vol 9726. Springer, Cham.
