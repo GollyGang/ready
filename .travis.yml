@@ -170,14 +170,16 @@ matrix:
             - vtk
             - wxmac
             - boost
-    - os: osx
-      name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
-      addons:
-        homebrew:
-          packages:
-            - vtk
-            - wxmac
-            - boost
+    # disabled pending a fix for issue #82        
+    #- os: osx
+    #  name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
+    #  addons:
+    #    homebrew:
+    #      update: true
+    #      packages:
+    #        - vtk
+    #        - wxmac
+    #        - boost
 
 branches:
   only:
