@@ -2762,20 +2762,20 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
                     << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[1] << " "
                     << pd->GetPointData()->GetNormals()->GetTuple3(iPt)[2] << "\n";
         }
-        vtkIdType npts,*pts;
         for(vtkIdType iCell=0;iCell<pd->GetPolys()->GetNumberOfCells();iCell++)
         {
-            pd->GetCellPoints(iCell,npts,pts);
+            vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+            pd->GetCellPoints(iCell, ids);
             out << "f";
             if(pd->GetPointData()->GetNormals())
             {
-                for(vtkIdType iPt=0;iPt<npts;iPt++)
-                    out << " " << wxInt32(pts[iPt]+1) << "//" << wxInt32(pts[iPt]+1); // (OBJ indices are 1-based)
+                for(vtkIdType iPt = 0; iPt < ids->GetNumberOfIds(); iPt++)
+                    out << " " << wxInt32(ids->GetId(iPt) + 1) << "//" << wxInt32(ids->GetId(iPt) + 1); // (OBJ indices are 1-based)
             }
             else
             {
-                for(vtkIdType iPt=0;iPt<npts;iPt++)
-                    out << " " << wxInt32(pts[iPt]+1); // (OBJ indices are 1-based)
+                for(vtkIdType iPt = 0; iPt < ids->GetNumberOfIds(); iPt++)
+                    out << " " << wxInt32(ids->GetId(iPt) + 1); // (OBJ indices are 1-based)
             }
             out << "\n";
         }

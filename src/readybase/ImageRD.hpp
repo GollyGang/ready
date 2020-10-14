@@ -79,7 +79,7 @@ class ImageRD : public AbstractRD
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
 
-        virtual int GetMemorySize() const;
+        virtual size_t GetMemorySize() const;
 
     protected:
 

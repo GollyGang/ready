@@ -62,6 +62,31 @@ matrix:
         - BIN_FOLDER=Release/
         # Allow the executables to load the shared VTK DLLs
         - export PATH=$PWD/VTK/bin:$PATH
+    # disabled pending a fix for link error undefined reference to `__exp_finite' (possibly need -ffinite-math-only ?)
+    #- os: linux
+    #  name: Ubuntu_20.04_gtk3_vtk7_wx3.0.4_clang
+    #  dist: focal
+    #  compiler: clang
+    #  addons:
+    #    apt:
+    #      packages:
+    #        - libvtk7-dev
+    #        - ocl-icd-opencl-dev
+    #        - libgtk-3-dev
+    #        - libwxgtk3.0-gtk3-dev
+    #        - libboost-program-options-dev
+    - os: linux
+      name: Ubuntu_20.04_gtk3_vtk7_wx3.0.4_gcc
+      dist: focal
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
+            - libboost-program-options-dev
     - os: linux
       name: Ubuntu_18.04_gtk3_vtk7_wx3.0.4_clang
       dist: bionic
@@ -139,19 +164,28 @@ matrix:
             - libgtk-3-dev
             - libwxgtk3.0-gtk3-dev
             - libboost-program-options-dev
-    # disabled vtk6 support pending a workaround for the vtkRenderingOpenGL(2) issue
-    #- os: linux
-    #  name: Ubuntu_16.04_gtk2_vtk6_wx3.0.2
-    #  dist: xenial
-    #  compiler: gcc
+    - os: linux
+      name: Ubuntu_16.04_gtk2_vtk6_wx3.0.2
+      dist: xenial
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk6-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
+            - libboost-program-options-dev
+    # disabled pending a fix for qt5 error in cmake
+    #- os: osx
+    #  osx_image: xcode12.2
+    #  name: MacOS_10.15.7_xcode12.2_vtk9.0.1_wx3.0.5
     #  addons:
-    #    apt:
+    #    homebrew:
     #      packages:
-    #        - libvtk6-dev
-    #        - ocl-icd-opencl-dev
-    #        - libgtk2.0-dev
-    #        - libwxgtk3.0-dev
-    #        - libboost-program-options-dev
+    #        - vtk
+    #        - wxmac
+    #        - boost
     - os: osx
       osx_image: xcode11.3
       name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
@@ -170,9 +204,9 @@ matrix:
             - vtk
             - wxmac
             - boost
-    # disabled pending a fix for issue #82        
+    # disabled pending a fix for qt5 error in cmake
     #- os: osx
-    #  name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
+    #  name: MacOS_10.13_xcode9.4.1_vtk9.0.1_wx3.0.4
     #  addons:
     #    homebrew:
     #      update: true

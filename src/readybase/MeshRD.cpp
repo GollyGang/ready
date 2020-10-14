@@ -160,19 +160,19 @@ void MeshRD::GenerateInitialPattern()
         this->BlankImage();
     }
 
-    vtkIdType npts,*pts;
     float cp[3];
     double *bounds = this->mesh->GetBounds();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)
     {
-        this->mesh->GetCellPoints(iCell,npts,pts);
+        vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+        this->mesh->GetCellPoints(iCell, ids);
         // get a point at the centre of the cell (need a location to sample the overlays)
         cp[0]=cp[1]=cp[2]=0.0f;
-        for(vtkIdType iPt=0;iPt<npts;iPt++)
+        for(vtkIdType iPt=0;iPt<ids->GetNumberOfIds();iPt++)
             for(int xyz=0;xyz<3;xyz++)
-                cp[xyz] += this->mesh->GetPoint(pts[iPt])[xyz]-bounds[xyz*2+0];
+                cp[xyz] += this->mesh->GetPoint(ids->GetId(iPt))[xyz]-bounds[xyz*2+0];
         for(int xyz=0;xyz<3;xyz++)
-            cp[xyz] /= npts;
+            cp[xyz] /= ids->GetNumberOfIds();
         for(size_t iOverlay=0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
         {
             const Overlay& overlay = this->initial_pattern_generator.GetOverlay(iOverlay);
@@ -1046,12 +1046,12 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
     for(vtkIdType i=0;i<cells->GetNumberOfIds();i++)
     {
         int iCell = cells->GetId(i);
-        vtkIdType npts,*pts;
-        this->mesh->GetCellPoints(iCell,npts,pts);
+        vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+        this->mesh->GetCellPoints(iCell, ids);
         // set this cell if any of its points are inside
-        for(vtkIdType iPt=0;iPt<npts;iPt++)
+        for(vtkIdType iPt=0;iPt<ids->GetNumberOfIds();iPt++)
         {
-            if(vtkMath::Distance2BetweenPoints(this->mesh->GetPoint(pts[iPt]),p)<r*r)
+            if(vtkMath::Distance2BetweenPoints(this->mesh->GetPoint(ids->GetId(iPt)),p)<r*r)
             {
                 float old_val = this->mesh->GetCellData()->GetArray(GetChemicalName(iChemical).c_str())->GetComponent( iCell, 0 );
                 this->StorePaintAction(iChemical,iCell,old_val);
@@ -1097,7 +1097,7 @@ void MeshRD::GetMesh(vtkUnstructuredGrid* mesh) const
 
 // --------------------------------------------------------------------------------
 
-int MeshRD::GetMemorySize() const
+size_t MeshRD::GetMemorySize() const
 {
     const size_t DATA_SIZE = this->n_chemicals * this->data_type_size * this->mesh->GetNumberOfCells();
     const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;

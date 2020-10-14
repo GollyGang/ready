@@ -326,8 +326,29 @@ set( OTHER_FILES
 
 #-------------------------------------------VTK----------------------------------------------
 
-find_package( VTK
-  COMPONENTS
+find_package( VTK NO_MODULE REQUIRED )
+if( VTK_VERSION VERSION_LESS "7.0.0" )
+  set( VTK_COMPONENTS
+    vtkCommonCore
+    vtkFiltersCore
+    vtkFiltersExtraction
+    vtkFiltersGeometry
+    vtkFiltersModeling
+    vtkFiltersSources
+    vtkFiltersTexture
+    vtkImagingColor
+    vtkImagingStencil
+    vtkInteractionStyle
+    vtkIOImage
+    vtkIOGeometry
+    vtkIOXML
+    vtkRenderingCore
+    vtkRenderingAnnotation
+    vtkRenderingFreeType
+    vtkRenderingOpenGL
+  )
+elseif( VTK_VERSION VERSION_LESS "8.90.0" )
+  set( VTK_COMPONENTS
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -345,9 +366,32 @@ find_package( VTK
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRenderingOpenGL2
-  REQUIRED
-)
-include( ${VTK_USE_FILE} )
+  )
+else()
+  set( VTK_COMPONENTS
+    CommonCore
+    FiltersCore
+    FiltersExtraction
+    FiltersGeometry
+    FiltersModeling
+    FiltersSources
+    FiltersTexture
+    ImagingColor
+    ImagingStencil
+    InteractionStyle
+    IOImage
+    IOGeometry
+    IOXML
+    RenderingCore
+    RenderingAnnotation
+    RenderingFreeType
+    RenderingOpenGL2
+  )
+endif()
+find_package( VTK COMPONENTS ${VTK_COMPONENTS} REQUIRED )
+if( VTK_VERSION VERSION_LESS "8.90.0" )
+  include( ${VTK_USE_FILE} )
+endif()
 
 #-------------------------------------------wxWidgets----------------------------------------------
 
@@ -482,6 +526,12 @@ target_link_libraries( readybase ${VTK_LIBRARIES} )
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
 target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
+  vtk_module_autoinit(
+    TARGETS readybase
+    MODULES ${VTK_LIBRARIES}
+  )
+endif()
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
