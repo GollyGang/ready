@@ -368,7 +368,6 @@ elseif( VTK_VERSION VERSION_LESS "8.90.0" )
     vtkRenderingOpenGL2
   )
 else()
-else()
   set( VTK_COMPONENTS
     CommonCore
     FiltersCore
