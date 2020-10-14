@@ -176,16 +176,16 @@ matrix:
             - libgtk2.0-dev
             - libwxgtk3.0-dev
             - libboost-program-options-dev
-    - os: osx
-      osx_image: xcode12.2
-      name: MacOS_10.15.7_xcode12.2_vtk9.0.1_wx3.0.5
-      addons:
-        homebrew:
-          packages:
-            - vtk
-            - wxmac
-            - boost
-            - qt5
+    # disabled pending a fix for qt5 error in cmake
+    #- os: osx
+    #  osx_image: xcode12.2
+    #  name: MacOS_10.15.7_xcode12.2_vtk9.0.1_wx3.0.5
+    #  addons:
+    #    homebrew:
+    #      packages:
+    #        - vtk
+    #        - wxmac
+    #        - boost
     - os: osx
       osx_image: xcode11.3
       name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
@@ -204,16 +204,16 @@ matrix:
             - vtk
             - wxmac
             - boost
-    - os: osx
-      name: MacOS_10.13_xcode9.4.1_vtk9.0.1_wx3.0.4
-      addons:
-        homebrew:
-          update: true
-          packages:
-            - vtk
-            - wxmac
-            - boost
-            - qt5
+    # disabled pending a fix for qt5 error in cmake
+    #- os: osx
+    #  name: MacOS_10.13_xcode9.4.1_vtk9.0.1_wx3.0.4
+    #  addons:
+    #    homebrew:
+    #      update: true
+    #      packages:
+    #        - vtk
+    #        - wxmac
+    #        - boost
 
 branches:
   only:
