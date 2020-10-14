@@ -173,7 +173,7 @@ class AbstractRD
         void SetDataType(int type);
 
         /// Returns the total memory size that will need to be transferred to the GPU
-        virtual int GetMemorySize() const =0;
+        virtual size_t GetMemorySize() const =0;
 
     protected: // typedefs
 

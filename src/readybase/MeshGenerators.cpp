@@ -1114,14 +1114,13 @@ void MeshGenerators::GetHyperbolicSpaceTessellation(int schlafli1,int schlafli2,
         num_faces = trans->GetOutput()->GetNumberOfCells();
         trans->GetOutput()->BuildCells();
         for( vtkIdType i = 0; i < num_faces; ++i ) {
-            vtkIdType *f;
-            vtkIdType np;
-            trans->GetOutput()->GetCellPoints(i,np,f);
-            num_vertices_per_face = np;
-            vector<int> ids;
-            for( vtkIdType j = 0; j < np; ++j )
-                ids.push_back( f[j] );
-            faces.push_back( ids );
+            vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+            trans->GetOutput()->GetCellPoints(i,ids);
+            num_vertices_per_face = ids->GetNumberOfIds();
+            vector<int> vids;
+            for( vtkIdType j = 0; j < ids->GetNumberOfIds(); ++j )
+                vids.push_back( ids->GetId(j) );
+            faces.push_back( vids );
         }
     }
 

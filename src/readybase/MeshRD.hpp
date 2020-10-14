@@ -75,7 +75,7 @@ class MeshRD : public AbstractRD
 
         void GetMesh(vtkUnstructuredGrid* mesh) const;
 
-        virtual int GetMemorySize() const;
+        virtual size_t GetMemorySize() const;
 
     protected: // functions
 

@@ -1652,7 +1652,7 @@ void ImageRD::FlipPaintAction(PaintAction& cca)
 
 // --------------------------------------------------------------------------------
 
-int ImageRD::GetMemorySize() const
+size_t ImageRD::GetMemorySize() const
 {
     return this->n_chemicals * this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
 }
