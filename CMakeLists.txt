@@ -522,16 +522,16 @@ endif()
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
 target_link_libraries( readybase ${VTK_LIBRARIES} )
-
-# create command-line utility
-add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
   vtk_module_autoinit(
     TARGETS readybase
     MODULES ${VTK_LIBRARIES}
   )
 endif()
+
+# create command-line utility
+add_executable( ${CMD_NAME} ${CMD_SOURCES} )
+target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
