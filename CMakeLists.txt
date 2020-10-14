@@ -326,8 +326,9 @@ set( OTHER_FILES
 
 #-------------------------------------------VTK----------------------------------------------
 
-find_package( VTK
-  COMPONENTS
+find_package( VTK NO_MODULE REQUIRED )
+if( VTK_VERSION VERSION_LESS "8.90.0" )
+  set( VTK_COMPONENTS
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -345,8 +346,29 @@ find_package( VTK
     vtkRenderingAnnotation
     vtkRenderingFreeType
     vtkRenderingOpenGL2
-  REQUIRED
-)
+  )
+else()
+  set( VTK_COMPONENTS
+    CommonCore
+    FiltersCore
+    FiltersExtraction
+    FiltersGeometry
+    FiltersModeling
+    FiltersSources
+    FiltersTexture
+    ImagingColor
+    ImagingStencil
+    InteractionStyle
+    IOImage
+    IOGeometry
+    IOXML
+    RenderingCore
+    RenderingAnnotation
+    RenderingFreeType
+    RenderingOpenGL2
+  )
+endif()
+find_package( VTK COMPONENTS ${VTK_COMPONENTS} REQUIRED )
 if( VTK_VERSION VERSION_LESS "8.90.0" )
   include( ${VTK_USE_FILE} )
 endif()
