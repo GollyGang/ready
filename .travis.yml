@@ -205,7 +205,7 @@ matrix:
             - wxmac
             - boost
     - os: osx
-      name: MacOS_10.13_xcode9.4.1_vtk8.2.0_wx3.0.4
+      name: MacOS_10.13_xcode9.4.1_vtk9.0.1_wx3.0.4
       addons:
         homebrew:
           update: true
@@ -213,6 +213,7 @@ matrix:
             - vtk
             - wxmac
             - boost
+            - qt5
 
 branches:
   only:
