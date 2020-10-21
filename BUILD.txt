@@ -131,6 +131,7 @@ mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ../ready
 make
+./ready
 
 Optional, for packaging:
 make package
