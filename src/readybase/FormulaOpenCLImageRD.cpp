@@ -62,7 +62,7 @@ struct KeywordOptions {
 void AddKeywords_1D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     const int NDIRS = 2;
-    const string dir[NDIRS] = { "left","right" };
+    const string dir[NDIRS] = { "w","e" };
     if (options.wrap)
     {
         kernel_source <<
@@ -76,8 +76,8 @@ void AddKeywords_1D(ostringstream& kernel_source, const KeywordOptions& options)
             options.indent << "const int xp1 = min(X-1,index_x+1);\n";
     }
     kernel_source <<
-        options.indent << "const int index_left =  X*(Y*index_z + index_y) + xm1;\n" <<
-        options.indent << "const int index_right = X*(Y*index_z + index_y) + xp1;\n";
+        options.indent << "const int index_w =  X*(Y*index_z + index_y) + xm1;\n" <<
+        options.indent << "const int index_e = X*(Y*index_z + index_y) + xp1;\n";
     for (const string& chem : options.inputs_needed)
     {
         for (int iDir = 0; iDir < NDIRS; iDir++)
@@ -95,22 +95,22 @@ void AddKeywords_1D(ostringstream& kernel_source, const KeywordOptions& options)
     for (const string& chem : options.laplacians_needed)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 laplacian_" << chem << " = ((" << options.data_type_string << "4)("
-            << chem << "_left.w + " << chem << ".y,\n";
+            << chem << "_w.w + " << chem << ".y,\n";
         kernel_source << options.indent << options.indent << chem << ".x + " << chem << ".z,\n";
         kernel_source << options.indent << options.indent << chem << ".y + " << chem << ".w,\n";
-        kernel_source << options.indent << options.indent << chem << ".z + " << chem << "_right.x) + _K0 * " << chem << ") / dx;\n";
+        kernel_source << options.indent << options.indent << chem << ".z + " << chem << "_e.x) + _K0 * " << chem << ") / dx;\n";
     }
     for (const string& chem : options.x_gradients_needed)
     {
         kernel_source << "\n" << options.indent << "// compute the x-gradients of each chemical\n";
         kernel_source << options.indent << "// 1D standard 3-point stencil: [ -1,0,1 ] / 2\n";
         kernel_source << options.indent << "const " << options.data_type_string << "4 x_gradient_" << chem << " = (" << options.data_type_string << "4)("
-            << chem << ".y - " << chem << "_left.w,\n";
+            << chem << ".y - " << chem << "_w.w,\n";
         kernel_source << options.indent << options.indent << chem << ".z - " << chem << ".x,\n";
         kernel_source << options.indent << options.indent << chem << ".w - " << chem << ".y,\n";
-        kernel_source << options.indent << options.indent << chem << "_right.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * dx);\n";
+        kernel_source << options.indent << options.indent << chem << "_e.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * dx);\n";
     }
-    //       (x y z w) [x y z w] (x y z w)        =     left    .   right
+    //       (x y z w) [x y z w] (x y z w)        =     w . e
 }
 
 // -------------------------------------------------------------------------
@@ -176,6 +176,16 @@ void AddKeywords_VertexNeighbors2D(ostringstream& kernel_source, const KeywordOp
             << chem << "_s.w*_K1 + " << chem << "_s.z*_K2 + " << chem << ".z*_K1 + " << chem << "_n.z*_K2 ) + "
             << chem << "*_K0) / (dx * dx);\n";
     }
+    for (const string& chem : options.x_gradients_needed)
+    {
+        kernel_source << "\n" << options.indent << "// compute the x-gradients of each chemical\n";
+        kernel_source << options.indent << "// 1D standard 3-point stencil: [ -1,0,1 ] / 2\n";
+        kernel_source << options.indent << "const " << options.data_type_string << "4 x_gradient_" << chem << " = (" << options.data_type_string << "4)("
+            << chem << ".y - " << chem << "_w.w,\n";
+        kernel_source << options.indent << options.indent << chem << ".z - " << chem << ".x,\n";
+        kernel_source << options.indent << options.indent << chem << ".w - " << chem << ".y,\n";
+        kernel_source << options.indent << options.indent << chem << "_e.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * dx);\n";
+    }
     //       (x y z w) (x y z w) (x y z w)           nw   n   ne
     //       (x y z w) [x y z w] (x y z w)    =       w   .   e
     //       (x y z w) (x y z w) (x y z w)           sw   s   se
@@ -185,10 +195,6 @@ void AddKeywords_VertexNeighbors2D(ostringstream& kernel_source, const KeywordOp
 
 void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOptions& options)
 {
-    // 27-point stencil, following:
-    // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions"
-    // Int. J. Num. Meth. Eng.
-    // (Equation 22)
     const int NDIRS = 26;
     const string dir[NDIRS] = { "n","ne","e","se","s","sw","w","nw","d","dn","dne","de","dse","ds","dsw","dw","dnw",
         "u","un","une","ue","use","us","usw","uw","unw" };
@@ -249,8 +255,11 @@ void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOp
     }
     if (!options.laplacians_needed.empty())
     {
+        // 27-point stencil, following:
         kernel_source << "\n" << options.indent << "// compute the Laplacians of each chemical\n";
         kernel_source << options.indent << "// 3D 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26\n";
+        kernel_source << options.indent << "// Following: O'Reilly and Beck (2006) \"A Family of Large-Stencil Discrete Laplacian Approximations in\n";
+        kernel_source << options.indent << "// Three Dimensions\" Int. J. Num. Meth. Eng. (Equation 22)\n";
         kernel_source << options.indent << "const " << options.data_type_string << "4 _K0 = -88.0" << options.data_type_suffix << "/26.0" << options.data_type_suffix << "; // center weight\n";
         kernel_source << options.indent << "const " << options.data_type_string << " _K1 = 6.0" << options.data_type_suffix << "/26.0" << options.data_type_suffix << "; // face-neighbors\n";
         kernel_source << options.indent << "const " << options.data_type_string << " _K2 = 3.0" << options.data_type_suffix << "/26.0" << options.data_type_suffix << "; // edge-neighbors\n";
@@ -305,6 +314,16 @@ void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOp
             chem << "_un.z + " << chem << "_une.x + " << chem << "_use.x + " << chem << "_us.z) * _K3 )     // w\n";
         // the final entry:
         kernel_source << options.indent << options.indent << " + " << chem << " * _K0) / (dx * dx * dx);\n";
+    }
+    for (const string& chem : options.x_gradients_needed)
+    {
+        kernel_source << "\n" << options.indent << "// compute the x-gradients of each chemical\n";
+        kernel_source << options.indent << "// 1D standard 3-point stencil: [ -1,0,1 ] / 2\n";
+        kernel_source << options.indent << "const " << options.data_type_string << "4 x_gradient_" << chem << " = (" << options.data_type_string << "4)("
+            << chem << ".y - " << chem << "_w.w,\n";
+        kernel_source << options.indent << options.indent << chem << ".z - " << chem << ".x,\n";
+        kernel_source << options.indent << options.indent << chem << ".w - " << chem << ".y,\n";
+        kernel_source << options.indent << options.indent << chem << "_e.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * dx);\n";
     }
     //            down                              here                              up
     //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dnw   dn  dne      nw   n   ne     unw   un  une
