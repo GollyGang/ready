@@ -16,7 +16,8 @@
     </description>
 
     <rule name="advection" type="formula" neighborhood_type="vertex">
-      <param name="timestep"> 0.001 </param>
+      <param name="dx"> 0.1 </param>
+      <param name="timestep"> 0.0001 </param>
       <formula number_of_chemicals="1">
         delta_a = -x_gradient_a;
       </formula>
