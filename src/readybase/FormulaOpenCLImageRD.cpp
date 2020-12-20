@@ -52,6 +52,9 @@ struct KeywordOptions {
     string data_type_string;
     string data_type_suffix;
     vector<string> laplacians_needed; // e.g. ["a", "b"]
+    vector<string> x_gradients_needed; // e.g. ["a", "b"]
+    vector<string> y_gradients_needed; // e.g. ["a", "b"]
+    vector<string> inputs_needed; // e.g. ["a", "b"]
 };
 
 // -------------------------------------------------------------------------
@@ -78,20 +81,36 @@ void AddKeywords_1D(ostringstream& kernel_source, const KeywordOptions& options)
     kernel_source <<
         options.indent << "const int index_left =  X*(Y*index_z + index_y) + xm1;\n" <<
         options.indent << "const int index_right = X*(Y*index_z + index_y) + xp1;\n";
-    for (const string& chem : options.laplacians_needed)
+    for (const string& chem : options.inputs_needed)
     {
         for (int iDir = 0; iDir < NDIRS; iDir++)
         {
             kernel_source << options.indent << options.data_type_string << "4 " << chem << "_" << dir[iDir] << " = " << chem << "_in[index_" << dir[iDir] << "];\n";
         }
     }
-    kernel_source << options.indent << "const " << options.data_type_string << "4 _K0 = -2.0" << options.data_type_suffix << "; // center weight\n";
+    if (!options.inputs_needed.empty())
+    {
+        kernel_source << options.indent << "const " << options.data_type_string << " h = 1.0" << options.data_type_suffix << "; // grid spacing\n";
+    }
+    if (!options.laplacians_needed.empty())
+    {
+        kernel_source << options.indent << "const " << options.data_type_string << "4 _K0 = -2.0" << options.data_type_suffix << "; // center weight\n";
+    }
     for (const string& chem : options.laplacians_needed)
     {
-        kernel_source << options.indent << options.data_type_string << "4 laplacian_" << chem << " = (" << options.data_type_string << "4)(" << chem << "_left.w + " << chem << ".y,\n";
+        kernel_source << options.indent << options.data_type_string << "4 laplacian_" << chem << " = ((" << options.data_type_string << "4)("
+            << chem << "_left.w + " << chem << ".y,\n";
         kernel_source << options.indent << chem << ".x + " << chem << ".z,\n";
         kernel_source << options.indent << chem << ".y + " << chem << ".w,\n";
-        kernel_source << options.indent << chem << ".z + " << chem << "_right.x) + _K0*" << chem << ";\n";
+        kernel_source << options.indent << chem << ".z + " << chem << "_right.x) + _K0 * " << chem << ") / (2.0" << options.data_type_suffix << " * h);\n";
+    }
+    for (const string& chem : options.x_gradients_needed)
+    {
+        kernel_source << options.indent << options.data_type_string << "4 x_gradient_" << chem << " = (" << options.data_type_string << "4)("
+            << chem << ".y - " << chem << "_left.w,\n";
+        kernel_source << options.indent << chem << ".z - " << chem << ".x,\n";
+        kernel_source << options.indent << chem << ".w - " << chem << ".y,\n";
+        kernel_source << options.indent << chem << "_right.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * h);\n";
     }
     //       (x y z w) [x y z w] (x y z w)        =     left    .   right
 }
@@ -130,7 +149,7 @@ void AddKeywords_VertexNeighbors2D(ostringstream& kernel_source, const KeywordOp
         options.indent << "const int index_sw = X*(Y*index_z + yp1) + xm1;\n" <<
         options.indent << "const int index_w =  X*(Y*index_z + index_y) + xm1;\n" <<
         options.indent << "const int index_nw = X*(Y*index_z + ym1) + xm1;\n";
-    for (const string& chem : options.laplacians_needed)
+    for (const string& chem : options.inputs_needed)
     {
         for (int iDir = 0; iDir < NDIRS; iDir++)
         {
@@ -222,7 +241,7 @@ void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOp
         options.indent << "const int index_usw = X*(Y*zp1 + yp1) + xm1;\n" <<
         options.indent << "const int index_uw =  X*(Y*zp1 + index_y) + xm1;\n" <<
         options.indent << "const int index_unw = X*(Y*zp1 + ym1) + xm1;\n";
-    for (const string& chem : options.laplacians_needed)
+    for (const string& chem : options.inputs_needed)
     {
         for (int iDir = 0; iDir < NDIRS; iDir++)
         {
@@ -335,9 +354,25 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     for (int i = 0; i < NC; i++)
     {
         const string chem = GetChemicalName(i);
+        bool inputs_needed = false;
         if (formula.find("laplacian_" + chem) != string::npos)
         {
             options.laplacians_needed.push_back(chem);
+            inputs_needed = true;
+        }
+        if (formula.find("x_gradient_" + chem) != string::npos)
+        {
+            options.x_gradients_needed.push_back(chem);
+            inputs_needed = true;
+        }
+        if (formula.find("y_gradient_" + chem) != string::npos)
+        {
+            options.y_gradients_needed.push_back(chem);
+            inputs_needed = true;
+        }
+        if (inputs_needed)
+        {
+            options.inputs_needed.push_back(chem);
         }
     }
     if(this->GetArenaDimensionality()==1)
