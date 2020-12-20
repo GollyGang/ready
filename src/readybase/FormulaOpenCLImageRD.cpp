@@ -46,6 +46,60 @@ delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;");
 
 // -------------------------------------------------------------------------
 
+void AddKeywords_FaceNeighbors3DRange1(ostringstream& kernel_source, bool wrap, const string& indent, int NC,
+    const string& data_type_string, const string& data_type_suffix)
+{
+    const int NDIRS = 6;
+    const string dir[NDIRS] = { "left","right","up","down","fore","back" };
+    // output the Laplacian part of the body
+    kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
+    kernel_source << indent << "// 3D 7-point stencil: [ [ 0,0,0; 0,1,0; 0,0,0 ], [0,1,0; 1,-6,1; 0,1,0 ], [ 0,0,0; 0,1,0; 0,0,0 ] ]\n";
+    if (wrap)
+        kernel_source <<
+        indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
+        indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
+        indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
+        indent << "const int yp1 = (index_y+1) & (Y-1);\n" <<
+        indent << "const int zm1 = (index_z-1+Z) & (Z-1);\n" <<
+        indent << "const int zp1 = (index_z+1) & (Z-1);\n";
+    else
+        kernel_source <<
+        indent << "const int xm1 = max(0,index_x-1);\n" <<
+        indent << "const int ym1 = max(0,index_y-1);\n" <<
+        indent << "const int zm1 = max(0,index_z-1);\n" <<
+        indent << "const int xp1 = min(X-1,index_x+1);\n" <<
+        indent << "const int yp1 = min(Y-1,index_y+1);\n" <<
+        indent << "const int zp1 = min(Z-1,index_z+1);\n";
+    kernel_source <<
+        indent << "const int index_left =  X*(Y*index_z + index_y) + xm1;\n" <<
+        indent << "const int index_right = X*(Y*index_z + index_y) + xp1;\n" <<
+        indent << "const int index_up =    X*(Y*index_z + ym1) + index_x;\n" <<
+        indent << "const int index_down =  X*(Y*index_z + yp1) + index_x;\n" <<
+        indent << "const int index_fore =  X*(Y*zm1 + index_y) + index_x;\n" <<
+        indent << "const int index_back =  X*(Y*zp1 + index_y) + index_x;\n";
+    for (int iC = 0; iC < NC; iC++)
+        for (int iDir = 0; iDir < NDIRS; iDir++)
+            kernel_source << indent << data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
+    kernel_source << indent << "const " << data_type_string << "4 _K0 = -6.0" << data_type_suffix << "; // center weight\n";
+    for (int iC = 0; iC < NC; iC++)
+    {
+        string chem = GetChemicalName(iC);
+        kernel_source << indent << data_type_string << "4 laplacian_" << chem << " = (" << data_type_string << "4)(" <<
+            chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w + " << chem << "_fore.x + " << chem << "_back.x,\n";
+        kernel_source << indent <<
+            chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x + " << chem << "_fore.y + " << chem << "_back.y,\n";
+        kernel_source << indent <<
+            chem << "_up.z + " << chem << ".w + " << chem << "_down.z + " << chem << ".y + " << chem << "_fore.z + " << chem << "_back.z,\n";
+        kernel_source << indent <<
+            chem << "_up.w + " << chem << "_right.x + " << chem << "_down.w + " << chem << ".z + " << chem << "_fore.w + " << chem << "_back.w) + _K0*" << chem << ";\n";
+    }
+    //                 (x y z w)                               up
+    //       (x y z w) [x y z w] (x y z w)        =     left    .   right      (plus fore and back in the 3rd dimension)
+    //                 (x y z w)                              down
+}
+
+// -------------------------------------------------------------------------
+
 std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     const string indent = "    ";
@@ -86,53 +140,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_here];\n"; // "float4 a = a_in[index_here];"
     if(this->neighborhood_type==FACE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1) // neighborhood_weight not relevant
     {
-        const int NDIRS = 6;
-        const string dir[NDIRS]={"left","right","up","down","fore","back"};
-        // output the Laplacian part of the body
-        kernel_source << "\n" << indent << "// compute the Laplacians of each chemical\n";
-        kernel_source << indent << "// 3D 7-point stencil: [ [ 0,0,0; 0,1,0; 0,0,0 ], [0,1,0; 1,-6,1; 0,1,0 ], [ 0,0,0; 0,1,0; 0,0,0 ] ]\n";
-        if(this->wrap)
-            kernel_source <<
-                indent << "const int xm1 = (index_x-1+X) & (X-1); // wrap (assumes X is a power of 2)\n" <<
-                indent << "const int xp1 = (index_x+1) & (X-1);\n" <<
-                indent << "const int ym1 = (index_y-1+Y) & (Y-1);\n" <<
-                indent << "const int yp1 = (index_y+1) & (Y-1);\n" <<
-                indent << "const int zm1 = (index_z-1+Z) & (Z-1);\n" <<
-                indent << "const int zp1 = (index_z+1) & (Z-1);\n";
-        else
-            kernel_source <<
-                indent << "const int xm1 = max(0,index_x-1);\n" <<
-                indent << "const int ym1 = max(0,index_y-1);\n" <<
-                indent << "const int zm1 = max(0,index_z-1);\n" <<
-                indent << "const int xp1 = min(X-1,index_x+1);\n" <<
-                indent << "const int yp1 = min(Y-1,index_y+1);\n" <<
-                indent << "const int zp1 = min(Z-1,index_z+1);\n";
-        kernel_source <<
-            indent << "const int index_left =  X*(Y*index_z + index_y) + xm1;\n" <<
-            indent << "const int index_right = X*(Y*index_z + index_y) + xp1;\n" <<
-            indent << "const int index_up =    X*(Y*index_z + ym1) + index_x;\n" <<
-            indent << "const int index_down =  X*(Y*index_z + yp1) + index_x;\n" <<
-            indent << "const int index_fore =  X*(Y*zm1 + index_y) + index_x;\n" <<
-            indent << "const int index_back =  X*(Y*zp1 + index_y) + index_x;\n";
-        for(int iC=0;iC<NC;iC++)
-            for(int iDir=0;iDir<NDIRS;iDir++)
-                kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(iC) << "_" << dir[iDir] << " = " << GetChemicalName(iC) << "_in[index_" << dir[iDir] << "];\n";
-        kernel_source << indent << "const " << this->data_type_string << "4 _K0 = -6.0" << this->data_type_suffix << "; // center weight\n";
-        for(int iC=0;iC<NC;iC++)
-        {
-            string chem = GetChemicalName(iC);
-            kernel_source << indent << this->data_type_string << "4 laplacian_" << chem << " = (" << this->data_type_string << "4)(" <<
-                chem << "_up.x + " << chem << ".y + " << chem << "_down.x + " << chem << "_left.w + " << chem << "_fore.x + " << chem << "_back.x,\n";
-            kernel_source << indent <<
-                chem << "_up.y + " << chem << ".z + " << chem << "_down.y + " << chem << ".x + " << chem << "_fore.y + " << chem << "_back.y,\n";
-            kernel_source << indent <<
-                chem << "_up.z + " << chem << ".w + " << chem << "_down.z + " << chem << ".y + " << chem << "_fore.z + " << chem << "_back.z,\n";
-            kernel_source << indent <<
-                chem << "_up.w + " << chem << "_right.x + " << chem << "_down.w + " << chem << ".z + " << chem << "_fore.w + " << chem << "_back.w) + _K0*" << chem << ";\n";
-        }
-        //                 (x y z w)                               up
-        //       (x y z w) [x y z w] (x y z w)        =     left    .   right      (plus fore and back in the 3rd dimension)
-        //                 (x y z w)                              down
+        AddKeywords_FaceNeighbors3DRange1(kernel_source, this->wrap, indent, NC, this->data_type_string, this->data_type_suffix);
     }
     else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1) // neighborhood_weight not relevant
     {
