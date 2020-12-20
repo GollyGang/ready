@@ -54,6 +54,7 @@ struct KeywordOptions {
     vector<string> laplacians_needed; // e.g. ["a", "b"]
     vector<string> x_gradients_needed; // e.g. ["a", "b"]
     vector<string> y_gradients_needed; // e.g. ["a", "b"]
+    vector<string> z_gradients_needed; // e.g. ["a", "b"]
     vector<string> inputs_needed; // e.g. ["a", "b"]
 };
 
@@ -185,6 +186,13 @@ void AddKeywords_VertexNeighbors2D(ostringstream& kernel_source, const KeywordOp
         kernel_source << options.indent << options.indent << chem << ".z - " << chem << ".x,\n";
         kernel_source << options.indent << options.indent << chem << ".w - " << chem << ".y,\n";
         kernel_source << options.indent << options.indent << chem << "_e.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * dx);\n";
+    }
+    for (const string& chem : options.y_gradients_needed)
+    {
+        kernel_source << "\n" << options.indent << "// compute the y-gradients of each chemical\n";
+        kernel_source << options.indent << "// 1D standard 3-point stencil: [ -1,0,1 ] / 2\n";
+        kernel_source << options.indent << "const " << options.data_type_string << "4 y_gradient_" << chem << " = ("
+            << chem << "_s - " << chem << "_n) / (2.0" << options.data_type_suffix << " * dx);\n";
     }
     //       (x y z w) (x y z w) (x y z w)           nw   n   ne
     //       (x y z w) [x y z w] (x y z w)    =       w   .   e
@@ -325,6 +333,20 @@ void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOp
         kernel_source << options.indent << options.indent << chem << ".w - " << chem << ".y,\n";
         kernel_source << options.indent << options.indent << chem << "_e.x - " << chem << ".z) / (2.0" << options.data_type_suffix << " * dx);\n";
     }
+    for (const string& chem : options.y_gradients_needed)
+    {
+        kernel_source << "\n" << options.indent << "// compute the y-gradients of each chemical\n";
+        kernel_source << options.indent << "// 1D standard 3-point stencil: [ -1,0,1 ] / 2\n";
+        kernel_source << options.indent << "const " << options.data_type_string << "4 y_gradient_" << chem << " = ("
+            << chem << "_s - " << chem << "_n) / (2.0" << options.data_type_suffix << " * dx);\n";
+    }
+    for (const string& chem : options.z_gradients_needed)
+    {
+        kernel_source << "\n" << options.indent << "// compute the z-gradients of each chemical\n";
+        kernel_source << options.indent << "// 1D standard 3-point stencil: [ -1,0,1 ] / 2\n";
+        kernel_source << options.indent << "const " << options.data_type_string << "4 z_gradient_" << chem << " = ("
+            << chem << "_u - " << chem << "_d) / (2.0" << options.data_type_suffix << " * dx);\n";
+    }
     //            down                              here                              up
     //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dnw   dn  dne      nw   n   ne     unw   un  une
     //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
@@ -392,6 +414,11 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         if (formula.find("y_gradient_" + chem) != string::npos)
         {
             options.y_gradients_needed.push_back(chem);
+            inputs_needed = true;
+        }
+        if (formula.find("z_gradient_" + chem) != string::npos)
+        {
+            options.z_gradients_needed.push_back(chem);
             inputs_needed = true;
         }
         if (inputs_needed)
