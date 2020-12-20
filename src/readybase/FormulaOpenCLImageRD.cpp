@@ -56,7 +56,7 @@ struct KeywordOptions {
 
 // -------------------------------------------------------------------------
 
-void AddKeywords_FaceNeighbors3DRange1(ostringstream& kernel_source, const KeywordOptions& options)
+void AddKeywords_FaceNeighbors3D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     const int NDIRS = 6;
     const string dir[NDIRS] = { "left","right","up","down","fore","back" };
@@ -116,7 +116,7 @@ void AddKeywords_FaceNeighbors3DRange1(ostringstream& kernel_source, const Keywo
 
 // -------------------------------------------------------------------------
 
-void AddKeywords_EdgeNeighbors2DRange1(ostringstream& kernel_source, const KeywordOptions& options)
+void AddKeywords_EdgeNeighbors2D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     const int NDIRS = 4;
     const string dir[NDIRS] = { "left","right","up","down" };
@@ -166,7 +166,7 @@ void AddKeywords_EdgeNeighbors2DRange1(ostringstream& kernel_source, const Keywo
 
 // -------------------------------------------------------------------------
 
-void AddKeywords_1DRange1(ostringstream& kernel_source, const KeywordOptions& options)
+void AddKeywords_1D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     const int NDIRS = 2;
     const string dir[NDIRS] = { "left","right" };
@@ -208,7 +208,7 @@ void AddKeywords_1DRange1(ostringstream& kernel_source, const KeywordOptions& op
 
 // -------------------------------------------------------------------------
 
-void AddKeywords_VertexNeighbors2DRange1(ostringstream& kernel_source, const KeywordOptions& options)
+void AddKeywords_VertexNeighbors2D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     const int NDIRS = 8;
     const string dir[NDIRS] = { "n","ne","e","se","s","sw","w","nw" };
@@ -273,7 +273,7 @@ void AddKeywords_VertexNeighbors2DRange1(ostringstream& kernel_source, const Key
 
 // -------------------------------------------------------------------------
 
-void AddKeywords_EdgeNeighbors3DRange1(ostringstream& kernel_source, const KeywordOptions& options)
+void AddKeywords_EdgeNeighbors3D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     // 19-point stencil, following:
     // Dowle, Mantel & Barkley (1997) "Fast simulations of waves in three-dimensional excitable media"
@@ -378,7 +378,7 @@ void AddKeywords_EdgeNeighbors3DRange1(ostringstream& kernel_source, const Keywo
 
 // -------------------------------------------------------------------------
 
-void AddKeywords_VertexNeighbors3DRange1(ostringstream& kernel_source, const KeywordOptions& options)
+void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     // 27-point stencil, following:
     // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions"
@@ -551,27 +551,27 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     }
     if (this->neighborhood_type == FACE_NEIGHBORS && this->GetArenaDimensionality() == 3)
     {
-        AddKeywords_FaceNeighbors3DRange1(kernel_source, options);
+        AddKeywords_FaceNeighbors3D(kernel_source, options);
     }
     else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==2)
     {
-        AddKeywords_EdgeNeighbors2DRange1(kernel_source, options);
+        AddKeywords_EdgeNeighbors2D(kernel_source, options);
     }
     else if(this->GetArenaDimensionality()==1)
     {
-        AddKeywords_1DRange1(kernel_source, options);
+        AddKeywords_1D(kernel_source, options);
     }
     else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2)
     {
-        AddKeywords_VertexNeighbors2DRange1(kernel_source, options);
+        AddKeywords_VertexNeighbors2D(kernel_source, options);
     }
     else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==3)
     {
-        AddKeywords_EdgeNeighbors3DRange1(kernel_source, options);
+        AddKeywords_EdgeNeighbors3D(kernel_source, options);
     }
     else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3)
     {
-        AddKeywords_VertexNeighbors3DRange1(kernel_source, options);
+        AddKeywords_VertexNeighbors3D(kernel_source, options);
     }
     else
     {
