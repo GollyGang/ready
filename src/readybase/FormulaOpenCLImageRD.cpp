@@ -547,7 +547,11 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
     for (int i = 0; i < NC; i++)
     {
-        options.laplacians_needed.push_back(GetChemicalName(i)); // TODO: only add the ones that are used in the formula
+        const string chem = GetChemicalName(i);
+        if (formula.find("laplacian_" + chem) != string::npos)
+        {
+            options.laplacians_needed.push_back(chem);
+        }
     }
     if (this->neighborhood_type == FACE_NEIGHBORS && this->GetArenaDimensionality() == 3)
     {
