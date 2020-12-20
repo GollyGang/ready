@@ -14,7 +14,7 @@ This (fibroushHistoryFill wavePartition) is like a hot mess of gray-scott-ness w
 
 Implemented and discovered by Dan Wills based on earlier work from the Ready codebase.
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.5
       </param>

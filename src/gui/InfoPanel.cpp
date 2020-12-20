@@ -423,8 +423,6 @@ void InfoPanel::Update(const AbstractRD* const system)
     {
         // (hide the neighborhood for image-based kernels, which don't use it)
         contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system->GetNeighborhoodType()+"-neighbors", false);
-        contents += AppendRow(neighborhood_range_label, neighborhood_range_label, wxString::Format(wxT("%d"),system->GetNeighborhoodRange()), false);
-        contents += AppendRow(neighborhood_weight_label, neighborhood_weight_label, system->GetNeighborhoodWeight(), false);
     }
 
     /* bit technical, leave as a file-only option

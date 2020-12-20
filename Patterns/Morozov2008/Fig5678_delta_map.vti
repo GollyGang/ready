@@ -6,7 +6,7 @@
       
       Figs. 5-8, with parameter delta varying across the image.
     </description>
-    <rule name="Morozov2008" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Morozov2008" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.010000
       </param>

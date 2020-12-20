@@ -16,7 +16,7 @@
         oscillon.&quot;
     </description>
     
-    <rule name="Yang2006" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Yang2006" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="D_a">         1.0         </param>
       <param name="D_b">         1.0         </param>
       <param name="D_c">         60.0        </param>

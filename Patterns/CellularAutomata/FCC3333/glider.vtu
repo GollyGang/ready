@@ -17,7 +17,7 @@
       &lt;/tt&gt;
 
     </description>
-    <rule name="FCC3333" type="kernel" neighborhood_type="face" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="FCC3333" type="kernel" neighborhood_type="face">
       <kernel number_of_chemicals="1">
         __kernel void rd_compute(__global float *a_in,__global float *a_out,__global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)
         {

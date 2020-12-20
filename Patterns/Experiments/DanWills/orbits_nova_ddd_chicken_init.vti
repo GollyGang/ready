@@ -7,7 +7,7 @@ This is an experimental RD formula (by Dan Wills) that treats reagents a and b a
 These settings with this formula which I called 'chicken', give rise to quite long-lived (25,000 odd timesteps) sequences of behaviour where wavefronts and spots of b form spontaneously (in areas of low b) and give rise to nice-looking blobby shaped ('captured' high-b) structures. These are subsequently overtaken by a secondary 'bright-b' wave that forms inside the region and ultimately destroys it, releasing the b-values to be blurred-away. This returns the system back to the low-b conditions that lead to the genesis of b-wavefronts once again. And so on ad-infinitum as far as I know! (my presumption is that this is actually in some way randomness-generating and not just burning down a very long fuse of initial-conditions randomness, or even maybe periodic at some stupefyingly-long period!?).
 &lt;/a&gt;
     </description>
-    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.001
       </param>

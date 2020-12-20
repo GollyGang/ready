@@ -7,7 +7,7 @@
       Two gliders in the 3D version of Robert Munafo&apos;s &quot;U-skate world&quot;. One was found by Tim Hutton, and travels in a straight line. The other is the same but with one spot added, causing it to travel in a helical path. The 2D patterns on which these are based are described at &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/uskate-world.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/uskate-world.html&lt;/a&gt;.
     </description>
     
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
     
       <param name="timestep">    1       </param>
       <param name="D_a">         0.164   </param>

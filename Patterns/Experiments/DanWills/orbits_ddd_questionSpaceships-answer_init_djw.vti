@@ -26,7 +26,7 @@ This formula intentionally 'wastes' two reagents (c and d) on the magnitude and 
 
 Note!: If you are porting this formula, the laplacians on reagents c and d can be harmlessly omitted, and the whole thing can easily be modified to not even need reagents c and d.
     </description>
-    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.06
       </param>

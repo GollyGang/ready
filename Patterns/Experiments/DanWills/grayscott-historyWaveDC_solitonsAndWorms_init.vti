@@ -15,7 +15,7 @@ This is the *solitonsAndWorms* example pattern, using the system described above
 
 Behavior: Solitons move and form worms which move orthogonally to their length. Both worms and solitons break down when they get too densely packed, due to the very diffuse (and fairly high powered: 1.01) history reagent being fed back negatively into the b reagent. Worm breakdown and soliton division create a population of moving solitons that keep apart from each other, creating a field of flowing worms and solitons. Usually the whole field will eventually end up flowing all in one direction.
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

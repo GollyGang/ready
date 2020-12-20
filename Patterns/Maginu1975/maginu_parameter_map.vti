@@ -7,7 +7,7 @@
       Kenjiro Maginu (1975) &quot;&lt;a href=&quot;https://doi.org/10.1016/0025-5564(75)90026-7&quot;&gt;Reaction-diffusion equation describing morphogenesis I. Waveform stability of stationary wave solutions in a one dimensional model&lt;/a&gt;&quot;
       Mathematical Biosciences Volume 27, Issues 1–2, Pages 17-98.
     </description>
-    <rule name="Maginu" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Maginu" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.1
       </param>

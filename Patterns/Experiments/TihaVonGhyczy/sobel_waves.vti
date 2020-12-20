@@ -8,7 +8,7 @@
 
       where sobel_a is the result of a &lt;a href=&quot;https://en.wikipedia.org/wiki/Sobel_operator&quot;&gt;Sobel filter convolution&lt;/a&gt;.
     </description>
-    <rule name="sobel waves" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="sobel waves" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float4 *a_in,__global float4 *a_out)
         {

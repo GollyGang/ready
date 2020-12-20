@@ -8,7 +8,7 @@
 
       Pair h,i, modulated by the other pairs, generates the final &apos;faces&apos;.
     </description>
-    <rule name="Multiple Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Multiple Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.1
       </param>

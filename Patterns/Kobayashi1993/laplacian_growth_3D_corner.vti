@@ -10,7 +10,7 @@
       
       Change parameter &apos;k&apos; between 0.8 and 5 to change the shape of the dendrites.
     </description>
-    <rule name="Laplacian Growth" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Laplacian Growth" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="k">
         3.500000
       </param>

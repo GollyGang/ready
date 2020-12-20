@@ -4,7 +4,7 @@
     <description>
       Anisotropic edge-detector feedback to a tip-splitting system forms continuously-evolving webs.
     </description>
-    <rule name="Fitzhugh-Nagumo" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Fitzhugh-Nagumo" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.02
       </param>

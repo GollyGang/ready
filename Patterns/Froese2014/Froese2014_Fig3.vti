@@ -9,7 +9,7 @@
       Figure 3 from the paper, showing motile solitons in a three-chemical reaction-diffusion system.
     </description>
     
-    <rule name="Froese2014" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Froese2014" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">     0.5     </param>
       <param name="D_a">          0.3     </param>
       <param name="D_b">          0.15    </param>

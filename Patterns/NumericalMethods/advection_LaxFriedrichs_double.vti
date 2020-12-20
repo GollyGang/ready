@@ -8,7 +8,7 @@
          is used as the starting point instead. This has the same effect as adding a diffusion term, causing the pattern to
          spread out. But it does allow stability.
     </description>
-    <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Advection" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
 
 #ifdef cl_khr_fp64

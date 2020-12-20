@@ -8,7 +8,7 @@
 
       M. Rosenzweig and R. MacArthur (1963) "Graphical representation and stability conditions of predator-prey interaction", American Naturalist 97: p. 209-223.
     </description>
-    <rule name="Rosenzweig-MacArthur" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Rosenzweig-MacArthur" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.050000
       </param>

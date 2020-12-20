@@ -4,7 +4,7 @@
     <description>
       A variant of the &quot;Worms&quot; pattern with edge-detector feedback. Chemicals c and d are used only for visualization.
     </description>
-    <rule name="Worms" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Worms" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.02
       </param>

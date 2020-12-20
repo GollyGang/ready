@@ -4,7 +4,7 @@
     <description>
       A 2-chemical system with 25-point gaussian and laplacian terms.
     </description>
-    <rule name="Splats" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Splats" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.05
       </param>

@@ -8,7 +8,7 @@
       In this simplified version the gradient term is not present but the core pattern-formation mechanism remains.
     </description>
     
-    <rule name="phyllotaxis" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="phyllotaxis" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
 __kernel void rd_compute(__global float *a_in,__global float *a_out)
 {

@@ -10,7 +10,7 @@
       A parameter map for the system described in Turing's paper. Parameter k varies from left to right. Parameter D_b varies from
       bottom to top. The system can produce high-on-low spots and low-on-high spots, separated by a region of labyrinthine stripes.
     </description>
-    <rule name="Turing" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Turing" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.1
       </param>

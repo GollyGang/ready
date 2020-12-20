@@ -38,8 +38,6 @@ AbstractRD::AbstractRD(int data_type)
     this->InternalSetDataType(data_type);
 
     this->neighborhood_type = VERTEX_NEIGHBORS;
-    this->neighborhood_range = 1;
-    this->neighborhood_weight_type = LAPLACIAN;
 
     #if defined(USE_SSE)
         // disable accurate handling of denormals and zeros, for speed
@@ -55,10 +53,6 @@ AbstractRD::AbstractRD(int data_type)
     this->canonical_neighborhood_type_identifiers[FACE_NEIGHBORS] = "face";
     for(map<TNeighborhood,string>::const_iterator it = this->canonical_neighborhood_type_identifiers.begin();it != this->canonical_neighborhood_type_identifiers.end();it++)
         this->recognized_neighborhood_type_identifiers[it->second] = it->first;
-    this->canonical_neighborhood_weight_identifiers[EQUAL] = "equal";
-    this->canonical_neighborhood_weight_identifiers[LAPLACIAN] = "laplacian";
-    for(map<TWeight,string>::const_iterator it = this->canonical_neighborhood_weight_identifiers.begin();it != this->canonical_neighborhood_weight_identifiers.end();it++)
-        this->recognized_neighborhood_weight_identifiers[it->second] = it->first;
 }
 
 // ---------------------------------------------------------------------
@@ -224,21 +218,6 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
         throw runtime_error("Unrecognized neighborhood_type");
     else this->neighborhood_type = this->recognized_neighborhood_type_identifiers[s];
 
-    s = rule->GetAttribute("neighborhood_range");
-    if(!s) this->neighborhood_range = 1;
-    else {
-        istringstream iss(s);
-        iss >> this->neighborhood_range;
-    }
-    if(neighborhood_range!=1)
-        throw runtime_error("Unsupported neighborhood range");
-
-    s = rule->GetAttribute("neighborhood_weight");
-    if(!s) this->neighborhood_weight_type = LAPLACIAN;
-    else if(this->recognized_neighborhood_weight_identifiers.find(s)==this->recognized_neighborhood_weight_identifiers.end())
-        throw runtime_error("Unrecognized neighborhood_weight");
-    else this->neighborhood_weight_type = this->recognized_neighborhood_weight_identifiers[s];
-
     // parameters:
     this->DeleteAllParameters();
     for(int i=0;i<rule->GetNumberOfNestedElements();i++)
@@ -289,8 +268,6 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
     if(this->HasEditableWrapOption())
         rule->SetIntAttribute("wrap",this->GetWrap()?1:0);
     rule->SetAttribute("neighborhood_type",this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second.c_str());
-    rule->SetIntAttribute("neighborhood_range",this->neighborhood_range);
-    rule->SetAttribute("neighborhood_weight",this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second.c_str());
     for(int i=0;i<this->GetNumberOfParameters();i++)    // parameters
     {
         vtkSmartPointer<vtkXMLDataElement> param = vtkSmartPointer<vtkXMLDataElement>::New();
@@ -395,20 +372,6 @@ void AbstractRD::StorePaintAction(int iChemical,int iCell,float old_val)
 std::string AbstractRD::GetNeighborhoodType() const
 {
     return this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second;
-}
-
-// ---------------------------------------------------------------------
-
-int AbstractRD::GetNeighborhoodRange() const
-{
-    return this->neighborhood_range;
-}
-
-// ---------------------------------------------------------------------
-
-std::string AbstractRD::GetNeighborhoodWeight() const
-{
-    return this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second;
 }
 
 // ---------------------------------------------------------------------

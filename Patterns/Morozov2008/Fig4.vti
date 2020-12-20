@@ -4,7 +4,7 @@
     <description>
       Fig. 4 from Andrew Morozov, Shigui Ruan, Bai-Lian Li (2008) "&lt;a href=&quot;http://www2.le.ac.uk/departments/mathematics/extranet/staff-material/staff-profiles/am379/list-of-papers/multispecies-patchy.pdf&quot;&gt;Patterns of patchy spread in multi-species reaction–diffusion models&lt;/a&gt;" Ecological Complexity, Volume 5, Issue 4, Pages 313-328.
     </description>
-    <rule name="Morozov2008" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Morozov2008" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.01
       </param>

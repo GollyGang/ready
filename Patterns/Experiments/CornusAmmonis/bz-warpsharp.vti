@@ -9,7 +9,7 @@
 Basically it "squeezes" unsharp edges. This method is a simplified Version of an algorithm by Nur Arad and Craig Gotsman: "Enhancement by Image-Dependent Warping", IEEE Transactions on Image Processing, 1999, Vol. 8, No. 8, S. 1063&quot;&lt;br&gt;
  - &lt;a href=&quot;http://www.home.unix-ag.org/simon/gimp/warp-sharp.html&quot;&gt;Warp-sharp, Simon Budig&lt;/a&gt;
     </description>
-    <rule name="BZ Warpsharp" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="BZ Warpsharp" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="7" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(
 __global float *a_in,

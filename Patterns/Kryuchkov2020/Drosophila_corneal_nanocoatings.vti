@@ -4,7 +4,7 @@
     <description>
       A 3D reaction-diffusion model of corneal nanocoatings in Drosophila (fruit flies).
     </description>
-    <rule name="Kryuchkov2020" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Kryuchkov2020" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="aa">
         0.067000
       </param>

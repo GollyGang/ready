@@ -80,7 +80,7 @@ class MeshRD : public AbstractRD
     protected: // functions
 
         /// work out which cells are neighbors of each other
-        void ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type);
+        void ComputeCellNeighbors(TNeighborhood neighborhood_type);
 
         /// advance the RD system by n timesteps
         virtual void InternalUpdate(int n_steps) =0;

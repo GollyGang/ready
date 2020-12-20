@@ -13,7 +13,7 @@
         This parameter set discovered by Dan Wills.
     </description>
     
-    <rule name="Schenk" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Schenk" type="formula" wrap="1" neighborhood_type="vertex">
         
       <param name="D_a">       9e-05      </param>
       <param name="D_b">       0.0007     </param>

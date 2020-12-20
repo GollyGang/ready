@@ -13,7 +13,7 @@
       Munster. &lt;a href=&quot;http://www.uni-muenster.de/Physik.AP/Purwins/Gruppe/Purwins-en.html&quot;&gt;[link]&lt;/a&gt;
     </description>
     
-    <rule name="Schenk" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Schenk" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="D_a">         0.00015     </param>
       <param name="D_b">         0.00015     </param>
       <param name="D_c">         0.0096      </param> <!-- N.B. typo in paper -->

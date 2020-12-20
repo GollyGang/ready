@@ -4,7 +4,7 @@
     <description>
       A fast non-physical Eulerian fluid simulation with a wide variety of behaviors.
     </description>
-    <rule name="Smoke" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Smoke" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="4" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *p_in,__global float *c_in,__global float *a_out,__global float *b_out,__global float *p_out,__global float *c_out)
 {

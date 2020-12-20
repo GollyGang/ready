@@ -16,7 +16,7 @@
       following Pearson's work as closely as possible.
     </description>
     
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">        1              </param>
       <param name="delta_x">         0.009765625    </param>
       <param name="D_a">             0.00002        </param>

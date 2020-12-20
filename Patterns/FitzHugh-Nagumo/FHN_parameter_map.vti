@@ -6,7 +6,7 @@
       
       A parameter map of the FitzHugh-Nagumo system, with epsilon varying from left to right and delta from bottom to top.
     </description>
-    <rule name="Fitzhugh-Nagumo" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Fitzhugh-Nagumo" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.010000
       </param>

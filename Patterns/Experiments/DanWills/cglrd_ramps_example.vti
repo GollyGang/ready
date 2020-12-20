@@ -8,7 +8,7 @@ The complex Ginzburg-Landau equation describes a vast variety of phenomena from 
 
 This modification (by Dan Wills) adds a tent-shaped horizontal control ramp to the system, such that the behavior can be made to differ in the center of the frame than at the edges. This is useful as a way to explore the parameter space, as well as allowing the simulation of some interesting ranges of dynamics.
     </description>
-    <rule name="Ginzburg-Landau" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Ginzburg-Landau" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.15
       </param>

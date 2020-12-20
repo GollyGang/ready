@@ -549,27 +549,27 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     {
         options.laplacians_needed.push_back(GetChemicalName(i)); // TODO: only add the ones that are used in the formula
     }
-    if (this->neighborhood_type == FACE_NEIGHBORS && this->GetArenaDimensionality() == 3 && this->neighborhood_range == 1) // neighborhood_weight not relevant
+    if (this->neighborhood_type == FACE_NEIGHBORS && this->GetArenaDimensionality() == 3)
     {
         AddKeywords_FaceNeighbors3DRange1(kernel_source, options);
     }
-    else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1) // neighborhood_weight not relevant
+    else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==2)
     {
         AddKeywords_EdgeNeighbors2DRange1(kernel_source, options);
     }
-    else if(this->GetArenaDimensionality()==1 && this->neighborhood_range==1) // neighborhood_type and neighborhood_weight not relevant
+    else if(this->GetArenaDimensionality()==1)
     {
         AddKeywords_1DRange1(kernel_source, options);
     }
-    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
+    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2)
     {
         AddKeywords_VertexNeighbors2DRange1(kernel_source, options);
     }
-    else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
+    else if(this->neighborhood_type==EDGE_NEIGHBORS && this->GetArenaDimensionality()==3)
     {
         AddKeywords_EdgeNeighbors3DRange1(kernel_source, options);
     }
-    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3 && this->neighborhood_range==1 && this->neighborhood_weight_type==LAPLACIAN)
+    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3)
     {
         AddKeywords_VertexNeighbors3DRange1(kernel_source, options);
     }
@@ -579,8 +579,6 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         oss << "FormulaOpenCLImageRD::AssembleKernelSourceFromFormula : unsupported neighborhood options:\n";
         oss << "type=" << this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second << ",\n";
         oss << "dim=" << this->GetArenaDimensionality() << ",\n";
-        oss << "range=" << this->neighborhood_range << ",\n";
-        oss << "weights=" << this->canonical_neighborhood_weight_identifiers.find(this->neighborhood_weight_type)->second;
         throw runtime_error(oss.str().c_str());
     }
     kernel_source << "\n";

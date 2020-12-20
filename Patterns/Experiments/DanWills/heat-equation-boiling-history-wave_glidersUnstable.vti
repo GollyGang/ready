@@ -10,7 +10,7 @@
               
         Written by Dan Wills, (as a bit of an homage-to-CAPOW by Rudy Rucker) based on earlier code in the Ready repo.
     </description>
-    <rule name="Heat Equation with History And Wave" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Heat Equation with History And Wave" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.01
       </param>
