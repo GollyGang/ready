@@ -52,6 +52,7 @@ struct KeywordOptions {
     string data_type_string;
     string data_type_suffix;
     vector<string> laplacians_needed; // e.g. ["a", "b"]
+    vector<string> bilaplacians_needed; // e.g. ["a", "b"]
     vector<string> x_gradients_needed; // e.g. ["a", "b"]
     vector<string> y_gradients_needed; // e.g. ["a", "b"]
     vector<string> z_gradients_needed; // e.g. ["a", "b"]
@@ -406,6 +407,11 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             options.laplacians_needed.push_back(chem);
             inputs_needed = true;
         }
+        if (formula.find("bilaplacian_" + chem) != string::npos)
+        {
+            options.bilaplacians_needed.push_back(chem);
+            inputs_needed = true;
+        }
         if (formula.find("x_gradient_" + chem) != string::npos)
         {
             options.x_gradients_needed.push_back(chem);
@@ -421,7 +427,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             options.z_gradients_needed.push_back(chem);
             inputs_needed = true;
         }
-        if (formula.find(chem+"_n") != string::npos || formula.find(chem + "_e") != string::npos) // TODO: need to consider all of these inputs
+        if (formula.find(chem + "_n") != string::npos || formula.find(chem + "_e") != string::npos) // TODO: need to consider all of these inputs
         {
             inputs_needed = true;
         }
