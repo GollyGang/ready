@@ -429,7 +429,8 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     kernel_source << "\n";
     // the parameters (assume all float for now)
     for (int i = 0; i < (int)this->parameters.size(); i++)
-        kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first
+                      << " = " << setprecision(8) << this->parameters[i].second << this->data_type_suffix << ";\n";
     // add a dx parameter for grid spacing if one is not already supplied
     if (!options.inputs_needed.empty() && find_if(this->parameters.begin(), this->parameters.end(),
         [](const pair<string, float>& param) { return param.first == "dx"; }) == this->parameters.end())
