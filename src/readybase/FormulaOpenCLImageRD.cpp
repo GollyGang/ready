@@ -421,6 +421,10 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             options.z_gradients_needed.push_back(chem);
             inputs_needed = true;
         }
+        if (formula.find(chem+"_n") != string::npos || formula.find(chem + "_e") != string::npos) // TODO: need to consider all of these inputs
+        {
+            inputs_needed = true;
+        }
         if (inputs_needed)
         {
             options.inputs_needed.push_back(chem);
@@ -432,8 +436,9 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first
                       << " = " << setprecision(8) << this->parameters[i].second << this->data_type_suffix << ";\n";
     // add a dx parameter for grid spacing if one is not already supplied
-    if (!options.inputs_needed.empty() && find_if(this->parameters.begin(), this->parameters.end(),
-        [](const pair<string, float>& param) { return param.first == "dx"; }) == this->parameters.end())
+    const bool has_dx_parameter = find_if(this->parameters.begin(), this->parameters.end(),
+        [](const pair<string, float>& param) { return param.first == "dx"; }) != this->parameters.end();
+    if (!options.inputs_needed.empty() && !has_dx_parameter)
     {
         kernel_source << indent << "const " << options.data_type_string << " dx = 1.0" << options.data_type_suffix << "; // grid spacing\n";
     }
