@@ -63,6 +63,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/overlays.hpp                  src/readybase/overlays.cpp
   src/readybase/Properties.hpp                src/readybase/Properties.cpp
   src/readybase/utils.hpp                     src/readybase/utils.cpp
+  src/readybase/stencils.hpp                  src/readybase/stencils.cpp
   src/readybase/OpenCL_Dyn_Load.h             src/readybase/OpenCL_Dyn_Load.c
   src/readybase/MeshGenerators.hpp            src/readybase/MeshGenerators.cpp
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp

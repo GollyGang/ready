@@ -17,11 +17,13 @@
 
 // local:
 #include "FormulaOpenCLImageRD.hpp"
+#include "stencils.hpp"
 #include "utils.hpp"
 
 // STL:
-#include <string>
+#include <set>
 #include <sstream>
+#include <string>
 using namespace std;
 
 // VTK:
@@ -51,16 +53,50 @@ struct KeywordOptions {
     string indent;
     string data_type_string;
     string data_type_suffix;
-    vector<string> laplacians_needed; // e.g. ["a", "b"]
-    vector<string> bilaplacians_needed; // e.g. ["a", "b"]
-    vector<string> x_gradients_needed; // e.g. ["a", "b"]
-    vector<string> y_gradients_needed; // e.g. ["a", "b"]
-    vector<string> z_gradients_needed; // e.g. ["a", "b"]
-    vector<string> inputs_needed; // e.g. ["a", "b"]
+    vector<AppliedStencil> stencils_needed;
+    set<InputPoint> inputs_needed;
 };
 
 // -------------------------------------------------------------------------
 
+string GetIndexString(int val, const string& coord, const string& coord_capital, bool wrap)
+{
+    ostringstream oss;
+    const string index = "index_" + coord;
+    if (val == 0)
+    {
+        oss << index;
+    }
+    else if (wrap)
+    {
+        oss << "((" << index << showpos << val << " + " << coord_capital << ") & (" << coord_capital << " - 1))";
+    }
+    else
+    {
+        oss << "min(" << coord_capital << "-1, max(0, " << index << showpos << val << "))";
+    }
+    return oss.str();
+}
+
+void AddKeywords_Block411(ostringstream& kernel_source, const KeywordOptions& options)
+{
+    // retrieve the values needed
+    for (const InputPoint& input_point : options.inputs_needed)
+    {
+        if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
+        {
+            continue; // central cell has already been retrieved
+        }
+        const string index_x = GetIndexString(input_point.point.x, "x", "X", options.wrap);
+        const string index_y = GetIndexString(input_point.point.y, "y", "Y", options.wrap);
+        const string index_z = GetIndexString(input_point.point.z, "z", "Z", options.wrap);
+        kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetNeighborName()
+                      << " = " << input_point.chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "];\n";
+    }
+}
+
+// -------------------------------------------------------------------------
+/*
 void AddKeywords_1D(ostringstream& kernel_source, const KeywordOptions& options)
 {
     const int NDIRS = 2;
@@ -353,7 +389,7 @@ void AddKeywords_VertexNeighbors3D(ostringstream& kernel_source, const KeywordOp
     //  (x y z w) (x y z w) (x y z w)   (x y z w) [x y z w] (x y z w)   (x y z w) (x y z w) (x y z w)  =       dw   d   de        w   .   e       uw   u   ue
     //  (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)   (x y z w) (x y z w) (x y z w)         dsw   ds  dse      sw   s   se     usw   us  use
 }
-
+*/
 // -------------------------------------------------------------------------
 
 std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
@@ -390,86 +426,61 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         indent << "const int index_z = get_global_id(2);\n" <<
         indent << "const int X = get_global_size(0);\n" <<
         indent << "const int Y = get_global_size(1);\n" <<
-        indent << "const int Z = get_global_size(2);\n" <<
-        indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n\n";
+        indent << "const int Z = get_global_size(2);\n";
     for (int i = 0; i < NC; i++)
     {
-        kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_here];\n";
+        kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(i)
+                      << " = " << GetChemicalName(i) << "_in[X*(Y*index_z + index_y) + index_x];\n";
         // (non-const, to allow the user to assign directly to it if wanted)
     }
+    kernel_source << "\n";
+    // search the formula for keywords
     KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
+    vector<Stencil> known_stencils = GetKnownStencils();
     for (int i = 0; i < NC; i++)
     {
         const string chem = GetChemicalName(i);
-        bool inputs_needed = false;
-        if (formula.find("laplacian_" + chem) != string::npos)
+        for (const Stencil& stencil : known_stencils)
         {
-            options.laplacians_needed.push_back(chem);
-            inputs_needed = true;
+            if (formula.find(stencil.label + "_" + chem) != string::npos) // TODO: parse properly
+            {
+                AppliedStencil applied_stencil{ stencil, chem }; // TODO: use this->GetArenaDimensionality()
+                options.stencils_needed.push_back(applied_stencil);
+                set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
+                options.inputs_needed.insert(input_points.begin(), input_points.end());
+            }
         }
-        if (formula.find("bilaplacian_" + chem) != string::npos)
+        // search for direct access to neighbors, e.g. "a_nw"
+        for (int x = -2; x <= 2; x++)
         {
-            options.bilaplacians_needed.push_back(chem);
-            inputs_needed = true;
-        }
-        if (formula.find("x_gradient_" + chem) != string::npos)
-        {
-            options.x_gradients_needed.push_back(chem);
-            inputs_needed = true;
-        }
-        if (formula.find("y_gradient_" + chem) != string::npos)
-        {
-            options.y_gradients_needed.push_back(chem);
-            inputs_needed = true;
-        }
-        if (formula.find("z_gradient_" + chem) != string::npos)
-        {
-            options.z_gradients_needed.push_back(chem);
-            inputs_needed = true;
-        }
-        if (formula.find(chem + "_n") != string::npos || formula.find(chem + "_e") != string::npos) // TODO: need to consider all of these inputs
-        {
-            inputs_needed = true;
-        }
-        if (inputs_needed)
-        {
-            options.inputs_needed.push_back(chem);
+            for (int y = -2; y <= 2; y++)
+            {
+                for (int z = -2; z <= 2; z++)
+                {
+                    InputPoint input_point{ {x, y, z}, chem };
+                    const string input_point_neighbor_name = input_point.GetNeighborName();
+                    if (formula.find(input_point_neighbor_name) != string::npos) // TODO: parse properly
+                    {
+                        options.inputs_needed.insert(input_point);
+                    }
+                }
+            }
         }
     }
-    kernel_source << "\n";
-    // the parameters (assume all float for now)
+    // add the parameters (assume all float for now)
     for (int i = 0; i < (int)this->parameters.size(); i++)
         kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first
                       << " = " << setprecision(8) << this->parameters[i].second << this->data_type_suffix << ";\n";
     // add a dx parameter for grid spacing if one is not already supplied
     const bool has_dx_parameter = find_if(this->parameters.begin(), this->parameters.end(),
         [](const pair<string, float>& param) { return param.first == "dx"; }) != this->parameters.end();
-    if (!options.inputs_needed.empty() && !has_dx_parameter)
+    if (!options.stencils_needed.empty() && !has_dx_parameter)
     {
         kernel_source << indent << "const " << options.data_type_string << " dx = 1.0" << options.data_type_suffix << "; // grid spacing\n";
     }
     kernel_source << "\n";
-    // add the keywords (laplacian_a, x_gradient_a, etc.)
-    if(this->GetArenaDimensionality()==1)
-    {
-        AddKeywords_1D(kernel_source, options);
-    }
-    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==2)
-    {
-        AddKeywords_VertexNeighbors2D(kernel_source, options);
-    }
-    else if(this->neighborhood_type==VERTEX_NEIGHBORS && this->GetArenaDimensionality()==3)
-    {
-        AddKeywords_VertexNeighbors3D(kernel_source, options);
-    }
-    else
-    {
-        ostringstream oss;
-        oss << "FormulaOpenCLImageRD::AssembleKernelSourceFromFormula : unsupported neighborhood options:\n";
-        oss << "type=" << this->canonical_neighborhood_type_identifiers.find(this->neighborhood_type)->second << ",\n";
-        oss << "dim=" << this->GetArenaDimensionality() << ",\n";
-        throw runtime_error(oss.str().c_str());
-    }
+    // add the keywords we found
+    AddKeywords_Block411(kernel_source, options);
     kernel_source << "\n";
     // add delta_a, etc.
     for(int iC=0;iC<NC;iC++)
