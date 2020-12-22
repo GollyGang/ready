@@ -113,28 +113,16 @@ string Stencil::GetDivisorCode() const
     return oss.str();
 }
 
-Point AppliedStencil::CellPointToBlockPoint(const Point& point)
-{
-    // convert cell coord to block coord, by dividing x by 4 and rounding away from zero
-    Point p{ point.x, point.y, point.z };
-    if (p.x > 0)
-    {
-        p.x = int(ceil(p.x / 4.0));
-    }
-    else if (p.x < 0)
-    {
-        p.x = -int(ceil(-p.x / 4.0));
-    }
-    return p;
-}
-
 set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
 {
     set<InputPoint> input_points;
     for (const StencilPoint& stencil_point : stencil.points)
     {
-        Point block_point = AppliedStencil::CellPointToBlockPoint(stencil_point.point);
-        input_points.insert({ block_point, chem });
+        for (int iSlot = 0; iSlot < 4; iSlot++)
+        {
+            Point block_point{ CellSlotToBlock(iSlot + stencil_point.point.x), stencil_point.point.y, stencil_point.point.z };
+            input_points.insert({ block_point, chem });
+        }
     }
     return input_points;
 }
@@ -243,11 +231,17 @@ Stencil GetBiLaplacianStencil(int dimensionality)
         return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
-        return StencilFrom3DArray("bilaplacian", {{{0,0,0,0,0},  {0,0,1,0,0},   {0,1,-1,1,0},   {0,0,1,0,0},   {0,0,0,0,0}},
+        //c3=1, c6=-4, c10=20, divisor=4
+        return StencilFrom3DArray("bilaplacian", {{{0,0,1,0,0},  {0,0,0,0,0},    {1,0,0,0,1},  {0,0,0,0,0},    {0,0,1,0,0}},
+                                                  {{0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0}},
+                                                  {{1,0,0,0,1},  {0,0,0,0,0},    {0,0,20,0,0}, {0,0,0,0,0},    {1,0,0,0,1}},
+                                                  {{0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0}},
+                                                  {{0,0,1,0,0},  {0,0,0,0,0},    {1,0,0,0,1},  {0,0,0,0,0},    {0,0,1,0,0}}}, 4, 4, 0, 1, 2);
+        /*return StencilFrom3DArray("bilaplacian", {{{0,0,0,0,0},  {0,0,1,0,0},   {0,1,-1,1,0},   {0,0,1,0,0},   {0,0,0,0,0}},
                                                   {{0,0,1,0,0},  {0,3,-8,3,0},  {1,-8,4,-8,1},  {0,3,-8,3,0},  {0,0,1,0,0}},
                                                   {{0,1,-1,1,0}, {1,-8,4,-8,1}, {-1,4,30,4,-1}, {1,-8,4,-8,1}, {0,1,-1,1,0}},
                                                   {{0,0,1,0,0},  {0,3,-8,3,0},  {1,-8,4,-8,1},  {0,3,-8,3,0},  {0,0,1,0,0}},
-                                                  {{0,0,0,0,0},  {0,0,1,0,0},   {0,1,-1,1,0},   {0,0,1,0,0},   {0,0,0,0,0}}}, 3, 4, 0, 1, 2);
+                                                  {{0,0,0,0,0},  {0,0,1,0,0},   {0,1,-1,1,0},   {0,0,1,0,0},   {0,0,0,0,0}}}, 3, 4, 0, 1, 2);*/
     default:
         throw exception("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
     }
