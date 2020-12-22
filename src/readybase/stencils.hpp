@@ -27,12 +27,15 @@ union Point
 
     std::string GetName() const;
 
-    bool operator<(const Point& b) const
+    friend bool operator<(const Point& a, const Point& b)
     {
-        if (x < b.x) return true;
-        else if (!(b.x < x) && y < b.y) return true;
-        else if(!(b.y < y) && z < b.z) return true;
-        return false;
+        if (a.x < b.x) return true;
+        else if (!(b.x < a.x)) {
+            if (a.y < b.y) return true;
+            else if (!(b.y < a.y)) return a.z < b.z;
+            else return false;
+        }
+        else return false;
     }
 };
 
@@ -61,11 +64,11 @@ struct InputPoint
 
     std::string GetName() const;
 
-    bool operator<(const InputPoint& b) const
+    friend bool operator<(const InputPoint& a, const InputPoint& b)
     {
-        if (point < b.point) return true;
-        else if (!(b.point < point) && chem < b.chem) return true;
-        return false;
+        if (a.point < b.point) return true;
+        else if (!(b.point < a.point) && a.chem < b.chem) return true;
+        else return false;
     }
 };
 
