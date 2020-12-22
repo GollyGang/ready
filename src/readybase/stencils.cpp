@@ -69,7 +69,7 @@ int CellSlotToSlot(int x)
     return x % 4;
 }
 
-std::string OffsetToCode(int iSlot, const Point& point, const string& chem)
+string OffsetToCode(int iSlot, const Point& point, const string& chem)
 {
     ostringstream oss;
     int source_block_x = CellSlotToBlock(iSlot + point.x);
@@ -183,22 +183,62 @@ Stencil StencilFrom2DArray(const string& label, float const (&arr)[M][N], int di
     return stencil;
 }
 
-std::vector<Stencil> GetKnownStencils()
+template<int L, int M, int N>
+Stencil StencilFrom3DArray(const string& label, float const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
+{
+    if (L % 2 != 1 || M % 2 != 1 || N % 2 != 1)
+    {
+        throw exception("Internal error: StencilFrom3DArray takes an odd-sized array");
+    }
+    Stencil stencil{ label, {}, divisor, dx_power };
+    for (int k = 0; k < N; k++)
+    {
+        for (int j = 0; j < M; j++)
+        {
+            for (int i = 0; i < L; i++)
+            {
+                if (arr[i][j][k] != 0.0f)
+                {
+                    Point point{ 0, 0, 0 };
+                    point.xyz[dim1] = i - (L - 1) / 2;
+                    point.xyz[dim2] = j - (M - 1) / 2;
+                    point.xyz[dim3] = k - (N - 1) / 2;
+                    stencil.points.push_back({ point, arr[i][j][k] });
+                }
+            }
+        }
+    }
+    return stencil;
+}
+
+vector<Stencil> GetKnownStencils()
 {
     //int a[3] = { -1, 0, 1 };
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
-    // TODO: 1D Laplacian 3-point stencil: [ 1,-2,1 ] / dx
-    // TODO: 1D bi-Laplacian 5-point stencil: [ 1,-4,6,-4,1 ] / dx^2
-    // TODO: 1D tri-Laplacian
-    Stencil Laplacian2D = StencilFrom2DArray("laplacian", { {1, 4, 1}, {4, -20, 4}, {1, 4, 1} }, 6, 2, 0, 1);
-    // TODO: 2D bi-Laplacian
-    // TODO: 2D tri-Laplacian
-    // TODO: 3D Laplacian 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26dx^3
-        // Following: O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in
-        // Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
-    // TODO: 3D bi-Laplacian
-    // TODO: 3D tri-Laplacian
-    return { XGradient, YGradient, ZGradient, Laplacian2D };
+    return { XGradient, YGradient, ZGradient };
 }
+
+Stencil GetLaplacianStencil(int dimensionality)
+{
+    switch (dimensionality)
+    {
+    case 1:
+        return StencilFrom1DArray("laplacian", { 1, -2, 1 }, 1, 1, 0);
+    case 2:
+        return StencilFrom2DArray("laplacian", { {1, 4, 1}, {4, -20, 4}, {1, 4, 1} }, 6, 2, 0, 1);
+    case 3:
+        // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
+        return StencilFrom3DArray("laplacian", { { {2,3,2}, {3,6,3}, {2,3,2} }, { {3,6,3}, {6,-88,6}, {3,6,3}}, { {2,3,2}, {3,6,3}, {2,3,2} } }, 26, 3, 0, 1, 2);
+    default:
+        throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
+    }
+}
+
+// TODO: 1D bi-Laplacian 5-point stencil: [ 1,-4,6,-4,1 ] / dx^2
+// TODO: 1D tri-Laplacian
+// TODO: 2D bi-Laplacian
+// TODO: 2D tri-Laplacian
+// TODO: 3D bi-Laplacian
+// TODO: 3D tri-Laplacian

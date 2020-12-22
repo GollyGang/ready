@@ -80,3 +80,4 @@ struct AppliedStencil
 };
 
 std::vector<Stencil> GetKnownStencils();
+Stencil GetLaplacianStencil(int dimensionality);

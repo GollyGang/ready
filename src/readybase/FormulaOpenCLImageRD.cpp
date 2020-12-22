@@ -119,6 +119,14 @@ void AddKeywords_Block411(ostringstream& kernel_source, const KeywordOptions& op
 
 // -------------------------------------------------------------------------
 
+bool UsingKeyword(const string& formula, const string& keyword)
+{
+    return formula.find(keyword) != string::npos;
+    // TODO: parse properly: ignore comments, whole words only, not in string, etc.
+}
+
+// -------------------------------------------------------------------------
+
 std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
 {
     const string indent = "    ";
@@ -164,15 +172,25 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     kernel_source << "\n";
     // search the formula for keywords
     KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
-    vector<Stencil> known_stencils = GetKnownStencils();
+    const vector<Stencil> known_stencils = GetKnownStencils();
+    const Stencil laplacian_stencil = GetLaplacianStencil(this->GetArenaDimensionality());
     for (int i = 0; i < NC; i++)
     {
         const string chem = GetChemicalName(i);
+        // search for uses of the Laplacian
+        if (UsingKeyword(formula, laplacian_stencil.label + "_" + chem))
+        {
+            AppliedStencil applied_stencil{ laplacian_stencil, chem };
+            options.stencils_needed.push_back(applied_stencil);
+            set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
+            options.inputs_needed.insert(input_points.begin(), input_points.end());
+        }
+        // search for uses of other keywords
         for (const Stencil& stencil : known_stencils)
         {
-            if (formula.find(stencil.label + "_" + chem) != string::npos) // TODO: parse properly
+            if (UsingKeyword(formula, stencil.label + "_" + chem))
             {
-                AppliedStencil applied_stencil{ stencil, chem }; // TODO: use this->GetArenaDimensionality()
+                AppliedStencil applied_stencil{ stencil, chem };
                 options.stencils_needed.push_back(applied_stencil);
                 set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
                 options.inputs_needed.insert(input_points.begin(), input_points.end());
@@ -187,7 +205,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                 {
                     InputPoint input_point{ {x, y, z}, chem };
                     const string input_point_neighbor_name = input_point.GetName();
-                    if (formula.find(input_point_neighbor_name) != string::npos) // TODO: parse properly
+                    if (UsingKeyword(formula, input_point_neighbor_name))
                     {
                         options.inputs_needed.insert(input_point);
                     }

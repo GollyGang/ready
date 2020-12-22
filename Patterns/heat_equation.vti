@@ -19,18 +19,19 @@
             <overwrite />
             <white_noise low="0.8" high="1" />
             <rectangle>
-                <point3D x="0.2" y="0.3" z="0" />
-                <point3D x="0.3" y="0.6" z="1" />
+                <point3D x="0.2" y="0.3" z="0.3" />
+                <point3D x="0.3" y="0.6" z="0.6" />
             </rectangle>
             <rectangle>
-                <point3D x="0.4" y="0.5" z="0" />
-                <point3D x="0.8" y="0.9" z="1" />
+                <point3D x="0.4" y="0.5" z="0.5" />
+                <point3D x="0.8" y="0.9" z="0.7" />
             </rectangle>
         </overlay>
     </initial_pattern_generator>
 
     <render_settings>
         <vertical_scale_2D value="40" />
+        <timesteps_per_render value="1" />
     </render_settings>
 
   </RD>
