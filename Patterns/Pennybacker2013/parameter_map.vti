@@ -12,15 +12,15 @@
     </description>
 
     <rule name="phyllotaxis" type="formula" wrap="0">
-      <param name="timestep"> 0.0005 </param>
-      <param name="dx">       0.4    </param>
-      <param name="mu_min">   -1.0   </param>
-      <param name="mu_max">   5.0    </param>
-      <param name="beta_min"> -3.0   </param>
-      <param name="beta_max"> 3.0    </param>
+      <param name="timestep">   0.002  </param>
+      <param name="dx">         0.4    </param>
+      <param name="mu_min">    -1.0    </param>
+      <param name="mu_max">     5.0    </param>
+      <param name="beta_min">  -3.0    </param>
+      <param name="beta_max">   3.0    </param>
       <formula number_of_chemicals="1">
-        float4 mu = mu_min + ( ( mu_max - mu_min ) * index_x ) / X; // TODO: slots
-        float4 beta = beta_min + ( ( beta_max - beta_min ) * index_y ) / Y;
+        float4 mu = mu_min + (mu_max - mu_min) * x_pos;
+        float4 beta = beta_min + ( beta_max - beta_min ) * y_pos;
         delta_a = mu * a - bilaplacian_a - 2.0f*laplacian_a - a + beta*a*a - a*a*a;
       </formula>
     </rule>

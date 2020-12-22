@@ -9,7 +9,7 @@
     </description>
 
     <rule name="phyllotaxis" type="formula" wrap="1">
-      <param name="timestep"> 0.0005 </param>
+      <param name="timestep"> 0.002  </param>
       <param name="dx">       0.4    </param>
       <param name="mu">       0.1    </param>
       <param name="beta">     0.5    </param>

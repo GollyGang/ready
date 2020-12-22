@@ -15,8 +15,8 @@
     </description>
 
     <rule name="Biharmonic equation" type="formula" wrap="1">
-      <param name="timestep">   0.0001   </param>
-      <param name="dx">         0.4      </param>
+      <param name="timestep">   0.002   </param>
+      <param name="dx">         0.4     </param>
       <formula number_of_chemicals="2">
         delta_a = -bilaplacian_a * step(-0.01f,-b);
       </formula>
@@ -149,7 +149,7 @@
       <use_image_interpolation value="true">
 
       </use_image_interpolation>
-      <timesteps_per_render value="100">
+      <timesteps_per_render value="512">
 
       </timesteps_per_render>
       <show_phase_plot value="false">

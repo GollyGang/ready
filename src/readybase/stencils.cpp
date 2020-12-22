@@ -218,7 +218,7 @@ Stencil GetLaplacianStencil(int dimensionality)
     case 1:
         return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 1, 0);
     case 2:
-        return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1);
+        return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1); // Known under the name "Mehrstellen"
     case 3:
         // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
         return StencilFrom3DArray("laplacian", {{{2,3,2}, {3,6,3}, {2,3,2}}, {{3,6,3}, {6,-88,6}, {3,6,3}}, {{2,3,2}, {3,6,3}, {2,3,2}}}, 26, 3, 0, 1, 2);
@@ -237,7 +237,8 @@ Stencil GetBiLaplacianStencil(int dimensionality)
     case 1:
         return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 2, 0);
     case 2:
-        return StencilFrom2DArray("bilaplacian", {{0,0,1,0,0}, {0,2,-8,2,0}, {1,-8,20,-8,1}, {0,2,-8,2,0}, {0,0,1,0,0}}, 1, 4, 0, 1);
+        return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
+        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
     /*case 3:
         return StencilFrom3DArray("bilaplacian", */
     default:

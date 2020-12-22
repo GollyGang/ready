@@ -78,7 +78,7 @@ string GetIndexString(int val, const string& coord, const string& coord_capital,
     return oss.str();
 }
 
-void AddKeywords_Block411(ostringstream& kernel_source, const KeywordOptions& options)
+void AddStencils_Block411(ostringstream& kernel_source, const KeywordOptions& options)
 {
     // retrieve the values needed
     for (const InputPoint& input_point : options.inputs_needed)
@@ -93,7 +93,7 @@ void AddKeywords_Block411(ostringstream& kernel_source, const KeywordOptions& op
         kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName()
             << " = " << input_point.chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "];\n";
     }
-    // compute the keywords needed
+    // compute the stencils needed
     for (const AppliedStencil& applied_stencil : options.stencils_needed)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetName()
@@ -189,7 +189,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             }
         }
         // search for direct access to neighbors, e.g. "a_nw"
-        for (int x = -2; x <= 2; x++)
+        for (int x = -1; x <= 1; x++)
         {
             for (int y = -2; y <= 2; y++)
             {
@@ -214,11 +214,27 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         [](const pair<string, float>& param) { return param.first == "dx"; }) != this->parameters.end();
     if (!options.stencils_needed.empty() && !has_dx_parameter)
     {
-        kernel_source << indent << "const " << options.data_type_string << " dx = 1.0" << options.data_type_suffix << "; // grid spacing\n";
+        kernel_source << indent << "const " << this->data_type_string << " dx = 1.0" << this->data_type_suffix << "; // grid spacing\n";
     }
     kernel_source << "\n";
-    // add the keywords we found
-    AddKeywords_Block411(kernel_source, options);
+    // add the stencils we found
+    AddStencils_Block411(kernel_source, options);
+    // add x_pos, y_pos, z_pos if being used
+    if (UsingKeyword(formula, "x_pos"))
+    {
+        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (" << this->data_type_string << "4)("
+            << "(4 * index_x + 0) / (4.0f * X), (4 * index_x + 1) / (4.0f * X), (4 * index_x + 2) / (4.0f * X), (4 * index_x + 3) / (4.0f * X));\n";
+    }
+    if (UsingKeyword(formula, "y_pos"))
+    {
+        kernel_source << indent << "const " << this->data_type_string << "4 y_pos = (" << this->data_type_string << "4)("
+            << "index_y / (1.0f * Y), index_y / (1.0f * Y), index_y / (1.0f * Y), index_y / (1.0f * Y));\n";
+    }
+    if (UsingKeyword(formula, "z_pos"))
+    {
+        kernel_source << indent << "const " << this->data_type_string << "4 z_pos = (" << this->data_type_string << "4)("
+            << "index_z / (1.0f * Z), index_z / (1.0f * Z), index_z / (1.0f * Z), index_z / (1.0f * Z));\n";
+    }
     kernel_source << "\n";
     // add delta_a, etc.
     for(int iC=0;iC<NC;iC++)
