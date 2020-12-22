@@ -88,6 +88,7 @@ std::string StencilPoint::GetCode(int iSlot, const string& chem) const
         oss << " * " << weight;
     }
     return oss.str();
+    // TODO: collect all the stencil points with the same weight and use a single multiply on them
 }
 
 string InputPoint::GetName() const
