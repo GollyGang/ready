@@ -216,12 +216,12 @@ Stencil GetLaplacianStencil(int dimensionality)
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("laplacian", { 1, -2, 1 }, 1, 1, 0);
+        return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 1, 0);
     case 2:
-        return StencilFrom2DArray("laplacian", { {1, 4, 1}, {4, -20, 4}, {1, 4, 1} }, 6, 2, 0, 1);
+        return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1);
     case 3:
         // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
-        return StencilFrom3DArray("laplacian", { { {2,3,2}, {3,6,3}, {2,3,2} }, { {3,6,3}, {6,-88,6}, {3,6,3}}, { {2,3,2}, {3,6,3}, {2,3,2} } }, 26, 3, 0, 1, 2);
+        return StencilFrom3DArray("laplacian", {{{2,3,2}, {3,6,3}, {2,3,2}}, {{3,6,3}, {6,-88,6}, {3,6,3}}, {{2,3,2}, {3,6,3}, {2,3,2}}}, 26, 3, 0, 1, 2);
     default:
         throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
@@ -230,27 +230,41 @@ Stencil GetLaplacianStencil(int dimensionality)
     // slower code for the more common use-cases.
 }
 
-/*Stencil GetBiLaplacianStencil(int dimensionality)
+Stencil GetBiLaplacianStencil(int dimensionality)
 {
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("bilaplacian", { 1, -4, 6, -4, 1 }, 1, 2, 0);
+        return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 2, 0);
     case 2:
-        return StencilFrom2DArray("bilaplacian",
-    case 3:
-        return StencilFrom3DArray("bilaplacian",
+        return StencilFrom2DArray("bilaplacian", {{0,0,1,0,0}, {0,2,-8,2,0}, {1,-8,20,-8,1}, {0,2,-8,2,0}, {0,0,1,0,0}}, 1, 4, 0, 1);
+    /*case 3:
+        return StencilFrom3DArray("bilaplacian", */
     default:
         throw exception("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
     }
     // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
     // slower code for the more common use-cases.
-}*/
+}
 
-// TODO: 1D tri-Laplacian
-// TODO: 2D tri-Laplacian
-// TODO: 3D tri-Laplacian
+/*Stencil GetTriLaplacianStencil(int dimensionality)
+{
+    switch (dimensionality)
+    {
+    case 1:
+        return StencilFrom1DArray("trilaplacian", 
+    case 2:
+        return StencilFrom2DArray("trilaplacian",
+    case 3:
+        return StencilFrom3DArray("trilaplacian",
+    default:
+        throw exception("Internal error: unsupported dimensionality in GetTriLaplacianStencil");
+    }
+    // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
+    // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
+    // slower code for the more common use-cases.
+}*/
 
 vector<Stencil> GetKnownStencils(int dimensionality)
 {
@@ -258,6 +272,7 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Laplacian };
+    Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
+    return { XGradient, YGradient, ZGradient, Laplacian, BiLaplacian };
 }
 

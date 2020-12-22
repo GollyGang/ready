@@ -183,6 +183,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             {
                 AppliedStencil applied_stencil{ stencil, chem };
                 options.stencils_needed.push_back(applied_stencil);
+                // collect all calls to the inputs needed for this stencil
                 set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
                 options.inputs_needed.insert(input_points.begin(), input_points.end());
             }
