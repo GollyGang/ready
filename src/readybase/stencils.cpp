@@ -82,7 +82,11 @@ std::string OffsetToCode(int iSlot, const Point& point, const string& chem)
 std::string StencilPoint::GetCode(int iSlot, const string& chem) const
 {
     ostringstream oss;
-    oss << OffsetToCode(iSlot, point, chem) << " * " << weight;
+    oss << OffsetToCode(iSlot, point, chem);
+    if (weight != 1.0f)
+    {
+        oss << " * " << weight;
+    }
     return oss.str();
 }
 
@@ -136,11 +140,11 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
 }
 
 template<int N>
-Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int xyz, int divisor, int dx_power)
+Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int divisor, int dx_power, int dim1)
 {
     if (N % 2 != 1)
     {
-        throw exception("StencilFrom1DArray takes an odd-sized array");
+        throw exception("Internal error: StencilFrom1DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
     for (int i = 0; i < N; i++)
@@ -148,8 +152,32 @@ Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int xyz, 
         if (arr[i] != 0.0f)
         {
             Point point{ 0, 0, 0 };
-            point.xyz[xyz] = i - (N - 1) / 2;
+            point.xyz[dim1] = i - (N - 1) / 2;
             stencil.points.push_back({ point, arr[i] });
+        }
+    }
+    return stencil;
+}
+
+template<int M, int N>
+Stencil StencilFrom2DArray(const string& label, float const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
+{
+    if (M % 2 != 1 || N % 2 != 1)
+    {
+        throw exception("Internal error: StencilFrom2DArray takes an odd-sized array");
+    }
+    Stencil stencil{ label, {}, divisor, dx_power };
+    for (int j = 0; j < N; j++)
+    {
+        for (int i = 0; i < M; i++)
+        {
+            if (arr[i][j] != 0.0f)
+            {
+                Point point{ 0, 0, 0 };
+                point.xyz[dim1] = i - (M - 1) / 2;
+                point.xyz[dim2] = j - (N - 1) / 2;
+                stencil.points.push_back({ point, arr[i][j] });
+            }
         }
     }
     return stencil;
@@ -158,13 +186,13 @@ Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int xyz, 
 std::vector<Stencil> GetKnownStencils()
 {
     //int a[3] = { -1, 0, 1 };
-    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 0, 2, 1);
-    Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 1, 2, 1);
-    Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 2, 1);
+    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
+    Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
+    Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
     // TODO: 1D Laplacian 3-point stencil: [ 1,-2,1 ] / dx
     // TODO: 1D bi-Laplacian 5-point stencil: [ 1,-4,6,-4,1 ] / dx^2
     // TODO: 1D tri-Laplacian
-    // TODO: 2D Laplacian 9-point stencil : [1, 4, 1; 4, -20, 4; 1, 4, 1] / 6dx^2
+    Stencil Laplacian2D = StencilFrom2DArray("laplacian", { {1, 4, 1}, {4, -20, 4}, {1, 4, 1} }, 6, 2, 0, 1);
     // TODO: 2D bi-Laplacian
     // TODO: 2D tri-Laplacian
     // TODO: 3D Laplacian 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26dx^3
@@ -172,5 +200,5 @@ std::vector<Stencil> GetKnownStencils()
         // Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
     // TODO: 3D bi-Laplacian
     // TODO: 3D tri-Laplacian
-    return { XGradient, YGradient, ZGradient};
+    return { XGradient, YGradient, ZGradient, Laplacian2D };
 }

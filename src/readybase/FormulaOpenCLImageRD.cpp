@@ -97,7 +97,7 @@ void AddKeywords_Block411(ostringstream& kernel_source, const KeywordOptions& op
     for (const AppliedStencil& applied_stencil : options.stencils_needed)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetName()
-            << " = (" << options.data_type_string << "4)(";
+            << " = (" << options.data_type_string << "4)(\n" << options.indent << options.indent;
         for (int iSlot = 0; iSlot < 4; iSlot++)
         {
             for (int iStencilPoint = 0; iStencilPoint < applied_stencil.stencil.points.size(); iStencilPoint++)
