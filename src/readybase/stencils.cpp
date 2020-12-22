@@ -211,15 +211,6 @@ Stencil StencilFrom3DArray(const string& label, float const (&arr)[L][M][N], int
     return stencil;
 }
 
-vector<Stencil> GetKnownStencils()
-{
-    //int a[3] = { -1, 0, 1 };
-    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
-    Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
-    Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
-    return { XGradient, YGradient, ZGradient };
-}
-
 Stencil GetLaplacianStencil(int dimensionality)
 {
     switch (dimensionality)
@@ -234,11 +225,39 @@ Stencil GetLaplacianStencil(int dimensionality)
     default:
         throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
+    // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
+    // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
+    // slower code for the more common use-cases.
 }
 
-// TODO: 1D bi-Laplacian 5-point stencil: [ 1,-4,6,-4,1 ] / dx^2
+/*Stencil GetBiLaplacianStencil(int dimensionality)
+{
+    switch (dimensionality)
+    {
+    case 1:
+        return StencilFrom1DArray("bilaplacian", { 1, -4, 6, -4, 1 }, 1, 2, 0);
+    case 2:
+        return StencilFrom2DArray("bilaplacian",
+    case 3:
+        return StencilFrom3DArray("bilaplacian",
+    default:
+        throw exception("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
+    }
+    // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
+    // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
+    // slower code for the more common use-cases.
+}*/
+
 // TODO: 1D tri-Laplacian
-// TODO: 2D bi-Laplacian
 // TODO: 2D tri-Laplacian
-// TODO: 3D bi-Laplacian
 // TODO: 3D tri-Laplacian
+
+vector<Stencil> GetKnownStencils(int dimensionality)
+{
+    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
+    Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
+    Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
+    Stencil Laplacian = GetLaplacianStencil(dimensionality);
+    return { XGradient, YGradient, ZGradient, Laplacian };
+}
+

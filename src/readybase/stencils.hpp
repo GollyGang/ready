@@ -79,5 +79,4 @@ struct AppliedStencil
     static Point CellPointToBlockPoint(const Point& point);
 };
 
-std::vector<Stencil> GetKnownStencils();
-Stencil GetLaplacianStencil(int dimensionality);
+std::vector<Stencil> GetKnownStencils(int dimensionality);

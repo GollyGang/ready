@@ -172,20 +172,11 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     kernel_source << "\n";
     // search the formula for keywords
     KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
-    const vector<Stencil> known_stencils = GetKnownStencils();
-    const Stencil laplacian_stencil = GetLaplacianStencil(this->GetArenaDimensionality());
+    const vector<Stencil> known_stencils = GetKnownStencils(this->GetArenaDimensionality());
     for (int i = 0; i < NC; i++)
     {
         const string chem = GetChemicalName(i);
-        // search for uses of the Laplacian
-        if (UsingKeyword(formula, laplacian_stencil.label + "_" + chem))
-        {
-            AppliedStencil applied_stencil{ laplacian_stencil, chem };
-            options.stencils_needed.push_back(applied_stencil);
-            set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
-            options.inputs_needed.insert(input_points.begin(), input_points.end());
-        }
-        // search for uses of other keywords
+        // search for uses of keywords
         for (const Stencil& stencil : known_stencils)
         {
             if (UsingKeyword(formula, stencil.label + "_" + chem))
