@@ -42,7 +42,7 @@ union Point
 struct StencilPoint
 {
     Point point;
-    float weight;
+    int weight;
 
     std::string GetCode(int iSlot, const std::string& chem) const;
 };
@@ -79,7 +79,6 @@ struct AppliedStencil
 
     std::string GetName() const { return stencil.label + "_" + chem; }
     std::set<InputPoint> GetInputPoints_Block411() const;
-    static Point CellPointToBlockPoint(const Point& point);
 };
 
 std::vector<Stencil> GetKnownStencils(int dimensionality);

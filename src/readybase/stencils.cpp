@@ -83,7 +83,7 @@ std::string StencilPoint::GetCode(int iSlot, const string& chem) const
 {
     ostringstream oss;
     oss << OffsetToCode(iSlot, point, chem);
-    if (weight != 1.0f)
+    if (weight != 1)
     {
         oss << " * " << weight;
     }
@@ -128,7 +128,7 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
 }
 
 template<int N>
-Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int divisor, int dx_power, int dim1)
+Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor, int dx_power, int dim1)
 {
     if (N % 2 != 1)
     {
@@ -137,7 +137,7 @@ Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int divis
     Stencil stencil{ label, {}, divisor, dx_power };
     for (int i = 0; i < N; i++)
     {
-        if (arr[i] != 0.0f)
+        if (arr[i] != 0)
         {
             Point point{ 0, 0, 0 };
             point.xyz[dim1] = i - (N - 1) / 2;
@@ -148,7 +148,7 @@ Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int divis
 }
 
 template<int M, int N>
-Stencil StencilFrom2DArray(const string& label, float const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
+Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
 {
     if (M % 2 != 1 || N % 2 != 1)
     {
@@ -159,7 +159,7 @@ Stencil StencilFrom2DArray(const string& label, float const (&arr)[M][N], int di
     {
         for (int i = 0; i < M; i++)
         {
-            if (arr[i][j] != 0.0f)
+            if (arr[i][j] != 0)
             {
                 Point point{ 0, 0, 0 };
                 point.xyz[dim1] = i - (M - 1) / 2;
@@ -172,7 +172,7 @@ Stencil StencilFrom2DArray(const string& label, float const (&arr)[M][N], int di
 }
 
 template<int L, int M, int N>
-Stencil StencilFrom3DArray(const string& label, float const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
+Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
 {
     if (L % 2 != 1 || M % 2 != 1 || N % 2 != 1)
     {
@@ -185,7 +185,7 @@ Stencil StencilFrom3DArray(const string& label, float const (&arr)[L][M][N], int
         {
             for (int i = 0; i < L; i++)
             {
-                if (arr[i][j][k] != 0.0f)
+                if (arr[i][j][k] != 0)
                 {
                     Point point{ 0, 0, 0 };
                     point.xyz[dim1] = i - (L - 1) / 2;
@@ -231,17 +231,15 @@ Stencil GetBiLaplacianStencil(int dimensionality)
         return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
-        //c3=1, c6=-4, c10=20, divisor=4
-        return StencilFrom3DArray("bilaplacian", {{{0,0,1,0,0},  {0,0,0,0,0},    {1,0,0,0,1},  {0,0,0,0,0},    {0,0,1,0,0}},
-                                                  {{0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0}},
-                                                  {{1,0,0,0,1},  {0,0,0,0,0},    {0,0,20,0,0}, {0,0,0,0,0},    {1,0,0,0,1}},
-                                                  {{0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0},  {0,-4,0,-4,0},  {0,0,0,0,0}},
-                                                  {{0,0,1,0,0},  {0,0,0,0,0},    {1,0,0,0,1},  {0,0,0,0,0},    {0,0,1,0,0}}}, 4, 4, 0, 1, 2);
-        /*return StencilFrom3DArray("bilaplacian", {{{0,0,0,0,0},  {0,0,1,0,0},   {0,1,-1,1,0},   {0,0,1,0,0},   {0,0,0,0,0}},
-                                                  {{0,0,1,0,0},  {0,3,-8,3,0},  {1,-8,4,-8,1},  {0,3,-8,3,0},  {0,0,1,0,0}},
-                                                  {{0,1,-1,1,0}, {1,-8,4,-8,1}, {-1,4,30,4,-1}, {1,-8,4,-8,1}, {0,1,-1,1,0}},
-                                                  {{0,0,1,0,0},  {0,3,-8,3,0},  {1,-8,4,-8,1},  {0,3,-8,3,0},  {0,0,1,0,0}},
-                                                  {{0,0,0,0,0},  {0,0,1,0,0},   {0,1,-1,1,0},   {0,0,1,0,0},   {0,0,0,0,0}}}, 3, 4, 0, 1, 2);*/
+        int c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, divisor;
+        // 52-point stencil:
+        c2 = c3 = c5 = c8 = c9 = 0;
+        c1 = -1; c4 = 10; c6 = -20; c7 = -36; c10 = 360; divisor = 36;
+        return StencilFrom3DArray("bilaplacian", {{{c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1}},
+                                                  {{c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2}},
+                                                  {{c3,c5,c8,c5,c3}, {c5,c7,c9,c7,c5}, {c8,c9,c10,c9,c8}, {c5,c7,c9,c7,c5}, {c3,c5,c8,c5,c3}},
+                                                  {{c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2}},
+                                                  {{c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1}}}, divisor, 4, 0, 1, 2);
     default:
         throw exception("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
     }
