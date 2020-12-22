@@ -142,9 +142,14 @@ std::vector<Stencil> GetKnownStencils()
     // TODO: z_gradient
     // TODO: 1D Laplacian 3-point stencil: [ 1,-2,1 ] / dx
     // TODO: 1D bi-Laplacian 5-point stencil: [ 1,-4,6,-4,1 ] / dx^2
+    // TODO: 1D tri-Laplacian
     // TODO: 2D Laplacian 9-point stencil : [1, 4, 1; 4, -20, 4; 1, 4, 1] / 6dx^2
-    // TODO: 3D 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26dx^3
+    // TODO: 2D bi-Laplacian
+    // TODO: 2D tri-Laplacian
+    // TODO: 3D Laplacian 27-point stencil: [ [ 2,3,2; 3,6,3; 2,3,2 ], [ 3,6,3; 6,-88,6; 3,6,3 ], [ 2,3,2; 3,6,3; 2,3,2 ] ] / 26dx^3
         // Following: O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in
         // Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
+    // TODO: 3D bi-Laplacian
+    // TODO: 3D tri-Laplacian
     return { XGradient };
 }
