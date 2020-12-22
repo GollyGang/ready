@@ -135,11 +135,32 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
     return input_points;
 }
 
+template<int N>
+Stencil StencilFrom1DArray(const string& label, float const (&arr)[N], int xyz, int divisor, int dx_power)
+{
+    if (N % 2 != 1)
+    {
+        throw exception("StencilFrom1DArray takes an odd-sized array");
+    }
+    Stencil stencil{ label, {}, divisor, dx_power };
+    for (int i = 0; i < N; i++)
+    {
+        if (arr[i] != 0.0f)
+        {
+            Point point{ 0, 0, 0 };
+            point.xyz[xyz] = i - (N - 1) / 2;
+            stencil.points.push_back({ point, arr[i] });
+        }
+    }
+    return stencil;
+}
+
 std::vector<Stencil> GetKnownStencils()
 {
-    Stencil XGradient{ "x_gradient", {{{-1, 0, 0}, -1.0f}, {{1, 0, 0}, 1.0f}}, 2, 1 };
-    // TODO: y_gradient
-    // TODO: z_gradient
+    //int a[3] = { -1, 0, 1 };
+    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 0, 2, 1);
+    Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 1, 2, 1);
+    Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 2, 1);
     // TODO: 1D Laplacian 3-point stencil: [ 1,-2,1 ] / dx
     // TODO: 1D bi-Laplacian 5-point stencil: [ 1,-4,6,-4,1 ] / dx^2
     // TODO: 1D tri-Laplacian
@@ -151,5 +172,5 @@ std::vector<Stencil> GetKnownStencils()
         // Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
     // TODO: 3D bi-Laplacian
     // TODO: 3D tri-Laplacian
-    return { XGradient };
+    return { XGradient, YGradient, ZGradient};
 }
