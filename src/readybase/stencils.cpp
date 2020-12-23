@@ -16,6 +16,8 @@
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // Stdlib:
+#include <cmath>
+#include <exception>
 #include <sstream>
 using namespace std;
 
