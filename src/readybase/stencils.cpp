@@ -205,7 +205,7 @@ Stencil GetLaplacianStencil(int dimensionality)
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 1, 0);
+        return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 1, 0); // TODO: dx_power should be 2?
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
         return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1); // Known under the name "Mehrstellen"
@@ -230,7 +230,7 @@ Stencil GetBiLaplacianStencil(int dimensionality)
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 2, 0);
+        return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 2, 0); // TODO: dx_power should be 4?
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
         return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
@@ -253,23 +253,38 @@ Stencil GetBiLaplacianStencil(int dimensionality)
     // slower code for the more common use-cases.
 }
 
-/*Stencil GetTriLaplacianStencil(int dimensionality)
+Stencil GetTriLaplacianStencil(int dimensionality)
 {
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("trilaplacian", 
+        return StencilFrom1DArray("trilaplacian", {1,-6,15,-20,15,-6,1}, 1, 1, 0); // TODO: dx_power should be 6?
     case 2:
-        return StencilFrom2DArray("trilaplacian",
+        // obtained by convolving a 2D Laplacian stencil with a 2D bi-Laplacian stencil - see Scripts/Python/convolve.py
+        return StencilFrom2DArray("trilaplacian", { {0,1,5,6,5,1,0}, {1,6,-33,-56,-33,6,1}, {5,-33,6,314,6,-33,5},
+                                                   {6,-56,314,-888,314,-56,6}, {5,-33,6,314,6,-33,5}, {1,6,-33,-56,-33,6,1},
+                                                   {0,1,5,6,5,1,0} }, 18, 6, 0, 1);
     case 3:
-        return StencilFrom3DArray("trilaplacian",
+        // obtained by convolving a 3D Laplacian stencil with a 3D bi-Laplacian stencil - see Scripts/Python/convolve.py
+        return StencilFrom3DArray("trilaplacian", { {{-1,-3,-1,0,-1,-3,-1},{-3,-4,27,20,27,-4,-3},{-1,27,139,60,139,27,-1},
+               {0,20,60,40,60,20,0},{-1,27,139,60,139,27,-1},{-3,-4,27,20,27,-4,-3},{-1,-3,-1,0,-1,-3,-1}},{{-3,-4,27,20,27,-4,-3},
+            {-4,198,180,-28,180,198,-4},{27,180,-1719,-396,-1719,180,27},{20,-28,-396,-392,-396,-28,20},{27,180,-1719,-396,-1719,180,27},
+            {-4,198,180,-28,180,198,-4},{-3,-4,27,20,27,-4,-3}},{{-1,27,139,60,139,27,-1},{27,180,-1719,-396,-1719,180,27},
+            {139,-1719,1827,4816,1827,-1719,139},{60,-396,4816,2680,4816,-396,60},{139,-1719,1827,4816,1827,-1719,139},
+            {27,180,-1719,-396,-1719,180,27},{-1,27,139,60,139,27,-1}},{{0,20,60,40,60,20,0},{20,-28,-396,-392,-396,-28,20},
+            {60,-396,4816,2680,4816,-396,60},{40,-392,2680,-47536,2680,-392,40},{60,-396,4816,2680,4816,-396,60},{20,-28,-396,-392,-396,-28,20},
+            {0,20,60,40,60,20,0}},{{-1,27,139,60,139,27,-1},{27,180,-1719,-396,-1719,180,27},{139,-1719,1827,4816,1827,-1719,139},
+            {60,-396,4816,2680,4816,-396,60},{139,-1719,1827,4816,1827,-1719,139},{27,180,-1719,-396,-1719,180,27},{-1,27,139,60,139,27,-1}},
+            {{-3,-4,27,20,27,-4,-3},{-4,198,180,-28,180,198,-4},{27,180,-1719,-396,-1719,180,27},{20,-28,-396,-392,-396,-28,20},
+            {27,180,-1719,-396,-1719,180,27},{-4,198,180,-28,180,198,-4},{-3,-4,27,20,27,-4,-3}},{{-1,-3,-1,0,-1,-3,-1},{-3,-4,27,20,27,-4,-3},
+            {-1,27,139,60,139,27,-1},{0,20,60,40,60,20,0},{-1,27,139,60,139,27,-1},{-3,-4,27,20,27,-4,-3},{-1,-3,-1,0,-1,-3,-1}} }, 1080, 6, 0, 1, 2);
     default:
         throw exception("Internal error: unsupported dimensionality in GetTriLaplacianStencil");
     }
     // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
     // slower code for the more common use-cases.
-}*/
+}
 
 vector<Stencil> GetKnownStencils(int dimensionality)
 {
@@ -278,6 +293,7 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Laplacian, BiLaplacian };
+    Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
+    return { XGradient, YGradient, ZGradient, Laplacian, BiLaplacian, TriLaplacian };
 }
 
