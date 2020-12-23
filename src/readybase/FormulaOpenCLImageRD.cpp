@@ -175,13 +175,31 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     // search the formula for keywords
     KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
     const vector<Stencil> known_stencils = GetKnownStencils(this->GetArenaDimensionality());
+    map<string, int> gradient_mag_squared;
     for (int i = 0; i < NC; i++)
     {
         const string chem = GetChemicalName(i);
-        // search for uses of keywords
+        // search for keywords that make use of stencils
+        set<string> dependent_stencils;
+        if (UsingKeyword(formula, "gradient_mag_squared_" + chem))
+        {
+            gradient_mag_squared[chem] = this->GetArenaDimensionality();
+            switch (this->GetArenaDimensionality())
+            {
+            default:
+            case 3:
+                dependent_stencils.insert("z_gradient_" + chem);
+            case 2:
+                dependent_stencils.insert("y_gradient_" + chem);
+            case 1:
+                dependent_stencils.insert("x_gradient_" + chem); // (N.B. no breaks)
+            }
+        }
+        // search for keywords that are stencils
         for (const Stencil& stencil : known_stencils)
         {
-            if (UsingKeyword(formula, stencil.label + "_" + chem))
+            const string keyword = stencil.label + "_" + chem;
+            if (UsingKeyword(formula, keyword) || dependent_stencils.find(keyword) != dependent_stencils.end())
             {
                 AppliedStencil applied_stencil{ stencil, chem };
                 options.stencils_needed.push_back(applied_stencil);
@@ -224,18 +242,34 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     // add x_pos, y_pos, z_pos if being used
     if (UsingKeyword(formula, "x_pos"))
     {
-        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (" << this->data_type_string << "4)("
-            << "(4 * index_x + 0) / (4.0f * X), (4 * index_x + 1) / (4.0f * X), (4 * index_x + 2) / (4.0f * X), (4 * index_x + 3) / (4.0f * X));\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (4 * index_x + (" << this->data_type_string
+            << "4)(0.0" << this->data_type_suffix << ", 1.0" << this->data_type_suffix << ", 2.0" << this->data_type_suffix
+            << ", 3.0" << this->data_type_suffix << ")) / (4.0" << this->data_type_suffix << " * X);\n";
     }
     if (UsingKeyword(formula, "y_pos"))
     {
-        kernel_source << indent << "const " << this->data_type_string << "4 y_pos = (" << this->data_type_string << "4)("
-            << "index_y / (1.0f * Y), index_y / (1.0f * Y), index_y / (1.0f * Y), index_y / (1.0f * Y));\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 y_pos = index_y / (" << this->data_type_string << ")(Y); \n";
     }
     if (UsingKeyword(formula, "z_pos"))
     {
-        kernel_source << indent << "const " << this->data_type_string << "4 z_pos = (" << this->data_type_string << "4)("
-            << "index_z / (1.0f * Z), index_z / (1.0f * Z), index_z / (1.0f * Z), index_z / (1.0f * Z));\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 z_pos = index_z / (" << this->data_type_string << ")(Z);\n";
+    }
+    // add gradient_mag_squared if being used
+    for (const pair<string, int>& pair : gradient_mag_squared)
+    {
+        const string& chem = pair.first;
+        const int dimensionality = pair.second;
+        kernel_source << indent << "const " << data_type_string << "4 gradient_mag_squared_" << chem
+            << " = pow(x_gradient_" << chem << ", 2.0" << this->data_type_suffix << ")";
+        if (dimensionality > 1)
+        {
+            kernel_source << " + pow(y_gradient_" << chem << ", 2.0" << this->data_type_suffix << ")";
+            if (dimensionality > 2)
+            {
+                kernel_source << " + pow(z_gradient_" << chem << ", 2.0" << this->data_type_suffix << ")";
+            }
+        }
+        kernel_source << ";\n";
     }
     kernel_source << "\n";
     // add delta_a, etc.

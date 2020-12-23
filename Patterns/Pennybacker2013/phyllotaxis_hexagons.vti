@@ -13,8 +13,7 @@
       <param name="mu">       0.001    </param>
       <param name="beta">     1.0    </param>
       <formula number_of_chemicals="1">
-        float4 gradient_mag_squared = pow( x_gradient_a, 2.0f ) + pow( y_gradient_a, 2.0f );
-        delta_a = mu * a - bilaplacian_a - 2.0f*laplacian_a - a - beta*(gradient_mag_squared + 2.0f*a*laplacian_a) - a*a*a;
+        delta_a = mu * a - bilaplacian_a - 2.0f*laplacian_a - a - beta*(gradient_mag_squared_a + 2.0f*a*laplacian_a) - a*a*a;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true">
