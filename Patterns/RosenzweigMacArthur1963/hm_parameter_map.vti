@@ -5,7 +5,7 @@
       A parameter map for the Rosenzweig-MacArthur rule.
 
       In this parameter map, h varies from left to right, while m varies from bottom to top.
-      
+
       M. Rosenzweig and R. MacArthur (1963) "Graphical representation and stability conditions of predator-prey interaction", American Naturalist 97: p. 209-223.
     </description>
     <rule name="Rosenzweig-MacArthur" type="formula" wrap="0" neighborhood_type="vertex">
@@ -34,13 +34,11 @@
         5.0
       </param>
       <formula number_of_chemicals="2">
-        float4 hpos = index_x / (float)X; // [0,1]
-        float4 vpos = index_y / (float)Y; // [0,1]
-        float4 h = h1 + (h2-h1)*hpos;
-        float4 m = m1 + (m2-m1)*vpos;
+        float4 h = h1 + (h2-h1)*x_pos;
+        float4 m = m1 + (m2-m1)*y_pos;
         delta_a = D_a * laplacian_a + a * (1.0f - a) - (a / (a + h)) * b;
         delta_b = D_b * laplacian_b + k * (a / (a + h)) * b - m * b;
-        
+
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="false">

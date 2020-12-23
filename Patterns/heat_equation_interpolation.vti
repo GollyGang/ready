@@ -56,6 +56,7 @@
       <color_displacement_mapped_surface value="false" />
       <vertical_scale_2D value="50" />
       <timesteps_per_render value="16" />
+      <contour_level value="0.9" />
     </render_settings>
 
   </RD>

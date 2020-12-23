@@ -3,7 +3,7 @@
   <RD format_version="5">
     <description>
       Andrew Morozov, Shigui Ruan, Bai-Lian Li (2008) "&lt;a href=&quot;http://www2.le.ac.uk/departments/mathematics/extranet/staff-material/staff-profiles/am379/list-of-papers/multispecies-patchy.pdf&quot;&gt;Patterns of patchy spread in multi-species reaction–diffusion models&lt;/a&gt;" Ecological Complexity, Volume 5, Issue 4, Pages 313-328.
-      
+
       Figs. 5-8, with parameter delta varying across the image.
     </description>
     <rule name="Morozov2008" type="formula" wrap="0" neighborhood_type="vertex">
@@ -38,8 +38,7 @@
         0.150000
       </param>
       <formula number_of_chemicals="3">
-        float4 hpos = index_x / (float)X; // [0,1]
-        float4 delta = delta1 + (delta2-delta1)*hpos;
+        float4 delta = delta1 + (delta2-delta1)*x_pos;
         delta_a = laplacian_a + a*(1.0f-a-chi12*b) - a*c/(1.0f+gamma*a);
         delta_b = epsilon1*laplacian_b + r*b*(1.0f-b-chi21*a);
         delta_c = epsilon2*laplacian_c + g*a*c/(1.0f + gamma*a) - delta*c;

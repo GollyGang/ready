@@ -3,7 +3,7 @@
   <RD format_version="5">
     <description>
       Figure 2 from &lt;a href=&quot;http://arxiv.org/pdf/patt-sol/9401002&quot;&gt;Hagberg and Meron (1994)&lt;/a&gt;.
-      
+
       A parameter map of the FitzHugh-Nagumo system, with epsilon varying from left to right and delta from bottom to top.
     </description>
     <rule name="Fitzhugh-Nagumo" type="formula" wrap="0" neighborhood_type="vertex">
@@ -32,10 +32,8 @@
         6.000000
       </param>
       <formula number_of_chemicals="2">
-        float4 hpos = index_x / (float)X; // [0,1]
-        float4 vpos = index_y / (float)Y; // [0,1]
-        float4 epsilon = epsilon_left + (epsilon_right-epsilon_left)*hpos;
-        float4 delta = delta_bottom + (delta_top-delta_bottom)*vpos;
+        float4 epsilon = epsilon_left + (epsilon_right-epsilon_left)*x_pos;
+        float4 delta = delta_bottom + (delta_top-delta_bottom)*y_pos;
         delta_a = a - a*a*a - b + diff*laplacian_a;
         delta_b = epsilon*(a - a1*b - a0) + delta*diff*laplacian_b;
       </formula>
