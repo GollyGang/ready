@@ -21,6 +21,7 @@
 #include "utils.hpp"
 
 // STL:
+#include <algorithm>
 #include <set>
 #include <sstream>
 #include <string>
