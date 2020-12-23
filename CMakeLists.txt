@@ -43,6 +43,10 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
