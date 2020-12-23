@@ -205,7 +205,7 @@ Stencil GetLaplacianStencil(int dimensionality)
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 1, 0); // TODO: dx_power should be 2?
+        return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 2, 0);
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
         return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1); // Known under the name "Mehrstellen"
@@ -230,7 +230,7 @@ Stencil GetBiLaplacianStencil(int dimensionality)
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 2, 0); // TODO: dx_power should be 4?
+        return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 4, 0);
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
         return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
@@ -258,7 +258,7 @@ Stencil GetTriLaplacianStencil(int dimensionality)
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("trilaplacian", {1,-6,15,-20,15,-6,1}, 1, 1, 0); // TODO: dx_power should be 6?
+        return StencilFrom1DArray("trilaplacian", {1,-6,15,-20,15,-6,1}, 1, 6, 0);
     case 2:
         // obtained by convolving a 2D Laplacian stencil with a 2D bi-Laplacian stencil - see Scripts/Python/convolve.py
         return StencilFrom2DArray("trilaplacian", { {0,1,5,6,5,1,0}, {1,6,-33,-56,-33,6,1}, {5,-33,6,314,6,-33,5},
