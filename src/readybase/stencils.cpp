@@ -210,9 +210,12 @@ Stencil GetLaplacianStencil(int dimensionality)
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
         return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1); // Known under the name "Mehrstellen"
     case 3:
-        // O'Reilly and Beck (2006) "A Family of Large-Stencil Discrete Laplacian Approximations in Three Dimensions" Int. J. Num. Meth. Eng. (Equation 22)
-        return StencilFrom3DArray("laplacian", {{{2,3,2}, {3,6,3}, {2,3,2}}, {{3,6,3}, {6,-88,6}, {3,6,3}}, {{2,3,2}, {3,6,3}, {2,3,2}}}, 26, 3, 0, 1, 2);
-        // TODO: compare with Patra2006, esp the dx_power
+        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
+        int c1, c2, c3, c4, divisor;
+        c1 = 1; c2 = 3; c3 = 14; c4 = -128; divisor = 30;
+        return StencilFrom3DArray("laplacian", {{{c1,c2,c1}, {c2,c3,c2}, {c1,c2,c1}},
+                                                {{c2,c3,c2}, {c3,c4,c3}, {c2,c3,c2}},
+                                                {{c1,c2,c1}, {c2,c3,c2}, {c1,c2,c1}}}, divisor, 2, 0, 1, 2);
     default:
         throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
