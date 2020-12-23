@@ -200,6 +200,17 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
     return stencil;
 }
 
+Stencil GetGaussianStencil(int dimensionality)
+{
+    switch (dimensionality)
+    {
+    case 2:
+        return StencilFrom2DArray("gaussian", {{1,4,7,4,1}, {4,16,26,16,4}, {7,26,41,26,7}, {4,16,26,16,4}, {1,4,7,4,1}}, 273, 1, 0, 1);
+    default:
+        throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
+    }
+}
+
 Stencil GetLaplacianStencil(int dimensionality)
 {
     switch (dimensionality)
@@ -294,6 +305,7 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Laplacian, BiLaplacian, TriLaplacian };
+    Stencil Gaussian = GetGaussianStencil(dimensionality);
+    return { XGradient, YGradient, ZGradient, Laplacian, BiLaplacian, TriLaplacian, Gaussian };
 }
 
