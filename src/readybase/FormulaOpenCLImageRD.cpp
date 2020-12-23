@@ -121,8 +121,9 @@ void AddStencils_Block411(ostringstream& kernel_source, const KeywordOptions& op
 
 bool UsingKeyword(const string& formula, const string& keyword)
 {
-    return formula.find(keyword) != string::npos;
-    // TODO: parse properly: ignore comments, whole words only, not in string, etc.
+    vector<string> tokens = tokenize_for_keywords(formula);
+    return find(tokens.begin(), tokens.end(), keyword) != tokens.end();
+    // TODO: parse properly: ignore comments, not in string, etc.
 }
 
 // -------------------------------------------------------------------------

@@ -212,6 +212,7 @@ Stencil GetLaplacianStencil(int dimensionality)
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
         int c1, c2, c3, c4, divisor;
+        // 27-point stencil:
         c1 = 1; c2 = 3; c3 = 14; c4 = -128; divisor = 30;
         return StencilFrom3DArray("laplacian", {{{c1,c2,c1}, {c2,c3,c2}, {c1,c2,c1}},
                                                 {{c2,c3,c2}, {c3,c4,c3}, {c2,c3,c2}},

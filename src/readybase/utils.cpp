@@ -186,3 +186,32 @@ string ReplaceAllSubstrings(string subject, const string& search, const string& 
 }
 
 // ---------------------------------------------------------------------------------------------------------
+
+vector<string> tokenize_for_keywords(const string& formula)
+{
+    // customized tokenize for when searching for keywords in formula rules: want case-sensitive, whole words only
+    vector<string> tokens;
+    string token;
+    for (char c : formula)
+    {
+        if ((c >= 'a' && c <= 'z') || c == '_')
+        {
+            token += c;
+        }
+        else
+        {
+            if (!token.empty())
+            {
+                tokens.push_back(token);
+                token = "";
+            }
+        }
+    }
+    if (!token.empty())
+    {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+// ---------------------------------------------------------------------------------------------------------
