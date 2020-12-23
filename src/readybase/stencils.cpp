@@ -204,8 +204,19 @@ Stencil GetGaussianStencil(int dimensionality)
 {
     switch (dimensionality)
     {
+    case 1:
+        // from OpenCV
+        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 1, 0); // is dx_power correct?
     case 2:
-        return StencilFrom2DArray("gaussian", {{1,4,7,4,1}, {4,16,26,16,4}, {7,26,41,26,7}, {4,16,26,16,4}, {1,4,7,4,1}}, 273, 1, 0, 1);
+        // from https://homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
+        return StencilFrom2DArray("gaussian", {{1,4,7,4,1},{4,16,26,16,4},{7,26,41,26,7},{4,16,26,16,4},{1,4,7,4,1}}, 273, 1, 0, 1); // is dx_power correct?
+    case 3:
+        // see Scripts/Python/convolve.py
+        return StencilFrom3DArray("gaussian", {{{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}},
+                                               {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
+                                               {{7,27,44,27,7},{26,101,164,101,26},{41,159,258,159,41},{26,101,164,101,26},{7,27,44,27,7}},
+                                               {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
+                                               {{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}}}, 4390.0, 1, 0, 1, 2); // is dx_power correct?
     default:
         throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
