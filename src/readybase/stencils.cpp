@@ -135,7 +135,7 @@ Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor
 {
     if (N % 2 != 1)
     {
-        throw exception("Internal error: StencilFrom1DArray takes an odd-sized array");
+        throw runtime_error("Internal error: StencilFrom1DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
     for (int i = 0; i < N; i++)
@@ -155,7 +155,7 @@ Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divi
 {
     if (M % 2 != 1 || N % 2 != 1)
     {
-        throw exception("Internal error: StencilFrom2DArray takes an odd-sized array");
+        throw runtime_error("Internal error: StencilFrom2DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
     for (int j = 0; j < N; j++)
@@ -179,7 +179,7 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
 {
     if (L % 2 != 1 || M % 2 != 1 || N % 2 != 1)
     {
-        throw exception("Internal error: StencilFrom3DArray takes an odd-sized array");
+        throw runtime_error("Internal error: StencilFrom3DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
     for (int k = 0; k < N; k++)
@@ -220,7 +220,7 @@ Stencil GetGaussianStencil(int dimensionality)
                                                {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
                                                {{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}}}, 4390, 1, 0, 1, 2); // is dx_power correct?
     default:
-        throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
+        throw runtime_error("Internal error: unsupported dimensionality in GetGaussianStencil");
     }
 }
 
@@ -231,10 +231,10 @@ Stencil GetLaplacianStencil(int dimensionality)
     case 1:
         return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 2, 0);
     case 2:
-        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
+        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
         return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1); // Known under the name "Mehrstellen"
     case 3:
-        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
+        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
         int c1, c2, c3, c4, divisor;
         // 27-point stencil:
         c1 = 1; c2 = 3; c3 = 14; c4 = -128; divisor = 30;
@@ -242,7 +242,7 @@ Stencil GetLaplacianStencil(int dimensionality)
                                                 {{c2,c3,c2}, {c3,c4,c3}, {c2,c3,c2}},
                                                 {{c1,c2,c1}, {c2,c3,c2}, {c1,c2,c1}}}, divisor, 2, 0, 1, 2);
     default:
-        throw exception("Internal error: unsupported dimensionality in GetLaplacianStencil");
+        throw runtime_error("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
     // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
@@ -256,10 +256,10 @@ Stencil GetBiLaplacianStencil(int dimensionality)
     case 1:
         return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 4, 0);
     case 2:
-        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
+        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
         return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
     case 3:
-        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22. 
+        // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
         int c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, divisor;
         // 52-point stencil:
         c2 = c3 = c5 = c8 = c9 = 0;
@@ -270,7 +270,7 @@ Stencil GetBiLaplacianStencil(int dimensionality)
                                                   {{c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2}},
                                                   {{c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1}}}, divisor, 4, 0, 1, 2);
     default:
-        throw exception("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
+        throw runtime_error("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
     }
     // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
@@ -303,7 +303,7 @@ Stencil GetTriLaplacianStencil(int dimensionality)
             {27,180,-1719,-396,-1719,180,27},{-4,198,180,-28,180,198,-4},{-3,-4,27,20,27,-4,-3}},{{-1,-3,-1,0,-1,-3,-1},{-3,-4,27,20,27,-4,-3},
             {-1,27,139,60,139,27,-1},{0,20,60,40,60,20,0},{-1,27,139,60,139,27,-1},{-3,-4,27,20,27,-4,-3},{-1,-3,-1,0,-1,-3,-1}} }, 1080, 6, 0, 1, 2);
     default:
-        throw exception("Internal error: unsupported dimensionality in GetTriLaplacianStencil");
+        throw runtime_error("Internal error: unsupported dimensionality in GetTriLaplacianStencil");
     }
     // We could use the 3D stencil for all dimensionalities, with the advantage that if the user converts a 1D or 2D formula to a full kernel
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
