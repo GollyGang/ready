@@ -34,7 +34,8 @@ print('\n3D tri-Laplacian stencil:')
 print(format3dforcplusplus(trilap3d), '/ 1080h^6')
 
 # obtain Gaussian stencils by gaussian filtering a single pixel
-# get reasonable results but differs from well-known results
+# get reasonable results but differs from well-known results, perhaps
+# because is point-sampling rather than taking an integral over each pixel?
 '''
 input = np.zeros(5)
 input[2]=1
@@ -80,4 +81,3 @@ gauss3d = np.round(gauss3d / gauss3d[0][0][0])
 divisor = gauss3d.sum()
 print('\n3D Gaussian stencil:')
 print(format3dforcplusplus(gauss3d), '/', divisor)
-

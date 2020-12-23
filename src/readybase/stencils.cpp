@@ -313,10 +313,10 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
+    Stencil Gaussian = GetGaussianStencil(dimensionality);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
-    Stencil Gaussian = GetGaussianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Laplacian, BiLaplacian, TriLaplacian, Gaussian };
+    return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian };
 }
 
