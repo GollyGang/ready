@@ -8,7 +8,7 @@
     </description>
     <rule name="Fitzhugh-Nagumo" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
-        0.010000
+        0.06
       </param>
       <param name="a0">
         -0.100000
@@ -74,7 +74,7 @@
       <show_displacement_mapped_surface value="false"/>
       <color_displacement_mapped_surface value="true"/>
       <use_image_interpolation value="true"/>
-      <timesteps_per_render value="1024"/>
+      <timesteps_per_render value="128"/>
       <show_phase_plot value="false"/>
       <phase_plot_x_axis value="a"/>
       <phase_plot_y_axis value="b"/>

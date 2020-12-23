@@ -15,7 +15,7 @@
     </description>
     <rule name="Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
-        0.200000
+        0.8
       </param>
       <param name="diff1">
         0.200000
