@@ -13,8 +13,9 @@
 <font size=+1><b>Changes in version ??? (released ???)</b></font>
 <ul>
 <li>Formulas now support more stencils: <b>bilaplacian_a</b>, <b>trilaplacian_a</b>, <b>gaussian_a</b>,
-<b>x_gradient_a</b>, <b>y_gradient_a</b>, <b>z_gradient_a</b>, <b>gradient_mag_squared_a</b> (and similarly for the other chemicals). Several patterns
-have been converted from kernel rules to formula rules because of this.
+<b>sobel_ne_a</b>, <b>x_gradient_a</b>, <b>y_gradient_a</b>, <b>z_gradient_a</b>, <b>gradient_mag_squared_a</b>
+(and similarly for the other chemicals). Several patterns have been converted from kernel rules to formula rules
+as a result.
 <li>Formulas now support <b>x_pos</b>, <b>y_pos</b> and <b>z_pos</b>, giving the cell location in each direction, in
 the range [0,1]. This allows a neater and more accurate way of implementing parameter maps.
 <li>Parameter <b>dx</b> is now reserved for controlling the grid spacing of the Gaussian, Laplacian, bi-Laplacian and tri-Laplacian
