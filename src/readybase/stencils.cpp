@@ -108,8 +108,8 @@ string InputPoint::GetName() const
 string Stencil::GetDivisorCode() const
 {
     ostringstream oss;
-    oss << divisor << " * dx";
-    for (int i = 0; i < dx_power - 1; i++)
+    oss << divisor;
+    for (int i = 0; i < dx_power; i++)
     {
         oss << " * dx";
     }
