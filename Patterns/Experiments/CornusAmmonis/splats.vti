@@ -2,7 +2,7 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="4">
     <description>
-      A 2-chemical system with 25-point gaussian and laplacian terms.
+      A 2-chemical system that combines Gaussian, Laplacian and bi-Laplacian kernels.
     </description>
     <rule name="Splats" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
