@@ -1,0 +1,40 @@
+<html>
+<title>Writing new rules</title>
+<body>
+
+<p>
+<h3>Writing new rules</h3>
+<p>
+As a first step, try changing the parameters of some of the rules. This can give very different behavior. Read <a href="http://mrob.com/pub/comp/xmorphia/">Robert Munafo's pages</a> about Gray-Scott, for example, and try out some of the parameters he discusses on <a href="open:Patterns/Gray-Scott/self-replicating_spots.vti">Gray-Scott/self-replicating_spots.vti</a>.
+<p>
+<h4>Formulas and kernel rules</h4>
+<p>
+Ready also allows you to reprogram rules completely. For formula and kernel rules, hit 'edit' next to the formula/kernel and then see what effect your change has. Some changes will cause an error when you try to run or step forward, and will show you a message box saying what went wrong.
+<p>
+Keywords for formula rules:
+<table border="1" cellpadding="5">
+<tr><td>laplacian_a</td><td>A <a href="https://en.wikipedia.org/wiki/Laplace_operator">Laplacian kernel</a> applied to chemical 'a' (or 'b', etc.).</td></tr>
+<tr><td>bilaplacian_a</td><td>A <a href="https://en.wikipedia.org/wiki/Biharmonic_equation">bi-Laplacian kernel</a> applied to chemical 'a' (or 'b', etc.). Equivalent to applying the Laplacian kernel twice.</td></tr>
+<tr><td>trilaplacian_a</td><td>A tri-Laplacian kernel applied to chemical 'a' (or 'b', etc.). Equivalent to applying the Laplacian kernel three times.</td></tr>
+<tr><td>gaussian_a</td><td>A <a href="https://en.wikipedia.org/wiki/Gaussian_filter">Gaussian kernel</a> applied to chemical 'a' (or 'b', etc.).</td></tr>
+<tr><td>sobel_ne_a</td><td>A <a href="https://en.wikipedia.org/wiki/Sobel_operator">Sobel filter</a> applied to chemical 'a' (or 'b', etc.) pointing in the north-east direction.</td></tr>
+<tr><td>x_gradient_a</td><td>The <a href="https://en.wikipedia.org/wiki/Image_gradient">gradient</a> of chemical 'a' (or 'b', etc.) in the x-direction.</td></tr>
+<tr><td>y_gradient_a</td><td>The gradient of chemical 'a' (or 'b', etc.) in the y-direction.</td></tr>
+<tr><td>z_gradient_a</td><td>The gradient of chemical 'a' (or 'b', etc.) in the z-direction.</td></tr>
+<tr><td>gradient_mag_squared_a</td><td>The squared magnitude of the gradient of chemical 'a' (or 'b', etc.). For a 2D pattern this is equal to x_gradient_a^2 + y_gradient_a^2.</td></tr>
+<tr><td>x_pos</td><td>The location of the cell in the x-direction, in the range 0 to 1.</td></tr>
+<tr><td>y_pos</td><td>The location of the cell in the y-direction, in the range 0 to 1.</td></tr>
+<tr><td>z_pos</td><td>The location of the cell in the z-direction, in the range 0 to 1.</td></tr>
+</table>
+<p>
+To understand how the formula is used, try View > <a href="action.html#Action_ViewFullKernel">View Full Kernel</a> to see the OpenCL kernel code that is assembled. Any formula rule can be converted to a kernel rule by using Action > <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a>.
+<p>
+<h4>Initial pattern generator</h4>
+<p>
+For more details on how the patterns are specified, including how the initial pattern generator works, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/Gray-Scott/self-replicating_spots.vti">example</a>). The format is documented <a href="formats.html">here</a>.
+<p>
+<h4>Share your findings</h4>
+<p>
+If you come up with interesting patterns then please share them with the world! The best patterns submitted to us will be included in the next release of Ready - see our <a href="credits.html#competition">pattern competition</a>.
+</body>
+</html>

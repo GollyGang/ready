@@ -273,6 +273,7 @@ set( HELP_FILES
   Help/edit.html              Help/formats.html
   Help/index.html             Help/problems.html
   Help/view.html              Help/introduction.html
+  Help/writing_new_rules.html
 )
 
 set( OTHER_FILES
