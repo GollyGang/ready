@@ -154,6 +154,9 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnUpdateViewPane(wxUpdateUIEvent& event);
         void OnRestoreDefaultPerspective(wxCommandEvent& event);
         void OnChangeActiveChemical(wxCommandEvent& event);
+        void OnViewFullKernel(wxCommandEvent& event);
+        void OnUpdateViewFullKernel(wxUpdateUIEvent& event);
+        void OnOpenCLDiagnostics(wxCommandEvent& event);
 
         // Action menu
         void OnStep(wxCommandEvent& event);
@@ -171,12 +174,9 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnUpdateAddParameter(wxUpdateUIEvent& event);
         void OnDeleteParameter(wxCommandEvent& event);
         void OnUpdateDeleteParameter(wxUpdateUIEvent& event);
-        void OnViewFullKernel(wxCommandEvent& event);
-        void OnUpdateViewFullKernel(wxUpdateUIEvent& event);
         void OnConvertToFullKernel(wxCommandEvent& event);
         void OnUpdateConvertToFullKernel(wxUpdateUIEvent& event);
         void OnSelectOpenCLDevice(wxCommandEvent& event);
-        void OnOpenCLDiagnostics(wxCommandEvent& event);
 
         // Help menu
         void OnAbout(wxCommandEvent& event);
