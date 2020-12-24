@@ -15,13 +15,16 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// Local:
+#include "stencils.hpp"
+
 // Stdlib:
 #include <cmath>
 #include <exception>
 #include <sstream>
 using namespace std;
 
-#include "stencils.hpp"
+// ---------------------------------------------------------------------
 
 string Point::GetName() const
 {
@@ -53,6 +56,8 @@ string Point::GetName() const
     return oss.str();
 }
 
+// ---------------------------------------------------------------------
+
 int CellSlotToBlock(int x)
 {
     if (x > 0)
@@ -61,6 +66,8 @@ int CellSlotToBlock(int x)
     }
     return -int(ceil(-x / 4.0));
 }
+
+// ---------------------------------------------------------------------
 
 int CellSlotToSlot(int x)
 {
@@ -71,6 +78,8 @@ int CellSlotToSlot(int x)
     return x % 4;
 }
 
+// ---------------------------------------------------------------------
+
 string OffsetToCode(int iSlot, const Point& point, const string& chem)
 {
     ostringstream oss;
@@ -80,6 +89,8 @@ string OffsetToCode(int iSlot, const Point& point, const string& chem)
     oss << sourceBlock.GetName() << "." << "xyzw"[iSourceSlot];
     return oss.str();
 }
+
+// ---------------------------------------------------------------------
 
 std::string StencilPoint::GetCode(int iSlot, const string& chem) const
 {
@@ -93,6 +104,8 @@ std::string StencilPoint::GetCode(int iSlot, const string& chem) const
     // TODO: collect all the stencil points with the same weight and use a single multiply on them
 }
 
+// ---------------------------------------------------------------------
+
 string InputPoint::GetName() const
 {
     ostringstream oss;
@@ -105,6 +118,8 @@ string InputPoint::GetName() const
     return oss.str();
 }
 
+// ---------------------------------------------------------------------
+
 string Stencil::GetDivisorCode() const
 {
     ostringstream oss;
@@ -115,6 +130,8 @@ string Stencil::GetDivisorCode() const
     }
     return oss.str();
 }
+
+// ---------------------------------------------------------------------
 
 set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
 {
@@ -129,6 +146,8 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
     }
     return input_points;
 }
+
+// ---------------------------------------------------------------------
 
 template<int N>
 Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor, int dx_power, int dim1)
@@ -149,6 +168,8 @@ Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor
     }
     return stencil;
 }
+
+// ---------------------------------------------------------------------
 
 template<int M, int N>
 Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
@@ -173,6 +194,8 @@ Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divi
     }
     return stencil;
 }
+
+// ---------------------------------------------------------------------
 
 template<int L, int M, int N>
 Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
@@ -202,6 +225,8 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
     return stencil;
 }
 
+// ---------------------------------------------------------------------
+
 Stencil GetGaussianStencil(int dimensionality)
 {
     switch (dimensionality)
@@ -223,6 +248,8 @@ Stencil GetGaussianStencil(int dimensionality)
         throw runtime_error("Internal error: unsupported dimensionality in GetGaussianStencil");
     }
 }
+
+// ---------------------------------------------------------------------
 
 Stencil GetLaplacianStencil(int dimensionality)
 {
@@ -248,6 +275,8 @@ Stencil GetLaplacianStencil(int dimensionality)
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
     // slower code for the more common use-cases.
 }
+
+// ---------------------------------------------------------------------
 
 Stencil GetBiLaplacianStencil(int dimensionality)
 {
@@ -276,6 +305,8 @@ Stencil GetBiLaplacianStencil(int dimensionality)
     // the stencil will continue to work if they then increase the dimensionality to 3. But it comes at a cost of more complicated and presumably
     // slower code for the more common use-cases.
 }
+
+// ---------------------------------------------------------------------
 
 Stencil GetTriLaplacianStencil(int dimensionality)
 {
@@ -310,6 +341,8 @@ Stencil GetTriLaplacianStencil(int dimensionality)
     // slower code for the more common use-cases.
 }
 
+// ---------------------------------------------------------------------
+
 vector<Stencil> GetKnownStencils(int dimensionality)
 {
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
@@ -323,3 +356,4 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, SobelNE };
 }
 
+// ---------------------------------------------------------------------

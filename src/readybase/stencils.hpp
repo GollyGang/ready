@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+// ---------------------------------------------------------------------
+
 union Point
 {
     struct { int x, y, z; };
@@ -39,6 +41,8 @@ union Point
     }
 };
 
+// ---------------------------------------------------------------------
+
 struct StencilPoint
 {
     Point point;
@@ -46,6 +50,8 @@ struct StencilPoint
 
     std::string GetCode(int iSlot, const std::string& chem) const;
 };
+
+// ---------------------------------------------------------------------
 
 struct Stencil
 {
@@ -56,6 +62,8 @@ struct Stencil
 
     std::string GetDivisorCode() const;
 };
+
+// ---------------------------------------------------------------------
 
 struct InputPoint
 {
@@ -72,6 +80,8 @@ struct InputPoint
     }
 };
 
+// ---------------------------------------------------------------------
+
 struct AppliedStencil
 {
     Stencil stencil;
@@ -81,4 +91,8 @@ struct AppliedStencil
     std::set<InputPoint> GetInputPoints_Block411() const;
 };
 
+// ---------------------------------------------------------------------
+
 std::vector<Stencil> GetKnownStencils(int dimensionality);
+
+// ---------------------------------------------------------------------
