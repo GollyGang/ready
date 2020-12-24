@@ -66,11 +66,11 @@ Now open <a href="open:Patterns/Turing1952/spots.vti">Turing1952/spots.vti</a>. 
 &nbsp;&nbsp;&nbsp;&nbsp;delta_b = max( -b, k * (a * b - b - 12.0f) + D_b * laplacian_b );
 </tt>
 <p>
-Here <tt>k</tt>, <tt>D_a</tt> and <tt>D_b</tt> are <i>parameters</i>, and can be edited in the Info Pane to give different behavior. 
+Here <tt>k</tt>, <tt>D_a</tt> and <tt>D_b</tt> are <i>parameters</i>, and can be edited in the Info Pane to give different behavior.
 <p>
 Set the system running. After a while, spots appear.
 <p>
-To see the same system in one dimension, scroll down in the Info Pane to "Dimensions" and edit to set it to 64 x 1 x 1. The line graph shows chemical a in a brighter color. Soon a pattern of peaks and troughs appears, in the same way as the 2D system. In 3D (try 32 x 32 x 32) we get blobs appearing. 
+To see the same system in one dimension, scroll down in the Info Pane to "Dimensions" and edit to set it to 64 x 1 x 1. The line graph shows chemical a in a brighter color. Soon a pattern of peaks and troughs appears, in the same way as the 2D system. In 3D (try 32 x 32 x 32) we get blobs appearing.
 <p>
 Turing suggested that this behavior of forming a regular pattern of spots is the sort of thing that might be used in nature by plants and animals wanting to direct their own growth (morphogenesis) or for the patterns on the skins of leopards, for example. While plausible, no evidence of this was found. I think it is fair to say that for many years the theory was poorly regarded amongst biologists, especially after <a href="http://en.wikipedia.org/wiki/Hedgehog_signaling_pathway">a different mechanism</a> was found to drive certain well-known examples of morphogenesis. It was only in 2006 that the <a href="http://phylogenous.wordpress.com/2010/12/01/alan-turings-reaction-diffusion-model-simplification-of-the-complex/">first evidence</a> for Turing's reaction-diffusion in biology was found, in the even placement of hair follicles on the skin of mice. Other systems have <a href="http://www.nature.com/ng/journal/vaop/ncurrent/full/ng.1090.html">since</a> been found.
 <p>
@@ -78,7 +78,7 @@ Also look at <a href="open:Patterns/Turing1952/spots_noisy.vti">Turing1952/spots
 <p>
 <h4>After Turing</h4>
 <p>
-After the concept of reaction-diffusion was identified, many other systems have been discovered that fit into the general scheme and show interesting phenomena. A partial list is shown below. 
+After the concept of reaction-diffusion was identified, many other systems have been discovered that fit into the general scheme and show interesting phenomena. A partial list is shown below.
 <p>
 <ul>
 <li><a href="http://en.wikipedia.org/wiki/Ginzburg%E2%80%93Landau_theory">Ginzburg-Landau theory</a> (1950) describes superconductivity. Our pattern <a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti">complex_Ginzburg-Landau.vti</a> shows a reaction-diffusion setting of a form of their equation.
@@ -94,7 +94,7 @@ As a first step, try changing the parameters of some of the rules. This can give
 <p>
 Ready also allows you to reprogram rules completely. For formula and kernel rules, hit 'edit' next to the formula/kernel and then see what effect your change has. Some changes will cause an error when you try to run or step forward but this just shows you a message box saying what went wrong.
 <p>
-To understand how the formula is used, try Action > <a href="action.html#Action_ViewFullKernel">View Full Kernel</a> to see the OpenCL kernel code that is assembled. This code is assembled from the parameters of the rule, such as the number of chemicals and the neighborhood type. Any formula rule can be converted to a kernel rule by using Action > <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a>. 
+To understand how the formula is used, try View > <a href="action.html#Action_ViewFullKernel">View Full Kernel</a> to see the OpenCL kernel code that is assembled. This code is assembled from the parameters of the rule, such as the number of chemicals and the neighborhood type. Any formula rule can be converted to a kernel rule by using Action > <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a>.
 <p>
 For more details, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/Gray-Scott/self-replicating_spots.vti">example</a>). The format is documented <a href="formats.html">here</a>, specifically the <a href="formats.html#formula">formula</a> and <a href="formats.html#kernel">kernel</a> sections.
 <p>
