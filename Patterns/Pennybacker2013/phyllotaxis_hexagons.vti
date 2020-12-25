@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
 
     <description>
       Phyllotaxis is the arrangement of leaves, seeds and petals on the surface of a plant. This is a model

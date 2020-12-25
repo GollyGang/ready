@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       &lt;a href=&quot;http://en.wikipedia.org/wiki/Alan_Turing&quot;&gt;Alan Turing&lt;/a&gt; published a paper in 1952 called
       &lt;a href=&quot;http://en.wikipedia.org/wiki/The_chemical_basis_of_morphogenesis&quot;&gt;The Chemical Basis of Morphogenesis&lt;/a&gt;.

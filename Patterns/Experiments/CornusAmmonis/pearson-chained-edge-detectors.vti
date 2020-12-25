@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
     <description>
       Chained edge-detector feedback applied to Pearson (1993). Parameter r_s controls edge-detector isotropy. Parameters ds1, ds2, ds3 control scaling of each edge detector layer in the feedback function. If initial conditions result in a stable system, try resetting the initial conditions to see &quot;worm&quot; patterns.
 

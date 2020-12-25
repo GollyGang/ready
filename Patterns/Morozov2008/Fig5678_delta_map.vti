@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       Andrew Morozov, Shigui Ruan, Bai-Lian Li (2008) "&lt;a href=&quot;http://www2.le.ac.uk/departments/mathematics/extranet/staff-material/staff-profiles/am379/list-of-papers/multispecies-patchy.pdf&quot;&gt;Patterns of patchy spread in multi-species reaction–diffusion models&lt;/a&gt;" Ecological Complexity, Volume 5, Issue 4, Pages 313-328.
 

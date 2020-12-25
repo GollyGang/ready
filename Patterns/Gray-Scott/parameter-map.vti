@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
+  <RD format_version="6">
     <description>
         A map of the parameters of the Gray-Scott system. Here 'k' increases from left to
         right and 'F' increases from bottom to top. For more detail, see:

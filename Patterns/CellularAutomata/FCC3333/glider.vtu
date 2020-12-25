@@ -26,7 +26,6 @@
             int num_neighbors = 0;
             for(int i = 0; i &lt; max_neighbors; i++)
             {
-
                 num_neighbors += (neighbor_weights[offset+i] &gt; 0.0f &amp;&amp; a_in[neighbor_indices[offset+i]] &gt; 0.5f ) ? 1 : 0;
             }
             a_out[index_x] = (num_neighbors == 3) ? 1.0f : 0.0f;

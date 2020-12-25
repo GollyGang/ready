@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="3">
+  <RD format_version="6">
 
     <description>
       John E. Pearson (1993) &quot;&lt;a href=&quot;http://jaguar.biologie.hu-berlin.de/~wolfram/pages/seminar_theoretische_biologie_2007/literatur/schaber/Pearson1993Science261.pdf&quot;&gt;Complex Patterns in a Simple System&lt;/a&gt;&quot; Science 261(5118):189-192.

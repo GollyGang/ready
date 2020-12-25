@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
 
     <description>
         The &lt;a href=&quot;http://en.wikipedia.org/wiki/Biharmonic_equation&quot;&gt;biharmonic equation&lt;/a&gt; says that the biharmonic (or bilaplacian) operator gives a value of zero everywhere. We approach this by

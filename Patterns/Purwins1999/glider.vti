@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
 
-  <RD format_version="3">
+  <RD format_version="6">
 
     <description>
       C. P. Schenk, A. W. Liehr, M. Bode, and H.-G. Purwins

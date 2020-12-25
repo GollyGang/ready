@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
     <description>
       A 2-chemical system that combines Gaussian, Laplacian and bi-Laplacian kernels.
     </description>

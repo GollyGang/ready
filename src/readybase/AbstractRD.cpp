@@ -186,6 +186,8 @@ void AbstractRD::SetFilename(const string& s)
 
 void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
 {
+    const int ready_format_version = 6;
+
     string str;
     const char *s;
     float f;
@@ -194,7 +196,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
     // check whether we should warn the user that they need to update Ready
     {
         read_required_attribute(rd,"format_version",i);
-        warn_to_update = (i>5);
+        warn_to_update = (i > ready_format_version);
         // (we will still proceed and try to read the file but it might fail or give poor results)
     }
 

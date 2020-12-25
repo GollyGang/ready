@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       Figure 2 from &lt;a href=&quot;http://arxiv.org/pdf/patt-sol/9401002&quot;&gt;Hagberg and Meron (1994)&lt;/a&gt;.
 
