@@ -24,11 +24,11 @@ then usually some of the parameters must be altered. Some examples:
     <ul>
     <li>With
     <a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a> there is an explicit
-    parameter for scale, dx, which is used in the computation of laplacian_a. If you double the size of the
-    pattern (to 512x512x1), you can set dx to half (0.004883) to get the same size of stripes as the
+    parameter for scale, <tt>dx</tt>, which is used in the computation of <tt>laplacian_a</tt> and <tt>laplacian_b</tt>. If you double the size of the
+    pattern (to 512x512x1), you can set <tt>dx</tt> to half (0.004883) to get the same size of stripes as the
     original. For numerical stability at the new size, change timestep to 0.3.
-    <li>There is no dx parameter in <a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a> but you can add one using <a href="action.html#Action_AddParameter">Add Parameter...</a> on the Action menu. Set it to 0.8 to make the glider bigger. Going
-    larger still will need you to increase the pattern dimensions and to reduce the timestep.
+    <li>There is no <tt>dx</tt> parameter in <a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a> but you can add one using <a href="action.html#Action_AddParameter">Add Parameter...</a> on the Action menu. Set it to 0.8 to make the glider bigger. Going larger still will need you to increase the pattern dimensions and to reduce the timestep. This combination works: 256x128, dx=0.5, timestep=0.5.
+    <li>The initial pattern generator (that draws the rectangles in that example) works relative to the size of the image, so changing the ratio of height to width affects how it works. Notice that you need to keep the dimensions in approximately the same ratio for the glider to work.
     </ul>
 <li>To make a video, use the command on the File menu: <a href="file.html#File_StartRecording">Start
 Recording...</a> to produce a sequence of images. Then use your favorite utility to make a video
