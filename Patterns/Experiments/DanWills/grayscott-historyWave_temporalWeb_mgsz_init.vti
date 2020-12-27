@@ -12,7 +12,7 @@
 	  This 'temporalweb' setup produces a dynamic connected web of 'b' reagent values that grows via thick budding lumps. The dynamics become more orderly (with a transient tendency towards curve/spiral-section arrangements) over time.
 	  
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

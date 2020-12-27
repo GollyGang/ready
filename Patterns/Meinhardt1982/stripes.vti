@@ -12,7 +12,7 @@
       Based on Greg Turk's implementation: &lt;a href=&quot;http://www.cc.gatech.edu/~turk/reaction_diffusion/reaction_diffusion.html&quot;&gt;link&lt;/a&gt;
     </description>
     
-    <rule name="Meinhardt" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Meinhardt" type="formula" wrap="0" neighborhood_type="vertex">
     
       <param name="timestep">    0.2       </param>
       <param name="k_ab">        0.04      </param>

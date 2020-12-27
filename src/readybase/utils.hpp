@@ -23,6 +23,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <map>
+#include <vector>
 
 // VTK:
 #include <vtkCommand.h>
@@ -87,6 +88,7 @@ class XML_Object
 void InterpolateInHSV(const float r1,const float g1,const float b1,const float r2,const float g2,const float b2,const float u,float& r,float& g,float& b);
 
 std::string ReplaceAllSubstrings(std::string subject, const std::string& search, const std::string& replace);
+std::vector<std::string> tokenize_for_keywords(const std::string& formula);
 
 class ThrowOnErrorObserver : public vtkCommand
 {

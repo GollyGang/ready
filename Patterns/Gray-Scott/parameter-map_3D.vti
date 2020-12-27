@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       A map of the parameters of the Gray-Scott system.
 
@@ -13,9 +13,9 @@
       The parameters diff1, diff2, k1, k2, F1 and F2 define the current range of the map. Change them to explore.
 
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
-        0.200000
+        0.8
       </param>
       <param name="diff1">
         0.200000
@@ -36,12 +36,9 @@
         0.087000
       </param>
       <formula number_of_chemicals="2">
-        float4 xpos = index_x / (float)X; // [0,1]
-        float4 ypos = index_y / (float)Y; // [0,1]
-        float4 zpos = index_z / (float)Z; // [0,1]
-        float4 k = k1 + (k2-k1)*xpos;
-        float4 F = F1 + (F2-F1)*ypos;
-        float4 diff = diff1 + (diff2-diff1)*zpos;
+        float4 k = k1 + (k2-k1)*x_pos;
+        float4 F = F1 + (F2-F1)*y_pos;
+        float4 diff = diff1 + (diff2-diff1)*z_pos;
         delta_a = 2.0f * diff * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = diff * laplacian_b + a*b*b - (F+k)*b;
       </formula>

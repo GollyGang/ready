@@ -8,7 +8,7 @@
         but applied to the central location not at the current timestep but at the one before, which is stored in
         channel b.
     </description>
-    <rule name="Advection" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Advection" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
 float centeredGradient( float a, float b, float c, float dx ) {
     return ( c - a ) / ( 2.0 * dx );

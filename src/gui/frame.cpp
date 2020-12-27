@@ -193,6 +193,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::PaintToolbar, MyFrame::OnUpdateViewPane)
     EVT_MENU(ID::RestoreDefaultPerspective, MyFrame::OnRestoreDefaultPerspective)
     EVT_MENU(ID::ChangeActiveChemical, MyFrame::OnChangeActiveChemical)
+    EVT_MENU(ID::ViewFullKernel, MyFrame::OnViewFullKernel)
+    EVT_UPDATE_UI(ID::ViewFullKernel, MyFrame::OnUpdateViewFullKernel)
+    EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // action menu
     EVT_MENU(ID::Step1, MyFrame::OnStep)
     EVT_MENU(ID::StepN, MyFrame::OnStep)
@@ -211,12 +214,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_UPDATE_UI(ID::AddParameter, MyFrame::OnUpdateAddParameter)
     EVT_MENU(ID::DeleteParameter,MyFrame::OnDeleteParameter)
     EVT_UPDATE_UI(ID::DeleteParameter, MyFrame::OnUpdateDeleteParameter)
-    EVT_MENU(ID::ViewFullKernel,MyFrame::OnViewFullKernel)
-    EVT_UPDATE_UI(ID::ViewFullKernel, MyFrame::OnUpdateViewFullKernel)
     EVT_MENU(ID::ConvertToFullKernel,MyFrame::OnConvertToFullKernel)
     EVT_UPDATE_UI(ID::ConvertToFullKernel, MyFrame::OnUpdateConvertToFullKernel)
     EVT_MENU(ID::SelectOpenCLDevice, MyFrame::OnSelectOpenCLDevice)
-    EVT_MENU(ID::OpenCLDiagnostics, MyFrame::OnOpenCLDiagnostics)
     // help menu
     EVT_MENU(wxID_HELP, MyFrame::OnHelp)
     EVT_MENU(ID::HelpQuick, MyFrame::OnHelp)
@@ -414,6 +414,9 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::RestoreDefaultPerspective, _("&Restore Default Layout") + GetAccelerator(DO_RESTORE), _("Put the windows and toolbars back where they were"));
         menu->AppendSeparator();
         menu->Append(ID::ChangeActiveChemical, _("&Change Active Chemical...") + GetAccelerator(DO_CHEMICAL), _("Change which chemical is being visualized"));
+        menu->AppendSeparator();
+        menu->Append(ID::ViewFullKernel, _("View Full Kernel") + GetAccelerator(DO_VIEWKERNEL), _("Shows the full OpenCL kernel as expanded from the formula"));
+        menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu, _("&View"));
     }
     {   // action menu:
@@ -433,11 +436,9 @@ void MyFrame::InitializeMenus()
         menu->Append(ID::AddParameter, _("&Add Parameter...") + GetAccelerator(DO_ADDPARAM),_("Add a new named parameter"));
         menu->Append(ID::DeleteParameter, _("&Delete Parameter...") + GetAccelerator(DO_DELPARAM),_("Delete one of the parameters"));
         menu->AppendSeparator();
-        menu->Append(ID::ViewFullKernel, _("View Full Kernel") + GetAccelerator(DO_VIEWKERNEL),_("Shows the full OpenCL kernel as expanded from the formula"));
         menu->Append(ID::ConvertToFullKernel, _("Convert to Full Kernel") + GetAccelerator(DO_CONVERTTOKERNEL),_("Converts the formula to a full kernel rule"));
         menu->AppendSeparator();
         menu->Append(ID::SelectOpenCLDevice, _("Select &OpenCL Device...") + GetAccelerator(DO_DEVICE), _("Choose which OpenCL device to run on"));
-        menu->Append(ID::OpenCLDiagnostics, _("Show Open&CL Diagnostics...") + GetAccelerator(DO_OPENCL), _("Show the available OpenCL devices and their attributes"));
         menuBar->Append(menu, _("&Action"));
     }
     {   // help menu:

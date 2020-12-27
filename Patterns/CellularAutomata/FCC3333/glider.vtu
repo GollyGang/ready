@@ -17,7 +17,7 @@
       &lt;/tt&gt;
 
     </description>
-    <rule name="FCC3333" type="kernel" neighborhood_type="face" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="FCC3333" type="kernel" neighborhood_type="face">
       <kernel number_of_chemicals="1">
         __kernel void rd_compute(__global float *a_in,__global float *a_out,__global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)
         {
@@ -26,7 +26,6 @@
             int num_neighbors = 0;
             for(int i = 0; i &lt; max_neighbors; i++)
             {
-
                 num_neighbors += (neighbor_weights[offset+i] &gt; 0.0f &amp;&amp; a_in[neighbor_indices[offset+i]] &gt; 0.5f ) ? 1 : 0;
             }
             a_out[index_x] = (num_neighbors == 3) ? 1.0f : 0.0f;

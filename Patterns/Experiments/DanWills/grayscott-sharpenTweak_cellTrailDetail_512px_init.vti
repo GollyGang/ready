@@ -11,7 +11,7 @@
       This setup is quite touchy about whether it will start properly based on some detail about the initial conditions - at least with the present initial state generator (which could probably be improved). This means that it might need to be retried/restarted a few times with differently regenerated initial states (different seeds) to get it going. It should be obvious when it is working though (wavefronts).
       
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

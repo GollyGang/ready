@@ -11,7 +11,7 @@ Guo Y, Sun M, Garfinkel A, Zhao X (2014) Mechanisms of Side Branching and Tip Sp
 
 Implemented by Cornus Ammonis.
     </description>
-    <rule name="Guo" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Guo" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.020000
       </param>

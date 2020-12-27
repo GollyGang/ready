@@ -14,7 +14,7 @@ Implemented by Dan Wills based on earlier work from the Ready codebase.
 
 This 'bubbleDynasties' setup forms expanding regions of either high-b (with low-b ripple-fronts inside), or expanding circular zero-b areas. The two 'phases' can sometimes fight-it-out for a long time.
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

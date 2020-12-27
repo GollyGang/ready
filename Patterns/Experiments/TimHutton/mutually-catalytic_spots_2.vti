@@ -19,7 +19,7 @@
       Channel g is just for visualisation.
       
     </description>
-    <rule name="coupled Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="coupled Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.060000
       </param>

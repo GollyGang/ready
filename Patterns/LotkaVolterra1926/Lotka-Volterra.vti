@@ -9,7 +9,7 @@
 
       After around 3000 timesteps the system settles down to make chaotic oscillating waves.
     </description>
-    <rule name="Lotka-Volterra" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Lotka-Volterra" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.050000
       </param>

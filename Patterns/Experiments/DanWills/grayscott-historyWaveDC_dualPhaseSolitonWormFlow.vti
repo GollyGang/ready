@@ -13,7 +13,7 @@
 
         There are very rare initial states that end up with the system stuck in the 'elevated' state, and it may stay that way for some time. So, if it looks flowing fingerprints and no dots for ages, you might need to generate a new initial state.
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

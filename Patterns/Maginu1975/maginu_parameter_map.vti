@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       A parameter map for the Maginu rule. The parameter alpha varies from left to right. The parameter gamma varies from bottom to top.
 
       Kenjiro Maginu (1975) &quot;&lt;a href=&quot;https://doi.org/10.1016/0025-5564(75)90026-7&quot;&gt;Reaction-diffusion equation describing morphogenesis I. Waveform stability of stationary wave solutions in a one dimensional model&lt;/a&gt;&quot;
       Mathematical Biosciences Volume 27, Issues 1–2, Pages 17-98.
     </description>
-    <rule name="Maginu" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Maginu" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.1
       </param>
@@ -33,10 +33,8 @@
         3.0
       </param>
       <formula number_of_chemicals="2">
-        float4 hpos = index_x / (float)X; // [0,1]
-        float4 vpos = index_y / (float)Y; // [0,1]
-        float4 alpha = alpha1 + (alpha2-alpha1)*hpos;
-        float4 gamma = gamma1 + (gamma2-gamma1)*vpos;
+        float4 alpha = alpha1 + (alpha2-alpha1)*x_pos;
+        float4 gamma = gamma1 + (gamma2-gamma1)*y_pos;
         delta_a = D_a * laplacian_a + alpha * (a - a*a*a) - b;
         delta_b = D_b * laplacian_b + epsilon * (a - gamma * b);
       </formula>

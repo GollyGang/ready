@@ -10,7 +10,7 @@
       to change the range of the parameters, or to use different ones.
       
     </description>
-    <rule name="SmoothLifeL" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="SmoothLifeL" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
         // ---------------------------------------------
         // SmoothLifeL (smooth time stepping 2D)

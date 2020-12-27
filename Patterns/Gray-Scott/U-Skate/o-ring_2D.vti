@@ -9,7 +9,7 @@
         &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/uskate-world.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/uskate-world.html&lt;/a&gt;
     </description>
     
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
     
       <param name="timestep">    1       </param>
       <param name="D_a">         0.164   </param>

@@ -1,75 +1,21 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       Ocean waves from the simplest of ideas:
 
-        da/dt = k1 * laplacian_a + k2 * sobel_a
+        da/dt = k1 * laplacian(a) + k2 * sobel_ne(a)
 
-      where sobel_a is the result of a &lt;a href=&quot;https://en.wikipedia.org/wiki/Sobel_operator&quot;&gt;Sobel filter convolution&lt;/a&gt;.
+      where sobel_ne is a &lt;a href=&quot;https://en.wikipedia.org/wiki/Sobel_operator&quot;&gt;Sobel filter convolution&lt;/a&gt;
+      pointing towards the north-east.
     </description>
-    <rule name="sobel waves" type="kernel" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
-      <kernel number_of_chemicals="1" block_size_x="4" block_size_y="1" block_size_z="1">
-        __kernel void rd_compute(__global float4 *a_in,__global float4 *a_out)
-        {
-            const int index_x = get_global_id(0);
-            const int index_y = get_global_id(1);
-            const int index_z = get_global_id(2);
-            const int X = get_global_size(0);
-            const int Y = get_global_size(1);
-            const int Z = get_global_size(2);
-
-            // collect the nearby cells we will need
-            const int xm1 = (index_x-1+X) &amp; (X-1); // wrap (assumes X is a power of 2)
-            const int xp1 = (index_x+1) &amp; (X-1);
-            const int ym1 = (index_y-1+Y) &amp; (Y-1);
-            const int yp1 = (index_y+1) &amp; (Y-1);
-            const int index_here = X*(Y*index_z + index_y) + index_x;
-            const int index_n =  X*(Y*index_z + ym1) + index_x;
-            const int index_ne = X*(Y*index_z + ym1) + xp1;
-            const int index_e =  X*(Y*index_z + index_y) + xp1;
-            const int index_se = X*(Y*index_z + yp1) + xp1;
-            const int index_s =  X*(Y*index_z + yp1) + index_x;
-            const int index_sw = X*(Y*index_z + yp1) + xm1;
-            const int index_w =  X*(Y*index_z + index_y) + xm1;
-            const int index_nw = X*(Y*index_z + ym1) + xm1;
-            float4 a = a_in[index_here];
-            float4 a_n = a_in[index_n];
-            float4 a_ne = a_in[index_ne];
-            float4 a_e = a_in[index_e];
-            float4 a_se = a_in[index_se];
-            float4 a_s = a_in[index_s];
-            float4 a_sw = a_in[index_sw];
-            float4 a_w = a_in[index_w];
-            float4 a_nw = a_in[index_nw];
-
-            // compute the Laplacian
-            // 2D standard 9-point stencil: [ 1,4,1; 4,-20,4; 1,4,1 ] / 6
-            const float4 _K0 = -20.0f/6.0f; // center weight
-            const float _K1 = 4.0f/6.0f; // edge-neighbors
-            const float _K2 = 1.0f/6.0f; // vertex-neighbors
-            float4 laplacian_a = (float4)(a_n.x*_K1 + a_n.y*_K2 + a.y*_K1 + a_s.y*_K2 + a_s.x*_K1 + a_sw.w*_K2 + a_w.w*_K1 + a_nw.w*_K2,
-            a_n.y*_K1 + a_n.z*_K2 + a.z*_K1 + a_s.z*_K2 + a_s.y*_K1 + a_s.x*_K2 + a.x*_K1 + a_n.x*_K2,
-            a_n.z*_K1 + a_n.w*_K2 + a.w*_K1 + a_s.w*_K2 + a_s.z*_K1 + a_s.y*_K2 + a.y*_K1 + a_n.y*_K2,
-            a_n.w*_K1 + a_ne.x*_K2 + a_e.x*_K1 + a_se.x*_K2 + a_s.w*_K1 + a_s.z*_K2 + a.z*_K1 + a_n.z*_K2 ) + a*_K0;
-
-            // Sobel filter to the NE: [ 2,1,0; 1,0,-1; 0,-1,-2 ]
-            // (N.B. North is down in Ready. Sorry about that.)
-            float4 sobel_a = (float4)(
-                2*a_nw.w + a_n.x + a_w.w - a.y   - a_s.x - 2*a_s.y,
-                2*a_n.x  + a_n.y + a.x   - a.z   - a_s.y - 2*a_s.z,
-                2*a_n.y  + a_n.z + a.y   - a.w   - a_s.z - 2*a_s.w,
-                2*a_n.z  + a_n.w + a.z   - a_e.x - a_s.w - 2*a_se.x);
-
-            float4 timestep = 0.1f;
-            float4 k1 = 0.1f;
-            float4 k2 = 0.18f;
-
-            float4 delta_a = k1 * laplacian_a + k2 * sobel_a;
-
-            a_out[index_here] = a + timestep * delta_a;
-        }
-      </kernel>
+    <rule name="sobel waves" type="formula">
+      <param name="timestep"> 0.1     </param>
+      <param name="k1">       0.1     </param>
+      <param name="k2">       0.18    </param>
+      <formula number_of_chemicals="1">
+        delta_a = k1 * laplacian_a + k2 * sobel_ne_a;
+      </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="true">
       <overlay chemical="a">

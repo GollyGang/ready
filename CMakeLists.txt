@@ -43,6 +43,10 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 #-------------------------------------------source files----------------------------------------------
 
 set( BASE_SOURCES      # low-level code used in all executables
@@ -63,6 +67,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/overlays.hpp                  src/readybase/overlays.cpp
   src/readybase/Properties.hpp                src/readybase/Properties.cpp
   src/readybase/utils.hpp                     src/readybase/utils.cpp
+  src/readybase/stencils.hpp                  src/readybase/stencils.cpp
   src/readybase/OpenCL_Dyn_Load.h             src/readybase/OpenCL_Dyn_Load.c
   src/readybase/MeshGenerators.hpp            src/readybase/MeshGenerators.cpp
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp
@@ -268,6 +273,7 @@ set( HELP_FILES
   Help/edit.html              Help/formats.html
   Help/index.html             Help/problems.html
   Help/view.html              Help/introduction.html
+  Help/writing_new_rules.html
 )
 
 set( OTHER_FILES

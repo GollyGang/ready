@@ -10,7 +10,7 @@
 	  
 	  The 'frothier' in the name of this pattern file refers to the interesting sharp wavefronts that can be seen in the 'd' reagent (and probably 'e' too if the values were to be correctly remapped).
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

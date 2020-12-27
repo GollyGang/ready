@@ -160,8 +160,6 @@ class AbstractRD
         void SetUndoPoint();  ///< Set an undo point, e.g on mouse up. All actions between undo points are grouped into one block.
 
         std::string GetNeighborhoodType() const;
-        int GetNeighborhoodRange() const;
-        std::string GetNeighborhoodWeight() const;
 
         /// Retrieve the data type used for storing values (VTK_FLOAT or VTK_DOUBLE)
         int GetDataType() const;
@@ -179,18 +177,6 @@ class AbstractRD
 
         enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
         // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
-
-        enum TWeight { EQUAL, EUCLIDEAN_DISTANCE, BOUNDARY_SIZE, RANGE, VERTEX_NEIGHBORS_RANGE, 
-            EDGE_NEIGHBORS_RANGE, FACE_NEIGHBORS_RANGE, LAPLACIAN };
-        // (not intending to support all of these options immediately, but here for thought)
-        // EQUAL: all weights are 1
-        // EUCLIDEAN_DISTANCE: weights are scaled by the distance to each cell centroid
-        // BOUNDARY_SIZE: weights are scaled by the length/area of the shared geometry between two neighbors
-        // RANGE: weight is minimum TNeighborhood steps to get from central cell
-        // VERTEX_NEIGHBORS_RANGE: weight is minimum vertex-neighbors steps to get from central cell
-        // EDGE_NEIGHBORS_RANGE: weight is minimum edge-neighbors steps to get from central cell
-        // FACE_NEIGHBORS_RANGE: weight is minimum face-neighbors steps to get from central cell
-        // LAPLACIAN: weights are as needed for the best Laplacian approximation for the neighborhood (e.g. nine-point stencil)
 
     protected: // variables
 
@@ -226,18 +212,13 @@ class AbstractRD
         std::vector<PaintAction> undo_stack;
 
         TNeighborhood neighborhood_type;
-        int neighborhood_range;
-        TWeight neighborhood_weight_type;
 
         std::map<TNeighborhood,std::string> canonical_neighborhood_type_identifiers;
         std::map<std::string,TNeighborhood> recognized_neighborhood_type_identifiers;
 
-        std::map<TWeight,std::string> canonical_neighborhood_weight_identifiers;
-        std::map<std::string,TWeight> recognized_neighborhood_weight_identifiers;
-
         double xgap,ygap;           /// spatial separation for rendering multiple chemicals
 
-        protected: // functions
+    protected: // functions
 
         /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;

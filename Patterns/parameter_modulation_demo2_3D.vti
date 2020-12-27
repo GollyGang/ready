@@ -5,7 +5,7 @@
       Using an extra chemical (c) to modulate the parameters of a Gray-Scott system.
       
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         1.0
       </param>

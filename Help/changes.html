@@ -12,6 +12,15 @@
 <p>
 <font size=+1><b>Changes in version ??? (released ???)</b></font>
 <ul>
+<li>Formulas now support more stencils: <b>bilaplacian_a</b>, <b>trilaplacian_a</b>, <b>gaussian_a</b>,
+<b>sobel_ne_a</b>, <b>x_gradient_a</b>, <b>y_gradient_a</b>, <b>z_gradient_a</b>, <b>gradient_mag_squared_a</b>
+(and similarly for the other chemicals). Several patterns have been converted from kernel rules to formula rules
+as a result.
+<li>Formulas now support <b>x_pos</b>, <b>y_pos</b> and <b>z_pos</b>, giving the cell location in each direction, in
+the range [0,1]. This allows a neater and more accurate way of implementing parameter maps.
+<li>Parameter <b>dx</b> is now reserved for controlling the grid spacing of the Gaussian, Laplacian, bi-Laplacian and tri-Laplacian
+stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * delta_x) and can just write laplacian_a since the value of dx is used in the stencil computation.
+<li>Moved View Full Kernel... and Show OpenCL Diagnostics... to the View menu.
 <li>Mac app requires macOS 10.10 or later.
 <li>More smaller brush sizes.
 <li>New patterns:
@@ -115,9 +124,9 @@
     <a href="open:Patterns/Experiments/CornusAmmonis/surfing-solitons.vti">"surfing" solitons,</a> and
     <a href="open:Patterns/Experiments/CornusAmmonis/tip-splitting-web.vti">tip-splitting web</a>.
     <li>And more amazing rules by Cornus Ammonis: <a href="open:Patterns/Experiments/CornusAmmonis/bz-warpsharp.vti">bz-warpsharp.vti</a> applying the warp-sharp algorithm to the Belousov-Zhabotinsky system, <a href="open:Patterns/Experiments/CornusAmmonis/smoke.vti">smoke.vti</a>, <a href="open:Patterns/Experiments/CornusAmmonis/smoke-ising.vti">smoke-ising.vti</a>, and <a href="open:Patterns/Experiments/CornusAmmonis/splats.vti">splats.vti</a>.
-    <li><a href="open:Patterns/advection.vti">advection.vti</a>: the advection equation, plus some different 
+    <li><a href="open:Patterns/advection.vti">advection.vti</a>: the advection equation, plus some different
     methods of integrating it, for comparison:
-    <a href="open:Patterns/NumericalMethods/advection_forwardEuler.vti">forward Euler</a>, 
+    <a href="open:Patterns/NumericalMethods/advection_forwardEuler.vti">forward Euler</a>,
     <a href="open:Patterns/NumericalMethods/advection_2stepAdamsBashforth.vti">two-step Adams-Bashforth</a>,
     <a href="open:Patterns/NumericalMethods/advection_3stepAdamsBashforth.vti">three-step Adams-Bashforth</a>,
     <a href="open:Patterns/NumericalMethods/advection_modifiedEuler.vti">modified Euler</a>,
@@ -131,7 +140,7 @@
     showing a single-chemical model of phyllotaxis in plants. Also <a href="open:Patterns/Pennybacker2013/spots.vti">Pennybacker2013/spots.vti</a>, <a href="open:Patterns/Pennybacker2013/stripes.vti">Pennybacker2013/stripes.vti</a> and
     <a href="open:Patterns/Pennybacker2013/parameter_map.vti">Pennybacker2013/parameter_map.vti</a>, showing a simpler model without the gradient term.
     <li><a href="open:Patterns/bilaplacian_interpolation.vti">bilaplacian_interpolation.vti</a>, showing the effect of the bilaplacian term instead of the more common laplacian.
-    <li><a href="open:Patterns/Agmon2014/oil-water.vti">Agmon2014/oil-water.vti</a>, where two mutually-repelling fluids undergo phase separation, and 
+    <li><a href="open:Patterns/Agmon2014/oil-water.vti">Agmon2014/oil-water.vti</a>, where two mutually-repelling fluids undergo phase separation, and
     <a href="open:Patterns/Agmon2014/cells.vti">Agmon2014/cells.vti</a> showing cell-like structures with a membrane.
     <li><a href="open:Patterns/Guo2014/guo.vti">Guo2014/guo.vti</a> - a model of branching phenomena in lung morphogenesis.
     <li><a href="open:Patterns/SmoothLife2011/gaussian-smoothlife.vti">gaussian-smoothlife.vti</a> - a variant of Stephan Rafler's SmoothLife system with neighborhoods computed with 2-pass 1D gaussian convolution.
@@ -154,22 +163,22 @@
     <li><a href="open:Patterns/CellularAutomata/Salt/salt2D_demo.vti">salt2D_demo.vti</a>, Miller and Fredkin's Salt CA, running in 2D.
     <li><a href="open:Patterns/CellularAutomata/Salt/salt3D_circular330.vti">salt3D_circular330.vti</a>, Miller and Fredkin's Salt CA, showing circular movement.
     <li><a href="open:Patterns/Brusselator.vti">Brusselator.vti</a>, a model of the famous chemical reaction named Belousov-Zhabotinsky.
-    <li><a href="open:Patterns/Yang2002/Yang_1.vti">Yang_1.vti</a>, <a href="open:Patterns/Yang2002/Yang_2b.vti">Yang_2b.vti</a>, 
-        <a href="open:Patterns/Yang2002/Yang_2c.vti">Yang_2c.vti</a>, <a href="open:Patterns/Yang2002/Yang_2d.vti">Yang_2d.vti</a>, 
-        <a href="open:Patterns/Yang2002/Yang_3a.vti">Yang_3a.vti</a>, <a href="open:Patterns/Yang2002/Yang_3b.vti">Yang_3b.vti</a>, 
-        <a href="open:Patterns/Yang2002/Yang_3c.vti">Yang_3c.vti</a>, <a href="open:Patterns/Yang2002/Yang_3d.vti">Yang_3d.vti</a>, 
+    <li><a href="open:Patterns/Yang2002/Yang_1.vti">Yang_1.vti</a>, <a href="open:Patterns/Yang2002/Yang_2b.vti">Yang_2b.vti</a>,
+        <a href="open:Patterns/Yang2002/Yang_2c.vti">Yang_2c.vti</a>, <a href="open:Patterns/Yang2002/Yang_2d.vti">Yang_2d.vti</a>,
+        <a href="open:Patterns/Yang2002/Yang_3a.vti">Yang_3a.vti</a>, <a href="open:Patterns/Yang2002/Yang_3b.vti">Yang_3b.vti</a>,
+        <a href="open:Patterns/Yang2002/Yang_3c.vti">Yang_3c.vti</a>, <a href="open:Patterns/Yang2002/Yang_3d.vti">Yang_3d.vti</a>,
         <a href="open:Patterns/Yang2002/Yang_4.vti">Yang_4.vti</a>: from a 2002 paper by Lingfa Yang et al.
-    <li><a href="open:Patterns/McCabe2010/McCabe.vti">McCabe.vti</a>, <a href="open:Patterns/McCabe2010/McCabe_simple.vti">McCabe_simple.vti</a>, 
+    <li><a href="open:Patterns/McCabe2010/McCabe.vti">McCabe.vti</a>, <a href="open:Patterns/McCabe2010/McCabe_simple.vti">McCabe_simple.vti</a>,
         <a href="open:Patterns/McCabe2010/McCabe_additive2a.vti">McCabe_additive2a.vti</a>, <a href="open:Patterns/McCabe2010/McCabe_additive2b.vti">McCabe_additive2b.vti</a>:
         Jonathan McCabe's "McCabeism"s, showing detail at multiple spatial scales.
-    <li><a href="open:Patterns/Yang2003/Fig2.vti">Yang2003/Fig2.vti</a>, <a href="open:Patterns/Yang2003/Fig3a.vti">Yang2003/Fig3a.vti</a>, 
-        <a href="open:Patterns/Yang2003/Fig3b.vti">Yang2003/Fig3b.vti</a>, <a href="open:Patterns/Yang2003/Fig3c.vti">Yang2003/Fig3c.vti</a>, 
+    <li><a href="open:Patterns/Yang2003/Fig2.vti">Yang2003/Fig2.vti</a>, <a href="open:Patterns/Yang2003/Fig3a.vti">Yang2003/Fig3a.vti</a>,
+        <a href="open:Patterns/Yang2003/Fig3b.vti">Yang2003/Fig3b.vti</a>, <a href="open:Patterns/Yang2003/Fig3c.vti">Yang2003/Fig3c.vti</a>,
         from a 2003 paper by Lingfa Yang et al.
     <li><a href="open:Patterns/Kytta2007/Fig5.7a.vti">Kytta2007/Fig5.7a.vti</a>, <a href="open:Patterns/Kytta2007/Fig5.7c.vti">Kytta2007/Fig5.7c.vti</a>,
         <a href="open:Patterns/Kytta2007/Fig5.8c.vti">Kytta2007/Fig5.8c.vti</a>, <a href="open:Patterns/Kytta2007/Fig5.8d.vti">Kytta2007/Fig5.8d.vti</a>,
         <a href="open:Patterns/Kytta2007/Fig5.8e.vti">Kytta2007/Fig5.8e.vti</a>, <a href="open:Patterns/Kytta2007/Fig5.8f.vti">Kytta2007/Fig5.8f.vti</a>,
         <a href="open:Patterns/Kytta2007/Fig5.8g.vti">Kytta2007/Fig5.8g.vti</a>, from Klaus Kyttä's 2007 MSc thesis.
-    <li><a href="open:Patterns/Yang2006/jumping.vti">Yang2006/jumping.vti</a>, <a href="open:Patterns/Yang2006/jumping_cGL.vti">jumping_cGL.vti</a>, 
+    <li><a href="open:Patterns/Yang2006/jumping.vti">Yang2006/jumping.vti</a>, <a href="open:Patterns/Yang2006/jumping_cGL.vti">jumping_cGL.vti</a>,
         showing 1D "jumping oscillons" from a 2006 paper by Lingfa Yang et al.
     <li><a href="open:Patterns/Meinhardt1982/zebra.vtu">Meinhardt1982/zebra.vtu</a> (replaces horse.vtu), showing stripes on a zebra mesh.
     <li>Schrödinger equation demos: <a href="open:Patterns/Schrodinger1926/packet.vti">packet.vti</a>, <a href="open:Patterns/Schrodinger1926/packet_pass.vti">packet_pass.vti</a>,
@@ -205,22 +214,22 @@
   <li>face-centred cubic honeycomb (rhombic dodecahedra)
   <li>diamond honeycomb (triakis truncated tetrahedra)
   </ul>
-<li>New patterns: 
+<li>New patterns:
   <ul>
     <li><a href="open:Patterns/CellularAutomata/Buss_hex.vtu">Buss_hex.vtu</a>, Frank Buss' hexagonal CA.
     <li><a href="open:Patterns/CellularAutomata/tri_life.vtu">tri_life.vtu</a>, B45/S34 on a triangular grid.
-    <li><a href="open:Patterns/CellularAutomata/PenroseTilings/Imai_glider_B2SC4.vtu">Imai_glider_B2SC4.vtu</a>, a 
+    <li><a href="open:Patterns/CellularAutomata/PenroseTilings/Imai_glider_B2SC4.vtu">Imai_glider_B2SC4.vtu</a>, a
     naturally-occuring glider on a Penrose tiling.
-  <li><a href="open:Patterns/CellularAutomata/PenroseTilings/Goucher_loops.vtu">Goucher_loops.vtu</a>, showing 
+  <li><a href="open:Patterns/CellularAutomata/PenroseTilings/Goucher_loops.vtu">Goucher_loops.vtu</a>, showing
     how Adam Goucher's Penrose glider behaves on the darts-and-kites tiling.
     <li><a href="open:Patterns/CellularAutomata/hex_B2oS2m34_gliders.vtu">hex_B2oS2m34_gliders.vtu</a>, Paul Callahan's
     Life-like rule on a hexagonal lattice.
-    <li><a href="open:Patterns/oregonator.vti">oregonator.vti</a>, the Oregonator, a model for the 
+    <li><a href="open:Patterns/oregonator.vti">oregonator.vti</a>, the Oregonator, a model for the
     famous Belousov-Zhabotinsky reaction.
-    <li><a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti">complex_Ginzburg-Landau_magnitude.vti</a>, 
-    by showing the magnitude of the complex number we get a quite different view to the 
+    <li><a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti">complex_Ginzburg-Landau_magnitude.vti</a>,
+    by showing the magnitude of the complex number we get a quite different view to the
     <a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti">original</a>.
-    <li><a href="open:Patterns/CellularAutomata/larger-than-life.vti">larger-than-life.vti</a>, a CA rule that uses a 
+    <li><a href="open:Patterns/CellularAutomata/larger-than-life.vti">larger-than-life.vti</a>, a CA rule that uses a
     larger neighborhood.
     <li><a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a>, following
     Pearson's 1993 Science paper.
@@ -229,25 +238,25 @@
     in Larger-than-Life.
     <li><a href="open:Patterns/SmoothLife2011/smoothlifeL.vti">SmoothLife2011/smoothlifeL.vti</a>, a SmoothLife
     rule that supports an amazing variety of life-like phenomena.
-    <li><a href="open:Patterns/SmoothLife2011/glider_3D.vti">SmoothLife2011/glider_3D.vti</a>, a 3D glider in a 
+    <li><a href="open:Patterns/SmoothLife2011/glider_3D.vti">SmoothLife2011/glider_3D.vti</a>, a 3D glider in a
     SmoothLife rule.
     <li><a href="open:Patterns/Purwins1999/glider.vti">Purwins1999/glider.vti</a> and <a href="open:Patterns/Purwins1999/glider_3D.vti">glider_3D.vti</a>: self-avoiding gliders in 2D and 3D.
-    <li><a href="open:Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti">Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti</a>, 
+    <li><a href="open:Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti">Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti</a>,
     showing two newly discovered 3D gliders in the U-Skate World.
-    <li><a href="open:Patterns/Gray-Scott/U-Skate/o-ring_2D.vti">Gray-Scott/U-Skate/o-ring_2D.vti</a>, 
+    <li><a href="open:Patterns/Gray-Scott/U-Skate/o-ring_2D.vti">Gray-Scott/U-Skate/o-ring_2D.vti</a>,
     showing another glider in the U-Skate World.
   </ul>
 <li>New Laplacian stencils for faster or more accurate time steps: 2D 9-point, 3D 19-point, 3D 27-point.
-<li>New File menu command: <a href="file.html#File_SaveCompact">Save Compact...</a> for easy sharing 
+<li>New File menu command: <a href="file.html#File_SaveCompact">Save Compact...</a> for easy sharing
     of files.
-<li>New Action menu command: <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a> 
+<li>New Action menu command: <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a>
     for converting formula rules to kernel rules (to get more flexibility).
 <li>3D images now show cell colors when <tt>use_image_interpolation=false</tt>, as with 3D meshes.
 <li><a href="file.html#File_StartRecording">File > Start Recording...</a> can now save out all the chemicals.
 <li>Bug fix: Full Screen wouldn't hide paint toolbar.
 <li>Bug fix: Pencil tool wouldn't work in some meshes on some platforms.
 </ul>
-    
+
 <p>
 <font size=+1><b>Changes in version 0.4 (released August 2012)</b></font>
 
@@ -255,10 +264,10 @@
 <ul>
 <li>New paint tools: pencil, brush, color picker. Paint on images and meshes, even while the system
     is running.
-<li>Undo/redo mechanism for paint actions. 
-<li>New patterns: 
+<li>Undo/redo mechanism for paint actions.
+<li>New patterns:
   <ul>
-  <li><a href="open:Patterns/CellularAutomata/PenroseTilings/Goucher_glider.vtu">Goucher_glider.vtu</a>, showing a 
+  <li><a href="open:Patterns/CellularAutomata/PenroseTilings/Goucher_glider.vtu">Goucher_glider.vtu</a>, showing a
       newly discovered glider on an aperiodic tiling.
   <li><a href="open:Patterns/CellularAutomata/PenroseTilings/life_oscillators.vtu">life_oscillators.vtu</a>, showing
       some oscillators from the paper by Nick Owens and Susan Stepney.
@@ -266,7 +275,7 @@
 <li>Bug fix: Color bar colors were garbled on some platforms.
 <li>Bug fix: Some lines in the 1D view appeared black on some graphics drivers.
 <li>Bug fix: Conflicting preferences file from previous versions would cause blank window. As an
-    interim fix in 0.3, use View > Restore Default Layout. 
+    interim fix in 0.3, use View > Restore Default Layout.
 <li>Bug fix: Control-clicking could cause problems in Mac app.
 <li>Bug fix: Mac users can command-click to roll the current image.
 </ul>
@@ -276,46 +285,46 @@
 
 <p>
 <ul>
-<li> Reaction-diffusion can now be run on the surface of meshes, or in a volume of tetrahedral cells. 
+<li> Reaction-diffusion can now be run on the surface of meshes, or in a volume of tetrahedral cells.
 Load the *.vtu files to see examples.
 <li> New menu commands:
   <ul>
-  <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current 
+  <li><a href="file.html#File_ReloadFromDisk">File > Reload from Disk</a> : reloads the current
   pattern file from the saved version on disk.
-  <li><a href="file.html#File_ImportMesh">File > Import Mesh</a> : imports mesh files (*.obj, *.vtp, 
+  <li><a href="file.html#File_ImportMesh">File > Import Mesh</a> : imports mesh files (*.obj, *.vtp,
   *.vtu) as surfaces to run RD on.
-  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> : exports a mesh file (*.obj, *.vtp) 
+  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> : exports a mesh file (*.obj, *.vtp)
   from the current contoured surface or displacement-mapped surface.
-  <li><a href="file.html#File_ExportImage">File > Export Image</a> : exports an image file (*.png, *.jpg) 
+  <li><a href="file.html#File_ExportImage">File > Export Image</a> : exports an image file (*.png, *.jpg)
   from the current slice or 2D system.
-  <li><a href="file.html#File_StartRecording">File > Start Recording...</a> : saves an image every 
+  <li><a href="file.html#File_StartRecording">File > Start Recording...</a> : saves an image every
   frame, for making videos.
   <li><a href="file.html#File_StopRecording">File > Stop Recording</a> : stops saving images.
   <li><a href="action.html#Action_Blank">Action > Blank</a> : sets all the chemicals to zero.
-  <li><a href="action.html#Action_ViewFullKernel">Action > View Full Kernel</a> : shows the full OpenCL
+  <li><a href="view.html#View_ViewFullKernel">Action > View Full Kernel</a> : shows the full OpenCL
   kernel that gets created from a formula rule.
   </ul>
 <li><a href="file.html#File_NewPattern">File > New Pattern</a> now offers to create a new image (1D, 2D
-or 3D) or mesh dataset (geodesic sphere, torus, tetrahedral mesh, triangular tiling, hexagonal tiling, 
+or 3D) or mesh dataset (geodesic sphere, torus, tetrahedral mesh, triangular tiling, hexagonal tiling,
 rhombille tiling or Penrose tiling).
-<li> New patterns: 
+<li> New patterns:
   <ul>
-  <li><a href="open:Patterns/bunny.vtu">bunny.vtu</a>, <a href="open:Patterns/lion.vtu">lion.vtu</a>, showing RD systems running on the surface of polygonal 
+  <li><a href="open:Patterns/bunny.vtu">bunny.vtu</a>, <a href="open:Patterns/lion.vtu">lion.vtu</a>, showing RD systems running on the surface of polygonal
   meshes.
   <li><a href="open:Patterns/CellularAutomata/Bays_3D.vti">Bays_3D.vti</a>, implements a 3D cellular automaton.
   <li><a href="open:Patterns/FitzHugh-Nagumo/Ising_regime.vti">Ising_regime.vti</a>, showing how tiny
   variation can grow into large meanders in the FitzHugh-Nagumo system.
   <li><a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a>,
   Robert Munafo's glider after which the U-Skate world is named.
-  <li><a href="open:Patterns/Gray-Scott/parameter-map.vti">Gray-Scott/parameter-map.vti</a>, showing 
+  <li><a href="open:Patterns/Gray-Scott/parameter-map.vti">Gray-Scott/parameter-map.vti</a>, showing
   how the parameters affect the Gray-Scott system.
-  <li><a href="open:Patterns/Turing1952/spots_noisy.vti">Turing1952/spots_noisy.vti</a>, showing 
+  <li><a href="open:Patterns/Turing1952/spots_noisy.vti">Turing1952/spots_noisy.vti</a>, showing
   the effect of noise on Turing patterns.
-  <li><a href="open:Patterns/Gray-Scott/Lesmes_noisy.vti">Gray-Scott/Lesmes_noisy.vti</a>, showing 
+  <li><a href="open:Patterns/Gray-Scott/Lesmes_noisy.vti">Gray-Scott/Lesmes_noisy.vti</a>, showing
   how noise can change the behavior of reaction-diffusion systems.
   <li><a href="open:Patterns/Gray-Scott/noisy_solitons_mitosis.vti">Gray-Scott/noisy_solitons_mitosis.vti</a>,
   showing how noise can trigger solitons to replicate.
-  <li><a href="open:Patterns/Experiments/mutually-catalytic_spots.vti">mutually-catalytic_spots.vti</a>, where 
+  <li><a href="open:Patterns/Experiments/mutually-catalytic_spots.vti">mutually-catalytic_spots.vti</a>, where
   big spots can only replicate if full of small spots.
   <li><a href="open:Patterns/parameter_modulation_demo.vti">parameter_modulation_demo.vti</a>, showing how
   values in an extra chemical can be used to modulate the parameters of a system in an 'R' shape.
@@ -323,11 +332,11 @@ rhombille tiling or Penrose tiling).
   values in an extra chemical can be used to modulate the parameters of a system in a circular shape.
   <li><a href="open:Patterns/CellularAutomata/life_torus.vtu">life_torus.vtu</a>, showing Conway's Game of Life on a torus
   covered with quadilaterals.
-  <li><a href="open:Patterns/CellularAutomata/PenroseTilings/life.vtu">PenroseTilings/life.vtu</a>, showing the Life rule B3/S23 running on a 
+  <li><a href="open:Patterns/CellularAutomata/PenroseTilings/life.vtu">PenroseTilings/life.vtu</a>, showing the Life rule B3/S23 running on a
   Penrose tiling.
-  <li><a href="open:Patterns/heat_equation_interpolation.vti">heat_equation_interpolation.vti</a>, 
+  <li><a href="open:Patterns/heat_equation_interpolation.vti">heat_equation_interpolation.vti</a>,
   showing how the heat equation can interpolate between spatial values.
-  <li><a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti">complex_Ginzburg-Landau.vti</a>, a model of 
+  <li><a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti">complex_Ginzburg-Landau.vti</a>, a model of
   superconductivity that shows the onset of spiral waves.
   <li><a href="open:Patterns/wave_equation.vti">wave_equation.vti</a>, showing the spreading of a ripple.
   </ul>
@@ -337,7 +346,7 @@ rhombille tiling or Penrose tiling).
   <li> New entries:
     <ul>
       <li><tt>show_color_scale</tt>: allows the color scale legend to be turned off.
-      <li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D 
+      <li><tt>color_displacement_mapped_surface</tt>: allows the displacement-mapped surface (for 2D
       images) to be colored using the image.
       <li><tt>show_cell_edges</tt>: allows the edges of the cells to be shown.
       <li><tt>show_bounding_box</tt>: allows the bounding box to be shown or hidden.
@@ -346,17 +355,17 @@ rhombille tiling or Penrose tiling).
 <li> Changes to the <a href="formats.html#overlay">overlays</a>:
   <ul>
   <li> New overlay shape: <a href="formats.html#pixel">pixel</a>, for specifying cells directly.
-  <li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for 
+  <li> New overlay fill: <a href="formats.html#linear_gradient">linear_gradient</a>, for
        values that follow a linear ramp.
-  <li> New overlay fill: <a href="formats.html#radial_gradient">radial_gradient</a>, for 
+  <li> New overlay fill: <a href="formats.html#radial_gradient">radial_gradient</a>, for
        for values that vary depending on the distance from the center.
-  <li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape 
+  <li> Each <a href="formats.html#overlay">overlay</a> element can now contain multiple shape
     specifiers.
   </ul>
-<li> Pattern files (*.vti, *.vtu) can now be loaded into Paraview correctly, with named chemicals 
+<li> Pattern files (*.vti, *.vtu) can now be loaded into Paraview correctly, with named chemicals
     ('a', 'b', etc.). There they can be visualized by volume rendering, or contoured in various ways.
 <li> Ready has a new (much nicer!) icon.
-<li> New option for image-based systems: <a href="formats.html#rule">wrap</a>, to toggle toroidal 
+<li> New option for image-based systems: <a href="formats.html#rule">wrap</a>, to toggle toroidal
     wrap-around on/off.
 </ul>
 
@@ -365,7 +374,7 @@ rhombille tiling or Penrose tiling).
 
 <p>
 <ul>
-<li> Fixed issue that gave 'Invalid work group size' and 'expecting CL_KERNEL_WORK_GROUP_SIZE to be 
+<li> Fixed issue that gave 'Invalid work group size' and 'expecting CL_KERNEL_WORK_GROUP_SIZE to be
     a power of 2' errors on different graphics cards.
 <li> Fixed XML-escaping issue that caused saved patterns to fail to load.
 </ul>
@@ -387,7 +396,7 @@ rhombille tiling or Penrose tiling).
 <li> Added File > Open Recent submenu.
 <li> Added View > Full Screen for toggling full screen mode.
 <li> Added View > Fit Pattern to fill the view with the entire pattern.
-<li> Added View > Wireframe for toggling from wireframe to surface view. Many other render settings 
+<li> Added View > Wireframe for toggling from wireframe to surface view. Many other render settings
     can be changed in the Info Pane.
 <li> Added Action > Reset to restore a pattern back to its starting point.
 <li> Some menu items have been moved or renamed.
@@ -402,7 +411,7 @@ rhombille tiling or Penrose tiling).
      A series of overlays are composed in the different chemical images, and may include randomness.
 <li> A new rule type "kernel" allows full OpenCL kernels to be specified, for maximum flexibility.
 <li> The world size can now be changed. Set x, y or z to 1 for 2D or 1D systems, e.g. 128x1x1
-<li> For 2D systems, all the chemicals are shown side-by-side. This can be turned off in the render 
+<li> For 2D systems, all the chemicals are shown side-by-side. This can be turned off in the render
     settings.
 </ul>
 

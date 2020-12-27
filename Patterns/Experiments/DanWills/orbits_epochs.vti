@@ -6,7 +6,7 @@
         
         Implemented by Dan Wills - gdanzo@gmail.com
     </description>
-    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.058
       </param>

@@ -4,7 +4,7 @@
     <description>
       Mutually-Catalytic Spots with second normal derivative feedback. The second normal derivative of reagent a is estimated using a second-order Sobel filter, and fed back into reagent d.
     </description>
-    <rule name="coupled Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="coupled Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.06
       </param>

@@ -6,7 +6,7 @@
 
 The clamping parameters can be altered to change the size and motility of the worms, and the &apos;scale&apos; parameter has a similar effect. Slight variations of the parameters can result in stable patterns of evenly-spaced lines, or &quot;waves on a checkerboard&quot; patterns resulting from the system entering a stable oscillatory state, which looks like a diamond with tapered edges in the phase diagram.
     </description>
-    <rule name="Worms" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Worms" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.005
       </param>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       Kobayashi, R. (1993) &quot;Modeling and numerical simulations of dendritic crystal growth&quot; Physica D: Nonlinear Phenomena, 63(3-4), 410-423.
 
@@ -10,27 +10,20 @@
 
       Change parameter &apos;k&apos; between 0.8 and 5.0 to change the shape of the dendrites.
     </description>
-    <rule name="Laplacian Growth" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
-      <param name="k">
-        2.5
-      </param>
+    <rule name="Laplacian Growth" type="formula" wrap="0" neighborhood_type="vertex">
+      <param name="k">          2.5     </param>
+      <param name="dx">         0.03    </param>
+      <param name="timestep">   0.0001  </param>
+      <param name="tau">        0.0003  </param>
+      <param name="epsilonbar"> 0.01    </param>
+      <param name="alpha">      0.9     </param>
+      <param name="gamma">      10.0    </param>
+      <param name="teq">        1.0     </param>
       <formula number_of_chemicals="2">
-        const float timestep = 0.0001;
-        const float dx = 0.03;
-        const float dy = 0.03;
-        const float tau = 0.0003;
-        const float epsilonbar = 0.01;
-        const float alpha = 0.9;
-        const float gamma = 10.0;
-        const float teq = 1.0;
-        const float D_a = epsilonbar*epsilonbar/(dx*dx*tau);
-        const float D_b = 1.0/(dx*dx);
-            
-        #define M_PI 3.14159265358979323846   // needed for MacOS
-
-        float4 m = (float4)(alpha / M_PI) * atan(gamma *(teq-b));
-        delta_a = D_a*laplacian_a + a*(1.0f-a)*(a-0.5f+m)/tau;
-        delta_b = D_b*laplacian_b + k*delta_a;
+        const float4 pi = 3.14159265358979323846f;
+        const float4 m = (alpha / pi) * atan(gamma*(teq-b));
+        delta_a = (epsilonbar*epsilonbar*laplacian_a + a*(1.0f-a)*(a-0.5f+m))/tau;
+        delta_b = laplacian_b + k*delta_a;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="false">

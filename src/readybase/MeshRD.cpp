@@ -246,8 +246,7 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
         this->cell_locator = NULL;
     }
 
-    this->ComputeCellNeighbors(this->neighborhood_type,this->neighborhood_range,
-        this->neighborhood_weight_type);
+    this->ComputeCellNeighbors(this->neighborhood_type);
 
     this->xgap = this->GetX() * 0.05;
 }
@@ -702,11 +701,8 @@ bool IsEdgeNeighbor(vtkUnstructuredGrid *grid,vtkIdType iCell1,vtkIdType iCell2)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWeight weight_type)
+void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
 {
-    // TODO: for now we treat LAPLACIAN weights the same as EQUAL weights, not sure what to do with this on arbitrary meshes
-    if(range!=1)
-        throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported range");
     if(!this->mesh->IsHomogeneous())
         throw runtime_error("MeshRD::ComputeCellNeighbors : mixed cell types not supported");
 
@@ -738,12 +734,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                         for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                         {
                             nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                            switch(weight_type)
-                            {
-                                case EQUAL: nbor.weight = 1.0f; break;
-                                case LAPLACIAN: nbor.weight = 1.0f; break;
-                                default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
-                            }
+                            nbor.weight = 1.0f;
                             if(neighbors.empty() || IsEdgeNeighbor(this->mesh,neighbors.back().iNeighbor,nbor.iNeighbor))
                                 add_if_new(neighbors,nbor);
                         }
@@ -757,12 +748,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                     for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                     {
                         nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                        switch(weight_type)
-                        {
-                            case EQUAL: nbor.weight = 1.0f; break;
-                            case LAPLACIAN: nbor.weight = 1.0f; break;
-                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
-                        }
+                        nbor.weight = 1.0f;
                         add_if_new(neighbors,nbor);
                     }
                 }
@@ -778,12 +764,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                     for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                     {
                         nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                        switch(weight_type)
-                        {
-                            case EQUAL: nbor.weight = 1.0f; break;
-                            case LAPLACIAN: nbor.weight = 1.0f; break;
-                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
-                        }
+                        nbor.weight = 1.0f;
                         add_if_new(neighbors,nbor);
                     }
                 }
@@ -799,12 +780,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type,int range,TWei
                     for(vtkIdType iNeighbor=0;iNeighbor<cellIds->GetNumberOfIds();iNeighbor++)
                     {
                         nbor.iNeighbor = cellIds->GetId(iNeighbor);
-                        switch(weight_type)
-                        {
-                            case EQUAL: nbor.weight = 1.0f; break;
-                            case LAPLACIAN: nbor.weight = 1.0f; break;
-                            default: throw runtime_error("MeshRD::ComputeCellNeighbors : unsupported weight type");
-                        }
+                        nbor.weight = 1.0f;
                         add_if_new(neighbors,nbor);
                     }
                 }

@@ -321,9 +321,6 @@ int main(int argc,char *argv[])
                 cout << "type=" << system->GetRuleType() << "\n";
                 cout << "name=" << system->GetRuleName() << "\n";
                 cout << "neighborhood_type=" << system->GetNeighborhoodType() << "\n";
-                // next one is an int!
-                cout << "neighborhood_range=" << system->GetNeighborhoodRange() << "\n";
-                cout << "neighborhood_weight=" << system->GetNeighborhoodWeight() << "\n";
                 cout << "================================\n";
             }
             if ( print_parameter_info )

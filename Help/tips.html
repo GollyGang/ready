@@ -9,38 +9,36 @@
 <ul>
 <li>To view a pattern file just drop it onto the Ready app, or onto the
 rendering window if the app is already running.
-<li>Rendering complex scenes can be quite costly, so to increase the speed you can turn off the 
-displacement mapped surfaces, and turn off the display of multiple chemicals. See the Render 
+<li>Rendering complex scenes can be quite costly, so to increase the speed you can turn off the
+displacement mapped surfaces, and turn off the display of multiple chemicals. See the Render
 Settings in the Info Pane.
-<li>For maximum speed, use <a href="action.html#Action_ChangeRunningSpeed">Change Running Speed...</a> 
-in the Action menu to increase the number of timesteps between each render. Fewer frames will be 
+<li>For maximum speed, use <a href="action.html#Action_ChangeRunningSpeed">Change Running Speed...</a>
+in the Action menu to increase the number of timesteps between each render. Fewer frames will be
 drawn, and the overall speed will be faster.
-<li>The patterns in the "CPU-only" folder typically run much slower than the others, if your 
-graphics card is reasonable. So for better performance you shouldn't use them. (If you don't have 
+<li>The patterns in the "CPU-only" folder typically run much slower than the others, if your
+graphics card is reasonable. So for better performance you shouldn't use them. (If you don't have
 OpenCL installed or you're in a virtual machine then only the CPU-only patterns will work.)
-<li>Any image-based reaction-diffusion pattern (vti files, not yet the vtu mesh ones) can be changed in 
-size using the dimensions control in the Info Pane. If you want the same behavior then usually some
-of the parameters must be altered. Some examples:
+<li>Any image-based reaction-diffusion pattern (vti files, not yet the vtu mesh ones) can be changed in
+size using the dimensions control in the Info Pane. If you want the size of the stripes and spots to grow
+then usually some of the parameters must be altered. Some examples:
     <ul>
-    <li>With 
+    <li>With
     <a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a> there is an explicit
-    parameter for scale, delta_x, which is used in the formula. If you double the size of the pattern 
-    (to 512x512x1), you can set delta_x to half (0.004883) to get the same pattern. For numerical 
-    stability at the new size, change timestep to 0.3.
-    <li>There is no explicit delta_x in <a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a>, 
-    which is common way to write things as we don't often need it. Here you can double the size of the
-    pattern (to 256x128x1) as long as you <i>quadruple</i> the diffusion parameters D_a and D_b to 
-    0.656 and 0.328 respectively. And again a smaller timestep (e.g. 0.5) will be needed.
+    parameter for scale, <tt>dx</tt>, which is used in the computation of <tt>laplacian_a</tt> and <tt>laplacian_b</tt>. If you double the size of the
+    pattern (to 512x512x1), you can set <tt>dx</tt> to half (0.004883) to get the same size of stripes as the
+    original. For numerical stability at the new size, change timestep to 0.3.
+    <li>There is no <tt>dx</tt> parameter in <a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a> but you can add one using <a href="action.html#Action_AddParameter">Add Parameter...</a> on the Action menu. Set it to 0.8 to make the glider bigger. Going larger still will need you to increase the pattern dimensions and to reduce the timestep. This combination works: 256x128, dx=0.5, timestep=0.5.
+    <li>The initial pattern generator (that draws the rectangles in that example) works relative to the size of the image, so changing the ratio of height to width affects how it works. Notice that you need to keep the dimensions in approximately the same ratio for the glider to work.
     </ul>
-<li>To make a video, use the command on the File menu: <a href="file.html#File_StartRecording">Start 
-Recording...</a> to produce a sequence of images. Then use your favorite utility to make a video 
-file. For example in <a href="http://ffmpeg.org/">FFmpeg</a> the following command makes a high 
-quality <a href="http://en.wikipedia.org/wiki/MPEG-4">MPEG-4</a> video at 50 frames per second: 
+<li>To make a video, use the command on the File menu: <a href="file.html#File_StartRecording">Start
+Recording...</a> to produce a sequence of images. Then use your favorite utility to make a video
+file. For example in <a href="http://ffmpeg.org/">FFmpeg</a> the following command makes a high
+quality <a href="http://en.wikipedia.org/wiki/MPEG-4">MPEG-4</a> video at 50 frames per second:
 <br><tt>ffmpeg -r 50 -i frame_%06d.png -vb 5000k -vcodec libx264 video.mp4</tt>
-<li>If your 3D mesh resolution is too low, use an external tool like 
+<li>If your 3D mesh resolution is too low, use an external tool like
 <a href="http://meshlab.sourceforge.net">MeshLab</a> to subdivide it before importing into Ready.
-<li><a href="http://www.paraview.org">ParaView</a> can load the output of Ready (vtu and vti files) 
-and has lots of filters to try. A method for making wrinkly rabbits was discussed 
+<li><a href="http://www.paraview.org">ParaView</a> can load the output of Ready (vtu and vti files)
+and has lots of filters to try. A method for making wrinkly rabbits was discussed
 <a href="http://www.conwaylife.com/forums/viewtopic.php?f=7&t=945">here</a>.
 </ul>
 

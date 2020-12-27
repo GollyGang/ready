@@ -5,7 +5,7 @@
 	
 This example generates waves with sharp peaks in the magnitude (c reagent). Waves sometimes form spiral nucleation centers, and usually all end up travelling in the same direction.
     </description>
-    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.05
       </param>

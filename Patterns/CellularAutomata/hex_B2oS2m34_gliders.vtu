@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="3">
-  
+
     <description>
         Gliders in the hexagonal rule B2o/S2m34, by Paul Callahan
         &lt;a href=&quot;http://www.radicaleye.com/lifepage/hexrule.txt&quot;&gt;http://www.radicaleye.com/lifepage/hexrule.txt&lt;/a&gt;
-        
+
         Based on a Python transition function by Andrew Trevorrow (andrew@trevorrow.com).
     </description>
-    
-    <rule name="B2oS2m34" type="kernel" neighborhood_type="edge" neighborhood_range="1" neighborhood_weight="equal">
+
+    <rule name="B2oS2m34" type="kernel" neighborhood_type="edge">
       <kernel number_of_chemicals="1">
         __kernel void rd_compute(
             __global float* a_in,
             __global float* a_out,
             __global int* neighbor_indices,
             __global float* neighbor_weights,
-            const int max_neighbors) 
+            const int max_neighbors)
         {
             int x = get_global_id(0);
             a_out[x] = 0.0f;
             int offset = x * max_neighbors;
-            if(neighbor_weights[offset+5]&lt;0.0001f) 
+            if(neighbor_weights[offset+5]&lt;0.0001f)
                 return; // fewer than 6 neighbors
             int C  = round(a_in[x]);
             int N  = round(a_in[neighbor_indices[offset+0]]);
@@ -33,7 +33,7 @@
             int nc = NW + SE + N + W + E + S;    // neighbor count
 
             // birth if there are 2 adjacent neighbors (2o)
-            if( C==0 &amp;&amp; nc==2 &amp;&amp; 
+            if( C==0 &amp;&amp; nc==2 &amp;&amp;
                 (NW+N==2 || N+E==2 || E+SE==2 ||
                   SE+S==2 || S+W==2 || W+NW==2) )
                 a_out[x] = 1.0f;
@@ -43,17 +43,17 @@
                 a_out[x] = 1.0f;
 
             // survival if there are 2 neighbors with 1 empty cell in between (2m)
-            if( C==1 &amp;&amp; nc==2 &amp;&amp; 
+            if( C==1 &amp;&amp; nc==2 &amp;&amp;
                (NW+E==2 || N+SE==2 || E+S==2 ||
-                  SE+W==2 || S+NW==2 || W+N==2) ) 
+                  SE+W==2 || S+NW==2 || W+N==2) )
                 a_out[x] = 1.0f;
 
             // death in all other cases
         }
       </kernel>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="false">
       <overlay chemical="a">
         <overwrite />
@@ -61,7 +61,7 @@
         <everywhere />
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
       <color_low r="0.3" g="0.3" b="0.3" />
       <color_high r="1" g="1" b="1" />
@@ -75,9 +75,9 @@
       <use_image_interpolation value="false" />
       <timesteps_per_render value="1" />
     </render_settings>
-    
+
   </RD>
-  
+
   <UnstructuredGrid>
     <Piece NumberOfPoints="40000" NumberOfCells="13068">
       <PointData>

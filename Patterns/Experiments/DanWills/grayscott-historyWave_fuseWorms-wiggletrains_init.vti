@@ -16,7 +16,7 @@ This is the *fuseWorms-wiggletrains* example pattern, using the system described
 
 Behavior: Solitons form and begin to move, divide and follow each other as they travel. Eventually a detailed web of interactions between entrained soliton 'gliders' is formed.
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

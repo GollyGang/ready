@@ -15,7 +15,7 @@ This is the *fuseWorms* example pattern, using the system described above.
 
 Behavior: Solitons form and begin to oscillate, some solitons become worms that oscillate (particularly when hit by gliders), and break apart when they move a lot. Worm tips can become glider emitters, generating a trail of gliders that move along interesting wiggly paths. Due to the coupling with the wave reagent, gliders follow each other, and tend to travel in convoy.
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         1
       </param>

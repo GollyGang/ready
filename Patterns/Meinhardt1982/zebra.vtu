@@ -14,7 +14,7 @@
         stripes varies across the body - see Greg Turk's work for ways of including this.
     </description>
     
-    <rule name="Meinhardt" type="formula" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Meinhardt" type="formula" neighborhood_type="vertex">
     
       <param name="timestep">     1        </param>
       <param name="k_ab">         0.04     </param>

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
-      &lt;a href=&quot;http://en.wikipedia.org/wiki/Alan_Turing&quot;&gt;Alan Turing&lt;/a&gt; published a paper in 1952 called 
+      &lt;a href=&quot;http://en.wikipedia.org/wiki/Alan_Turing&quot;&gt;Alan Turing&lt;/a&gt; published a paper in 1952 called
       &lt;a href=&quot;http://en.wikipedia.org/wiki/The_chemical_basis_of_morphogenesis&quot;&gt;The Chemical Basis of Morphogenesis&lt;/a&gt;.
       He showed how chemicals (morphogens) could diffuse through living tissue and drive development in embryos and plants.
       The key result is that &lt;i&gt;instabilities&lt;/i&gt; can arise and form static patterns.
@@ -10,7 +10,7 @@
       A parameter map for the system described in Turing's paper. Parameter k varies from left to right. Parameter D_b varies from
       bottom to top. The system can produce high-on-low spots and low-on-high spots, separated by a region of labyrinthine stripes.
     </description>
-    <rule name="Turing" type="formula" wrap="0" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Turing" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="timestep">
         0.1
       </param>
@@ -30,10 +30,8 @@
         0.90
       </param>
       <formula number_of_chemicals="2">
-        float4 hpos = index_x / (float)X; // [0,1]
-        float4 vpos = index_y / (float)Y; // [0,1]
-        float4 k = k1 + (k2-k1)*hpos;
-        float4 D_b = D_b1 + (D_b2-D_b1)*vpos;
+        float4 k = k1 + (k2-k1)*x_pos;
+        float4 D_b = D_b1 + (D_b2-D_b1)*y_pos;
         delta_a = k * (16.0f - a * b) + D_a * laplacian_a;
         delta_b = max( -b, k * (a * b - b - 12.0f) + D_b * laplacian_b );
       </formula>

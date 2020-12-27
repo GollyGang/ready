@@ -5,7 +5,7 @@
 	
 This example generates waves with interesting rough edges that repeatedly nucleate from areas with low magnitude.
 </description>
-    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.05
       </param>

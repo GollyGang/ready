@@ -8,7 +8,7 @@ This 'epochs' rule will most likely look like it hasn't started, is likely to go
 
 The behaviour of this system is a very long cycle (150k timesteps or so) of the generation (inside complicated wavefronts) of many dots of high 'c' that look a bit like stars. If they are close enough, multiple stars can fuse into larger stars, that last longer. Eventually the stars all wink out and the background wave of star-genesis gets another go.
     </description>
-    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Orbit" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.058
       </param>

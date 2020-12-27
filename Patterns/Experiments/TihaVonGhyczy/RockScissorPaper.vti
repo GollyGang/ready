@@ -4,7 +4,7 @@
     <description>
       Rock, scissor, paper. Cyclical predation. A eats B, B eats C, C eats A.
     </description>
-    <rule name="RockScissorPaper" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="RockScissorPaper" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.050000
       </param>
@@ -64,7 +64,7 @@
       <show_displacement_mapped_surface value="false"/>
       <color_displacement_mapped_surface value="false"/>
       <use_image_interpolation value="true"/>
-      <timesteps_per_render value="8"/>
+      <timesteps_per_render value="1"/>
       <show_phase_plot value="false"/>
       <phase_plot_x_axis value="a"/>
       <phase_plot_y_axis value="b"/>

@@ -18,7 +18,7 @@ Behavior: Short wavefronts travel through space, dividing constantly and annihla
 The initial state is set up in such a way to try to start a reaction, but this setup is sensitive to initial conditions so sometimes it doesn't get going, or ends after a short time. If you get uninteresting evolution (ie it doesn't start or quickly dies out), then you may be able to remedy it by generating a new initial pattern (Action Menu, Generate Intial Pattern). It should give the expected behavior most of the time. This pattern often fares better if the resolution is a made bit larger, (512x512 cells for example).
 
     </description>
-    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex" neighborhood_range="1" neighborhood_weight="laplacian">
+    <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
         0.5
       </param>
