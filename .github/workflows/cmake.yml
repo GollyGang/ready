@@ -1,4 +1,4 @@
-name: CMake
+name: Build
 
 on: [push]
 
@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, macos-11.0, macos-10.15, windows-2019, windows-2016]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -26,6 +26,10 @@ jobs:
 
     - name: Install dependencies (for Ubuntu 16.04)
       if: matrix.os == 'ubuntu-16.04'
+      run: sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev libboost-program-options-dev
+
+    - name: Install dependencies (for macOS)
+      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
       run: sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev libboost-program-options-dev
 
     - name: Create Build Environment
