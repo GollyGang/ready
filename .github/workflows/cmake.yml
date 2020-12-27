@@ -29,6 +29,18 @@ jobs:
         sudo apt-get update
         sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev libboost-program-options-dev
 
+    - name: brew info vtk (for macOS)
+      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
+      run: brew info vtk
+
+    - name: brew update (for macOS)
+      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
+      run: brew update
+
+    - name: brew info vtk (for macOS)
+      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
+      run: brew info vtk
+
     - name: Install vtk (for macOS)
       if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
       run: brew install vtk --with-qt
