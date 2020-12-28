@@ -34,10 +34,19 @@ jobs:
       run: |
         brew install vtk wxmac boost
         echo "MACOS_QT5_HINT=$(-DCMAKE_PREFIX_PATH=$(brew --prefix qt5))" >> $GITHUB_ENV
-        echo $MACOS_QT5_HINT
+        echo "MACOS_QT5_HINT2=$(brew --prefix qt5)" >> $GITHUB_ENV
 
     - name: Test
       run: echo $MACOS_QT5_HINT
+
+    - name: Test2
+      run: echo $MACOS_QT5_HINT2
+
+    - name: Test3
+      run: echo ${{ env.MACOS_QT5_HINT1 }}
+
+    - name: Test4
+      run: echo ${{ env.MACOS_QT5_HINT2 }}
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
