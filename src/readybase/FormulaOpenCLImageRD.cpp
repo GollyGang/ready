@@ -60,58 +60,59 @@ struct KeywordOptions {
 
 // -------------------------------------------------------------------------
 
-string GetIndexString(int val, const string& coord, const string& coord_capital, bool wrap)
+void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
 {
-    ostringstream oss;
-    const string index = "index_" + coord;
-    if (val == 0)
+    // collect the float4 input blocks we will need
+    vector<InputPoint> input_blocks;
+    for (const InputPoint& input_point : options.inputs_needed)
     {
-        oss << index;
+        if (input_point.point.x % 4 == 0)
+        {
+            continue; // this block is already aligned
+        }
+        if (input_point.point.x >= 0)
+        {
+            input_blocks.push_back({ {input_point.point.x + 4 - (input_point.point.x % 4), input_point.point.y, input_point.point.z}, input_point.chem });
+        }
+        else
+        {
+            input_blocks.push_back({ {input_point.point.x - 4 - (input_point.point.x % 4), input_point.point.y, input_point.point.z}, input_point.chem });
+        }
     }
-    else if (wrap)
-    {
-        oss << "((" << index << showpos << val << " + " << coord_capital << ") & (" << coord_capital << " - 1))";
-    }
-    else
-    {
-        oss << "min(" << coord_capital << "-1, max(0, " << index << showpos << val << "))";
-    }
-    return oss.str();
-}
-
-void AddStencils_Block411(ostringstream& kernel_source, const KeywordOptions& options)
-{
-    // retrieve the values needed
+    options.inputs_needed.insert(input_blocks.begin(), input_blocks.end());
+    // retrieve the float4 input blocks needed from global memory
     for (const InputPoint& input_point : options.inputs_needed)
     {
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
         {
             continue; // central cell has already been retrieved
         }
-        const string index_x = GetIndexString(input_point.point.x, "x", "X", options.wrap);
-        const string index_y = GetIndexString(input_point.point.y, "y", "Y", options.wrap);
-        const string index_z = GetIndexString(input_point.point.z, "z", "Z", options.wrap);
-        kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName()
-            << " = " << input_point.chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "];\n";
+        if (input_point.point.x % 4 == 0)
+        {
+            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetCode(options.wrap) << ";\n";
+        }
+    }
+    // compute the non-block-aligned float4's from the block-aligned ones we have retrieved
+    for (const InputPoint& input_point : options.inputs_needed)
+    {
+        if (input_point.point.x % 4 != 0)
+        {
+            // swizzle from the retrieved blocks
+            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName() 
+                << " = (" << options.data_type_string << "4)" << input_point.GetSwizzled() << ";\n";
+        }
     }
     // compute the stencils needed
     for (const AppliedStencil& applied_stencil : options.stencils_needed)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetName()
-            << " = (" << options.data_type_string << "4)(\n" << options.indent << options.indent;
-        for (int iSlot = 0; iSlot < 4; iSlot++)
+            << " = (";
+        for (int iStencilPoint = 0; iStencilPoint < applied_stencil.stencil.points.size(); iStencilPoint++)
         {
-            for (int iStencilPoint = 0; iStencilPoint < applied_stencil.stencil.points.size(); iStencilPoint++)
+            kernel_source << applied_stencil.stencil.points[iStencilPoint].GetCode(applied_stencil.chem);
+            if (iStencilPoint < applied_stencil.stencil.points.size()-1)
             {
-                kernel_source << applied_stencil.stencil.points[iStencilPoint].GetCode(iSlot, applied_stencil.chem);
-                if (iStencilPoint < applied_stencil.stencil.points.size()-1)
-                {
-                    kernel_source << " + ";
-                }
-            }
-            if (iSlot < 3)
-            {
-                kernel_source << ",\n" << options.indent << options.indent;
+                kernel_source << " + ";
             }
         }
         kernel_source << ") / (" << applied_stencil.stencil.GetDivisorCode() << ");\n";

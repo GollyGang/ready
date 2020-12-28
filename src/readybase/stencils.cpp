@@ -58,44 +58,10 @@ string Point::GetName() const
 
 // ---------------------------------------------------------------------
 
-int CellSlotToBlock(int x)
-{
-    if (x > 0)
-    {
-        return x / 4;
-    }
-    return -int(ceil(-x / 4.0));
-}
-
-// ---------------------------------------------------------------------
-
-int CellSlotToSlot(int x)
-{
-    while (x < 0)
-    {
-        x += 4;
-    }
-    return x % 4;
-}
-
-// ---------------------------------------------------------------------
-
-string OffsetToCode(int iSlot, const Point& point, const string& chem)
+std::string StencilPoint::GetCode(const string& chem) const
 {
     ostringstream oss;
-    int source_block_x = CellSlotToBlock(iSlot + point.x);
-    int iSourceSlot = CellSlotToSlot(iSlot + point.x);
-    InputPoint sourceBlock{ { source_block_x, point.y, point.z }, chem };
-    oss << sourceBlock.GetName() << "." << "xyzw"[iSourceSlot];
-    return oss.str();
-}
-
-// ---------------------------------------------------------------------
-
-std::string StencilPoint::GetCode(int iSlot, const string& chem) const
-{
-    ostringstream oss;
-    oss << OffsetToCode(iSlot, point, chem);
+    oss << InputPoint{ point, chem }.GetName();
     if (weight != 1)
     {
         oss << " * " << weight;
@@ -120,6 +86,77 @@ string InputPoint::GetName() const
 
 // ---------------------------------------------------------------------
 
+string InputPoint::GetSwizzled() const
+{
+    // assemble a non-block-aligned float4 for the requested point
+    InputPoint block_left{ point, chem };
+    InputPoint block_right{ point, chem };
+    if (point.x >= 0)
+    {
+        block_left.point.x -= point.x % 4;
+        block_right.point.x += 4 - (point.x % 4);
+    }
+    else
+    {
+        block_left.point.x -= 4 + (point.x % 4);
+        block_right.point.x -= point.x % 4;
+    }
+    ostringstream oss;
+    oss << "(";
+    switch (point.x % 4)
+    {
+    case 1:
+    case -3:
+        oss << block_left.GetName() << ".yzw, " << block_right.GetName() << ".x";
+        break;
+    case 2:
+    case -2:
+        oss << block_left.GetName() << ".zw, " << block_right.GetName() << ".xy";
+        break;
+    case 3:
+    case -1:
+        oss << block_left.GetName() << ".w, " << block_right.GetName() << ".xyz";
+        break;
+    }
+    oss << ")";
+    return oss.str();
+}
+
+// -------------------------------------------------------------------------
+
+string InputPoint::GetCode(bool wrap) const
+{
+    const string index_x = GetIndexString(point.x / 4, "x", "X", wrap);
+    const string index_y = GetIndexString(point.y, "y", "Y", wrap);
+    const string index_z = GetIndexString(point.z, "z", "Z", wrap);
+    ostringstream oss;
+    oss << GetName() << " = " << chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "]";
+    return oss.str();
+}
+
+// -------------------------------------------------------------------------
+
+string InputPoint::GetIndexString(int val, const string& coord, const string& coord_capital, bool wrap)
+{
+    ostringstream oss;
+    const string index = "index_" + coord;
+    if (val == 0)
+    {
+        oss << index;
+    }
+    else if (wrap)
+    {
+        oss << "((" << index << showpos << val << " + " << coord_capital << ") & (" << coord_capital << " - 1))";
+    }
+    else
+    {
+        oss << "min(" << coord_capital << "-1, max(0, " << index << showpos << val << "))";
+    }
+    return oss.str();
+}
+
+// ---------------------------------------------------------------------
+
 string Stencil::GetDivisorCode() const
 {
     ostringstream oss;
@@ -138,11 +175,7 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
     set<InputPoint> input_points;
     for (const StencilPoint& stencil_point : stencil.points)
     {
-        for (int iSlot = 0; iSlot < 4; iSlot++)
-        {
-            Point block_point{ CellSlotToBlock(iSlot + stencil_point.point.x), stencil_point.point.y, stencil_point.point.z };
-            input_points.insert({ block_point, chem });
-        }
+        input_points.insert({ stencil_point.point, chem });
     }
     return input_points;
 }
