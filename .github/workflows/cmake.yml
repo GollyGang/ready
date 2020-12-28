@@ -32,8 +32,11 @@ jobs:
     - name: Install dependencies (for macOS)
       if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
       run: |
-        brew install vtk wxmac boost qt5
-        brew link qt5 --force
+        brew install vtk wxmac boost
+        echo 'export PATH="/usr/local/opt/qt/bin:$PATH"' >> /Users/runner/.bash_profile
+        export LDFLAGS="-L/usr/local/opt/qt/lib"
+        export CPPFLAGS="-I/usr/local/opt/qt/include"
+        export PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig"
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
