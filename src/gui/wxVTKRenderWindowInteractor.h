@@ -151,11 +151,11 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
     vtkSetMacro(UseCaptureMouse,int);
     vtkBooleanMacro(UseCaptureMouse,int);
 
-#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
+//#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
   protected:
-    virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration);
-    virtual int InternalDestroyTimer(int platformTimerId);
-#endif
+    virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
+    virtual int InternalDestroyTimer(int platformTimerId) override;
+//#endif
 
   protected:
     wxTimer timer;
