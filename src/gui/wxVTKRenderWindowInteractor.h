@@ -55,6 +55,11 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
 
+//This is needed for vtk 3.1 :
+#ifndef VTK_MAJOR_VERSION
+#include "vtkVersion.h"
+#endif
+
 #define USE_WXGLCANVAS
 
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)
@@ -151,11 +156,11 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
     vtkSetMacro(UseCaptureMouse,int);
     vtkBooleanMacro(UseCaptureMouse,int);
 
-//#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
   protected:
     virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
     virtual int InternalDestroyTimer(int platformTimerId) override;
-//#endif
+#endif
 
   protected:
     wxTimer timer;
