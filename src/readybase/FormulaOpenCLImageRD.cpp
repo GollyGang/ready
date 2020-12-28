@@ -234,9 +234,9 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     // add x_pos, y_pos, z_pos if being used
     if (UsingKeyword(formula_tokens, "x_pos"))
     {
-        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (4 * index_x + (" << this->data_type_string
-            << "4)(0.0" << this->data_type_suffix << ", 1.0" << this->data_type_suffix << ", 2.0" << this->data_type_suffix
-            << ", 3.0" << this->data_type_suffix << ")) / (4.0" << this->data_type_suffix << " * X);\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (index_x + (" << this->data_type_string
+            << "4)(0.0" << this->data_type_suffix << ", 0.25" << this->data_type_suffix << ", 0.5" << this->data_type_suffix
+            << ", 0.75" << this->data_type_suffix << ")) / X;\n";
     }
     if (UsingKeyword(formula_tokens, "y_pos"))
     {
