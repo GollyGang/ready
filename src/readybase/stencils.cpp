@@ -102,7 +102,6 @@ string InputPoint::GetSwizzled() const
         block_right.point.x -= point.x % 4;
     }
     ostringstream oss;
-    oss << "(";
     switch (point.x % 4)
     {
     case 1:
@@ -118,7 +117,6 @@ string InputPoint::GetSwizzled() const
         oss << block_left.GetName() << ".w, " << block_right.GetName() << ".xyz";
         break;
     }
-    oss << ")";
     return oss.str();
 }
 
@@ -178,6 +176,24 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
         input_points.insert({ stencil_point.point, chem });
     }
     return input_points;
+}
+
+// ---------------------------------------------------------------------
+
+string AppliedStencil::GetCode() const
+{
+    ostringstream oss;
+    oss << GetName() << " = (";
+    for (int iStencilPoint = 0; iStencilPoint < stencil.points.size(); iStencilPoint++)
+    {
+        oss << stencil.points[iStencilPoint].GetCode(chem);
+        if (iStencilPoint < stencil.points.size() - 1)
+        {
+            oss << " + ";
+        }
+    }
+    oss << ") / (" << stencil.GetDivisorCode() << ")";
+    return oss.str();
 }
 
 // ---------------------------------------------------------------------

@@ -91,6 +91,7 @@ struct AppliedStencil
     std::string chem; // e.g. "a"
 
     std::string GetName() const { return stencil.label + "_" + chem; }
+    std::string GetCode() const;
     std::set<InputPoint> GetInputPoints_Block411() const;
 };
 
