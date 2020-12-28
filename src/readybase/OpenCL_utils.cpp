@@ -262,6 +262,18 @@ std::string OpenCL_utils::GetOpenCLDiagnostics() // should never throw
                     if(device_type&CL_DEVICE_TYPE_DEFAULT) { if(!oss.str().empty()) { oss << " & "; } oss << "DEFAULT"; }
                     report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
                 }
+                // CL_DEVICE_LOCAL_MEM_TYPE:
+                cl_device_local_mem_type local_mem_type;
+                ret = clGetDeviceInfo(devices_available[iDevice], CL_DEVICE_LOCAL_MEM_TYPE, sizeof(cl_device_local_mem_type), &local_mem_type, NULL);
+                if (ret != CL_SUCCESS) {
+                    report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                }
+                else {
+                    ostringstream oss;
+                    if (local_mem_type & CL_LOCAL) { oss << "LOCAL"; }
+                    if (local_mem_type & CL_GLOBAL) { oss << "GLOBAL"; }
+                    report << GetDeviceInfoIdAsString(CL_DEVICE_LOCAL_MEM_TYPE) << " : " << oss.str() << "\n";
+                }
             }
             report << "\n";
         }
