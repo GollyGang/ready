@@ -89,7 +89,7 @@ void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
         }
         if (input_point.point.x % 4 == 0)
         {
-            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetCode(options.wrap) << ";\n";
+            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetDirectAccessCode(options.wrap) << ";\n";
         }
     }
     // compute the non-block-aligned float4's from the block-aligned ones we have retrieved

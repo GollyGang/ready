@@ -21,6 +21,7 @@
 // Stdlib:
 #include <cmath>
 #include <exception>
+#include <map>
 #include <sstream>
 using namespace std;
 
@@ -54,20 +55,6 @@ string Point::GetName() const
         }
     }
     return oss.str();
-}
-
-// ---------------------------------------------------------------------
-
-std::string StencilPoint::GetCode(const string& chem) const
-{
-    ostringstream oss;
-    oss << InputPoint{ point, chem }.GetName();
-    if (weight != 1)
-    {
-        oss << " * " << weight;
-    }
-    return oss.str();
-    // TODO: collect all the stencil points with the same weight and use a single multiply on them
 }
 
 // ---------------------------------------------------------------------
@@ -122,8 +109,12 @@ string InputPoint::GetSwizzled() const
 
 // -------------------------------------------------------------------------
 
-string InputPoint::GetCode(bool wrap) const
+string InputPoint::GetDirectAccessCode(bool wrap) const
 {
+    if (point.x % 4 != 0)
+    {
+        throw runtime_error("internal error in GetDirectAccessCode: point.x not divisible by 4");
+    }
     const string index_x = GetIndexString(point.x / 4, "x", "X", wrap);
     const string index_y = GetIndexString(point.y, "y", "Y", wrap);
     const string index_z = GetIndexString(point.z, "z", "Z", wrap);
@@ -158,10 +149,21 @@ string InputPoint::GetIndexString(int val, const string& coord, const string& co
 string Stencil::GetDivisorCode() const
 {
     ostringstream oss;
-    oss << divisor;
-    for (int i = 0; i < dx_power; i++)
+    if (divisor != 1 || dx_power > 0)
     {
-        oss << " * dx";
+        if (dx_power > 0)
+        {
+            oss << "(";
+        }
+        oss << divisor;
+        for (int i = 0; i < dx_power; i++)
+        {
+            oss << " * dx";
+        }
+        if (dx_power > 0)
+        {
+            oss << ")";
+        }
     }
     return oss.str();
 }
@@ -184,15 +186,45 @@ string AppliedStencil::GetCode() const
 {
     ostringstream oss;
     oss << GetName() << " = (";
-    for (int iStencilPoint = 0; iStencilPoint < stencil.points.size(); iStencilPoint++)
+    map<int, vector<Point>> weights;
+    for (const StencilPoint& stencil_point : stencil.points)
     {
-        oss << stencil.points[iStencilPoint].GetCode(chem);
-        if (iStencilPoint < stencil.points.size() - 1)
+        weights[stencil_point.weight].push_back(stencil_point.point);
+    }
+    bool is_first_weight_list = true;
+    for(const pair<int, vector<Point>>& weight_list : weights)
+    {
+        if (!is_first_weight_list)
         {
             oss << " + ";
         }
+        is_first_weight_list = false;
+        const int weight = weight_list.first;
+        const vector<Point>& points = weight_list.second;
+        if (weight != 1)
+        {
+            oss << weight << " * ";
+            if (points.size() > 1)
+            {
+                oss << "(";
+            }
+        }
+        bool is_first_point = true;
+        for (const Point& point : points)
+        {
+            if (!is_first_point)
+            {
+                oss << " + ";
+            }
+            is_first_point = false;
+            oss << InputPoint{ point, chem }.GetName();
+        }
+        if (weight != 1 && points.size() > 1)
+        {
+            oss << ")";
+        }
     }
-    oss << ") / (" << stencil.GetDivisorCode() << ")";
+    oss << ") / " << stencil.GetDivisorCode();
     return oss.str();
 }
 
@@ -282,17 +314,17 @@ Stencil GetGaussianStencil(int dimensionality)
     {
     case 1:
         // from OpenCV
-        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 1, 0); // is dx_power correct?
+        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 0, 0); // is dx_power correct?
     case 2:
         // from https://homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
-        return StencilFrom2DArray("gaussian", {{1,4,7,4,1},{4,16,26,16,4},{7,26,41,26,7},{4,16,26,16,4},{1,4,7,4,1}}, 273, 1, 0, 1); // is dx_power correct?
+        return StencilFrom2DArray("gaussian", {{1,4,7,4,1},{4,16,26,16,4},{7,26,41,26,7},{4,16,26,16,4},{1,4,7,4,1}}, 273, 0, 0, 1); // is dx_power correct?
     case 3:
         // see Scripts/Python/convolve.py
         return StencilFrom3DArray("gaussian", {{{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}},
                                                {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
                                                {{7,27,44,27,7},{26,101,164,101,26},{41,159,258,159,41},{26,101,164,101,26},{7,27,44,27,7}},
                                                {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
-                                               {{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}}}, 4390, 1, 0, 1, 2); // is dx_power correct?
+                                               {{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}}}, 4390, 0, 0, 1, 2); // is dx_power correct?
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetGaussianStencil");
     }

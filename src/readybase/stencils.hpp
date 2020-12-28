@@ -47,8 +47,6 @@ struct StencilPoint
 {
     Point point;
     int weight;
-
-    std::string GetCode(const std::string& chem) const;
 };
 
 // ---------------------------------------------------------------------
@@ -71,7 +69,7 @@ struct InputPoint
     std::string chem;
 
     std::string GetName() const;
-    std::string GetCode(bool wrap) const;
+    std::string GetDirectAccessCode(bool wrap) const;
     std::string GetSwizzled() const;
     static std::string GetIndexString(int val, const std::string& coord, const std::string& coord_capital, bool wrap);
 
