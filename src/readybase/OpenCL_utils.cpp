@@ -104,18 +104,24 @@ std::string OpenCL_utils::GetOpenCLDiagnostics() // should never throw
         for(unsigned int iPlatform=0;iPlatform<num_platforms;iPlatform++)
         {
             report << "Platform " << iPlatform+1 << ":\n";
-            const size_t MAX_INFO_LENGTH = 1000;
-            char info[MAX_INFO_LENGTH];
-            size_t info_length;
             for(cl_platform_info i=CL_PLATFORM_PROFILE;i<=CL_PLATFORM_EXTENSIONS;i++)
             {
-                ret = clGetPlatformInfo(platforms_available[iPlatform],i,MAX_INFO_LENGTH,info,&info_length);
-                if(ret != CL_SUCCESS)
+                size_t info_length;
+                ret = clGetPlatformInfo(platforms_available[iPlatform], i, 0, NULL, &info_length);
+                if (ret != CL_SUCCESS)
                 {
                     report << "clGetPlatformInfo failed: " << GetDescriptionOfOpenCLError(ret);
-                    return report.str();
                 }
-                report << GetPlatformInfoIdAsString(i) << " : " << info << "\n";
+                else {
+                    char* info = new char[info_length];
+                    ret = clGetPlatformInfo(platforms_available[iPlatform], i, info_length, info, &info_length);
+                    if (ret != CL_SUCCESS)
+                    {
+                        report << "clGetPlatformInfo failed: " << GetDescriptionOfOpenCLError(ret);
+                    }
+                    report << GetPlatformInfoIdAsString(i) << " : " << info << "\n";
+                    delete[] info;
+                }
             }
 
             const size_t MAX_DEVICES = 10;
@@ -159,12 +165,21 @@ std::string OpenCL_utils::GetOpenCLDiagnostics() // should never throw
                 report << "Device " << iDevice+1 << ":\n";
                 for(int i=0;i<N_CHAR_RETURNING_IDS;i++)
                 {
-                    ret = clGetDeviceInfo(devices_available[iDevice],charReturningIds[i],MAX_INFO_LENGTH,info,NULL);
-                    if(ret != CL_SUCCESS) {
+                    size_t info_length;
+                    ret = clGetDeviceInfo(devices_available[iDevice],charReturningIds[i],0,NULL,&info_length);
+                    if (ret != CL_SUCCESS) {
                         report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
                     }
                     else {
-                        report << GetDeviceInfoIdAsString(charReturningIds[i]) << " : " << info << "\n";
+                        char* info = new char[info_length];
+                        ret = clGetDeviceInfo(devices_available[iDevice], charReturningIds[i], info_length, info, &info_length);
+                        if (ret != CL_SUCCESS) {
+                            report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                        }
+                        else {
+                            report << GetDeviceInfoIdAsString(charReturningIds[i]) << " : " << info << "\n";
+                        }
+                        delete[] info;
                     }
                 }
                 for(int i=0;i<N_UINT_RETURNING_IDS;i++)
@@ -246,6 +261,18 @@ std::string OpenCL_utils::GetOpenCLDiagnostics() // should never throw
                     if(device_type&CL_DEVICE_TYPE_ACCELERATOR) { if(!oss.str().empty()) { oss << " & "; } oss << "ACCELERATOR"; }
                     if(device_type&CL_DEVICE_TYPE_DEFAULT) { if(!oss.str().empty()) { oss << " & "; } oss << "DEFAULT"; }
                     report << GetDeviceInfoIdAsString(CL_DEVICE_TYPE) << " : " << oss.str() << "\n";
+                }
+                // CL_DEVICE_LOCAL_MEM_TYPE:
+                cl_device_local_mem_type local_mem_type;
+                ret = clGetDeviceInfo(devices_available[iDevice], CL_DEVICE_LOCAL_MEM_TYPE, sizeof(cl_device_local_mem_type), &local_mem_type, NULL);
+                if (ret != CL_SUCCESS) {
+                    report << "clGetDeviceInfo failed: " << GetDescriptionOfOpenCLError(ret) << "\n";
+                }
+                else {
+                    ostringstream oss;
+                    if (local_mem_type & CL_LOCAL) { oss << "LOCAL"; }
+                    if (local_mem_type & CL_GLOBAL) { oss << "GLOBAL"; }
+                    report << GetDeviceInfoIdAsString(CL_DEVICE_LOCAL_MEM_TYPE) << " : " << oss.str() << "\n";
                 }
             }
             report << "\n";
@@ -374,13 +401,14 @@ string OpenCL_utils::GetPlatformDescription(int iPlatform)
     throwOnError(ret,"OpenCL_utils::GetPlatformDescription : clGetPlatformIDs failed: ");
 
     ostringstream oss;
-    const size_t MAX_INFO_LENGTH = 1000;
-    char info[MAX_INFO_LENGTH];
     size_t info_length;
-    ret = clGetPlatformInfo(platforms_available[iPlatform],CL_PLATFORM_NAME,
-        MAX_INFO_LENGTH,info,&info_length);
+    ret = clGetPlatformInfo(platforms_available[iPlatform], CL_PLATFORM_NAME, 0, NULL, &info_length);
     throwOnError(ret,"OpenCL_utils::GetPlatformDescription : clGetPlatformInfo failed: ");
-    string platform_name = info;
+    char* info = new char[info_length];
+    ret = clGetPlatformInfo(platforms_available[iPlatform], CL_PLATFORM_NAME, info_length, info, &info_length);
+    throwOnError(ret, "OpenCL_utils::GetPlatformDescription : clGetPlatformInfo failed: ");
+    string platform_name(info, info + info_length);
+    delete[] info;
     platform_name = platform_name.substr(platform_name.find_first_not_of(" \n\r\t"));
     oss << platform_name;
     return oss.str();
@@ -399,10 +427,6 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
     cl_int ret = clGetPlatformIDs(MAX_PLATFORMS,platforms_available,&num_platforms);
     throwOnError(ret,"OpenCL_utils::GetDeviceDescription : clGetPlatformIDs failed: ");
 
-    const size_t MAX_INFO_LENGTH = 1000;
-    char info[MAX_INFO_LENGTH];
-    size_t info_length;
-
     ostringstream oss;
     const size_t MAX_DEVICES = 10;
     cl_device_id devices_available[MAX_DEVICES];
@@ -410,10 +434,14 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
     ret = clGetDeviceIDs(platforms_available[iPlatform],CL_DEVICE_TYPE_ALL,
         MAX_DEVICES,devices_available,&num_devices);
     throwOnError(ret,"OpenCL_utils::GetDeviceDescription : clGetDeviceIDs failed: ");
-    ret = clGetDeviceInfo(devices_available[iDevice],CL_DEVICE_NAME,
-        MAX_INFO_LENGTH,info,&info_length);
-    throwOnError(ret,"OpenCL_utils::GetDeviceDescription : clGetDeviceInfo failed: ");
-    string device_name = info;
+    size_t info_length;
+    ret = clGetDeviceInfo(devices_available[iDevice], CL_DEVICE_NAME, 0, NULL, &info_length);
+    throwOnError(ret, "OpenCL_utils::GetDeviceDescription : clGetDeviceInfo failed: ");
+    char* info = new char[info_length];
+    ret = clGetDeviceInfo(devices_available[iDevice], CL_DEVICE_NAME, info_length, info, &info_length);
+    throwOnError(ret, "OpenCL_utils::GetDeviceDescription : clGetDeviceInfo failed: ");
+    string device_name(info, info + info_length);
+    delete[] info;
     device_name = device_name.substr(device_name.find_first_not_of(" \n\r\t"));
     oss << device_name;
     return oss.str();
