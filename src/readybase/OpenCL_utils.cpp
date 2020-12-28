@@ -441,6 +441,7 @@ string OpenCL_utils::GetDeviceDescription(int iPlatform,int iDevice)
     ret = clGetDeviceInfo(devices_available[iDevice], CL_DEVICE_NAME, info_length, info, &info_length);
     throwOnError(ret, "OpenCL_utils::GetDeviceDescription : clGetDeviceInfo failed: ");
     string device_name(info, info + info_length);
+    delete[] info;
     device_name = device_name.substr(device_name.find_first_not_of(" \n\r\t"));
     oss << device_name;
     return oss.str();
