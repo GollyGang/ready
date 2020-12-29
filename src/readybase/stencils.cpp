@@ -33,7 +33,7 @@ string Point::GetName() const
     if (x != 0 || y != 0 || z != 0)
     {
         const int order[3] = { 2, 1, 0 }; // output will be e.g. "ne", "usw", "d"
-        const std::string dirs[3][2] = { {"e", "w"}, {"s", "n"}, {"u", "d"} };
+        const std::string dirs[3][2] = { {"e", "w"}, {"n", "s"}, {"u", "d"} };
         for (const int i : order)
         {
             if (xyz[i] > 0)
@@ -151,6 +151,7 @@ string Stencil::GetDivisorCode() const
     ostringstream oss;
     if (divisor != 1 || dx_power > 0)
     {
+        oss << " / ";
         if (dx_power > 0)
         {
             oss << "(";
@@ -185,7 +186,12 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
 string AppliedStencil::GetCode() const
 {
     ostringstream oss;
-    oss << GetName() << " = (";
+    oss << GetName() << " = ";
+    const string divisor_code = stencil.GetDivisorCode(); 
+    if (!divisor_code.empty())
+    {
+        oss << "(";
+    }
     map<int, vector<Point>> weights;
     for (const StencilPoint& stencil_point : stencil.points)
     {
@@ -224,7 +230,10 @@ string AppliedStencil::GetCode() const
             oss << ")";
         }
     }
-    oss << ") / " << stencil.GetDivisorCode();
+    if (!divisor_code.empty())
+    {
+        oss << ")" << divisor_code;
+    }
     return oss.str();
 }
 
@@ -260,16 +269,16 @@ Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divi
         throw runtime_error("Internal error: StencilFrom2DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
-    for (int j = 0; j < N; j++)
+    for (int j = 0; j < M; j++)
     {
-        for (int i = 0; i < M; i++)
+        for (int i = 0; i < N; i++)
         {
-            if (arr[i][j] != 0)
+            if (arr[j][i] != 0)
             {
                 Point point{ 0, 0, 0 };
-                point.xyz[dim1] = i - (M - 1) / 2;
-                point.xyz[dim2] = j - (N - 1) / 2;
-                stencil.points.push_back({ point, arr[i][j] });
+                point.xyz[dim1] = i - (N - 1) / 2;
+                point.xyz[dim2] = - j + (M - 1) / 2; // rows are in reading order, heading south, which is negative y
+                stencil.points.push_back({ point, arr[j][i] });
             }
         }
     }
@@ -286,19 +295,19 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
         throw runtime_error("Internal error: StencilFrom3DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
-    for (int k = 0; k < N; k++)
+    for (int k = 0; k < L; k++)
     {
         for (int j = 0; j < M; j++)
         {
-            for (int i = 0; i < L; i++)
+            for (int i = 0; i < N; i++)
             {
-                if (arr[i][j][k] != 0)
+                if (arr[k][j][i] != 0)
                 {
                     Point point{ 0, 0, 0 };
-                    point.xyz[dim1] = i - (L - 1) / 2;
-                    point.xyz[dim2] = j - (M - 1) / 2;
-                    point.xyz[dim3] = k - (N - 1) / 2;
-                    stencil.points.push_back({ point, arr[i][j][k] });
+                    point.xyz[dim1] = i - (N - 1) / 2;
+                    point.xyz[dim2] = -j + (M - 1) / 2; // rows are in reading order, heading south, which is negative y
+                    point.xyz[dim3] = k - (L - 1) / 2;
+                    stencil.points.push_back({ point, arr[k][j][i] });
                 }
             }
         }
@@ -429,12 +438,15 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
-    Stencil SobelNE = StencilFrom2DArray("sobel_ne", { {2, 1, 0}, {1, 0, -1}, {0, -1, -2} }, 1, 0, 0, 1);
+    Stencil SobelW = StencilFrom2DArray("sobel_w", { {1, 0, -1}, {2, 0, -2}, {1, 0, -1} }, 1, 0, 0, 1);
+    Stencil SobelN = StencilFrom2DArray("sobel_n", { {1, 2, 1}, {0, 0, 0}, {-1, -2, -1} }, 1, 0, 0, 1);
+    Stencil SobelSW = StencilFrom2DArray("sobel_sw", { {0, -1, -2}, {1, 0, -1}, {2, 1, 0} }, 1, 0, 0, 1);
     Stencil Gaussian = GetGaussianStencil(dimensionality);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, SobelNE };
+    return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, 
+        SobelW, SobelN, SobelSW };
 }
 
 // ---------------------------------------------------------------------
