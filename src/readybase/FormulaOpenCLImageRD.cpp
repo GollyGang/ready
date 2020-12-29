@@ -212,6 +212,13 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
                     if (UsingKeyword(formula_tokens, input_point_neighbor_name))
                     {
                         options.inputs_needed.insert(input_point);
+                        if (input_point.point.x % 4 != 0)
+                        {
+                            // add the block-aligned float4's we'll need to provide this non-block-aligned float4
+                            const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks();
+                            options.inputs_needed.insert(blocks.first);
+                            options.inputs_needed.insert(blocks.second);
+                        }
                     }
                 }
             }

@@ -71,6 +71,7 @@ struct InputPoint
     std::string GetName() const;
     std::string GetDirectAccessCode(bool wrap) const;
     std::string GetSwizzled() const;
+    std::pair<InputPoint, InputPoint> GetAlignedBlocks() const;
     static std::string GetIndexString(int val, const std::string& coord, const std::string& coord_capital, bool wrap);
 
     friend bool operator<(const InputPoint& a, const InputPoint& b)

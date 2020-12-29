@@ -73,9 +73,9 @@ string InputPoint::GetName() const
 
 // ---------------------------------------------------------------------
 
-string InputPoint::GetSwizzled() const
+pair<InputPoint, InputPoint> InputPoint::GetAlignedBlocks() const
 {
-    // assemble a non-block-aligned float4 for the requested point
+    // return the two block-aligned float4's we'll need to assemble this non-block-aligned float4
     InputPoint block_left{ point, chem };
     InputPoint block_right{ point, chem };
     if (point.x >= 0)
@@ -88,6 +88,17 @@ string InputPoint::GetSwizzled() const
         block_left.point.x -= 4 + (point.x % 4);
         block_right.point.x -= point.x % 4;
     }
+    return make_pair(block_left, block_right);
+}
+
+// ---------------------------------------------------------------------
+
+string InputPoint::GetSwizzled() const
+{
+    // assemble a non-block-aligned float4 for the requested point
+    const pair<InputPoint, InputPoint> blocks = GetAlignedBlocks();
+    const InputPoint& block_left = blocks.first;
+    const InputPoint& block_right = blocks.second;
     ostringstream oss;
     switch (point.x % 4)
     {
