@@ -449,15 +449,36 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
-    Stencil SobelW = StencilFrom2DArray("sobel_w", { {1, 0, -1}, {2, 0, -2}, {1, 0, -1} }, 1, 0, 0, 1);
-    Stencil SobelN = StencilFrom2DArray("sobel_n", { {1, 2, 1}, {0, 0, 0}, {-1, -2, -1} }, 1, 0, 0, 1);
-    Stencil SobelSW = StencilFrom2DArray("sobel_sw", { {0, -1, -2}, {1, 0, -1}, {2, 1, 0} }, 1, 0, 0, 1);
+    Stencil SobelN = StencilFrom2DArray("sobelN", { {1, 2, 1},
+                                                    {0, 0, 0},
+                                                    {-1, -2, -1} }, 1, 0, 0, 1);
+    Stencil SobelS = StencilFrom2DArray("sobelS", { {-1, -2, -1},
+                                                    {0, 0, 0},
+                                                    {1, 2, 1} }, 1, 0, 0, 1);
+    Stencil SobelE = StencilFrom2DArray("sobelE", { {-1, 0, 1},
+                                                    {-2, 0, 2},
+                                                    {-1, 0, 1} }, 1, 0, 0, 1);
+    Stencil SobelW = StencilFrom2DArray("sobelW", { {1, 0, -1},
+                                                    {2, 0, -2},
+                                                    {1, 0, -1} }, 1, 0, 0, 1);
+    Stencil SobelNW = StencilFrom2DArray("sobelNW", { {2, 1, 0},
+                                                      {1, 0, -1},
+                                                      {0, -1, -2} }, 1, 0, 0, 1);
+    Stencil SobelNE = StencilFrom2DArray("sobelNE", { {0, 1, 2},
+                                                      {-1, 0, 1},
+                                                      {-2, -1, 0} }, 1, 0, 0, 1);
+    Stencil SobelSW = StencilFrom2DArray("sobelSW", { {0, -1, -2},
+                                                      {1, 0, -1},
+                                                      {2, 1, 0} }, 1, 0, 0, 1);
+    Stencil SobelSE = StencilFrom2DArray("sobelSE", { {-2, -1, 0},
+                                                      {-1, 0, 1},
+                                                      {0, 1, 2} }, 1, 0, 0, 1);
     Stencil Gaussian = GetGaussianStencil(dimensionality);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
     return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, 
-        SobelW, SobelN, SobelSW };
+        SobelN, SobelS, SobelE, SobelW, SobelNW, SobelNE, SobelSW, SobelSE };
 }
 
 // ---------------------------------------------------------------------
