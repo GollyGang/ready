@@ -31,7 +31,7 @@ endif()
 
 project( Ready )
 
-set( READY_VERSION 0.10.1 )   # check matches Help/about.html
+set( READY_VERSION 0.11.0 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
