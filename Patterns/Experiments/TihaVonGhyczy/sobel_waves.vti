@@ -4,9 +4,9 @@
     <description>
       Ocean waves from the simplest of ideas:
 
-        da/dt = k1 * laplacian(a) + k2 * sobel_sw(a)
+        da/dt = k1 * laplacian_a + k2 * sobelSW_a
 
-      where sobel_sw is a &lt;a href=&quot;https://en.wikipedia.org/wiki/Sobel_operator&quot;&gt;Sobel filter convolution&lt;/a&gt;
+      where sobelSW_a is a &lt;a href=&quot;https://en.wikipedia.org/wiki/Sobel_operator&quot;&gt;Sobel filter convolution&lt;/a&gt;
       with positive values coming from the south-west.
     </description>
     <rule name="sobel waves" type="formula">
@@ -14,7 +14,7 @@
       <param name="k1">       0.1     </param>
       <param name="k2">       0.18    </param>
       <formula number_of_chemicals="1">
-        delta_a = k1 * laplacian_a + k2 * sobel_sw_a;
+        delta_a = k1 * laplacian_a + k2 * sobelSW_a;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="true">
