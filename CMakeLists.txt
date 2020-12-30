@@ -191,6 +191,26 @@ set( PATTERN_FILES
   Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots_2.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_forwardEuler.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_2stepAdamsBashforth.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_3stepAdamsBashforth.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_modifiedEuler.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_midpointMethod.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_HeunsMethod.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxFriedrichs.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxWendroff.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_RungeKutta4.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_staggeredLeapfrog.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_forwardEuler_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_2stepAdamsBashforth_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_3stepAdamsBashforth_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_modifiedEuler_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_midpointMethod_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_HeunsMethod_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxFriedrichs_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxWendroff_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_RungeKutta4_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_staggeredLeapfrog_double.vti
   Patterns/Experiments/DanWills/cglrd_ramps_example.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_moreLifelike.vti
@@ -230,26 +250,6 @@ set( PATTERN_FILES
   Patterns/Experiments/TihaVonGhyczy/sobel_waves.vti
   Patterns/Agmon2014/cells.vti      Patterns/Agmon2014/cells_double.vti
   Patterns/Agmon2014/oil-water.vti
-  Patterns/NumericalMethods/advection_forwardEuler.vti
-  Patterns/NumericalMethods/advection_2stepAdamsBashforth.vti
-  Patterns/NumericalMethods/advection_3stepAdamsBashforth.vti
-  Patterns/NumericalMethods/advection_modifiedEuler.vti
-  Patterns/NumericalMethods/advection_midpointMethod.vti
-  Patterns/NumericalMethods/advection_HeunsMethod.vti
-  Patterns/NumericalMethods/advection_LaxFriedrichs.vti
-  Patterns/NumericalMethods/advection_LaxWendroff.vti
-  Patterns/NumericalMethods/advection_RungeKutta4.vti
-  Patterns/NumericalMethods/advection_staggeredLeapfrog.vti
-  Patterns/NumericalMethods/advection_forwardEuler_double.vti
-  Patterns/NumericalMethods/advection_2stepAdamsBashforth_double.vti
-  Patterns/NumericalMethods/advection_3stepAdamsBashforth_double.vti
-  Patterns/NumericalMethods/advection_modifiedEuler_double.vti
-  Patterns/NumericalMethods/advection_midpointMethod_double.vti
-  Patterns/NumericalMethods/advection_HeunsMethod_double.vti
-  Patterns/NumericalMethods/advection_LaxFriedrichs_double.vti
-  Patterns/NumericalMethods/advection_LaxWendroff_double.vti
-  Patterns/NumericalMethods/advection_RungeKutta4_double.vti
-  Patterns/NumericalMethods/advection_staggeredLeapfrog_double.vti
   Patterns/Guo2014/guo.vti
   Patterns/Maginu1975/maginu_parameter_map.vti
   Patterns/Kryuchkov2020/Drosophila_corneal_nanocoatings.vti
