@@ -2,13 +2,13 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="5">
     <description>
-      Kuramoto-Sivashinsky-equation, range stabilized (see stabilize parameter) by advice from Steffen Richters.
-	  
-	  Ported to Formula-mode by Dan Wills on the back of Tim Hutton's great work with keyword support.
-	  
-      It is expected to be black for a while initially (11k timesteps or so) as the values evolve-up to the visualisation-range.
-	  
-	  If you want to reduce dx (to 0.4 say) then you might want to also reduce the timestep (to 0.001, say?) and increase the substeps-per-render to 128 or more,
+Kuramoto-Sivashinsky-equation, range stabilized (see the stabilize parameter) based on advice from Steffen Richters ("Richters Finger" on Youtube).
+
+Ported to Formula-mode by Dan Wills on the back of Tim Hutton's great work with keyword support.
+
+It is expected to be black for a while initially (11k timesteps or so) as the values evolve-up to the visualisation-range.
+
+If you want to reduce dx (to 0.4 say) then you might want to also reduce the timestep (to 0.001, say?) and increase the substeps-per-render to 128 or more,
 	</description>
     <rule name="KSE" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="dx">
@@ -31,9 +31,7 @@
         -1.0
 	  </param>
       <formula number_of_chemicals="1">
-delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + ( gradient_mag_squared_a ) * gms_weight;
-delta_a += a * stabilize;
-a_out[index_here] = a + timestep * delta_a;
+delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + ( gradient_mag_squared_a ) * gms_weight + a * stabilize;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="true">
