@@ -262,6 +262,7 @@ set( PATTERN_FILES
   Patterns/Kobayashi1993/laplacian_growth.vti
   Patterns/Kobayashi1993/laplacian_growth_3D.vti     Patterns/Kobayashi1993/laplacian_growth_3D_corner.vti
   Patterns/Morozov2008/Fig2.vti      Patterns/Morozov2008/Fig4.vti      Patterns/Morozov2008/Fig5678_delta_map.vti
+  Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_stabilized.vti
 )
 
 set( HELP_FILES

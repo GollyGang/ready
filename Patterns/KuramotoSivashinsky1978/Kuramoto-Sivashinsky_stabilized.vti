@@ -2,43 +2,42 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="5">
     <description>
-Kuramoto-Sivashinsky-equation, range stabilized (see the stabilize parameter) based on advice from Steffen Richters ("Richters Finger" on Youtube).
+The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kuramoto%E2%80%93Sivashinsky_equation&quot;&gt;Kuramoto-Sivashinsky-equation&lt;/a&gt;, with its range stabilized based on advice from &lt;a href=&quot;https://www.youtube.com/channel/UC1Mo9AoX5desRiFLW_skbEg/featured&quot;&gt;Steffen Richters&lt;/a&gt;.
 
-Ported to Formula-mode by Dan Wills on the back of Tim Hutton's great work with keyword support.
+The stabilize parameter prevents the values from growing continuously. You can set it to zero to see what happens without it.
 
-It is expected to be black for a while initially (11k timesteps or so) as the values evolve-up to the visualisation-range.
+To increase the size of the blobs, try e.g.: dx = 0.3, timestep = 0.0005
 
-If you want to reduce dx (to 0.4 say) then you might want to also reduce the timestep (to 0.001, say?) and increase the substeps-per-render to 128 or more,
-	</description>
-    <rule name="KSE" type="formula" wrap="1" neighborhood_type="vertex">
+Created by Dan Wills.
+    </description>
+    <rule name="KSE" type="formula" wrap="1">
       <param name="dx">
         0.500000
       </param>
       <param name="timestep">
         0.005000
       </param>
-	  <param name="stabilize">
+      <param name="stabilize">
         -0.05
-	  </param>
-
-	  <param name="gms_weight">
+      </param>
+      <param name="gms_weight">
         0.2
       </param>
-	  <param name="lapweight">
+      <param name="lapweight">
         -1.0
-	  </param>
-	  <param name="bilapweight">
+      </param>
+      <param name="bilapweight">
         -1.0
-	  </param>
+      </param>
       <formula number_of_chemicals="1">
-delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + ( gradient_mag_squared_a ) * gms_weight + a * stabilize;
+delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + gradient_mag_squared_a * gms_weight + a * stabilize;
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="true">
       <overlay chemical="a">
         <overwrite>
         </overwrite>
-        <white_noise low="0.6" high="0.7001">
+        <white_noise low="55" high="120">
         </white_noise>
         <everywhere>
         </everywhere>
