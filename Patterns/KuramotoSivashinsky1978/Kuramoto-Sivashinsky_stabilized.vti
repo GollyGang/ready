@@ -2,9 +2,9 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="5">
     <description>
-The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kuramoto%E2%80%93Sivashinsky_equation&quot;&gt;Kuramoto-Sivashinsky-equation&lt;/a&gt;, with its range stabilized based on advice from &lt;a href=&quot;https://www.youtube.com/channel/UC1Mo9AoX5desRiFLW_skbEg/featured&quot;&gt;Steffen Richters&lt;/a&gt;.
+The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kuramoto%E2%80%93Sivashinsky_equation&quot;&gt;Kuramoto-Sivashinsky equation&lt;/a&gt;, with its range stabilized based on advice from &lt;a href=&quot;https://www.youtube.com/channel/UC1Mo9AoX5desRiFLW_skbEg/featured&quot;&gt;Steffen Richters&lt;/a&gt;.
 
-The stabilize parameter prevents the values from growing continuously. You can set it to zero to see what happens without it.
+The stabilize parameter prevents the values from growing continuously. Set it to zero to see what happens without it.
 
 To increase the size of the blobs, try e.g.: dx = 0.3, timestep = 0.0005
 

@@ -123,8 +123,6 @@ set( PATTERN_FILES
   Patterns/kernel_test.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti  Patterns/parameter_modulation_demo2_3D.vti
-  Patterns/bunny.vtu
-  Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti
@@ -144,6 +142,8 @@ set( PATTERN_FILES
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
   Patterns/FitzHugh-Nagumo/FHN_parameter_map.vti
+  Patterns/Gray-Scott/bunny.vtu
+  Patterns/Gray-Scott/lion.vtu
   Patterns/Gray-Scott/Lesmes_noisy.vti
   Patterns/Gray-Scott/noisy_solitons_mitosis.vti
   Patterns/Gray-Scott/parameter-map.vti
