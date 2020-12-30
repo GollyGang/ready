@@ -21,6 +21,7 @@
 // Stdlib:
 #include <cmath>
 #include <exception>
+#include <map>
 #include <sstream>
 using namespace std;
 
@@ -32,7 +33,7 @@ string Point::GetName() const
     if (x != 0 || y != 0 || z != 0)
     {
         const int order[3] = { 2, 1, 0 }; // output will be e.g. "ne", "usw", "d"
-        const std::string dirs[3][2] = { {"e", "w"}, {"s", "n"}, {"u", "d"} };
+        const std::string dirs[3][2] = { {"e", "w"}, {"n", "s"}, {"u", "d"} };
         for (const int i : order)
         {
             if (xyz[i] > 0)
@@ -58,54 +59,6 @@ string Point::GetName() const
 
 // ---------------------------------------------------------------------
 
-int CellSlotToBlock(int x)
-{
-    if (x > 0)
-    {
-        return x / 4;
-    }
-    return -int(ceil(-x / 4.0));
-}
-
-// ---------------------------------------------------------------------
-
-int CellSlotToSlot(int x)
-{
-    while (x < 0)
-    {
-        x += 4;
-    }
-    return x % 4;
-}
-
-// ---------------------------------------------------------------------
-
-string OffsetToCode(int iSlot, const Point& point, const string& chem)
-{
-    ostringstream oss;
-    int source_block_x = CellSlotToBlock(iSlot + point.x);
-    int iSourceSlot = CellSlotToSlot(iSlot + point.x);
-    InputPoint sourceBlock{ { source_block_x, point.y, point.z }, chem };
-    oss << sourceBlock.GetName() << "." << "xyzw"[iSourceSlot];
-    return oss.str();
-}
-
-// ---------------------------------------------------------------------
-
-std::string StencilPoint::GetCode(int iSlot, const string& chem) const
-{
-    ostringstream oss;
-    oss << OffsetToCode(iSlot, point, chem);
-    if (weight != 1)
-    {
-        oss << " * " << weight;
-    }
-    return oss.str();
-    // TODO: collect all the stencil points with the same weight and use a single multiply on them
-}
-
-// ---------------------------------------------------------------------
-
 string InputPoint::GetName() const
 {
     ostringstream oss;
@@ -120,13 +73,109 @@ string InputPoint::GetName() const
 
 // ---------------------------------------------------------------------
 
+pair<InputPoint, InputPoint> InputPoint::GetAlignedBlocks() const
+{
+    // return the two block-aligned float4's we'll need to assemble this non-block-aligned float4
+    InputPoint block_left{ point, chem };
+    InputPoint block_right{ point, chem };
+    if (point.x >= 0)
+    {
+        block_left.point.x -= point.x % 4;
+        block_right.point.x += 4 - (point.x % 4);
+    }
+    else
+    {
+        block_left.point.x -= 4 + (point.x % 4);
+        block_right.point.x -= point.x % 4;
+    }
+    return make_pair(block_left, block_right);
+}
+
+// ---------------------------------------------------------------------
+
+string InputPoint::GetSwizzled() const
+{
+    // assemble a non-block-aligned float4 for the requested point
+    const pair<InputPoint, InputPoint> blocks = GetAlignedBlocks();
+    const InputPoint& block_left = blocks.first;
+    const InputPoint& block_right = blocks.second;
+    ostringstream oss;
+    switch (point.x % 4)
+    {
+    case 1:
+    case -3:
+        oss << block_left.GetName() << ".yzw, " << block_right.GetName() << ".x";
+        break;
+    case 2:
+    case -2:
+        oss << block_left.GetName() << ".zw, " << block_right.GetName() << ".xy";
+        break;
+    case 3:
+    case -1:
+        oss << block_left.GetName() << ".w, " << block_right.GetName() << ".xyz";
+        break;
+    }
+    return oss.str();
+}
+
+// -------------------------------------------------------------------------
+
+string InputPoint::GetDirectAccessCode(bool wrap) const
+{
+    if (point.x % 4 != 0)
+    {
+        throw runtime_error("internal error in GetDirectAccessCode: point.x not divisible by 4");
+    }
+    const string index_x = GetIndexString(point.x / 4, "x", "X", wrap);
+    const string index_y = GetIndexString(point.y, "y", "Y", wrap);
+    const string index_z = GetIndexString(point.z, "z", "Z", wrap);
+    ostringstream oss;
+    oss << GetName() << " = " << chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "]";
+    return oss.str();
+}
+
+// -------------------------------------------------------------------------
+
+string InputPoint::GetIndexString(int val, const string& coord, const string& coord_capital, bool wrap)
+{
+    ostringstream oss;
+    const string index = "index_" + coord;
+    if (val == 0)
+    {
+        oss << index;
+    }
+    else if (wrap)
+    {
+        oss << "((" << index << showpos << val << " + " << coord_capital << ") & (" << coord_capital << " - 1))";
+    }
+    else
+    {
+        oss << "min(" << coord_capital << "-1, max(0, " << index << showpos << val << "))";
+    }
+    return oss.str();
+}
+
+// ---------------------------------------------------------------------
+
 string Stencil::GetDivisorCode() const
 {
     ostringstream oss;
-    oss << divisor;
-    for (int i = 0; i < dx_power; i++)
+    if (divisor != 1 || dx_power > 0)
     {
-        oss << " * dx";
+        oss << " / ";
+        if (dx_power > 0)
+        {
+            oss << "(";
+        }
+        oss << divisor;
+        for (int i = 0; i < dx_power; i++)
+        {
+            oss << " * dx";
+        }
+        if (dx_power > 0)
+        {
+            oss << ")";
+        }
     }
     return oss.str();
 }
@@ -138,13 +187,65 @@ set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
     set<InputPoint> input_points;
     for (const StencilPoint& stencil_point : stencil.points)
     {
-        for (int iSlot = 0; iSlot < 4; iSlot++)
-        {
-            Point block_point{ CellSlotToBlock(iSlot + stencil_point.point.x), stencil_point.point.y, stencil_point.point.z };
-            input_points.insert({ block_point, chem });
-        }
+        input_points.insert({ stencil_point.point, chem });
     }
     return input_points;
+}
+
+// ---------------------------------------------------------------------
+
+string AppliedStencil::GetCode() const
+{
+    ostringstream oss;
+    oss << GetName() << " = ";
+    const string divisor_code = stencil.GetDivisorCode(); 
+    if (!divisor_code.empty())
+    {
+        oss << "(";
+    }
+    map<int, vector<Point>> weights;
+    for (const StencilPoint& stencil_point : stencil.points)
+    {
+        weights[stencil_point.weight].push_back(stencil_point.point);
+    }
+    bool is_first_weight_list = true;
+    for(const pair<int, vector<Point>>& weight_list : weights)
+    {
+        if (!is_first_weight_list)
+        {
+            oss << " + ";
+        }
+        is_first_weight_list = false;
+        const int weight = weight_list.first;
+        const vector<Point>& points = weight_list.second;
+        if (weight != 1)
+        {
+            oss << weight << " * ";
+            if (points.size() > 1)
+            {
+                oss << "(";
+            }
+        }
+        bool is_first_point = true;
+        for (const Point& point : points)
+        {
+            if (!is_first_point)
+            {
+                oss << " + ";
+            }
+            is_first_point = false;
+            oss << InputPoint{ point, chem }.GetName();
+        }
+        if (weight != 1 && points.size() > 1)
+        {
+            oss << ")";
+        }
+    }
+    if (!divisor_code.empty())
+    {
+        oss << ")" << divisor_code;
+    }
+    return oss.str();
 }
 
 // ---------------------------------------------------------------------
@@ -179,16 +280,16 @@ Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divi
         throw runtime_error("Internal error: StencilFrom2DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
-    for (int j = 0; j < N; j++)
+    for (int j = 0; j < M; j++)
     {
-        for (int i = 0; i < M; i++)
+        for (int i = 0; i < N; i++)
         {
-            if (arr[i][j] != 0)
+            if (arr[j][i] != 0)
             {
                 Point point{ 0, 0, 0 };
-                point.xyz[dim1] = i - (M - 1) / 2;
-                point.xyz[dim2] = j - (N - 1) / 2;
-                stencil.points.push_back({ point, arr[i][j] });
+                point.xyz[dim1] = i - (N - 1) / 2;
+                point.xyz[dim2] = - j + (M - 1) / 2; // rows are in reading order, heading south, which is negative y
+                stencil.points.push_back({ point, arr[j][i] });
             }
         }
     }
@@ -205,19 +306,19 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
         throw runtime_error("Internal error: StencilFrom3DArray takes an odd-sized array");
     }
     Stencil stencil{ label, {}, divisor, dx_power };
-    for (int k = 0; k < N; k++)
+    for (int k = 0; k < L; k++)
     {
         for (int j = 0; j < M; j++)
         {
-            for (int i = 0; i < L; i++)
+            for (int i = 0; i < N; i++)
             {
-                if (arr[i][j][k] != 0)
+                if (arr[k][j][i] != 0)
                 {
                     Point point{ 0, 0, 0 };
-                    point.xyz[dim1] = i - (L - 1) / 2;
-                    point.xyz[dim2] = j - (M - 1) / 2;
-                    point.xyz[dim3] = k - (N - 1) / 2;
-                    stencil.points.push_back({ point, arr[i][j][k] });
+                    point.xyz[dim1] = i - (N - 1) / 2;
+                    point.xyz[dim2] = -j + (M - 1) / 2; // rows are in reading order, heading south, which is negative y
+                    point.xyz[dim3] = k - (L - 1) / 2;
+                    stencil.points.push_back({ point, arr[k][j][i] });
                 }
             }
         }
@@ -233,17 +334,17 @@ Stencil GetGaussianStencil(int dimensionality)
     {
     case 1:
         // from OpenCV
-        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 1, 0); // is dx_power correct?
+        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 0, 0); // is dx_power correct?
     case 2:
         // from https://homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
-        return StencilFrom2DArray("gaussian", {{1,4,7,4,1},{4,16,26,16,4},{7,26,41,26,7},{4,16,26,16,4},{1,4,7,4,1}}, 273, 1, 0, 1); // is dx_power correct?
+        return StencilFrom2DArray("gaussian", {{1,4,7,4,1},{4,16,26,16,4},{7,26,41,26,7},{4,16,26,16,4},{1,4,7,4,1}}, 273, 0, 0, 1); // is dx_power correct?
     case 3:
         // see Scripts/Python/convolve.py
         return StencilFrom3DArray("gaussian", {{{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}},
                                                {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
                                                {{7,27,44,27,7},{26,101,164,101,26},{41,159,258,159,41},{26,101,164,101,26},{7,27,44,27,7}},
                                                {{4,16,25,16,4},{16,62,101,62,16},{26,101,164,101,26},{16,62,101,62,16},{4,16,25,16,4}},
-                                               {{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}}}, 4390, 1, 0, 1, 2); // is dx_power correct?
+                                               {{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}}}, 4390, 0, 0, 1, 2); // is dx_power correct?
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetGaussianStencil");
     }
@@ -348,12 +449,36 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
-    Stencil SobelNE = StencilFrom2DArray("sobel_ne", { {2, 1, 0}, {1, 0, -1}, {0, -1, -2} }, 1, 0, 0, 1);
+    Stencil SobelN = StencilFrom2DArray("sobelN", { {1, 2, 1},
+                                                    {0, 0, 0},
+                                                    {-1, -2, -1} }, 1, 0, 0, 1);
+    Stencil SobelS = StencilFrom2DArray("sobelS", { {-1, -2, -1},
+                                                    {0, 0, 0},
+                                                    {1, 2, 1} }, 1, 0, 0, 1);
+    Stencil SobelE = StencilFrom2DArray("sobelE", { {-1, 0, 1},
+                                                    {-2, 0, 2},
+                                                    {-1, 0, 1} }, 1, 0, 0, 1);
+    Stencil SobelW = StencilFrom2DArray("sobelW", { {1, 0, -1},
+                                                    {2, 0, -2},
+                                                    {1, 0, -1} }, 1, 0, 0, 1);
+    Stencil SobelNW = StencilFrom2DArray("sobelNW", { {2, 1, 0},
+                                                      {1, 0, -1},
+                                                      {0, -1, -2} }, 1, 0, 0, 1);
+    Stencil SobelNE = StencilFrom2DArray("sobelNE", { {0, 1, 2},
+                                                      {-1, 0, 1},
+                                                      {-2, -1, 0} }, 1, 0, 0, 1);
+    Stencil SobelSW = StencilFrom2DArray("sobelSW", { {0, -1, -2},
+                                                      {1, 0, -1},
+                                                      {2, 1, 0} }, 1, 0, 0, 1);
+    Stencil SobelSE = StencilFrom2DArray("sobelSE", { {-2, -1, 0},
+                                                      {-1, 0, 1},
+                                                      {0, 1, 2} }, 1, 0, 0, 1);
     Stencil Gaussian = GetGaussianStencil(dimensionality);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, SobelNE };
+    return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, 
+        SobelN, SobelS, SobelE, SobelW, SobelNW, SobelNE, SobelSW, SobelSE };
 }
 
 // ---------------------------------------------------------------------

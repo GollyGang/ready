@@ -48,95 +48,25 @@
         0.1
       </param>
       <formula number_of_chemicals="7">
-        float4 uax = (float4)(
-(-(a_nw.w + a_sw.w) + (a_n.y   + a_s.y) - 2.0f * a_w.w + 2.0f * a.y  ),
-(-(a_n.x  + a_s.x)  + (a_n.z   + a_s.z) - 2.0f * a.x   + 2.0f * a.z  ),
-(-(a_n.y  + a_s.y)  + (a_n.w   + a_s.w) - 2.0f * a.y   + 2.0f * a.w  ),
-(-(a_n.z  + a_s.z)  + (a_ne.x + a_se.x) - 2.0f * a.z   + 2.0f * a_e.x));
-
-
-float4 uay = (float4)(
-((a_nw.w + a_n.y ) - (a_sw.w +  a_s.y) - 2.0f * a_s.x + 2.0f * a_n.x),
-((a_n.x  + a_n.z ) - (a_s.x  +  a_s.z) - 2.0f * a_s.y + 2.0f * a_n.y),
-((a_n.y  + a_n.w ) - (a_s.y  +  a_s.w) - 2.0f * a_s.z + 2.0f * a_n.z),
-((a_n.z  + a_ne.x) - (a_s.z  + a_se.x) - 2.0f * a_s.w + 2.0f * a_n.w));
-
-
-float4 uax2 = (float4)(
-(a_nw.w + a_sw.w + a_n.y   + a_s.y) + 2.0f * (a_w.w + a.y  ) - 2.0f * (a_n.x + a_s.x + 2.0f * a.x),
-(a_n.x  + a_s.x  + a_n.z   + a_s.z) + 2.0f * (a.x   + a.z  ) - 2.0f * (a_n.y + a_s.y + 2.0f * a.y),
-(a_n.y  + a_s.y  + a_n.w   + a_s.w) + 2.0f * (a.y   + a.w  ) - 2.0f * (a_n.z + a_s.z + 2.0f * a.z),
-(a_n.z  + a_s.z  + a_ne.x + a_se.x) + 2.0f * (a.z   + a_e.x) - 2.0f * (a_n.w + a_s.w + 2.0f * a.w));
-
-
-float4 uay2 = (float4)(
-(a_nw.w + a_sw.w + a_n.y   + a_s.y) + 2.0f * (a_n.x + a_s.x) - 2.0f * (a_w.w + a.y   + 2.0f * a.x),
-(a_n.x  + a_s.x  + a_n.z   + a_s.z) + 2.0f * (a_n.y + a_s.y) - 2.0f * (a.x   + a.z   + 2.0f * a.y),
-(a_n.y  + a_s.y  + a_n.w   + a_s.w) + 2.0f * (a_n.z + a_s.z) - 2.0f * (a.y   + a.w   + 2.0f * a.z),
-(a_n.z  + a_s.z  + a_ne.x + a_se.x) + 2.0f * (a_n.w + a_s.w) - 2.0f * (a.z   + a_e.x + 2.0f * a.w));
-
-
-float4 uaxy = (float4)(
-(- a_nw.w + a_sw.w + a_n.y  - a_s.y),
-(- a_n.x  + a_s.x  + a_n.z  - a_s.z),
-(- a_n.y  + a_s.y  + a_n.w  - a_s.w),
-(- a_n.z  + a_s.z  + a_ne.x - a_se.x));
-
-
+float4 uax = sobelE_a;
+float4 uay = sobelN_a;
+float4 uax2 = (a_nw + a_sw + a_ne + a_se) + 2.0f * (a_w + a_e) - 2.0f * (a_n + a_s + 2.0f * a);
+float4 uay2 = (a_nw + a_sw + a_ne + a_se) + 2.0f * (a_n + a_s) - 2.0f * (a_w + a_e + 2.0f * a);
+float4 uaxy = -a_nw + a_sw + a_ne - a_se;
 float4 uaxsq = pow(uax, 2.0f);
 float4 uaysq = pow(uay, 2.0f);
 float4 dsq = 0;
 if (!(any(isequal(uaxsq, 0)) || any(isequal(uaysq, 0)))) {
-    dsq = (uaxsq * uax2 + 2 * uax * uay * uaxy + uaysq * uay2) / (uaxsq * uaysq); 
+    dsq = (uaxsq * uax2 + 2 * uax * uay * uaxy + uaysq * uay2) / (uaxsq * uaysq);
 }
-
-
-float4 ubx = (float4)(
-(-(b_nw.w + b_sw.w) + (b_n.y   + b_s.y) - 2.0f * b_w.w + 2.0f * b.y  ),
-(-(b_n.x  + b_s.x)  + (b_n.z   + b_s.z) - 2.0f * b.x   + 2.0f * b.z  ),
-(-(b_n.y  + b_s.y)  + (b_n.w   + b_s.w) - 2.0f * b.y   + 2.0f * b.w  ),
-(-(b_n.z  + b_s.z)  + (b_ne.x + b_se.x) - 2.0f * b.z   + 2.0f * b_e.x));
-
-
-float4 uby = (float4)(
-((b_nw.w + b_n.y ) - (b_sw.w +  b_s.y) - 2.0f * b_s.x + 2.0f * b_n.x),
-((b_n.x  + b_n.z ) - (b_s.x  +  b_s.z) - 2.0f * b_s.y + 2.0f * b_n.y),
-((b_n.y  + b_n.w ) - (b_s.y  +  b_s.w) - 2.0f * b_s.z + 2.0f * b_n.z),
-((b_n.z  + b_ne.x) - (b_s.z  + b_se.x) - 2.0f * b_s.w + 2.0f * b_n.w));
-
-
-float4 ucx = (float4)(
-(-(c_nw.w + c_sw.w) + (c_n.y   + c_s.y) - 2.0f * c_w.w + 2.0f * c.y  ),
-(-(c_n.x  + c_s.x)  + (c_n.z   + c_s.z) - 2.0f * c.x   + 2.0f * c.z  ),
-(-(c_n.y  + c_s.y)  + (c_n.w   + c_s.w) - 2.0f * c.y   + 2.0f * c.w  ),
-(-(c_n.z  + c_s.z)  + (c_ne.x + c_se.x) - 2.0f * c.z   + 2.0f * c_e.x));
-
-
-float4 ucy = (float4)(
-((c_nw.w + c_n.y ) - (c_sw.w +  c_s.y) - 2.0f * c_s.x + 2.0f * c_n.x),
-((c_n.x  + c_n.z ) - (c_s.x  +  c_s.z) - 2.0f * c_s.y + 2.0f * c_n.y),
-((c_n.y  + c_n.w ) - (c_s.y  +  c_s.w) - 2.0f * c_s.z + 2.0f * c_n.z),
-((c_n.z  + c_ne.x) - (c_s.z  + c_se.x) - 2.0f * c_s.w + 2.0f * c_n.w));
-
-
-float4 udx = (float4)(
-(-(d_nw.w + d_sw.w) + (d_n.y   + d_s.y) - 2.0f * d_w.w + 2.0f * d.y  ),
-(-(d_n.x  + d_s.x)  + (d_n.z   + d_s.z) - 2.0f * d.x   + 2.0f * d.z  ),
-(-(d_n.y  + d_s.y)  + (d_n.w   + d_s.w) - 2.0f * d.y   + 2.0f * d.w  ),
-(-(d_n.z  + d_s.z)  + (d_ne.x + d_se.x) - 2.0f * d.z   + 2.0f * d_e.x));
-
-
-float4 udy = (float4)(
-((d_nw.w + d_n.y ) - (d_sw.w +  d_s.y) - 2.0f * d_s.x + 2.0f * d_n.x),
-((d_n.x  + d_n.z ) - (d_s.x  +  d_s.z) - 2.0f * d_s.y + 2.0f * d_n.y),
-((d_n.y  + d_n.w ) - (d_s.y  +  d_s.w) - 2.0f * d_s.z + 2.0f * d_n.z),
-((d_n.z  + d_ne.x) - (d_s.z  + d_se.x) - 2.0f * d_s.w + 2.0f * d_n.w));
-
-
+float4 ubx = sobelE_b;
+float4 uby = sobelN_b;
+float4 ucx = sobelE_c;
+float4 ucy = sobelN_c;
+float4 udx = sobelE_d;
+float4 udy = sobelN_d;
 float4 dp1 = ucx * udx + ucy * udy;
 float4 dp2 = ubx * ucy - uby * ucx;
-
-
 delta_a = 2.0f * diff_ab * laplacian_a - a*b*b + F1*(1.0f-a);
 delta_b = diff_ab * laplacian_b + a*b*b - (F1+k1-d*b_feed)*b;
 delta_c = (a - 0.5f) * dps2 * dp2 + 2.0f * diff_cd * laplacian_c - c*d*d + F2*(1.0f-c);
@@ -145,183 +75,183 @@ e = 2.0f*b + d*2.0f;
 f = vs * sign(dsq) * pow(fabs(dsq), vp) + vo;
 g = (f * 2) + 0.5f;
       </formula>
-      
+
     </rule>
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite>
-          
+
         </overwrite>
         <constant value="1">
-          
+
         </constant>
         <everywhere>
-          
+
         </everywhere>
-        
+
       </overlay>
       <overlay chemical="b">
         <overwrite>
-          
+
         </overwrite>
         <white_noise low="0.4" high="0.6">
-          
+
         </white_noise>
         <circle radius="0.03">
           <point3D x="0.2" y="0.2" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
         <circle radius="0.03">
           <point3D x="0.5" y="0.3" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
         <circle radius="0.03">
           <point3D x="0.7" y="0.5" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
-        
+
       </overlay>
       <overlay chemical="a">
         <subtract>
-          
+
         </subtract>
         <constant value="0.5">
-          
+
         </constant>
         <circle radius="0.07">
           <point3D x="0.2" y="0.2" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
         <circle radius="0.07">
           <point3D x="0.5" y="0.3" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
         <circle radius="0.07">
           <point3D x="0.7" y="0.5" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
-        
+
       </overlay>
       <overlay chemical="c">
         <overwrite>
-          
+
         </overwrite>
         <constant value="1">
-          
+
         </constant>
         <everywhere>
-          
+
         </everywhere>
-        
+
       </overlay>
       <overlay chemical="d">
         <overwrite>
-          
+
         </overwrite>
         <white_noise low="0.4" high="0.6">
-          
+
         </white_noise>
         <circle radius="0.01">
           <point3D x="0.495" y="0.3" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
-        
+
       </overlay>
-      
+
     </initial_pattern_generator>
     <render_settings>
       <surface_color r="1" g="1" b="1">
-        
+
       </surface_color>
       <color_low r="0" g="0" b="1">
-        
+
       </color_low>
       <color_high r="1" g="0" b="0">
-        
+
       </color_high>
       <show_color_scale value="true">
-        
+
       </show_color_scale>
       <show_multiple_chemicals value="false">
-        
+
       </show_multiple_chemicals>
       <active_chemical value="g">
-        
+
       </active_chemical>
       <low value="0">
-        
+
       </low>
       <high value="1">
-        
+
       </high>
       <vertical_scale_1D value="30">
-        
+
       </vertical_scale_1D>
       <vertical_scale_2D value="15">
-        
+
       </vertical_scale_2D>
       <contour_level value="0.25">
-        
+
       </contour_level>
       <use_wireframe value="false">
-        
+
       </use_wireframe>
       <show_cell_edges value="false">
-        
+
       </show_cell_edges>
       <show_bounding_box value="true">
-        
+
       </show_bounding_box>
       <slice_3D value="true">
-        
+
       </slice_3D>
       <slice_3D_axis value="z">
-        
+
       </slice_3D_axis>
       <slice_3D_position value="0.5">
-        
+
       </slice_3D_position>
       <show_displacement_mapped_surface value="false">
-        
+
       </show_displacement_mapped_surface>
       <color_displacement_mapped_surface value="true">
-        
+
       </color_displacement_mapped_surface>
       <use_image_interpolation value="true">
-        
+
       </use_image_interpolation>
       <timesteps_per_render value="128">
-        
+
       </timesteps_per_render>
       <show_phase_plot value="false">
-        
+
       </show_phase_plot>
       <phase_plot_x_axis value="a">
-        
+
       </phase_plot_x_axis>
       <phase_plot_y_axis value="b">
-        
+
       </phase_plot_y_axis>
       <phase_plot_z_axis value="c">
-        
+
       </phase_plot_z_axis>
-      
+
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 255 0 255 0 0">

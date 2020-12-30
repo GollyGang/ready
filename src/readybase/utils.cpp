@@ -189,12 +189,12 @@ string ReplaceAllSubstrings(string subject, const string& search, const string& 
 
 vector<string> tokenize_for_keywords(const string& formula)
 {
-    // customized tokenize for when searching for keywords in formula rules: want case-sensitive, whole words only
+    // customized tokenize for when searching for keywords in formula rules: whole words only
     vector<string> tokens;
     string token;
     for (char c : formula)
     {
-        if ((c >= 'a' && c <= 'z') || c == '_')
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || (c >= '0' && c <= '9'))
         {
             token += c;
         }

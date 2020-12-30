@@ -60,70 +60,60 @@ struct KeywordOptions {
 
 // -------------------------------------------------------------------------
 
-string GetIndexString(int val, const string& coord, const string& coord_capital, bool wrap)
+void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
 {
-    ostringstream oss;
-    const string index = "index_" + coord;
-    if (val == 0)
+    // collect the float4 input blocks we will need
+    vector<InputPoint> input_blocks;
+    for (const InputPoint& input_point : options.inputs_needed)
     {
-        oss << index;
+        if (input_point.point.x % 4 == 0)
+        {
+            continue; // this block is already aligned
+        }
+        if (input_point.point.x >= 0)
+        {
+            input_blocks.push_back({ {input_point.point.x + 4 - (input_point.point.x % 4), input_point.point.y, input_point.point.z}, input_point.chem });
+        }
+        else
+        {
+            input_blocks.push_back({ {input_point.point.x - 4 - (input_point.point.x % 4), input_point.point.y, input_point.point.z}, input_point.chem });
+        }
     }
-    else if (wrap)
-    {
-        oss << "((" << index << showpos << val << " + " << coord_capital << ") & (" << coord_capital << " - 1))";
-    }
-    else
-    {
-        oss << "min(" << coord_capital << "-1, max(0, " << index << showpos << val << "))";
-    }
-    return oss.str();
-}
-
-void AddStencils_Block411(ostringstream& kernel_source, const KeywordOptions& options)
-{
-    // retrieve the values needed
+    options.inputs_needed.insert(input_blocks.begin(), input_blocks.end());
+    // retrieve the float4 input blocks needed from global memory
     for (const InputPoint& input_point : options.inputs_needed)
     {
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
         {
             continue; // central cell has already been retrieved
         }
-        const string index_x = GetIndexString(input_point.point.x, "x", "X", options.wrap);
-        const string index_y = GetIndexString(input_point.point.y, "y", "Y", options.wrap);
-        const string index_z = GetIndexString(input_point.point.z, "z", "Z", options.wrap);
-        kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName()
-            << " = " << input_point.chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "];\n";
+        if (input_point.point.x % 4 == 0)
+        {
+            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetDirectAccessCode(options.wrap) << ";\n";
+        }
+    }
+    // compute the non-block-aligned float4's from the block-aligned ones we have retrieved
+    for (const InputPoint& input_point : options.inputs_needed)
+    {
+        if (input_point.point.x % 4 != 0)
+        {
+            // swizzle from the retrieved blocks
+            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName() 
+                << " = (" << options.data_type_string << "4)(" << input_point.GetSwizzled() << ");\n";
+        }
     }
     // compute the stencils needed
     for (const AppliedStencil& applied_stencil : options.stencils_needed)
     {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetName()
-            << " = (" << options.data_type_string << "4)(\n" << options.indent << options.indent;
-        for (int iSlot = 0; iSlot < 4; iSlot++)
-        {
-            for (int iStencilPoint = 0; iStencilPoint < applied_stencil.stencil.points.size(); iStencilPoint++)
-            {
-                kernel_source << applied_stencil.stencil.points[iStencilPoint].GetCode(iSlot, applied_stencil.chem);
-                if (iStencilPoint < applied_stencil.stencil.points.size()-1)
-                {
-                    kernel_source << " + ";
-                }
-            }
-            if (iSlot < 3)
-            {
-                kernel_source << ",\n" << options.indent << options.indent;
-            }
-        }
-        kernel_source << ") / (" << applied_stencil.stencil.GetDivisorCode() << ");\n";
+        kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetCode() << ";\n";
     }
 }
 
 // -------------------------------------------------------------------------
 
-bool UsingKeyword(const string& formula, const string& keyword)
+bool UsingKeyword(const vector<string>& formula_tokens, const string& keyword)
 {
-    vector<string> tokens = tokenize_for_keywords(formula);
-    return find(tokens.begin(), tokens.end(), keyword) != tokens.end();
+    return find(formula_tokens.begin(), formula_tokens.end(), keyword) != formula_tokens.end();
     // TODO: parse properly: ignore comments, not in string, etc.
 }
 
@@ -173,6 +163,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     }
     kernel_source << "\n";
     // search the formula for keywords
+    const vector<string> formula_tokens = tokenize_for_keywords(this->formula);
     KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
     const vector<Stencil> known_stencils = GetKnownStencils(this->GetArenaDimensionality());
     map<string, int> gradient_mag_squared;
@@ -181,7 +172,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         const string chem = GetChemicalName(i);
         // search for keywords that make use of stencils
         set<string> dependent_stencils;
-        if (UsingKeyword(formula, "gradient_mag_squared_" + chem))
+        if (UsingKeyword(formula_tokens, "gradient_mag_squared_" + chem))
         {
             gradient_mag_squared[chem] = this->GetArenaDimensionality();
             switch (this->GetArenaDimensionality())
@@ -199,7 +190,7 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
         for (const Stencil& stencil : known_stencils)
         {
             const string keyword = stencil.label + "_" + chem;
-            if (UsingKeyword(formula, keyword) || dependent_stencils.find(keyword) != dependent_stencils.end())
+            if (UsingKeyword(formula_tokens, keyword) || dependent_stencils.find(keyword) != dependent_stencils.end())
             {
                 AppliedStencil applied_stencil{ stencil, chem };
                 options.stencils_needed.push_back(applied_stencil);
@@ -209,17 +200,25 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
             }
         }
         // search for direct access to neighbors, e.g. "a_nw"
-        for (int x = -1; x <= 1; x++)
+        const int MAX_RADIUS = 10; // surely if the user wants something this big they should use a kernel?
+        for (int x = -MAX_RADIUS; x <= MAX_RADIUS; x++)
         {
-            for (int y = -2; y <= 2; y++)
+            for (int y = -MAX_RADIUS; y <= MAX_RADIUS; y++)
             {
-                for (int z = -2; z <= 2; z++)
+                for (int z = -MAX_RADIUS; z <= MAX_RADIUS; z++)
                 {
                     InputPoint input_point{ {x, y, z}, chem };
                     const string input_point_neighbor_name = input_point.GetName();
-                    if (UsingKeyword(formula, input_point_neighbor_name))
+                    if (UsingKeyword(formula_tokens, input_point_neighbor_name))
                     {
                         options.inputs_needed.insert(input_point);
+                        if (input_point.point.x % 4 != 0)
+                        {
+                            // add the block-aligned float4's we'll need to provide this non-block-aligned float4
+                            const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks();
+                            options.inputs_needed.insert(blocks.first);
+                            options.inputs_needed.insert(blocks.second);
+                        }
                     }
                 }
             }
@@ -240,17 +239,17 @@ std::string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(std::string fo
     // add the stencils we found
     AddStencils_Block411(kernel_source, options);
     // add x_pos, y_pos, z_pos if being used
-    if (UsingKeyword(formula, "x_pos"))
+    if (UsingKeyword(formula_tokens, "x_pos"))
     {
-        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (4 * index_x + (" << this->data_type_string
-            << "4)(0.0" << this->data_type_suffix << ", 1.0" << this->data_type_suffix << ", 2.0" << this->data_type_suffix
-            << ", 3.0" << this->data_type_suffix << ")) / (4.0" << this->data_type_suffix << " * X);\n";
+        kernel_source << indent << "const " << this->data_type_string << "4 x_pos = (index_x + (" << this->data_type_string
+            << "4)(0.0" << this->data_type_suffix << ", 0.25" << this->data_type_suffix << ", 0.5" << this->data_type_suffix
+            << ", 0.75" << this->data_type_suffix << ")) / X;\n";
     }
-    if (UsingKeyword(formula, "y_pos"))
+    if (UsingKeyword(formula_tokens, "y_pos"))
     {
         kernel_source << indent << "const " << this->data_type_string << "4 y_pos = index_y / (" << this->data_type_string << ")(Y); \n";
     }
-    if (UsingKeyword(formula, "z_pos"))
+    if (UsingKeyword(formula_tokens, "z_pos"))
     {
         kernel_source << indent << "const " << this->data_type_string << "4 z_pos = index_z / (" << this->data_type_string << ")(Z);\n";
     }
