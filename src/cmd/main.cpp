@@ -252,7 +252,7 @@ int main(int argc,char *argv[])
     Properties render_settings("render_settings");
     InitializeDefaultRenderSettings(render_settings);
 
-    AbstractRD *system;
+    unique_ptr<AbstractRD> system;
     try
     {
         // Read the file
@@ -410,7 +410,7 @@ int main(int argc,char *argv[])
                 {
                     cout << "\n";
                     cout << "nchem: " << ix << "\n";
-                    OpenCLImageRD *isystem = dynamic_cast< OpenCLImageRD* >(system);
+                    const OpenCLImageRD &isystem = dynamic_cast<const OpenCLImageRD&>(*system);
 
                     cout << "xres=" << system->GetX() << "\n";
                     cout << "yres=" << system->GetY() << "\n";
@@ -422,7 +422,7 @@ int main(int argc,char *argv[])
                     cout << "Reagent block size is: " << reagent_block_size << "\n";
                     float* rd_data = new float[reagent_block_size];
 
-                    isystem->GetFromOpenCLBuffers( rd_data, ix );
+                    isystem.GetFromOpenCLBuffers( rd_data, ix );
 
                     cout << "\nRD data for reagent " << ix << ": [ ";
                     for (unsigned long rix=0; rix<reagent_block_size; rix++)
@@ -488,7 +488,6 @@ int main(int argc,char *argv[])
         return EXIT_FAILURE;
     }
 
-    delete system;
     return EXIT_SUCCESS;
 }
 

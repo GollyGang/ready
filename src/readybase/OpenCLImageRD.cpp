@@ -234,7 +234,7 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
+void OpenCLImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id ) const
 {
     // read from opencl buffers into our image
     const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();

@@ -34,8 +34,8 @@ class wxVTKRenderWindowInteractor;
 #include "InteractorStylePainter.hpp"
 
 // readybase
+#include "AbstractRD.hpp"
 #include "Properties.hpp"
-class AbstractRD;
 
 // VTK:
 class vtkUnstructuredGrid;
@@ -54,7 +54,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool UserWantsToCancelWhenAskedIfWantsToSave();
 
         // interface with InfoPanel
-        AbstractRD* GetCurrentRDSystem() { return system; }
+        AbstractRD& GetCurrentRDSystem() { return *this->system; }
         void SetRuleName(std::string s);
         void SetDescription(std::string s);
         void SetParameter(int iParam,float val);
@@ -75,7 +75,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnChar(wxKeyEvent& event);
         void ProcessKey(int key, int modifiers);
 
-        bool IsFullScreen() { return this->fullscreen; }
+        bool IsFullScreen() const { return this->fullscreen; }
 
         // implementation of IPaintHandler interface
         virtual void LeftMouseDown(int x,int y);
@@ -207,7 +207,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void CheckFocus();
         void EnableAllMenus(bool enable);
        
-        void SetCurrentRDSystem(AbstractRD* system);
+        void SetCurrentRDSystem(std::unique_ptr<AbstractRD> system);
         void UpdateWindows();
         void UpdateWindowTitle();
         void UpdateToolbars();
@@ -232,7 +232,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         vtkSmartPointer<wxVTKRenderWindowInteractor> pVTKWindow;
 
         // current system being simulated (in future we might want more than one)
-        AbstractRD *system;
+        std::unique_ptr<AbstractRD> system;
 
         // panes:
         PatternsPanel *patterns_panel;

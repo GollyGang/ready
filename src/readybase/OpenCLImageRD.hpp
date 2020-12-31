@@ -45,7 +45,7 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual void Undo();
         virtual void Redo();
-        virtual void GetFromOpenCLBuffers( float* dest, int chemical_id );
+        virtual void GetFromOpenCLBuffers( float* dest, int chemical_id ) const;
 
     protected:
 

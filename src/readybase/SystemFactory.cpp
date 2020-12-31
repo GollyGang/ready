@@ -41,16 +41,31 @@ using namespace std;
 
 // -------------------------------------------------------------------------------------------------------------
 
-AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                    Properties &render_settings,bool &warn_to_update);
+unique_ptr<AbstractRD> CreateFromImageDataFile(
+    const char *filename,
+    bool is_opencl_available,
+    int opencl_platform,
+    int opencl_device,
+    Properties &render_settings,
+    bool &warn_to_update);
 
-AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                           Properties &render_settings,bool &warn_to_update);
+unique_ptr<AbstractRD> CreateFromUnstructuredGridFile(
+    const char *filename,
+    bool is_opencl_available,
+    int opencl_platform,
+    int opencl_device,
+    Properties &render_settings,
+    bool &warn_to_update);
 
 // -------------------------------------------------------------------------------------------------------------
 
-AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                          Properties &render_settings,bool &warn_to_update)
+unique_ptr<AbstractRD> SystemFactory::CreateFromFile(
+    const char *filename,
+    bool is_opencl_available,
+    int opencl_platform,
+    int opencl_device,
+    Properties &render_settings,
+    bool &warn_to_update)
 {
     // temporarily turn off internationalisation, to avoid string-to-float conversion issues
     char *old_locale = setlocale(LC_NUMERIC,"C");
@@ -58,7 +73,7 @@ AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_av
     vtkSmartPointer<vtkXMLGenericDataObjectReader> generic_reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
     bool parallel;
     int data_structure_type = generic_reader->ReadOutputType(filename,parallel);
-    AbstractRD *system;
+    unique_ptr<AbstractRD> system;
     switch(data_structure_type)
     {
         case VTK_IMAGE_DATA:
@@ -83,8 +98,13 @@ AbstractRD* SystemFactory::CreateFromFile(const char *filename,bool is_opencl_av
 
 // -------------------------------------------------------------------------------------------------------------
 
-AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                    Properties &render_settings,bool &warn_to_update)
+unique_ptr<AbstractRD> CreateFromImageDataFile(
+    const char *filename,
+    bool is_opencl_available,
+    int opencl_platform,
+    int opencl_device,
+    Properties &render_settings,
+    bool &warn_to_update)
 {
     vtkSmartPointer<RD_XMLImageReader> reader = vtkSmartPointer<RD_XMLImageReader>::New();
     reader->SetFileName(filename);
@@ -102,11 +122,11 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     string type = reader->GetType();
     string name = reader->GetName();
 
-    ImageRD* image_system;
+    unique_ptr<ImageRD> image_system;
     if(type=="inbuilt")
     {
         if(name=="Gray-Scott")
-            image_system = new GrayScottImageRD();
+            image_system = make_unique<GrayScottImageRD>();
         else
             throw runtime_error("Unsupported inbuilt implementation: "+name);
     }
@@ -114,13 +134,13 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
     {
         if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
-        image_system = new FormulaOpenCLImageRD(opencl_platform,opencl_device,data_type);
+        image_system = make_unique<FormulaOpenCLImageRD>(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
         if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
-        image_system = new FullKernelOpenCLImageRD(opencl_platform,opencl_device,data_type);
+        image_system = make_unique<FullKernelOpenCLImageRD>(opencl_platform,opencl_device,data_type);
     }
     else throw runtime_error("Unsupported rule type: "+type);
     image_system->InitializeFromXML(reader->GetRDElement(),warn_to_update);
@@ -147,8 +167,13 @@ AbstractRD* CreateFromImageDataFile(const char *filename,bool is_opencl_availabl
 
 // -------------------------------------------------------------------------------------------------------------
 
-AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                                           Properties &render_settings,bool &warn_to_update)
+unique_ptr<AbstractRD> CreateFromUnstructuredGridFile(
+    const char *filename,
+    bool is_opencl_available,
+    int opencl_platform,
+    int opencl_device,
+    Properties &render_settings,
+    bool &warn_to_update)
 {
     vtkSmartPointer<RD_XMLUnstructuredGridReader> reader = vtkSmartPointer<RD_XMLUnstructuredGridReader>::New();
     reader->SetFileName(filename);
@@ -166,11 +191,11 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     string type = reader->GetType();
     string name = reader->GetName();
 
-    MeshRD* mesh_system;
+    unique_ptr<MeshRD> mesh_system;
     if(type=="inbuilt")
     {
         if(name=="Gray-Scott")
-            mesh_system = new GrayScottMeshRD();
+            mesh_system = make_unique<GrayScottMeshRD>();
         else
             throw runtime_error("Unsupported inbuilt implementation: "+name);
     }
@@ -178,13 +203,13 @@ AbstractRD* CreateFromUnstructuredGridFile(const char *filename,bool is_opencl_a
     {
         if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
-        mesh_system = new FormulaOpenCLMeshRD(opencl_platform,opencl_device,data_type);
+        mesh_system = make_unique<FormulaOpenCLMeshRD>(opencl_platform,opencl_device,data_type);
     }
     else if(type=="kernel")
     {
         if(!is_opencl_available)
             throw runtime_error(OpenCL_utils::GetOpenCLInstallationHints());
-        mesh_system = new FullKernelOpenCLMeshRD(opencl_platform,opencl_device,data_type);
+        mesh_system = make_unique<FullKernelOpenCLMeshRD>(opencl_platform,opencl_device,data_type);
     }
     else throw runtime_error("Unsupported rule type: "+type);
 

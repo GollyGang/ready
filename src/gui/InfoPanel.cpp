@@ -359,7 +359,7 @@ void InfoPanel::ResetPosition()
 
 // -----------------------------------------------------------------------------
 
-void InfoPanel::Update(const AbstractRD* const system)
+void InfoPanel::Update(const AbstractRD& system)
 {
     // build HTML string to display current parameters
     wxString contents;
@@ -368,27 +368,27 @@ void InfoPanel::Update(const AbstractRD* const system)
 
     rownum = 0;
 
-    wxString s(system->GetRuleName().c_str(),wxConvUTF8);
+    wxString s(system.GetRuleName().c_str(),wxConvUTF8);
     contents += AppendRow(rule_name_label, rule_name_label, s, true);
 
-    s = wxString(system->GetRuleType().c_str(),wxConvUTF8);
+    s = wxString(system.GetRuleType().c_str(),wxConvUTF8);
     contents += AppendRow(rule_type_label, rule_type_label, s, false);
 
-    s = wxString(system->GetDescription().c_str(),wxConvUTF8);
+    s = wxString(system.GetDescription().c_str(),wxConvUTF8);
     s.Replace(wxT("\n\n"), wxT("<p>"));
     contents += AppendRow(description_label, description_label, s, true, true);
 
-    contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system->GetNumberOfChemicals()),
-                          system->HasEditableNumberOfChemicals());
+    contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system.GetNumberOfChemicals()),
+                          system.HasEditableNumberOfChemicals());
 
-    for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
+    for(int iParam=0;iParam<(int)system.GetNumberOfParameters();iParam++)
     {
-        contents += AppendRow(system->GetParameterName(iParam), system->GetParameterName(iParam),
-                              FormatFloat(system->GetParameterValue(iParam)), true);
+        contents += AppendRow(system.GetParameterName(iParam), system.GetParameterName(iParam),
+                              FormatFloat(system.GetParameterValue(iParam)), true);
     }
 
-    wxString formula = system->GetFormula();
-    if(system->HasEditableFormula() || formula.size()>0)
+    wxString formula = system.GetFormula();
+    if(system.HasEditableFormula() || formula.size()>0)
     {
         // escape HTML reserved characters
         formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
@@ -405,36 +405,36 @@ void InfoPanel::Update(const AbstractRD* const system)
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        if(system->GetRuleType()=="kernel")
-            contents += AppendRow(kernel_label, kernel_label, formula, system->HasEditableFormula(), true);
+        if(system.GetRuleType()=="kernel")
+            contents += AppendRow(kernel_label, kernel_label, formula, system.HasEditableFormula(), true);
         else
-            contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
+            contents += AppendRow(formula_label, formula_label, formula, system.HasEditableFormula(), true);
     }
 
-    if(system->HasEditableDimensions())
+    if(system.HasEditableDimensions())
         contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
-                                        FormatFloat(system->GetX(),3),FormatFloat(system->GetY(),3),FormatFloat(system->GetZ(),3)),
-                                        system->HasEditableDimensions());
+                                        FormatFloat(system.GetX(),3),FormatFloat(system.GetY(),3),FormatFloat(system.GetZ(),3)),
+                                        system.HasEditableDimensions());
     else
         contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
-                                        system->GetNumberOfCells()),false);
+                                        system.GetNumberOfCells()),false);
 
-    if(!system->HasEditableDimensions() || system->GetRuleType()!="kernel")
+    if(!system.HasEditableDimensions() || system.GetRuleType()!="kernel")
     {
         // (hide the neighborhood for image-based kernels, which don't use it)
-        contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system->GetNeighborhoodType()+"-neighbors", false);
+        contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType()+"-neighbors", false);
     }
 
     /* bit technical, leave as a file-only option
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
-                                        system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
-                                        system->HasEditableBlockSize());*/
+                                        system.GetBlockSizeX(),system.GetBlockSizeY(),system.GetBlockSizeZ()),
+                                        system.HasEditableBlockSize());*/
 
-    if(system->HasEditableWrapOption())
-        contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
+    if(system.HasEditableWrapOption())
+        contents += AppendRow(wrap_label, wrap_label, system.GetWrap()?_("on"):_("off"), true);
 
-    contents += AppendRow(data_type_label,data_type_label,system->GetDataType()==VTK_DOUBLE?_("double"):_("float"),
-        system->HasEditableDataType());
+    contents += AppendRow(data_type_label,data_type_label,system.GetDataType()==VTK_DOUBLE?_("double"):_("float"),
+        system.HasEditableDataType());
 
     contents += _T("</table>");
 
@@ -610,7 +610,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
     else if(type=="chemical")
     {
         wxArrayString choices;
-        for(int i=0;i<this->frame->GetCurrentRDSystem()->GetNumberOfChemicals();i++)
+        for(int i=0;i<this->frame->GetCurrentRDSystem().GetNumberOfChemicals();i++)
             choices.Add(GetChemicalName(i));
         wxSingleChoiceDialog dlg(this,_("Chemical:"),_("Select active chemical"),
             choices);
@@ -644,21 +644,21 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
+    const AbstractRD& sys = frame->GetCurrentRDSystem();
     int iParam = 0;
-    while (iParam < (int)sys->GetNumberOfParameters()) {
-        if (parameter == sys->GetParameterName(iParam)) break;
+    while (iParam < (int)sys.GetNumberOfParameters()) {
+        if (parameter == sys.GetParameterName(iParam)) break;
         iParam++;
     }
-    if (iParam == (int)sys->GetNumberOfParameters()) {
+    if (iParam == (int)sys.GetNumberOfParameters()) {
         Warning(_("Bug in ChangeParameter! Unknown parameter: ") + parameter);
         return;
     }
 
     wxString newname;
     float newval;
-    float oldval = sys->GetParameterValue(iParam);
-    bool can_edit_name = sys->HasEditableFormula();
+    float oldval = sys.GetParameterValue(iParam);
+    bool can_edit_name = sys.HasEditableFormula();
 
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
@@ -680,7 +680,7 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
 
 void InfoPanel::ChangeRuleName()
 {
-    wxString oldname(frame->GetCurrentRDSystem()->GetRuleName().c_str(),wxConvUTF8);
+    wxString oldname(frame->GetCurrentRDSystem().GetRuleName().c_str(),wxConvUTF8);
     wxString newname;
 
     // position dialog box to left of linkrect
@@ -699,7 +699,7 @@ void InfoPanel::ChangeRuleName()
 
 void InfoPanel::ChangeDescription()
 {
-    wxString oldtext(frame->GetCurrentRDSystem()->GetDescription().c_str(),wxConvUTF8);
+    wxString oldtext(frame->GetCurrentRDSystem().GetDescription().c_str(),wxConvUTF8);
     wxString newtext;
 
     MultiLineDialog dialog(frame, _("Change description"), _("Enter the new description:"), oldtext);
@@ -722,10 +722,10 @@ void InfoPanel::ChangeDescription()
 
 void InfoPanel::ChangeFormula()
 {
-    wxString oldcode(frame->GetCurrentRDSystem()->GetFormula().c_str(),wxConvUTF8);
+    wxString oldcode(frame->GetCurrentRDSystem().GetFormula().c_str(),wxConvUTF8);
     wxString newcode;
 
-    wxString code_type(frame->GetCurrentRDSystem()->GetRuleType().c_str(),wxConvUTF8);
+    wxString code_type(frame->GetCurrentRDSystem().GetRuleType().c_str(),wxConvUTF8);
     MultiLineDialog dialog(frame, _("Change ")+code_type, _("Enter the new ")+code_type+_T(":"), oldcode);
 
     // best to center potentially large dialog box
@@ -748,7 +748,7 @@ void InfoPanel::ChangeNumChemicals()
 {
     const int MAX_CHEMICALS = 1000;
 
-    int oldnum = frame->GetCurrentRDSystem()->GetNumberOfChemicals();
+    int oldnum = frame->GetCurrentRDSystem().GetNumberOfChemicals();
     int newnum;
 
     // position dialog box to left of linkrect
@@ -769,10 +769,10 @@ void InfoPanel::ChangeNumChemicals()
 
 void InfoPanel::ChangeDimensions()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    int oldx = sys->GetX();
-    int oldy = sys->GetY();
-    int oldz = sys->GetZ();
+    const AbstractRD& sys = frame->GetCurrentRDSystem();
+    int oldx = sys.GetX();
+    int oldy = sys.GetY();
+    int oldz = sys.GetZ();
     int newx, newy, newz;
 
     // position dialog box to left of linkrect
@@ -789,12 +789,12 @@ void InfoPanel::ChangeDimensions()
         newz = dialog.GetZ();
         if (newx == oldx && newy == oldy && newz == oldz) break;
         const bool not_all_powers_of_two = newx&(newx - 1) || newy&(newy - 1) || newz&(newz - 1);
-        if (sys->GetRuleType() == "formula" && not_all_powers_of_two)
+        if (sys.GetRuleType() == "formula" && not_all_powers_of_two)
         {
             wxMessageBox(_("For efficient wrap-around in OpenCL we require all the dimensions to be powers of 2"));
             continue;
         }
-        else if (sys->GetRuleType() == "kernel" && not_all_powers_of_two)
+        else if (sys.GetRuleType() == "kernel" && not_all_powers_of_two)
         {
             int answer = wxMessageBox(
                 _("Check the kernel to see if it supports dimensions that are not powers of 2"),
@@ -811,10 +811,10 @@ void InfoPanel::ChangeDimensions()
 
 void InfoPanel::ChangeBlockSize()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    int oldx = sys->GetBlockSizeX();
-    int oldy = sys->GetBlockSizeY();
-    int oldz = sys->GetBlockSizeZ();
+    const AbstractRD& sys = frame->GetCurrentRDSystem();
+    int oldx = sys.GetBlockSizeX();
+    int oldy = sys.GetBlockSizeY();
+    int oldz = sys.GetBlockSizeZ();
     int newx, newy, newz;
 
     // position dialog box to left of linkrect
@@ -838,8 +838,8 @@ void InfoPanel::ChangeBlockSize()
 
 void InfoPanel::ChangeWrapOption()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    sys->SetWrap(!sys->GetWrap());
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    sys.SetWrap(!sys.GetWrap());
     this->Update(sys);
 }
 
@@ -847,11 +847,11 @@ void InfoPanel::ChangeWrapOption()
 
 void InfoPanel::ChangeDataType()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    switch( sys->GetDataType() ) {
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    switch( sys.GetDataType() ) {
         default:
-        case VTK_FLOAT: sys->SetDataType( VTK_DOUBLE ); break;
-        case VTK_DOUBLE: sys->SetDataType( VTK_FLOAT ); break;
+        case VTK_FLOAT: sys.SetDataType( VTK_DOUBLE ); break;
+        case VTK_DOUBLE: sys.SetDataType( VTK_FLOAT ); break;
     }
     this->Update(sys);
     frame->RenderSettingsChanged();
@@ -888,7 +888,7 @@ void InfoPanel::ChangeInfo(const wxString& label)
     } else if ( frame->GetRenderSettings().IsProperty(string(label.mb_str())) ) {
         ChangeRenderSetting(label);
 
-    } else if ( frame->GetCurrentRDSystem()->IsParameter(string(label.mb_str())) ) {
+    } else if ( frame->GetCurrentRDSystem().IsParameter(string(label.mb_str())) ) {
         ChangeParameter(label);
     } else {
         Warning(_("Bug in ChangeInfo! Unexpected label: ") + label);
