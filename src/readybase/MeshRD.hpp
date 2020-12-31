@@ -32,7 +32,6 @@ class MeshRD : public AbstractRD
     public:
 
         MeshRD(int data_type);
-        virtual ~MeshRD();
 
         virtual void SaveFile(const char* filename,const Properties& render_settings,
             bool generate_initial_pattern_when_loading) const;
@@ -95,8 +94,8 @@ class MeshRD : public AbstractRD
         vtkSmartPointer<vtkUnstructuredGrid> starting_pattern; ///< we save the starting pattern, to allow the user to reset
 
         int max_neighbors;
-        int *cell_neighbor_indices;   ///< index of each neighbor of a cell
-        float *cell_neighbor_weights; ///< diffusion coefficient between each cell and a neighbor
+        std::vector<int> cell_neighbor_indices;   ///< index of each neighbor of a cell
+        std::vector<float> cell_neighbor_weights; ///< diffusion coefficient between each cell and a neighbor
 
         vtkSmartPointer<vtkCellLocator> cell_locator; ///< Returns a cell ID when given a 3D location
 
