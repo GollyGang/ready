@@ -44,7 +44,7 @@ class GrayScottImageRD : public InbuiltImageRD
 
     protected:
 
-        std::vector<vtkImageData*> buffer_images; // one for each chemical
+        std::vector<vtkSmartPointer<vtkImageData>> buffer_images; // one for each chemical
 
     protected:
 

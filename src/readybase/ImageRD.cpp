@@ -105,7 +105,7 @@ ImageRD::ImageRD(int data_type)
     , image_top1D(2.0)
     , image_ratio1D(30.0)
 {
-    this->starting_pattern = vtkImageData::New();
+    this->starting_pattern = vtkSmartPointer<vtkImageData>::New();
     this->assign_attribute_filter = NULL;
     this->rearrange_fields_filter = NULL;
 }
@@ -115,18 +115,12 @@ ImageRD::ImageRD(int data_type)
 ImageRD::~ImageRD()
 {
     this->DeallocateImages();
-    this->starting_pattern->Delete();
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::DeallocateImages()
 {
-    for(int iChem=0;iChem<(int)this->images.size();iChem++)
-    {
-        if(this->images[iChem])
-            this->images[iChem]->Delete();
-    }
     this->images.clear();
     this->n_chemicals = 0;
 }
@@ -294,10 +288,9 @@ void ImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 
 // ---------------------------------------------------------------------
 
-/* static */ vtkImageData* ImageRD::AllocateVTKImage(int x,int y,int z,int data_type)
+/* static */ vtkSmartPointer<vtkImageData> ImageRD::AllocateVTKImage(int x,int y,int z,int data_type)
 {
-    vtkImageData *im = vtkImageData::New();
-    assert(im);
+    vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
     im->SetDimensions(x,y,z);
     im->AllocateScalars(data_type,1);
     if(im->GetDimensions()[0]!=x || im->GetDimensions()[1]!=y || im->GetDimensions()[2]!=z)
@@ -1253,7 +1246,6 @@ void ImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
     }
     else {
         while (this->images.size() > n) {
-            this->images.back()->Delete();
             this->images.pop_back();
         }
     }
