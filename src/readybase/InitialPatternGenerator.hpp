@@ -43,6 +43,6 @@ class InitialPatternGenerator
 
         void RemoveAllOverlays();
 
-        std::vector<Overlay*> overlays; // TODO: use unique_ptr when C++11-compatible VTK is available on target platforms
+        std::vector<std::unique_ptr<Overlay>> overlays;
         bool zero_first;
 };
