@@ -46,10 +46,10 @@ class ImageRD : public AbstractRD
         virtual float GetZ() const;
         virtual void SetDimensions(int x,int y,int z);
         virtual void SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc);
-        
+
         virtual int GetNumberOfCells() const;
 
-        virtual void SetNumberOfChemicals(int n);
+        void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
         virtual void GenerateInitialPattern();
         virtual void BlankImage(float value = 0.0f);

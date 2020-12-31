@@ -117,9 +117,9 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
 
 // ---------------------------------------------------------------------
 
-void GrayScottMeshRD::SetNumberOfChemicals(int n)
+void GrayScottMeshRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
-    MeshRD::SetNumberOfChemicals(n);
+    MeshRD::SetNumberOfChemicals(n, reallocate_storage);
     this->buffer->DeepCopy(this->mesh);
 }
 

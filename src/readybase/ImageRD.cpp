@@ -127,6 +127,8 @@ void ImageRD::DeallocateImages()
         if(this->images[iChem])
             this->images[iChem]->Delete();
     }
+    this->images.clear();
+    this->n_chemicals = 0;
 }
 
 // ---------------------------------------------------------------------
@@ -1230,15 +1232,22 @@ void ImageRD::SetDimensions(int x, int y, int z)
 
 // ---------------------------------------------------------------------
 
-void ImageRD::SetNumberOfChemicals(int n)
+void ImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
+    if (reallocate_storage)
+    {
+        this->DeallocateImages();
+    }
     if (n == this->n_chemicals) {
         return;
     }
     if (n > this->n_chemicals)
     {
         while (this->images.size() < n) {
-            this->images.push_back( AllocateVTKImage(this->GetX(), this->GetY(), this->GetZ(), this->data_type) );
+            this->images.push_back( AllocateVTKImage(X, Y, Z, this->data_type) );
             this->images.back()->GetPointData()->GetScalars()->FillComponent(0, 0.0);
         }
     }

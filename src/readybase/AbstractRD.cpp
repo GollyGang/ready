@@ -388,8 +388,10 @@ int AbstractRD::GetDataType() const
 void AbstractRD::SetDataType(int type)
 {
     this->InternalSetDataType(type);
-    this->SetNumberOfChemicals(this->n_chemicals); // we use this because it causes the data to be reallocated
-    this->GenerateInitialPattern(); // TODO: would be nice to keep current pattern somehow
+    const bool reallocate_storage = true;
+    this->SetNumberOfChemicals(this->n_chemicals, reallocate_storage);
+    this->GenerateInitialPattern();
+    // TODO: would be nice to keep current pattern somehow, instead of reallocating and reinitializing
 }
 
 // ---------------------------------------------------------------------

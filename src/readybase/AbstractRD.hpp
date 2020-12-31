@@ -54,7 +54,7 @@ class AbstractRD
         /// Some implementations (e.g. inbuilt ones) cannot have their number_of_chemicals edited.
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
-        virtual void SetNumberOfChemicals(int n) =0;
+        virtual void SetNumberOfChemicals(int n, bool reallocate_storage = false) =0;
 
         /// How many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const { return this->timesteps_taken; }
