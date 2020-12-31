@@ -74,8 +74,8 @@ using namespace std;
 MeshRD::MeshRD(int data_type)
     : AbstractRD(data_type)
 {
-    this->starting_pattern = vtkUnstructuredGrid::New();
-    this->mesh = vtkUnstructuredGrid::New();
+    this->starting_pattern = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    this->mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     this->cell_neighbor_indices = NULL;
     this->cell_neighbor_weights = NULL;
     this->cell_locator = NULL;
@@ -88,12 +88,7 @@ MeshRD::~MeshRD()
     delete []this->cell_neighbor_indices;
     delete []this->cell_neighbor_weights;
 
-    this->mesh->Delete();
-    this->starting_pattern->Delete();
     this->n_chemicals = 0;
-
-    if(this->cell_locator)
-        this->cell_locator->Delete();
 }
 
 // ---------------------------------------------------------------------
@@ -245,11 +240,7 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
     this->is_modified = true;
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
 
-    if(this->cell_locator)
-    {
-        this->cell_locator->Delete();
-        this->cell_locator = NULL;
-    }
+    this->cell_locator = NULL;
 
     this->ComputeCellNeighbors(this->neighborhood_type);
 
@@ -1051,7 +1042,7 @@ void MeshRD::CreateCellLocatorIfNeeded()
 {
     if(this->cell_locator) return;
 
-    this->cell_locator = vtkCellLocator::New();
+    this->cell_locator = vtkSmartPointer<vtkCellLocator>::New();
     this->cell_locator->SetDataSet(this->mesh);
     this->cell_locator->SetTolerance(0.0001);
     this->cell_locator->BuildLocator();

@@ -39,7 +39,6 @@ class GrayScottMeshRD : public InbuiltMeshRD
     public:
 
         GrayScottMeshRD();
-        ~GrayScottMeshRD();
 
         void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
         virtual void CopyFromMesh(vtkUnstructuredGrid *mesh2);
@@ -50,5 +49,5 @@ class GrayScottMeshRD : public InbuiltMeshRD
 
     protected:
 
-        vtkUnstructuredGrid* buffer;           ///< temporary storage used during computation
+        vtkSmartPointer<vtkUnstructuredGrid> buffer;           ///< temporary storage used during computation
 };

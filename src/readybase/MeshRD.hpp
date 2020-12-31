@@ -91,14 +91,14 @@ class MeshRD : public AbstractRD
 
     protected: // variables
 
-        vtkUnstructuredGrid* mesh;             ///< the cell data contains a named array for each chemical ('a', 'b', etc.)
-        vtkUnstructuredGrid* starting_pattern; ///< we save the starting pattern, to allow the user to reset
+        vtkSmartPointer<vtkUnstructuredGrid> mesh;             ///< the cell data contains a named array for each chemical ('a', 'b', etc.)
+        vtkSmartPointer<vtkUnstructuredGrid> starting_pattern; ///< we save the starting pattern, to allow the user to reset
 
         int max_neighbors;
         int *cell_neighbor_indices;   ///< index of each neighbor of a cell
         float *cell_neighbor_weights; ///< diffusion coefficient between each cell and a neighbor
 
-        vtkCellLocator* cell_locator; ///< Returns a cell ID when given a 3D location
+        vtkSmartPointer<vtkCellLocator> cell_locator; ///< Returns a cell ID when given a 3D location
 
     private: // deliberately not implemented, to prevent use
 
