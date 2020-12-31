@@ -36,7 +36,7 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         virtual void TestFormula(std::string program_string);
 
-        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); } 
+        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); }
 
         virtual void SetFrom2DImage(int iChemical, vtkImageData *im);
 
@@ -46,13 +46,13 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
         virtual void Undo();
         virtual void Redo();
         virtual void GetFromOpenCLBuffers( float* dest, int chemical_id );
-		
+
     protected:
 
         virtual void CopyFromImage(vtkImageData* im);
 
         virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
-        virtual void SetNumberOfChemicals(int n);
+        void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
         virtual void InternalUpdate(int n_steps);
 

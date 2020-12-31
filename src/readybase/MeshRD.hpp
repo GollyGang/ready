@@ -43,13 +43,13 @@ class MeshRD : public AbstractRD
         virtual float GetY() const;
         virtual float GetZ() const;
 
-        virtual void SetNumberOfChemicals(int n);
+        void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
         virtual bool HasEditableFormula() const { return true; }
 
         virtual std::string GetFileExtension() const { return MeshRD::GetFileExtensionStatic(); }
         static std::string GetFileExtensionStatic() { return "vtu"; }
-        
+
         virtual int GetNumberOfCells() const;
 
         virtual void GenerateInitialPattern();

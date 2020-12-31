@@ -110,8 +110,13 @@ void MeshRD::Update(int n_steps)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::SetNumberOfChemicals(int n)
+void MeshRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
+    if (reallocate_storage)
+    {
+        this->mesh->GetCellData()->Initialize();
+        this->n_chemicals = 0;
+    }
     if (n == this->n_chemicals) {
         return;
     }

@@ -30,7 +30,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         OpenCLMeshRD(int opencl_platform,int opencl_device,int data_type);
         virtual ~OpenCLMeshRD();
 
-        virtual void SetNumberOfChemicals(int n);
+        void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
         virtual bool HasEditableFormula() const { return true; }
 
@@ -47,7 +47,7 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
         virtual void BlankImage(float value = 0.0f);
 
         virtual void TestFormula(std::string program_string);
-        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); } 
+        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); }
 
         virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
         virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);

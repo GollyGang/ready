@@ -51,9 +51,9 @@ OpenCLMeshRD::~OpenCLMeshRD()
 
 // -------------------------------------------------------------------------
 
-void OpenCLMeshRD::SetNumberOfChemicals(int n)
+void OpenCLMeshRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
-    MeshRD::SetNumberOfChemicals(n);
+    MeshRD::SetNumberOfChemicals(n, reallocate_storage);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();

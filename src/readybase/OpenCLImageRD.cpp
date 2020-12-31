@@ -177,9 +177,9 @@ void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::SetNumberOfChemicals(int n)
+void OpenCLImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
-    ImageRD::SetNumberOfChemicals(n);
+    ImageRD::SetNumberOfChemicals(n, reallocate_storage);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
