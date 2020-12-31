@@ -249,7 +249,7 @@ const float MyFrame::brush_sizes[] = {0.002f, 0.005f, 0.01f, 0.02f, 0.05f};
 // constructor
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
-       pVTKWindow(NULL),system(NULL),
+       system(NULL),
        is_running(false),
        speed_data_available(false),
        i_timesteps_per_second_buffer(0),
@@ -326,7 +326,6 @@ MyFrame::~MyFrame()
 {
     this->SaveSettings(); // save the current settings so it starts up the same next time
     this->aui_mgr.UnInit();
-    this->pVTKWindow->Delete();
     delete this->pencil_cursor;
     delete this->brush_cursor;
     delete this->picker_cursor;
@@ -664,7 +663,7 @@ void MyFrame::InitializeRenderPane()
 {
     // for now the VTK window goes in the center pane (always visible) - we got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
-    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
+    this->pVTKWindow = vtkSmartPointer<wxVTKRenderWindowInteractor>::Take(new wxVTKRenderWindowInteractor(this,wxID_ANY));
     this->aui_mgr.AddPane(this->pVTKWindow,
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::CanvasPane))

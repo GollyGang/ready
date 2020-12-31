@@ -229,7 +229,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         wxString default_perspective;
 
         // VTK does the rendering
-        wxVTKRenderWindowInteractor *pVTKWindow;
+        vtkSmartPointer<wxVTKRenderWindowInteractor> pVTKWindow;
 
         // current system being simulated (in future we might want more than one)
         AbstractRD *system;
