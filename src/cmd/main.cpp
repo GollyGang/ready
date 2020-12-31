@@ -345,11 +345,6 @@ int main(int argc,char *argv[])
                 cout << "Render settings:\n";
                 cout << "================================\n";
 
-                // A good example cast, left as a relic:
-                //AbstractRD* rdPlayer = dynamic_cast<AbstractRD*>(system);
-                //FormulaOpenCLImageRD* rdPlayer = dynamic_cast<FormulaOpenCLImageRD*>(system);
-                //Properties *render_settings = rdPlayer->render_settings;
-
                 int num_properties = render_settings.GetNumberOfProperties();
                 cout << "Number of properties is: " << num_properties << "\n";
                 for (int i=0;i<num_properties;i++)

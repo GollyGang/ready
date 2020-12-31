@@ -189,7 +189,7 @@ void MeshRD::GenerateInitialPattern()
                 vals[i] = this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str())->GetComponent( iCell, 0 );
                 if(i==iC) val = vals[i];
             }
-            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent( iCell, 0, overlay.Apply(vals,this,cp[0],cp[1],cp[2]) );
+            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent(iCell, 0, overlay.Apply(vals, *this, cp[0], cp[1], cp[2]));
         }
     }
     this->mesh->Modified();

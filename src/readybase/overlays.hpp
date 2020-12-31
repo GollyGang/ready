@@ -30,20 +30,79 @@
 #include "utils.hpp"
 class AbstractRD;
 
-// internal:
-class BaseOperation;
-class BaseFill;
-class BaseShape;
+// ------------------------------------------------------------------------------------------------
+
+/// Base class for a mathematical operation to be carried out at a particular location in the RD system.
+class BaseOperation : public XML_Object
+{
+public:
+
+    virtual ~BaseOperation() {}
+
+    /// construct when we don't know the derived type (returns empty pointer if name is unknown)
+    static std::unique_ptr<BaseOperation> New(vtkXMLDataElement* node);
+
+    /// apply the operation to target, with parameter value
+    virtual void Apply(double& target, double value) const = 0;
+
+protected:
+
+    /// can construct from an XML node
+    BaseOperation(vtkXMLDataElement* node) : XML_Object(node) {}
+};
+
+// ------------------------------------------------------------------------------------------------
+
+/// Base class for different ways of specifying values at a particular location in the RD system.
+class BaseFill : public XML_Object
+{
+public:
+
+    virtual ~BaseFill() {}
+
+    /// construct when we don't know the derived type (returns empty pointer if name is unknown)
+    static std::unique_ptr<BaseFill> New(vtkXMLDataElement* node);
+
+    /// what value would this fill type be at the given location, given the existing data
+    virtual double GetValue(const AbstractRD& system, const std::vector<double>& vals, float x, float y, float z) const = 0;
+
+protected:
+
+    /// can construct from an XML node
+    BaseFill(vtkXMLDataElement* node) : XML_Object(node) {}
+};
+
+// ------------------------------------------------------------------------------------------------
+
+/// Base class for different shapes that we can draw onto the RD system.
+class BaseShape : public XML_Object
+{
+public:
+
+    virtual ~BaseShape() {}
+
+    /// construct when we don't know the derived type (returns empty pointer if name is unknown)
+    static std::unique_ptr<BaseShape> New(vtkXMLDataElement* node);
+
+    /// returns whether the x, y, z location is inside this shape
+    virtual bool IsInside(float x, float y, float z, float X, float Y, float Z, int dimensionality) const = 0;
+
+protected:
+
+    /// can construct from an XML node
+    BaseShape(vtkXMLDataElement* node) : XML_Object(node) {}
+};
+
+// ------------------------------------------------------------------------------------------------
 
 /// An overlay is a filled shape to be drawn on top of an image (think: stacked transparencies).
 class Overlay : public XML_Object
 {
     public:
-    
+
         /// can construct from an XML node
         Overlay(vtkXMLDataElement* node);
-        ~Overlay();
-            
+
         /// for saving to file, get the overlay as an XML element
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
 
@@ -51,21 +110,24 @@ class Overlay : public XML_Object
 
         int GetTargetChemical() const { return this->iTargetChemical; }
 
-        /// given a vector of values (one for each chemical) at a location in a system, returns the new value
-        double Apply(std::vector<double> vals,AbstractRD* system,float x,float y,float z) const;
+        /// given a vector of values (one for each chemical) at a location in a system,
+        /// apply all the operations and return the new value
+        double Apply(const std::vector<double>& vals, const AbstractRD& system,float x,float y,float z) const;
 
     protected:
-    
+
         int iTargetChemical;             ///< each overlay applies to a single chemical
 
-        BaseOperation *op;               ///< e.g. overwrite, add, multiply, etc.
-        BaseFill *fill;                  ///< e.g. constant value, white noise, named parameter, other chemical, etc.
-        std::vector<BaseShape*> shapes;  ///< e.g. rectangle, sphere, scattered shapes, etc.
+        std::unique_ptr<BaseOperation> op;               ///< e.g. overwrite, add, multiply, etc.
+        std::unique_ptr<BaseFill> fill;                  ///< e.g. constant value, white noise, named parameter, other chemical, etc.
+        std::vector<std::unique_ptr<BaseShape>> shapes;  ///< e.g. rectangle, sphere, scattered shapes, etc.
 
     private:
 
         Overlay();          ///< not implemented
         Overlay(Overlay&);  ///< not implemented
 };
+
+// ------------------------------------------------------------------------------------------------
 
 #endif
