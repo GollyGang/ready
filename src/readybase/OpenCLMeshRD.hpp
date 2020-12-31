@@ -28,43 +28,43 @@ class OpenCLMeshRD : public MeshRD, public OpenCL_MixIn
     public:
 
         OpenCLMeshRD(int opencl_platform,int opencl_device,int data_type);
-        virtual ~OpenCLMeshRD();
+        ~OpenCLMeshRD();
 
         void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
-        virtual bool HasEditableFormula() const { return true; }
+        bool HasEditableFormula() const override { return true; }
 
-        virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
+        void CopyFromMesh(vtkUnstructuredGrid* mesh2) override;
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel
-        virtual void AddParameter(const std::string& name,float val);
-        virtual void DeleteParameter(int iParam);
-        virtual void DeleteAllParameters();
-        virtual void SetParameterName(int iParam,const std::string& s);
-        virtual void SetParameterValue(int iParam,float val);
+        void AddParameter(const std::string& name,float val) override;
+        void DeleteParameter(int iParam) override;
+        void DeleteAllParameters() override;
+        void SetParameterName(int iParam,const std::string& s) override;
+        void SetParameterValue(int iParam,float val) override;
 
-        virtual void GenerateInitialPattern();
-        virtual void BlankImage(float value = 0.0f);
+        void GenerateInitialPattern() override;
+        void BlankImage(float value = 0.0f) override;
 
-        virtual void TestFormula(std::string program_string);
-        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); }
+        void TestFormula(std::string program_string) override;
+        std::string GetKernel() const override { return this->AssembleKernelSourceFromFormula(this->formula); }
 
-        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
-        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
+        void SetValue(float x,float y,float z,float val,const Properties& render_settings) override;
+        void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) override;
 
-        virtual void Undo();
-        virtual void Redo();
+        void Undo() override;
+        void Redo() override;
 
     protected:
 
-        virtual void InternalUpdate(int n_steps);
+        void InternalUpdate(int n_steps) override;
 
-        virtual void ReloadKernelIfNeeded();
+        void ReloadKernelIfNeeded() override;
 
-        virtual void CreateOpenCLBuffers();
-        virtual void WriteToOpenCLBuffersIfNeeded();
-        virtual void ReadFromOpenCLBuffers();
-        virtual void ReleaseOpenCLBuffers();
+        void CreateOpenCLBuffers() override;
+        void WriteToOpenCLBuffersIfNeeded() override;
+        void ReadFromOpenCLBuffers() override;
+        void ReleaseOpenCLBuffers() override;
 
     private:
 

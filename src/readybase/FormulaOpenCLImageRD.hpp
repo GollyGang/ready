@@ -20,8 +20,8 @@
 
 /// An RD system that uses an OpenCL formula snippet.
 /** An N-dimensional (1D,2D,3D) OpenCL RD implementations with n chemicals
- *  specified as a short formula involving delta_a, laplacian_a, etc. 
- *  implemented with Euler integration, a basic finite difference stencil 
+ *  specified as a short formula involving delta_a, laplacian_a, etc.
+ *  implemented with Euler integration, a basic finite difference stencil
  *  and float4 blocks for speed */
 class FormulaOpenCLImageRD : public OpenCLImageRD
 {
@@ -29,23 +29,23 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
 
         FormulaOpenCLImageRD(int opencl_platform,int opencl_device,int data_type);
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
+        void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update) override;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const override;
 
-        virtual std::string GetRuleType() const { return "formula"; }
+        std::string GetRuleType() const override { return "formula"; }
 
-        virtual int GetBlockSizeX() const { return 4; } // we use float4 in a 4x1x1 block
+        int GetBlockSizeX() const override { return 4; } // we use float4 in a 4x1x1 block
 
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
+        std::string AssembleKernelSourceFromFormula(std::string formula) const override;
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel
-        virtual void AddParameter(const std::string& name,float val);
-        virtual void DeleteParameter(int iParam);
-        virtual void DeleteAllParameters();
-        virtual void SetParameterName(int iParam,const std::string& s);
-        virtual void SetParameterValue(int iParam,float val);
+        void AddParameter(const std::string& name,float val) override;
+        void DeleteParameter(int iParam) override;
+        void DeleteAllParameters() override;
+        void SetParameterName(int iParam,const std::string& s) override;
+        void SetParameterValue(int iParam,float val) override;
 
-        virtual bool HasEditableWrapOption() const { return true; }
-        virtual void SetWrap(bool w);
-        virtual bool HasEditableDataType() const { return true; }
+        bool HasEditableWrapOption() const override { return true; }
+        void SetWrap(bool w) override;
+        bool HasEditableDataType() const override { return true; }
 };

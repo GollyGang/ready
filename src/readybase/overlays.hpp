@@ -39,13 +39,13 @@ class BaseShape;
 class Overlay : public XML_Object
 {
     public:
-    
+
         /// can construct from an XML node
         Overlay(vtkXMLDataElement* node);
         ~Overlay();
-            
+
         /// for saving to file, get the overlay as an XML element
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override;
 
         static const char* GetTypeName() { return "overlay"; }
 
@@ -55,7 +55,7 @@ class Overlay : public XML_Object
         double Apply(std::vector<double> vals,AbstractRD* system,float x,float y,float z) const;
 
     protected:
-    
+
         int iTargetChemical;             ///< each overlay applies to a single chemical
 
         BaseOperation *op;               ///< e.g. overwrite, add, multiply, etc.

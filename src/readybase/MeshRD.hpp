@@ -32,52 +32,54 @@ class MeshRD : public AbstractRD
     public:
 
         MeshRD(int data_type);
-        virtual ~MeshRD();
+        ~MeshRD();
 
-        virtual void SaveFile(const char* filename,const Properties& render_settings,
-            bool generate_initial_pattern_when_loading) const;
+        void SaveFile(const char* filename,
+            const Properties& render_settings,
+            bool generate_initial_pattern_when_loading) const override;
 
-        virtual void Update(int n_steps);
+        void Update(int n_steps) override;
 
-        virtual float GetX() const;
-        virtual float GetY() const;
-        virtual float GetZ() const;
+        float GetX() const override;
+        float GetY() const override;
+        float GetZ() const override;
 
         void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
-        virtual bool HasEditableFormula() const { return true; }
+        bool HasEditableFormula() const override { return true; }
 
-        virtual std::string GetFileExtension() const { return MeshRD::GetFileExtensionStatic(); }
+        std::string GetFileExtension() const override { return MeshRD::GetFileExtensionStatic(); }
         static std::string GetFileExtensionStatic() { return "vtu"; }
 
-        virtual int GetNumberOfCells() const;
+        int GetNumberOfCells() const override;
 
-        virtual void GenerateInitialPattern();
-        virtual void BlankImage(float value = 0.0f);
+        void GenerateInitialPattern() override;
+        void BlankImage(float value = 0.0f) override;
         virtual void CopyFromMesh(vtkUnstructuredGrid* mesh2);
-        virtual void SaveStartingPattern();
-        virtual void RestoreStartingPattern();
+        void SaveStartingPattern() override;
+        void RestoreStartingPattern() override;
 
-        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
-        void AddPhasePlot(  vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
-                            int iChemX,int iChemY,int iChemZ);
+        void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings) override;
 
-        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
-        virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
-        virtual void SetFrom2DImage(int iChemical, vtkImageData *im);
-        virtual bool Is2DImageAvailable() const { return false; }
+        void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const override;
+        void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const override;
+        void SetFrom2DImage(int iChemical, vtkImageData *im) override;
+        bool Is2DImageAvailable() const override { return false; }
 
-        virtual int GetArenaDimensionality() const;
+        int GetArenaDimensionality() const override;
 
-        virtual float GetValue(float x,float y,float z,const Properties& render_settings);
-        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
-        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
+        float GetValue(float x,float y,float z,const Properties& render_settings) override;
+        void SetValue(float x,float y,float z,float val,const Properties& render_settings) override;
+        void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) override;
 
         void GetMesh(vtkUnstructuredGrid* mesh) const;
 
-        virtual size_t GetMemorySize() const;
+        size_t GetMemorySize() const override;
 
     protected: // functions
+
+        void AddPhasePlot(  vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
+                            int iChemX,int iChemY,int iChemZ) override;
 
         /// work out which cells are neighbors of each other
         void ComputeCellNeighbors(TNeighborhood neighborhood_type);
@@ -87,7 +89,7 @@ class MeshRD : public AbstractRD
 
         void CreateCellLocatorIfNeeded();
 
-        virtual void FlipPaintAction(PaintAction& cca);
+        void FlipPaintAction(PaintAction& cca) override;
 
     protected: // variables
 
