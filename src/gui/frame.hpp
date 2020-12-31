@@ -206,7 +206,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void SaveSettings();
         void CheckFocus();
         void EnableAllMenus(bool enable);
-       
+
         void SetCurrentRDSystem(std::unique_ptr<AbstractRD> system);
         void UpdateWindows();
         void UpdateWindowTitle();
@@ -272,7 +272,7 @@ class MyFrame : public wxFrame, public IPaintHandler
 
         // toolbar things
         enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
-        wxCursor *pencil_cursor,*brush_cursor,*picker_cursor;
+        std::unique_ptr<wxCursor> pencil_cursor, brush_cursor, picker_cursor;
         float current_paint_value;
         bool left_mouse_is_down,right_mouse_is_down;
         wxString icons_folder;

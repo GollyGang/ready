@@ -325,9 +325,6 @@ MyFrame::~MyFrame()
 {
     this->SaveSettings(); // save the current settings so it starts up the same next time
     this->aui_mgr.UnInit();
-    delete this->pencil_cursor;
-    delete this->brush_cursor;
-    delete this->picker_cursor;
 }
 
 // ---------------------------------------------------------------------
@@ -548,17 +545,17 @@ void MyFrame::InitializeCursors()
     wxImage im1(cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 18);
-    this->pencil_cursor = new wxCursor(im1);
+    this->pencil_cursor = make_unique<wxCursor>(im1);
 
     wxImage im2(cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 21);
-    this->brush_cursor = new wxCursor(im2);
+    this->brush_cursor = make_unique<wxCursor>(im2);
 
     wxImage im3(cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 14);
-    this->picker_cursor = new wxCursor(im3);
+    this->picker_cursor = make_unique<wxCursor>(im3);
 }
 
 // ---------------------------------------------------------------------
