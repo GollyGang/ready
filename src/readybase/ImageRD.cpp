@@ -1245,9 +1245,7 @@ void ImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
         }
     }
     else {
-        while (this->images.size() > n) {
-            this->images.pop_back();
-        }
+        this->images.resize(n);
     }
     this->n_chemicals = n;
     this->is_modified = true;
