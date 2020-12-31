@@ -83,10 +83,10 @@ class ImageRD : public AbstractRD
 
     protected:
 
-        std::vector<vtkImageData*> images; ///< one for each chemical
+        std::vector<vtkSmartPointer<vtkImageData>> images; ///< one for each chemical
 
         // we save the starting pattern, to allow the user to reset
-        vtkImageData *starting_pattern;
+        vtkSmartPointer<vtkImageData> starting_pattern;
 
         double image_top1D;        /// topmost location of the 1D image strips
         double image_ratio1D;     /// proportions of the 1D image strips
@@ -100,13 +100,13 @@ class ImageRD : public AbstractRD
 
         void DeallocateImages();
 
-        static vtkImageData* AllocateVTKImage(int x,int y,int z,int data_type);
+        static vtkSmartPointer<vtkImageData> AllocateVTKImage(int x,int y,int z,int data_type);
 
         virtual int GetArenaDimensionality() const;
 
         virtual void FlipPaintAction(PaintAction& cca);
 
-        // some saved handles into the pipeline, for manual updated to workaround a named arrays problem
+        // some saved handles into the pipeline, for manual updates to workaround a named arrays problem
         vtkAssignAttribute *assign_attribute_filter;
         vtkRearrangeFields *rearrange_fields_filter;
 

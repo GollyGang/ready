@@ -37,14 +37,7 @@ GrayScottMeshRD::GrayScottMeshRD()
     this->AddParameter("D_b",0.041f);
     this->AddParameter("k",0.06f);
     this->AddParameter("F",0.035f);
-    this->buffer = vtkUnstructuredGrid::New();
-}
-
-// ---------------------------------------------------------------------
-
-GrayScottMeshRD::~GrayScottMeshRD()
-{
-    this->buffer->Delete();
+    this->buffer = vtkSmartPointer<vtkUnstructuredGrid>::New();
 }
 
 // ---------------------------------------------------------------------
