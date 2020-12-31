@@ -356,10 +356,9 @@ class LinearGradient : public BaseFill
             read_required_attribute(node,"val2",this->val2);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("linear_gradient: expected two nested elements (point3D,point3D)");
-            this->p1 = new Point3D(node->GetNestedElement(0));
-            this->p2 = new Point3D(node->GetNestedElement(1));
+            this->p1 = make_unique<Point3D>(node->GetNestedElement(0));
+            this->p2 = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~LinearGradient() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "linear_gradient"; }
 
@@ -392,7 +391,8 @@ class LinearGradient : public BaseFill
     protected:
 
         double val1,val2;
-        Point3D *p1,*p2;
+        unique_ptr<Point3D> p1;
+        unique_ptr<Point3D> p2;
 };
 
 class RadialGradient : public BaseFill
@@ -405,10 +405,9 @@ class RadialGradient : public BaseFill
             read_required_attribute(node,"val2",this->val2);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("radial_gradient: expected two nested elements (point3D,point3D)");
-            this->p1 = new Point3D(node->GetNestedElement(0));
-            this->p2 = new Point3D(node->GetNestedElement(1));
+            this->p1 = make_unique<Point3D>(node->GetNestedElement(0));
+            this->p2 = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~RadialGradient() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "radial_gradient"; }
 
@@ -438,7 +437,8 @@ class RadialGradient : public BaseFill
     protected:
 
         double val1,val2;
-        Point3D *p1,*p2;
+        unique_ptr<Point3D> p1;
+        unique_ptr<Point3D> p2;
 };
 
 class Gaussian : public BaseFill
@@ -451,9 +451,8 @@ class Gaussian : public BaseFill
             read_required_attribute(node,"sigma",this->sigma);
             if(node->GetNumberOfNestedElements()!=1)
                 throw runtime_error("gasussian: expected one nested element (point3D)");
-            this->center = new Point3D(node->GetNestedElement(0));
+            this->center = make_unique<Point3D>(node->GetNestedElement(0));
         }
-        virtual ~Gaussian() { delete this->center; }
 
         static const char* GetTypeName() { return "gaussian"; }
 
@@ -481,7 +480,7 @@ class Gaussian : public BaseFill
     protected:
 
         double height,sigma;
-        Point3D *center;
+        unique_ptr<Point3D> center;
 };
 
 class Sine : public BaseFill
@@ -494,10 +493,9 @@ class Sine : public BaseFill
             read_required_attribute(node,"amplitude",this->amplitude);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("sine: expected two nested elements (point3D,point3D)");
-            this->p1 = new Point3D(node->GetNestedElement(0));
-            this->p2 = new Point3D(node->GetNestedElement(1));
+            this->p1 = make_unique<Point3D>(node->GetNestedElement(0));
+            this->p2 = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~Sine() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "sine"; }
 
@@ -530,7 +528,8 @@ class Sine : public BaseFill
     protected:
 
         double phase,amplitude;
-        Point3D *p1,*p2;
+        unique_ptr<Point3D> p1;
+        unique_ptr<Point3D> p2;
 };
 
 // -------- shapes: -----------
@@ -564,10 +563,9 @@ class Rectangle : public BaseShape
         {
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("rectangle: expected two nested elements (point3D,point3D)");
-            this->a = new Point3D(node->GetNestedElement(0));
-            this->b = new Point3D(node->GetNestedElement(1));
+            this->a = make_unique<Point3D>(node->GetNestedElement(0));
+            this->b = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~Rectangle() { delete this->a; delete this->b; }
 
         static const char* GetTypeName() { return "rectangle"; }
 
@@ -599,7 +597,8 @@ class Rectangle : public BaseShape
 
     protected:
 
-        Point3D *a,*b;
+        unique_ptr<Point3D> a;
+        unique_ptr<Point3D> b;
 };
 
 class Circle : public BaseShape
@@ -611,9 +610,8 @@ class Circle : public BaseShape
             read_required_attribute(node,"radius",this->radius);
             if(node->GetNumberOfNestedElements()!=1)
                 throw runtime_error("circle: expected one nested element (point3D)");
-            this->c = new Point3D(node->GetNestedElement(0));
+            this->c = make_unique<Point3D>(node->GetNestedElement(0));
         }
-        virtual ~Circle() { delete this->c; }
 
         static const char* GetTypeName() { return "circle"; }
 
@@ -644,7 +642,7 @@ class Circle : public BaseShape
 
     protected:
 
-        Point3D *c;
+        unique_ptr<Point3D> c;
         double radius;
 };
 
