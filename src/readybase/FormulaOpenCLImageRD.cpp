@@ -98,7 +98,7 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
             {
                 AppliedStencil applied_stencil{ stencil, chem };
                 inputs_needed.stencils_needed.push_back(applied_stencil);
-                // collect all calls to the inputs needed for this stencil
+                // add the cell inputs needed for this stencil
                 set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
                 inputs_needed.cells_needed.insert(input_points.begin(), input_points.end());
             }
@@ -151,10 +151,10 @@ struct KernelOptions {
 
 // -------------------------------------------------------------------------
 
-void AddStencils_Block411(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+void AddCells(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
 {
     // retrieve the float4 input blocks needed from global memory
-    for (const InputPoint& input_point : inputs_needed.cells_needed)
+    for (const InputPoint& input_point : cells_needed)
     {
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
         {
@@ -167,7 +167,7 @@ void AddStencils_Block411(ostringstream& kernel_source, const InputsNeeded& inpu
         }
     }
     // compute the non-block-aligned float4's from the block-aligned ones we have retrieved
-    for (const InputPoint& input_point : inputs_needed.cells_needed)
+    for (const InputPoint& input_point : cells_needed)
     {
         if (input_point.point.x % 4 != 0)
         {
@@ -175,11 +175,6 @@ void AddStencils_Block411(ostringstream& kernel_source, const InputsNeeded& inpu
             kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName() 
                 << " = (" << options.data_type_string << "4)(" << input_point.GetSwizzled() << ");\n";
         }
-    }
-    // compute the stencils needed
-    for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
-    {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetCode() << ";\n";
     }
 }
 
@@ -196,8 +191,13 @@ void AddKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed
     kernel_source << options.indent << "const int Y = get_global_size(1);\n";
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
-    // add the stencils we found
-    AddStencils_Block411(kernel_source, inputs_needed, options);
+    // add the the cells we need
+    AddCells(kernel_source, inputs_needed.cells_needed, options);
+    // add the stencils we need
+    for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
+    {
+        kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetCode() << ";\n";
+    }
     // add x_pos, y_pos, z_pos if being used
     if (inputs_needed.using_x_pos)
     {
@@ -230,7 +230,7 @@ void AddKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed
         }
         kernel_source << ";\n";
     }
-    // declara delta_a, etc. and initialize to zero
+    // declare delta_a, etc. and initialize to zero
     for (const string& chem : inputs_needed.deltas_needed)
         kernel_source << options.indent << options.data_type_string << "4 delta_" << chem << " = 0.0" << options.data_type_suffix << ";\n";
     kernel_source << "\n";
