@@ -31,7 +31,7 @@ class FullKernelOpenCLMeshRD : public OpenCLMeshRD
 
         std::string GetRuleType() const override { return "kernel"; }
 
-        std::string AssembleKernelSourceFromFormula(std::string formula) const override;
+        std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
         bool HasEditableDataType() const override { return false; }
 };

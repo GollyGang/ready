@@ -89,6 +89,7 @@ void InterpolateInHSV(const float r1,const float g1,const float b1,const float r
 
 std::string ReplaceAllSubstrings(std::string subject, const std::string& search, const std::string& replace);
 std::vector<std::string> tokenize_for_keywords(const std::string& formula);
+bool UsingKeyword(const std::vector<std::string>& formula_tokens, const std::string& keyword);
 
 class ThrowOnErrorObserver : public vtkCommand
 {

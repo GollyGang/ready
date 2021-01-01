@@ -20,6 +20,7 @@
 #include "overlays.hpp"
 
 // STL:
+#include <algorithm>
 using namespace std;
 
 // SSE:
@@ -98,23 +99,27 @@ int AbstractRD::GetNumberOfParameters() const
 
 std::string AbstractRD::GetParameterName(int iParam) const
 {
-    return this->parameters[iParam].first;
+    return this->parameters[iParam].name;
 }
 
 // ---------------------------------------------------------------------
 
 float AbstractRD::GetParameterValue(int iParam) const
 {
-    return this->parameters[iParam].second;
+    return this->parameters[iParam].value;
 }
 
 // ---------------------------------------------------------------------
 
 float AbstractRD::GetParameterValueByName(const std::string& name) const
 {
-    for(int iParam=0;iParam<(int)this->parameters.size();iParam++)
-        if(this->parameters[iParam].first == name)
-            return this->parameters[iParam].second;
+    for (const Parameter& parameter : this->parameters)
+    {
+        if (parameter.name == name)
+        {
+            return parameter.value;
+        }
+    }
     throw runtime_error("ImageRD::GetParameterValueByName : parameter name not found: "+name);
 }
 
@@ -122,7 +127,7 @@ float AbstractRD::GetParameterValueByName(const std::string& name) const
 
 void AbstractRD::AddParameter(const std::string& name,float val)
 {
-    this->parameters.push_back(make_pair(name,val));
+    this->parameters.push_back({ name, val });
     this->is_modified = true;
 }
 
@@ -146,7 +151,7 @@ void AbstractRD::DeleteAllParameters()
 
 void AbstractRD::SetParameterName(int iParam,const string& s)
 {
-    this->parameters[iParam].first = s;
+    this->parameters[iParam].name = s;
     this->is_modified = true;
 }
 
@@ -154,7 +159,7 @@ void AbstractRD::SetParameterName(int iParam,const string& s)
 
 void AbstractRD::SetParameterValue(int iParam,float val)
 {
-    this->parameters[iParam].second = val;
+    this->parameters[iParam].value = val;
     this->is_modified = true;
 }
 
@@ -162,10 +167,8 @@ void AbstractRD::SetParameterValue(int iParam,float val)
 
 bool AbstractRD::IsParameter(const string& name) const
 {
-    for(int i=0;i<(int)this->parameters.size();i++)
-        if(this->parameters[i].first == name)
-            return true;
-    return false;
+    return find_if(this->parameters.begin(), this->parameters.end(),
+        [&](const Parameter& param) { return param.name == name; }) != this->parameters.end();
 }
 
 // ---------------------------------------------------------------------

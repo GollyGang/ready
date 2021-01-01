@@ -66,7 +66,7 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD& source)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
+string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }

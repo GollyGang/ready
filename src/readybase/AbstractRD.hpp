@@ -173,6 +173,11 @@ class AbstractRD
         /// Returns the total memory size that will need to be transferred to the GPU
         virtual size_t GetMemorySize() const =0;
 
+        struct Parameter {
+            std::string name;
+            float value;
+        };
+
     protected: // typedefs
 
         enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
@@ -191,7 +196,7 @@ class AbstractRD
 
         InitialPatternGenerator initial_pattern_generator;
 
-        std::vector<std::pair<std::string,float> > parameters;
+        std::vector<Parameter> parameters;
 
         int timesteps_taken;
 

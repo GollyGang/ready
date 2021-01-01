@@ -215,3 +215,12 @@ vector<string> tokenize_for_keywords(const string& formula)
 }
 
 // ---------------------------------------------------------------------------------------------------------
+
+bool UsingKeyword(const vector<string>& formula_tokens, const string& keyword)
+{
+    return find(formula_tokens.begin(), formula_tokens.end(), keyword) != formula_tokens.end();
+    // TODO: parse properly: ignore comments, not in string, etc.
+}
+
+// -------------------------------------------------------------------------
+

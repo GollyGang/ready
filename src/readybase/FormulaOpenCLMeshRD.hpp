@@ -30,7 +30,7 @@ class FormulaOpenCLMeshRD : public OpenCLMeshRD
 
         std::string GetRuleType() const override { return "formula"; }
 
-        std::string AssembleKernelSourceFromFormula(std::string formula) const override;
+        std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel
         void AddParameter(const std::string& name,float val) override;

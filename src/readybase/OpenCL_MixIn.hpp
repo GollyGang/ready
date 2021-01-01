@@ -46,7 +46,7 @@ class OpenCL_MixIn
 
     protected:
 
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
+        virtual std::string AssembleKernelSourceFromFormula(const std::string& formula) const =0;
 
         void ReloadContextIfNeeded();
         virtual void ReloadKernelIfNeeded() =0;
