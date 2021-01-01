@@ -424,6 +424,9 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+    const float image_height = this->GetX() / this->image_ratio1D; // we thicken it 
+    const float x_gap = this->x_spacing_proportion * this->GetX();
+    const float y_gap = image_height;
 
     // create a lookup table for mapping values to colors
     vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
@@ -443,7 +446,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         image_mapper->SetInputData(this->GetImage(iChem));
 
         // will convert the x*y 2D image to a x*y grid of quads
-        const float image_height = this->GetX() / this->image_ratio1D;
         const float image_offset = this->image_top1D - image_height * 2.0f * (iChem - iFirstChem);
         vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
         plane->SetXResolution(this->GetX());
@@ -497,6 +499,8 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     }
 
     // add a line graph for all the chemicals (active one highlighted)
+    const float graph_bottom = this->image_top1D + y_gap;
+    const float graph_top = graph_bottom + (high-low) * scaling;
     for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
     {
         vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
@@ -516,14 +520,14 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->RotateX(90.0);
         actor->PickableOff();
-        actor->SetPosition(0,-low*scaling+this->ygap,0);
+        actor->SetPosition(0, graph_bottom - low * scaling,0);
         pRenderer->AddActor(actor);
     }
 
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(0,0,this->ygap,(high-low)*scaling+this->ygap,0,0);
+    axis->SetBounds(0,0,graph_bottom,graph_top,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -537,9 +541,10 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     pRenderer->AddActor(axis);
 
     // add a phase plot
+    const float phase_plot_bottom = graph_top + y_gap*2;
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f,this->ygap*2 + scaling * (high-low),0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
+        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f, phase_plot_bottom,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
@@ -573,9 +578,13 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+    const float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+    const float x_gap = this->x_spacing_proportion * this->GetX();
+    const float y_gap = this->y_spacing_proportion * this->GetY();
 
     double offset[3] = {0,0,0};
+    const float surface_bottom = offset[1] + 0.5 + this->GetY() + y_gap;
+    const float surface_top = surface_bottom + this->GetY();
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -654,7 +663,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetSpecularPower(3);
             if(use_wireframe)
                 actor->GetProperty()->SetRepresentationToWireframe();
-            actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
+            actor->SetPosition(offset[0]+0.5, surface_bottom, offset[2] - low*scaling);
             actor->PickableOff();
             pRenderer->AddActor(actor);
 
@@ -674,7 +683,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             if(show_bounding_box)
             {
                 vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-                box->SetBounds(0,this->GetX()-1,0,this->GetY()-1,low*scaling,high*scaling);
+                box->SetBounds(0,this->GetX()-1,0,this->GetY()-1,0,(high-low)*scaling);
 
                 vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
                 edges->SetInputConnection(box->GetOutputPort());
@@ -686,7 +695,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
                 actor->SetMapper(mapper);
                 actor->GetProperty()->SetColor(0,0,0);
                 actor->GetProperty()->SetAmbient(1);
-                actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
+                actor->SetPosition(offset[0]+0.5,surface_bottom,offset[2]);
                 actor->PickableOff();
 
                 pRenderer->AddActor(actor);
@@ -715,15 +724,15 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             pRenderer->AddActor(captionActor);
         }
 
-        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
+        offset[0] += this->GetX() + x_gap; // the next chemical should appear further to the right
     }
 
+    // add an axis to the first diplacement-mapped surface
     if(show_displacement_mapped_surface)
     {
-        // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0.5,0.5,this->GetY()-0.5+this->GetY()+this->ygap,this->GetY()-0.5+this->GetY()+this->ygap,low*scaling,high*scaling);
+        axis->SetBounds(0.5,0.5,surface_top,surface_top,0,(high-low)*scaling);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
@@ -746,11 +755,11 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     // add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        float posY = this->ygap*2 + this->GetY();
+        float phase_plot_bottom = surface_bottom;
         if(show_displacement_mapped_surface)
-            posY += this->ygap + this->GetY();
+            phase_plot_bottom = surface_top + y_gap * 2;
 
-        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,posY,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
+        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f, phase_plot_bottom,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
@@ -799,6 +808,8 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
 
+    const float x_gap = this->x_spacing_proportion * this->GetX();
+    const float y_gap = this->y_spacing_proportion * this->GetY();
     double offset[3] = {0,0,0};
 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
@@ -1015,7 +1026,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             pRenderer->AddActor(captionActor);
         }
 
-        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
+        offset[0] += this->GetX() + x_gap; // the next chemical should appear further to the right
     }
 
     // also add a scalar bar to show how the colors correspond to values
@@ -1027,7 +1038,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     // add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        this->AddPhasePlot( pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+this->ygap,0.0f,
+        this->AddPhasePlot( pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+y_gap,0.0f,
                             iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
@@ -1503,9 +1514,10 @@ float ImageRD::GetValue(float x,float y,float z,const Properties& render_setting
     else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1546,9 +1558,10 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
     else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1595,9 +1608,10 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
     else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x + x_gap  / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
