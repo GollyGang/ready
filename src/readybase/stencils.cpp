@@ -75,6 +75,10 @@ string InputPoint::GetName() const
 
 pair<InputPoint, InputPoint> InputPoint::GetAlignedBlocks() const
 {
+    if (point.x % 4 == 0)
+    {
+        throw runtime_error("internal error: already block-aligned in GetAlignedBlocks");
+    }
     // return the two block-aligned float4's we'll need to assemble this non-block-aligned float4
     InputPoint block_left{ point, chem };
     InputPoint block_right{ point, chem };

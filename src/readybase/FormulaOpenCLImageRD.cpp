@@ -111,23 +111,28 @@ void DetectKeywordsNeeded(const string& formula, int num_chemicals, int dimensio
                 for (int z = -MAX_RADIUS; z <= MAX_RADIUS; z++)
                 {
                     InputPoint input_point{ {x, y, z}, chem };
-                    const string input_point_neighbor_name = input_point.GetName();
-                    if (UsingKeyword(formula_tokens, input_point_neighbor_name))
+                    if (UsingKeyword(formula_tokens, input_point.GetName()))
                     {
                         options.inputs_needed.insert(input_point);
-                        if (input_point.point.x % 4 != 0)
-                        {
-                            // add the block-aligned float4's we'll need to provide this non-block-aligned float4
-                            const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks();
-                            options.inputs_needed.insert(blocks.first);
-                            options.inputs_needed.insert(blocks.second);
-                        }
                     }
                 }
             }
         }
         options.deltas_needed.push_back(chem); // TODO: only add delta_<chem> and the forward-Euler step if delta_<chem> appears in the formula
     }
+    // non-block-aligned inputs need other inputs: the two blocks that supply them
+    vector<InputPoint> input_blocks;
+    for (const InputPoint& input_point : options.inputs_needed)
+    {
+        if (input_point.point.x % 4 != 0)
+        {
+            const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks();
+            input_blocks.push_back(blocks.first);
+            input_blocks.push_back(blocks.second);
+        }
+    }
+    options.inputs_needed.insert(input_blocks.begin(), input_blocks.end());
+    // detect if using x_pos, y_pos or z_pos
     options.using_x_pos = UsingKeyword(formula_tokens, "x_pos");
     options.using_y_pos = UsingKeyword(formula_tokens, "y_pos");
     options.using_z_pos = UsingKeyword(formula_tokens, "z_pos");
@@ -136,31 +141,13 @@ void DetectKeywordsNeeded(const string& formula, int num_chemicals, int dimensio
 
 void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
 {
-    // collect the float4 input blocks we will need
-    vector<InputPoint> input_blocks;
-    for (const InputPoint& input_point : options.inputs_needed)
-    {
-        if (input_point.point.x % 4 == 0)
-        {
-            continue; // this block is already aligned
-        }
-        if (input_point.point.x >= 0)
-        {
-            input_blocks.push_back({ {input_point.point.x + 4 - (input_point.point.x % 4), input_point.point.y, input_point.point.z}, input_point.chem });
-        }
-        else
-        {
-            input_blocks.push_back({ {input_point.point.x - 4 - (input_point.point.x % 4), input_point.point.y, input_point.point.z}, input_point.chem });
-        }
-    }
-    options.inputs_needed.insert(input_blocks.begin(), input_blocks.end());
     // retrieve the float4 input blocks needed from global memory
     for (const InputPoint& input_point : options.inputs_needed)
     {
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
         {
             kernel_source << options.indent << options.data_type_string << "4 " << input_point.GetDirectAccessCode(options.wrap) << ";\n";
-            // non-const to allow the user to set it directly
+            // the central cell is non-const to allow the user to set it directly - it appears in the forward-Euler step
         }
         else if (input_point.point.x % 4 == 0)
         {
