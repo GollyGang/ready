@@ -76,19 +76,6 @@ MeshRD::MeshRD(int data_type)
 {
     this->starting_pattern = vtkSmartPointer<vtkUnstructuredGrid>::New();
     this->mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    this->cell_neighbor_indices = NULL;
-    this->cell_neighbor_weights = NULL;
-    this->cell_locator = NULL;
-}
-
-// ---------------------------------------------------------------------
-
-MeshRD::~MeshRD()
-{
-    delete []this->cell_neighbor_indices;
-    delete []this->cell_neighbor_weights;
-
-    this->n_chemicals = 0;
 }
 
 // ---------------------------------------------------------------------
@@ -189,7 +176,7 @@ void MeshRD::GenerateInitialPattern()
                 vals[i] = this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str())->GetComponent( iCell, 0 );
                 if(i==iC) val = vals[i];
             }
-            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent( iCell, 0, overlay.Apply(vals,this,cp[0],cp[1],cp[2]) );
+            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent(iCell, 0, overlay.Apply(vals, *this, cp[0], cp[1], cp[2]));
         }
     }
     this->mesh->Modified();
@@ -799,10 +786,8 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
     }
 
     // copy data to plain arrays
-    if(this->cell_neighbor_indices) delete []this->cell_neighbor_indices;
-    if(this->cell_neighbor_weights) delete []this->cell_neighbor_weights;
-    this->cell_neighbor_indices = new int[this->mesh->GetNumberOfCells()*this->max_neighbors];
-    this->cell_neighbor_weights = new float[this->mesh->GetNumberOfCells()*this->max_neighbors];
+    this->cell_neighbor_indices.resize(this->mesh->GetNumberOfCells() * this->max_neighbors);
+    this->cell_neighbor_weights.resize(this->mesh->GetNumberOfCells() * this->max_neighbors);
     for(int i=0;i<this->mesh->GetNumberOfCells();i++)
     {
         for(int j=0;j<(int)cell_neighbors[i].size();j++)

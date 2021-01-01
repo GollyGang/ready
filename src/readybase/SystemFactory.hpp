@@ -19,13 +19,20 @@
 class AbstractRD;
 class Properties;
 
+// STL:
+#include <memory>
+
 // -------------------------------------------------------------------------------------------------------------
 
 /// Methods for creating RD systems when we don't know their type.
 namespace SystemFactory {
 
     /// Load an RD system from file and create the appropriate AbstractRD-derived instance. (User is responsible for deletion.)
-    AbstractRD* CreateFromFile(const char *filename,bool is_opencl_available,int opencl_platform,int opencl_device,
-                               Properties &render_settings,bool &warn_to_update);
-
+    std::unique_ptr<AbstractRD> CreateFromFile(
+        const char *filename,
+        bool is_opencl_available,
+        int opencl_platform,
+        int opencl_device,
+        Properties &render_settings,
+        bool &warn_to_update);
 };

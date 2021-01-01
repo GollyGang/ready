@@ -252,7 +252,7 @@ int main(int argc,char *argv[])
     Properties render_settings("render_settings");
     InitializeDefaultRenderSettings(render_settings);
 
-    AbstractRD *system;
+    unique_ptr<AbstractRD> system;
     try
     {
         // Read the file
@@ -345,11 +345,6 @@ int main(int argc,char *argv[])
                 cout << "Render settings:\n";
                 cout << "================================\n";
 
-                // A good example cast, left as a relic:
-                //AbstractRD* rdPlayer = dynamic_cast<AbstractRD*>(system);
-                //FormulaOpenCLImageRD* rdPlayer = dynamic_cast<FormulaOpenCLImageRD*>(system);
-                //Properties *render_settings = rdPlayer->render_settings;
-
                 int num_properties = render_settings.GetNumberOfProperties();
                 cout << "Number of properties is: " << num_properties << "\n";
                 for (int i=0;i<num_properties;i++)
@@ -410,7 +405,7 @@ int main(int argc,char *argv[])
                 {
                     cout << "\n";
                     cout << "nchem: " << ix << "\n";
-                    OpenCLImageRD *isystem = dynamic_cast< OpenCLImageRD* >(system);
+                    const OpenCLImageRD &isystem = dynamic_cast<const OpenCLImageRD&>(*system);
 
                     cout << "xres=" << system->GetX() << "\n";
                     cout << "yres=" << system->GetY() << "\n";
@@ -420,9 +415,9 @@ int main(int argc,char *argv[])
                     unsigned long reagent_block_size = system->GetX() * system->GetY() * system->GetZ();
 
                     cout << "Reagent block size is: " << reagent_block_size << "\n";
-                    float* rd_data = new float[reagent_block_size];
+                    vector<float> rd_data(reagent_block_size);
 
-                    isystem->GetFromOpenCLBuffers( rd_data, ix );
+                    isystem.GetFromOpenCLBuffers( &rd_data[0], ix );
 
                     cout << "\nRD data for reagent " << ix << ": [ ";
                     for (unsigned long rix=0; rix<reagent_block_size; rix++)
@@ -434,7 +429,6 @@ int main(int argc,char *argv[])
                         }
                     }
                     cout << " ]\n";
-                    delete []rd_data;
                 }
                 cout << "================================\n";
             }
@@ -488,7 +482,6 @@ int main(int argc,char *argv[])
         return EXIT_FAILURE;
     }
 
-    delete system;
     return EXIT_SUCCESS;
 }
 

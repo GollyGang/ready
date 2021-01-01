@@ -329,7 +329,7 @@ void ImageRD::GenerateInitialPattern()
                     vector<double> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
                         vals[i] = this->GetImage(i)->GetScalarComponentAsDouble(x,y,z,0);
-                    this->GetImage(iC)->SetScalarComponentFromDouble(x,y,z,0,overlay.Apply(vals,this,x,y,z));
+                    this->GetImage(iC)->SetScalarComponentFromDouble(x, y, z, 0, overlay.Apply(vals, *this, x, y, z));
                 }
             }
         }

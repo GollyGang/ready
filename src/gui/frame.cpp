@@ -249,7 +249,6 @@ const float MyFrame::brush_sizes[] = {0.002f, 0.005f, 0.01f, 0.02f, 0.05f};
 // constructor
 MyFrame::MyFrame(const wxString& title)
        : wxFrame(NULL, wxID_ANY, title),
-       system(NULL),
        is_running(false),
        speed_data_available(false),
        i_timesteps_per_second_buffer(0),
@@ -311,12 +310,12 @@ MyFrame::MyFrame(const wxString& title)
     } else {
         // create new pattern
         this->InitializeDefaultRenderSettings(this->render_settings);
-        GrayScottImageRD *s = new GrayScottImageRD();
+        unique_ptr<GrayScottImageRD> s = make_unique<GrayScottImageRD>();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
         s->SetFilename("untitled");
         s->GenerateInitialPattern();
-        this->SetCurrentRDSystem(s);
+        this->SetCurrentRDSystem(move(s));
     }
 }
 
@@ -326,10 +325,6 @@ MyFrame::~MyFrame()
 {
     this->SaveSettings(); // save the current settings so it starts up the same next time
     this->aui_mgr.UnInit();
-    delete this->pencil_cursor;
-    delete this->brush_cursor;
-    delete this->picker_cursor;
-    delete this->system;
 }
 
 // ---------------------------------------------------------------------
@@ -550,17 +545,17 @@ void MyFrame::InitializeCursors()
     wxImage im1(cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 18);
-    this->pencil_cursor = new wxCursor(im1);
+    this->pencil_cursor = make_unique<wxCursor>(im1);
 
     wxImage im2(cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 21);
-    this->brush_cursor = new wxCursor(im2);
+    this->brush_cursor = make_unique<wxCursor>(im2);
 
     wxImage im3(cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 14);
-    this->picker_cursor = new wxCursor(im3);
+    this->picker_cursor = make_unique<wxCursor>(im3);
 }
 
 // ---------------------------------------------------------------------
@@ -597,7 +592,7 @@ void MyFrame::InitializeInfoPane()
 
 void MyFrame::UpdateInfoPane()
 {
-    this->info_panel->Update(this->system);
+    this->info_panel->Update(*this->system);
 }
 
 // ---------------------------------------------------------------------
@@ -858,7 +853,7 @@ void MyFrame::OnWireframe(wxCommandEvent& event)
     bool wireframe = this->render_settings.GetProperty("use_wireframe").GetBool();
     wireframe = !wireframe;
     this->render_settings.GetProperty("use_wireframe").SetBool(wireframe);
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateInfoPane();
     this->Refresh(false);
 }
@@ -963,14 +958,13 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::SetCurrentRDSystem(AbstractRD* sys)
+void MyFrame::SetCurrentRDSystem(unique_ptr<AbstractRD> sys)
 {
-    delete this->system;
-    this->system = sys;
+    this->system = move(sys);
     int iChem = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
     iChem = min(iChem,this->system->GetNumberOfChemicals()-1); // ensure is in valid range
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(iChem));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, true);
     this->is_running = false;
     this->i_timesteps_per_second_buffer = 0;
     this->speed_data_available = false;
@@ -1517,7 +1511,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     this->SetStatusText(_("Generating..."));
 
-    AbstractRD *sys;
+    unique_ptr<AbstractRD> sys;
     Properties new_render_settings("render_settings");
     this->InitializeDefaultRenderSettings(new_render_settings);
     try
@@ -1558,7 +1552,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         return;
     }
 
-    if (sys == NULL)
+    if (!sys)
     {
         return; // user cancelled
     }
@@ -1569,7 +1563,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     this->SetStatusText(_("Generating data values..."));
     sys->CreateDefaultInitialPatternGenerator(sys->GetNumberOfChemicals());
     sys->GenerateInitialPattern();
-    this->SetCurrentRDSystem(sys);
+    this->SetCurrentRDSystem(move(sys));
 
     this->system->SetFilename("untitled");
     this->system->SetModified(false);
@@ -1634,13 +1628,13 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
 
     // load pattern file
     bool warn_to_update = false;
-    AbstractRD *target_system = NULL;
+    unique_ptr<AbstractRD> target_system;
     Properties previous_render_settings = this->render_settings;
     try
     {
         this->InitializeDefaultRenderSettings(this->render_settings);
         target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
-        this->SetCurrentRDSystem(target_system);
+        this->SetCurrentRDSystem(move(target_system));
     }
     catch(const exception& e)
     {
@@ -1649,7 +1643,6 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
         message += _("Failed to open file. Error:\n\n");
         message += wxString(e.what(),wxConvUTF8);
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
-        delete target_system;
         this->render_settings = previous_render_settings;
         return;
     }
@@ -1659,7 +1652,6 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
         wxString message = warn_to_update ? _("This file is from a more recent version of Ready. You should download a newer version.\n\n") : _("");
         message += _("Failed to open file.");
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
-        delete target_system;
         this->render_settings = previous_render_settings;
         return;
     }
@@ -1887,7 +1879,7 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
     dlg.SetSelection(IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical()));
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(dlg.GetSelection()));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2359,7 +2351,7 @@ void MyFrame::SetNumberOfChemicals(int n)
     int ic = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
     if(ic>=n)
         this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(n-1));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2408,7 +2400,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
     }
     this->system->BlankImage();
     this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, true);
     this->UpdateWindows();
     return true;
 }
@@ -2421,7 +2413,7 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->system->SetBlockSizeY(y);
     this->system->SetBlockSizeZ(z);
     this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2434,7 +2426,7 @@ void MyFrame::RenderSettingsChanged()
     if (prop.GetInt() < 1) prop.SetInt(1);
     if (prop.GetInt() > MAX_TIMESTEPS_PER_RENDER) prop.SetInt(MAX_TIMESTEPS_PER_RENDER);
 
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2444,7 +2436,7 @@ void MyFrame::OnAddParameter(wxCommandEvent& event)
 {
     StringDialog dlg(this,_("Add a parameter"),_("Name:"),wxEmptyString,wxDefaultPosition,wxDefaultSize);
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->GetCurrentRDSystem()->AddParameter(string(dlg.GetValue().mb_str()),0.0f);
+    this->GetCurrentRDSystem().AddParameter(string(dlg.GetValue().mb_str()),0.0f);
     this->UpdateWindows();
 }
 
@@ -2453,11 +2445,11 @@ void MyFrame::OnAddParameter(wxCommandEvent& event)
 void MyFrame::OnDeleteParameter(wxCommandEvent& event)
 {
     wxArrayString as;
-    for(int i=0;i<this->GetCurrentRDSystem()->GetNumberOfParameters();i++)
-        as.Add(wxString(this->GetCurrentRDSystem()->GetParameterName(i).c_str(),wxConvUTF8));
+    for(int i=0;i<this->GetCurrentRDSystem().GetNumberOfParameters();i++)
+        as.Add(wxString(this->GetCurrentRDSystem().GetParameterName(i).c_str(),wxConvUTF8));
     wxSingleChoiceDialog dlg(this,_("Select a parameter to delete:"),_("Delete a parameter"),as);
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->GetCurrentRDSystem()->DeleteParameter(dlg.GetSelection());
+    this->GetCurrentRDSystem().DeleteParameter(dlg.GetSelection());
     this->UpdateWindows();
 }
 
@@ -2465,15 +2457,15 @@ void MyFrame::OnDeleteParameter(wxCommandEvent& event)
 
 void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->GetRuleType()=="formula");
+    event.Enable(this->GetCurrentRDSystem().GetRuleType()=="formula");
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->GetRuleType()=="formula" &&
-                 this->GetCurrentRDSystem()->GetNumberOfParameters() > 0);
+    event.Enable(this->GetCurrentRDSystem().GetRuleType()=="formula" &&
+                 this->GetCurrentRDSystem().GetNumberOfParameters() > 0);
 }
 
 // ---------------------------------------------------------------------
@@ -2640,7 +2632,7 @@ void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
     float value_inside = 0.0f;
     float value_outside = 1.0f;
 
-    ImageRD *image_sys;
+    unique_ptr<ImageRD> image_sys;
     if (this->is_opencl_available)
     {
         IntegerDialog nc_dlg(this, _("Number of chemicals in new volume image"), _("Number of chemicals:"),
@@ -2675,18 +2667,18 @@ void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
         // at some point we would want the user to decide what data type to use in the image
         const int data_type = VTK_FLOAT;
 
-        image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
+        image_sys = make_unique<FormulaOpenCLImageRD>(opencl_platform, opencl_device, data_type);
         image_sys->SetFormula("delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\ndelta_b = D_b * laplacian_b + a*b*b - (F+K+c*0.035f)*b;");
     }
     else {
-        image_sys = new GrayScottImageRD();
+        image_sys = make_unique<GrayScottImageRD>();
     }
 
     image_sys->CopyFromMesh(ug, num_chemicals, target_chemical, largest_dimension, value_inside, value_outside);
     image_sys->CreateDefaultInitialPatternGenerator(2);
     image_sys->GenerateInitialPattern();
     this->render_settings.GetProperty("timesteps_per_render").SetInt(16);
-    this->SetCurrentRDSystem(image_sys);
+    this->SetCurrentRDSystem(move(image_sys));
 }
 
 // ---------------------------------------------------------------------
@@ -2696,16 +2688,16 @@ void MyFrame::MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug)
     // at some point we would want the user to decide what data type to use on the imported mesh
     const int data_type = VTK_FLOAT;
 
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (this->is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(ug);
     mesh_sys->SetNumberOfChemicals(2);
     mesh_sys->CreateDefaultInitialPatternGenerator(2);
     mesh_sys->GenerateInitialPattern();
-    this->SetCurrentRDSystem(mesh_sys);
+    this->SetCurrentRDSystem(move(mesh_sys));
 }
 
 // ---------------------------------------------------------------------
@@ -2867,7 +2859,7 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
     this->system->SetFrom2DImage(dlg.iTargetChemical, resize->GetOutput());
 
     this->is_running = false;
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -3435,16 +3427,16 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
 
 void MyFrame::OnConvertToFullKernel(wxCommandEvent& event)
 {
-    AbstractRD *sys;
+    unique_ptr<AbstractRD> sys;
     try
     {
         if(this->system->GetFileExtension()=="vti")
         {
-            sys = new FullKernelOpenCLImageRD(*dynamic_cast<OpenCLImageRD*>(this->system));
+            sys = make_unique<FullKernelOpenCLImageRD>(dynamic_cast<const OpenCLImageRD&>(*this->system));
         }
         else if(this->system->GetFileExtension()=="vtu")
         {
-            sys = new FullKernelOpenCLMeshRD(*dynamic_cast<OpenCLMeshRD*>(this->system));
+            sys = make_unique<FullKernelOpenCLMeshRD>(dynamic_cast<const OpenCLMeshRD&>(*this->system));
         }
         else wxMessageBox(_T("Internal error: unrecognised file extension"));
     }
@@ -3453,7 +3445,7 @@ void MyFrame::OnConvertToFullKernel(wxCommandEvent& event)
         wxMessageBox(wxString::Format(_T("Error converting rule: %s"),e.what()));
         return;
     }
-    this->SetCurrentRDSystem(sys);
+    this->SetCurrentRDSystem(move(sys));
 }
 
 // ---------------------------------------------------------------------

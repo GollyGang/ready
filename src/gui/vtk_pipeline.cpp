@@ -37,11 +37,13 @@ using namespace std;
 
 // ------------------------------------------------------------------------------------------------
 
-void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* system,const Properties& render_settings,
+void InitializeVTKPipeline(
+    wxVTKRenderWindowInteractor* pVTKWindow,
+    AbstractRD& system,
+    const Properties& render_settings,
     bool reset_camera)
 {
     assert(pVTKWindow);
-    assert(system);
 
     // the VTK renderer is responsible for drawing the scene onto the screen
     vtkSmartPointer<vtkRenderer> pRenderer;
@@ -65,18 +67,18 @@ void InitializeVTKPipeline(wxVTKRenderWindowInteractor* pVTKWindow,AbstractRD* s
         pVTKWindow->SetInteractorStyle(is);
     }
 
-    system->InitializeRenderPipeline(pRenderer,render_settings);
+    system.InitializeRenderPipeline(pRenderer,render_settings);
 
     if(reset_camera)
     {
         vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
-        if(system->GetArenaDimensionality()>2)
+        if(system.GetArenaDimensionality()>2)
         {
             camera->SetPosition(-3,3,10); // move off-axis to look more natural
         }
-        else if( system->GetArenaDimensionality()==2
+        else if( system.GetArenaDimensionality()==2
                 && render_settings.GetProperty("show_displacement_mapped_surface").GetBool()
-                && system->GetFileExtension()!="vtu" )
+                && system.GetFileExtension()!="vtu" )
         {
             camera->SetPosition(0,-3,10); // move slightly down, to give perspective on the displacement plots
         }

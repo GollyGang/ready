@@ -43,7 +43,7 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 

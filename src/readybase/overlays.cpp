@@ -32,64 +32,7 @@ using namespace std;
 
 // ------------------------------------------------------------------------------------------------
 
-/// Base class for a mathematical operation to be carried out at a particular location in the RD system.
-class BaseOperation : public XML_Object
-{
-    public:
-
-        virtual ~BaseOperation() {}
-
-        /// construct when we don't know the derived type (returns NULL if name is unknown)
-        static BaseOperation* New(vtkXMLDataElement* node);
-
-        virtual void Apply(double& target,double value) const =0;
-
-    protected:
-
-        /// can construct from an XML node
-        BaseOperation(vtkXMLDataElement* node) : XML_Object(node) {}
-};
-
-/// Base class for different ways of specifying values at a particular location in the RD system.
-class BaseFill : public XML_Object
-{
-    public:
-
-        virtual ~BaseFill() {}
-
-        /// construct when we don't know the derived type (returns NULL if name is unknown)
-        static BaseFill* New(vtkXMLDataElement* node);
-
-        /// what value would this fill type be at the given location, given the existing data
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const =0;
-
-    protected:
-
-        /// can construct from an XML node
-        BaseFill(vtkXMLDataElement* node) : XML_Object(node) {}
-};
-
-/// Base class for different shapes that we can draw onto the RD system.
-class BaseShape : public XML_Object
-{
-    public:
-
-        virtual ~BaseShape() {}
-
-        /// construct when we don't know the derived type (returns NULL if name is unknown)
-        static BaseShape* New(vtkXMLDataElement* node);
-
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const =0;
-
-    protected:
-
-        /// can construct from an XML node
-        BaseShape(vtkXMLDataElement* node) : XML_Object(node) {}
-};
-
-// ------------------------------------------------------------------------------------------------
-
-Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node), op(NULL), fill(NULL)
+Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node)
 {
     string s;
     read_required_attribute(node,"chemical",s);
@@ -97,41 +40,30 @@ Overlay::Overlay(vtkXMLDataElement* node) : XML_Object(node), op(NULL), fill(NUL
     const int n_nested = node->GetNumberOfNestedElements();
     if(n_nested<3)
         throw runtime_error("overlay : expected at least 3 nested elements (operation, fill, shape)");
-    BaseShape *pShape;
-    BaseOperation *pOp;
-    BaseFill *pFill;
     for(int i_nested=0;i_nested<n_nested;i_nested++)
     {
         vtkXMLDataElement *subnode = node->GetNestedElement(i_nested);
         // is this an operation element?
-        pOp = BaseOperation::New(subnode);
+        unique_ptr<BaseOperation> pOp = BaseOperation::New(subnode);
         if(pOp) {
-            this->op = pOp; // TODO: check if already supplied
+            this->op = move(pOp); // TODO: check if already supplied
             continue; // (save time parsing as other types)
         }
         // is this a fill element?
-        pFill = BaseFill::New(subnode);
+        unique_ptr<BaseFill> pFill = BaseFill::New(subnode);
         if(pFill) {
-            this->fill = pFill; // TODO: check if already supplied
+            this->fill = move(pFill); // TODO: check if already supplied
             continue;
         }
         // must be a shape element?
-        pShape = BaseShape::New(subnode);
+        unique_ptr<BaseShape> pShape = BaseShape::New(subnode);
         if(pShape)
-            this->shapes.push_back(pShape);
+            this->shapes.push_back(move(pShape));
         else throw runtime_error(string("Unknown overlay element: ")+subnode->GetName());
     }
-    if(this->op == NULL) throw runtime_error("overlay: missing operation element");
-    if(this->fill == NULL) throw runtime_error("overlay: missing fill element");
+    if(!this->op) throw runtime_error("overlay: missing operation element");
+    if(!this->fill) throw runtime_error("overlay: missing fill element");
     if(this->shapes.empty()) throw runtime_error("overlay: missing shape element");
-}
-
-Overlay::~Overlay()
-{
-    delete this->op;
-    delete this->fill;
-    for(int i=0;i<(int)this->shapes.size();i++)
-        delete this->shapes[i];
 }
 
 vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
@@ -146,15 +78,18 @@ vtkSmartPointer<vtkXMLDataElement> Overlay::GetAsXML() const
     return xml;
 }
 
-double Overlay::Apply(vector<double> vals,AbstractRD* system,float x,float y,float z) const
+double Overlay::Apply(const vector<double>& vals, const AbstractRD& system, float x, float y, float z) const
 {
-    double val = vals[this->iTargetChemical];
+    // copy the values into a scratchpad to allow the overlays to affect each other
+    // e.g. one might write a constant value, the next double it
+    vector<double> vals_scratchpad(vals);
+
+    double& val = vals_scratchpad[this->iTargetChemical];
     for(int iShape=0;iShape<(int)this->shapes.size();iShape++)
     {
-        if( this->shapes[iShape]->IsInside( x, y, z, system->GetX(), system->GetY(), system->GetZ(), system->GetArenaDimensionality() ) )
+        if( this->shapes[iShape]->IsInside( x, y, z, system.GetX(), system.GetY(), system.GetZ(), system.GetArenaDimensionality() ) )
         {
-            this->op->Apply( val, this->fill->GetValue(system,vals,x,y,z) );
-            vals[this->iTargetChemical] = val; // in case there are multiple shapes at this location in this overlay
+            this->op->Apply( val, this->fill->GetValue(system, vals_scratchpad, x, y, z) );
         }
     }
     return val;
@@ -308,7 +243,7 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
             return this->value;
         }
@@ -339,7 +274,7 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system,const vector<double>& vals, float x, float y, float z) const
         {
             if(this->iOtherChemical < 0 || this->iOtherChemical >= (int)vals.size())
                 throw runtime_error("OtherChemical:GetValue : chemical out of range");
@@ -370,9 +305,9 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
-            return system->GetParameterValueByName(this->parameter_name.c_str());
+            return system.GetParameterValueByName(this->parameter_name.c_str());
         }
 
     protected:
@@ -401,7 +336,7 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
             return frand(this->low,this->high);
         }
@@ -421,10 +356,9 @@ class LinearGradient : public BaseFill
             read_required_attribute(node,"val2",this->val2);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("linear_gradient: expected two nested elements (point3D,point3D)");
-            this->p1 = new Point3D(node->GetNestedElement(0));
-            this->p2 = new Point3D(node->GetNestedElement(1));
+            this->p1 = make_unique<Point3D>(node->GetNestedElement(0));
+            this->p2 = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~LinearGradient() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "linear_gradient"; }
 
@@ -439,11 +373,11 @@ class LinearGradient : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
-            double rel_x = x/system->GetX();
-            double rel_y = y/system->GetY();
-            double rel_z = z/system->GetZ();
+            double rel_x = x/system.GetX();
+            double rel_y = y/system.GetY();
+            double rel_z = z/system.GetZ();
             // project this point onto the linear gradient axis
             double blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
             double bx = (this->p2->x-this->p1->x) / blen;
@@ -457,7 +391,8 @@ class LinearGradient : public BaseFill
     protected:
 
         double val1,val2;
-        Point3D *p1,*p2;
+        unique_ptr<Point3D> p1;
+        unique_ptr<Point3D> p2;
 };
 
 class RadialGradient : public BaseFill
@@ -470,10 +405,9 @@ class RadialGradient : public BaseFill
             read_required_attribute(node,"val2",this->val2);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("radial_gradient: expected two nested elements (point3D,point3D)");
-            this->p1 = new Point3D(node->GetNestedElement(0));
-            this->p2 = new Point3D(node->GetNestedElement(1));
+            this->p1 = make_unique<Point3D>(node->GetNestedElement(0));
+            this->p2 = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~RadialGradient() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "radial_gradient"; }
 
@@ -488,22 +422,23 @@ class RadialGradient : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
             // convert p1 and p2 to absolute coordinates
-            double rp1x = p1->x * system->GetX();
-            double rp1y = p1->y * system->GetY();
-            double rp1z = p1->z * system->GetZ();
-            double rp2x = p2->x * system->GetX();
-            double rp2y = p2->y * system->GetY();
-            double rp2z = p2->z * system->GetZ();
+            double rp1x = p1->x * system.GetX();
+            double rp1y = p1->y * system.GetY();
+            double rp1z = p1->z * system.GetZ();
+            double rp2x = p2->x * system.GetX();
+            double rp2y = p2->y * system.GetY();
+            double rp2z = p2->z * system.GetZ();
             return val1 + (val2-val1) * hypot3(x-rp1x,y-rp1y,z-rp1z) / hypot3(rp2x-rp1x,rp2y-rp1y,rp2z-rp1z);
         }
 
     protected:
 
         double val1,val2;
-        Point3D *p1,*p2;
+        unique_ptr<Point3D> p1;
+        unique_ptr<Point3D> p2;
 };
 
 class Gaussian : public BaseFill
@@ -516,9 +451,8 @@ class Gaussian : public BaseFill
             read_required_attribute(node,"sigma",this->sigma);
             if(node->GetNumberOfNestedElements()!=1)
                 throw runtime_error("gasussian: expected one nested element (point3D)");
-            this->center = new Point3D(node->GetNestedElement(0));
+            this->center = make_unique<Point3D>(node->GetNestedElement(0));
         }
-        virtual ~Gaussian() { delete this->center; }
 
         static const char* GetTypeName() { return "gaussian"; }
 
@@ -532,13 +466,13 @@ class Gaussian : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
             // convert center to absolute coordinates
-            double ax = center->x * system->GetX();
-            double ay = center->y * system->GetY();
-            double az = center->z * system->GetZ();
-            double asigma = this->sigma * max(system->GetX(),max(system->GetY(),system->GetZ())); // (proportional to the largest dimension)
+            double ax = center->x * system.GetX();
+            double ay = center->y * system.GetY();
+            double az = center->z * system.GetZ();
+            double asigma = this->sigma * max(system.GetX(),max(system.GetY(),system.GetZ())); // (proportional to the largest dimension)
             double dist = hypot3(ax-x,ay-y,az-z);
             return this->height * exp( -dist*dist/(2.0f*asigma*asigma) );
         }
@@ -546,7 +480,7 @@ class Gaussian : public BaseFill
     protected:
 
         double height,sigma;
-        Point3D *center;
+        unique_ptr<Point3D> center;
 };
 
 class Sine : public BaseFill
@@ -559,10 +493,9 @@ class Sine : public BaseFill
             read_required_attribute(node,"amplitude",this->amplitude);
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("sine: expected two nested elements (point3D,point3D)");
-            this->p1 = new Point3D(node->GetNestedElement(0));
-            this->p2 = new Point3D(node->GetNestedElement(1));
+            this->p1 = make_unique<Point3D>(node->GetNestedElement(0));
+            this->p2 = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~Sine() { delete this->p1; delete this->p2; }
 
         static const char* GetTypeName() { return "sine"; }
 
@@ -577,11 +510,11 @@ class Sine : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(AbstractRD *system,vector<double> vals,float x,float y,float z) const
+        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
         {
-            double rel_x = x/system->GetX();
-            double rel_y = y/system->GetY();
-            double rel_z = z/system->GetZ();
+            double rel_x = x/system.GetX();
+            double rel_y = y/system.GetY();
+            double rel_z = z/system.GetZ();
             // project this point onto the axis
             double blen = hypot3(this->p2->x-this->p1->x,this->p2->y-this->p1->y,this->p2->z-this->p1->z);
             double bx = (this->p2->x-this->p1->x) / blen;
@@ -595,7 +528,8 @@ class Sine : public BaseFill
     protected:
 
         double phase,amplitude;
-        Point3D *p1,*p2;
+        unique_ptr<Point3D> p1;
+        unique_ptr<Point3D> p2;
 };
 
 // -------- shapes: -----------
@@ -629,10 +563,9 @@ class Rectangle : public BaseShape
         {
             if(node->GetNumberOfNestedElements()!=2)
                 throw runtime_error("rectangle: expected two nested elements (point3D,point3D)");
-            this->a = new Point3D(node->GetNestedElement(0));
-            this->b = new Point3D(node->GetNestedElement(1));
+            this->a = make_unique<Point3D>(node->GetNestedElement(0));
+            this->b = make_unique<Point3D>(node->GetNestedElement(1));
         }
-        virtual ~Rectangle() { delete this->a; delete this->b; }
 
         static const char* GetTypeName() { return "rectangle"; }
 
@@ -664,7 +597,8 @@ class Rectangle : public BaseShape
 
     protected:
 
-        Point3D *a,*b;
+        unique_ptr<Point3D> a;
+        unique_ptr<Point3D> b;
 };
 
 class Circle : public BaseShape
@@ -676,9 +610,8 @@ class Circle : public BaseShape
             read_required_attribute(node,"radius",this->radius);
             if(node->GetNumberOfNestedElements()!=1)
                 throw runtime_error("circle: expected one nested element (point3D)");
-            this->c = new Point3D(node->GetNestedElement(0));
+            this->c = make_unique<Point3D>(node->GetNestedElement(0));
         }
-        virtual ~Circle() { delete this->c; }
 
         static const char* GetTypeName() { return "circle"; }
 
@@ -709,7 +642,7 @@ class Circle : public BaseShape
 
     protected:
 
-        Point3D *c;
+        unique_ptr<Point3D> c;
         double radius;
 };
 
@@ -756,37 +689,37 @@ class Pixel : public BaseShape
 
 // when you create a new derived class, add it to the appropriate factory method here:
 
-/* static */ BaseOperation* BaseOperation::New(vtkXMLDataElement *node)
+/* static */ unique_ptr<BaseOperation> BaseOperation::New(vtkXMLDataElement *node)
 {
     string name(node->GetName());
-    if(name==Overwrite::GetTypeName())         return new Overwrite(node);
-    else if(name==Add::GetTypeName())          return new Add(node);
-    else if(name==Subtract::GetTypeName())     return new Subtract(node);
-    else if(name==Multiply::GetTypeName())     return new Multiply(node);
-    else if(name==Divide::GetTypeName())       return new Divide(node);
-    else                                       return NULL;
+    if(name==Overwrite::GetTypeName())         return make_unique<Overwrite>(node);
+    else if(name==Add::GetTypeName())          return make_unique<Add>(node);
+    else if(name==Subtract::GetTypeName())     return make_unique<Subtract>(node);
+    else if(name==Multiply::GetTypeName())     return make_unique<Multiply>(node);
+    else if(name==Divide::GetTypeName())       return make_unique<Divide>(node);
+    else                                       return unique_ptr<BaseOperation>();
 }
 
-/* static */ BaseFill* BaseFill::New(vtkXMLDataElement* node)
+/* static */ unique_ptr<BaseFill> BaseFill::New(vtkXMLDataElement* node)
 {
     string name(node->GetName());
-    if(name==Constant::GetTypeName())             return new Constant(node);
-    else if(name==WhiteNoise::GetTypeName())      return new WhiteNoise(node);
-    else if(name==OtherChemical::GetTypeName())   return new OtherChemical(node);
-    else if(name==Parameter::GetTypeName())       return new Parameter(node);
-    else if(name==LinearGradient::GetTypeName())  return new LinearGradient(node);
-    else if(name==RadialGradient::GetTypeName())  return new RadialGradient(node);
-    else if(name==Gaussian::GetTypeName())        return new Gaussian(node);
-    else if(name==Sine::GetTypeName())            return new Sine(node);
-    else                                          return NULL;
+    if(name==Constant::GetTypeName())             return make_unique<Constant>(node);
+    else if(name==WhiteNoise::GetTypeName())      return make_unique<WhiteNoise>(node);
+    else if(name==OtherChemical::GetTypeName())   return make_unique<OtherChemical>(node);
+    else if(name==Parameter::GetTypeName())       return make_unique<Parameter>(node);
+    else if(name==LinearGradient::GetTypeName())  return make_unique<LinearGradient>(node);
+    else if(name==RadialGradient::GetTypeName())  return make_unique<RadialGradient>(node);
+    else if(name==Gaussian::GetTypeName())        return make_unique<Gaussian>(node);
+    else if(name==Sine::GetTypeName())            return make_unique<Sine>(node);
+    else                                          return unique_ptr<BaseFill>();
 }
 
-/* static */ BaseShape* BaseShape::New(vtkXMLDataElement* node)
+/* static */ unique_ptr<BaseShape> BaseShape::New(vtkXMLDataElement* node)
 {
     string name(node->GetName());
-    if(name==Everywhere::GetTypeName())        return new Everywhere(node);
-    else if(name==Rectangle::GetTypeName())    return new Rectangle(node);
-    else if(name==Circle::GetTypeName())       return new Circle(node);
-    else if(name==Pixel::GetTypeName())        return new Pixel(node);
-    else                                       return NULL;
+    if(name==Everywhere::GetTypeName())        return make_unique<Everywhere>(node);
+    else if(name==Rectangle::GetTypeName())    return make_unique<Rectangle>(node);
+    else if(name==Circle::GetTypeName())       return make_unique<Circle>(node);
+    else if(name==Pixel::GetTypeName())        return make_unique<Pixel>(node);
+    else                                       return unique_ptr<BaseShape>();
 }
