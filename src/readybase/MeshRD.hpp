@@ -84,9 +84,6 @@ class MeshRD : public AbstractRD
         /// work out which cells are neighbors of each other
         void ComputeCellNeighbors(TNeighborhood neighborhood_type);
 
-        /// advance the RD system by n timesteps
-        virtual void InternalUpdate(int n_steps) =0;
-
         void CreateCellLocatorIfNeeded();
 
         void FlipPaintAction(PaintAction& cca) override;
