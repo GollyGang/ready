@@ -41,7 +41,7 @@ class FullKernelOpenCLImageRD : public OpenCLImageRD
         void SetBlockSizeY(int n) override { this->block_size[1]=n; this->need_reload_formula=true; }
         void SetBlockSizeZ(int n) override { this->block_size[2]=n; this->need_reload_formula=true; }
 
-        std::string AssembleKernelSourceFromFormula(std::string formula) const override;
+        std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
         bool HasEditableDataType() const override { return false; }
 

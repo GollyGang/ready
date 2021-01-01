@@ -1239,7 +1239,7 @@ void ImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
     }
     if (n > this->n_chemicals)
     {
-        while (this->images.size() < n) {
+        while (static_cast<int>(this->images.size()) < n) {
             this->images.push_back( AllocateVTKImage(X, Y, Z, this->data_type) );
             this->images.back()->GetPointData()->GetScalars()->FillComponent(0, 0.0);
         }

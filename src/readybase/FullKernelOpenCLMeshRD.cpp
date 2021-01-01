@@ -57,7 +57,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string formula) const
+string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(const std::string& formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }

@@ -126,11 +126,19 @@ string InputPoint::GetDirectAccessCode(bool wrap) const
     {
         throw runtime_error("internal error in GetDirectAccessCode: point.x not divisible by 4");
     }
-    const string index_x = GetIndexString(point.x / 4, "x", "X", wrap);
-    const string index_y = GetIndexString(point.y, "y", "Y", wrap);
-    const string index_z = GetIndexString(point.z, "z", "Z", wrap);
     ostringstream oss;
-    oss << GetName() << " = " << chem << "_in[X * (Y * " << index_z << " + " << index_y << ") + " << index_x << "]";
+    oss << GetName() << " = " << chem << "_in[";
+    if (point.x == 0 && point.y == 0 && point.z == 0)
+    {
+        oss << "index_here";
+    }
+    else {
+        const string index_x = GetIndexString(point.x / 4, "x", "X", wrap);
+        const string index_y = GetIndexString(point.y, "y", "Y", wrap);
+        const string index_z = GetIndexString(point.z, "z", "Z", wrap);
+        oss << "X* (Y * " << index_z << " + " << index_y << ") + " << index_x;
+    }
+    oss << "]";
     return oss.str();
 }
 
