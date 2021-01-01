@@ -152,7 +152,7 @@ struct KernelOptions {
 
 // -------------------------------------------------------------------------
 
-void AddCells(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
+void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
 {
     // retrieve the float4 input blocks needed from global memory
     for (const InputPoint& input_point : cells_needed)
@@ -181,7 +181,7 @@ void AddCells(ostringstream& kernel_source, const set<InputPoint>& cells_needed,
 
 // -------------------------------------------------------------------------
 
-void AddKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     kernel_source << options.indent << "// keywords needed for the formula:\n";
     // output the first part of the body
@@ -193,7 +193,7 @@ void AddKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
     // add the the cells we need
-    AddCells(kernel_source, inputs_needed.cells_needed, options);
+    WriteCellsNeeded(kernel_source, inputs_needed.cells_needed, options);
     // add the stencils we need
     for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
     {
@@ -293,7 +293,7 @@ string WriteKernel(const InputsNeeded& inputs_needed,
     }
     kernel_source << "\n";
     // add the keywords we need
-    AddKeywords(kernel_source, inputs_needed, options);
+    WriteKeywords(kernel_source, inputs_needed, options);
     // add the formula
     kernel_source << options.indent << "// the formula:\n";
     istringstream iss(formula);
