@@ -49,13 +49,9 @@ delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;");
 
 // -------------------------------------------------------------------------
 
-struct KeywordOptions {
-    bool wrap;
-    string indent;
-    string data_type_string;
-    string data_type_suffix;
+struct InputsNeeded {
     vector<AppliedStencil> stencils_needed;
-    set<InputPoint> inputs_needed;
+    set<InputPoint> cells_needed;
     map<string, int> gradient_mag_squared;
     bool using_x_pos;
     bool using_y_pos;
@@ -65,19 +61,24 @@ struct KeywordOptions {
 
 // -------------------------------------------------------------------------
 
-void DetectKeywordsNeeded(const string& formula, int num_chemicals, int dimensionality, KeywordOptions& options)
+InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality)
 {
+    InputsNeeded inputs_needed;
+
     const vector<string> formula_tokens = tokenize_for_keywords(formula);
     const vector<Stencil> known_stencils = GetKnownStencils(dimensionality);
     for (int i = 0; i < num_chemicals; i++)
     {
         const string chem = GetChemicalName(i);
-        options.inputs_needed.insert({{ 0, 0, 0 }, chem }); // always need the central cell
+        // assume we will need the central cell
+        inputs_needed.cells_needed.insert({{ 0, 0, 0 }, chem });
+        // assume we need delta_<chem> for the forward Euler step
+        inputs_needed.deltas_needed.push_back(chem);
         // search for keywords that make use of stencils
         set<string> dependent_stencils;
         if (UsingKeyword(formula_tokens, "gradient_mag_squared_" + chem))
         {
-            options.gradient_mag_squared[chem] = dimensionality;
+            inputs_needed.gradient_mag_squared[chem] = dimensionality;
             switch (dimensionality)
             {
             default:
@@ -96,10 +97,10 @@ void DetectKeywordsNeeded(const string& formula, int num_chemicals, int dimensio
             if (UsingKeyword(formula_tokens, keyword) || dependent_stencils.find(keyword) != dependent_stencils.end())
             {
                 AppliedStencil applied_stencil{ stencil, chem };
-                options.stencils_needed.push_back(applied_stencil);
+                inputs_needed.stencils_needed.push_back(applied_stencil);
                 // collect all calls to the inputs needed for this stencil
                 set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
-                options.inputs_needed.insert(input_points.begin(), input_points.end());
+                inputs_needed.cells_needed.insert(input_points.begin(), input_points.end());
             }
         }
         // search for direct access to neighbors, e.g. "a_nw"
@@ -113,36 +114,47 @@ void DetectKeywordsNeeded(const string& formula, int num_chemicals, int dimensio
                     InputPoint input_point{ {x, y, z}, chem };
                     if (UsingKeyword(formula_tokens, input_point.GetName()))
                     {
-                        options.inputs_needed.insert(input_point);
+                        inputs_needed.cells_needed.insert(input_point);
                     }
                 }
             }
         }
-        options.deltas_needed.push_back(chem); // TODO: only add delta_<chem> and the forward-Euler step if delta_<chem> appears in the formula
     }
     // non-block-aligned inputs need other inputs: the two blocks that supply them
-    vector<InputPoint> input_blocks;
-    for (const InputPoint& input_point : options.inputs_needed)
+    vector<InputPoint> blocks_needed;
+    for (const InputPoint& input_point : inputs_needed.cells_needed)
     {
         if (input_point.point.x % 4 != 0)
         {
             const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks();
-            input_blocks.push_back(blocks.first);
-            input_blocks.push_back(blocks.second);
+            blocks_needed.push_back(blocks.first);
+            blocks_needed.push_back(blocks.second);
         }
     }
-    options.inputs_needed.insert(input_blocks.begin(), input_blocks.end());
+    inputs_needed.cells_needed.insert(blocks_needed.begin(), blocks_needed.end());
     // detect if using x_pos, y_pos or z_pos
-    options.using_x_pos = UsingKeyword(formula_tokens, "x_pos");
-    options.using_y_pos = UsingKeyword(formula_tokens, "y_pos");
-    options.using_z_pos = UsingKeyword(formula_tokens, "z_pos");
+    inputs_needed.using_x_pos = UsingKeyword(formula_tokens, "x_pos");
+    inputs_needed.using_y_pos = UsingKeyword(formula_tokens, "y_pos");
+    inputs_needed.using_z_pos = UsingKeyword(formula_tokens, "z_pos");
+
+    return inputs_needed;
 }
+
 // -------------------------------------------------------------------------
 
-void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
+struct KernelOptions {
+    bool wrap;
+    string indent;
+    string data_type_string;
+    string data_type_suffix;
+};
+
+// -------------------------------------------------------------------------
+
+void AddStencils_Block411(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     // retrieve the float4 input blocks needed from global memory
-    for (const InputPoint& input_point : options.inputs_needed)
+    for (const InputPoint& input_point : inputs_needed.cells_needed)
     {
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
         {
@@ -155,7 +167,7 @@ void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
         }
     }
     // compute the non-block-aligned float4's from the block-aligned ones we have retrieved
-    for (const InputPoint& input_point : options.inputs_needed)
+    for (const InputPoint& input_point : inputs_needed.cells_needed)
     {
         if (input_point.point.x % 4 != 0)
         {
@@ -165,14 +177,15 @@ void AddStencils_Block411(ostringstream& kernel_source, KeywordOptions& options)
         }
     }
     // compute the stencils needed
-    for (const AppliedStencil& applied_stencil : options.stencils_needed)
+    for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetCode() << ";\n";
     }
 }
 
 // -------------------------------------------------------------------------
-void AddKeywords(ostringstream& kernel_source, KeywordOptions& options)
+
+void AddKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     kernel_source << options.indent << "// keywords needed for the formula:\n";
     // output the first part of the body
@@ -184,24 +197,24 @@ void AddKeywords(ostringstream& kernel_source, KeywordOptions& options)
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
     // add the stencils we found
-    AddStencils_Block411(kernel_source, options);
+    AddStencils_Block411(kernel_source, inputs_needed, options);
     // add x_pos, y_pos, z_pos if being used
-    if (options.using_x_pos)
+    if (inputs_needed.using_x_pos)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 x_pos = (index_x + (" << options.data_type_string
             << "4)(0.0" << options.data_type_suffix << ", 0.25" << options.data_type_suffix << ", 0.5" << options.data_type_suffix
             << ", 0.75" << options.data_type_suffix << ")) / X;\n";
     }
-    if (options.using_y_pos)
+    if (inputs_needed.using_y_pos)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 y_pos = index_y / (" << options.data_type_string << ")(Y); \n";
     }
-    if (options.using_z_pos)
+    if (inputs_needed.using_z_pos)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 z_pos = index_z / (" << options.data_type_string << ")(Z);\n";
     }
     // add gradient_mag_squared if being used
-    for (const pair<string, int>& pair : options.gradient_mag_squared)
+    for (const pair<string, int>& pair : inputs_needed.gradient_mag_squared)
     {
         const string& chem = pair.first;
         const int dimensionality = pair.second;
@@ -218,7 +231,7 @@ void AddKeywords(ostringstream& kernel_source, KeywordOptions& options)
         kernel_source << ";\n";
     }
     // declara delta_a, etc. and initialize to zero
-    for (const string& chem : options.deltas_needed)
+    for (const string& chem : inputs_needed.deltas_needed)
         kernel_source << options.indent << options.data_type_string << "4 delta_" << chem << " = 0.0" << options.data_type_suffix << ";\n";
     kernel_source << "\n";
 }
@@ -227,14 +240,13 @@ void AddKeywords(ostringstream& kernel_source, KeywordOptions& options)
 
 string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
 {
+    // search the formula for keywords
+    const InputsNeeded inputs_needed = DetectInputsNeeded(formula, this->GetNumberOfChemicals(), this->GetArenaDimensionality());
+
+    // output the kernel as a string
+    ostringstream kernel_source;
     const string indent = "    ";
     const int NC = this->GetNumberOfChemicals();
-
-    // search the formula for keywords
-    KeywordOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
-    DetectKeywordsNeeded(formula, NC, this->GetArenaDimensionality(), options);
-
-    ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
     if( this->data_type == VTK_DOUBLE ) {
         kernel_source << "\
@@ -246,7 +258,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
 #endif\n\n";
     }
-    // output the function definition
+    // output the function declaration
     kernel_source << "__kernel void rd_compute(";
     for(int i=0;i<NC;i++)
         kernel_source << "__global " << this->data_type_string << "4 *" << GetChemicalName(i) << "_in,";
@@ -263,16 +275,17 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
         kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first
                       << " = " << setprecision(8) << this->parameters[i].second << this->data_type_suffix << ";\n";
     // add a dx parameter for grid spacing if one is not already supplied
-    // TODO: only need this if using a stencil that includes it
     const bool has_dx_parameter = find_if(this->parameters.begin(), this->parameters.end(),
         [](const pair<string, float>& param) { return param.first == "dx"; }) != this->parameters.end();
-    if (!options.stencils_needed.empty() && !has_dx_parameter)
+    if (!inputs_needed.stencils_needed.empty() && !has_dx_parameter)
     {
         kernel_source << indent << "const " << this->data_type_string << " dx = 1.0" << this->data_type_suffix << "; // grid spacing\n";
+        // TODO: only need this if using a stencil that uses dx
     }
     kernel_source << "\n";
     // add the keywords we need
-    AddKeywords(kernel_source, options);
+    const KernelOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
+    AddKeywords(kernel_source, inputs_needed, options);
     // add the formula
     kernel_source << indent << "// the formula:\n";
     istringstream iss(formula);
