@@ -230,8 +230,6 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
     this->cell_locator = NULL;
 
     this->ComputeCellNeighbors(this->neighborhood_type);
-
-    this->xgap = this->GetX() * 0.05;
 }
 
 // ---------------------------------------------------------------------
@@ -278,6 +276,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
 
     double offset[3] = {0,0,0};
+    const float x_gap = this->x_spacing_proportion * this->GetX();
 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
@@ -479,7 +478,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             pRenderer->AddActor(captionActor);
         }
 
-        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
+        offset[0] += this->GetX() + x_gap; // the next chemical should appear further to the right
     }
 
     // also add a scalar bar to show how the colors correspond to values
@@ -902,9 +901,10 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x-this->mesh->GetBounds()[0] + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -940,9 +940,10 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x-this->mesh->GetBounds()[0] + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -982,9 +983,10 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x-this->mesh->GetBounds()[0] + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {

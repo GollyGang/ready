@@ -79,10 +79,10 @@ class AbstractRD
 
         std::string GetDescription() const { return this->description; }
         void SetDescription(std::string s);
-        
+
         virtual int GetNumberOfCells() const =0;
 
-        // most implementations have parameters that can be edited and changed 
+        // most implementations have parameters that can be edited and changed
         // (will cause errors if they don't match the inbuilt names, the formula or the kernel)
         int GetNumberOfParameters() const;
         std::string GetParameterName(int iParam) const;
@@ -140,7 +140,7 @@ class AbstractRD
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const =0;
         /// Sets the values for a certain chemical from an image
         virtual void SetFrom2DImage(int iChemical, vtkImageData *im) = 0;
-        /// Indicates whether GetAs2DImage() and SetFrom2DImage() can be called. 
+        /// Indicates whether GetAs2DImage() and SetFrom2DImage() can be called.
         virtual bool Is2DImageAvailable() const =0;
 
         /// Retrieve the dimensionality of the system volume, irrespective of the cells within it.
@@ -221,7 +221,8 @@ class AbstractRD
         std::map<TNeighborhood,std::string> canonical_neighborhood_type_identifiers;
         std::map<std::string,TNeighborhood> recognized_neighborhood_type_identifiers;
 
-        double xgap,ygap;           /// spatial separation for rendering multiple chemicals
+        double x_spacing_proportion;    /// spatial separation for rendering multiple chemicals, as a proportion of X
+        double y_spacing_proportion;    /// spatial separation for rendering multiple chemicals, as a proportion of Y
 
     protected: // functions
 
@@ -238,4 +239,4 @@ class AbstractRD
         void InternalSetDataType(int type);
 };
 
-#endif 
+#endif
