@@ -29,7 +29,7 @@ class Property : public XML_Object
 {
     public:
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override;
         void ReadFromXML(vtkXMLDataElement* node);
 
         /// Construct as a float.
@@ -85,7 +85,7 @@ class Properties : public XML_Object
 
         Properties(std::string set_name) : XML_Object(NULL),set_name(set_name) {}
         void OverwriteFromXML(vtkXMLDataElement* node);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override;
 
         int GetNumberOfProperties() const { return (int)this->properties.size(); }
         const Property& GetProperty(int i) const { return this->properties[i]; }

@@ -153,8 +153,8 @@ class wxVTKRenderWindowInteractor : public wxWindow, public vtkRenderWindowInter
 
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION >= 2)
   protected:
-    virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
-    virtual int InternalDestroyTimer(int platformTimerId) override;
+    int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
+    int InternalDestroyTimer(int platformTimerId) override;
 #endif
 
   protected:
