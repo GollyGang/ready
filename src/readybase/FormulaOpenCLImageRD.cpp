@@ -196,12 +196,6 @@ void AddKeywords(ostringstream& kernel_source, KeywordOptions& options)
     kernel_source << options.indent << "const int Y = get_global_size(1);\n";
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
-    /*for (int i = 0; i < NC; i++) TODO
-    {
-        kernel_source << indent << this->data_type_string << "4 " << GetChemicalName(i)
-            << " = " << GetChemicalName(i) << "_in[index_here];\n";
-        // (non-const, to allow the user to assign directly to it if wanted)
-    }*/
     // add the stencils we found
     AddStencils_Block411(kernel_source, options);
     // add x_pos, y_pos, z_pos if being used
@@ -282,6 +276,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
         kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first
                       << " = " << setprecision(8) << this->parameters[i].second << this->data_type_suffix << ";\n";
     // add a dx parameter for grid spacing if one is not already supplied
+    // TODO: only need this if using a stencil that includes it
     const bool has_dx_parameter = find_if(this->parameters.begin(), this->parameters.end(),
         [](const pair<string, float>& param) { return param.first == "dx"; }) != this->parameters.end();
     if (!options.stencils_needed.empty() && !has_dx_parameter)
