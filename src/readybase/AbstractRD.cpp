@@ -20,6 +20,7 @@
 #include "overlays.hpp"
 
 // STL:
+#include <algorithm>
 using namespace std;
 
 // SSE:
