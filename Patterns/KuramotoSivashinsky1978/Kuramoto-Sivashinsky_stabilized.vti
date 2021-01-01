@@ -8,6 +8,10 @@ The stabilize parameter prevents the values from growing continuously. Set it to
 
 To increase the size of the blobs, try e.g.: dx = 0.3, timestep = 0.0005
 
+In 3D (try 32 x 32 x 32) use stabilize = -0.1.
+
+In 1D use stabilize = -0.025.
+
 Created by Dan Wills.
     </description>
     <rule name="KSE" type="formula" wrap="1">
@@ -64,7 +68,7 @@ delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + gradient_mag_s
       </vertical_scale_1D>
       <vertical_scale_2D value="15">
       </vertical_scale_2D>
-      <contour_level value="0.25">
+      <contour_level value="100">
       </contour_level>
       <cap_contour value="true">
       </cap_contour>
