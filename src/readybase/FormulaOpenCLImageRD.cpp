@@ -154,7 +154,7 @@ struct KernelOptions {
 
 void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
 {
-    // retrieve the float4 input blocks needed from global memory
+    // write code to retrieve the block-aligned inputs from global memory
     for (const InputPoint& input_point : cells_needed)
     {
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
@@ -167,7 +167,7 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
             kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetDirectAccessCode(options.wrap) << ";\n";
         }
     }
-    // compute the non-block-aligned float4's from the block-aligned ones we have retrieved
+    // write code to compute the non-block-aligned float4's from the block-aligned ones we have retrieved
     for (const InputPoint& input_point : cells_needed)
     {
         if (input_point.point.x % 4 != 0)
@@ -192,14 +192,14 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
     kernel_source << options.indent << "const int Y = get_global_size(1);\n";
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
-    // add the the cells we need
+    // write code for the cells we need
     WriteCellsNeeded(kernel_source, inputs_needed.cells_needed, options);
-    // add the stencils we need
+    // write code for the stencils we need
     for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetCode() << ";\n";
     }
-    // add x_pos, y_pos, z_pos if being used
+    // write code for x_pos, y_pos, z_pos if needed
     if (inputs_needed.using_x_pos)
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 x_pos = (index_x + (" << options.data_type_string
@@ -214,7 +214,7 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
     {
         kernel_source << options.indent << "const " << options.data_type_string << "4 z_pos = index_z / (" << options.data_type_string << ")(Z);\n";
     }
-    // add gradient_mag_squared if being used
+    // write code for gradient_mag_squared if needed
     for (const pair<string, int>& pair : inputs_needed.gradient_mag_squared)
     {
         const string& chem = pair.first;
@@ -239,7 +239,7 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
 
 // -------------------------------------------------------------------------
 
-string WriteKernel(const InputsNeeded& inputs_needed,
+string AssembleKernelSource(const InputsNeeded& inputs_needed,
     const vector<AbstractRD::Parameter>& parameters,
     int num_chemicals,
     int dimensionality,
@@ -329,7 +329,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     const string indent = "    ";
     const KernelOptions options{ this->wrap, indent, this->data_type, this->data_type_string, this->data_type_suffix };
 
-    const string kernel_source = WriteKernel(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
+    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
         this->GetArenaDimensionality(), formula, options);
 
     return kernel_source;
