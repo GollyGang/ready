@@ -53,7 +53,8 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(const std::stri
 
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
-    if( this->data_type == VTK_DOUBLE ) {
+    if( this->data_type == VTK_DOUBLE )
+    {
         kernel_source << "\
 #ifdef cl_khr_fp64\n\
     #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
@@ -91,8 +92,10 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(const std::stri
     kernel_source << "\n";
     // the parameters (assume all float for now)
     kernel_source << indent << "// parameters:\n";
-    for(int i=0;i<(int)this->parameters.size();i++)
-        kernel_source << indent << this->data_type_string << " " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
+    for (const Parameter& parameter : this->parameters)
+    {
+        kernel_source << indent << this->data_type_string << " " << parameter.name << " = " << parameter.value << this->data_type_suffix << ";\n";
+    }
     // the update step
     for(int i=0;i<NC;i++)
         kernel_source << indent << this->data_type_string << " delta_" << GetChemicalName(i) << " = 0.0" << this->data_type_suffix << ";\n";

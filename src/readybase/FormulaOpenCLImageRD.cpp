@@ -145,6 +145,7 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
 struct KernelOptions {
     bool wrap;
     string indent;
+    int data_type;
     string data_type_string;
     string data_type_suffix;
 };
@@ -238,17 +239,18 @@ void AddKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed
 
 // -------------------------------------------------------------------------
 
-string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
+string WriteKernel(const InputsNeeded& inputs_needed,
+    const vector<AbstractRD::Parameter>& parameters,
+    int num_chemicals,
+    int dimensionality,
+    const string& formula,
+    const KernelOptions& options)
 {
-    // search the formula for keywords
-    const InputsNeeded inputs_needed = DetectInputsNeeded(formula, this->GetNumberOfChemicals(), this->GetArenaDimensionality());
-
     // output the kernel as a string
     ostringstream kernel_source;
-    const string indent = "    ";
-    const int NC = this->GetNumberOfChemicals();
     kernel_source << fixed << setprecision(6);
-    if( this->data_type == VTK_DOUBLE ) {
+    if (options.data_type == VTK_DOUBLE)
+    {
         kernel_source << "\
 #ifdef cl_khr_fp64\n\
     #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
@@ -260,52 +262,77 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     }
     // output the function declaration
     kernel_source << "__kernel void rd_compute(";
-    for(int i=0;i<NC;i++)
-        kernel_source << "__global " << this->data_type_string << "4 *" << GetChemicalName(i) << "_in,";
-    for(int i=0;i<NC;i++)
+    for (int i = 0; i < num_chemicals; i++)
     {
-        kernel_source << "__global " << this->data_type_string << "4 *" << GetChemicalName(i) << "_out";
-        if(i<NC-1)
+        kernel_source << "__global " << options.data_type_string << "4 *" << GetChemicalName(i) << "_in";
+        kernel_source << ",";
+    }
+    for (int i = 0; i < num_chemicals; i++)
+    {
+        kernel_source << "__global " << options.data_type_string << "4 *" << GetChemicalName(i) << "_out";
+        if (i < num_chemicals - 1)
+        {
             kernel_source << ",";
+        }
     }
     kernel_source << ")\n{\n";
     // add the parameters
-    kernel_source << indent << "// parameters:\n";
-    for (int i = 0; i < (int)this->parameters.size(); i++)
-        kernel_source << indent << "const " << this->data_type_string << "4 " << this->parameters[i].first
-                      << " = " << setprecision(8) << this->parameters[i].second << this->data_type_suffix << ";\n";
+    kernel_source << options.indent << "// parameters:\n";
+    for (const AbstractRD::Parameter& parameter : parameters)
+    {
+        kernel_source << options.indent << "const " << options.data_type_string << "4 " << parameter.name
+            << " = " << setprecision(8) << parameter.value << options.data_type_suffix << ";\n";
+    }
     // add a dx parameter for grid spacing if one is not already supplied
-    const bool has_dx_parameter = find_if(this->parameters.begin(), this->parameters.end(),
-        [](const pair<string, float>& param) { return param.first == "dx"; }) != this->parameters.end();
+    const bool has_dx_parameter = find_if(parameters.begin(), parameters.end(),
+        [](const AbstractRD::Parameter& param) { return param.name == "dx"; }) != parameters.end();
     if (!inputs_needed.stencils_needed.empty() && !has_dx_parameter)
     {
-        kernel_source << indent << "const " << this->data_type_string << " dx = 1.0" << this->data_type_suffix << "; // grid spacing\n";
+        kernel_source << options.indent << "const " << options.data_type_string << " dx = 1.0" << options.data_type_suffix << "; // grid spacing\n";
         // TODO: only need this if using a stencil that uses dx
     }
     kernel_source << "\n";
     // add the keywords we need
-    const KernelOptions options{ this->wrap, indent, this->data_type_string, this->data_type_suffix };
     AddKeywords(kernel_source, inputs_needed, options);
     // add the formula
-    kernel_source << indent << "// the formula:\n";
+    kernel_source << options.indent << "// the formula:\n";
     istringstream iss(formula);
     string s;
-    while(iss.good())
+    while (iss.good())
     {
-        getline(iss,s);
-        kernel_source << indent << s << "\n";
+        getline(iss, s);
+        kernel_source << options.indent << s << "\n";
     }
     kernel_source << "\n";
     // add the forward-Euler step
     // TODO: only add this when delta_<chem> appears in the formula
-    kernel_source << indent << "// forward-Euler update step:\n";
-    for(int iC=0;iC<NC;iC++)
-        kernel_source << indent << GetChemicalName(iC) << "_out[index_here] = " << GetChemicalName(iC) << " + timestep * delta_" << GetChemicalName(iC) << ";\n";
+    kernel_source << options.indent << "// forward-Euler update step:\n";
+    for (int iC = 0; iC < num_chemicals; iC++)
+    {
+        kernel_source << options.indent << GetChemicalName(iC) << "_out[index_here] = "
+            << GetChemicalName(iC) << " + timestep * delta_" << GetChemicalName(iC) << ";\n";
+    }
     // TODO: timestep only needed if it appears in the formula or if we are doing forward-Euler for at least one chemical
     // finish up
     kernel_source << "}\n";
 
     return kernel_source.str();
+}
+
+// -------------------------------------------------------------------------
+
+string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
+{
+    const InputsNeeded inputs_needed = DetectInputsNeeded(formula, this->GetNumberOfChemicals(),
+        this->GetArenaDimensionality());
+
+    const string indent = "    ";
+    const KernelOptions options{ this->wrap, indent, this->data_type, this->data_type_string, this->data_type_suffix };
+
+    const string kernel_source = WriteKernel(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
+        this->GetArenaDimensionality(), formula, options);
+
+    return kernel_source;
 }
 
 // -------------------------------------------------------------------------
