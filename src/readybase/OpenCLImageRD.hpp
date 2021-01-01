@@ -29,38 +29,38 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         OpenCLImageRD(int opencl_platform,int opencl_device,int data_type);
 
-        virtual bool HasEditableFormula() const { return true; }
+        bool HasEditableFormula() const override { return true; }
 
-        virtual void GenerateInitialPattern();
-        virtual void BlankImage(float value = 0.0f);
+        void GenerateInitialPattern() override;
+        void BlankImage(float value = 0.0f) override;
 
-        virtual void TestFormula(std::string program_string);
+        void TestFormula(std::string program_string) override;
 
-        virtual std::string GetKernel() const { return this->AssembleKernelSourceFromFormula(this->formula); }
+        std::string GetKernel() const override { return this->AssembleKernelSourceFromFormula(this->formula); }
 
-        virtual void SetFrom2DImage(int iChemical, vtkImageData *im);
+        void SetFrom2DImage(int iChemical, vtkImageData *im) override;
 
-        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
-        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
+        void SetValue(float x,float y,float z,float val,const Properties& render_settings) override;
+        void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) override;
 
-        virtual void Undo();
-        virtual void Redo();
-        virtual void GetFromOpenCLBuffers( float* dest, int chemical_id ) const;
+        void Undo() override;
+        void Redo() override;
+        void GetFromOpenCLBuffers(float* dest, int chemical_id) const;
 
     protected:
 
-        virtual void CopyFromImage(vtkImageData* im);
+        void CopyFromImage(vtkImageData* im) override;
 
-        virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
+        void AllocateImages(int x,int y,int z,int nc,int data_type) override;
         void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
 
-        virtual void InternalUpdate(int n_steps);
+        void InternalUpdate(int n_steps) override;
 
-        virtual void ReloadKernelIfNeeded();
+        void ReloadKernelIfNeeded() override;
 
-        virtual void CreateOpenCLBuffers();
-        virtual void WriteToOpenCLBuffersIfNeeded();
-        virtual void ReadFromOpenCLBuffers();
+        void CreateOpenCLBuffers() override;
+        void WriteToOpenCLBuffersIfNeeded() override;
+        void ReadFromOpenCLBuffers() override;
 };
 
 #endif

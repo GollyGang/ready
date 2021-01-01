@@ -519,7 +519,7 @@ endif()
 if( APPLE )
   # support macOS 10.10 or later
   add_definitions( -mmacosx-version-min=10.10 )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wno-nullability-completeness-on-arrays -Wno-inconsistent-missing-override")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wno-nullability-completeness-on-arrays")
 endif()
 if( APPLE OR UNIX )
   # use same settings as in makefiles

@@ -26,11 +26,11 @@ class InbuiltMeshRD : public MeshRD
 
         InbuiltMeshRD(int data_type) : MeshRD(data_type) {}
 
-        virtual std::string GetRuleType() const { return "inbuilt"; }
+        std::string GetRuleType() const override { return "inbuilt"; }
 
-        virtual bool HasEditableFormula() const { return false; }
-        virtual bool HasEditableNumberOfChemicals() const { return false; }
-        virtual bool HasEditableDataType() const { return false; }
+        bool HasEditableFormula() const override { return false; }
+        bool HasEditableNumberOfChemicals() const override { return false; }
+        bool HasEditableDataType() const override { return false; }
 };
 
 /// A non-OpenCL mesh implementation, just as an example.
@@ -41,11 +41,11 @@ class GrayScottMeshRD : public InbuiltMeshRD
         GrayScottMeshRD();
 
         void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
-        virtual void CopyFromMesh(vtkUnstructuredGrid *mesh2);
+        void CopyFromMesh(vtkUnstructuredGrid *mesh2) override;
 
     protected:
 
-        virtual void InternalUpdate(int n_steps);
+        void InternalUpdate(int n_steps) override;
 
     protected:
 

@@ -43,9 +43,9 @@ class RD_XMLImageReader : public vtkXMLImageDataReader
         vtkXMLDataElement* GetRDElement();
         bool ShouldGenerateInitialPatternWhenLoading();
 
-    protected:  
+    protected:
 
-        RD_XMLImageReader() {} 
+        RD_XMLImageReader() {}
 
 };
 
@@ -64,9 +64,9 @@ class RD_XMLUnstructuredGridReader : public vtkXMLUnstructuredGridReader
         vtkXMLDataElement* GetRDElement();
         bool ShouldGenerateInitialPatternWhenLoading();
 
-    protected:  
+    protected:
 
-        RD_XMLUnstructuredGridReader() {} 
+        RD_XMLUnstructuredGridReader() {}
 
 };
 
@@ -84,13 +84,13 @@ class RD_XMLImageWriter : public vtkXMLImageDataWriter
         void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
         void GenerateInitialPatternWhenLoading() { this->generate_initial_pattern_when_loading = true; }
 
-    protected:  
+    protected:
 
-        RD_XMLImageWriter() : system(NULL), generate_initial_pattern_when_loading(false) {} 
+        RD_XMLImageWriter() : system(NULL), generate_initial_pattern_when_loading(false) {}
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(ImageRD* system);
 
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent) override;
+        int WritePrimaryElement(ostream& os,vtkIndent indent) override;
 
     protected:
 
@@ -113,13 +113,13 @@ class RD_XMLUnstructuredGridWriter : public vtkXMLUnstructuredGridWriter
         void SetRenderSettings(const Properties* settings) { this->render_settings = settings; }
         void GenerateInitialPatternWhenLoading() { this->generate_initial_pattern_when_loading = true; }
 
-    protected:  
+    protected:
 
-        RD_XMLUnstructuredGridWriter() : system(NULL), generate_initial_pattern_when_loading(false) {} 
+        RD_XMLUnstructuredGridWriter() : system(NULL), generate_initial_pattern_when_loading(false) {}
 
         static vtkSmartPointer<vtkXMLDataElement> BuildRDSystemXML(MeshRD* system);
 
-        virtual int WritePrimaryElement(ostream& os,vtkIndent indent) override;
+        int WritePrimaryElement(ostream& os,vtkIndent indent) override;
 
     protected:
 

@@ -104,7 +104,7 @@ class Overlay : public XML_Object
         Overlay(vtkXMLDataElement* node);
 
         /// for saving to file, get the overlay as an XML element
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override;
 
         static const char* GetTypeName() { return "overlay"; }
 

@@ -223,6 +223,8 @@ class AbstractRD
         /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;
 
+        virtual void AddPhasePlot(vtkRenderer* pRenderer, float scaling, float low, float high, float posX, float posY, float posZ,
+            int iChemX, int iChemY, int iChemZ) =0;
         virtual void FlipPaintAction(PaintAction& cca) =0; ///< Undo/redo this paint action.
         void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.
 
