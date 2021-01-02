@@ -1,4 +1,4 @@
-#  Copyright 2011-2020 The Ready Bunch
+#  Copyright 2011-2021 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -590,6 +590,24 @@ if(DOXYGEN_FOUND)
   )
 endif()
 # (if doxygen is found then 'make doc' should produce html documentation of the source code)
+
+#------------------------------------------test-------------------------------------------------
+
+enable_testing()
+
+# Test that we can run rdy and print out the help information
+add_test(
+  NAME test_rdy_help
+  COMMAND ${CMD_NAME} -h
+)
+
+# Test that we can load each pattern and compile its kernel
+foreach(pattern_file ${PATTERN_FILES})
+  add_test(
+    NAME test_"${pattern_file}"
+    COMMAND ${CMD_NAME} -i "${pattern_file}" -v
+  )
+endforeach()
 
 #----------------------------------------install------------------------------------------------
 
