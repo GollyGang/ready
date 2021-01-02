@@ -237,6 +237,10 @@ class AbstractRD
     private: // functions
 
         void InternalSetDataType(int type);
+
+    private: // constants
+
+        static const int ready_format_version = 6;
 };
 
 #endif
