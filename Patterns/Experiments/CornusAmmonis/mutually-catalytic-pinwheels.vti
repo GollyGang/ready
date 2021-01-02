@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
     <description>
       Mutually-Catalytic Pinwheels, based on Tim Hutton&apos;s Mutually-Catalytic Spots. Small spots (reagents c and d) move perpendicular to the gradient of large spots (reagents a and b). The direction of rotation reverses at points with a = 0.5 creating counter-rotating rings.
     </description>

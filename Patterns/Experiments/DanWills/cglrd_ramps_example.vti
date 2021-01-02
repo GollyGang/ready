@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="3">
+  <RD format_version="6">
     <description>
 The complex Ginzburg-Landau equation describes a vast variety of phenomena from nonlinear waves to second-order phase
 transitions, from superconductivity, superfluidity, and Bose-Einstein condensation to liquid crystals and strings in

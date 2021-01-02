@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
     <description>
       Mutually-Catalytic Spots with second normal derivative feedback. The second normal derivative of reagent a is estimated using a second-order Sobel filter, and fed back into reagent d.
     </description>

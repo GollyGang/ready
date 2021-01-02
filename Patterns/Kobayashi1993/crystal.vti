@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
     Kobayashi, R. (1993) &quot;Modeling and numerical simulations of dendritic crystal growth&quot; Physica D: Nonlinear Phenomena, 63(3-4), 410-423.
 
