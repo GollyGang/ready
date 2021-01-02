@@ -19,7 +19,8 @@ as a result.
 <li>Formulas now support <b>x_pos</b>, <b>y_pos</b> and <b>z_pos</b>, giving the cell location in each direction, in
 the range [0,1]. This allows a neater and more accurate way of implementing parameter maps.
 <li>Formulas now support <b>a_e</b>, <b>a_nw</b> etc. in a more natural way. Instead of accessing the float4 block that is
-the neighbor of the current block, these keywords return a float4 that has the four values that are neighbors in the specified way. Now we can do e.g. <tt>a = a_ne;</tt> in a formula to have the whole pattern shift down and left by one pixel.
+the neighbor of the current block, these keywords return a float4 that has the four values that are neighbors in the specified way. Now we can do e.g. <tt>a = a_ne;</tt> in a formula to have the whole pattern shift down and left by one pixel. This is a
+<b>breaking change</b>: formula rules that accessed cells using a_w, a_e, a_nw, a_se, etc. will no longer behave as they did before.
 <li>Parameter <b>dx</b> is now reserved for controlling the grid spacing of the Gaussian, Laplacian, bi-Laplacian and tri-Laplacian
 stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * delta_x) and can just write laplacian_a since the value of dx is used in the stencil computation.
 <li>Moved View Full Kernel... and Show OpenCL Diagnostics... to the View menu.
