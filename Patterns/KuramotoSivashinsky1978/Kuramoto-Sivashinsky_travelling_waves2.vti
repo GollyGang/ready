@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
       The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kuramoto%E2%80%93Sivashinsky_equation&quot;&gt;Kuramoto-Sivashinsky equation&lt;/a&gt;, with its range stabilized based on advice from &lt;a href=&quot;https://www.youtube.com/channel/UC1Mo9AoX5desRiFLW_skbEg/featured&quot;&gt;Steffen Richters&lt;/a&gt;.
 
