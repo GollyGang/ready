@@ -225,8 +225,8 @@ before_script:
   - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT -DCMAKE_BUILD_TYPE=Release ..
 
 script:
-  # Test that the code builds on this platform
+  # Run the build
   - cmake --build . --config Release
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]||[ "$TRAVIS_OS_NAME" = "osx" ]; then cmake --build . --config Release --target RUN_TESTS; fi
-  #- if [ "$TRAVIS_OS_NAME" = "linux" ]||[ "$TRAVIS_OS_NAME" = "osx" ]; then ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v; fi
+  # Run the tests
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]||[ "$TRAVIS_OS_NAME" = "osx" ]; then ctest; fi
   # (Currently on this Windows platform on Travis it fails to load some shared libraries, so this test is conditional.)
