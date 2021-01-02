@@ -228,5 +228,9 @@ script:
   # Run the build
   - cmake --build . --config Release
   # Run the tests
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]||[ "$TRAVIS_OS_NAME" = "osx" ]; then ctest -V; fi
-  # (Currently on this Windows platform on Travis it fails to load some shared libraries, so this test is conditional.)
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ctest -R rdy -V; fi
+  # (no OpenCL drivers on the Linux machines)
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ctest -V; fi
+  # OSX machines have OpenCL drivers!
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; ctest -V; fi
+  # just testing to see what the errors are on Windows now
