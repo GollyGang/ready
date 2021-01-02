@@ -609,6 +609,18 @@ foreach(pattern_file ${PATTERN_FILES})
   )
 endforeach()
 
+# Test that we can run one pattern for 100 steps and save it out
+add_test(
+  NAME test_rdy_run
+  COMMAND ${CMD_NAME} -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
+)
+
+# And then read it in again
+add_test(
+  NAME test_rdy_run2
+  COMMAND ${CMD_NAME} -i gs_100.vti -v
+)
+
 #----------------------------------------install------------------------------------------------
 
 # put Ready in the root of the installation folder instead of in "bin"
