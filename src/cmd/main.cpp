@@ -115,7 +115,7 @@ int main(int argc,char *argv[])
         } else {
             cout << "\n" << blurb << "\n";
             cout << "\n" << desc << "\n";
-            return EXIT_FAILURE;
+            return EXIT_SUCCESS;
         }
     }
 
