@@ -111,11 +111,11 @@ int main(int argc,char *argv[])
             cout << "Here's the help:\n";
             cout << "\n" << blurb << "\n";
             cout << "\n" << desc << "\n";
-            return 1;
+            return EXIT_FAILURE;
         } else {
             cout << "\n" << blurb << "\n";
             cout << "\n" << desc << "\n";
-            return 1;
+            return EXIT_FAILURE;
         }
     }
 
@@ -136,7 +136,7 @@ int main(int argc,char *argv[])
     {
         cout << "\n" << blurb << "\n";
         cout << "\n" << desc << "\n";
-        return 1;
+        return EXIT_SUCCESS;
     }
 
     if ( vm.count("verbose") )
@@ -445,7 +445,7 @@ int main(int argc,char *argv[])
             }
             free(strs);
             */
-            cout << "Ignoring exception.\n";
+            return EXIT_FAILURE;
         }
 
         if( warn_to_update )
