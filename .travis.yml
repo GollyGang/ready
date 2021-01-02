@@ -232,5 +232,5 @@ script:
   # (no OpenCL drivers on the Linux machines)
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ctest -V; fi
   # OSX machines have OpenCL drivers!
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; ctest -V; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ctest -V; fi
   # just testing to see what the errors are on Windows now
