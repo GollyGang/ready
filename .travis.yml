@@ -229,8 +229,11 @@ script:
   - cmake --build . --config Release
   # Run the tests
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ctest -R rdy -V; fi
-  # (no OpenCL drivers on the Linux machines)
+  # (No OpenCL drivers on the Linux machines so we just run a subset of the tests)
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ctest -V; fi
-  # OSX machines have OpenCL drivers!
+  # (OSX machines have OpenCL drivers, so we can run all the tests)
+  - cd ./$BIN_FOLDER
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then rdy.exe -h; fi
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ctest -C Release -V; fi
-  # just testing to see what the errors are on Windows now
+  #- if [ "$TRAVIS_OS_NAME" = "windows" ]; then ctest -C Release -V; fi
+  # (On Windows we can't run rdy.exe because of -)
