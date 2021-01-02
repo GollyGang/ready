@@ -267,11 +267,11 @@ int main(int argc,char *argv[])
                 cout << "Loaded VTI: " << vti_in.c_str() << "\n";
             }
 
-            /*system->Update( 0 );
+            system->Update( 0 );
             if (verbose)
             {
                 cout << "System updated to zeroth step..\n";
-            }*/
+            }
 
             if ( print_reagent_info )
             {
