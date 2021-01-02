@@ -35,8 +35,6 @@ namespace po = boost::program_options;
 
 // -------------------------------------------------------------------------------------------------------------
 
-void InitializeDefaultRenderSettings(Properties &render_settings);
-
 // Please keep the following in sync with the blurb below!:
 // -------------------------------------------------------------------------------------------------------------
 /*
@@ -111,11 +109,11 @@ int main(int argc,char *argv[])
             cout << "Here's the help:\n";
             cout << "\n" << blurb << "\n";
             cout << "\n" << desc << "\n";
-            return 1;
+            return EXIT_FAILURE;
         } else {
             cout << "\n" << blurb << "\n";
             cout << "\n" << desc << "\n";
-            return 1;
+            return EXIT_SUCCESS;
         }
     }
 
@@ -136,7 +134,7 @@ int main(int argc,char *argv[])
     {
         cout << "\n" << blurb << "\n";
         cout << "\n" << desc << "\n";
-        return 1;
+        return EXIT_SUCCESS;
     }
 
     if ( vm.count("verbose") )
@@ -250,7 +248,7 @@ int main(int argc,char *argv[])
     }
 
     Properties render_settings("render_settings");
-    InitializeDefaultRenderSettings(render_settings);
+    render_settings.SetDefaultRenderSettings();
 
     unique_ptr<AbstractRD> system;
     try
@@ -445,7 +443,7 @@ int main(int argc,char *argv[])
             }
             free(strs);
             */
-            cout << "Ignoring exception.\n";
+            return EXIT_FAILURE;
         }
 
         if( warn_to_update )
@@ -483,13 +481,6 @@ int main(int argc,char *argv[])
     }
 
     return EXIT_SUCCESS;
-}
-
-// -------------------------------------------------------------------------------------------------------------
-
-void InitializeDefaultRenderSettings(Properties &render_settings)
-{
-    render_settings.SetDefaultRenderSettings();
 }
 
 // -------------------------------------------------------------------------------------------------------------

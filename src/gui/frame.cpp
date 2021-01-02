@@ -309,7 +309,7 @@ MyFrame::MyFrame(const wxString& title)
         this->OpenFile(initfile);
     } else {
         // create new pattern
-        this->InitializeDefaultRenderSettings(this->render_settings);
+        this->render_settings.SetDefaultRenderSettings();
         unique_ptr<GrayScottImageRD> s = make_unique<GrayScottImageRD>();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
@@ -1513,7 +1513,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     unique_ptr<AbstractRD> sys;
     Properties new_render_settings("render_settings");
-    this->InitializeDefaultRenderSettings(new_render_settings);
+    new_render_settings.SetDefaultRenderSettings();
     try
     {
         switch(sel)
@@ -1632,7 +1632,7 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
     Properties previous_render_settings = this->render_settings;
     try
     {
-        this->InitializeDefaultRenderSettings(this->render_settings);
+        this->render_settings.SetDefaultRenderSettings();
         target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(move(target_system));
     }
@@ -2295,42 +2295,6 @@ void MyFrame::OnChar(wxKeyEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::InitializeDefaultRenderSettings(Properties& props)
-{
-    props.DeleteAllProperties();
-    props.AddProperty(Property("surface_color","color",1.0f,1.0f,1.0f)); // RGB [0,1]
-    props.AddProperty(Property("color_low","color",0.0f,0.0f,1.0f));
-    props.AddProperty(Property("color_high","color",1.0f,0.0f,0.0f));
-    props.AddProperty(Property("show_color_scale",true));
-    props.AddProperty(Property("show_multiple_chemicals",true));
-    props.AddProperty(Property("active_chemical","chemical","a"));
-    props.AddProperty(Property("low",0.0f));
-    props.AddProperty(Property("high",1.0f));
-    props.AddProperty(Property("vertical_scale_1D",30.0f));
-    props.AddProperty(Property("vertical_scale_2D",15.0f));
-    props.AddProperty(Property("contour_level",0.25f));
-    props.AddProperty(Property("cap_contour",true));
-    props.AddProperty(Property("invert_contour_cap", false));
-    props.AddProperty(Property("use_wireframe",false));
-    props.AddProperty(Property("show_cell_edges",false));
-    props.AddProperty(Property("show_bounding_box",true));
-    props.AddProperty(Property("show_chemical_label",true));
-    props.AddProperty(Property("slice_3D",true));
-    props.AddProperty(Property("slice_3D_axis","axis","z"));
-    props.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
-    props.AddProperty(Property("show_displacement_mapped_surface",true));
-    props.AddProperty(Property("color_displacement_mapped_surface",true));
-    props.AddProperty(Property("use_image_interpolation",true));
-    props.AddProperty(Property("timesteps_per_render",100));
-    props.AddProperty(Property("show_phase_plot",false));
-    props.AddProperty(Property("phase_plot_x_axis","chemical","a"));
-    props.AddProperty(Property("phase_plot_y_axis","chemical","b"));
-    props.AddProperty(Property("phase_plot_z_axis","chemical","c"));
-    // TODO: allow user to change defaults
-}
-
-// ---------------------------------------------------------------------
-
 void MyFrame::SetNumberOfChemicals(int n)
 {
     try
@@ -2610,7 +2574,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     bool ok = LoadMesh(mesh_filename, ug);
     if (!ok) return;
 
-    this->InitializeDefaultRenderSettings(this->render_settings);
+    this->render_settings.SetDefaultRenderSettings();
     this->render_settings.GetProperty("slice_3D").SetBool(false);
     this->render_settings.GetProperty("active_chemical").SetChemical("b");
 

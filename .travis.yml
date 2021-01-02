@@ -219,16 +219,18 @@ branches:
   only:
     - gh-pages
 
-before_script:  
+before_script:
   - mkdir build
   - cd build
   - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB $BOOST_ROOT -DCMAKE_BUILD_TYPE=Release ..
 
 script:
-  # Test that the code builds on this platform
+  # Run the build
   - cmake --build . --config Release
-  # Test that rdy works on this platform
-  - PATTERNS_FOLDER=$PWD
-  - cd ./$BIN_FOLDER
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]||[ "$TRAVIS_OS_NAME" = "osx" ]; then ./rdy -i $PATTERNS_FOLDER/Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v; fi
-  # (Currently on this Windows platform on Travis it fails to load some shared libraries, so this test is conditional.)
+  # Run the tests
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ctest -R rdy -V; fi
+  # (No OpenCL drivers on the Linux machines so we just run a subset of the tests)
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ctest -V; fi
+  # (OSX machines have OpenCL drivers, so we can run all the tests)
+  #- if [ "$TRAVIS_OS_NAME" = "windows" ]; then ctest -C Release -V; fi
+  # (On Windows we can't run rdy.exe for some reason)
