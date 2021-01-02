@@ -201,7 +201,6 @@ class MyFrame : public wxFrame, public IPaintHandler
         void UpdateInfoPane();
         void InitializeHelpPane();
         void InitializeRenderPane();
-        static void InitializeDefaultRenderSettings(Properties& props);
         void LoadSettings();
         void SaveSettings();
         void CheckFocus();

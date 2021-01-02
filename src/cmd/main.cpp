@@ -35,8 +35,6 @@ namespace po = boost::program_options;
 
 // -------------------------------------------------------------------------------------------------------------
 
-void InitializeDefaultRenderSettings(Properties &render_settings);
-
 // Please keep the following in sync with the blurb below!:
 // -------------------------------------------------------------------------------------------------------------
 /*
@@ -250,7 +248,7 @@ int main(int argc,char *argv[])
     }
 
     Properties render_settings("render_settings");
-    InitializeDefaultRenderSettings(render_settings);
+    render_settings.SetDefaultRenderSettings();
 
     unique_ptr<AbstractRD> system;
     try
@@ -483,13 +481,6 @@ int main(int argc,char *argv[])
     }
 
     return EXIT_SUCCESS;
-}
-
-// -------------------------------------------------------------------------------------------------------------
-
-void InitializeDefaultRenderSettings(Properties &render_settings)
-{
-    render_settings.SetDefaultRenderSettings();
 }
 
 // -------------------------------------------------------------------------------------------------------------

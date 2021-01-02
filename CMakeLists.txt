@@ -604,7 +604,7 @@ add_test(
 # Test that we can load each pattern and compile its kernel
 foreach(pattern_file ${PATTERN_FILES})
   add_test(
-    NAME test_"${pattern_file}"
+    NAME test_${pattern_file}
     COMMAND ${CMD_NAME} -i "${pattern_file}" -v
   )
 endforeach()
