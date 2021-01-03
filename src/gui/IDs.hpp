@@ -94,6 +94,7 @@ namespace ID
         // help menu
         HelpQuick,
         HelpIntro,
+        HelpWriting,
         HelpTips,
         HelpKeyboard,
         HelpMouse,

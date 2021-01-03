@@ -221,6 +221,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_HELP, MyFrame::OnHelp)
     EVT_MENU(ID::HelpQuick, MyFrame::OnHelp)
     EVT_MENU(ID::HelpIntro, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpWriting, MyFrame::OnHelp)
     EVT_MENU(ID::HelpTips, MyFrame::OnHelp)
     EVT_MENU(ID::HelpKeyboard, MyFrame::OnHelp)
     EVT_MENU(ID::HelpMouse, MyFrame::OnHelp)
@@ -440,6 +441,7 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_HELP,        _("Contents"));
         menu->Append(ID::HelpQuick,    _("Quick Start"));
         menu->Append(ID::HelpIntro,    _("Introduction to RD"));
+        menu->Append(ID::HelpWriting,  _("Writing new rules"));
         menu->AppendSeparator();
         menu->Append(ID::HelpTips,     _("Hints and Tips"));
         menu->Append(ID::HelpKeyboard, _("Keyboard Shortcuts"));
@@ -1411,6 +1413,7 @@ void MyFrame::OnHelp(wxCommandEvent& event)
         case wxID_HELP:         this->help_panel->ShowHelp(_("Help/index.html")); break;
         case ID::HelpQuick:     this->help_panel->ShowHelp(_("Help/quickstart.html")); break;
         case ID::HelpIntro:     this->help_panel->ShowHelp(_("Help/introduction.html")); break;
+        case ID::HelpWriting:   this->help_panel->ShowHelp(_("Help/writing_new_rules.html")); break;
         case ID::HelpTips:      this->help_panel->ShowHelp(_("Help/tips.html")); break;
         case ID::HelpKeyboard:  this->help_panel->ShowHelp(SHOW_KEYBOARD_SHORTCUTS); break;
         case ID::HelpMouse:     this->help_panel->ShowHelp(_("Help/mouse.html")); break;
