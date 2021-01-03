@@ -3,6 +3,10 @@
   <RD format_version="5">
     <description>
       A 3D reaction-diffusion model of corneal nanocoatings in Drosophila (fruit flies).
+
+      Mikhail Kryuchkov, Oleksii Bilousov, Jannis Lehmann, Manfred Fiebig and Vladimir L. Katanaev (2020) &lt;a href=&quot;https://www.nature.com/articles/s41586-020-2707-9&quot;&gt;Reverse and forward engineering of Drosophila corneal nanocoatings&lt;/a&gt; Nature, volume 585, pages 383–389.
+
+      This model was developed with Ready.
     </description>
     <rule name="Kryuchkov2020" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="aa">
@@ -51,10 +55,12 @@
         1.000000
       </param>
       <formula number_of_chemicals="5">
-        delta_a = max(0,min(aa*a+ba*b+ca,Fmax))-da*a+diff_a*laplacian_a+d*nsu;
-        delta_b = max(0,min(ab*a+bb*b+cb,Gmax))-db*b+diff_b*laplacian_b+d*nsv;
+        delta_a = max(0,min(aa*a+ba*b+ca,Fmax))
+            - da*a + diff_a*laplacian_a + d*nsu;
+        delta_b = max(0,min(ab*a+bb*b+cb,Gmax))
+            - db*b + diff_b*laplacian_b + d*nsv;
         c = a+b;
-        
+
       </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="false">
