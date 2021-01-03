@@ -94,7 +94,6 @@ class Properties : public XML_Object
         void AddProperty(Property p);
         bool IsProperty(const std::string& name);
         void DeleteAllProperties() { this->properties.clear(); }
-        void SetDefaultRenderSettings();
 
     protected:
 

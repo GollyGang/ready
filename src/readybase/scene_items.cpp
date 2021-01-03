@@ -59,3 +59,36 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
     lut->AddRGBPoint(high, r, g, b);
     return lut;
 }
+
+void SetDefaultRenderSettings(Properties& render_settings)
+{
+    render_settings.DeleteAllProperties();
+    render_settings.AddProperty(Property("surface_color", "color", 1.0f, 1.0f, 1.0f)); // RGB [0,1]
+    render_settings.AddProperty(Property("color_low", "color", 0.0f, 0.0f, 1.0f));
+    render_settings.AddProperty(Property("color_high", "color", 1.0f, 0.0f, 0.0f));
+    render_settings.AddProperty(Property("show_color_scale", true));
+    render_settings.AddProperty(Property("show_multiple_chemicals", true));
+    render_settings.AddProperty(Property("active_chemical", "chemical", "a"));
+    render_settings.AddProperty(Property("low", 0.0f));
+    render_settings.AddProperty(Property("high", 1.0f));
+    render_settings.AddProperty(Property("vertical_scale_1D", 30.0f));
+    render_settings.AddProperty(Property("vertical_scale_2D", 15.0f));
+    render_settings.AddProperty(Property("contour_level", 0.25f));
+    render_settings.AddProperty(Property("cap_contour", true));
+    render_settings.AddProperty(Property("invert_contour_cap", false));
+    render_settings.AddProperty(Property("use_wireframe", false));
+    render_settings.AddProperty(Property("show_cell_edges", false));
+    render_settings.AddProperty(Property("show_bounding_box", true));
+    render_settings.AddProperty(Property("show_chemical_label", true));
+    render_settings.AddProperty(Property("slice_3D", true));
+    render_settings.AddProperty(Property("slice_3D_axis", "axis", "z"));
+    render_settings.AddProperty(Property("slice_3D_position", 0.5f)); // [0,1]
+    render_settings.AddProperty(Property("show_displacement_mapped_surface", true));
+    render_settings.AddProperty(Property("color_displacement_mapped_surface", false));
+    render_settings.AddProperty(Property("use_image_interpolation", true));
+    render_settings.AddProperty(Property("timesteps_per_render", 100));
+    render_settings.AddProperty(Property("show_phase_plot", false));
+    render_settings.AddProperty(Property("phase_plot_x_axis", "chemical", "a"));
+    render_settings.AddProperty(Property("phase_plot_y_axis", "chemical", "b"));
+    render_settings.AddProperty(Property("phase_plot_z_axis", "chemical", "c"));
+}

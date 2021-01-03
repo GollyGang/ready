@@ -31,16 +31,17 @@
 #include "MakeNewSystem.hpp"
 
 // readybase:
-#include <utils.hpp>
-#include <OpenCL_utils.hpp>
-#include <IO_XML.hpp>
-#include <GrayScottImageRD.hpp>
-#include <GrayScottMeshRD.hpp>
 #include <FormulaOpenCLImageRD.hpp>
 #include <FormulaOpenCLMeshRD.hpp>
 #include <FullKernelOpenCLImageRD.hpp>
 #include <FullKernelOpenCLMeshRD.hpp>
+#include <GrayScottImageRD.hpp>
+#include <GrayScottMeshRD.hpp>
+#include <IO_XML.hpp>
+#include <OpenCL_utils.hpp>
+#include <scene_items.hpp>
 #include <SystemFactory.hpp>
+#include <utils.hpp>
 
 // local resources:
 #include "appicon16.xpm"
@@ -310,7 +311,7 @@ MyFrame::MyFrame(const wxString& title)
         this->OpenFile(initfile);
     } else {
         // create new pattern
-        this->render_settings.SetDefaultRenderSettings();
+        SetDefaultRenderSettings(this->render_settings);
         unique_ptr<GrayScottImageRD> s = make_unique<GrayScottImageRD>();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
@@ -1516,7 +1517,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     unique_ptr<AbstractRD> sys;
     Properties new_render_settings("render_settings");
-    new_render_settings.SetDefaultRenderSettings();
+    SetDefaultRenderSettings(new_render_settings);
     try
     {
         switch(sel)
@@ -1635,7 +1636,7 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
     Properties previous_render_settings = this->render_settings;
     try
     {
-        this->render_settings.SetDefaultRenderSettings();
+        SetDefaultRenderSettings(this->render_settings);
         target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(move(target_system));
     }
@@ -2577,7 +2578,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     bool ok = LoadMesh(mesh_filename, ug);
     if (!ok) return;
 
-    this->render_settings.SetDefaultRenderSettings();
+    SetDefaultRenderSettings(this->render_settings);
     this->render_settings.GetProperty("slice_3D").SetBool(false);
     this->render_settings.GetProperty("active_chemical").SetChemical("b");
 

@@ -26,3 +26,5 @@ class vtkScalarsToColors;
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut);
 
 vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings);
+
+void SetDefaultRenderSettings(Properties& render_settings);
