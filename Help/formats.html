@@ -137,9 +137,9 @@ Attributes:
 <li><tt>name</tt> (required) : The name of this rule. If type="inbuilt" then name must match one of
 the inbuilt rules (currently just "Gray-Scott").
 <li><tt>wrap</tt> (optional) : "1" if the data should wrap around, or "0" if the data should have a
-boundary. Currently only affects images, not meshes. Default: "1".
+boundary. Currently only affects images (vti files), not meshes. Default: "1".
 <li><tt>neighborhood_type</tt> (optional) : "vertex" for vertex-neighbors, "edge" for edge-neighbors
-or "face" for face-neighbors. Default: "vertex".
+or "face" for face-neighbors. This parameter only affects meshes (vtu files). Default: "vertex".
 </ul>
 <p>Contains:
 <ul>
