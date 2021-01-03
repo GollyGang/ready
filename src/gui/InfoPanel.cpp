@@ -419,9 +419,9 @@ void InfoPanel::Update(const AbstractRD& system)
         contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
                                         system.GetNumberOfCells()),false);
 
-    if(!system.HasEditableDimensions() || system.GetRuleType()!="kernel")
+    if(!system.HasEditableDimensions())
     {
-        // (hide the neighborhood for image-based kernels, which don't use it)
+        // (hide the neighborhood for vti files, which don't use it)
         contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType()+"-neighbors", false);
     }
 
