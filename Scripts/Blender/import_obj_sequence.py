@@ -1,7 +1,7 @@
 #  A Blender script to import a sequence of OBJ meshes into an animation.
 #
 # ------------------------------------------------------------------------
-#  Copyright 2011-2020 The Ready Bunch
+#  Copyright 2011-2021 The Ready Bunch
 #
 #  This file is part of Ready.
 #
