@@ -9,7 +9,7 @@
 <font size=+1><b>Extended VTK format: *.vti, *.vtu</b></font>
 
 <p>
-The only file format currently supported by Ready is an extended version of
+Ready's file format is an extended version of
 <a href="http://vtk.org">VTK</a>'s format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>.
 These are the Ready-specific XML elements, in alphabetical order:
 
@@ -166,9 +166,17 @@ Attributes:
 </ul>
 <p>Contains:
 <p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc.
-The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). In the <a href="#kernel">kernel</a> section below, the "<tt>delta_a = ...</tt>" lines show how the formula might be inserted at that location in a full kernel.
+
 <p>
-See the pattern files for more examples.
+The formula can specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). Example: <tt>delta_a = laplacian_a;</tt>
+
+<p>Alternatively the formula can write directly into the chemicals. Example: <tt>a = x_pos;</tt>
+
+<p>For a list of the keywords you can use, see <a href="writing_new_rules.html">Writing new rules</a>.
+
+<p>In the <a href="#kernel">kernel</a> section below, the "<tt>delta_a = ...</tt>" lines show how the formula might be inserted at that location in a full kernel.
+
+<p>See the pattern files for more examples.
 
 <h4><a name="kernel"></a><b>&lt;kernel&gt;</b></h4>
 
