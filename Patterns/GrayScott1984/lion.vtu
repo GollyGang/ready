@@ -1,28 +1,30 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="2">
-  
+
     <description>
       Gray-Scott running on the surface of a lion mesh.
-      
+
+      P. Gray, S.K. Scott (1984) &lt;a href=&quot;https://www.sciencedirect.com/science/article/pii/0009250984870177&quot;&gt;Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Oscillations and instabilities in the system A + 2B → 3B; B → C&lt;/a&gt; Chemical Engineering Science, Volume 39, Issue 6.
+
       Mesh courtesy of Robert Sumner and Jovan Popovic. &lt;a href=&quot;http://people.csail.mit.edu/sumner/research/deftransfer/data.html&quot;&gt;link&lt;/a&gt;
     </description>
-    
+
     <rule name="Gray-Scott" type="formula">
-    
+
       <param name="timestep">   1       </param>
       <param name="D_a">        0.082   </param>
       <param name="D_b">        0.041   </param>
       <param name="K">          0.064   </param>
       <param name="F">          0.035   </param>
-      
+
       <formula number_of_chemicals="2">
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -38,7 +40,7 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
       <active_chemical value="b" />
       <slice_3D value="false" />
@@ -47,7 +49,7 @@
       <color_low r="0.77" g="0.66" b="0.45" />
       <high value="0.4" />
     </render_settings>
-  
+
   </RD>
 
   <UnstructuredGrid>
