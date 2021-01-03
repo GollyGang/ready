@@ -41,7 +41,6 @@
 #include <vtkGenericCell.h>
 #include <vtkGeometryFilter.h>
 #include <vtkIdList.h>
-#include <vtkLookupTable.h>
 #include <vtkMath.h>
 #include <vtkMergeFilter.h>
 #include <vtkPlane.h>
@@ -54,6 +53,7 @@
 #include <vtkRenderer.h>
 #include <vtkReverseSense.h>
 #include <vtkScalarBarActor.h>
+#include <vtkScalarsToColors.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkThreshold.h>
@@ -238,11 +238,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
@@ -262,15 +257,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }

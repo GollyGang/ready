@@ -339,6 +339,7 @@ set( OTHER_FILES
 find_package( VTK NO_MODULE REQUIRED )
 if( VTK_VERSION VERSION_LESS "7.0.0" )
   set( VTK_COMPONENTS
+    vtkCommonColor
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -359,6 +360,7 @@ if( VTK_VERSION VERSION_LESS "7.0.0" )
   )
 elseif( VTK_VERSION VERSION_LESS "8.90.0" )
   set( VTK_COMPONENTS
+    vtkCommonColor
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -379,6 +381,7 @@ elseif( VTK_VERSION VERSION_LESS "8.90.0" )
   )
 else()
   set( VTK_COMPONENTS
+    CommonColor
     CommonCore
     FiltersCore
     FiltersExtraction

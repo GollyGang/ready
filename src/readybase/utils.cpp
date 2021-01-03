@@ -223,4 +223,3 @@ bool UsingKeyword(const vector<string>& formula_tokens, const string& keyword)
 }
 
 // -------------------------------------------------------------------------
-

@@ -15,14 +15,17 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
 #include "scene_items.hpp"
 
+// local:
+#include "Properties.hpp"
+
 // VTK:
+#include <vtkColorSeries.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkRenderer.h>
 #include <vtkScalarsToColors.h>
 #include <vtkScalarBarActor.h>
-#include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
 
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
@@ -39,4 +42,20 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
     scalar_bar->GetTitleTextProperty()->SetOpacity(0);
     scalar_bar->SetTitleRatio(0.7);
     pRenderer->AddActor2D(scalar_bar);
+}
+
+vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings)
+{
+    const float low = render_settings.GetProperty("low").GetFloat();
+    const float high = render_settings.GetProperty("high").GetFloat();
+
+    vtkSmartPointer<vtkColorTransferFunction> lut = vtkSmartPointer<vtkColorTransferFunction>::New();
+    lut->SetColorSpaceToHSV();
+    lut->HSVWrapOff();
+    float r, g, b;
+    render_settings.GetProperty("color_low").GetColor(r, g, b);
+    lut->AddRGBPoint(low, r, g, b);
+    render_settings.GetProperty("color_high").GetColor(r, g, b);
+    lut->AddRGBPoint(high, r, g, b);
+    return lut;
 }
