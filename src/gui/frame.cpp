@@ -273,7 +273,7 @@ MyFrame::MyFrame(const wxString& title)
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
     #ifdef __WXMSW__
-        this->aui_mgr.SetFlags(wxAUI_MGR_LIVE_RESIZE);
+        this->aui_mgr.SetFlags(wxAUI_MGR_DEFAULT | wxAUI_MGR_LIVE_RESIZE);
     #endif
     this->aui_mgr.SetManagedWindow(this);
 
