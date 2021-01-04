@@ -29,4 +29,6 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
 
 void SetDefaultRenderSettings(Properties& render_settings);
 
-static const std::string SupportedColorMaps[] = { "custom", "spectral", "citrus" };
+static const std::string SupportedColorMaps[] = {
+    "custom", "spectral", "spectral reversed", "inferno", "inferno reversed",
+    "orange-purple", "purple-orange", "brown-teal", "teal-brown" };

@@ -73,6 +73,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp
   src/readybase/scene_items.hpp               src/readybase/scene_items.cpp
   src/readybase/InitialPatternGenerator.hpp   src/readybase/InitialPatternGenerator.cpp
+  src/readybase/colormaps.hpp
 )
 include_directories( src/readybase )
 

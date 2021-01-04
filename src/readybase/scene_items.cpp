@@ -18,6 +18,7 @@
 #include "scene_items.hpp"
 
 // local:
+#include "colormaps.hpp"
 #include "Properties.hpp"
 
 // VTK:
@@ -74,9 +75,41 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
             color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_SPECTRAL_9);
             reverse = true;
         }
-        else if (colormap_label == "citrus")
+        else if (colormap_label == "spectral reversed")
         {
-            color_series->SetColorScheme(vtkColorSeries::CITRUS);
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_SPECTRAL_9);
+        }
+        else if (colormap_label == "orange-purple")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_PURPLE_ORANGE_11);
+        }
+        else if (colormap_label == "purple-orange")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_PURPLE_ORANGE_11);
+            reverse = true;
+        }
+        else if (colormap_label == "brown-teal")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_BROWN_BLUE_GREEN_11);
+        }
+        else if (colormap_label == "teal-brown")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_BROWN_BLUE_GREEN_11);
+            reverse = true;
+        }
+        else if (colormap_label == "inferno" || colormap_label == "inferno reversed")
+        {
+            color_series->SetNumberOfColors(256);
+            for (int i = 0; i < 256; i++)
+            {
+                vtkColor3f color(colormaps::inferno[i][0], colormaps::inferno[i][1], colormaps::inferno[i][2]);
+                vtkColor3ub color_ub(color[0] * 255, color[1] * 255, color[2] * 255);
+                color_series->SetColor(i, color_ub);
+            }
+            if (colormap_label == "inferno reversed")
+            {
+                reverse = true;
+            }
         }
         else
         {
