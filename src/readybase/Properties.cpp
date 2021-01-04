@@ -59,7 +59,7 @@ void Property::ReadFromXML(vtkXMLDataElement* node)
     {
         read_required_attribute(node,"value",this->s);
         if(find(begin(SupportedColorMaps), end(SupportedColorMaps), this->s) == end(SupportedColorMaps))
-            throw runtime_error("Property::ReadFromXML : unrecognised axis: "+this->s);
+            throw runtime_error("Property::ReadFromXML : unrecognised colormap: "+this->s);
     }
     else throw runtime_error("Property::ReadFromXML : unrecognised type: "+this->type);
 }
