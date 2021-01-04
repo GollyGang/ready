@@ -15,8 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
 #include "Properties.hpp"
+
+// local:
+#include "scene_items.hpp"
 
 // STL:
 #include <string>
@@ -53,6 +55,12 @@ void Property::ReadFromXML(vtkXMLDataElement* node)
         if(this->s != "x" && this->s != "y" && this->s != "z")
             throw runtime_error("Property::ReadFromXML : unrecognised axis: "+this->s);
     }
+    else if(this->type=="colormap")
+    {
+        read_required_attribute(node,"value",this->s);
+        if(find(begin(SupportedColorMaps), end(SupportedColorMaps), this->s) == end(SupportedColorMaps))
+            throw runtime_error("Property::ReadFromXML : unrecognised axis: "+this->s);
+    }
     else throw runtime_error("Property::ReadFromXML : unrecognised type: "+this->type);
 }
 
@@ -75,6 +83,8 @@ vtkSmartPointer<vtkXMLDataElement> Property::GetAsXML() const
     else if(this->type=="chemical")
         node->SetAttribute("value",this->s.c_str());
     else if(this->type=="axis")
+        node->SetAttribute("value",this->s.c_str());
+    else if(this->type=="colormap")
         node->SetAttribute("value",this->s.c_str());
     else throw runtime_error("Property::GetAsXML : unrecognised type: "+this->type);
     return node;

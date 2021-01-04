@@ -26,6 +26,7 @@
 
 // readybase:
 #include "ImageRD.hpp"
+#include "scene_items.hpp"
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
@@ -36,6 +37,7 @@
 #include <vtkMath.h>
 
 // STL:
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -471,6 +473,8 @@ void InfoPanel::Update(const AbstractRD& system)
             contents += AppendRow(print_label, name, prop.GetChemical(), true);
         else if(type=="axis")
             contents += AppendRow(print_label, name, prop.GetAxis(), true);
+        else if(type=="colormap")
+            contents += AppendRow(print_label, name, prop.GetColorMap(), true);
         else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
 
@@ -633,6 +637,20 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         dlg.SetSelection(iAxis);
         if(dlg.ShowModal()!=wxID_OK) return;
         prop.SetAxis(string(choices[dlg.GetSelection()].mb_str()));
+        frame->RenderSettingsChanged();
+    }
+    else if (type == "colormap")
+    {
+        wxArrayString choices;
+        for (const string& s : SupportedColorMaps)
+        {
+            choices.Add(s);
+        }
+        wxSingleChoiceDialog dlg(this, _("Color map:"), _("Select color map"), choices);
+        int iColorMap = distance(begin(SupportedColorMaps), find(begin(SupportedColorMaps), end(SupportedColorMaps), prop.GetColorMap()));
+        dlg.SetSelection(iColorMap);
+        if (dlg.ShowModal() != wxID_OK) return;
+        prop.SetColorMap(string(choices[dlg.GetSelection()].mb_str()));
         frame->RenderSettingsChanged();
     }
     else {

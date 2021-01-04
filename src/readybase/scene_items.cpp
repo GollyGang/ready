@@ -28,6 +28,10 @@
 #include <vtkScalarBarActor.h>
 #include <vtkTextProperty.h>
 
+// STL:
+#include <string>
+using namespace std;
+
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
 {
     vtkSmartPointer<vtkScalarBarActor> scalar_bar = vtkSmartPointer<vtkScalarBarActor>::New();
@@ -46,17 +50,48 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
 
 vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings)
 {
+    const string colormap_label = render_settings.GetProperty("colormap").GetColorMap();
     const float low = render_settings.GetProperty("low").GetFloat();
     const float high = render_settings.GetProperty("high").GetFloat();
 
     vtkSmartPointer<vtkColorTransferFunction> lut = vtkSmartPointer<vtkColorTransferFunction>::New();
-    lut->SetColorSpaceToHSV();
-    lut->HSVWrapOff();
-    float r, g, b;
-    render_settings.GetProperty("color_low").GetColor(r, g, b);
-    lut->AddRGBPoint(low, r, g, b);
-    render_settings.GetProperty("color_high").GetColor(r, g, b);
-    lut->AddRGBPoint(high, r, g, b);
+    if (colormap_label == "custom")
+    {
+        lut->SetColorSpaceToHSV();
+        lut->HSVWrapOff();
+        float r, g, b;
+        render_settings.GetProperty("color_low").GetColor(r, g, b);
+        lut->AddRGBPoint(low, r, g, b);
+        render_settings.GetProperty("color_high").GetColor(r, g, b);
+        lut->AddRGBPoint(high, r, g, b);
+    }
+    else
+    {
+        vtkSmartPointer<vtkColorSeries> color_series = vtkSmartPointer<vtkColorSeries>::New();
+        bool reverse = false;
+        if (colormap_label == "spectral")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_SPECTRAL_9);
+            reverse = true;
+        }
+        else if (colormap_label == "citrus")
+        {
+            color_series->SetColorScheme(vtkColorSeries::CITRUS);
+        }
+        else
+        {
+            throw runtime_error("unsupported colormap: " + colormap_label);
+        }
+        const float min_val = reverse ? high: low;
+        const float max_val = reverse ? low : high;
+        for (int i = 0; i < color_series->GetNumberOfColors(); i++)
+        {
+            const vtkColor3ub color = color_series->GetColor(i);
+            const float u = min_val + i * (max_val - min_val) / (color_series->GetNumberOfColors() - 1);
+            float rgb[3] = { color.GetRed() / 255.0f, color.GetGreen() / 255.0f, color.GetBlue() / 255.0f };
+            lut->AddRGBPoint(u, rgb[0], rgb[1], rgb[2]);
+        }
+    }
     return lut;
 }
 
@@ -64,6 +99,7 @@ void SetDefaultRenderSettings(Properties& render_settings)
 {
     render_settings.DeleteAllProperties();
     render_settings.AddProperty(Property("surface_color", "color", 1.0f, 1.0f, 1.0f)); // RGB [0,1]
+    render_settings.AddProperty(Property("colormap", "colormap", "spectral"));
     render_settings.AddProperty(Property("color_low", "color", 0.0f, 0.0f, 1.0f));
     render_settings.AddProperty(Property("color_high", "color", 1.0f, 0.0f, 0.0f));
     render_settings.AddProperty(Property("show_color_scale", true));

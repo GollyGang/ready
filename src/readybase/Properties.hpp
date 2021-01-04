@@ -60,6 +60,7 @@ class Property : public XML_Object
         void GetColor(float& r,float& g,float& b) const { assert(type=="color"); r=this->f1; g=this->f2; b=this->f3; }
         const std::string& GetChemical() const { assert(type=="chemical"); return this->s; }
         const std::string& GetAxis() const { assert(type=="axis"); return this->s; }
+        const std::string& GetColorMap() const { assert(type=="colormap"); return this->s; }
 
         void SetFloat(float f) { assert(type=="float"); this->f1=f; }
         void SetInt(int i) { assert(type=="int"); this->i = i; }
@@ -67,6 +68,7 @@ class Property : public XML_Object
         void SetColor(float r,float g,float b) { assert(type=="color"); this->f1=r; this->f2=g; this->f3=b; }
         void SetChemical(const std::string& s) { assert(type=="chemical"); this->s = s; }
         void SetAxis(const std::string& s) { assert(type=="axis"); this->s = s; }
+        void SetColorMap(const std::string& s) { assert(type=="colormap"); this->s = s; }
 
     protected:
 
