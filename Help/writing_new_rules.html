@@ -5,7 +5,7 @@
 <p>
 <h3>Writing new rules</h3>
 <p>
-As a first step, try changing the parameters of some of the rules. This can give very different behavior. Read <a href="http://mrob.com/pub/comp/xmorphia/">Robert Munafo's pages</a> about Gray-Scott, for example, and try out some of the parameters he discusses on this pattern: <a href="open:Patterns/Gray-Scott/self-replicating_spots.vti">Gray-Scott/self-replicating_spots.vti</a>.
+As a first step, try changing the parameters of some of the rules. This can give very different behavior. Read <a href="http://mrob.com/pub/comp/xmorphia/">Robert Munafo's pages</a> about Gray-Scott, for example, and try out some of the parameters he discusses on this pattern: <a href="open:Patterns/GrayScott1984/self-replicating_spots.vti">GrayScott1984/self-replicating_spots.vti</a>.
 <p>
 <h4>Formulas and kernel rules</h4>
 <p>
@@ -25,14 +25,14 @@ Keywords for formula rules on images:
 <tr><td>x_pos</td><td>The location of the cell in the x-direction, in the range 0 to 1.</td></tr>
 <tr><td>y_pos</td><td>The location of the cell in the y-direction, in the range 0 to 1.</td></tr>
 <tr><td>z_pos</td><td>The location of the cell in the z-direction, in the range 0 to 1.</td></tr>
-<tr><td>a_n, a_ne, a_n2, a_une, etc.</td><td>The neighboring cells. Indexed as u=up/d=down Z cells, n=north/s=south Y cells, e=east/w=west X cells: a_[u/d][Z][n/s][Y][e/w][X]. The digit can be omitted if it is one. The digit and the direction can be omitted if the digit is zero.</td></tr>
+<tr><td>a_n, a_ne, a_n2, a_une, etc.</td><td>The neighboring cells. Indexed as u=up/d=down Z cells, n=north/s=south Y cells, e=east/w=west X cells: a_[u/d][Z][n/s][Y][e/w][X]. The digit is omitted if it is one. The digit and the direction are omitted if the digit is zero. Currently we allow indices up to 10 - if you want to go further then write a kernel instead.</td></tr>
 </table>
 <p>
 The <i>grid spacing</i> (sometimes denoted by <i>h</i>) of the Laplacian and Gaussian stencils is controlled by parameter <tt>dx</tt>. If there is no parameter called <tt>dx</tt> then the default value of 1 is used.
 <p>
 To understand how the formula is used, try View > <a href="view.html#View_ViewFullKernel">View Full Kernel</a> to see the OpenCL kernel code that is assembled. You'll see for example how the <tt>timestep</tt> parameter is used at the end during the forward Euler step. Any formula rule can be permanently converted to a kernel rule by using Action > <a href="action.html#Action_ConvertToFullKernel">Convert to Full Kernel</a>.
 <p>
-For speed we process the image in blocks of 4x1x1, stored as float4. All of the above keywords are float4 values. While doing it this way makes Ready run faster, it does complicate the way we have to write rules - see the examples and please get in touch for more help.
+For speed we process the image in blocks of 4x1x1, stored as float4. All of the above keywords are float4 values. While doing it this way makes Ready run faster, it can complicate the way we have to write rules - see the examples and please get in touch for more help.
 <p>
 Images in Ready can be 1D, 2D or 3D. The keywords in the formulas generate stencils of the appropriate dimensionality.
 <p>
@@ -45,7 +45,7 @@ Keywords for formula rules on meshes:
 <p>
 <h4>Initial pattern generator</h4>
 <p>
-For more details on how the patterns are specified, including how the initial pattern generator works, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/Gray-Scott/self-replicating_spots.vti">example</a>). The format is documented <a href="formats.html">here</a>.
+For more details on how the patterns are specified, including how the initial pattern generator works, open the pattern files in a text editor (right-click on them) (<a href="edit:Patterns/GrayScott1984/self-replicating_spots.vti">example</a>). The format is documented <a href="formats.html">here</a>.
 <p>
 <h4>Share your findings</h4>
 <p>

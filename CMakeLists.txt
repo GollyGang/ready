@@ -142,17 +142,17 @@ set( PATTERN_FILES
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
   Patterns/FitzHugh-Nagumo/FHN_parameter_map.vti
-  Patterns/Gray-Scott/bunny.vtu
-  Patterns/Gray-Scott/lion.vtu
-  Patterns/Gray-Scott/Lesmes_noisy.vti
-  Patterns/Gray-Scott/noisy_solitons_mitosis.vti
-  Patterns/Gray-Scott/parameter-map.vti
-  Patterns/Gray-Scott/parameter-map_3D.vti
-  Patterns/Gray-Scott/Pearson1993.vti
-  Patterns/Gray-Scott/self-replicating_spots.vti
-  Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti
-  Patterns/Gray-Scott/U-Skate/Munafo_glider.vti
-  Patterns/Gray-Scott/U-Skate/o-ring_2D.vti
+  Patterns/GrayScott1984/bunny.vtu
+  Patterns/GrayScott1984/lion.vtu
+  Patterns/GrayScott1984/Lesmes_noisy.vti
+  Patterns/GrayScott1984/noisy_solitons_mitosis.vti
+  Patterns/GrayScott1984/parameter-map.vti
+  Patterns/GrayScott1984/parameter-map_3D.vti
+  Patterns/GrayScott1984/Pearson1993.vti
+  Patterns/GrayScott1984/self-replicating_spots.vti
+  Patterns/GrayScott1984/U-Skate/Hutton-and-helix-gliders.vti
+  Patterns/GrayScott1984/U-Skate/Munafo_glider.vti
+  Patterns/GrayScott1984/U-Skate/o-ring_2D.vti
   Patterns/CellularAutomata/Bays_3D.vti
   Patterns/CellularAutomata/Conway_life.vti
   Patterns/CellularAutomata/life_torus.vtu

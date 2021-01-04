@@ -6,6 +6,8 @@
         right and 'F' increases from bottom to top. For more detail, see:
         &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/index.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/index.html&lt;/a&gt;
 
+        P. Gray, S.K. Scott (1984) &lt;a href=&quot;https://www.sciencedirect.com/science/article/pii/0009250984870177&quot;&gt;Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Oscillations and instabilities in the system A + 2B → 3B; B → C&lt;/a&gt; Chemical Engineering Science, Volume 39, Issue 6.
+
         The parameters k1, k2, F1 and F2 define the current range of the map. Change them to explore.
     </description>
 

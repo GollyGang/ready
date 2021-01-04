@@ -4,6 +4,8 @@
     <description>
       A map of the parameters of the Gray-Scott system.
 
+      P. Gray, S.K. Scott (1984) &lt;a href=&quot;https://www.sciencedirect.com/science/article/pii/0009250984870177&quot;&gt;Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Oscillations and instabilities in the system A + 2B → 3B; B → C&lt;/a&gt; Chemical Engineering Science, Volume 39, Issue 6.
+
       Here &apos;k&apos; increases (in the default camera view) from left to
       right, &apos;F&apos; increases from bottom to top and &apos;diff&apos; increases from back to front.
 
