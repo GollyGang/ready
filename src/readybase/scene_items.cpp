@@ -49,6 +49,18 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
     pRenderer->AddActor2D(scalar_bar);
 }
 
+template<size_t N>
+void ColorMapFromList(vtkColorSeries* color_series, const float values[N][3])
+{
+    color_series->SetNumberOfColors(N);
+    for (int i = 0; i < N; i++)
+    {
+        vtkColor3f color(values[i][0], values[i][1], values[i][2]);
+        vtkColor3ub color_ub(color[0] * 255, color[1] * 255, color[2] * 255);
+        color_series->SetColor(i, color_ub);
+    }
+}
+
 vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings)
 {
     const string colormap_label = render_settings.GetProperty("colormap").GetColorMap();
@@ -99,14 +111,16 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
         }
         else if (colormap_label == "inferno" || colormap_label == "inferno reversed")
         {
-            color_series->SetNumberOfColors(256);
-            for (int i = 0; i < 256; i++)
-            {
-                vtkColor3f color(colormaps::inferno[i][0], colormaps::inferno[i][1], colormaps::inferno[i][2]);
-                vtkColor3ub color_ub(color[0] * 255, color[1] * 255, color[2] * 255);
-                color_series->SetColor(i, color_ub);
-            }
+            ColorMapFromList<256>(color_series, colormaps::inferno);
             if (colormap_label == "inferno reversed")
+            {
+                reverse = true;
+            }
+        }
+        else if (colormap_label == "terrain" || colormap_label == "terrain reversed")
+        {
+            ColorMapFromList<6>(color_series, colormaps::terrain);
+            if (colormap_label == "terrain reversed")
             {
                 reverse = true;
             }

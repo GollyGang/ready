@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
 
     <description>
         The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the
@@ -85,10 +85,11 @@
 
     <render_settings>
        <active_chemical value="d" />
+       <colormap value="inferno" />
        <show_multiple_chemicals value="false" />
        <show_displacement_mapped_surface value="false" />
        <color_displacement_mapped_surface value="true" />
-       <low value="-0.1" />
+       <low value="0.00" />
        <high value="0.04" />
        <vertical_scale_1D value="100" />
        <vertical_scale_2D value="10" />
