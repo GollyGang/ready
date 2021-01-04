@@ -1478,14 +1478,36 @@ void MyFrame::OnSavePattern(wxCommandEvent& event)
 
 void MyFrame::SaveFile(const wxString& path)
 {
-    wxBusyCursor busy;
+    wxBeginBusyCursor();
 
-    this->system->SaveFile(path.mb_str(),this->render_settings,false);
+    try
+    {
+        this->system->SaveFile(path.mb_str(), this->render_settings, false);
+    }
+    catch (const exception& e)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file. Error:\n\n");
+        message += wxString(e.what(), wxConvUTF8);
+        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+        return;
+    }
+    catch (...)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file.");
+        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+        return;
+    }
 
     AddRecentPattern(path);
     this->system->SetFilename(string(path.mb_str()));
     this->system->SetModified(false);
     this->UpdateWindowTitle();
+
+    wxEndBusyCursor();
 }
 
 // ---------------------------------------------------------------------
@@ -3382,13 +3404,33 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
         return;
     }
 
-    wxBusyCursor busy;
+    wxBeginBusyCursor();
 
     // TODO: might be preferable to not adopt the saved file
     this->system->BlankImage();
-    this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    try
+    {
+        this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    }
+    catch (const exception& e)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file. Error:\n\n");
+        message += wxString(e.what(), wxConvUTF8);
+        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+    }
+    catch (...)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file.");
+        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+    }
     this->is_running = false;
     this->UpdateWindows();
+
+    wxEndBusyCursor();
 }
 
 // ---------------------------------------------------------------------
