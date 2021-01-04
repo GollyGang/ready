@@ -84,6 +84,7 @@ using namespace std;
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkRendererCollection.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkWindowToImageFilter.h>
@@ -1135,13 +1136,9 @@ void MyFrame::UpdateToolbars()
         this->current_paint_value) );
     // update the color swatch with the current color
     wxImage im(22,22);
-    float r1,g1,b1,r2,g2,b2,low,high,r,g,b;
-    this->render_settings.GetProperty("color_low").GetColor(r1,g1,b1);
-    this->render_settings.GetProperty("color_high").GetColor(r2,g2,b2);
-    low = this->render_settings.GetProperty("low").GetFloat();
-    high = this->render_settings.GetProperty("high").GetFloat();
-    InterpolateInHSV(r1,g1,b1,r2,g2,b2,min(1.0f,max(0.0f,(this->current_paint_value-low)/(high-low))),r,g,b);
-    im.SetRGB(wxRect(0,0,22,22),r*255,g*255,b*255);
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(this->render_settings);
+    const unsigned char* rgba = lut->MapValue(this->current_paint_value);
+    im.SetRGB(wxRect(0,0,22,22), rgba[0], rgba[1], rgba[2]);
     dynamic_cast<wxBitmapButton*>(this->paint_toolbar->FindControl(ID::CurrentValueColor))->SetBitmap(wxBitmap(im));
     this->aui_mgr.Update();
 }

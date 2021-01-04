@@ -165,16 +165,6 @@ string trim_multiline_string(const char* s)
 
 // ---------------------------------------------------------------------------------------------------------
 
-void InterpolateInHSV(const float r1,const float g1,const float b1,const float r2,const float g2,const float b2,const float u,float& r,float& g,float& b)
-{
-    float h1,s1,v1,h2,s2,v2;
-    vtkMath::RGBToHSV(r1,g1,b1,&h1,&s1,&v1);
-    vtkMath::RGBToHSV(r2,g2,b2,&h2,&s2,&v2);
-    vtkMath::HSVToRGB(h1+(h2-h1)*u,s1+(s2-s1)*u,v1+(v2-v1)*u,&r,&g,&b);
-}
-
-// ---------------------------------------------------------------------------------------------------------
-
 string ReplaceAllSubstrings(string subject, const string& search, const string& replace)
 {
     size_t pos = 0;
