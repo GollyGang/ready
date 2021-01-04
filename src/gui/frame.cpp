@@ -1490,7 +1490,7 @@ void MyFrame::SaveFile(const wxString& path)
         string message;
         message += _("Failed to save file. Error:\n\n");
         message += wxString(e.what(), wxConvUTF8);
-        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
         return;
     }
     catch (...)
@@ -1498,7 +1498,7 @@ void MyFrame::SaveFile(const wxString& path)
         wxEndBusyCursor();
         string message;
         message += _("Failed to save file.");
-        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
         return;
     }
 
@@ -3418,14 +3418,14 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
         string message;
         message += _("Failed to save file. Error:\n\n");
         message += wxString(e.what(), wxConvUTF8);
-        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
     }
     catch (...)
     {
         wxEndBusyCursor();
         string message;
         message += _("Failed to save file.");
-        MonospaceMessageBox(message, _("Error reading file"), wxART_ERROR);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
     }
     this->is_running = false;
     this->UpdateWindows();
