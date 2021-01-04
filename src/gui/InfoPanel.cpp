@@ -448,10 +448,15 @@ void InfoPanel::Update(const AbstractRD& system)
     rownum = 1;     // nicer if 1st render setting has gray background
 
     const Properties& render_settings = frame->GetRenderSettings();
+    const bool using_HSV_blend = render_settings.GetProperty("colormap").GetColorMap() == "HSV blend";
     for(int i=0;i<render_settings.GetNumberOfProperties();i++)
     {
         const Property& prop = render_settings.GetProperty(i);
         string name = prop.GetName();
+        if (!using_HSV_blend && (name == "color_low" || name == "color_high"))
+        {
+            continue;
+        }
         wxString print_label(name);
         print_label.Replace(_T("_"),_T(" "));
         string type = prop.GetType();

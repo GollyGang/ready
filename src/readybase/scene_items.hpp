@@ -30,5 +30,5 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
 void SetDefaultRenderSettings(Properties& render_settings);
 
 static const std::string SupportedColorMaps[] = {
-    "custom", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed",
+    "HSV blend", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed",
     "orange-purple", "purple-orange", "brown-teal", "teal-brown" };

@@ -68,7 +68,7 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
     const float high = render_settings.GetProperty("high").GetFloat();
 
     vtkSmartPointer<vtkColorTransferFunction> lut = vtkSmartPointer<vtkColorTransferFunction>::New();
-    if (colormap_label == "custom")
+    if (colormap_label == "HSV blend")
     {
         lut->SetColorSpaceToHSV();
         lut->HSVWrapOff();
