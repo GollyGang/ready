@@ -45,12 +45,11 @@
     </initial_pattern_generator>
     <render_settings>
       <surface_color r="1" g="1" b="1"/>
-      <color_low r="0" g="0" b="0"/>
-      <color_high r="1" g="1" b="1"/>
+      <colormap value="terrain" />
       <show_color_scale value="true"/>
       <show_multiple_chemicals value="false"/>
       <active_chemical value="a"/>
-      <low value="90"/>
+      <low value="70"/>
       <high value="220"/>
       <vertical_scale_1D value="30"/>
       <vertical_scale_2D value="60"/>
@@ -65,7 +64,7 @@
       <slice_3D_axis value="z"/>
       <slice_3D_position value="0.5"/>
       <show_displacement_mapped_surface value="true"/>
-      <color_displacement_mapped_surface value="false"/>
+      <color_displacement_mapped_surface value="true"/>
       <use_image_interpolation value="true"/>
       <timesteps_per_render value="1344"/>
       <show_phase_plot value="false"/>

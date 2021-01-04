@@ -15,8 +15,20 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// Local:
+class Properties;
+
 // VTK:
 class vtkRenderer;
 class vtkScalarsToColors;
+#include <vtkSmartPointer.h>
 
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut);
+
+vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings);
+
+void SetDefaultRenderSettings(Properties& render_settings);
+
+static const std::string SupportedColorMaps[] = {
+    "HSV blend", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed",
+    "orange-purple", "purple-orange", "brown-teal", "teal-brown" };

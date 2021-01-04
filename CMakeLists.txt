@@ -73,6 +73,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp
   src/readybase/scene_items.hpp               src/readybase/scene_items.cpp
   src/readybase/InitialPatternGenerator.hpp   src/readybase/InitialPatternGenerator.cpp
+  src/readybase/colormaps.hpp
 )
 include_directories( src/readybase )
 
@@ -339,6 +340,7 @@ set( OTHER_FILES
 find_package( VTK NO_MODULE REQUIRED )
 if( VTK_VERSION VERSION_LESS "7.0.0" )
   set( VTK_COMPONENTS
+    vtkCommonColor
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -359,6 +361,7 @@ if( VTK_VERSION VERSION_LESS "7.0.0" )
   )
 elseif( VTK_VERSION VERSION_LESS "8.90.0" )
   set( VTK_COMPONENTS
+    vtkCommonColor
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -379,6 +382,7 @@ elseif( VTK_VERSION VERSION_LESS "8.90.0" )
   )
 else()
   set( VTK_COMPONENTS
+    CommonColor
     CommonCore
     FiltersCore
     FiltersExtraction

@@ -65,7 +65,6 @@ using namespace std;
 #include <vtkImageToStructuredPoints.h>
 #include <vtkImageWrapPad.h>
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkLookupTable.h>
 #include <vtkMath.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMergeFilter.h>
@@ -84,6 +83,7 @@ using namespace std;
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkScalarBarActor.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -400,11 +400,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
     float vertical_scale_1D = render_settings.GetProperty("vertical_scale_1D").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
@@ -428,15 +423,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     const float x_gap = this->x_spacing_proportion * this->GetX();
     const float y_gap = image_height;
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
@@ -555,11 +542,6 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
     float vertical_scale_2D = render_settings.GetProperty("vertical_scale_2D").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
     float contour_level = render_settings.GetProperty("contour_level").GetFloat();
@@ -589,15 +571,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
     {
@@ -769,11 +743,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
@@ -795,15 +764,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low, high);
-    lut->SetSaturationRange(low_sat, high_sat);
-    lut->SetHueRange(low_hue, high_hue);
-    lut->SetValueRange(low_val, high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -1399,21 +1360,10 @@ void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) 
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
 
     // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     // pass the image through the lookup table
     vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();

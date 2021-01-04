@@ -15,15 +15,23 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
 #include "scene_items.hpp"
 
+// local:
+#include "colormaps.hpp"
+#include "Properties.hpp"
+
 // VTK:
+#include <vtkColorSeries.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkRenderer.h>
 #include <vtkScalarsToColors.h>
 #include <vtkScalarBarActor.h>
-#include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
+
+// STL:
+#include <string>
+using namespace std;
 
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
 {
@@ -39,4 +47,136 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
     scalar_bar->GetTitleTextProperty()->SetOpacity(0);
     scalar_bar->SetTitleRatio(0.7);
     pRenderer->AddActor2D(scalar_bar);
+}
+
+template<size_t N>
+void ColorMapFromList(vtkColorSeries* color_series, const float values[N][3])
+{
+    color_series->SetNumberOfColors(N);
+    for (int i = 0; i < N; i++)
+    {
+        vtkColor3f color(values[i][0], values[i][1], values[i][2]);
+        vtkColor3ub color_ub(color[0] * 255, color[1] * 255, color[2] * 255);
+        color_series->SetColor(i, color_ub);
+    }
+}
+
+void ColorTransferFunctionFromLinearColorSeries(vtkColorTransferFunction* lut, vtkColorSeries* color_series, float min_val, float max_val)
+{
+    for (int i = 0; i < color_series->GetNumberOfColors(); i++)
+    {
+        const vtkColor3ub color = color_series->GetColor(i);
+        const float u = min_val + i * (max_val - min_val) / (color_series->GetNumberOfColors() - 1);
+        float rgb[3] = { color.GetRed() / 255.0f, color.GetGreen() / 255.0f, color.GetBlue() / 255.0f };
+        lut->AddRGBPoint(u, rgb[0], rgb[1], rgb[2]);
+    }
+}
+
+vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings)
+{
+    const string colormap_label = render_settings.GetProperty("colormap").GetColorMap();
+    const float low = render_settings.GetProperty("low").GetFloat();
+    const float high = render_settings.GetProperty("high").GetFloat();
+
+    vtkSmartPointer<vtkColorTransferFunction> lut = vtkSmartPointer<vtkColorTransferFunction>::New();
+    if (colormap_label == "HSV blend")
+    {
+        lut->SetColorSpaceToHSV();
+        lut->HSVWrapOff();
+        float r, g, b;
+        render_settings.GetProperty("color_low").GetColor(r, g, b);
+        lut->AddRGBPoint(low, r, g, b);
+        render_settings.GetProperty("color_high").GetColor(r, g, b);
+        lut->AddRGBPoint(high, r, g, b);
+    }
+    else
+    {
+        vtkSmartPointer<vtkColorSeries> color_series = vtkSmartPointer<vtkColorSeries>::New();
+        bool reverse = false;
+        if (colormap_label == "spectral")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_SPECTRAL_9);
+            reverse = true;
+        }
+        else if (colormap_label == "spectral reversed")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_SPECTRAL_9);
+        }
+        else if (colormap_label == "orange-purple")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_PURPLE_ORANGE_11);
+        }
+        else if (colormap_label == "purple-orange")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_PURPLE_ORANGE_11);
+            reverse = true;
+        }
+        else if (colormap_label == "brown-teal")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_BROWN_BLUE_GREEN_11);
+        }
+        else if (colormap_label == "teal-brown")
+        {
+            color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_BROWN_BLUE_GREEN_11);
+            reverse = true;
+        }
+        else if (colormap_label == "inferno" || colormap_label == "inferno reversed")
+        {
+            ColorMapFromList<256>(color_series, colormaps::inferno);
+            if (colormap_label == "inferno reversed")
+            {
+                reverse = true;
+            }
+        }
+        else if (colormap_label == "terrain" || colormap_label == "terrain reversed")
+        {
+            ColorMapFromList<6>(color_series, colormaps::terrain);
+            if (colormap_label == "terrain reversed")
+            {
+                reverse = true;
+            }
+        }
+        else
+        {
+            throw runtime_error("unsupported colormap: " + colormap_label);
+        }
+        const float min_val = reverse ? high : low;
+        const float max_val = reverse ? low : high;
+        ColorTransferFunctionFromLinearColorSeries(lut, color_series, min_val, max_val);
+    }
+    return lut;
+}
+
+void SetDefaultRenderSettings(Properties& render_settings)
+{
+    render_settings.DeleteAllProperties();
+    render_settings.AddProperty(Property("surface_color", "color", 1.0f, 1.0f, 1.0f)); // RGB [0,1]
+    render_settings.AddProperty(Property("colormap", "colormap", "spectral"));
+    render_settings.AddProperty(Property("color_low", "color", 0.0f, 0.0f, 1.0f));
+    render_settings.AddProperty(Property("color_high", "color", 1.0f, 0.0f, 0.0f));
+    render_settings.AddProperty(Property("show_color_scale", true));
+    render_settings.AddProperty(Property("show_multiple_chemicals", true));
+    render_settings.AddProperty(Property("active_chemical", "chemical", "a"));
+    render_settings.AddProperty(Property("low", 0.0f));
+    render_settings.AddProperty(Property("high", 1.0f));
+    render_settings.AddProperty(Property("vertical_scale_1D", 30.0f));
+    render_settings.AddProperty(Property("vertical_scale_2D", 15.0f));
+    render_settings.AddProperty(Property("contour_level", 0.25f));
+    render_settings.AddProperty(Property("cap_contour", true));
+    render_settings.AddProperty(Property("invert_contour_cap", false));
+    render_settings.AddProperty(Property("use_wireframe", false));
+    render_settings.AddProperty(Property("show_cell_edges", false));
+    render_settings.AddProperty(Property("show_bounding_box", true));
+    render_settings.AddProperty(Property("show_chemical_label", true));
+    render_settings.AddProperty(Property("slice_3D", true));
+    render_settings.AddProperty(Property("slice_3D_axis", "axis", "z"));
+    render_settings.AddProperty(Property("slice_3D_position", 0.5f)); // [0,1]
+    render_settings.AddProperty(Property("show_displacement_mapped_surface", true));
+    render_settings.AddProperty(Property("color_displacement_mapped_surface", false));
+    render_settings.AddProperty(Property("use_image_interpolation", true));
+    render_settings.AddProperty(Property("timesteps_per_render", 100));
+    render_settings.AddProperty(Property("show_phase_plot", false));
+    render_settings.AddProperty(Property("phase_plot_x_axis", "chemical", "a"));
+    render_settings.AddProperty(Property("phase_plot_y_axis", "chemical", "b"));
+    render_settings.AddProperty(Property("phase_plot_z_axis", "chemical", "c"));
 }

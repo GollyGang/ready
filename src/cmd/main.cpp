@@ -27,11 +27,12 @@ namespace po = boost::program_options;
 #include <stdlib.h>
 
 // readybase:
-#include <SystemFactory.hpp>
-#include <Properties.hpp>
-#include <OpenCL_utils.hpp>
 #include <AbstractRD.hpp>
+#include <OpenCL_utils.hpp>
 #include <OpenCLImageRD.hpp>
+#include <Properties.hpp>
+#include <scene_items.hpp>
+#include <SystemFactory.hpp>
 
 // -------------------------------------------------------------------------------------------------------------
 
@@ -248,7 +249,7 @@ int main(int argc,char *argv[])
     }
 
     Properties render_settings("render_settings");
-    render_settings.SetDefaultRenderSettings();
+    SetDefaultRenderSettings(render_settings);
 
     unique_ptr<AbstractRD> system;
     try

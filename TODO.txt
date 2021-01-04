@@ -5,9 +5,9 @@ UI annoyances:
 - can floating panes go behind main window?
 
 Big picture issues:
-- Would love an Android version but OpenCL isn't supported. Renderscript Compute seems to be the 
-  thing but kernels are compiled at build time, which isn't what we want. Could work as a pattern 
-  viewer, allowing users to finger paint. NDK is another possibility. Maybe OpenGL ES, with a 
+- Would love an Android version but OpenCL isn't supported. Renderscript Compute seems to be the
+  thing but kernels are compiled at build time, which isn't what we want. Could work as a pattern
+  viewer, allowing users to finger paint. NDK is another possibility. Maybe OpenGL ES, with a
   shader - fits in with WebGL Playground idea below.
 - Scripting support
 - use FFT for speed?
@@ -18,7 +18,6 @@ before 0.x release:
 - merged phase plot and graph for 1D patterns: plot graph at right angles, to e.g. show Schroedinger as a corkscrew
 - fix panning issue on complex scenes (e.g. Bays_3D.vti)
 - new fill types: perlin noise (vtkPerlinNoise), conical gradient
-- choice of color palettes w/ vtkColorSeries (need vtk6)
 - choice of log or linear color palette
 - NKS rules from pp 163-166
 - floating-point speed reporting
@@ -26,7 +25,7 @@ before 0.x release:
 - programmable colouring (R,G,B channels, or something that uses less memory (second opencl pass?))
 - add Help files for Info Panel, etc.?
 - progress indicator for mesh generators?
-- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap 
+- way to expand mesh grids where possible? by detecting mesh properties? could then implement wrap
    too, on polyhedral meshes. Needed for images too, to expand a dataset without deleting the data.
 - add spectrum slider to change current paint color?
 - set scene rotating by a setting in the start recording dialog box, or for general use?

@@ -26,6 +26,7 @@
     </initial_pattern_generator>
     <render_settings>
       <surface_color r="1" g="1" b="1"/>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="0.78"/>
       <color_high r="0.55" g="0.82" b="1"/>
       <show_color_scale value="true"/>

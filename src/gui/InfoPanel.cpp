@@ -26,6 +26,7 @@
 
 // readybase:
 #include "ImageRD.hpp"
+#include "scene_items.hpp"
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
@@ -36,6 +37,7 @@
 #include <vtkMath.h>
 
 // STL:
+#include <algorithm>
 #include <string>
 using namespace std;
 
@@ -446,10 +448,15 @@ void InfoPanel::Update(const AbstractRD& system)
     rownum = 1;     // nicer if 1st render setting has gray background
 
     const Properties& render_settings = frame->GetRenderSettings();
+    const bool using_HSV_blend = render_settings.GetProperty("colormap").GetColorMap() == "HSV blend";
     for(int i=0;i<render_settings.GetNumberOfProperties();i++)
     {
         const Property& prop = render_settings.GetProperty(i);
         string name = prop.GetName();
+        if (!using_HSV_blend && (name == "color_low" || name == "color_high"))
+        {
+            continue;
+        }
         wxString print_label(name);
         print_label.Replace(_T("_"),_T(" "));
         string type = prop.GetType();
@@ -471,6 +478,8 @@ void InfoPanel::Update(const AbstractRD& system)
             contents += AppendRow(print_label, name, prop.GetChemical(), true);
         else if(type=="axis")
             contents += AppendRow(print_label, name, prop.GetAxis(), true);
+        else if(type=="colormap")
+            contents += AppendRow(print_label, name, prop.GetColorMap(), true);
         else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
 
@@ -633,6 +642,20 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         dlg.SetSelection(iAxis);
         if(dlg.ShowModal()!=wxID_OK) return;
         prop.SetAxis(string(choices[dlg.GetSelection()].mb_str()));
+        frame->RenderSettingsChanged();
+    }
+    else if (type == "colormap")
+    {
+        wxArrayString choices;
+        for (const string& s : SupportedColorMaps)
+        {
+            choices.Add(s);
+        }
+        wxSingleChoiceDialog dlg(this, _("Color map:"), _("Select color map"), choices);
+        int iColorMap = distance(begin(SupportedColorMaps), find(begin(SupportedColorMaps), end(SupportedColorMaps), prop.GetColorMap()));
+        dlg.SetSelection(iColorMap);
+        if (dlg.ShowModal() != wxID_OK) return;
+        prop.SetColorMap(string(choices[dlg.GetSelection()].mb_str()));
         frame->RenderSettingsChanged();
     }
     else {

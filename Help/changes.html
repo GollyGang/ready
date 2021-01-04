@@ -23,6 +23,7 @@ the neighbor of the current block, these keywords return a float4 that has the f
 <b>breaking change</b>: formula rules that accessed cells using a_w, a_e, a_nw, a_se, etc. will no longer behave as they did before.
 <li>Parameter <b>dx</b> is now reserved for controlling the grid spacing of the Gaussian, Laplacian, bi-Laplacian and tri-Laplacian
 stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * delta_x) and can just write laplacian_a since the value of dx is used in the stencil computation.
+<li>New <a href="formats.html#render_settings">render setting</a>: <b>colormap</b>, with 11 maps available: "HSV blend", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed", "orange-purple", "purple-orange", "brown-teal", "teal-brown". The old behavior (HSV interpolation between two colors) is still available - choose "HSV blend".
 <li>Moved View Full Kernel... and Show OpenCL Diagnostics... to the View menu.
 <li>Mac app requires macOS 10.10 or later.
 <li>More smaller brush sizes.

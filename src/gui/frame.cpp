@@ -31,16 +31,17 @@
 #include "MakeNewSystem.hpp"
 
 // readybase:
-#include <utils.hpp>
-#include <OpenCL_utils.hpp>
-#include <IO_XML.hpp>
-#include <GrayScottImageRD.hpp>
-#include <GrayScottMeshRD.hpp>
 #include <FormulaOpenCLImageRD.hpp>
 #include <FormulaOpenCLMeshRD.hpp>
 #include <FullKernelOpenCLImageRD.hpp>
 #include <FullKernelOpenCLMeshRD.hpp>
+#include <GrayScottImageRD.hpp>
+#include <GrayScottMeshRD.hpp>
+#include <IO_XML.hpp>
+#include <OpenCL_utils.hpp>
+#include <scene_items.hpp>
 #include <SystemFactory.hpp>
+#include <utils.hpp>
 
 // local resources:
 #include "appicon16.xpm"
@@ -83,6 +84,7 @@ using namespace std;
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkRendererCollection.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkWindowToImageFilter.h>
@@ -310,7 +312,7 @@ MyFrame::MyFrame(const wxString& title)
         this->OpenFile(initfile);
     } else {
         // create new pattern
-        this->render_settings.SetDefaultRenderSettings();
+        SetDefaultRenderSettings(this->render_settings);
         unique_ptr<GrayScottImageRD> s = make_unique<GrayScottImageRD>();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
@@ -1134,13 +1136,9 @@ void MyFrame::UpdateToolbars()
         this->current_paint_value) );
     // update the color swatch with the current color
     wxImage im(22,22);
-    float r1,g1,b1,r2,g2,b2,low,high,r,g,b;
-    this->render_settings.GetProperty("color_low").GetColor(r1,g1,b1);
-    this->render_settings.GetProperty("color_high").GetColor(r2,g2,b2);
-    low = this->render_settings.GetProperty("low").GetFloat();
-    high = this->render_settings.GetProperty("high").GetFloat();
-    InterpolateInHSV(r1,g1,b1,r2,g2,b2,min(1.0f,max(0.0f,(this->current_paint_value-low)/(high-low))),r,g,b);
-    im.SetRGB(wxRect(0,0,22,22),r*255,g*255,b*255);
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(this->render_settings);
+    const unsigned char* rgba = lut->MapValue(this->current_paint_value);
+    im.SetRGB(wxRect(0,0,22,22), rgba[0], rgba[1], rgba[2]);
     dynamic_cast<wxBitmapButton*>(this->paint_toolbar->FindControl(ID::CurrentValueColor))->SetBitmap(wxBitmap(im));
     this->aui_mgr.Update();
 }
@@ -1477,14 +1475,36 @@ void MyFrame::OnSavePattern(wxCommandEvent& event)
 
 void MyFrame::SaveFile(const wxString& path)
 {
-    wxBusyCursor busy;
+    wxBeginBusyCursor();
 
-    this->system->SaveFile(path.mb_str(),this->render_settings,false);
+    try
+    {
+        this->system->SaveFile(path.mb_str(), this->render_settings, false);
+    }
+    catch (const exception& e)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file. Error:\n\n");
+        message += wxString(e.what(), wxConvUTF8);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+        return;
+    }
+    catch (...)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file.");
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+        return;
+    }
 
     AddRecentPattern(path);
     this->system->SetFilename(string(path.mb_str()));
     this->system->SetModified(false);
     this->UpdateWindowTitle();
+
+    wxEndBusyCursor();
 }
 
 // ---------------------------------------------------------------------
@@ -1516,7 +1536,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     unique_ptr<AbstractRD> sys;
     Properties new_render_settings("render_settings");
-    new_render_settings.SetDefaultRenderSettings();
+    SetDefaultRenderSettings(new_render_settings);
     try
     {
         switch(sel)
@@ -1635,7 +1655,7 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
     Properties previous_render_settings = this->render_settings;
     try
     {
-        this->render_settings.SetDefaultRenderSettings();
+        SetDefaultRenderSettings(this->render_settings);
         target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
         this->SetCurrentRDSystem(move(target_system));
     }
@@ -2577,7 +2597,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     bool ok = LoadMesh(mesh_filename, ug);
     if (!ok) return;
 
-    this->render_settings.SetDefaultRenderSettings();
+    SetDefaultRenderSettings(this->render_settings);
     this->render_settings.GetProperty("slice_3D").SetBool(false);
     this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
@@ -3381,13 +3401,33 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
         return;
     }
 
-    wxBusyCursor busy;
+    wxBeginBusyCursor();
 
     // TODO: might be preferable to not adopt the saved file
     this->system->BlankImage();
-    this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    try
+    {
+        this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    }
+    catch (const exception& e)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file. Error:\n\n");
+        message += wxString(e.what(), wxConvUTF8);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+    }
+    catch (...)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file.");
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+    }
     this->is_running = false;
     this->UpdateWindows();
+
+    wxEndBusyCursor();
 }
 
 // ---------------------------------------------------------------------

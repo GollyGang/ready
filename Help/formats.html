@@ -447,8 +447,9 @@ Default values are shown to illustrate the format.
 <p>
 <ul>
 <li><tt>&lt;surface_color r="1" g="1" b="1" /&gt;</tt><br>The RGB color to use for the surface (range: 0.0-1.0).
-<li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt><br>The color for low values (range: 0.0-1.0).
-<li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt><br>The color for high values (range: 0.0-1.0).
+<li><tt>&lt;colormap value="spectral" /&gt;</tt><br>The colormap to use.
+<li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt><br>The color for low values (range: 0.0-1.0). If colormap is 'HSV blend'.
+<li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt><br>The color for high values (range: 0.0-1.0). If colormap is 'HSV blend'.
 <li><tt>&lt;show_color_scale value="true" /&gt;</tt><br>Whether to show the color scale that maps values to colors.
 <li><tt>&lt;show_multiple_chemicals value="true" /&gt;</tt><br>Whether to show all the chemicals, or just the active one.
 <li><tt>&lt;active_chemical value="a" /&gt;</tt><br>The chemical to show (a, b, c, etc.).
