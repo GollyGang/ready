@@ -113,6 +113,7 @@ d = 1000000 * (pb + pa);
       <surface_color r="1" g="1" b="1">
 
       </surface_color>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="0">
 
       </color_low>
