@@ -61,6 +61,17 @@ void ColorMapFromList(vtkColorSeries* color_series, const float values[N][3])
     }
 }
 
+void ColorTransferFunctionFromLinearColorSeries(vtkColorTransferFunction* lut, vtkColorSeries* color_series, float min_val, float max_val)
+{
+    for (int i = 0; i < color_series->GetNumberOfColors(); i++)
+    {
+        const vtkColor3ub color = color_series->GetColor(i);
+        const float u = min_val + i * (max_val - min_val) / (color_series->GetNumberOfColors() - 1);
+        float rgb[3] = { color.GetRed() / 255.0f, color.GetGreen() / 255.0f, color.GetBlue() / 255.0f };
+        lut->AddRGBPoint(u, rgb[0], rgb[1], rgb[2]);
+    }
+}
+
 vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings)
 {
     const string colormap_label = render_settings.GetProperty("colormap").GetColorMap();
@@ -129,15 +140,9 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
         {
             throw runtime_error("unsupported colormap: " + colormap_label);
         }
-        const float min_val = reverse ? high: low;
+        const float min_val = reverse ? high : low;
         const float max_val = reverse ? low : high;
-        for (int i = 0; i < color_series->GetNumberOfColors(); i++)
-        {
-            const vtkColor3ub color = color_series->GetColor(i);
-            const float u = min_val + i * (max_val - min_val) / (color_series->GetNumberOfColors() - 1);
-            float rgb[3] = { color.GetRed() / 255.0f, color.GetGreen() / 255.0f, color.GetBlue() / 255.0f };
-            lut->AddRGBPoint(u, rgb[0], rgb[1], rgb[2]);
-        }
+        ColorTransferFunctionFromLinearColorSeries(lut, color_series, min_val, max_val);
     }
     return lut;
 }
