@@ -77,6 +77,8 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
         font.SetPointSize(12);
         treectrl->SetFont(font);
+        // ensure entire background is near white (avoids bug in wxMac 3.1.5 if bg is pure white)
+        treectrl->SetBackgroundColour(wxColour(254,254,254));
     #elif defined(__WXMSW__)
         // reduce indent a lot on Windows
         treectrl->SetIndent(4);
