@@ -2489,6 +2489,7 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("timesteps_per_render").SetInt(dlg.GetValue());
     this->UpdateInfoPane();
+    this->UpdateToolbars(); // show the new value
 }
 
 // ---------------------------------------------------------------------
