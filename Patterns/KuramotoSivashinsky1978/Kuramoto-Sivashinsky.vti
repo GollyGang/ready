@@ -41,7 +41,7 @@ delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + gradient_mag_s
       <overlay chemical="a">
         <overwrite>
         </overwrite>
-        <white_noise low="55" high="120">
+        <white_noise low="65" high="120">
         </white_noise>
         <everywhere>
         </everywhere>
@@ -50,17 +50,18 @@ delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + gradient_mag_s
     <render_settings>
       <surface_color r="1" g="1" b="1">
       </surface_color>
+      <colormap value="spectral" />
       <color_low r="0" g="0" b="0">
       </color_low>
       <color_high r="1" g="1" b="1">
       </color_high>
-      <show_color_scale value="false">
+      <show_color_scale value="true">
       </show_color_scale>
       <show_multiple_chemicals value="false">
       </show_multiple_chemicals>
       <active_chemical value="a">
       </active_chemical>
-      <low value="55">
+      <low value="65">
       </low>
       <high value="120">
       </high>
