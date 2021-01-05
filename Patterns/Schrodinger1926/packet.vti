@@ -1,51 +1,42 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
 
     <description>
-        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the 
-        wave function for some quantum state. Here a wave packet travels through empty space. Over time the probability spreads out, because of
+        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the
+        wave function for some quantum state. Here a wave packet travels through empty space. Over time the wave packet spreads out, because of
         uncertainty in its initial momentum.
-        
-        In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. 
-        The probability density is shown in 'c'.
-        
+
+        In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part.
+
         Derivation:
-        
+
         &lt;tt&gt;
         i*(dx/dt) = -Laplacian(x)
         &lt;/tt&gt;
-        
+
         where x is a complex number a+bi, i is the square root of -1.
-        
+
         hence:
         &lt;tt&gt;&lt;pre&gt;da/dt = -Im(Laplacian(x)) = -Laplacian(b)
         db/dt =  Re(Laplacian(x)) =  Laplacian(a)&lt;/pre&gt;&lt;/tt&gt;
-        
-        c = a&lt;sup&gt;2&lt;/sup&gt; + b&lt;sup&gt;2&lt;/sup&gt;
-    </description>
+
+        By default we plot 'a' and 'b' on orthogonal axes to show the rotation. Set 'plot ab orthogonally'
+        below to false to plot them as separate lines on the graph.
+      </description>
 
     <rule type="formula" name="Schrodinger equation">
-        
+
       <param name="timestep">    0.001    </param>
 
-      <formula number_of_chemicals="3">
+      <formula number_of_chemicals="2">
         delta_a = -laplacian_b;
         delta_b =  laplacian_a;
-        c = a*a + b*b;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
-        
-      <overlay chemical="c">
-        <overwrite />
-        <gaussian height="1" sigma="0.03">
-          <point3D x="0.2" y="0.3" z="0.5" />
-        </gaussian>
-        <everywhere />
-      </overlay>
 
       <overlay chemical="a">
         <overwrite />
@@ -55,8 +46,14 @@
         </sine>
         <everywhere />
       </overlay>
-      <overlay chemical="a"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
-      
+      <overlay chemical="a">
+        <multiply />
+        <gaussian height="1" sigma="0.03">
+          <point3D x="0.2" y="0.3" z="0.5" />
+        </gaussian>
+        <everywhere />
+      </overlay>
+
       <overlay chemical="b">
         <overwrite />
         <sine amplitude="1" phase="1.5708">
@@ -65,14 +62,19 @@
         </sine>
         <everywhere />
       </overlay>
-      <overlay chemical="b"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
-
-      <overlay chemical="c"><multiply /><other_chemical chemical="c" /><everywhere /></overlay>
+      <overlay chemical="b">
+        <multiply />
+        <gaussian height="1" sigma="0.03">
+          <point3D x="0.2" y="0.3" z="0.5" />
+        </gaussian>
+        <everywhere />
+      </overlay>
 
     </initial_pattern_generator>
-    
+
     <render_settings>
-       <active_chemical value="c" />
+       <active_chemical value="a" />
+       <show_multiple_chemicals value="true" />
        <show_displacement_mapped_surface value="true" />
        <color_displacement_mapped_surface value="false" />
        <low value="-1" />
@@ -80,8 +82,9 @@
        <vertical_scale_1D value="100" />
        <vertical_scale_2D value="100" />
        <timesteps_per_render value="1024" />
+       <plot_ab_orthogonally value="true" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 511 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 511 0 0 0 0">
@@ -90,9 +93,6 @@
         AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
       </DataArray>
       <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
-        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
-      </DataArray>
-      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
         AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
       </DataArray>
     </PointData>

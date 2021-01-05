@@ -20,6 +20,9 @@
 
         Note that parameter nu is different to that shown in the paper. Another anomaly is that
         the 'narrow oscillon' mentioned doesn't seem to be present.
+
+        By default we plot 'a' and 'b' on orthogonal axes to show the rotation of the oscillons. Set 'plot ab orthogonally'
+        below to false to plot them as separate lines on the graph.
     </description>
 
     <rule type="formula" name="Ginzburg-Landau">
@@ -102,6 +105,7 @@
       <vertical_scale_1D value="100" />
       <contour_level value="0" />
       <show_color_scale value="false" />
+      <plot_ab_orthogonally value="true" />
     </render_settings>
 
   </RD>
