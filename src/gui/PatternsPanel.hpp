@@ -42,6 +42,8 @@ class PatternsPanel : public wxPanel
         // return false if key event should be passed to default handler
         bool DoKey(int key, int mods);
 
+        void SelectPath(const wxString& path);
+
     private:
 
         void AppendDir(const wxString& indir, wxTreeCtrl* treectrl, wxTreeItemId root);
