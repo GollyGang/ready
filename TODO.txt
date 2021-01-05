@@ -15,7 +15,6 @@ Big picture issues:
 before 0.x release:
 
 - allow operations on chemicals: swap, duplicate
-- merged phase plot and graph for 1D patterns: plot graph at right angles, to e.g. show Schroedinger as a corkscrew
 - fix panning issue on complex scenes (e.g. Bays_3D.vti)
 - new fill types: perlin noise (vtkPerlinNoise), conical gradient
 - choice of log or linear color palette

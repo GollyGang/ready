@@ -183,4 +183,5 @@ void SetDefaultRenderSettings(Properties& render_settings)
     render_settings.AddProperty(Property("phase_plot_x_axis", "chemical", "a"));
     render_settings.AddProperty(Property("phase_plot_y_axis", "chemical", "b"));
     render_settings.AddProperty(Property("phase_plot_z_axis", "chemical", "c"));
+    render_settings.AddProperty(Property("plot_ab_orthogonally", false));
 }

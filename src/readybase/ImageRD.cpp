@@ -414,6 +414,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
+    bool plot_ab_orthogonally = render_settings.GetProperty("plot_ab_orthogonally").GetBool();
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
@@ -490,13 +491,42 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     const float graph_top = graph_bottom + (high-low) * scaling;
     for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
     {
-        vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInputData(this->GetImage(iChemical));
-        vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
-        warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-scaling);
+        if (plot_ab_orthogonally && iChemical == 1)
+        {
+            continue;
+        }
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(warp->GetOutputPort());
+        if (plot_ab_orthogonally && iChemical == 0 && this->GetNumberOfChemicals() > 1)
+        {
+            // plot the merged ab pair here
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane->SetInputData(this->GetImage(0));
+            vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+            warp->SetInputConnection(plane->GetOutputPort());
+            warp->SetScaleFactor(scaling);
+            warp->SetNormal(0, 1, 0);
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane2 = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane2->SetInputData(this->GetImage(1));
+            vtkSmartPointer<vtkMergeFilter> merge = vtkSmartPointer<vtkMergeFilter>::New();
+            merge->SetGeometryConnection(warp->GetOutputPort());
+            merge->SetScalarsConnection(plane2->GetOutputPort());
+            vtkSmartPointer<vtkWarpScalar> warp2 = vtkSmartPointer<vtkWarpScalar>::New();
+            warp2->SetInputConnection(merge->GetOutputPort());
+            warp2->SetScaleFactor(scaling);
+            warp2->SetNormal(0, 0, -1);
+            mapper->SetInputConnection(warp2->GetOutputPort());
+        }
+        else
+        {
+            // plot this chemical in the normal way
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane->SetInputData(this->GetImage(iChemical));
+            vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+            warp->SetInputConnection(plane->GetOutputPort());
+            warp->SetScaleFactor(scaling);
+            warp->SetNormal(0, 1, 0);
+            mapper->SetInputConnection(warp->GetOutputPort());
+        }
         mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
@@ -505,7 +535,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetColor(1,1,1);
         else
             actor->GetProperty()->SetColor(0.5,0.5,0.5);
-        actor->RotateX(90.0);
         actor->PickableOff();
         actor->SetPosition(0, graph_bottom - low * scaling,0);
         pRenderer->AddActor(actor);
