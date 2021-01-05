@@ -219,5 +219,5 @@ void PatternsPanel::SelectPath(const wxString& path)
     wxFileName full_path(path);
     full_path.MakeAbsolute();
     this->patternctrl->ExpandPath(full_path.GetFullPath());
-    this->patternctrl->SelectPath(full_path.GetFullPath());
+    this->patternctrl->SetPath(full_path.GetFullPath());
 }
