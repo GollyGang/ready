@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="1">
-  
+  <RD format_version="6">
+
     <description>
         Conway's Game of Life, just because we can. Not an efficient way to do this, since everything is stored as floats.
     </description>
 
     <rule type="kernel" name="B3/S23">
-    
+
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
-        __kernel void rd_compute(__global float* a_in,__global float* a_out) 
+        __kernel void rd_compute(__global float* a_in,__global float* a_out)
         {
             const int x = get_global_id(0);
             const int y = get_global_id(1);
@@ -38,11 +38,11 @@
                 a_out[i_here] = 1.0f; // B3
             else if(a==1 &amp;&amp; (n==2 || n==3) )
                 a_out[i_here] = 1.0f; // S23
-            else 
+            else
                 a_out[i_here]=0.0f;
         }
       </kernel>
-      
+
     </rule>
 
     <initial_pattern_generator apply_when_loading="true">
@@ -57,12 +57,13 @@
     </initial_pattern_generator>
 
     <render_settings>
+        <colormap value="HSV blend" />
         <use_image_interpolation value="false" />
         <vertical_scale_2D value="3" />
         <timesteps_per_render value="1" />
     </render_settings>
 
-    
+
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">

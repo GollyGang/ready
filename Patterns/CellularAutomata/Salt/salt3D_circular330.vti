@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="3">
+  <RD format_version="6">
     <description>
 Miller and Fredkin&apos;s Salt CA, in 2D.&lt;br&gt;
 From: &quot;Circular Motion of Strings in Cellular Automata, and Other Surprises&quot;, Daniel B. Miller and Edward Fredkin&lt;br&gt;
@@ -10,7 +10,7 @@ See: &lt;a href=&quot;http://digitalphilosophy.org&quot;&gt;digitalphilosophy.or
 other, but in two different axis-aligned planes. The path it traces is roughly hexagonal, and all the points in
 its path lie on a single plane. As we increase the length of the string (by adding cells diagonally along one
 of the planes), we also increase the radius of the path it traces. As the radius increases, the string&apos;s path
-(calculated as the average position of each &apos;up&apos; cell in the string) begins to closely approximate a circle. We 
+(calculated as the average position of each &apos;up&apos; cell in the string) begins to closely approximate a circle. We
 have analyzed the degree to which these paths approximate circles: as the radius increases, the
 standard deviation from a true circle, plotted as a percentage of the radius, approaches zero.&quot;
     </description>
@@ -32,7 +32,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     // We implement the 3D Salt CA as a 7-state CA with a radius-3 Moore neighborhood
     // cells in states 0-5 are down - their state determines the current phase
     // cells in state 6 are up - their location parity determines whether they move in the current phase
-    // A more 'pure CA' way of doing this is to have states representing the checkerboard but 
+    // A more 'pure CA' way of doing this is to have states representing the checkerboard but
     // this way makes it easier to draw on.
 
     // get the current phase from somewhere
@@ -46,7 +46,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
             current_phase = val;
             break;
         }
-    }           
+    }
     if(current_phase==-1)
     {
         // one rare case: we couldn&apos;t find phase anywhere
@@ -108,9 +108,9 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
         {
             // if either activator is up then the swap is possible;
             // if any inhibitor is up then the swap is forbidden
-            if( ( is_up(val[activators[i][0]]) || is_up(val[activators[i][1]]) ) 
-                &amp;&amp; !( is_up(val[inhibitors[i][0]]) || is_up(val[inhibitors[i][1]]) || 
-                              is_up(val[inhibitors[i][2]]) || is_up(val[inhibitors[i][3]]) || 
+            if( ( is_up(val[activators[i][0]]) || is_up(val[activators[i][1]]) )
+                &amp;&amp; !( is_up(val[inhibitors[i][0]]) || is_up(val[inhibitors[i][1]]) ||
+                              is_up(val[inhibitors[i][2]]) || is_up(val[inhibitors[i][3]]) ||
                               is_up(val[inhibitors[i][4]]) || is_up(val[inhibitors[i][5]]) ||
                               is_up(val[inhibitors[i][6]]) || is_up(val[inhibitors[i][7]]) ||
                               is_up(val[inhibitors[i][8]]) || is_up(val[inhibitors[i][9]]) ||
@@ -137,7 +137,7 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     }
 }
       </kernel>
-      
+
     </rule>
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
@@ -145,10 +145,10 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
         <constant value="0"/>
         <everywhere/>
       </overlay>
-      
+
       <overlay chemical="a">
         <overwrite/>
-        <constant value="6" /> 
+        <constant value="6" />
         <!-- http://busyboxes.org/n : (0,2,-1),(2,0,1),(2,2,0) -->
         <!-- simplest orbiting string -->
         <!-- <pixel x="10" y="12" z="9" />
@@ -201,47 +201,48 @@ __kernel void rd_compute(__global float *a_in,__global float *a_out)
     </initial_pattern_generator>
     <render_settings>
       <surface_color r="1" g="1" b="1" />
+      <colormap value="HSV blend" />
       <color_low r="0.392157" g="0.392157" b="0.392157" />
       <color_high r="1" g="1" b="1" />
       <show_color_scale value="false" />
       <low value="5" />
       <high value="6" />
       <contour_level value="5.5">
-        
+
       </contour_level>
       <use_wireframe value="false">
-        
+
       </use_wireframe>
       <show_cell_edges value="true">
-        
+
       </show_cell_edges>
       <show_bounding_box value="true">
-        
+
       </show_bounding_box>
       <slice_3D value="false">
-        
+
       </slice_3D>
       <slice_3D_axis value="z">
-        
+
       </slice_3D_axis>
       <slice_3D_position value="0.56">
-        
+
       </slice_3D_position>
       <show_displacement_mapped_surface value="true">
-        
+
       </show_displacement_mapped_surface>
       <color_displacement_mapped_surface value="true">
-        
+
       </color_displacement_mapped_surface>
       <use_image_interpolation value="false">
-        
+
       </use_image_interpolation>
       <timesteps_per_render value="1">
-        
+
       </timesteps_per_render>
-      
+
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 31 0 31 0 31" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 31 0 31 0 31">

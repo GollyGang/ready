@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
+  <RD format_version="6">
     <description>
-      Some of the oscillators in Conway's Game of Life on a Penrose tiling. 
-      
-      From the paper by 
+      Some of the oscillators in Conway's Game of Life on a Penrose tiling.
+
+      From the paper by
 &lt;a href=&quot;http://www-users.cs.york.ac.uk/susan/bib/ss/nonstd/penroselife.htm&quot;&gt;
 Nick Owens and Susan Stepney&lt;/a&gt;.
     </description>
-    
+
     <rule name="B3/S23" type="kernel">
       <kernel number_of_chemicals="1">
         __kernel void rd_compute(
@@ -16,7 +16,7 @@ Nick Owens and Susan Stepney&lt;/a&gt;.
                 __global float* a_out,
                 __global int* neighbor_indices,
                 __global float* neighbor_weights,
-                const int max_neighbors) 
+                const int max_neighbors)
         {
             const int x = get_global_id(0);
             // count neighbors
@@ -24,7 +24,7 @@ Nick Owens and Susan Stepney&lt;/a&gt;.
             int offset = x * max_neighbors;
             for(int i=0;i&lt;max_neighbors;i++)
             {
-                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                if(neighbor_weights[offset+i]&lt;0.0001f)
                     continue; // not a neighbor
                 int y = round(a_in[neighbor_indices[offset+i]]);
                 if(y==1) n1++;
@@ -39,26 +39,27 @@ Nick Owens and Susan Stepney&lt;/a&gt;.
                 a_out[x] = 0.0f;
         }
       </kernel>
-      
+
     </rule>
-    
+
     <initial_pattern_generator>
       <overlay chemical="a">
         <overwrite />
         <white_noise low="0" high="1" />
         <everywhere />
       </overlay>
-      
+
     </initial_pattern_generator>
-    
+
     <render_settings>
+      <colormap value="HSV blend" />
       <slice_3D value="false" />
       <show_color_scale value="false" />
       <show_cell_edges value="true" />
       <use_image_interpolation value="false" />
       <timesteps_per_render value="1" />
     </render_settings>
-    
+
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="3126" NumberOfCells="3010" >

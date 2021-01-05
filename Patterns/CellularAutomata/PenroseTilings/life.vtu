@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="1">
-    
+  <RD format_version="6">
+
     <description>
         Life on a Penrose tiling. Various still-lives and oscillators are seen. No gliders have
         yet been found.
-        
-        Inspired by 
+
+        Inspired by
         &lt;a href=&quot;http://www-users.cs.york.ac.uk/susan/bib/ss/nonstd/penroselife.htm&quot;&gt;
         the work of Nick Owens and Susan Stepney&lt;/a&gt;.
     </description>
 
     <rule type="kernel" name="B3/S23">
-        
+
       <kernel number_of_chemicals="1" block_size_x="1" block_size_y="1" block_size_z="1">
         __kernel void rd_compute(
                 __global float* a_in,
                 __global float* a_out,
                 __global int* neighbor_indices,
                 __global float* neighbor_weights,
-                const int max_neighbors) 
+                const int max_neighbors)
         {
             const int x = get_global_id(0);
             // count neighbors
@@ -27,7 +27,7 @@
             int offset = x * max_neighbors;
             for(int i=0;i&lt;max_neighbors;i++)
             {
-                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                if(neighbor_weights[offset+i]&lt;0.0001f)
                     continue; // not a neighbor
                 int y = round(a_in[neighbor_indices[offset+i]]);
                 if(y==1) n1++;
@@ -42,9 +42,9 @@
                 a_out[x] = 0.0f;
         }
       </kernel>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -52,15 +52,16 @@
         <everywhere />
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
+      <colormap value="HSV blend" />
       <slice_3D value="false" />
       <timesteps_per_render value="1" />
       <show_color_scale value="false" />
       <use_image_interpolation value="false" />
-	  <show_cell_edges value="true" />
+      <show_cell_edges value="true" />
     </render_settings>
-    
+
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="3126" NumberOfCells="3010" >
