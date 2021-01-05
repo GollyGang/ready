@@ -127,7 +127,7 @@ set( PATTERN_FILES
   Patterns/heat_equation_interpolation.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti
-  Patterns/wave_equation.vti
+  Patterns/wave_equation.vti               Patterns/wave_soliton.vti
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
