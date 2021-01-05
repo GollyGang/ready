@@ -213,3 +213,11 @@ bool PatternsPanel::DoKey(int key, int mods)
     frame->ProcessKey(key, mods);
     return true;
 }
+
+void PatternsPanel::SelectPath(const wxString& path)
+{
+    wxFileName full_path(path);
+    full_path.MakeAbsolute();
+    this->patternctrl->ExpandPath(full_path.GetFullPath());
+    this->patternctrl->SetPath(full_path.GetFullPath());
+}

@@ -1657,6 +1657,7 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
     {
         SetDefaultRenderSettings(this->render_settings);
         target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
+        this->patterns_panel->SelectPath(path);
         this->SetCurrentRDSystem(move(target_system));
     }
     catch(const exception& e)
