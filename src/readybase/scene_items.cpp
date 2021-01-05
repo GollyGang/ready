@@ -120,21 +120,24 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
             color_series->SetColorScheme(vtkColorSeries::BREWER_DIVERGING_BROWN_BLUE_GREEN_11);
             reverse = true;
         }
-        else if (colormap_label == "inferno" || colormap_label == "inferno reversed")
+        else if (colormap_label == "inferno")
         {
             ColorMapFromList<256>(color_series, colormaps::inferno);
-            if (colormap_label == "inferno reversed")
-            {
-                reverse = true;
-            }
         }
-        else if (colormap_label == "terrain" || colormap_label == "terrain reversed")
+        else if (colormap_label == "inferno reversed")
+        {
+            ColorMapFromList<256>(color_series, colormaps::inferno);
+            reverse = true;
+        }
+        else if (colormap_label == "terrain")
         {
             ColorMapFromList<6>(color_series, colormaps::terrain);
-            if (colormap_label == "terrain reversed")
-            {
-                reverse = true;
-            }
+            reverse = true;
+        }
+        else if (colormap_label == "terrain reversed")
+        {
+            ColorMapFromList<6>(color_series, colormaps::terrain);
+            reverse = true;
         }
         else
         {
@@ -144,6 +147,7 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
         const float max_val = reverse ? low : high;
         ColorTransferFunctionFromLinearColorSeries(lut, color_series, min_val, max_val);
     }
+    lut->SetNanColor(0.1, 0.1, 0.1);
     return lut;
 }
 
