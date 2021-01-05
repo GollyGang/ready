@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="3">
-  
+  <RD format_version="6">
+
     <description>
         Hans Meinhardt&apos;s five-chemical model for producing stripes. The pattern is initiated at the hoofs, mouth and eyes.
-        
+
         Meinhardt, Hans (1982) &quot;Models of Biological Pattern Formation&quot;&lt;br&gt;
         &lt;a href=&quot;http://www.eb.tuebingen.mpg.de/research/emeriti/hans-meinhardt/82-book/bur82.html&quot;&gt;book available to download&lt;/a&gt;
-        
+
         Based on Greg Turk&apos;s implementation: &lt;a href=&quot;http://www.cc.gatech.edu/~turk/reaction_diffusion/reaction_diffusion.html&quot;&gt;link&lt;/a&gt;
 
         Real zebras have much thinner stripes, we'd need a higher-resolution mesh to simulate them more plausibly. Also the width of the
         stripes varies across the body - see Greg Turk's work for ways of including this.
     </description>
-    
+
     <rule name="Meinhardt" type="formula" neighborhood_type="vertex">
-    
+
       <param name="timestep">     1        </param>
       <param name="k_ab">         0.04     </param>
       <param name="k_c">          0.06     </param>
       <param name="k_de">         0.04     </param>
       <param name="diff1">        0.009    </param>
       <param name="diff2">        0.2      </param>
-      
+
       <formula number_of_chemicals="5">
         delta_a = diff1 * laplacian_a + 0.01f * a * a * e / c - a * k_ab;
         delta_b = diff1 * laplacian_b + 0.01f * b * b * d / c - b * k_ab;
@@ -30,11 +30,11 @@
         delta_d = diff2 * laplacian_d + (a - d) * k_de;
         delta_e = diff2 * laplacian_e + (b - e) * k_de;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="false">
-    
+
         <!-- a = k_c / (2*k_ab) -->
         <overlay chemical="a">
             <overwrite />
@@ -51,14 +51,14 @@
             <parameter name="k_ab" />
             <everywhere />
         </overlay>
-        
+
         <!-- b = a -->
         <overlay chemical="b">
             <overwrite />
             <other_chemical chemical="a" />
             <everywhere />
         </overlay>
-        
+
         <!-- c = 0.02*a*a*a/k_c -->
         <overlay chemical="c">
             <overwrite />
@@ -85,21 +85,21 @@
             <constant value="0.02" />
             <everywhere />
         </overlay>
-        
+
         <!-- d = a -->
         <overlay chemical="d">
             <overwrite />
             <other_chemical chemical="a" />
             <everywhere />
         </overlay>
-        
+
         <!-- e = a -->
         <overlay chemical="e">
             <overwrite />
             <other_chemical chemical="a" />
             <everywhere />
         </overlay>
-        
+
         <!-- add a seed pattern -->
         <overlay chemical="a">
             <overwrite />
@@ -116,12 +116,13 @@
               <point3d x="1" y="1" z="1" />
             </rectangle>
         </overlay>
-        
+
     </initial_pattern_generator>
 
     <render_settings>
         <low value="0" />
         <high value="1.5" />
+        <colormap value="HSV blend" />
         <color_low r="0" g="0" b="0" />
         <color_high r="1" g="1" b="1" />
         <show_color_scale value="false" />
@@ -129,7 +130,7 @@
         <slice_3D value="false" />
         <show_multiple_chemicals value="false" />
     </render_settings>
-    
+
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="69043" NumberOfCells="138053">
