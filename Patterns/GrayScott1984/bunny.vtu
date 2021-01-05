@@ -51,6 +51,8 @@
     </initial_pattern_generator>
 
     <render_settings>
+      <low value="0" />
+      <high value="0.4" />
       <active_chemical value="b" />
       <slice_3D value="false" />
       <show_multiple_chemicals value="false" />
