@@ -258,7 +258,7 @@ set( PATTERN_FILES
   Patterns/RosenzweigMacArthur1963/hm_parameter_map.vti
   Patterns/RosenzweigMacArthur1963/predator-prey.vti
   Patterns/RosenzweigMacArthur1963/predator-prey_1D.vti
-  Patterns/LotkaVolterra1926/Lotka-Volterra.vti
+  Patterns/LotkaVolterra1926/Lotka-Volterra.vti      Patterns/LotkaVolterra1926/Lotka-Volterra_1D.vti
   Patterns/Kobayashi1993/crystal.vti                 Patterns/Kobayashi1993/crystals.vti
   Patterns/Kobayashi1993/laplacian_growth.vti
   Patterns/Kobayashi1993/laplacian_growth_3D.vti     Patterns/Kobayashi1993/laplacian_growth_3D_corner.vti

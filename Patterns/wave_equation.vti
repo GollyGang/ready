@@ -18,7 +18,7 @@
 
         d^2a/dt^2 = db/dt = laplacian_a
 
-        To avoid a time delay in updating 'a' we first update b fully, using our standard forward-Euler integration:
+        To avoid a time delay in updating 'a' we first update 'b' fully, using our standard forward-Euler integration:
 
         b += laplacian_a * timestep
 
