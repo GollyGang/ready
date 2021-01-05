@@ -572,6 +572,23 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     axis->SetNumberOfLabels(5);
     axis->PickableOff();
     pRenderer->AddActor(axis);
+    if (plot_ab_orthogonally)
+    {
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(0, 0, graph_bottom, graph_bottom, low * scaling, high * scaling);
+        axis->SetRanges(0, 0, 0, 0, low, high);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->YAxisVisibilityOff();
+        axis->SetZLabel("");
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
+    }
 
     // add a phase plot
     const float phase_plot_bottom = graph_top + y_gap*2;
