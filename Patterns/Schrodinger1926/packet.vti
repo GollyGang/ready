@@ -21,8 +21,9 @@
         &lt;tt&gt;&lt;pre&gt;da/dt = -Im(Laplacian(x)) = -Laplacian(b)
         db/dt =  Re(Laplacian(x)) =  Laplacian(a)&lt;/pre&gt;&lt;/tt&gt;
 
-        By default we plot 'a' and 'b' on orthogonal axes to show the rotation. Set 'plot ab orthogonally'
-        below to false to plot them as separate lines on the graph.
+        By default we plot 'a' and 'b' on orthogonal axes to show the rotation - you might need to rotate
+        the scene to view the graph from the side. Set 'plot ab orthogonally' below to false to plot 'a' and 'b' as
+        separate lines on the graph.
       </description>
 
     <rule type="formula" name="Schrodinger equation">

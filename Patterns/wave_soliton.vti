@@ -8,7 +8,7 @@
       d^2a/dt^2 = laplacian_a
 
       This pattern has been initialized with a soliton - a pulse that moves along without spreading out. Compare with the
-      &lt;a href&quot;open:Patterns/advection.vti&quot;&gt;advection equation&lt;/a&gt;.
+      &lt;a href=&quot;open:Patterns/advection.vti&quot;&gt;advection equation&lt;/a&gt;.
     </description>
     <rule name="Wave equation" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
