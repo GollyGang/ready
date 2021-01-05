@@ -415,9 +415,26 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
     bool plot_ab_orthogonally = render_settings.GetProperty("plot_ab_orthogonally").GetBool();
+    if (plot_ab_orthogonally && this->GetNumberOfChemicals() <= 1)
+    {
+        plot_ab_orthogonally = false;
+    }
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    int iFirstChem = 0;
+    int iLastChem = this->GetNumberOfChemicals() - 1;
+    if(!show_multiple_chemicals)
+    { 
+        if (plot_ab_orthogonally && iActiveChemical < 2)
+        {
+            iFirstChem = 0;
+            iLastChem = 1;
+        }
+        else
+        {
+            iFirstChem = iActiveChemical;
+            iLastChem = iFirstChem;
+        }
+    }
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     const float image_height = this->GetX() / this->image_ratio1D; // we thicken it 
@@ -426,7 +443,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
 
     vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
-    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
+    for(int iChem = iFirstChem; iChem <= iLastChem; ++iChem)
     {
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -489,14 +506,14 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     // add a line graph for all the chemicals (active one highlighted)
     const float graph_bottom = this->image_top1D + y_gap;
     const float graph_top = graph_bottom + (high-low) * scaling;
-    for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
+    for(int iChemical = iFirstChem; iChemical <= iLastChem; iChemical++)
     {
         if (plot_ab_orthogonally && iChemical == 1)
         {
             continue;
         }
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        if (plot_ab_orthogonally && iChemical == 0 && this->GetNumberOfChemicals() > 1)
+        if (plot_ab_orthogonally && iChemical == 0)
         {
             // plot the merged ab pair here
             vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
@@ -597,12 +614,13 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     const float surface_bottom = offset[1] + 0.5 + this->GetY() + y_gap;
     const float surface_top = surface_bottom + this->GetY();
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    int iFirstChem = 0;
+    int iLastChem = this->GetNumberOfChemicals() - 1;
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem; }
 
     vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
-    for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
+    for(int iChem = iFirstChem; iChem <= iLastChem; iChem++)
     {
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -795,14 +813,15 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 
     vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    int iFirstChem = 0;
+    int iLastChem = this->GetNumberOfChemicals() - 1;
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem; }
 
     const float x_gap = this->x_spacing_proportion * this->GetX();
     const float y_gap = this->y_spacing_proportion * this->GetY();
     double offset[3] = {0,0,0};
 
-    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
+    for(int iChem = iFirstChem; iChem <= iLastChem; ++iChem)
     {
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 
