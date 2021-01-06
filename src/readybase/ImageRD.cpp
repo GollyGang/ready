@@ -574,14 +574,15 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     pRenderer->AddActor(axis);
     if (plot_ab_orthogonally)
     {
+        axis->SetYLabel("a");
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0, 0, graph_bottom, graph_bottom, -low * scaling, -high * scaling);
+        axis->SetBounds(0, 0, graph_top, graph_top, -low * scaling, -high * scaling);
         axis->SetRanges(0, 0, 0, 0, low, high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
         axis->YAxisVisibilityOff();
-        axis->SetZLabel("");
+        axis->SetZLabel("b");
         axis->SetLabelFormat("%.2f");
         axis->SetInertia(10000);
         axis->SetCornerOffset(0);
