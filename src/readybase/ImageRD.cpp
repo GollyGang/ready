@@ -85,6 +85,7 @@ using namespace std;
 #include <vtkScalarBarActor.h>
 #include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
+#include <vtkStripper.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkTexture.h>
@@ -92,6 +93,7 @@ using namespace std;
 #include <vtkThreshold.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkTubeFilter.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkWarpScalar.h>
@@ -513,25 +515,34 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
             continue;
         }
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         if (plot_ab_orthogonally && iChemical == 0)
         {
             // plot the merged ab pair here
             vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
             plane->SetInputData(this->GetImage(0));
-            vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
-            warp->SetInputConnection(plane->GetOutputPort());
-            warp->SetScaleFactor(scaling);
-            warp->SetNormal(0, 1, 0);
+            vtkSmartPointer<vtkWarpScalar> warp_y = vtkSmartPointer<vtkWarpScalar>::New();
+            warp_y->SetInputConnection(plane->GetOutputPort());
+            warp_y->SetScaleFactor(scaling);
+            warp_y->SetNormal(0, 1, 0);
             vtkSmartPointer<vtkImageDataGeometryFilter> plane2 = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
             plane2->SetInputData(this->GetImage(1));
             vtkSmartPointer<vtkMergeFilter> merge = vtkSmartPointer<vtkMergeFilter>::New();
-            merge->SetGeometryConnection(warp->GetOutputPort());
+            merge->SetGeometryConnection(warp_y->GetOutputPort());
             merge->SetScalarsConnection(plane2->GetOutputPort());
-            vtkSmartPointer<vtkWarpScalar> warp2 = vtkSmartPointer<vtkWarpScalar>::New();
-            warp2->SetInputConnection(merge->GetOutputPort());
-            warp2->SetScaleFactor(scaling);
-            warp2->SetNormal(0, 0, -1);
-            mapper->SetInputConnection(warp2->GetOutputPort());
+            vtkSmartPointer<vtkWarpScalar> warp_z = vtkSmartPointer<vtkWarpScalar>::New();
+            warp_z->SetInputConnection(merge->GetOutputPort());
+            warp_z->SetScaleFactor(scaling);
+            warp_z->SetNormal(0, 0, -1);
+            vtkSmartPointer<vtkStripper> stripper = vtkSmartPointer<vtkStripper>::New();
+            stripper->SetInputConnection(warp_z->GetOutputPort());
+            vtkSmartPointer<vtkTubeFilter> tube = vtkSmartPointer<vtkTubeFilter>::New();
+            tube->SetInputConnection(stripper->GetOutputPort());
+            tube->SetRadius(this->GetX() / 512.0);
+            tube->SetNumberOfSides(6);
+            mapper->SetInputConnection(tube->GetOutputPort());
+            actor->GetProperty()->SetColor(1, 1, 1);
+            actor->GetProperty()->SetAmbient(0.3);
         }
         else
         {
@@ -543,15 +554,14 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
             warp->SetScaleFactor(scaling);
             warp->SetNormal(0, 1, 0);
             mapper->SetInputConnection(warp->GetOutputPort());
+            actor->GetProperty()->SetAmbient(1);
+            if (iChemical == iActiveChemical)
+                actor->GetProperty()->SetColor(1, 1, 1);
+            else
+                actor->GetProperty()->SetColor(0.5, 0.5, 0.5);
         }
         mapper->ScalarVisibilityOff();
-        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
-        actor->GetProperty()->SetAmbient(1);
-        if(iChemical==iActiveChemical)
-            actor->GetProperty()->SetColor(1,1,1);
-        else
-            actor->GetProperty()->SetColor(0.5,0.5,0.5);
         actor->PickableOff();
         actor->SetPosition(0, graph_bottom - low * scaling,0);
         pRenderer->AddActor(actor);
