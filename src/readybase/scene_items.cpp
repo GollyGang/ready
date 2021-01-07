@@ -200,6 +200,7 @@ bool RenderSettingAppliesToDimensionality(const string& render_setting, int dime
     applies["invert_contour_cap"].insert(3);
     applies["use_wireframe"].insert(2);
     applies["use_wireframe"].insert(3);
+    applies["show_bounding_box"].insert(2);
     applies["show_bounding_box"].insert(3);
     applies["slice_3D"].insert(3);
     applies["slice_3D_axis"].insert(3);
