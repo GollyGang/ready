@@ -132,7 +132,6 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
         else if (colormap_label == "terrain")
         {
             ColorMapFromList<6>(color_series, colormaps::terrain);
-            reverse = true;
         }
         else if (colormap_label == "terrain reversed")
         {
