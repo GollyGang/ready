@@ -125,7 +125,7 @@ set( PATTERN_FILES
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti  Patterns/parameter_modulation_demo2_3D.vti
   Patterns/heat_equation_interpolation.vti
-  Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti
+  Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti                Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_1D.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti
   Patterns/wave_equation.vti               Patterns/wave_soliton.vti
   Patterns/oregonator.vti

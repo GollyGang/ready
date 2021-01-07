@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <RD format_version="6">
+    <description>
+      &quot;The complex Ginzburg-Landau equation describes a vast variety of phenomena from nonlinear
+      waves to second-order phase transitions, from superconductivity, superfluidity, and
+      Bose-Einstein condensation to liquid crystals and strings in field theory.&quot;
+      &lt;a href=&quot;http://hopf.chem.brandeis.edu/members_content/yanglingfa/pattern/cgle/&quot;&gt;
+      [link]&lt;/a&gt;
+      
+      In this pattern we are plotting &apos;a&apos; and &apos;b&apos; orthogonally to each other - you might need to rotate the scene to view the graph from the side. Set &apos;plot ab orthogonally&apos; to false to plot them separately.
+      
+    </description>
+    <rule name="Ginzburg-Landau" type="formula" wrap="1" neighborhood_type="vertex">
+      <param name="timestep">
+        0.200000
+      </param>
+      <param name="alpha">
+        0.062500
+      </param>
+      <param name="beta">
+        1.000000
+      </param>
+      <param name="delta">
+        1.000000
+      </param>
+      <param name="gamma">
+        0.062500
+      </param>
+      <param name="D_a">
+        0.200000
+      </param>
+      <param name="D_b">
+        0.200000
+      </param>
+      <formula number_of_chemicals="2">
+        delta_a = D_a * laplacian_a + alpha*a - gamma*b + (-beta*a + delta*b)*(a*a+b*b);
+        delta_b = D_b * laplacian_b + alpha*b + gamma*a + (-beta*b - delta*a)*(a*a+b*b);
+      </formula>
+    </rule>
+    <initial_pattern_generator apply_when_loading="true" zero_first="true">
+      <overlay chemical="a">
+        <overwrite/>
+        <white_noise low="-0.1" high="0.1"/>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite/>
+        <white_noise low="-0.1" high="0.1"/>
+        <everywhere/>
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1"/>
+      <colormap value="spectral"/>
+      <color_low r="0" g="0" b="0"/>
+      <color_high r="1" g="1" b="1"/>
+      <show_color_scale value="true"/>
+      <show_multiple_chemicals value="true"/>
+      <active_chemical value="a"/>
+      <low value="-0.25"/>
+      <high value="0.25"/>
+      <vertical_scale_1D value="30"/>
+      <vertical_scale_2D value="30"/>
+      <contour_level value="0"/>
+      <cap_contour value="true"/>
+      <invert_contour_cap value="false"/>
+      <use_wireframe value="false"/>
+      <show_cell_edges value="false"/>
+      <show_bounding_box value="true"/>
+      <show_chemical_label value="true"/>
+      <slice_3D value="true"/>
+      <slice_3D_axis value="z"/>
+      <slice_3D_position value="0.5"/>
+      <show_displacement_mapped_surface value="false"/>
+      <color_displacement_mapped_surface value="false"/>
+      <use_image_interpolation value="true"/>
+      <timesteps_per_render value="64"/>
+      <show_phase_plot value="true"/>
+      <phase_plot_x_axis value="a"/>
+      <phase_plot_y_axis value="b"/>
+      <phase_plot_z_axis value="c"/>
+      <plot_ab_orthogonally value="true"/>
+    </render_settings>
+  </RD>
+  <ImageData WholeExtent="0 511 0 0 0 0" Origin="0 0 0" Spacing="1 1 1" Direction="1 0 0 0 1 0 0 0 1">
+  <Piece Extent="0 511 0 0 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        AQAAAACAAAAACAAAFwAAAA==eJxjYBgFo2AUjIJRMApGwUgDAAgAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
