@@ -66,6 +66,7 @@ AbstractRD::~AbstractRD()
 
 void AbstractRD::SetFormula(string s)
 {
+    s.erase(s.find_last_not_of(" \t\n\r") + 1); // trim trailing whitespace
     if(s != this->formula)
         this->need_reload_formula = true;
     this->formula = s;
