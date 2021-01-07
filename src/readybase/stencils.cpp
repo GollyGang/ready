@@ -458,9 +458,15 @@ Stencil GetTriLaplacianStencil(int dimensionality)
 
 vector<Stencil> GetKnownStencils(int dimensionality)
 {
-    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
+    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0); // name, stencil, divisor, dx_power, axes
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
+    Stencil XDeriv2 = StencilFrom1DArray("x_deriv2", { 1, -2, 1 }, 1, 2, 0);
+    Stencil YDeriv2 = StencilFrom1DArray("y_deriv2", { 1, -2, 1 }, 1, 2, 1);
+    Stencil ZDeriv2 = StencilFrom1DArray("z_deriv2", { 1, -2, 1 }, 1, 2, 2);
+    Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 0);
+    Stencil YDeriv3 = StencilFrom1DArray("y_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 1);
+    Stencil ZDeriv3 = StencilFrom1DArray("z_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 2);
     Stencil SobelN = StencilFrom2DArray("sobelN", { {1, 2, 1},
                                                     {0, 0, 0},
                                                     {-1, -2, -1} }, 1, 0, 0, 1);
@@ -485,13 +491,15 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil SobelSE = StencilFrom2DArray("sobelSE", { {-2, -1, 0},
                                                       {-1, 0, 1},
                                                       {0, 1, 2} }, 1, 0, 0, 1);
-    Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { -1, 2, 0, -2, 1 }, 2, 1, 0);
     Stencil Gaussian = GetGaussianStencil(dimensionality);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, XDeriv3, Gaussian, Laplacian, BiLaplacian, TriLaplacian,
-        SobelN, SobelS, SobelE, SobelW, SobelNW, SobelNE, SobelSW, SobelSE };
+    return { XGradient, YGradient, ZGradient,
+             XDeriv2, YDeriv2, ZDeriv2,
+             XDeriv3, YDeriv3, ZDeriv3,
+             Gaussian, Laplacian, BiLaplacian, TriLaplacian,
+             SobelN, SobelS, SobelE, SobelW, SobelNW, SobelNE, SobelSW, SobelSE };
 }
 
 // ---------------------------------------------------------------------
