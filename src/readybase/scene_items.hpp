@@ -18,6 +18,9 @@
 // Local:
 class Properties;
 
+// STL:
+#include <string>
+
 // VTK:
 class vtkRenderer;
 class vtkScalarsToColors;
@@ -28,6 +31,8 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut);
 vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_settings);
 
 void SetDefaultRenderSettings(Properties& render_settings);
+
+bool RenderSettingAppliesToDimensionality(const std::string& render_setting, int dimensionality);
 
 static const std::string SupportedColorMaps[] = {
     "HSV blend", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed",

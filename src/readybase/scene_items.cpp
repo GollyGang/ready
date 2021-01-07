@@ -30,7 +30,7 @@
 #include <vtkTextProperty.h>
 
 // STL:
-#include <string>
+#include <set>
 using namespace std;
 
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
@@ -184,4 +184,32 @@ void SetDefaultRenderSettings(Properties& render_settings)
     render_settings.AddProperty(Property("phase_plot_y_axis", "chemical", "b"));
     render_settings.AddProperty(Property("phase_plot_z_axis", "chemical", "c"));
     render_settings.AddProperty(Property("plot_ab_orthogonally", false));
+}
+
+bool RenderSettingAppliesToDimensionality(const string& render_setting, int dimensionality)
+{
+    map<string, set<int>> applies; // whether the string applies to dimensionalities 1, 2 and 3
+    // default is true if string is not listed
+    // default for a dimensionality is false if the integer is not inserted
+    applies["surface_color"].insert(2);
+    applies["surface_color"].insert(3);
+    applies["vertical_scale_1D"].insert(1);
+    applies["vertical_scale_2D"].insert(2);
+    applies["contour_level"].insert(3);
+    applies["cap_contour"].insert(3);
+    applies["invert_contour_cap"].insert(3);
+    applies["use_wireframe"].insert(2);
+    applies["use_wireframe"].insert(3);
+    applies["show_bounding_box"].insert(3);
+    applies["slice_3D"].insert(3);
+    applies["slice_3D_axis"].insert(3);
+    applies["slice_3D_position"].insert(3);
+    applies["show_displacement_mapped_surface"].insert(2);
+    applies["color_displacement_mapped_surface"].insert(2);
+    applies["plot_ab_orthogonally"].insert(1);
+    if (applies.count(render_setting))
+    {
+        return applies[render_setting].count(dimensionality);
+    }
+    return true; // default to true if we don't know about this render setting
 }

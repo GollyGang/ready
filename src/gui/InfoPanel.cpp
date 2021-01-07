@@ -453,6 +453,10 @@ void InfoPanel::Update(const AbstractRD& system)
     {
         const Property& prop = render_settings.GetProperty(i);
         string name = prop.GetName();
+        if (!RenderSettingAppliesToDimensionality(name, system.GetArenaDimensionality()))
+        {
+            continue;
+        }
         if (!using_HSV_blend && (name == "color_low" || name == "color_high"))
         {
             continue;
