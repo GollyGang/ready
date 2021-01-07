@@ -267,6 +267,7 @@ set( PATTERN_FILES
   Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_multistable.vti
   Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves.vti
   Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves2.vti
+  Patterns/KortewegDeVries1895/kdv.vti
 )
 
 set( HELP_FILES
