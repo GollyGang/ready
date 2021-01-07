@@ -523,12 +523,12 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     if (is_multiline) {
         result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
         result += print_label;
-        result += _T("</b></td><td valign=top></td>");
+        result += _T("</b></td><td valign=top width=\"100%\"></td>");
         // see below for how value is formatted
     } else {
         result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
         result += print_label;
-        result += _T("</b></td><td valign=top>");
+        result += _T("</b></td><td valign=top width=\"100%\">");
         if (color.empty()) {
             result += value;
         } else {
