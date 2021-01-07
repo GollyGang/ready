@@ -33,6 +33,7 @@ vtkSmartPointer<vtkScalarsToColors> GetColorMap(const Properties& render_setting
 void SetDefaultRenderSettings(Properties& render_settings);
 
 bool RenderSettingAppliesToDimensionality(const std::string& render_setting, int dimensionality);
+bool RenderSettingDoesntApplyToMesh(const std::string& render_setting);
 
 static const std::string SupportedColorMaps[] = {
     "HSV blend", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed",

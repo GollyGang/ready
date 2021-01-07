@@ -214,3 +214,14 @@ bool RenderSettingAppliesToDimensionality(const string& render_setting, int dime
     }
     return true; // default to true if we don't know about this render setting
 }
+
+bool RenderSettingDoesntApplyToMesh(const string& render_setting)
+{
+    set<string> doesnt_apply;
+    doesnt_apply.insert("vertical_scale_1D");
+    doesnt_apply.insert("vertical_scale_2D");
+    doesnt_apply.insert("show_displacement_mapped_surface");
+    doesnt_apply.insert("color_displacement_mapped_surface");
+    doesnt_apply.insert("plot_ab_orthogonally");
+    return doesnt_apply.count(render_setting);
+}

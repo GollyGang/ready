@@ -370,27 +370,27 @@ void InfoPanel::Update(const AbstractRD& system)
 
     rownum = 0;
 
-    wxString s(system.GetRuleName().c_str(),wxConvUTF8);
+    wxString s(system.GetRuleName().c_str(), wxConvUTF8);
     contents += AppendRow(rule_name_label, rule_name_label, s, true);
 
-    s = wxString(system.GetRuleType().c_str(),wxConvUTF8);
+    s = wxString(system.GetRuleType().c_str(), wxConvUTF8);
     contents += AppendRow(rule_type_label, rule_type_label, s, false);
 
-    s = wxString(system.GetDescription().c_str(),wxConvUTF8);
+    s = wxString(system.GetDescription().c_str(), wxConvUTF8);
     s.Replace(wxT("\n\n"), wxT("<p>"));
     contents += AppendRow(description_label, description_label, s, true, true);
 
     contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system.GetNumberOfChemicals()),
-                          system.HasEditableNumberOfChemicals());
+        system.HasEditableNumberOfChemicals());
 
-    for(int iParam=0;iParam<(int)system.GetNumberOfParameters();iParam++)
+    for (int iParam = 0; iParam < (int)system.GetNumberOfParameters(); iParam++)
     {
         contents += AppendRow(system.GetParameterName(iParam), system.GetParameterName(iParam),
-                              FormatFloat(system.GetParameterValue(iParam)), true);
+            FormatFloat(system.GetParameterValue(iParam)), true);
     }
 
     wxString formula = system.GetFormula();
-    if(system.HasEditableFormula() || formula.size()>0)
+    if (system.HasEditableFormula() || formula.size() > 0)
     {
         // escape HTML reserved characters
         formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
@@ -407,24 +407,24 @@ void InfoPanel::Update(const AbstractRD& system)
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        if(system.GetRuleType()=="kernel")
+        if (system.GetRuleType() == "kernel")
             contents += AppendRow(kernel_label, kernel_label, formula, system.HasEditableFormula(), true);
         else
             contents += AppendRow(formula_label, formula_label, formula, system.HasEditableFormula(), true);
     }
 
-    if(system.HasEditableDimensions())
+    if (system.HasEditableDimensions())
         contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
-                                        FormatFloat(system.GetX(),3),FormatFloat(system.GetY(),3),FormatFloat(system.GetZ(),3)),
-                                        system.HasEditableDimensions());
+            FormatFloat(system.GetX(), 3), FormatFloat(system.GetY(), 3), FormatFloat(system.GetZ(), 3)),
+            system.HasEditableDimensions());
     else
         contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
-                                        system.GetNumberOfCells()),false);
+            system.GetNumberOfCells()), false);
 
-    if(!system.HasEditableDimensions())
+    if (!system.HasEditableDimensions())
     {
         // (hide the neighborhood for vti files, which don't use it)
-        contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType()+"-neighbors", false);
+        contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType() + "-neighbors", false);
     }
 
     /* bit technical, leave as a file-only option
@@ -432,10 +432,10 @@ void InfoPanel::Update(const AbstractRD& system)
                                         system.GetBlockSizeX(),system.GetBlockSizeY(),system.GetBlockSizeZ()),
                                         system.HasEditableBlockSize());*/
 
-    if(system.HasEditableWrapOption())
-        contents += AppendRow(wrap_label, wrap_label, system.GetWrap()?_("on"):_("off"), true);
+    if (system.HasEditableWrapOption())
+        contents += AppendRow(wrap_label, wrap_label, system.GetWrap() ? _("on") : _("off"), true);
 
-    contents += AppendRow(data_type_label,data_type_label,system.GetDataType()==VTK_DOUBLE?_("double"):_("float"),
+    contents += AppendRow(data_type_label, data_type_label, system.GetDataType() == VTK_DOUBLE ? _("double") : _("float"),
         system.HasEditableDataType());
 
     contents += _T("</table>");
@@ -449,11 +449,15 @@ void InfoPanel::Update(const AbstractRD& system)
 
     const Properties& render_settings = frame->GetRenderSettings();
     const bool using_HSV_blend = render_settings.GetProperty("colormap").GetColorMap() == "HSV blend";
-    for(int i=0;i<render_settings.GetNumberOfProperties();i++)
+    for (int i = 0; i < render_settings.GetNumberOfProperties(); i++)
     {
         const Property& prop = render_settings.GetProperty(i);
         string name = prop.GetName();
         if (!RenderSettingAppliesToDimensionality(name, system.GetArenaDimensionality()))
+        {
+            continue;
+        }
+        if (!system.HasEditableDimensions() && RenderSettingDoesntApplyToMesh(name))
         {
             continue;
         }
