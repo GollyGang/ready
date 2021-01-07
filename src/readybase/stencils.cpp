@@ -485,11 +485,12 @@ vector<Stencil> GetKnownStencils(int dimensionality)
     Stencil SobelSE = StencilFrom2DArray("sobelSE", { {-2, -1, 0},
                                                       {-1, 0, 1},
                                                       {0, 1, 2} }, 1, 0, 0, 1);
+    Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { -1, 2, 0, -2, 1 }, 2, 1, 0);
     Stencil Gaussian = GetGaussianStencil(dimensionality);
     Stencil Laplacian = GetLaplacianStencil(dimensionality);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
-    return { XGradient, YGradient, ZGradient, Gaussian, Laplacian, BiLaplacian, TriLaplacian, 
+    return { XGradient, YGradient, ZGradient, XDeriv3, Gaussian, Laplacian, BiLaplacian, TriLaplacian,
         SobelN, SobelS, SobelE, SobelW, SobelNW, SobelNE, SobelSW, SobelSE };
 }
 
