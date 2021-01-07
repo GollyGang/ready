@@ -97,6 +97,7 @@
        <show_phase_plot value="false" />
        <contour_level value="0.01" />
        <slice_3D value="false" />
+       <plot_ab_orthogonally value="true" />
     </render_settings>
 
   </RD>

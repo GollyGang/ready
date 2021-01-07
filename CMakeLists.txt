@@ -127,7 +127,7 @@ set( PATTERN_FILES
   Patterns/heat_equation_interpolation.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti
-  Patterns/wave_equation.vti
+  Patterns/wave_equation.vti               Patterns/wave_soliton.vti
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
@@ -258,7 +258,7 @@ set( PATTERN_FILES
   Patterns/RosenzweigMacArthur1963/hm_parameter_map.vti
   Patterns/RosenzweigMacArthur1963/predator-prey.vti
   Patterns/RosenzweigMacArthur1963/predator-prey_1D.vti
-  Patterns/LotkaVolterra1926/Lotka-Volterra.vti
+  Patterns/LotkaVolterra1926/Lotka-Volterra.vti      Patterns/LotkaVolterra1926/Lotka-Volterra_1D.vti
   Patterns/Kobayashi1993/crystal.vti                 Patterns/Kobayashi1993/crystals.vti
   Patterns/Kobayashi1993/laplacian_growth.vti
   Patterns/Kobayashi1993/laplacian_growth_3D.vti     Patterns/Kobayashi1993/laplacian_growth_3D_corner.vti

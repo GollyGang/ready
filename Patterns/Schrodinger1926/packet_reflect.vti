@@ -1,20 +1,25 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
 
     <description>
-        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the 
+        The &lt;a href=&quot;http://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation&quot;&gt;Schrödinger equation&lt;/a&gt; describes the change in the
         wave function for some quantum state. Here a wave packet travels through empty space until it reaches a high energy barrier, which it is reflected from.
-        
+
         In our implementation, 'a' represents the real part of the complex number and 'b' the imaginary part. A fixed energy background is given by 'c'.
         The probability density is shown in 'd'.
-        
+
         By changing the values of parameter 'potential' and then using 'Generate Initial Pattern' from the 'Action' menu you can change the height
         of the barrier. Or you can paint directly into 'c'.
+
+        By default we plot 'a' and 'b' on orthogonal axes to show the rotation. Set 'plot ab orthogonally'
+        below to false to plot them as separate lines on the graph.
+
+        Instabilities appear after around 1.4M steps, because we are only using simple numerical methods.
     </description>
 
     <rule type="formula" name="Schrodinger equation">
-        
+
       <param name="timestep">    0.001    </param>
       <param name="potential">   4        </param>
 
@@ -23,11 +28,11 @@
         delta_b =  laplacian_a + c*a;
         d = a*a + b*b;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
-        
+
       <overlay chemical="d">
         <overwrite />
         <gaussian height="1" sigma="0.03">
@@ -45,7 +50,7 @@
         <everywhere />
       </overlay>
       <overlay chemical="a"><multiply /><other_chemical chemical="d" /><everywhere /></overlay>
-      
+
       <overlay chemical="b">
         <overwrite />
         <sine amplitude="1" phase="1.5708">
@@ -55,7 +60,7 @@
         <everywhere />
       </overlay>
       <overlay chemical="b"><multiply /><other_chemical chemical="d" /><everywhere /></overlay>
-      
+
       <overlay chemical="c">
         <overwrite />
         <parameter name="potential" />
@@ -66,9 +71,9 @@
       </overlay>
 
       <overlay chemical="d"><multiply /><other_chemical chemical="d" /><everywhere /></overlay>
-      
+
     </initial_pattern_generator>
-    
+
     <render_settings>
        <active_chemical value="d" />
        <show_displacement_mapped_surface value="true" />
@@ -78,8 +83,9 @@
        <vertical_scale_1D value="100" />
        <vertical_scale_2D value="100" />
        <timesteps_per_render value="1024" />
+       <plot_ab_orthogonally value="true" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 511 0 0 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 511 0 0 0 0">
