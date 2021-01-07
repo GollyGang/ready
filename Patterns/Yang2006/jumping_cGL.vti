@@ -22,7 +22,7 @@
         the 'narrow oscillon' mentioned doesn't seem to be present.
 
         By default we plot 'a' and 'b' on orthogonal axes to show the rotation of the oscillons - you might need to rotate
-        the scene to view the graph from the side. Compare with the wave packets in the &lt;a href=&quot;open:Patterns/Schrodinger1926/packet.vti&quot;&gt;Schrödinger equation&lt;/a&gt;. Set 'plot ab orthogonally'
+        the scene to view the graph from the side. The oscillons are revealed to be pure rotation. Compare with the wave packets in the &lt;a href=&quot;open:Patterns/Schrodinger1926/packet.vti&quot;&gt;Schrödinger equation&lt;/a&gt;. Set 'plot ab orthogonally'
         below to false to plot 'a' and 'b' as separate lines on the graph.
     </description>
 
