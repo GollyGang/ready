@@ -638,14 +638,18 @@ void InfoPanel::ChangeWrapOption()
 
 void InfoPanel::ChangeDataType()
 {
-    AbstractRD& sys = frame->GetCurrentRDSystem();
-    switch( sys.GetDataType() ) {
-        default:
-        case VTK_FLOAT: sys.SetDataType( VTK_DOUBLE ); break;
-        case VTK_DOUBLE: sys.SetDataType( VTK_FLOAT ); break;
+    const int confirm = wxMessageBox(_("This will overwrite the existing pattern, OK to continue?"), _("Confirm"), wxOK | wxCANCEL);
+    if (confirm != wxOK)
+    {
+        return;
     }
-    this->Update(sys);
-    frame->RenderSettingsChanged();
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    switch (sys.GetDataType())
+    {
+        default:
+        case VTK_FLOAT: frame->SetDataType(VTK_DOUBLE); break;
+        case VTK_DOUBLE: frame->SetDataType(VTK_FLOAT); break;
+    }
 }
 
 // -----------------------------------------------------------------------------

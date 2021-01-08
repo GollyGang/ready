@@ -2407,6 +2407,33 @@ void MyFrame::SetBlockSize(int x,int y,int z)
 
 // ---------------------------------------------------------------------
 
+void MyFrame::SetDataType(int data_type)
+{
+    const int old_data_type = this->system->GetDataType();
+    try
+    {
+        this->system->SetDataType(data_type);
+        InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
+        this->UpdateWindows();
+    }
+    catch (const exception& e)
+    {
+        MonospaceMessageBox(_("Failed to set data type:\n\n") + wxString(e.what(), wxConvUTF8), _("Error"), wxART_ERROR);
+        this->system->SetDataType(old_data_type);
+        InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
+        this->UpdateWindows();
+    }
+    catch (...)
+    {
+        wxMessageBox(_("Failed to set data type"));
+        this->system->SetDataType(old_data_type);
+        InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
+        this->UpdateWindows();
+    }
+}
+
+// ---------------------------------------------------------------------
+
 void MyFrame::RenderSettingsChanged()
 {
     // first do some range checking (not done in InfoPanel::ChangeRenderSetting)

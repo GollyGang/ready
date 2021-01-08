@@ -63,6 +63,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void SetNumberOfChemicals(int n);
         bool SetDimensions(int x,int y,int z);
         void SetBlockSize(int x,int y,int z);
+        void SetDataType(int data_type);
         Properties& GetRenderSettings() { return this->render_settings; }
         void RenderSettingsChanged();
 
