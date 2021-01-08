@@ -86,6 +86,7 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/frame.hpp                        src/gui/frame.cpp
   src/gui/HelpPanel.hpp                    src/gui/HelpPanel.cpp
   src/gui/InfoPanel.hpp                    src/gui/InfoPanel.cpp
+  src/gui/HtmlInfo.hpp                     src/gui/HtmlInfo.cpp
   src/gui/PatternsPanel.hpp                src/gui/PatternsPanel.cpp
   src/gui/vtk_pipeline.hpp                 src/gui/vtk_pipeline.cpp
   src/gui/InteractorStylePainter.hpp       src/gui/InteractorStylePainter.cpp
