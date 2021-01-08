@@ -55,10 +55,8 @@ float4 uay2 = (a_nw + a_sw + a_ne + a_se) + 2.0f * (a_n + a_s) - 2.0f * (a_w + a
 float4 uaxy = -a_nw + a_sw + a_ne - a_se;
 float4 uaxsq = pow(uax, 2.0f);
 float4 uaysq = pow(uay, 2.0f);
-float4 dsq = 0;
-if (!(any(isequal(uaxsq, 0)) || any(isequal(uaysq, 0)))) {
-    dsq = (uaxsq * uax2 + 2 * uax * uay * uaxy + uaysq * uay2) / (uaxsq * uaysq);
-}
+float4 dsq = select(0, (uaxsq * uax2 + 2 * uax * uay * uaxy + uaysq * uay2) / (uaxsq * uaysq),
+    isgreater(uaxsq * uaysq, 1e-18f));
 float4 ubx = sobelE_b;
 float4 uby = sobelN_b;
 float4 ucx = sobelE_c;
@@ -177,6 +175,7 @@ g = (f * 2) + 0.5f;
       <surface_color r="1" g="1" b="1">
 
       </surface_color>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="1">
 
       </color_low>
