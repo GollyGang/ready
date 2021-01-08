@@ -330,7 +330,8 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
 
     // If the data type is double then we need to do something about the float4's that appear in the formula,
     // otherwise compilation will fail when trying to convert them to double4. And vice verse for float4.
-    // float itself doesn't seem to be a problem, converts silently to double or double4
+    // float itself doesn't seem to be a problem, converts silently to double or double4. But do need to handle double,
+    // which doesn't convert to float or float4.
     string amended_formula = formula;
     if (this->data_type == VTK_DOUBLE)
     {
@@ -339,6 +340,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     else if (this->data_type == VTK_FLOAT)
     {
         amended_formula = ReplaceAllSubstrings(amended_formula, "double4", "float4");
+        amended_formula = ReplaceAllSubstrings(amended_formula, "double", "float");
     }
 
     const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
