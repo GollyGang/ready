@@ -459,12 +459,14 @@ Stencil GetTriLaplacianStencil(int dimensionality)
 vector<Stencil> GetKnownStencils(int dimensionality)
 {
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0); // name, stencil, divisor, dx_power, axes
+    //Stencil XGradient = StencilFrom1DArray("x_gradient", { 1, -8, 0, 8, -1 }, 12, 1, 0); // 4th order version
     Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
     Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
     Stencil XDeriv2 = StencilFrom1DArray("x_deriv2", { 1, -2, 1 }, 1, 2, 0);
     Stencil YDeriv2 = StencilFrom1DArray("y_deriv2", { 1, -2, 1 }, 1, 2, 1);
     Stencil ZDeriv2 = StencilFrom1DArray("z_deriv2", { 1, -2, 1 }, 1, 2, 2);
     Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 0);
+    //Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { 1, -8, 13, 0, -13, 8, -1 }, 8, 3, 0); // 4th order version
     Stencil YDeriv3 = StencilFrom1DArray("y_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 1);
     Stencil ZDeriv3 = StencilFrom1DArray("z_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 2);
     Stencil SobelN = StencilFrom2DArray("sobelN", { {1, 2, 1},
