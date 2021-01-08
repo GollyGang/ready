@@ -18,7 +18,7 @@
 #include "HtmlInfo.hpp"
 
 // Local:
-#include "Frame.hpp"
+#include "frame.hpp"
 #include "InfoPanel.hpp"
 #include "prefs.hpp"
 #include "wxutils.hpp"
