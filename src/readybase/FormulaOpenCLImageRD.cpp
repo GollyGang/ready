@@ -246,7 +246,6 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     const string& formula,
     const KernelOptions& options)
 {
-    // output the kernel as a string
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
     if (options.data_type == VTK_DOUBLE)
@@ -329,8 +328,21 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     const string indent = "    ";
     const KernelOptions options{ this->wrap, indent, this->data_type, this->data_type_string, this->data_type_suffix };
 
+    // If the data type is double then we need to do something about the float4's that appear in the formula,
+    // otherwise compilation will fail when trying to convert them to double4. And vice verse for float4.
+    // float itself doesn't seem to be a problem, converts silently to double or double4
+    string amended_formula = formula;
+    if (this->data_type == VTK_DOUBLE)
+    {
+        amended_formula = ReplaceAllSubstrings(amended_formula, "float4", "double4");
+    }
+    else if (this->data_type == VTK_FLOAT)
+    {
+        amended_formula = ReplaceAllSubstrings(amended_formula, "double4", "float4");
+    }
+
     const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality(), formula, options);
+        this->GetArenaDimensionality(), amended_formula, options);
 
     return kernel_source;
 }
