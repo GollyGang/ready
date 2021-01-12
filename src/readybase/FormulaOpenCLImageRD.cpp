@@ -241,6 +241,7 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
 
 string AssembleKernelSource(const InputsNeeded& inputs_needed,
     const vector<AbstractRD::Parameter>& parameters,
+    const size_t local_work_size[3],
     int num_chemicals,
     int dimensionality,
     const string& formula,
@@ -259,6 +260,9 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
 #endif\n\n";
     }
+    kernel_source << "#define LX " << local_work_size[0] << "\n";
+    kernel_source << "#define LY " << local_work_size[1] << "\n";
+    kernel_source << "#define LZ " << local_work_size[2] << "\n";
     // output the function declaration
     kernel_source << "__kernel void rd_compute(";
     for (int i = 0; i < num_chemicals; i++)
@@ -343,7 +347,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
         amended_formula = ReplaceAllSubstrings(amended_formula, "double", "float");
     }
 
-    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
+    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->local_work_size, this->GetNumberOfChemicals(),
         this->GetArenaDimensionality(), amended_formula, options);
 
     return kernel_source;

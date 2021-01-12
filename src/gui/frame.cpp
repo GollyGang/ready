@@ -3049,7 +3049,7 @@ void MyFrame::OnViewFullKernel(wxCommandEvent& event)
 
 void MyFrame::OnUpdateViewFullKernel(wxUpdateUIEvent& event)
 {
-    event.Enable(this->system->GetRuleType()=="formula");
+    event.Enable(true);// this->system->GetRuleType() == "formula");
 }
 
 // ---------------------------------------------------------------------

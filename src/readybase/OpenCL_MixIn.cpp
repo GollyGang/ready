@@ -28,7 +28,9 @@ using namespace std;
 
 // ---------------------------------------------------------------------------
 
-OpenCL_MixIn::OpenCL_MixIn(int opencl_platform,int opencl_device)
+OpenCL_MixIn::OpenCL_MixIn(int opencl_platform, int opencl_device)
+    : global_range{ 1, 1, 1 }
+    , local_work_size{ 1, 1, 1 }
 {
     this->iPlatform = opencl_platform;
     this->iDevice = opencl_device;

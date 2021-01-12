@@ -68,7 +68,12 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD& source)
 
 string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
 {
-    return formula; // here the formula is a full OpenCL kernel
+    ostringstream kernel_source;
+    kernel_source << "#define LX " << this->local_work_size[0] << "\n";
+    kernel_source << "#define LY " << this->local_work_size[1] << "\n";
+    kernel_source << "#define LZ " << this->local_work_size[2] << "\n";
+    kernel_source << formula;
+    return kernel_source.str();
 }
 
 // ---------------------------------------------------------------------------------------------------------

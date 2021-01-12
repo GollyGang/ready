@@ -15,19 +15,20 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
 #include "OpenCLImageRD.hpp"
+
+// local:
 #include "OpenCL_utils.hpp"
 #include "utils.hpp"
 using namespace OpenCL_utils;
 
 // STL:
-#include <vector>
-#include <stdexcept>
-#include <utility>
-#include <sstream>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <stdexcept>
+#include <sstream>
+#include <utility>
+#include <vector>
 using namespace std;
 
 // VTK:
@@ -48,13 +49,36 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
 
-    cl_int ret;
+    this->global_range[0] = max(1, vtkMath::Round(this->GetX()) / this->GetBlockSizeX());
+    this->global_range[1] = max(1, vtkMath::Round(this->GetY()) / this->GetBlockSizeY());
+    this->global_range[2] = max(1, vtkMath::Round(this->GetZ()) / this->GetBlockSizeZ());
+
+    cl_ulong local_memory_size;
+    clGetDeviceInfo(this->device_id, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(local_memory_size), &local_memory_size, NULL);
+    cl_ulong max_work_group_size;
+    clGetDeviceInfo(this->device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(max_work_group_size), &max_work_group_size, NULL);
+
+    int n = 8;
+    this->local_work_size[0] = min(this->global_range[0], (size_t)n);
+    this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n);
+    this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n);
+    size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
+    int extra = 2;
+    size_t expected_mem = 4 * sizeof(float) * (this->local_work_size[0]+extra) * (this->local_work_size[1]+extra) * (this->local_work_size[2]+extra);
+    // TODO: allow for number of chemicals etc, as we allocate in the kernel
+    if (work_group_size > max_work_group_size) {
+        throw runtime_error("CL_DEVICE_MAX_WORK_GROUP_SIZE exceeded");
+    }
+    if (expected_mem > local_memory_size) {
+        throw runtime_error("CL_DEVICE_LOCAL_MEM_SIZE exceeded");
+    }
 
     // create the program
     this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
     const char *source = this->kernel_source.c_str();
     size_t source_size = this->kernel_source.length();
     clReleaseProgram(this->program);
+    cl_int ret;
     this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
 
@@ -78,11 +102,6 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     clReleaseKernel(this->kernel);
     this->kernel = clCreateKernel(this->program,this->kernel_function_name.c_str(),&ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
-
-    this->global_range[0] = max(1,vtkMath::Round(this->GetX()) / this->GetBlockSizeX());
-    this->global_range[1] = max(1,vtkMath::Round(this->GetY()) / this->GetBlockSizeY());
-    this->global_range[2] = max(1,vtkMath::Round(this->GetZ()) / this->GetBlockSizeZ());
-    // (we let the local work group size be automatically decided, seems to be faster and more flexible that way)
 
     this->need_reload_formula = false;
 }
@@ -210,7 +229,7 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
                 throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
             }
         }
-        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, NULL, 0, NULL, NULL);
+        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_work_size, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed: ");
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
