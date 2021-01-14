@@ -35,6 +35,10 @@ using namespace std;
 FormulaOpenCLImageRD::FormulaOpenCLImageRD(int opencl_platform,int opencl_device,int data_type)
     : OpenCLImageRD(opencl_platform,opencl_device,data_type)
 {
+    this->block_size[0] = 4;
+    this->block_size[1] = 1;
+    this->block_size[2] = 1;
+
     // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");
     this->AddParameter("timestep",1.0f);
@@ -61,7 +65,7 @@ struct InputsNeeded {
 
 // -------------------------------------------------------------------------
 
-InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality)
+InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality, const int block_size[3])
 {
     InputsNeeded inputs_needed;
 
@@ -96,10 +100,10 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
             const string keyword = stencil.label + "_" + chem;
             if (UsingKeyword(formula_tokens, keyword) || dependent_stencils.find(keyword) != dependent_stencils.end())
             {
-                AppliedStencil applied_stencil{ stencil, chem };
+                const AppliedStencil applied_stencil{ stencil, chem };
                 inputs_needed.stencils_needed.push_back(applied_stencil);
                 // add the cell inputs needed for this stencil
-                set<InputPoint> input_points = applied_stencil.GetInputPoints_Block411();
+                const set<InputPoint> input_points = applied_stencil.GetInputPoints();
                 inputs_needed.cells_needed.insert(input_points.begin(), input_points.end());
             }
         }
@@ -111,7 +115,7 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
             {
                 for (int z = -MAX_RADIUS; z <= MAX_RADIUS; z++)
                 {
-                    InputPoint input_point{ {x, y, z}, chem };
+                    const InputPoint input_point{ {x, y, z}, chem };
                     if (UsingKeyword(formula_tokens, input_point.GetName()))
                     {
                         inputs_needed.cells_needed.insert(input_point);
@@ -120,18 +124,21 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
             }
         }
     }
-    // non-block-aligned inputs need other inputs: the two blocks that supply them
-    vector<InputPoint> blocks_needed;
-    for (const InputPoint& input_point : inputs_needed.cells_needed)
+    if (block_size[0] == 4)
     {
-        if (input_point.point.x % 4 != 0)
+        // non-block-aligned inputs need other inputs: the two blocks that supply them
+        vector<InputPoint> blocks_needed;
+        for (const InputPoint& input_point : inputs_needed.cells_needed)
         {
-            const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks();
-            blocks_needed.push_back(blocks.first);
-            blocks_needed.push_back(blocks.second);
+            if (input_point.point.x % 4 != 0)
+            {
+                const pair<InputPoint, InputPoint> blocks = input_point.GetAlignedBlocks_Block411();
+                blocks_needed.push_back(blocks.first);
+                blocks_needed.push_back(blocks.second);
+            }
         }
+        inputs_needed.cells_needed.insert(blocks_needed.begin(), blocks_needed.end());
     }
-    inputs_needed.cells_needed.insert(blocks_needed.begin(), blocks_needed.end());
     // detect if using x_pos, y_pos or z_pos
     inputs_needed.using_x_pos = UsingKeyword(formula_tokens, "x_pos");
     inputs_needed.using_y_pos = UsingKeyword(formula_tokens, "y_pos");
@@ -143,11 +150,21 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
 // -------------------------------------------------------------------------
 
 struct KernelOptions {
+    KernelOptions(bool wrap, const string& indent, int data_type, const string& data_type_string,
+                  const string& data_type_suffix, const int block_size[3])
+        : wrap(wrap)
+        , indent(indent)
+        , data_type(data_type)
+        , data_type_string(data_type_string)
+        , data_type_suffix(data_type_suffix)
+        , block_size{ block_size[0], block_size[1], block_size[2] }
+    {}
     bool wrap;
     string indent;
     int data_type;
     string data_type_string;
     string data_type_suffix;
+    const int block_size[3];
 };
 
 // -------------------------------------------------------------------------
@@ -157,24 +174,31 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
     // write code to retrieve the block-aligned inputs from global memory
     for (const InputPoint& input_point : cells_needed)
     {
+        // central cell
         if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
         {
-            kernel_source << options.indent << options.data_type_string << "4 " << input_point.GetDirectAccessCode(options.wrap) << ";\n";
+            kernel_source << options.indent << options.data_type_string << " "
+                          << input_point.GetDirectAccessCode(options.wrap, options.block_size) << ";\n";
             // the central cell is non-const to allow the user to set it directly - it appears in the forward-Euler step
         }
-        else if (input_point.point.x % 4 == 0)
+        // other block-aligned points
+        else if (input_point.point.x % options.block_size[0] == 0)
         {
-            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetDirectAccessCode(options.wrap) << ";\n";
+            kernel_source << options.indent << "const " << options.data_type_string << " "
+                          << input_point.GetDirectAccessCode(options.wrap, options.block_size) << ";\n";
         }
     }
-    // write code to compute the non-block-aligned float4's from the block-aligned ones we have retrieved
-    for (const InputPoint& input_point : cells_needed)
+    if (options.block_size[0] == 4)
     {
-        if (input_point.point.x % 4 != 0)
+        // write code to compute the non-block-aligned float4's from the block-aligned ones we have retrieved
+        for (const InputPoint& input_point : cells_needed)
         {
-            // swizzle from the retrieved blocks
-            kernel_source << options.indent << "const " << options.data_type_string << "4 " << input_point.GetName() 
-                << " = (" << options.data_type_string << "4)(" << input_point.GetSwizzled() << ");\n";
+            if (input_point.point.x % options.block_size[0] != 0)
+            {
+                // swizzle from the retrieved blocks
+                kernel_source << options.indent << "const " << options.data_type_string << " " << input_point.GetName()
+                    << " = (" << options.data_type_string << ")(" << input_point.GetSwizzled_Block411() << ");\n";
+            }
         }
     }
 }
@@ -197,29 +221,36 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
     // write code for the stencils we need
     for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
     {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 " << applied_stencil.GetCode() << ";\n";
+        kernel_source << options.indent << "const " << options.data_type_string << " " << applied_stencil.GetCode() << ";\n";
     }
     // write code for x_pos, y_pos, z_pos if needed
     if (inputs_needed.using_x_pos)
     {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 x_pos = (index_x + (" << options.data_type_string
-            << "4)(0.0" << options.data_type_suffix << ", 0.25" << options.data_type_suffix << ", 0.5" << options.data_type_suffix
-            << ", 0.75" << options.data_type_suffix << ")) / X;\n";
+        if (options.block_size[0] == 4)
+        {
+            kernel_source << options.indent << "const " << options.data_type_string << " x_pos = (index_x + (" << options.data_type_string
+                << ")(0.0" << options.data_type_suffix << ", 0.25" << options.data_type_suffix << ", 0.5" << options.data_type_suffix
+                << ", 0.75" << options.data_type_suffix << ")) / X;\n";
+        }
+        else
+        {
+            kernel_source << options.indent << "const " << options.data_type_string << " x_pos = index_x / (" << options.data_type_string << ")(X); \n";
+        }
     }
     if (inputs_needed.using_y_pos)
     {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 y_pos = index_y / (" << options.data_type_string << ")(Y); \n";
+        kernel_source << options.indent << "const " << options.data_type_string << " y_pos = index_y / (" << options.data_type_string << ")(Y); \n";
     }
     if (inputs_needed.using_z_pos)
     {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 z_pos = index_z / (" << options.data_type_string << ")(Z);\n";
+        kernel_source << options.indent << "const " << options.data_type_string << " z_pos = index_z / (" << options.data_type_string << ")(Z);\n";
     }
     // write code for gradient_mag_squared if needed
     for (const pair<string, int>& pair : inputs_needed.gradient_mag_squared)
     {
         const string& chem = pair.first;
         const int dimensionality = pair.second;
-        kernel_source << options.indent << "const " << options.data_type_string << "4 gradient_mag_squared_" << chem
+        kernel_source << options.indent << "const " << options.data_type_string << " gradient_mag_squared_" << chem
             << " = pow(x_gradient_" << chem << ", 2.0" << options.data_type_suffix << ")";
         if (dimensionality > 1)
         {
@@ -233,7 +264,7 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
     }
     // declare delta_a, etc. and initialize to zero
     for (const string& chem : inputs_needed.deltas_needed)
-        kernel_source << options.indent << options.data_type_string << "4 delta_" << chem << " = 0.0" << options.data_type_suffix << ";\n";
+        kernel_source << options.indent << options.data_type_string << " delta_" << chem << " = 0.0" << options.data_type_suffix << ";\n";
     kernel_source << "\n";
 }
 
@@ -263,12 +294,12 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     kernel_source << "__kernel void rd_compute(";
     for (int i = 0; i < num_chemicals; i++)
     {
-        kernel_source << "__global " << options.data_type_string << "4 *" << GetChemicalName(i) << "_in";
+        kernel_source << "__global " << options.data_type_string << " *" << GetChemicalName(i) << "_in";
         kernel_source << ",";
     }
     for (int i = 0; i < num_chemicals; i++)
     {
-        kernel_source << "__global " << options.data_type_string << "4 *" << GetChemicalName(i) << "_out";
+        kernel_source << "__global " << options.data_type_string << " *" << GetChemicalName(i) << "_out";
         if (i < num_chemicals - 1)
         {
             kernel_source << ",";
@@ -279,7 +310,7 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     kernel_source << options.indent << "// parameters:\n";
     for (const AbstractRD::Parameter& parameter : parameters)
     {
-        kernel_source << options.indent << "const " << options.data_type_string << "4 " << parameter.name
+        kernel_source << options.indent << "const " << options.data_type_string << " " << parameter.name
             << " = " << setprecision(8) << parameter.value << options.data_type_suffix << ";\n";
     }
     // add a dx parameter for grid spacing if one is not already supplied
@@ -322,25 +353,39 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
 
 string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
 {
+    string full_data_type_string = this->data_type_string;
+    if (this->block_size[0] == 4 && this->block_size[1] == 1 && this->block_size[2] == 1)
+    {
+        full_data_type_string += "4";
+    }
+    else if(this->block_size[0] == 1 && this->block_size[1] == 1 && this->block_size[2] == 1)
+    {
+    }
+    else
+    {
+        throw runtime_error("unsupported block size in AssembleKernelSourceFromFormula");
+    }
+
     const InputsNeeded inputs_needed = DetectInputsNeeded(formula, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality());
+        this->GetArenaDimensionality(), this->block_size);
 
     const string indent = "    ";
-    const KernelOptions options{ this->wrap, indent, this->data_type, this->data_type_string, this->data_type_suffix };
+    const KernelOptions options(this->wrap, indent, this->data_type, full_data_type_string, this->data_type_suffix, this->block_size);
 
-    // If the data type is double then we need to do something about the float4's that appear in the formula,
-    // otherwise compilation will fail when trying to convert them to double4. And vice verse for float4.
-    // float itself doesn't seem to be a problem, converts silently to double or double4. But do need to handle double,
-    // which doesn't convert to float or float4.
     string amended_formula = formula;
     if (this->data_type == VTK_DOUBLE)
     {
-        amended_formula = ReplaceAllSubstrings(amended_formula, "float4", "double4");
+        // float4 doesn't auto-convert to double4
+        amended_formula = ReplaceAllSubstrings(amended_formula, "float4", full_data_type_string);
     }
     else if (this->data_type == VTK_FLOAT)
     {
-        amended_formula = ReplaceAllSubstrings(amended_formula, "double4", "float4");
-        amended_formula = ReplaceAllSubstrings(amended_formula, "double", "float");
+        // float4 doesn't auto-convert to float
+        amended_formula = ReplaceAllSubstrings(amended_formula, "float4", full_data_type_string);
+        // double4 doesn't auto-convert to float4 or float
+        amended_formula = ReplaceAllSubstrings(amended_formula, "double4", full_data_type_string);
+        // double doesn't auto-convert to float4 or float
+        amended_formula = ReplaceAllSubstrings(amended_formula, "double", full_data_type_string);
     }
 
     const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),

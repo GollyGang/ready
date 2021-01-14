@@ -34,7 +34,13 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
 
         std::string GetRuleType() const override { return "formula"; }
 
-        int GetBlockSizeX() const override { return 4; } // we use float4 in a 4x1x1 block
+        bool HasEditableBlockSize() const override { return true; }
+        int GetBlockSizeX() const override { return this->block_size[0]; }
+        int GetBlockSizeY() const override { return this->block_size[1]; }
+        int GetBlockSizeZ() const override { return this->block_size[2]; }
+        void SetBlockSizeX(int n) override { this->block_size[0] = n; this->need_reload_formula = true; }
+        void SetBlockSizeY(int n) override { this->block_size[1] = n; this->need_reload_formula = true; }
+        void SetBlockSizeZ(int n) override { this->block_size[2] = n; this->need_reload_formula = true; }
 
         std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
@@ -48,4 +54,8 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
         bool HasEditableWrapOption() const override { return true; }
         void SetWrap(bool w) override;
         bool HasEditableDataType() const override { return true; }
+
+    private:
+
+        int block_size[3];
 };
