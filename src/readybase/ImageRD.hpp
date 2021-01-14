@@ -82,6 +82,8 @@ class ImageRD : public AbstractRD
 
         size_t GetMemorySize() const override;
 
+        std::vector<float> GetData(int i_chemical) const override;
+
     protected:
 
         std::vector<vtkSmartPointer<vtkImageData>> images; ///< one for each chemical

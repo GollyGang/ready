@@ -1052,3 +1052,16 @@ size_t MeshRD::GetMemorySize() const
 }
 
 // --------------------------------------------------------------------------------
+
+vector<float> MeshRD::GetData(int i_chemical) const
+{
+    vtkDataArray* data = this->mesh->GetCellData()->GetArray(GetChemicalName(i_chemical).c_str());
+    vector<float> values(this->mesh->GetNumberOfCells());
+    for (int i = 0; i < this->mesh->GetNumberOfCells(); i++)
+    {
+        values[i] = data->GetComponent(i, 0);
+    }
+    return values;
+}
+
+// --------------------------------------------------------------------------------

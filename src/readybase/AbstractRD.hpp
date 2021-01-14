@@ -173,6 +173,8 @@ class AbstractRD
         /// Returns the total memory size that will need to be transferred to the GPU
         virtual size_t GetMemorySize() const =0;
 
+        virtual std::vector<float> GetData(int i_chemical) const =0;
+
         struct Parameter {
             std::string name;
             float value;

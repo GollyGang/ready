@@ -75,6 +75,8 @@ class MeshRD : public AbstractRD
 
         size_t GetMemorySize() const override;
 
+        std::vector<float> GetData(int i_chemical) const override;
+
     protected: // functions
 
         void AddPhasePlot(  vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
