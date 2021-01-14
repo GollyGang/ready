@@ -68,6 +68,14 @@ void read_required_attribute(vtkXMLDataElement* e,const std::string& name,T& val
         throw std::runtime_error(to_string(e->GetName())+" : failed to read required attribute: "+name);
 }
 
+template <typename T>
+void read_optional_attribute(vtkXMLDataElement* e,const std::string& name,T& val)
+{
+    const char *str = e->GetAttribute(name.c_str());
+    if(str && !from_string(str,val))
+        throw std::runtime_error(to_string(e->GetName())+" : failed to read optional attribute: "+name);
+}
+
 std::string GetChemicalName(size_t i); ///< a, b, c, ... z, aa, ab, ...
 int IndexFromChemicalName(const std::string& s);
 

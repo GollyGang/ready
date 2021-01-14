@@ -375,7 +375,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     string amended_formula = formula;
     if (this->data_type == VTK_DOUBLE)
     {
-        // float4 doesn't auto-convert to double4
+        // float4 doesn't auto-convert to double4 or double
         amended_formula = ReplaceAllSubstrings(amended_formula, "float4", full_data_type_string);
     }
     else if (this->data_type == VTK_FLOAT)
@@ -406,6 +406,9 @@ void FormulaOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_t
     // formula:
     vtkSmartPointer<vtkXMLDataElement> xml_formula = rule->FindNestedElementWithName("formula");
     if(!xml_formula) throw runtime_error("formula node not found in file");
+    read_optional_attribute(xml_formula, "block_size_x", this->block_size[0]);
+    read_optional_attribute(xml_formula, "block_size_y", this->block_size[1]);
+    read_optional_attribute(xml_formula, "block_size_z", this->block_size[2]);
 
     // number_of_chemicals:
     read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
@@ -428,6 +431,9 @@ vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML(bool generate_
     vtkSmartPointer<vtkXMLDataElement> formula = vtkSmartPointer<vtkXMLDataElement>::New();
     formula->SetName("formula");
     formula->SetIntAttribute("number_of_chemicals",this->GetNumberOfChemicals());
+    formula->SetIntAttribute("block_size_x", this->block_size[0]);
+    formula->SetIntAttribute("block_size_y", this->block_size[1]);
+    formula->SetIntAttribute("block_size_z", this->block_size[2]);
     string f = this->GetFormula();
     f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
     formula->SetCharacterData(f.c_str(), (int)f.length());
