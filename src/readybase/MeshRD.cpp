@@ -688,7 +688,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
         vtkIdType npts = ptIds->GetNumberOfIds();
         switch(neighborhood_type)
         {
-            case VERTEX_NEIGHBORS: // neighbors share a vertex
+            case TNeighborhood::VERTEX_NEIGHBORS: // neighbors share a vertex
             {
                 vtkSmartPointer<vtkIdList> vertIds = vtkSmartPointer<vtkIdList>::New();
                 vertIds->SetNumberOfIds(1);
@@ -723,7 +723,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
                 }
             }
             break;
-            case EDGE_NEIGHBORS: // neighbors share an edge
+            case TNeighborhood::EDGE_NEIGHBORS: // neighbors share an edge
             {
                 vtkCell* pCell = this->mesh->GetCell(iCell);
                 for(int iEdge=0;iEdge<pCell->GetNumberOfEdges();iEdge++)
@@ -739,7 +739,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
                 }
             }
             break;
-            case FACE_NEIGHBORS:
+            case TNeighborhood::FACE_NEIGHBORS:
             {
                 vtkCell* pCell = this->mesh->GetCell(iCell);
                 for(int iEdge=0;iEdge<pCell->GetNumberOfFaces();iEdge++)

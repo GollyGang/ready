@@ -271,7 +271,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool is_opencl_available;
 
         // toolbar things
-        enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
+        enum class TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
         std::unique_ptr<wxCursor> pencil_cursor, brush_cursor, picker_cursor;
         float current_paint_value;
         bool left_mouse_is_down,right_mouse_is_down;
