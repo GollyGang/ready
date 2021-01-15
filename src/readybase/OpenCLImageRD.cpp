@@ -45,6 +45,36 @@ OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device,int data_type
 
 // ----------------------------------------------------------------------------------------------------------------
 
+void OpenCLImageRD::BuildProgramForWorkgroupSize()
+{
+    // create the program
+    this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
+    const char* source = this->kernel_source.c_str();
+    size_t source_size = this->kernel_source.length();
+    clReleaseProgram(this->program);
+    cl_int ret;
+    this->program = clCreateProgramWithSource(this->context, 1, &source, &source_size, &ret);
+    throwOnError(ret, "OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
+
+    // build the program
+    ret = clBuildProgram(this->program, 1, &this->device_id, "-cl-denorms-are-zero", NULL, NULL);
+    if (ret != CL_SUCCESS)
+    {
+        size_t build_log_length = 0;
+        cl_int ret2 = clGetProgramBuildInfo(this->program, this->device_id, CL_PROGRAM_BUILD_LOG, 0, 0, &build_log_length);
+        throwOnError(ret2, "OpenCLImageRD::ReloadKernelIfNeeded : retrieving length of program build log failed: ");
+        vector<char> build_log(build_log_length);
+        cl_int ret3 = clGetProgramBuildInfo(this->program, this->device_id, CL_PROGRAM_BUILD_LOG, build_log_length, build_log.data(), 0);
+        throwOnError(ret3, "OpenCLImageRD::ReloadKernelIfNeeded : retrieving program build log failed: ");
+        { ofstream out("kernel.txt"); out << kernel_source; }
+        ostringstream oss;
+        oss << "OpenCLImageRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << string(build_log.begin(), build_log.end());
+        throwOnError(ret, oss.str().c_str());
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
@@ -58,49 +88,45 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     cl_ulong max_work_group_size;
     clGetDeviceInfo(this->device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(max_work_group_size), &max_work_group_size, NULL);
 
-    int n = 8;
-    this->local_work_size[0] = min(this->global_range[0], (size_t)n);
-    this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n);
-    this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n);
-    size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
-    int extra = 2;
-    size_t expected_mem = 4 * sizeof(float) * (this->local_work_size[0]+extra) * (this->local_work_size[1]+extra) * (this->local_work_size[2]+extra);
-    // TODO: allow for number of chemicals etc, as we allocate in the kernel
-    if (work_group_size > max_work_group_size) {
-        throw runtime_error("CL_DEVICE_MAX_WORK_GROUP_SIZE exceeded");
-    }
-    if (expected_mem > local_memory_size) {
-        throw runtime_error("CL_DEVICE_LOCAL_MEM_SIZE exceeded");
-    }
-
-    // create the program
-    this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
-    const char *source = this->kernel_source.c_str();
-    size_t source_size = this->kernel_source.length();
-    clReleaseProgram(this->program);
-    cl_int ret;
-    this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
-    throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
-
-    // build the program
-    ret = clBuildProgram(this->program, 1, &this->device_id, "-cl-denorms-are-zero", NULL, NULL);
-    if(ret != CL_SUCCESS)
+    int n = 1;
+    while (n <= 1024)
     {
-        size_t build_log_length = 0;
-        cl_int ret2 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,0,0,&build_log_length);
-        throwOnError(ret2,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving length of program build log failed: ");
-        vector<char> build_log(build_log_length);
-        cl_int ret3 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,build_log_length,build_log.data(),0);
-        throwOnError(ret3,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving program build log failed: ");
-        { ofstream out("kernel.txt"); out << kernel_source; }
-        ostringstream oss;
-        oss << "OpenCLImageRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << string( build_log.begin(), build_log.end() );
-        throwOnError(ret,oss.str().c_str());
+        this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
+        this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
+        this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
+        try
+        {
+            // ensure that we don't hit CL_DEVICE_MAX_WORK_GROUP_SIZE
+            size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
+            if (work_group_size > max_work_group_size) {
+                throw runtime_error("CL_DEVICE_MAX_WORK_GROUP_SIZE exceeded");
+            }
+            // ensure that we don't hit CL_DEVICE_LOCAL_MEM_SIZE
+            int extra = 2;
+            size_t expected_mem = 4 * sizeof(float) * (this->local_work_size[0] + extra) * (this->local_work_size[1] + extra) * (this->local_work_size[2] + extra);
+            // TODO: allow for number of chemicals etc, as we allocate in the kernel
+            if (expected_mem > local_memory_size)
+            {
+                throw runtime_error("CL_DEVICE_LOCAL_MEM_SIZE exceeded");
+            }
+            BuildProgramForWorkgroupSize();
+        }
+        catch (...)
+        {
+            break;
+        }
+        n *= 2;
     }
+    n /= 2; // return to last known good
+    this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
+    this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
+    this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
+    BuildProgramForWorkgroupSize();
 
     // create the kernel
     clReleaseKernel(this->kernel);
-    this->kernel = clCreateKernel(this->program,this->kernel_function_name.c_str(),&ret);
+    cl_int ret;
+    this->kernel = clCreateKernel(this->program, this->kernel_function_name.c_str(), &ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
 
     this->need_reload_formula = false;
