@@ -98,8 +98,9 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
         {
             // ensure that we don't hit CL_DEVICE_MAX_WORK_GROUP_SIZE
             size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
-            if (work_group_size > max_work_group_size) {
-                throw runtime_error("CL_DEVICE_MAX_WORK_GROUP_SIZE exceeded");
+            if (work_group_size >= max_work_group_size)  // if allow to be equal, can get errors later
+            {
+                break;
             }
             // ensure that we don't hit CL_DEVICE_LOCAL_MEM_SIZE
             int extra = 2;
@@ -107,7 +108,7 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
             // TODO: allow for number of chemicals etc, as we allocate in the kernel
             if (expected_mem > local_memory_size)
             {
-                throw runtime_error("CL_DEVICE_LOCAL_MEM_SIZE exceeded");
+                break;
             }
             BuildProgramForWorkgroupSize();
         }
@@ -128,6 +129,14 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     cl_int ret;
     this->kernel = clCreateKernel(this->program, this->kernel_function_name.c_str(), &ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
+
+    cl_ulong mem_used;
+    ret = clGetKernelWorkGroupInfo(this->kernel, this->device_id, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &mem_used, NULL);
+    throwOnError(ret, "OpenCLImageRD::clGetKernelWorkGroupInfo : clGetKernelWorkGroupInfo failed: ");
+    if (mem_used > local_memory_size)
+    {
+        throw runtime_error("CL_DEVICE_LOCAL_MEM_SIZE exceeded");
+    }
 
     this->need_reload_formula = false;
 }
@@ -256,7 +265,13 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
             }
         }
         ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_work_size, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed: ");
+        if (ret != CL_SUCCESS)
+        {
+            ostringstream oss;
+            oss << "OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed.\n";
+            oss << "Local work size: " << this->local_work_size[0] << " x " << this->local_work_size[1] << " x " << this->local_work_size[2] << "\n";
+            throwOnError(ret, oss.str().c_str());
+        }
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
 
