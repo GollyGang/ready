@@ -163,6 +163,9 @@ Attributes:
 <p>Attributes:
 <ul>
 <li><tt>number_of_chemicals</tt> (required) : The number of chemicals used.
+<li><tt>block_size_x</tt> (optional) : The x component of the dimensions of the spatial unit processed by each kernel call. Default: 4x1x1
+<li><tt>block_size_y</tt> (optional) : The y component.
+<li><tt>block_size_z</tt> (optional) : The z component.
 </ul>
 <p>Contains:
 <p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc.

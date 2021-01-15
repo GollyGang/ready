@@ -187,10 +187,9 @@ void InfoPanel::Update(const AbstractRD& system)
         contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType() + "-neighbors", false);
     }
 
-    /* bit technical, leave as a file-only option
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                         system.GetBlockSizeX(),system.GetBlockSizeY(),system.GetBlockSizeZ()),
-                                        system.HasEditableBlockSize());*/
+                                        system.HasEditableBlockSize());
 
     if (system.HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system.GetWrap() ? _("on") : _("off"), true);

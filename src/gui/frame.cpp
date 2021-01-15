@@ -2400,9 +2400,7 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->system->SetBlockSizeX(x);
     this->system->SetBlockSizeY(y);
     this->system->SetBlockSizeZ(z);
-    this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
-    this->UpdateWindows();
+    this->UpdateInfoPane();
 }
 
 // ---------------------------------------------------------------------
