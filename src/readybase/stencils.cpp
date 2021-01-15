@@ -73,7 +73,7 @@ string InputPoint::GetName() const
 
 // ---------------------------------------------------------------------
 
-pair<InputPoint, InputPoint> InputPoint::GetAlignedBlocks() const
+pair<InputPoint, InputPoint> InputPoint::GetAlignedBlocks_Block411() const
 {
     if (point.x % 4 == 0)
     {
@@ -97,10 +97,10 @@ pair<InputPoint, InputPoint> InputPoint::GetAlignedBlocks() const
 
 // ---------------------------------------------------------------------
 
-string InputPoint::GetSwizzled() const
+string InputPoint::GetSwizzled_Block411() const
 {
     // assemble a non-block-aligned float4 for the requested point
-    const pair<InputPoint, InputPoint> blocks = GetAlignedBlocks();
+    const pair<InputPoint, InputPoint> blocks = GetAlignedBlocks_Block411();
     const InputPoint& block_left = blocks.first;
     const InputPoint& block_right = blocks.second;
     ostringstream oss;
@@ -124,9 +124,9 @@ string InputPoint::GetSwizzled() const
 
 // -------------------------------------------------------------------------
 
-string InputPoint::GetDirectAccessCode(bool wrap) const
+string InputPoint::GetDirectAccessCode(bool wrap, const int block_size[3]) const
 {
-    if (point.x % 4 != 0)
+    if (block_size[0] == 4 && point.x % 4 != 0)
     {
         throw runtime_error("internal error in GetDirectAccessCode: point.x not divisible by 4");
     }
@@ -137,7 +137,7 @@ string InputPoint::GetDirectAccessCode(bool wrap) const
         oss << "index_here";
     }
     else {
-        const string index_x = GetIndexString(point.x / 4, "x", "X", wrap);
+        const string index_x = GetIndexString(point.x / block_size[0], "x", "X", wrap);
         const string index_y = GetIndexString(point.y, "y", "Y", wrap);
         const string index_z = GetIndexString(point.z, "z", "Z", wrap);
         oss << "X* (Y * " << index_z << " + " << index_y << ") + " << index_x;
@@ -194,7 +194,7 @@ string Stencil::GetDivisorCode() const
 
 // ---------------------------------------------------------------------
 
-set<InputPoint> AppliedStencil::GetInputPoints_Block411() const
+set<InputPoint> AppliedStencil::GetInputPoints() const
 {
     set<InputPoint> input_points;
     for (const StencilPoint& stencil_point : stencil.points)

@@ -38,7 +38,7 @@ AbstractRD::AbstractRD(int data_type)
     this->wrap = true;
     this->InternalSetDataType(data_type);
 
-    this->neighborhood_type = VERTEX_NEIGHBORS;
+    this->neighborhood_type = TNeighborhood::VERTEX_NEIGHBORS;
 
     #if defined(USE_SSE)
         // disable accurate handling of denormals and zeros, for speed
@@ -49,9 +49,9 @@ AbstractRD::AbstractRD(int data_type)
         #endif
     #endif // (USE_SSE)
 
-    this->canonical_neighborhood_type_identifiers[VERTEX_NEIGHBORS] = "vertex";
-    this->canonical_neighborhood_type_identifiers[EDGE_NEIGHBORS] = "edge";
-    this->canonical_neighborhood_type_identifiers[FACE_NEIGHBORS] = "face";
+    this->canonical_neighborhood_type_identifiers[TNeighborhood::VERTEX_NEIGHBORS] = "vertex";
+    this->canonical_neighborhood_type_identifiers[TNeighborhood::EDGE_NEIGHBORS] = "edge";
+    this->canonical_neighborhood_type_identifiers[TNeighborhood::FACE_NEIGHBORS] = "face";
     for(map<TNeighborhood,string>::const_iterator it = this->canonical_neighborhood_type_identifiers.begin();it != this->canonical_neighborhood_type_identifiers.end();it++)
         this->recognized_neighborhood_type_identifiers[it->second] = it->first;
 }
@@ -217,7 +217,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
     // neighborhood specifiers
 
     s = rule->GetAttribute("neighborhood_type");
-    if(!s) this->neighborhood_type = VERTEX_NEIGHBORS;
+    if(!s) this->neighborhood_type = TNeighborhood::VERTEX_NEIGHBORS;
     else if(this->recognized_neighborhood_type_identifiers.find(s)==this->recognized_neighborhood_type_identifiers.end())
         throw runtime_error("Unrecognized neighborhood_type");
     else this->neighborhood_type = this->recognized_neighborhood_type_identifiers[s];

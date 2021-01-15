@@ -259,7 +259,7 @@ MyFrame::MyFrame(const wxString& title)
        fullscreen(false),
        render_settings("render_settings"),
        is_recording(false),
-       CurrentCursor(POINTER),
+       CurrentCursor(TCursorType::POINTER),
        current_paint_value(0.5f),
        left_mouse_is_down(false),
        right_mouse_is_down(false)
@@ -1514,7 +1514,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     // ask user what type of dataset to generate:
-    enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
+    enum class GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
         BodyCentredCubic, FaceCentredCubic, Diamond, HyperbolicPlane, HyperbolicSpace }; // TODO: tetrahedral grid (different kinds)
     GenType sel;
     {
@@ -1541,24 +1541,24 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     {
         switch(sel)
         {
-            case Image1D:          sys = MakeNewImage1D(this->is_opencl_available,opencl_platform,opencl_device,new_render_settings); break;
-            case Image2D:          sys = MakeNewImage2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Image3D:          sys = MakeNewImage3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case GeoSphere:        sys = MakeNewGeodesicSphere(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Torus:            sys = MakeNewTorus(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case TriMesh:          sys = MakeNewTriangularMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case HexMesh:          sys = MakeNewHexagonalMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Rhombille:        sys = MakeNewRhombilleTiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case PenroseP3:        sys = MakeNewPenroseP3Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case PenroseP2:        sys = MakeNewPenroseP2Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Del2D:            sys = MakeNewDelaunay2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Vor2D:            sys = MakeNewVoronoi2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Del3D:            sys = MakeNewDelaunay3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case BodyCentredCubic: sys = MakeNewBodyCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case FaceCentredCubic: sys = MakeNewFaceCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Diamond:          sys = MakeNewDiamondHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case HyperbolicPlane:  sys = MakeNewHyperbolicPlane(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case HyperbolicSpace:  sys = MakeNewHyperbolicSpace(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Image1D:          sys = MakeNewImage1D(this->is_opencl_available,opencl_platform,opencl_device,new_render_settings); break;
+            case GenType::Image2D:          sys = MakeNewImage2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Image3D:          sys = MakeNewImage3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::GeoSphere:        sys = MakeNewGeodesicSphere(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Torus:            sys = MakeNewTorus(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::TriMesh:          sys = MakeNewTriangularMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::HexMesh:          sys = MakeNewHexagonalMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Rhombille:        sys = MakeNewRhombilleTiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::PenroseP3:        sys = MakeNewPenroseP3Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::PenroseP2:        sys = MakeNewPenroseP2Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Del2D:            sys = MakeNewDelaunay2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Vor2D:            sys = MakeNewVoronoi2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Del3D:            sys = MakeNewDelaunay3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::BodyCentredCubic: sys = MakeNewBodyCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::FaceCentredCubic: sys = MakeNewFaceCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Diamond:          sys = MakeNewDiamondHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::HyperbolicPlane:  sys = MakeNewHyperbolicPlane(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::HyperbolicSpace:  sys = MakeNewHyperbolicSpace(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
         }
     }
     catch(const exception& e)
@@ -2400,9 +2400,7 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->system->SetBlockSizeX(x);
     this->system->SetBlockSizeY(y);
     this->system->SetBlockSizeZ(z);
-    this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
-    this->UpdateWindows();
+    this->UpdateInfoPane();
 }
 
 // ---------------------------------------------------------------------
@@ -3056,7 +3054,7 @@ void MyFrame::OnUpdateViewFullKernel(wxUpdateUIEvent& event)
 
 void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = POINTER;
+    this->CurrentCursor = TCursorType::POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3069,14 +3067,14 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectPointerTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==POINTER);
+    event.Check(this->CurrentCursor == TCursorType::POINTER);
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = PENCIL;
+    this->CurrentCursor = TCursorType::PENCIL;
     this->pVTKWindow->SetCursor(*this->pencil_cursor);
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3090,14 +3088,14 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectPencilTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==PENCIL);
+    event.Check(this->CurrentCursor == TCursorType::PENCIL);
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = BRUSH;
+    this->CurrentCursor = TCursorType::BRUSH;
     this->pVTKWindow->SetCursor(*this->brush_cursor);
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3111,14 +3109,14 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectBrushTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==BRUSH);
+    event.Check(this->CurrentCursor == TCursorType::BRUSH);
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = PICKER;
+    this->CurrentCursor = TCursorType::PICKER;
     this->pVTKWindow->SetCursor(*this->picker_cursor);
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3132,7 +3130,7 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectPickerTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==PICKER);
+    event.Check(this->CurrentCursor == TCursorType::PICKER);
 }
 
 // ---------------------------------------------------------------------
@@ -3151,9 +3149,9 @@ void MyFrame::LeftMouseDown(int x, int y)
     {
         switch(this->CurrentCursor)
         {
-            case POINTER:
+            case TCursorType::POINTER:
                 break; // (VTK will handle the control of the viewpoint)
-            case PENCIL:
+            case TCursorType::PENCIL:
             {
                 if (repaint_to_erase && this->current_paint_value == this->system->GetValue(p[0],p[1],p[2],this->render_settings)) {
                     // erase cell by using low value
@@ -3166,14 +3164,14 @@ void MyFrame::LeftMouseDown(int x, int y)
                 this->pVTKWindow->Refresh();
             }
             break;
-            case BRUSH:
+            case TCursorType::BRUSH:
             {
                 this->system->SetValuesInRadius(p[0],p[1],p[2],this->brush_sizes[current_brush_size],
                     this->current_paint_value,this->render_settings);
                 this->pVTKWindow->Refresh();
             }
             break;
-            case PICKER:
+            case TCursorType::PICKER:
             {
                 this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
                 this->UpdateToolbars();
@@ -3223,9 +3221,9 @@ void MyFrame::RightMouseUp(int x, int y)
     this->right_mouse_is_down = false;
     if(!this->pVTKWindow->GetShiftKey())
     {
-        if(this->CurrentCursor == PENCIL)
+        if(this->CurrentCursor == TCursorType::PENCIL)
             this->pVTKWindow->SetCursor(*this->pencil_cursor);
-        else if(this->CurrentCursor == BRUSH )
+        else if(this->CurrentCursor == TCursorType::BRUSH )
             this->pVTKWindow->SetCursor(*this->brush_cursor);
     }
 }
@@ -3246,9 +3244,9 @@ void MyFrame::MouseMove(int x, int y)
     {
         switch(this->CurrentCursor)
         {
-            case POINTER:
+            case TCursorType::POINTER:
                 break; // (VTK will handle the control of the viewpoint)
-            case PENCIL:
+            case TCursorType::PENCIL:
             {
                 if (erasing) {
                     this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
@@ -3258,14 +3256,14 @@ void MyFrame::MouseMove(int x, int y)
                 this->pVTKWindow->Refresh();
             }
             break;
-            case BRUSH:
+            case TCursorType::BRUSH:
             {
                 this->system->SetValuesInRadius(p[0],p[1],p[2],this->brush_sizes[current_brush_size],
                     this->current_paint_value,this->render_settings);
                 this->pVTKWindow->Refresh();
             }
             break;
-            case PICKER:
+            case TCursorType::PICKER:
             {
                 this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
                 this->UpdateToolbars();
@@ -3285,7 +3283,7 @@ void MyFrame::MouseMove(int x, int y)
 
 void MyFrame::KeyDown()
 {
-    if(this->pVTKWindow->GetShiftKey() && ( this->CurrentCursor == PENCIL || this->CurrentCursor == BRUSH ) )
+    if(this->pVTKWindow->GetShiftKey() && ( this->CurrentCursor == TCursorType::PENCIL || this->CurrentCursor == TCursorType::BRUSH ) )
         this->pVTKWindow->SetCursor(*this->picker_cursor);
 }
 
@@ -3295,9 +3293,9 @@ void MyFrame::KeyUp()
 {
     if(!this->pVTKWindow->GetShiftKey())
     {
-        if(this->CurrentCursor == PENCIL)
+        if(this->CurrentCursor == TCursorType::PENCIL)
             this->pVTKWindow->SetCursor(*this->pencil_cursor);
-        else if(this->CurrentCursor == BRUSH )
+        else if(this->CurrentCursor == TCursorType::BRUSH )
             this->pVTKWindow->SetCursor(*this->brush_cursor);
     }
 }

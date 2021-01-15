@@ -180,7 +180,7 @@ class AbstractRD
 
     protected: // typedefs
 
-        enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
+        enum class TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
         // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
 
     protected: // variables
