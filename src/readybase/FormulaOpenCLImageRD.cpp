@@ -151,13 +151,16 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
 
 struct KernelOptions {
     KernelOptions(bool wrap, const string& indent, int data_type, const string& data_type_string,
-                  const string& data_type_suffix, const int block_size[3])
+                  const string& data_type_suffix, const int block_size[3],
+                  bool use_local_memory, const size_t local_work_size[3])
         : wrap(wrap)
         , indent(indent)
         , data_type(data_type)
         , data_type_string(data_type_string)
         , data_type_suffix(data_type_suffix)
         , block_size{ block_size[0], block_size[1], block_size[2] }
+        , use_local_memory(use_local_memory)
+        , local_work_size{ local_work_size[0], local_work_size[1], local_work_size[2] }
     {}
     bool wrap;
     string indent;
@@ -165,12 +168,23 @@ struct KernelOptions {
     string data_type_string;
     string data_type_suffix;
     const int block_size[3];
+    bool use_local_memory;
+    const size_t local_work_size[3];
 };
 
 // -------------------------------------------------------------------------
 
 void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
 {
+    kernel_source << options.indent << "// keywords needed for the formula:\n";
+    // output the first part of the body
+    kernel_source << options.indent << "const int index_x = get_global_id(0);\n";
+    kernel_source << options.indent << "const int index_y = get_global_id(1);\n";
+    kernel_source << options.indent << "const int index_z = get_global_id(2);\n";
+    kernel_source << options.indent << "const int X = get_global_size(0);\n";
+    kernel_source << options.indent << "const int Y = get_global_size(1);\n";
+    kernel_source << options.indent << "const int Z = get_global_size(2);\n";
+    kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
     // write code to retrieve the block-aligned inputs from global memory
     for (const InputPoint& input_point : cells_needed)
     {
@@ -207,17 +221,6 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
 
 void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
-    kernel_source << options.indent << "// keywords needed for the formula:\n";
-    // output the first part of the body
-    kernel_source << options.indent << "const int index_x = get_global_id(0);\n";
-    kernel_source << options.indent << "const int index_y = get_global_id(1);\n";
-    kernel_source << options.indent << "const int index_z = get_global_id(2);\n";
-    kernel_source << options.indent << "const int X = get_global_size(0);\n";
-    kernel_source << options.indent << "const int Y = get_global_size(1);\n";
-    kernel_source << options.indent << "const int Z = get_global_size(2);\n";
-    kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
-    // write code for the cells we need
-    WriteCellsNeeded(kernel_source, inputs_needed.cells_needed, options);
     // write code for the stencils we need
     for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
     {
@@ -272,12 +275,10 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
 
 string AssembleKernelSource(const InputsNeeded& inputs_needed,
     const vector<AbstractRD::Parameter>& parameters,
-    const size_t local_work_size[3],
     int num_chemicals,
     int dimensionality,
     const string& formula,
-    const KernelOptions& options,
-    bool use_local_memory)
+    const KernelOptions& options)
 {
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
@@ -292,11 +293,11 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
 #endif\n\n";
     }
-    if (use_local_memory)
+    if (options.use_local_memory)
     {
-        kernel_source << "#define LX " << local_work_size[0] << "\n";
-        kernel_source << "#define LY " << local_work_size[1] << "\n";
-        kernel_source << "#define LZ " << local_work_size[2] << "\n";
+        kernel_source << "#define LX " << options.local_work_size[0] << "\n";
+        kernel_source << "#define LY " << options.local_work_size[1] << "\n";
+        kernel_source << "#define LZ " << options.local_work_size[2] << "\n";
     }
     // output the function declaration
     kernel_source << "__kernel void rd_compute(";
@@ -330,6 +331,8 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
         // TODO: only need this if using a stencil that uses dx
     }
     kernel_source << "\n";
+    // add the cells we need
+    WriteCellsNeeded(kernel_source, inputs_needed.cells_needed, options);
     // add the keywords we need
     WriteKeywords(kernel_source, inputs_needed, options);
     // add the formula
@@ -378,7 +381,8 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
         this->GetArenaDimensionality(), this->block_size);
 
     const string indent = "    ";
-    const KernelOptions options(this->wrap, indent, this->data_type, full_data_type_string, this->data_type_suffix, this->block_size);
+    const KernelOptions options(this->wrap, indent, this->data_type, full_data_type_string, this->data_type_suffix, this->block_size,
+        this->use_local_memory, this->local_work_size);
 
     string amended_formula = formula;
     if (this->data_type == VTK_DOUBLE)
@@ -396,8 +400,8 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
         amended_formula = ReplaceAllSubstrings(amended_formula, "double", full_data_type_string);
     }
 
-    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->local_work_size, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality(), amended_formula, options, this->use_local_memory);
+    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
+        this->GetArenaDimensionality(), amended_formula, options);
 
     return kernel_source;
 }
