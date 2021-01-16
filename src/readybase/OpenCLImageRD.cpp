@@ -45,7 +45,7 @@ OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device,int data_type
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::BuildProgramForWorkgroupSize()
+void OpenCLImageRD::BuildProgram()
 {
     // create the program
     this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
@@ -83,60 +83,56 @@ void OpenCLImageRD::ReloadKernelIfNeeded()
     this->global_range[1] = max(1, vtkMath::Round(this->GetY()) / this->GetBlockSizeY());
     this->global_range[2] = max(1, vtkMath::Round(this->GetZ()) / this->GetBlockSizeZ());
 
-    cl_ulong local_memory_size;
-    clGetDeviceInfo(this->device_id, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(local_memory_size), &local_memory_size, NULL);
-    cl_ulong max_work_group_size;
-    clGetDeviceInfo(this->device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(max_work_group_size), &max_work_group_size, NULL);
-
-    int n = 1;
-    while (n <= 1024)
+    if (this->use_local_memory)
     {
+        cl_ulong local_memory_size;
+        clGetDeviceInfo(this->device_id, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(local_memory_size), &local_memory_size, NULL);
+        cl_ulong max_work_group_size;
+        clGetDeviceInfo(this->device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(max_work_group_size), &max_work_group_size, NULL);
+
+        int n = 1;
+        while (n <= 1024)
+        {
+            this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
+            this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
+            this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
+            try
+            {
+                // ensure that we don't hit CL_DEVICE_MAX_WORK_GROUP_SIZE
+                size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
+                if (work_group_size >= max_work_group_size)  // if allow to be equal, can get errors later
+                {
+                    break;
+                }
+                // ensure that we don't hit CL_DEVICE_LOCAL_MEM_SIZE
+                int extra = 2;
+                size_t expected_mem = 4 * sizeof(float) * (this->local_work_size[0] + extra) * (this->local_work_size[1] + extra) * (this->local_work_size[2] + extra);
+                // TODO: allow for number of chemicals etc, as we allocate in the kernel
+                if (expected_mem > local_memory_size)
+                {
+                    break;
+                }
+                BuildProgram();
+            }
+            catch (...)
+            {
+                break;
+            }
+            n *= 2;
+        }
+        n /= 2; // return to last known good
         this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
         this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
         this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
-        try
-        {
-            // ensure that we don't hit CL_DEVICE_MAX_WORK_GROUP_SIZE
-            size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
-            if (work_group_size >= max_work_group_size)  // if allow to be equal, can get errors later
-            {
-                break;
-            }
-            // ensure that we don't hit CL_DEVICE_LOCAL_MEM_SIZE
-            int extra = 2;
-            size_t expected_mem = 4 * sizeof(float) * (this->local_work_size[0] + extra) * (this->local_work_size[1] + extra) * (this->local_work_size[2] + extra);
-            // TODO: allow for number of chemicals etc, as we allocate in the kernel
-            if (expected_mem > local_memory_size)
-            {
-                break;
-            }
-            BuildProgramForWorkgroupSize();
-        }
-        catch (...)
-        {
-            break;
-        }
-        n *= 2;
     }
-    n /= 2; // return to last known good
-    this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
-    this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
-    this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
-    BuildProgramForWorkgroupSize();
+
+    BuildProgram();
 
     // create the kernel
     clReleaseKernel(this->kernel);
     cl_int ret;
     this->kernel = clCreateKernel(this->program, this->kernel_function_name.c_str(), &ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
-
-    cl_ulong mem_used;
-    ret = clGetKernelWorkGroupInfo(this->kernel, this->device_id, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &mem_used, NULL);
-    throwOnError(ret, "OpenCLImageRD::clGetKernelWorkGroupInfo : clGetKernelWorkGroupInfo failed: ");
-    if (mem_used > local_memory_size)
-    {
-        throw runtime_error("CL_DEVICE_LOCAL_MEM_SIZE exceeded");
-    }
 
     this->need_reload_formula = false;
 }
@@ -264,7 +260,9 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
                 throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
             }
         }
-        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, this->local_work_size, 0, NULL, NULL);
+        ret = clEnqueueNDRangeKernel(this->command_queue, this->kernel, 3, // dimensions
+            NULL, this->global_range, this->use_local_memory ? this->local_work_size : NULL,
+            0, NULL, NULL);
         if (ret != CL_SUCCESS)
         {
             ostringstream oss;

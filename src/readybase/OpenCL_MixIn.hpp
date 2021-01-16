@@ -67,6 +67,7 @@ class OpenCL_MixIn
         cl_kernel kernel;
         std::string kernel_function_name;
         size_t global_range[3];
+        bool use_local_memory;
         size_t local_work_size[3];
 
         cl_command_queue command_queue;

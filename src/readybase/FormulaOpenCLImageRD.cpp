@@ -276,7 +276,8 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     int num_chemicals,
     int dimensionality,
     const string& formula,
-    const KernelOptions& options)
+    const KernelOptions& options,
+    bool use_local_memory)
 {
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
@@ -291,9 +292,12 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
 #endif\n\n";
     }
-    kernel_source << "#define LX " << local_work_size[0] << "\n";
-    kernel_source << "#define LY " << local_work_size[1] << "\n";
-    kernel_source << "#define LZ " << local_work_size[2] << "\n";
+    if (use_local_memory)
+    {
+        kernel_source << "#define LX " << local_work_size[0] << "\n";
+        kernel_source << "#define LY " << local_work_size[1] << "\n";
+        kernel_source << "#define LZ " << local_work_size[2] << "\n";
+    }
     // output the function declaration
     kernel_source << "__kernel void rd_compute(";
     for (int i = 0; i < num_chemicals; i++)
@@ -393,7 +397,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     }
 
     const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->local_work_size, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality(), amended_formula, options);
+        this->GetArenaDimensionality(), amended_formula, options, this->use_local_memory);
 
     return kernel_source;
 }

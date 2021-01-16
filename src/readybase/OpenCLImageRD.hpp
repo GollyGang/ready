@@ -62,7 +62,8 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
         void ReadFromOpenCLBuffers() override;
 
     private:
-        void BuildProgramForWorkgroupSize();
+
+        void BuildProgram();
 };
 
 #endif
