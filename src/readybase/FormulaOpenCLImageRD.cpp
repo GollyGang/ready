@@ -174,7 +174,29 @@ struct KernelOptions {
 
 // -------------------------------------------------------------------------
 
-void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
+void WriteParameters(ostringstream& kernel_source, const vector<AbstractRD::Parameter>& parameters, 
+                     const InputsNeeded& inputs_needed, const KernelOptions& options)
+{
+    kernel_source << options.indent << "// parameters:\n";
+    for (const AbstractRD::Parameter& parameter : parameters)
+    {
+        kernel_source << options.indent << "const " << options.data_type_string << " " << parameter.name
+            << " = " << setprecision(8) << parameter.value << options.data_type_suffix << ";\n";
+    }
+    // add a dx parameter for grid spacing if one is not already supplied
+    const bool has_dx_parameter = find_if(parameters.begin(), parameters.end(),
+        [](const AbstractRD::Parameter& param) { return param.name == "dx"; }) != parameters.end();
+    if (!inputs_needed.stencils_needed.empty() && !has_dx_parameter)
+    {
+        kernel_source << options.indent << "const " << options.data_type_string << " dx = 1.0" << options.data_type_suffix << "; // grid spacing\n";
+        // TODO: only need this if using a stencil that uses dx
+    }
+    kernel_source << "\n";
+}
+
+// -------------------------------------------------------------------------
+
+void WriteIndices(ostringstream& kernel_source, const KernelOptions& options)
 {
     kernel_source << options.indent << "// keywords needed for the formula:\n";
     // output the first part of the body
@@ -185,6 +207,12 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
     kernel_source << options.indent << "const int Y = get_global_size(1);\n";
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
+}
+
+// -------------------------------------------------------------------------
+
+void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
+{
     // write code to retrieve the block-aligned inputs from global memory
     for (const InputPoint& input_point : cells_needed)
     {
@@ -316,21 +344,9 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     }
     kernel_source << ")\n{\n";
     // add the parameters
-    kernel_source << options.indent << "// parameters:\n";
-    for (const AbstractRD::Parameter& parameter : parameters)
-    {
-        kernel_source << options.indent << "const " << options.data_type_string << " " << parameter.name
-            << " = " << setprecision(8) << parameter.value << options.data_type_suffix << ";\n";
-    }
-    // add a dx parameter for grid spacing if one is not already supplied
-    const bool has_dx_parameter = find_if(parameters.begin(), parameters.end(),
-        [](const AbstractRD::Parameter& param) { return param.name == "dx"; }) != parameters.end();
-    if (!inputs_needed.stencils_needed.empty() && !has_dx_parameter)
-    {
-        kernel_source << options.indent << "const " << options.data_type_string << " dx = 1.0" << options.data_type_suffix << "; // grid spacing\n";
-        // TODO: only need this if using a stencil that uses dx
-    }
-    kernel_source << "\n";
+    WriteParameters(kernel_source, parameters, inputs_needed, options);
+    // add the bit that retrieves the global indices etc.
+    WriteIndices(kernel_source, options);
     // add the cells we need
     WriteCellsNeeded(kernel_source, inputs_needed.cells_needed, options);
     // add the keywords we need
