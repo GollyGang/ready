@@ -1697,3 +1697,22 @@ size_t ImageRD::GetMemorySize() const
 }
 
 // --------------------------------------------------------------------------------
+
+vector<float> ImageRD::GetData(int i_chemical) const
+{
+    vector<float> values(this->GetX() * this->GetY() * this->GetZ());
+    size_t i = 0;
+    for(int z = 0; z < this->GetZ(); z++)
+    {
+        for (int y = 0; y < this->GetY(); y++)
+        {
+            for (int x = 0; x < this->GetX(); x++)
+            {
+                values[i++] = this->images[i_chemical]->GetScalarComponentAsFloat(x, y, z, 0);
+            }
+        }
+    }
+    return values;
+}
+
+// --------------------------------------------------------------------------------
