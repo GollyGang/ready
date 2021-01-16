@@ -404,25 +404,23 @@ int main(int argc,char *argv[])
                 {
                     cout << "\n";
                     cout << "nchem: " << ix << "\n";
-                    const OpenCLImageRD &isystem = dynamic_cast<const OpenCLImageRD&>(*system);
 
                     cout << "xres=" << system->GetX() << "\n";
                     cout << "yres=" << system->GetY() << "\n";
                     cout << "zres=" << system->GetZ() << "\n";
 
                     // not in bytes!
-                    unsigned long reagent_block_size = system->GetX() * system->GetY() * system->GetZ();
+                    unsigned long reagent_size = system->GetX() * system->GetY() * system->GetZ();
 
-                    cout << "Reagent block size is: " << reagent_block_size << "\n";
-                    vector<float> rd_data(reagent_block_size);
+                    cout << "Reagent size is: " << reagent_size << "\n";
 
-                    isystem.GetFromOpenCLBuffers( &rd_data[0], ix );
+                    const vector<float> rd_data = system->GetData( ix );
 
                     cout << "\nRD data for reagent " << ix << ": [ ";
-                    for (unsigned long rix=0; rix<reagent_block_size; rix++)
+                    for (unsigned long rix=0; rix<rd_data.size(); rix++)
                     {
                         cout << rd_data[rix];
-                        if ( rix < reagent_block_size-1 )
+                        if ( rix < rd_data.size()-1 )
                         {
                             cout << ",";
                         }

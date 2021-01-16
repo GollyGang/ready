@@ -45,7 +45,6 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
 
         void Undo() override;
         void Redo() override;
-        void GetFromOpenCLBuffers(float* dest, int chemical_id) const;
 
     protected:
 
