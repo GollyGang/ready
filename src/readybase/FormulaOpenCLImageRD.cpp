@@ -54,6 +54,7 @@ delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;");
 // -------------------------------------------------------------------------
 
 struct InputsNeeded {
+    vector<string> chemicals_needed;
     vector<AppliedStencil> stencils_needed;
     set<InputPoint> cells_needed;
     map<string, int> gradient_mag_squared;
@@ -61,6 +62,8 @@ struct InputsNeeded {
     bool using_y_pos;
     bool using_z_pos;
     vector<string> deltas_needed;
+    vector<string> local_memory_needed;
+    int stencil_radii[3];
 };
 
 // -------------------------------------------------------------------------
@@ -74,10 +77,13 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
     for (int i = 0; i < num_chemicals; i++)
     {
         const string chem = GetChemicalName(i);
+        inputs_needed.chemicals_needed.push_back(chem);
         // assume we will need the central cell
         inputs_needed.cells_needed.insert({{ 0, 0, 0 }, chem });
         // assume we need delta_<chem> for the forward Euler step
         inputs_needed.deltas_needed.push_back(chem);
+        // assume we need local memory for every chemical
+        inputs_needed.local_memory_needed.push_back(chem);
         // search for keywords that make use of stencils
         set<string> dependent_stencils;
         if (UsingKeyword(formula_tokens, "gradient_mag_squared_" + chem))
@@ -143,6 +149,10 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
     inputs_needed.using_x_pos = UsingKeyword(formula_tokens, "x_pos");
     inputs_needed.using_y_pos = UsingKeyword(formula_tokens, "y_pos");
     inputs_needed.using_z_pos = UsingKeyword(formula_tokens, "z_pos");
+    // TODO: compute the maximum radii for the stencils
+    inputs_needed.stencil_radii[0] = 1;
+    inputs_needed.stencil_radii[1] = 1;
+    inputs_needed.stencil_radii[2] = 1;
 
     return inputs_needed;
 }
@@ -174,6 +184,45 @@ struct KernelOptions {
 
 // -------------------------------------------------------------------------
 
+void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+{
+    if (options.data_type == VTK_DOUBLE)
+    {
+        kernel_source << "\
+#ifdef cl_khr_fp64\n\
+    #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
+#elif defined(cl_amd_fp64)\n\
+    #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n\
+#else\n\
+    #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
+#endif\n\n";
+    }
+    if (options.use_local_memory)
+    {
+        kernel_source << "#define LX " << options.local_work_size[0] << "\n";
+        kernel_source << "#define LY " << options.local_work_size[1] << "\n";
+        kernel_source << "#define LZ " << options.local_work_size[2] << "\n";
+    }
+    // output the function declaration
+    kernel_source << "kernel void rd_compute(";
+    for (const string& chem : inputs_needed.chemicals_needed)
+    {
+        kernel_source << "global " << options.data_type_string << " *" << chem << "_in";
+        kernel_source << ",";
+    }
+    for (int i = 0; i < inputs_needed.chemicals_needed.size(); i++)
+    {
+        kernel_source << "global " << options.data_type_string << " *" << inputs_needed.chemicals_needed[i] << "_out";
+        if (i < inputs_needed.chemicals_needed.size() - 1)
+        {
+            kernel_source << ",";
+        }
+    }
+    kernel_source << ")\n{\n";
+}
+
+// -------------------------------------------------------------------------
+
 void WriteParameters(ostringstream& kernel_source, const vector<AbstractRD::Parameter>& parameters, 
                      const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
@@ -198,21 +247,41 @@ void WriteParameters(ostringstream& kernel_source, const vector<AbstractRD::Para
 
 void WriteIndices(ostringstream& kernel_source, const KernelOptions& options)
 {
-    kernel_source << options.indent << "// keywords needed for the formula:\n";
-    // output the first part of the body
+    kernel_source << options.indent << "// indices:\n";
     kernel_source << options.indent << "const int index_x = get_global_id(0);\n";
     kernel_source << options.indent << "const int index_y = get_global_id(1);\n";
     kernel_source << options.indent << "const int index_z = get_global_id(2);\n";
+    if (options.use_local_memory)
+    {
+        kernel_source << options.indent << "const int local_x = get_local_id(0);\n";
+        kernel_source << options.indent << "const int local_y = get_local_id(1);\n";
+        kernel_source << options.indent << "const int local_z = get_local_id(2);\n";
+    }
     kernel_source << options.indent << "const int X = get_global_size(0);\n";
     kernel_source << options.indent << "const int Y = get_global_size(1);\n";
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
+    kernel_source << "\n";
+}
+
+// -------------------------------------------------------------------------
+
+void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+{
+    // TODO: work out which chemicals need local memory
+    // TODO: output how much local memory we allocate (to help pick work group sizes)
+    for (const string& chem : inputs_needed.local_memory_needed)
+    {
+        kernel_source << options.indent << "local " << options.data_type_string << "local_" << chem
+            << "[LX + 2 * XR][LY + 2 * YR][LZ + 2 * ZR]; // expanded to allow access to neighbors\n";
+    }
 }
 
 // -------------------------------------------------------------------------
 
 void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells_needed, const KernelOptions& options)
 {
+    kernel_source << options.indent << "// cells needed:\n";
     // write code to retrieve the block-aligned inputs from global memory
     for (const InputPoint& input_point : cells_needed)
     {
@@ -243,12 +312,14 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
             }
         }
     }
+    kernel_source << "\n";
 }
 
 // -------------------------------------------------------------------------
 
 void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
+    kernel_source << options.indent << "// keywords needed:\n";
     // write code for the stencils we need
     for (const AppliedStencil& applied_stencil : inputs_needed.stencils_needed)
     {
@@ -295,7 +366,9 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
     }
     // declare delta_a, etc. and initialize to zero
     for (const string& chem : inputs_needed.deltas_needed)
+    {
         kernel_source << options.indent << options.data_type_string << " delta_" << chem << " = 0.0" << options.data_type_suffix << ";\n";
+    }
     kernel_source << "\n";
 }
 
@@ -303,50 +376,22 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
 
 string AssembleKernelSource(const InputsNeeded& inputs_needed,
     const vector<AbstractRD::Parameter>& parameters,
-    int num_chemicals,
-    int dimensionality,
     const string& formula,
     const KernelOptions& options)
 {
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
-    if (options.data_type == VTK_DOUBLE)
-    {
-        kernel_source << "\
-#ifdef cl_khr_fp64\n\
-    #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
-#elif defined(cl_amd_fp64)\n\
-    #pragma OPENCL EXTENSION cl_amd_fp64 : enable\n\
-#else\n\
-    #error \"Double precision floating point not supported on this OpenCL device. Choose another or contact the Ready team.\"\n\
-#endif\n\n";
-    }
-    if (options.use_local_memory)
-    {
-        kernel_source << "#define LX " << options.local_work_size[0] << "\n";
-        kernel_source << "#define LY " << options.local_work_size[1] << "\n";
-        kernel_source << "#define LZ " << options.local_work_size[2] << "\n";
-    }
-    // output the function declaration
-    kernel_source << "kernel void rd_compute(";
-    for (int i = 0; i < num_chemicals; i++)
-    {
-        kernel_source << "global " << options.data_type_string << " *" << GetChemicalName(i) << "_in";
-        kernel_source << ",";
-    }
-    for (int i = 0; i < num_chemicals; i++)
-    {
-        kernel_source << "global " << options.data_type_string << " *" << GetChemicalName(i) << "_out";
-        if (i < num_chemicals - 1)
-        {
-            kernel_source << ",";
-        }
-    }
-    kernel_source << ")\n{\n";
+    // add the #defines and the kernel definition header
+    WriteHeader(kernel_source, inputs_needed, options);
     // add the parameters
     WriteParameters(kernel_source, parameters, inputs_needed, options);
     // add the bit that retrieves the global indices etc.
     WriteIndices(kernel_source, options);
+    // add the bit that declares local memory and copies into it
+    if (options.use_local_memory)
+    {
+        WriteLocalMemorySection(kernel_source, inputs_needed, options);
+    }
     // add the cells we need
     WriteCellsNeeded(kernel_source, inputs_needed.cells_needed, options);
     // add the keywords we need
@@ -364,10 +409,9 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     // add the forward-Euler step
     // TODO: only add this when delta_<chem> appears in the formula
     kernel_source << options.indent << "// forward-Euler update step:\n";
-    for (int iC = 0; iC < num_chemicals; iC++)
+    for (const string& chem : inputs_needed.chemicals_needed)
     {
-        kernel_source << options.indent << GetChemicalName(iC) << "_out[index_here] = "
-            << GetChemicalName(iC) << " + timestep * delta_" << GetChemicalName(iC) << ";\n";
+        kernel_source << options.indent << chem << "_out[index_here] = " << chem << " + timestep * delta_" << chem << ";\n";
     }
     // TODO: timestep only needed if it appears in the formula or if we are doing forward-Euler for at least one chemical
     // finish up
@@ -416,8 +460,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
         amended_formula = ReplaceAllSubstrings(amended_formula, "double", full_data_type_string);
     }
 
-    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality(), amended_formula, options);
+    const string kernel_source = AssembleKernelSource(inputs_needed, this->parameters, amended_formula, options);
 
     return kernel_source;
 }
