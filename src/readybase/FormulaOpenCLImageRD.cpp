@@ -34,11 +34,8 @@ using namespace std;
 
 FormulaOpenCLImageRD::FormulaOpenCLImageRD(int opencl_platform,int opencl_device,int data_type)
     : OpenCLImageRD(opencl_platform,opencl_device,data_type)
+    , block_size{4, 1, 1}
 {
-    this->block_size[0] = 4;
-    this->block_size[1] = 1;
-    this->block_size[2] = 1;
-
     // these settings are used in File > New Pattern
     this->SetRuleName("Gray-Scott");
     this->AddParameter("timestep",1.0f);
@@ -202,6 +199,9 @@ void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed
         kernel_source << "#define LX " << options.local_work_size[0] << "\n";
         kernel_source << "#define LY " << options.local_work_size[1] << "\n";
         kernel_source << "#define LZ " << options.local_work_size[2] << "\n";
+        kernel_source << "#define XR " << inputs_needed.stencil_radii[0] << "\n";
+        kernel_source << "#define YR " << inputs_needed.stencil_radii[1] << "\n";
+        kernel_source << "#define ZR " << inputs_needed.stencil_radii[2] << "\n";
     }
     // output the function declaration
     kernel_source << "kernel void rd_compute(";
@@ -245,7 +245,7 @@ void WriteParameters(ostringstream& kernel_source, const vector<AbstractRD::Para
 
 // -------------------------------------------------------------------------
 
-void WriteIndices(ostringstream& kernel_source, const KernelOptions& options)
+void WriteIndices(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     kernel_source << options.indent << "// indices:\n";
     kernel_source << options.indent << "const int index_x = get_global_id(0);\n";
@@ -261,6 +261,11 @@ void WriteIndices(ostringstream& kernel_source, const KernelOptions& options)
     kernel_source << options.indent << "const int Y = get_global_size(1);\n";
     kernel_source << options.indent << "const int Z = get_global_size(2);\n";
     kernel_source << options.indent << "const int index_here = X*(Y*index_z + index_y) + index_x;\n";
+    for (const string& chem : inputs_needed.chemicals_needed)
+    {
+        kernel_source << options.indent << options.data_type_string << " " << chem << " = " << chem << "_in[index_here];\n";
+        // (non-const to allow the user to assign directly to it if needed)
+    }
     kernel_source << "\n";
 }
 
@@ -268,13 +273,24 @@ void WriteIndices(ostringstream& kernel_source, const KernelOptions& options)
 
 void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
+    kernel_source << options.indent << "// local memory:\n";
     // TODO: work out which chemicals need local memory
     // TODO: output how much local memory we allocate (to help pick work group sizes)
     for (const string& chem : inputs_needed.local_memory_needed)
     {
-        kernel_source << options.indent << "local " << options.data_type_string << "local_" << chem
-            << "[LX + 2 * XR][LY + 2 * YR][LZ + 2 * ZR]; // expanded to allow access to neighbors\n";
+        kernel_source << options.indent << "local " << options.data_type_string << " local_" << chem
+            << "[LX + 2 * XR][LY + 2 * YR][LZ + 2 * ZR];\n";
     }
+    kernel_source << options.indent << "const int lx = local_x + XR;\n";
+    kernel_source << options.indent << "const int ly = local_y + YR;\n";
+    kernel_source << options.indent << "const int lz = local_z + ZR;\n";
+    // copy across the cell at this local_index
+    for (const string& chem : inputs_needed.local_memory_needed)
+    {
+        kernel_source << options.indent << "local_" << chem << "[lx][ly][lz] = " << chem << ";\n";
+    }
+    // TODO: copy across the cells outside our local work group
+    kernel_source << "\n";
 }
 
 // -------------------------------------------------------------------------
@@ -285,15 +301,9 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
     // write code to retrieve the block-aligned inputs from global memory
     for (const InputPoint& input_point : cells_needed)
     {
-        // central cell
-        if (input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
-        {
-            kernel_source << options.indent << options.data_type_string << " "
-                          << input_point.GetDirectAccessCode(options.wrap, options.block_size) << ";\n";
-            // the central cell is non-const to allow the user to set it directly - it appears in the forward-Euler step
-        }
-        // other block-aligned points
-        else if (input_point.point.x % options.block_size[0] == 0)
+        // block-aligned points (but not the central cell)
+        if (!(input_point.point.x == 0 && input_point.point.y == 0 && input_point.point.z == 0)
+            && input_point.point.x % options.block_size[0] == 0)
         {
             kernel_source << options.indent << "const " << options.data_type_string << " "
                           << input_point.GetDirectAccessCode(options.wrap, options.block_size) << ";\n";
@@ -386,7 +396,7 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
     // add the parameters
     WriteParameters(kernel_source, parameters, inputs_needed, options);
     // add the bit that retrieves the global indices etc.
-    WriteIndices(kernel_source, options);
+    WriteIndices(kernel_source, inputs_needed, options);
     // add the bit that declares local memory and copies into it
     if (options.use_local_memory)
     {

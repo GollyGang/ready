@@ -30,7 +30,7 @@ using namespace std;
 
 OpenCL_MixIn::OpenCL_MixIn(int opencl_platform, int opencl_device)
     : global_range{ 1, 1, 1 }
-    , use_local_memory(false)
+    , use_local_memory(true)
     , local_work_size{ 1, 1, 1 }
     , iPlatform(opencl_platform)
     , iDevice(opencl_device)
