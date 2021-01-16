@@ -328,15 +328,15 @@ string AssembleKernelSource(const InputsNeeded& inputs_needed,
         kernel_source << "#define LZ " << options.local_work_size[2] << "\n";
     }
     // output the function declaration
-    kernel_source << "__kernel void rd_compute(";
+    kernel_source << "kernel void rd_compute(";
     for (int i = 0; i < num_chemicals; i++)
     {
-        kernel_source << "__global " << options.data_type_string << " *" << GetChemicalName(i) << "_in";
+        kernel_source << "global " << options.data_type_string << " *" << GetChemicalName(i) << "_in";
         kernel_source << ",";
     }
     for (int i = 0; i < num_chemicals; i++)
     {
-        kernel_source << "__global " << options.data_type_string << " *" << GetChemicalName(i) << "_out";
+        kernel_source << "global " << options.data_type_string << " *" << GetChemicalName(i) << "_out";
         if (i < num_chemicals - 1)
         {
             kernel_source << ",";

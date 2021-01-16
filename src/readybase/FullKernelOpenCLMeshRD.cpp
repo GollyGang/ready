@@ -33,7 +33,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_de
     : OpenCLMeshRD(opencl_platform,opencl_device,data_type)
 {
     this->SetRuleName("Full kernel example");
-    this->SetFormula("__kernel void rd_compute() {}");
+    this->SetFormula("kernel void rd_compute() {}");
 }
 
 // ---------------------------------------------------------------------------------------------------------
