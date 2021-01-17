@@ -146,10 +146,16 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
     inputs_needed.using_x_pos = UsingKeyword(formula_tokens, "x_pos");
     inputs_needed.using_y_pos = UsingKeyword(formula_tokens, "y_pos");
     inputs_needed.using_z_pos = UsingKeyword(formula_tokens, "z_pos");
-    // TODO: compute the maximum radii for the stencils
-    inputs_needed.stencil_radii[0] = 1;
-    inputs_needed.stencil_radii[1] = 1;
-    inputs_needed.stencil_radii[2] = 1;
+    // compute the overall stencil radius in each direction
+    inputs_needed.stencil_radii[0] = 0;
+    inputs_needed.stencil_radii[1] = 0;
+    inputs_needed.stencil_radii[2] = 0;
+    for (const InputPoint& input_point : inputs_needed.cells_needed)
+    {
+        inputs_needed.stencil_radii[0] = max(inputs_needed.stencil_radii[0], abs(input_point.point.x) / block_size[0]);
+        inputs_needed.stencil_radii[1] = max(inputs_needed.stencil_radii[1], abs(input_point.point.y) / block_size[1]);
+        inputs_needed.stencil_radii[2] = max(inputs_needed.stencil_radii[2], abs(input_point.point.z) / block_size[2]);
+    }
 
     return inputs_needed;
 }
@@ -196,12 +202,14 @@ void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed
     }
     if (options.use_local_memory)
     {
+        kernel_source << "// work group size:\n";
         kernel_source << "#define LX " << options.local_work_size[0] << "\n";
         kernel_source << "#define LY " << options.local_work_size[1] << "\n";
-        kernel_source << "#define LZ " << options.local_work_size[2] << "\n";
+        kernel_source << "#define LZ " << options.local_work_size[2] << "\n\n";
+        kernel_source << "// neighborhood size in each direction:\n";
         kernel_source << "#define XR " << inputs_needed.stencil_radii[0] << "\n";
         kernel_source << "#define YR " << inputs_needed.stencil_radii[1] << "\n";
-        kernel_source << "#define ZR " << inputs_needed.stencil_radii[2] << "\n";
+        kernel_source << "#define ZR " << inputs_needed.stencil_radii[2] << "\n\n";
     }
     // output the function declaration
     kernel_source << "kernel void rd_compute(";
@@ -273,34 +281,97 @@ void WriteIndices(ostringstream& kernel_source, const InputsNeeded& inputs_neede
 
 void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
-    kernel_source << options.indent << "// local memory:\n";
-    // TODO: work out which chemicals need local memory
-    // TODO: output how much local memory we allocate (to help pick work group sizes)
+    kernel_source << options.indent << "// copy into local memory:\n";
     for (const string& chem : inputs_needed.local_memory_needed)
     {
         kernel_source << options.indent << "local " << options.data_type_string << " local_" << chem
-            << "[LX + 2 * XR][LY + 2 * YR][LZ + 2 * ZR];\n";
+            << "[LX + XR * 2][LY + YR * 2][LZ + ZR * 2];\n";
+    }
+    int copy_size[3];
+    for (int i = 0; i < 3; i++)
+    {
+        copy_size[i] = ceil((options.local_work_size[i] + inputs_needed.stencil_radii[i] * 2) / (float)options.local_work_size[i]);
+    }
+    for (int cz = 0; cz < copy_size[2]; cz++) {
+        for (int cy = 0; cy < copy_size[1]; cy++) {
+            for (int cx = 0; cx < copy_size[0]; cx++) {
+                bool first_block = (cx == 0 && cy == 0 && cz == 0);
+                if(!first_block) // (the first block is always full, so always copy the cell)
+                {
+                    kernel_source << options.indent << "if(";
+                    if (cx > 0)
+                    {
+                        kernel_source << cx << " * LX + local_x < LX + XR * 2";
+                        if (cy > 0 || cz > 0)
+                        {
+                            kernel_source << " && ";
+                        }
+                    }
+                    if (cy > 0)
+                    {
+                        kernel_source << cy << " * LY + local_y < LY + YR * 2";
+                        if (cz > 0)
+                        {
+                            kernel_source << " && ";
+                        }
+                    }
+                    if (cz > 0)
+                    {
+                        kernel_source << cz << " * LZ + local_z < LZ + ZR * 2";
+                    }
+                    kernel_source << ") {\n";
+                }
+                for (const string& chem : inputs_needed.local_memory_needed)
+                {
+                    ostringstream ix;
+                    ix << "index_x - XR";
+                    if (cx > 0)
+                    {
+                        ix << " + " << cx << " * LX";
+                    }
+                    ostringstream iy;
+                    iy << "index_y - YR";
+                    if (cy > 0)
+                    {
+                        iy << " + " << cy << " * LY";
+                    }
+                    ostringstream iz;
+                    iz << "index_z - ZR";
+                    if (cz > 0)
+                    {
+                        iz << " + " << cz << " * LZ";
+                    }
+                    if (!first_block)
+                    {
+                        kernel_source << options.indent;
+                    }
+                    kernel_source << options.indent << "local_" << chem << "[";
+                    if (cx > 0)
+                    {
+                        kernel_source << cx << " * LX + ";
+                    }
+                    kernel_source << "local_x][";
+                    if (cy > 0)
+                    {
+                        kernel_source << cy << " * LY + ";
+                    }
+                    kernel_source << "local_y][";
+                    if (cz > 0)
+                    {
+                        kernel_source << cz << " * LZ + ";
+                    }
+                    kernel_source << "local_z] = " << chem << "_in[" << GetIndexString(ix.str(), iy.str(), iz.str(), options.wrap) << "];\n";
+                }
+                if (!first_block)
+                {
+                    kernel_source << options.indent << "}\n";
+                }
+            }
+        }
     }
     kernel_source << options.indent << "const int lx = local_x + XR;\n";
     kernel_source << options.indent << "const int ly = local_y + YR;\n";
     kernel_source << options.indent << "const int lz = local_z + ZR;\n";
-    // copy across the cell at this local_index
-    for (const string& chem : inputs_needed.local_memory_needed)
-    {
-        kernel_source << options.indent << "local_" << chem << "[lx][ly][lz] = " << chem << ";\n";
-    }
-    int copy_radii[3];
-    for (int i = 0; i < 3; i++)
-    {
-        copy_radii[i] = ceil(inputs_needed.stencil_radii[i] / (double)options.local_work_size[i]);
-    }
-    kernel_source << options.indent << "for(int cz = 0; cz < " << copy_radii[2] * 2 + 1 << "; cz++) {\n";
-    kernel_source << options.indent << options.indent << "for(int cy = 0; cy < " << copy_radii[1] * 2 + 1 << "; cy++) {\n";
-    kernel_source << options.indent << options.indent << options.indent << "for(int cx = 0; cx < " << copy_radii[0] * 2 + 1 << "; cx++) {\n";
-    // TODO
-    kernel_source << options.indent << options.indent << options.indent << "}\n";
-    kernel_source << options.indent << options.indent << "}\n";
-    kernel_source << options.indent << "}\n";
     kernel_source << "\n";
 }
 
@@ -317,7 +388,7 @@ void WriteCellsNeeded(ostringstream& kernel_source, const set<InputPoint>& cells
             && input_point.point.x % options.block_size[0] == 0)
         {
             kernel_source << options.indent << "const " << options.data_type_string << " "
-                          << input_point.GetDirectAccessCode(options.wrap, options.block_size) << ";\n";
+                          << input_point.GetDirectAccessCode(options.wrap, options.block_size, options.use_local_memory) << ";\n";
         }
     }
     if (options.block_size[0] == 4)
