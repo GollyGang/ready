@@ -289,7 +289,18 @@ void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& i
     {
         kernel_source << options.indent << "local_" << chem << "[lx][ly][lz] = " << chem << ";\n";
     }
-    // TODO: copy across the cells outside our local work group
+    int copy_radii[3];
+    for (int i = 0; i < 3; i++)
+    {
+        copy_radii[i] = ceil(inputs_needed.stencil_radii[i] / (double)options.local_work_size[i]);
+    }
+    kernel_source << options.indent << "for(int cz = 0; cz < " << copy_radii[2] * 2 + 1 << "; cz++) {\n";
+    kernel_source << options.indent << options.indent << "for(int cy = 0; cy < " << copy_radii[1] * 2 + 1 << "; cy++) {\n";
+    kernel_source << options.indent << options.indent << options.indent << "for(int cx = 0; cx < " << copy_radii[0] * 2 + 1 << "; cx++) {\n";
+    // TODO
+    kernel_source << options.indent << options.indent << options.indent << "}\n";
+    kernel_source << options.indent << options.indent << "}\n";
+    kernel_source << options.indent << "}\n";
     kernel_source << "\n";
 }
 
