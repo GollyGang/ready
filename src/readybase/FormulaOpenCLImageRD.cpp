@@ -202,11 +202,11 @@ void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed
     }
     if (options.use_local_memory)
     {
-        kernel_source << "// work group size:\n";
+        kernel_source << "// work group size, in blocks:\n";
         kernel_source << "#define LX " << options.local_work_size[0] << "\n";
         kernel_source << "#define LY " << options.local_work_size[1] << "\n";
         kernel_source << "#define LZ " << options.local_work_size[2] << "\n\n";
-        kernel_source << "// neighborhood size in each direction:\n";
+        kernel_source << "// neighborhood size in each direction, in blocks:\n";
         kernel_source << "#define XR " << inputs_needed.stencil_radii[0] << "\n";
         kernel_source << "#define YR " << inputs_needed.stencil_radii[1] << "\n";
         kernel_source << "#define ZR " << inputs_needed.stencil_radii[2] << "\n\n";
@@ -295,8 +295,8 @@ void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& i
     for (int cz = 0; cz < copy_size[2]; cz++) {
         for (int cy = 0; cy < copy_size[1]; cy++) {
             for (int cx = 0; cx < copy_size[0]; cx++) {
-                bool first_block = (cx == 0 && cy == 0 && cz == 0);
-                if(!first_block) // (the first block is always full, so always copy the cell)
+                const bool first_block = (cx == 0 && cy == 0 && cz == 0);
+                if(!first_block) // (the first block is always full, so no need for the if-statement)
                 {
                     kernel_source << options.indent << "if(";
                     if (cx > 0)
@@ -369,6 +369,7 @@ void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& i
             }
         }
     }
+    kernel_source << options.indent << "barrier(CLK_LOCAL_MEM_FENCE);\n";
     kernel_source << options.indent << "const int lx = local_x + XR;\n";
     kernel_source << options.indent << "const int ly = local_y + YR;\n";
     kernel_source << options.indent << "const int lz = local_z + ZR;\n";
