@@ -286,11 +286,11 @@ void WriteLocalMemoryCopyBlocks(ostringstream& kernel_source, const InputsNeeded
     {
         copy_size[i] = ceil((options.local_work_size[i] + inputs_needed.stencil_radii[i] * 2) / (float)options.local_work_size[i]);
     }
-    for (int cx = 0; cx < copy_size[0]; cx++)
+    for (int cz = 0; cz < copy_size[2]; cz++)
     {
         for (int cy = 0; cy < copy_size[1]; cy++)
         {
-            for (int cz = 0; cz < copy_size[2]; cz++)
+            for (int cx = 0; cx < copy_size[0]; cx++)
             {
                 const bool first_block = (cx == 0 && cy == 0 && cz == 0);
                 if (!first_block) // (the first block is always full, so no need for the if-statement)
@@ -343,94 +343,28 @@ void WriteLocalMemoryCopyBlocks(ostringstream& kernel_source, const InputsNeeded
                         kernel_source << options.indent;
                     }
                     kernel_source << options.indent << "local_" << chem << "[";
-                    if (cx > 0)
+                    if (cz > 0)
                     {
-                        kernel_source << cx << " * LX + ";
+                        kernel_source << cz << " * LZ + ";
                     }
-                    kernel_source << "local_x][";
+                    kernel_source << "local_z][";
                     if (cy > 0)
                     {
                         kernel_source << cy << " * LY + ";
                     }
                     kernel_source << "local_y][";
-                    if (cz > 0)
+                    if (cx > 0)
                     {
-                        kernel_source << cz << " * LZ + ";
+                        kernel_source << cx << " * LX + ";
                     }
-                    kernel_source << "local_z] = " << chem << "_in[" << GetIndexString(ix.str(), iy.str(), iz.str(), options.wrap) << "];\n";
+                    kernel_source << "local_x]";
+                    kernel_source << "= " << chem << "_in[" << GetIndexString(ix.str(), iy.str(), iz.str(), options.wrap) << "]; \n";
                 }
                 if (!first_block)
                 {
                     kernel_source << options.indent << "}\n";
                 }
             }
-        }
-    }
-}
-
-// -------------------------------------------------------------------------
-void WriteCopyCell(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options, int dim, int r)
-{
-    for (const string& chem : inputs_needed.local_memory_needed)
-    {
-        kernel_source << options.indent << options.indent << "local_" << chem;
-        switch (dim)
-        {
-        default:
-        case 0: kernel_source << "[lx " << showpos << r << "][ly][lz] = "; break;
-        case 1: kernel_source << "[lx][ly " << showpos << r << "][lz] = "; break;
-        case 2: kernel_source << "[lx][ly][lz " << showpos << r << "] = "; break;
-        }
-        kernel_source << chem << "_in[";
-        switch (dim)
-        {
-        default:
-        case 0: {
-            ostringstream ix;
-            ix << "index_x " << showpos << r;
-            kernel_source << GetIndexString(ix.str(), "index_y", "index_z", options.wrap);
-        } break;
-        case 1: {
-            ostringstream iy;
-            iy << "index_y " << showpos << r;
-            kernel_source << GetIndexString("index_x", iy.str(), "index_z", options.wrap);
-        } break;
-        case 2: {
-            ostringstream iz;
-            iz << "index_z " << showpos << r;
-            kernel_source << GetIndexString("index_x", "index_y", iz.str(), options.wrap);
-        } break;
-        }
-        kernel_source << "];\n";
-    }
-}
-
-// -------------------------------------------------------------------------
-
-void WriteLocalMemoryCopyEdges(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
-{
-    // copy the local cell
-    for (const string& chem : inputs_needed.local_memory_needed)
-    {
-        kernel_source << options.indent << "local_" << chem << "[lx][ly][lz] = " << chem << ";\n";
-    }
-    // each edge is responsible for copying the cells beyond
-    for (int dim = 0; dim < 3; dim++)
-    {
-        if (inputs_needed.stencil_radii[dim] > 0)
-        {
-            kernel_source << options.indent << "if(l" << "xyz"[dim] << " == 0) {\n";
-            for (int i = -1; i >= -inputs_needed.stencil_radii[dim]; i--)
-            {
-                WriteCopyCell(kernel_source, inputs_needed, options, dim, i);
-            }
-            kernel_source << options.indent << "}\n";
-            kernel_source << options.indent << "if(l" << "xyz"[dim] << " == L" << "XYZ"[dim] << " - 1) {\n";
-            for (int i = 1; i <= inputs_needed.stencil_radii[dim]; i++)
-            {
-                WriteCopyCell(kernel_source, inputs_needed, options, dim, i);
-            }
-            kernel_source << options.indent << "}\n";
         }
     }
 }
@@ -444,13 +378,12 @@ void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& i
     for (const string& chem : inputs_needed.local_memory_needed)
     {
         kernel_source << options.indent << "local " << options.data_type_string << " local_" << chem
-            << "[LX + XR * 2][LY + YR * 2][LZ + ZR * 2];\n";
+            << "[LZ + ZR * 2][LY + YR * 2][LX + XR * 2];\n";
     }
     kernel_source << options.indent << "const int lx = local_x + XR;\n";
     kernel_source << options.indent << "const int ly = local_y + YR;\n";
     kernel_source << options.indent << "const int lz = local_z + ZR;\n";
-    //WriteLocalMemoryCopyBlocks(kernel_source, inputs_needed, options);
-    WriteLocalMemoryCopyEdges(kernel_source, inputs_needed, options);
+    WriteLocalMemoryCopyBlocks(kernel_source, inputs_needed, options);
     kernel_source << options.indent << "barrier(CLK_LOCAL_MEM_FENCE);\n";
     kernel_source << "\n";
 }

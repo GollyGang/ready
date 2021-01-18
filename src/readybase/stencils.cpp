@@ -197,9 +197,9 @@ string InputPoint::GetDirectAccessCode(bool wrap, const int block_size[3], bool 
     oss << GetName() << " = ";
     if (use_local_memory)
     {
-        oss << "local_" << chem << "[lx" << showpos << point.x / block_size[0]
+        oss << "local_" << chem << "[lz" << showpos << point.z / block_size[2]
                                 << "][ly" << showpos << point.y / block_size[1]
-                                << "][lz" << showpos << point.z / block_size[2] << "]";
+                                << "][lx" << showpos << point.x / block_size[0] << "]";
     }
     else
     {
