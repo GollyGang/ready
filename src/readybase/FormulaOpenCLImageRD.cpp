@@ -281,6 +281,7 @@ void WriteIndices(ostringstream& kernel_source, const InputsNeeded& inputs_neede
 
 void WriteLocalMemoryCopyBlocks(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
+    // unroll the copy blocks, with if-statements to check if local index is for a cell that should be copied
     int copy_size[3];
     for (int i = 0; i < 3; i++)
     {
@@ -371,6 +372,31 @@ void WriteLocalMemoryCopyBlocks(ostringstream& kernel_source, const InputsNeeded
 
 // -------------------------------------------------------------------------
 
+void WriteLocalMemoryCopyBlocks2(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+{
+    // include the for-loops in the kernel code
+    kernel_source << options.indent << "const int x_start = index_x - local_x - XR;\n";
+    kernel_source << options.indent << "const int x_end = index_x - local_x + LX + XR;\n";
+    kernel_source << options.indent << "const int y_start = index_y - local_y - YR;\n";
+    kernel_source << options.indent << "const int y_end = index_y - local_y + LY + YR;\n";
+    kernel_source << options.indent << "const int z_start = index_z - local_z - ZR;\n";
+    kernel_source << options.indent << "const int z_end = index_z - local_z + LZ + ZR;\n";
+    kernel_source << options.indent << "for (int z = z_start + local_z; z < z_end; z += LZ) {\n";
+    kernel_source << options.indent << options.indent << "for (int y = y_start + local_y; y < y_end; y += LY) {\n";
+    kernel_source << options.indent << options.indent << options.indent << "for (int x = x_start + local_x; x < x_end; x += LX) {\n";
+    for (const string& chem : inputs_needed.local_memory_needed)
+    {
+        kernel_source << options.indent << options.indent << options.indent << options.indent << "local_" << chem
+            << "[z-z_start][y-y_start][x-x_start] = " << chem << "_in["
+            << GetIndexString("x", "y", "z", options.wrap) << "];\n";
+    }
+    kernel_source << options.indent << options.indent << options.indent << "}\n";
+    kernel_source << options.indent << options.indent << "}\n";
+    kernel_source << options.indent << "}\n";
+}
+
+// -------------------------------------------------------------------------
+
 void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     kernel_source << options.indent << "// copy into local memory:\n";
@@ -380,11 +406,12 @@ void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& i
         kernel_source << options.indent << "local " << options.data_type_string << " local_" << chem
             << "[LZ + ZR * 2][LY + YR * 2][LX + XR * 2];\n";
     }
+    WriteLocalMemoryCopyBlocks(kernel_source, inputs_needed, options);
+    //WriteLocalMemoryCopyBlocks2(kernel_source, inputs_needed, options);
+    kernel_source << options.indent << "barrier(CLK_LOCAL_MEM_FENCE);\n";
     kernel_source << options.indent << "const int lx = local_x + XR;\n";
     kernel_source << options.indent << "const int ly = local_y + YR;\n";
     kernel_source << options.indent << "const int lz = local_z + ZR;\n";
-    WriteLocalMemoryCopyBlocks(kernel_source, inputs_needed, options);
-    kernel_source << options.indent << "barrier(CLK_LOCAL_MEM_FENCE);\n";
     kernel_source << "\n";
 }
 
