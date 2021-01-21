@@ -18,6 +18,7 @@
 #include "stencils.hpp"
 
 // Stdlib:
+#include <array>
 #include <cmath>
 #include <exception>
 #include <map>
@@ -286,6 +287,20 @@ Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor
 template<int M, int N>
 Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
 {
+    array<array<int, N>, M> arr2;
+    for (int j = 0; j < M; j++)
+    {
+        for (int i = 0; i < N; i++)
+        {
+            arr2[j][i] = arr[j][i];
+        }
+    }
+    return StencilFrom2DArray(label, arr2, divisor, dx_power, dim1, dim2);
+}
+
+template<int M, int N>
+Stencil StencilFrom2DArray(const string& label, const array<array<int, N>, M>& arr, int divisor, int dx_power, int dim1, int dim2)
+{
     if (M % 2 != 1 || N % 2 != 1)
     {
         throw runtime_error("Internal error: StencilFrom2DArray takes an odd-sized array");
@@ -311,6 +326,23 @@ Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divi
 
 template<int L, int M, int N>
 Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
+{
+    array<array<array<int, N>, M>, L> arr2;
+    for (int k = 0; k < L; k++)
+    {
+        for (int j = 0; j < M; j++)
+        {
+            for (int i = 0; i < N; i++)
+            {
+                arr2[k][j][i] = arr[k][j][i];
+            }
+        }
+    }
+    return StencilFrom3DArray(label, arr2, divisor, dx_power, dim1, dim2, dim3);
+}
+
+template<int L, int M, int N>
+Stencil StencilFrom3DArray(const string& label, const array<array<array<int, N>, M>, L>& arr, int divisor, int dx_power, int dim1, int dim2, int dim3)
 {
     if (L % 2 != 1 || M % 2 != 1 || N % 2 != 1)
     {
@@ -339,16 +371,55 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
 
 // ---------------------------------------------------------------------
 
+using Arr3x3 = array<array<int, 3>, 3>;
+using Arr3x3x3 = array<array<array<int, 3>, 3>, 3>;
+using Arr5x5 = array<array<int, 5>, 5>;
+using Arr5x5x5 = array<array<array<int, 5>, 5>, 5>;
+
+Arr3x3 RotationallySymmetric3x3(int c1, int c2, int c3)
+{
+    return { { {c1, c2, c1},
+               {c2, c3, c2},
+               {c1, c2, c1} } };
+}
+
+Arr3x3x3 RotationallySymmetric3x3x3(int c1, int c2, int c3, int c4)
+{
+    return { { { { {c1, c2, c1}, {c2, c3, c2}, {c1, c2, c1} } },
+               { { {c2, c3, c2}, {c3, c4, c3}, {c2, c3, c2} } },
+               { { {c1, c2, c1}, {c2, c3, c2}, {c1, c2, c1} } } } };
+}
+
+Arr5x5 RotationallySymmetric5x5(int c1, int c2, int c3, int c4, int c5, int c6)
+{
+    return { { {c1, c2, c3, c2, c1},
+               {c2, c4, c5, c4, c2},
+               {c3, c5, c6, c5, c3},
+               {c2, c4, c5, c4, c2},
+               {c1, c2, c3, c2, c1} } };
+}
+
+Arr5x5x5 RotationallySymmetric5x5x5(int c1, int c2, int c3, int c4, int c5, int c6, int c7, int c8, int c9, int c10)
+{
+    return { { { { {c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1} } },
+               { { {c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2} } },
+               { { {c3,c5,c8,c5,c3}, {c5,c7,c9,c7,c5}, {c8,c9,c10,c9,c8}, {c5,c7,c9,c7,c5}, {c3,c5,c8,c5,c3} } },
+               { { {c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2} } },
+               { { {c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1} } } } };
+}
+
+// ---------------------------------------------------------------------
+
 Stencil GetGaussianStencil(int dimensionality)
 {
     switch (dimensionality)
     {
     case 1:
         // from OpenCV
-        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 0, 0); // is dx_power correct?
+        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 0, 0);
     case 2:
         // from https://homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
-        return StencilFrom2DArray("gaussian", {{1,4,7,4,1},{4,16,26,16,4},{7,26,41,26,7},{4,16,26,16,4},{1,4,7,4,1}}, 273, 0, 0, 1); // is dx_power correct?
+        return StencilFrom2DArray("gaussian", RotationallySymmetric5x5(1,4,7,16,26,41), 273, 0, 0, 1);
     case 3:
         // see Scripts/Python/convolve.py
         return StencilFrom3DArray("gaussian", {{{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}},
@@ -368,25 +439,28 @@ Stencil GetLaplacianStencil(int dimensionality, const AbstractRD::Accuracy& accu
     switch (dimensionality)
     {
     case 1:
-        return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 2, 0);
+        switch (accuracy)
+        {
+            case AbstractRD::Accuracy::Low:
+            case AbstractRD::Accuracy::Medium: // 2nd order version
+                return StencilFrom1DArray("laplacian", { 1, -2, 1 }, 1, 2, 0);
+            case AbstractRD::Accuracy::High: // 4th order version
+                return StencilFrom1DArray("laplacian", { -1, 16, -30, 16, -1 }, 12, 2, 0);
+        }
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
         switch (accuracy)
         {
             case AbstractRD::Accuracy::Low:
-                return StencilFrom2DArray("laplacian", { {0,1,0}, {1,-4,1}, {0,1,0} }, 1, 2, 0, 1); // anisotropic
-            case AbstractRD::Accuracy::Medium:
-            case AbstractRD::Accuracy::High:
-                return StencilFrom2DArray("laplacian", { {1,4,1}, {4,-20,4}, {1,4,1} }, 6, 2, 0, 1); // Known under the name "Mehrstellen"
+                return StencilFrom2DArray("laplacian", RotationallySymmetric3x3(0, 1, -4), 1, 2, 0, 1); // anisotropic
+            case AbstractRD::Accuracy::Medium: // 2nd order version
+                return StencilFrom2DArray("laplacian", RotationallySymmetric3x3(1, 4, -20), 6, 2, 0, 1); // Known under the name "Mehrstellen"
+            case AbstractRD::Accuracy::High: // 4th order version
+                return StencilFrom2DArray("laplacian", RotationallySymmetric5x5(0, -2, -1, 16, 52, -252), 60, 2, 0, 1); // 21-point stencil
         }
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        int c1, c2, c3, c4, divisor;
-        // 27-point stencil:
-        c1 = 1; c2 = 3; c3 = 14; c4 = -128; divisor = 30;
-        return StencilFrom3DArray("laplacian", {{{c1,c2,c1}, {c2,c3,c2}, {c1,c2,c1}},
-                                                {{c2,c3,c2}, {c3,c4,c3}, {c2,c3,c2}},
-                                                {{c1,c2,c1}, {c2,c3,c2}, {c1,c2,c1}}}, divisor, 2, 0, 1, 2);
+        return StencilFrom3DArray("laplacian", RotationallySymmetric3x3x3(1, 3, 14, -128), 30, 2, 0, 1, 2); // 27-point stencil
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
@@ -405,18 +479,10 @@ Stencil GetBiLaplacianStencil(int dimensionality)
         return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 4, 0);
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        return StencilFrom2DArray("bilaplacian", {{0,1,1,1,0}, {1,-2,-10,-2,1}, {1,-10,36,-10,1}, {1,-2,-10,-2,1}, {0,1,1,1,0}}, 3, 4, 0, 1);
+        return StencilFrom2DArray("bilaplacian", RotationallySymmetric5x5(0, 1, 1, -2, -10, 36), 3, 4, 0, 1);
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        int c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, divisor;
-        // 52-point stencil:
-        c2 = c3 = c5 = c8 = c9 = 0;
-        c1 = -1; c4 = 10; c6 = -20; c7 = -36; c10 = 360; divisor = 36;
-        return StencilFrom3DArray("bilaplacian", {{{c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1}},
-                                                  {{c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2}},
-                                                  {{c3,c5,c8,c5,c3}, {c5,c7,c9,c7,c5}, {c8,c9,c10,c9,c8}, {c5,c7,c9,c7,c5}, {c3,c5,c8,c5,c3}},
-                                                  {{c2,c4,c5,c4,c2}, {c4,c6,c7,c6,c4}, {c5,c7,c9, c7,c5}, {c4,c6,c7,c6,c4}, {c2,c4,c5,c4,c2}},
-                                                  {{c1,c2,c3,c2,c1}, {c2,c4,c5,c4,c2}, {c3,c5,c8, c5,c3}, {c2,c4,c5,c4,c2}, {c1,c2,c3,c2,c1}}}, divisor, 4, 0, 1, 2);
+        return StencilFrom3DArray("bilaplacian", RotationallySymmetric5x5x5(-1, 0, 0, 10, 0, -20, -36, 0, 0, 360), 36, 4, 0, 1, 2); // 52-point stencil
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
     }
@@ -435,9 +501,13 @@ Stencil GetTriLaplacianStencil(int dimensionality)
         return StencilFrom1DArray("trilaplacian", {1,-6,15,-20,15,-6,1}, 1, 6, 0);
     case 2:
         // obtained by convolving a 2D Laplacian stencil with a 2D bi-Laplacian stencil - see Scripts/Python/convolve.py
-        return StencilFrom2DArray("trilaplacian", { {0,1,5,6,5,1,0}, {1,6,-33,-56,-33,6,1}, {5,-33,6,314,6,-33,5},
-                                                   {6,-56,314,-888,314,-56,6}, {5,-33,6,314,6,-33,5}, {1,6,-33,-56,-33,6,1},
-                                                   {0,1,5,6,5,1,0} }, 18, 6, 0, 1);
+        return StencilFrom2DArray("trilaplacian", { {0,1,5,6,5,1,0},
+                                                    {1,6,-33,-56,-33,6,1},
+                                                    {5,-33,6,314,6,-33,5},
+                                                    {6,-56,314,-888,314,-56,6},
+                                                    {5,-33,6,314,6,-33,5},
+                                                    {1,6,-33,-56,-33,6,1},
+                                                    {0,1,5,6,5,1,0} }, 18, 6, 0, 1);
     case 3:
         // obtained by convolving a 3D Laplacian stencil with a 3D bi-Laplacian stencil - see Scripts/Python/convolve.py
         return StencilFrom3DArray("trilaplacian", { {{-1,-3,-1,0,-1,-3,-1},{-3,-4,27,20,27,-4,-3},{-1,27,139,60,139,27,-1},
@@ -464,17 +534,35 @@ Stencil GetTriLaplacianStencil(int dimensionality)
 
 vector<Stencil> GetKnownStencils(int dimensionality, const AbstractRD::Accuracy& accuracy)
 {
-    Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0); // name, stencil, divisor, dx_power, axes
-    //Stencil XGradient = StencilFrom1DArray("x_gradient", { 1, -8, 0, 8, -1 }, 12, 1, 0); // 4th order version
-    Stencil YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
-    Stencil ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
-    Stencil XDeriv2 = StencilFrom1DArray("x_deriv2", { 1, -2, 1 }, 1, 2, 0);
-    Stencil YDeriv2 = StencilFrom1DArray("y_deriv2", { 1, -2, 1 }, 1, 2, 1);
-    Stencil ZDeriv2 = StencilFrom1DArray("z_deriv2", { 1, -2, 1 }, 1, 2, 2);
-    Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 0);
-    //Stencil XDeriv3 = StencilFrom1DArray("x_deriv3", { 1, -8, 13, 0, -13, 8, -1 }, 8, 3, 0); // 4th order version
-    Stencil YDeriv3 = StencilFrom1DArray("y_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 1);
-    Stencil ZDeriv3 = StencilFrom1DArray("z_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 2);
+    Stencil XGradient, YGradient, ZGradient;
+    Stencil XDeriv2, YDeriv2, ZDeriv2;
+    Stencil XDeriv3, YDeriv3, ZDeriv3;
+    switch (accuracy)
+    {
+        case AbstractRD::Accuracy::Low:
+        case AbstractRD::Accuracy::Medium: // 2nd order versions
+            XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0);
+            YGradient = StencilFrom1DArray("y_gradient", { -1, 0, 1 }, 2, 1, 1);
+            ZGradient = StencilFrom1DArray("z_gradient", { -1, 0, 1 }, 2, 1, 2);
+            XDeriv2 = StencilFrom1DArray("x_deriv2", { 1, -2, 1 }, 1, 2, 0);
+            YDeriv2 = StencilFrom1DArray("y_deriv2", { 1, -2, 1 }, 1, 2, 1);
+            ZDeriv2 = StencilFrom1DArray("z_deriv2", { 1, -2, 1 }, 1, 2, 2);
+            XDeriv3 = StencilFrom1DArray("x_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 0);
+            YDeriv3 = StencilFrom1DArray("y_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 1);
+            ZDeriv3 = StencilFrom1DArray("z_deriv3", { -1, 2, 0, -2, 1 }, 2, 3, 2);
+            break;
+        case AbstractRD::Accuracy::High: // 4th order versions
+            XGradient = StencilFrom1DArray("x_gradient", { 1, -8, 0, 8, -1 }, 12, 1, 0);
+            YGradient = StencilFrom1DArray("y_gradient", { 1, -8, 0, 8, -1 }, 12, 1, 1);
+            ZGradient = StencilFrom1DArray("z_gradient", { 1, -8, 0, 8, -1 }, 12, 1, 2);
+            XDeriv2 = StencilFrom1DArray("x_deriv2", { -1, 16, -30, 16, -1 }, 12, 2, 0);
+            YDeriv2 = StencilFrom1DArray("y_deriv2", { -1, 16, -30, 16, -1 }, 12, 2, 1);
+            ZDeriv2 = StencilFrom1DArray("z_deriv2", { -1, 16, -30, 16, -1 }, 12, 2, 2);
+            XDeriv3 = StencilFrom1DArray("x_deriv3", { 1, -8, 13, 0, -13, 8, -1 }, 8, 3, 0);
+            YDeriv3 = StencilFrom1DArray("y_deriv3", { 1, -8, 13, 0, -13, 8, -1 }, 8, 3, 1);
+            ZDeriv3 = StencilFrom1DArray("z_deriv3", { 1, -8, 13, 0, -13, 8, -1 }, 8, 3, 2);
+            break;
+    }
     Stencil SobelN = StencilFrom2DArray("sobelN", { {1, 2, 1},
                                                     {0, 0, 0},
                                                     {-1, -2, -1} }, 1, 0, 0, 1);
