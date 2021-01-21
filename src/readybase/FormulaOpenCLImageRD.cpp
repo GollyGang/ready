@@ -279,7 +279,7 @@ void WriteIndices(ostringstream& kernel_source, const InputsNeeded& inputs_neede
 
 // -------------------------------------------------------------------------
 
-void WriteLocalMemoryCopyBlocks(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+void WriteLocalMemoryCopyBlocksUnrolled(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     // unroll the copy blocks, with if-statements to check if local index is for a cell that should be copied
     int copy_size[3];
@@ -372,7 +372,7 @@ void WriteLocalMemoryCopyBlocks(ostringstream& kernel_source, const InputsNeeded
 
 // -------------------------------------------------------------------------
 
-void WriteLocalMemoryCopyBlocks2(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
+void WriteLocalMemoryCopyBlocksWithLoops(ostringstream& kernel_source, const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     // include the for-loops in the kernel code
     kernel_source << options.indent << "const int x_start = index_x - local_x - XR;\n";
@@ -387,7 +387,7 @@ void WriteLocalMemoryCopyBlocks2(ostringstream& kernel_source, const InputsNeede
     for (const string& chem : inputs_needed.local_memory_needed)
     {
         kernel_source << options.indent << options.indent << options.indent << options.indent << "local_" << chem
-            << "[z-z_start][y-y_start][x-x_start] = " << chem << "_in["
+            << "[z - z_start][y - y_start][x - x_start] = " << chem << "_in["
             << GetIndexString("x", "y", "z", options.wrap) << "];\n";
     }
     kernel_source << options.indent << options.indent << options.indent << "}\n";
@@ -406,8 +406,8 @@ void WriteLocalMemorySection(ostringstream& kernel_source, const InputsNeeded& i
         kernel_source << options.indent << "local " << options.data_type_string << " local_" << chem
             << "[LZ + ZR * 2][LY + YR * 2][LX + XR * 2];\n";
     }
-    WriteLocalMemoryCopyBlocks(kernel_source, inputs_needed, options);
-    //WriteLocalMemoryCopyBlocks2(kernel_source, inputs_needed, options);
+    WriteLocalMemoryCopyBlocksUnrolled(kernel_source, inputs_needed, options);
+    //WriteLocalMemoryCopyBlocksWithLoops(kernel_source, inputs_needed, options); // possibly a bit slower, may depend on stencils
     kernel_source << options.indent << "barrier(CLK_LOCAL_MEM_FENCE);\n";
     kernel_source << options.indent << "const int lx = local_x + XR;\n";
     kernel_source << options.indent << "const int ly = local_y + YR;\n";
