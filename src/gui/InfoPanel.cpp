@@ -52,6 +52,7 @@ const wxString InfoPanel::formula_label = _("Formula");
 const wxString InfoPanel::kernel_label = _("Kernel");
 const wxString InfoPanel::dimensions_label = _("Dimensions");
 const wxString InfoPanel::block_size_label = _("Block size");
+const wxString InfoPanel::use_local_memory_label = _("Use local memory");
 const wxString InfoPanel::number_of_cells_label = _("Number of cells");
 const wxString InfoPanel::wrap_label = _("Toroidal wrap-around");
 const wxString InfoPanel::data_type_label = _("Data type");
@@ -190,6 +191,8 @@ void InfoPanel::Update(const AbstractRD& system)
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
                                         system.GetBlockSizeX(),system.GetBlockSizeY(),system.GetBlockSizeZ()),
                                         system.HasEditableBlockSize());
+
+    contents += AppendRow(use_local_memory_label, use_local_memory_label, system.GetUseLocalMemory() ? _("true") : _("false"), true);
 
     if (system.HasEditableWrapOption())
         contents += AppendRow(wrap_label, wrap_label, system.GetWrap() ? _("on") : _("off"), true);
@@ -636,6 +639,15 @@ void InfoPanel::ChangeBlockSize()
 
 // -----------------------------------------------------------------------------
 
+void InfoPanel::ChangeUseLocalMemory()
+{
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    sys.SetUseLocalMemory(!sys.GetUseLocalMemory());
+    this->Update(sys);
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::ChangeWrapOption()
 {
     AbstractRD& sys = frame->GetCurrentRDSystem();
@@ -682,6 +694,9 @@ void InfoPanel::ChangeInfo(const wxString& label)
 
     } else if ( label == block_size_label ) {
         ChangeBlockSize();
+
+    } else if ( label == use_local_memory_label ) {
+        ChangeUseLocalMemory();
 
     } else if ( label == wrap_label ) {
         ChangeWrapOption();

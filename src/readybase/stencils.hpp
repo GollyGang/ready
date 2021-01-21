@@ -69,10 +69,9 @@ struct InputPoint
     std::string chem;
 
     std::string GetName() const;
-    std::string GetDirectAccessCode(bool wrap, const int block_size[3]) const;
+    std::string GetDirectAccessCode(bool wrap, const int block_size[3], bool use_local_memory) const;
     std::string GetSwizzled_Block411() const;
     std::pair<InputPoint, InputPoint> GetAlignedBlocks_Block411() const;
-    static std::string GetIndexString(int val, const std::string& coord, const std::string& coord_capital, bool wrap);
 
     friend bool operator<(const InputPoint& a, const InputPoint& b)
     {
@@ -97,5 +96,9 @@ struct AppliedStencil
 // ---------------------------------------------------------------------
 
 std::vector<Stencil> GetKnownStencils(int dimensionality);
+std::string GetIndexString(int x, int y, int z, bool wrap);
+std::string GetIndexString(const std::string& x, const std::string& y, const std::string& z, bool wrap);
+std::string GetCoordString(int val, const std::string& coord, const std::string& coord_capital, bool wrap);
+std::string GetCoordString(const std::string& val, const std::string& coord_capital, bool wrap);
 
 // ---------------------------------------------------------------------
