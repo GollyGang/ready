@@ -12,7 +12,9 @@
       The rate of change is the negative x gradient. The result is that patterns move to the right without changing shape, as
       if carried by some bulk flow or &lt;i&gt;advection&lt;/i&gt;.
 
-      (After a while distortions and instabilities appear because we are using only simple numerical methods.)
+      After a while distortions and instabilities appear because we are using only simple numerical methods. To reduce
+      the distortions, set the accuracy to 'high' below to use a 5-point stencil. To delay the onset of numerical instability,
+      use a smaller timestep or change the data type to 'double'.
     </description>
 
     <rule name="advection" type="formula" neighborhood_type="vertex">

@@ -59,7 +59,7 @@ const wxString InfoPanel::neighborhood_type_label = _("Neighborhood");
 const wxString InfoPanel::neighborhood_range_label = _("Neighborhood range");
 const wxString InfoPanel::neighborhood_weight_label = _("Neighborhood weight");
 const wxString InfoPanel::accuracy_label = _("Accuracy");
-const wxString InfoPanel::accuracy_labels[3] = { _("Low"), _("Medium"), _("High") };
+const wxString InfoPanel::accuracy_labels[3] = { _("low"), _("medium"), _("high") };
 
 // -----------------------------------------------------------------------------
 
