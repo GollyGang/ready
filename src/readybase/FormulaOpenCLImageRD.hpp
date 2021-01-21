@@ -45,7 +45,6 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
         bool HasEditableAccuracyOption() const override { return true; }
         void SetAccuracy(Accuracy acc) override { this->accuracy = acc; this->need_reload_formula = true; }
 
-
         std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel
