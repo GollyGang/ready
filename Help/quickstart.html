@@ -72,6 +72,9 @@ To improve the overall speed here are some things to check:
 <li>Avoid using the same graphics card for rendering, if possible. For example on my laptop I can tell Windows that Ready
 should use the integrated graphics chip for rendering (Graphics Settings), which leaves the NVidia card free to run OpenCL.
 <li>Set the data type to float if possible. Using double is typically slower.
+<li>Try using local memory, with the setting in the Info Pane. This is a recent feature, let us know if it makes a
+dramatic difference.
+<li>Try changing the block size. On most devices the default 4x1x1 block size is fastest.
 </ul>
 
 <p>
