@@ -607,20 +607,30 @@ void InfoPanel::ChangeBlockSize()
     int oldz = sys.GetBlockSizeZ();
     int newx, newy, newz;
 
-    // position dialog box to left of linkrect
-    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    int dlgwd = 300;
-    pos.x -= dlgwd + 20;
-
-    XYZIntDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
-
-    if (dialog.ShowModal() == wxID_OK)
+    const bool allow_full_control = false;
+    if (allow_full_control)
     {
-        newx = dialog.GetX();
-        newy = dialog.GetY();
-        newz = dialog.GetZ();
-        if (newx != oldx || newy != oldy || newz != oldz)
-            frame->SetBlockSize(newx, newy, newz);
+        // position dialog box to left of linkrect
+        wxPoint pos = ClientToScreen(wxPoint(html->linkrect.x, html->linkrect.y));
+        int dlgwd = 300;
+        pos.x -= dlgwd + 20;
+
+        XYZIntDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd, -1));
+
+        if (dialog.ShowModal() == wxID_OK)
+        {
+            newx = dialog.GetX();
+            newy = dialog.GetY();
+            newz = dialog.GetZ();
+            if (newx != oldx || newy != oldy || newz != oldz)
+                frame->SetBlockSize(newx, newy, newz);
+        }
+    }
+    else
+    {
+        newx = (oldx == 4) ? 1 : 4;
+        newy = newz = 1;
+        frame->SetBlockSize(newx, newy, newz);
     }
 }
 
