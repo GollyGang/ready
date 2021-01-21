@@ -419,7 +419,7 @@ Stencil GetGaussianStencil(int dimensionality)
         return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 0, 0);
     case 2:
         // from https://homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
-        return StencilFrom2DArray("gaussian", RotationallySymmetric5x5(1,4,7,16,26,41), 273, 0, 0, 1);
+        return StencilFrom2DArray<5,5>("gaussian", RotationallySymmetric5x5(1,4,7,16,26,41), 273, 0, 0, 1);
     case 3:
         // see Scripts/Python/convolve.py
         return StencilFrom3DArray("gaussian", {{{1,4,6,4,1},{4,16,25,16,4},{7,27,44,27,7},{4,16,25,16,4},{1,4,6,4,1}},
