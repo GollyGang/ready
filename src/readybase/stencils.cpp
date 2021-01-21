@@ -360,7 +360,7 @@ Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divi
             arr2[j][i] = arr[j][i];
         }
     }
-    return StencilFrom2DArray(label, arr2, divisor, dx_power, dim1, dim2);
+    return StencilFrom2DArray<M,N>(label, arr2, divisor, dx_power, dim1, dim2);
 }
 
 // ---------------------------------------------------------------------
@@ -407,7 +407,7 @@ Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int d
             }
         }
     }
-    return StencilFrom3DArray(label, arr2, divisor, dx_power, dim1, dim2, dim3);
+    return StencilFrom3DArray<L,M,N>(label, arr2, divisor, dx_power, dim1, dim2, dim3);
 }
 
 // ---------------------------------------------------------------------
@@ -493,15 +493,15 @@ Stencil GetLaplacianStencil(int dimensionality, const AbstractRD::Accuracy& accu
         switch (accuracy)
         {
             case AbstractRD::Accuracy::Low:
-                return StencilFrom2DArray("laplacian", RotationallySymmetric3x3(0, 1, -4), 1, 2, 0, 1); // anisotropic
+                return StencilFrom2DArray<3,3>("laplacian", RotationallySymmetric3x3(0, 1, -4), 1, 2, 0, 1); // anisotropic
             case AbstractRD::Accuracy::Medium: // 2nd order version
-                return StencilFrom2DArray("laplacian", RotationallySymmetric3x3(1, 4, -20), 6, 2, 0, 1); // Known under the name "Mehrstellen"
+                return StencilFrom2DArray<3,3>("laplacian", RotationallySymmetric3x3(1, 4, -20), 6, 2, 0, 1); // Known under the name "Mehrstellen"
             case AbstractRD::Accuracy::High: // 4th order version
-                return StencilFrom2DArray("laplacian", RotationallySymmetric5x5(0, -2, -1, 16, 52, -252), 60, 2, 0, 1); // 21-point stencil
+                return StencilFrom2DArray<5,5>("laplacian", RotationallySymmetric5x5(0, -2, -1, 16, 52, -252), 60, 2, 0, 1); // 21-point stencil
         }
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        return StencilFrom3DArray("laplacian", RotationallySymmetric3x3x3(1, 3, 14, -128), 30, 2, 0, 1, 2); // 27-point stencil
+        return StencilFrom3DArray<3,3>("laplacian", RotationallySymmetric3x3x3(1, 3, 14, -128), 30, 2, 0, 1, 2); // 27-point stencil
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
@@ -520,10 +520,10 @@ Stencil GetBiLaplacianStencil(int dimensionality)
         return StencilFrom1DArray("bilaplacian", {1,-4,6,-4,1}, 1, 4, 0);
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        return StencilFrom2DArray("bilaplacian", RotationallySymmetric5x5(0, 1, 1, -2, -10, 36), 3, 4, 0, 1);
+        return StencilFrom2DArray<5,5>("bilaplacian", RotationallySymmetric5x5(0, 1, 1, -2, -10, 36), 3, 4, 0, 1);
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        return StencilFrom3DArray("bilaplacian", RotationallySymmetric5x5x5(-1, 0, 0, 10, 0, -20, -36, 0, 0, 360), 36, 4, 0, 1, 2); // 52-point stencil
+        return StencilFrom3DArray<5,5,5>("bilaplacian", RotationallySymmetric5x5x5(-1, 0, 0, 10, 0, -20, -36, 0, 0, 360), 36, 4, 0, 1, 2); // 52-point stencil
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetBiLaplacianStencil");
     }
