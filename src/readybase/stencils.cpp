@@ -15,7 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// Local:
 #include "stencils.hpp"
 
 // Stdlib:
@@ -364,7 +363,7 @@ Stencil GetGaussianStencil(int dimensionality)
 
 // ---------------------------------------------------------------------
 
-Stencil GetLaplacianStencil(int dimensionality)
+Stencil GetLaplacianStencil(int dimensionality, const AbstractRD::Accuracy& accuracy)
 {
     switch (dimensionality)
     {
@@ -372,7 +371,14 @@ Stencil GetLaplacianStencil(int dimensionality)
         return StencilFrom1DArray("laplacian", {1,-2,1}, 1, 2, 0);
     case 2:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        return StencilFrom2DArray("laplacian", {{1,4,1}, {4,-20,4}, {1,4,1}}, 6, 2, 0, 1); // Known under the name "Mehrstellen"
+        switch (accuracy)
+        {
+            case AbstractRD::Accuracy::Low:
+                return StencilFrom2DArray("laplacian", { {0,1,0}, {1,-4,1}, {0,1,0} }, 1, 2, 0, 1); // anisotropic
+            case AbstractRD::Accuracy::Medium:
+            case AbstractRD::Accuracy::High:
+                return StencilFrom2DArray("laplacian", { {1,4,1}, {4,-20,4}, {1,4,1} }, 6, 2, 0, 1); // Known under the name "Mehrstellen"
+        }
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
         int c1, c2, c3, c4, divisor;
@@ -456,7 +462,7 @@ Stencil GetTriLaplacianStencil(int dimensionality)
 
 // ---------------------------------------------------------------------
 
-vector<Stencil> GetKnownStencils(int dimensionality)
+vector<Stencil> GetKnownStencils(int dimensionality, const AbstractRD::Accuracy& accuracy)
 {
     Stencil XGradient = StencilFrom1DArray("x_gradient", { -1, 0, 1 }, 2, 1, 0); // name, stencil, divisor, dx_power, axes
     //Stencil XGradient = StencilFrom1DArray("x_gradient", { 1, -8, 0, 8, -1 }, 12, 1, 0); // 4th order version
@@ -494,7 +500,7 @@ vector<Stencil> GetKnownStencils(int dimensionality)
                                                       {-1, 0, 1},
                                                       {0, 1, 2} }, 1, 0, 0, 1);
     Stencil Gaussian = GetGaussianStencil(dimensionality);
-    Stencil Laplacian = GetLaplacianStencil(dimensionality);
+    Stencil Laplacian = GetLaplacianStencil(dimensionality, accuracy);
     Stencil BiLaplacian = GetBiLaplacianStencil(dimensionality);
     Stencil TriLaplacian = GetTriLaplacianStencil(dimensionality);
     return { XGradient, YGradient, ZGradient,

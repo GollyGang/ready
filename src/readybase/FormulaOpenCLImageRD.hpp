@@ -43,6 +43,8 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
         void SetBlockSizeZ(int n) override { this->block_size[2] = n; this->need_reload_formula = true; }
 
         bool HasEditableAccuracyOption() const override { return true; }
+        void SetAccuracy(Accuracy acc) override { this->accuracy = acc; this->need_reload_formula = true; }
+
 
         std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 

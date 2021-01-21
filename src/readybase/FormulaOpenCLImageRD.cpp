@@ -65,12 +65,13 @@ struct InputsNeeded {
 
 // -------------------------------------------------------------------------
 
-InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality, const int block_size[3])
+InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality, const int block_size[3],
+                                const AbstractRD::Accuracy& accuracy)
 {
     InputsNeeded inputs_needed;
 
     const vector<string> formula_tokens = tokenize_for_keywords(formula);
-    const vector<Stencil> known_stencils = GetKnownStencils(dimensionality);
+    const vector<Stencil> known_stencils = GetKnownStencils(dimensionality, accuracy);
     for (int i = 0; i < num_chemicals; i++)
     {
         const string chem = GetChemicalName(i);
@@ -367,7 +368,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     }
 
     const InputsNeeded inputs_needed = DetectInputsNeeded(formula, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality(), this->block_size);
+        this->GetArenaDimensionality(), this->block_size, this->GetAccuracy());
 
     const string indent = "    ";
     const KernelOptions options(this->wrap, indent, this->data_type, full_data_type_string, this->data_type_suffix, this->block_size);
