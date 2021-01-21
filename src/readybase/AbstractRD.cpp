@@ -32,14 +32,14 @@ AbstractRD::AbstractRD(int data_type)
     : x_spacing_proportion(0.05)
     , y_spacing_proportion(0.1)
     , accuracy(Accuracy::Medium)
+    , use_local_memory(false)
+    , timesteps_taken(0)
+    , need_reload_formula(true)
+    , is_modified(false)
+    , wrap(true)
+    , neighborhood_type(TNeighborhood::VERTEX_NEIGHBORS)
 {
-    this->timesteps_taken = 0;
-    this->need_reload_formula = true;
-    this->is_modified = false;
-    this->wrap = true;
     this->InternalSetDataType(data_type);
-
-    this->neighborhood_type = TNeighborhood::VERTEX_NEIGHBORS;
 
     #if defined(USE_SSE)
         // disable accurate handling of denormals and zeros, for speed
@@ -418,4 +418,3 @@ void AbstractRD::InternalSetDataType(int type)
 }
 
 // ---------------------------------------------------------------------
-

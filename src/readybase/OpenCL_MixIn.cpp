@@ -28,25 +28,23 @@ using namespace std;
 
 // ---------------------------------------------------------------------------
 
-OpenCL_MixIn::OpenCL_MixIn(int opencl_platform,int opencl_device)
+OpenCL_MixIn::OpenCL_MixIn(int opencl_platform, int opencl_device)
+    : global_range{ 1, 1, 1 }
+    , local_work_size{ 1, 1, 1 }
+    , iPlatform(opencl_platform)
+    , iDevice(opencl_device)
+    , need_reload_context(true)
+    , need_write_to_opencl_buffers(true)
+    , kernel_function_name("rd_compute")
+    , device_id(NULL)
+    , context(NULL)
+    , command_queue(NULL)
+    , kernel(NULL)
+    , program(NULL)
+    , iCurrentBuffer(0)
 {
-    this->iPlatform = opencl_platform;
-    this->iDevice = opencl_device;
-    this->need_reload_context = true;
-    this->need_write_to_opencl_buffers = true;
-    this->kernel_function_name = "rd_compute";
-
-    // initialise the opencl things to null in case we fail to create them
-    this->device_id = NULL;
-    this->context = NULL;
-    this->command_queue = NULL;
-    this->kernel = NULL;
-    this->program = NULL;
-
     if(LinkOpenCL()!= CL_SUCCESS)
         throw runtime_error("Failed to load dynamic library for OpenCL");
-
-    this->iCurrentBuffer = 0;
 }
 
 // ---------------------------------------------------------------------------

@@ -83,6 +83,7 @@ class InfoPanel : public wxPanel
         static const wxString kernel_label;
         static const wxString dimensions_label;
         static const wxString block_size_label;
+        static const wxString use_local_memory_label;
         static const wxString number_of_cells_label;
         static const wxString wrap_label;
         static const wxString data_type_label;
@@ -109,6 +110,7 @@ private:
         void ChangeDimensions();
         void ChangeBlockSize();
         void ChangeAccuracy();
+        void ChangeUseLocalMemory();
         void ChangeWrapOption();
         void ChangeDataType();
         

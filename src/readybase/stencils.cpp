@@ -124,31 +124,49 @@ string InputPoint::GetSwizzled_Block411() const
 
 // -------------------------------------------------------------------------
 
-string InputPoint::GetDirectAccessCode(bool wrap, const int block_size[3]) const
+string GetIndexString(const string& x, const string& y, const string& z, bool wrap)
 {
-    if (block_size[0] == 4 && point.x % 4 != 0)
-    {
-        throw runtime_error("internal error in GetDirectAccessCode: point.x not divisible by 4");
-    }
+    // x, y, z must include index_x etc: "index_x+1" or "index_y-2" or "index_z" etc.
     ostringstream oss;
-    oss << GetName() << " = " << chem << "_in[";
-    if (point.x == 0 && point.y == 0 && point.z == 0)
-    {
-        oss << "index_here";
-    }
-    else {
-        const string index_x = GetIndexString(point.x / block_size[0], "x", "X", wrap);
-        const string index_y = GetIndexString(point.y, "y", "Y", wrap);
-        const string index_z = GetIndexString(point.z, "z", "Z", wrap);
-        oss << "X* (Y * " << index_z << " + " << index_y << ") + " << index_x;
-    }
-    oss << "]";
+    const string index_x = GetCoordString(x, "X", wrap);
+    const string index_y = GetCoordString(y, "Y", wrap);
+    const string index_z = GetCoordString(z, "Z", wrap);
+    oss << "X* (Y * " << index_z << " + " << index_y << ") + " << index_x;
     return oss.str();
 }
 
 // -------------------------------------------------------------------------
 
-string InputPoint::GetIndexString(int val, const string& coord, const string& coord_capital, bool wrap)
+string GetIndexString(int x, int y, int z, bool wrap)
+{
+    ostringstream oss;
+    const string index_x = GetCoordString(x, "x", "X", wrap);
+    const string index_y = GetCoordString(y, "y", "Y", wrap);
+    const string index_z = GetCoordString(z, "z", "Z", wrap);
+    oss << "X* (Y * " << index_z << " + " << index_y << ") + " << index_x;
+    return oss.str();
+}
+
+// -------------------------------------------------------------------------
+
+string GetCoordString(const string& val, const string& coord_capital, bool wrap)
+{
+    // val must include index_x etc: "index_x+1" or "index_y-2" or "index_z" etc.
+    ostringstream oss;
+    if (wrap)
+    {
+        oss << "((" << val << " + " << coord_capital << ") & (" << coord_capital << " - 1))";
+    }
+    else
+    {
+        oss << "min(" << coord_capital << "-1, max(0, " << val << "))";
+    }
+    return oss.str();
+}
+
+// ---------------------------------------------------------------------
+
+string GetCoordString(int val, const string& coord, const string& coord_capital, bool wrap)
 {
     ostringstream oss;
     const string index = "index_" + coord;
@@ -168,6 +186,29 @@ string InputPoint::GetIndexString(int val, const string& coord, const string& co
 }
 
 // ---------------------------------------------------------------------
+
+string InputPoint::GetDirectAccessCode(bool wrap, const int block_size[3], bool use_local_memory) const
+{
+    if (block_size[0] == 4 && point.x % 4 != 0)
+    {
+        throw runtime_error("internal error in GetDirectAccessCode: point.x not divisible by 4");
+    }
+    ostringstream oss;
+    oss << GetName() << " = ";
+    if (use_local_memory)
+    {
+        oss << "local_" << chem << "[lz" << showpos << point.z / block_size[2]
+                                << "][ly" << showpos << point.y / block_size[1]
+                                << "][lx" << showpos << point.x / block_size[0] << "]";
+    }
+    else
+    {
+        oss << chem << "_in[" << GetIndexString(point.x / block_size[0], point.y / block_size[1], point.z / block_size[2], wrap) << "]";
+    }
+    return oss.str();
+}
+
+// -------------------------------------------------------------------------
 
 string Stencil::GetDivisorCode() const
 {
