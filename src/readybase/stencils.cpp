@@ -501,7 +501,7 @@ Stencil GetLaplacianStencil(int dimensionality, const AbstractRD::Accuracy& accu
         }
     case 3:
         // Patra, M. & Karttunen, M. (2006) "Stencils with isotropic discretization error for differential operators" Numerical Methods for Partial Differential Equations, 22.
-        return StencilFrom3DArray<3,3>("laplacian", RotationallySymmetric3x3x3(1, 3, 14, -128), 30, 2, 0, 1, 2); // 27-point stencil
+        return StencilFrom3DArray<3,3,3>("laplacian", RotationallySymmetric3x3x3(1, 3, 14, -128), 30, 2, 0, 1, 2); // 27-point stencil
     default:
         throw runtime_error("Internal error: unsupported dimensionality in GetLaplacianStencil");
     }
