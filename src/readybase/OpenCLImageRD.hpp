@@ -60,6 +60,10 @@ class OpenCLImageRD : public ImageRD, public OpenCL_MixIn
         void CreateOpenCLBuffers() override;
         void WriteToOpenCLBuffersIfNeeded() override;
         void ReadFromOpenCLBuffers() override;
+
+    private:
+
+        void BuildProgram();
 };
 
 #endif

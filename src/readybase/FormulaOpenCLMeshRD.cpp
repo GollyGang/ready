@@ -65,12 +65,12 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(const std::stri
 #endif\n\n";
     }
     // output the function definition
-    kernel_source << "__kernel void rd_compute(";
+    kernel_source << "kernel void rd_compute(";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global " << this->data_type_string << " *" << GetChemicalName(i) << "_in,";
+        kernel_source << "global " << this->data_type_string << " *" << GetChemicalName(i) << "_in,";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global " << this->data_type_string << " *" << GetChemicalName(i) << "_out,";
-    kernel_source << "__global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)\n";
+        kernel_source << "global " << this->data_type_string << " *" << GetChemicalName(i) << "_out,";
+    kernel_source << "global int* neighbor_indices,global float* neighbor_weights,const int max_neighbors)\n";
     // output the body
     kernel_source << "{\n";
     kernel_source << indent << "const int index_x = get_global_id(0);\n";

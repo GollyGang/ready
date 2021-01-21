@@ -129,6 +129,9 @@ class AbstractRD
         virtual void SetBlockSizeY(int n) {}
         virtual void SetBlockSizeZ(int n) {}
 
+        bool GetUseLocalMemory() const { return this->use_local_memory; }
+        void SetUseLocalMemory(bool val) { this->use_local_memory = val; this->need_reload_formula = true; }
+
         virtual bool HasEditableWrapOption() const { return false; }
         bool GetWrap() const { return this->wrap; }
         virtual void SetWrap(bool w) { this->wrap = w; }
@@ -195,6 +198,7 @@ class AbstractRD
         size_t data_type_size;
         std::string data_type_string;
         std::string data_type_suffix;
+        bool use_local_memory;
 
         InitialPatternGenerator initial_pattern_generator;
 
