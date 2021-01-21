@@ -133,6 +133,11 @@ class AbstractRD
         bool GetWrap() const { return this->wrap; }
         virtual void SetWrap(bool w) { this->wrap = w; }
 
+        virtual bool HasEditableAccuracyOption() const { return false; }
+        enum class Accuracy { Low, Medium, High };
+        Accuracy GetAccuracy() const { return this->accuracy; }
+        virtual void SetAccuracy(Accuracy acc) { this->accuracy = acc; }
+
         /// Retrieve the current 3D object as a vtkPolyData.
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const =0;
 
@@ -225,6 +230,8 @@ class AbstractRD
 
         double x_spacing_proportion;    /// spatial separation for rendering multiple chemicals, as a proportion of X
         double y_spacing_proportion;    /// spatial separation for rendering multiple chemicals, as a proportion of Y
+
+        Accuracy accuracy;
 
     protected: // functions
 

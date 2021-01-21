@@ -89,6 +89,8 @@ class InfoPanel : public wxPanel
         static const wxString neighborhood_type_label;
         static const wxString neighborhood_range_label;
         static const wxString neighborhood_weight_label;
+        static const wxString accuracy_label;
+        static const wxString accuracy_labels[3];
 
 private:
         
@@ -106,6 +108,7 @@ private:
         void ChangeFormula();
         void ChangeDimensions();
         void ChangeBlockSize();
+        void ChangeAccuracy();
         void ChangeWrapOption();
         void ChangeDataType();
         

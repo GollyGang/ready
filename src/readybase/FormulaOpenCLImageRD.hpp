@@ -42,6 +42,8 @@ class FormulaOpenCLImageRD : public OpenCLImageRD
         void SetBlockSizeY(int n) override { this->block_size[1] = n; this->need_reload_formula = true; }
         void SetBlockSizeZ(int n) override { this->block_size[2] = n; this->need_reload_formula = true; }
 
+        bool HasEditableAccuracyOption() const override { return true; }
+
         std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
         // we override the parameter access functions because changing the parameters requires rewriting the kernel

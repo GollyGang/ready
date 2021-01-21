@@ -31,6 +31,7 @@ using namespace std;
 AbstractRD::AbstractRD(int data_type)
     : x_spacing_proportion(0.05)
     , y_spacing_proportion(0.1)
+    , accuracy(Accuracy::Medium)
 {
     this->timesteps_taken = 0;
     this->need_reload_formula = true;
