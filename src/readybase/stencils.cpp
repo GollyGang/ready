@@ -285,20 +285,6 @@ Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor
 // ---------------------------------------------------------------------
 
 template<int M, int N>
-Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
-{
-    array<array<int, N>, M> arr2;
-    for (int j = 0; j < M; j++)
-    {
-        for (int i = 0; i < N; i++)
-        {
-            arr2[j][i] = arr[j][i];
-        }
-    }
-    return StencilFrom2DArray(label, arr2, divisor, dx_power, dim1, dim2);
-}
-
-template<int M, int N>
 Stencil StencilFrom2DArray(const string& label, const array<array<int, N>, M>& arr, int divisor, int dx_power, int dim1, int dim2)
 {
     if (M % 2 != 1 || N % 2 != 1)
@@ -322,24 +308,21 @@ Stencil StencilFrom2DArray(const string& label, const array<array<int, N>, M>& a
     return stencil;
 }
 
-// ---------------------------------------------------------------------
-
-template<int L, int M, int N>
-Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
+template<int M, int N>
+Stencil StencilFrom2DArray(const string& label, int const (&arr)[M][N], int divisor, int dx_power, int dim1, int dim2)
 {
-    array<array<array<int, N>, M>, L> arr2;
-    for (int k = 0; k < L; k++)
+    array<array<int, N>, M> arr2;
+    for (int j = 0; j < M; j++)
     {
-        for (int j = 0; j < M; j++)
+        for (int i = 0; i < N; i++)
         {
-            for (int i = 0; i < N; i++)
-            {
-                arr2[k][j][i] = arr[k][j][i];
-            }
+            arr2[j][i] = arr[j][i];
         }
     }
-    return StencilFrom3DArray(label, arr2, divisor, dx_power, dim1, dim2, dim3);
+    return StencilFrom2DArray(label, arr2, divisor, dx_power, dim1, dim2);
 }
+
+// ---------------------------------------------------------------------
 
 template<int L, int M, int N>
 Stencil StencilFrom3DArray(const string& label, const array<array<array<int, N>, M>, L>& arr, int divisor, int dx_power, int dim1, int dim2, int dim3)
@@ -367,6 +350,23 @@ Stencil StencilFrom3DArray(const string& label, const array<array<array<int, N>,
         }
     }
     return stencil;
+}
+
+template<int L, int M, int N>
+Stencil StencilFrom3DArray(const string& label, int const (&arr)[L][M][N], int divisor, int dx_power, int dim1, int dim2, int dim3)
+{
+    array<array<array<int, N>, M>, L> arr2;
+    for (int k = 0; k < L; k++)
+    {
+        for (int j = 0; j < M; j++)
+        {
+            for (int i = 0; i < N; i++)
+            {
+                arr2[k][j][i] = arr[k][j][i];
+            }
+        }
+    }
+    return StencilFrom3DArray(label, arr2, divisor, dx_power, dim1, dim2, dim3);
 }
 
 // ---------------------------------------------------------------------
