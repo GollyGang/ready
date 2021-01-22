@@ -59,6 +59,8 @@ const wxString InfoPanel::data_type_label = _("Data type");
 const wxString InfoPanel::neighborhood_type_label = _("Neighborhood");
 const wxString InfoPanel::neighborhood_range_label = _("Neighborhood range");
 const wxString InfoPanel::neighborhood_weight_label = _("Neighborhood weight");
+const wxString InfoPanel::accuracy_label = _("Accuracy");
+const wxString InfoPanel::accuracy_labels[3] = { _("low"), _("medium"), _("high") };
 
 // -----------------------------------------------------------------------------
 
@@ -186,6 +188,11 @@ void InfoPanel::Update(const AbstractRD& system)
     {
         // (hide the neighborhood for vti files, which don't use it)
         contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType() + "-neighbors", false);
+    }
+
+    if (system.HasEditableAccuracyOption())
+    {
+        contents += AppendRow(accuracy_label, accuracy_label, accuracy_labels[static_cast<int>(system.GetAccuracy())], true);
     }
 
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
@@ -602,6 +609,26 @@ void InfoPanel::ChangeDimensions()
 
 // -----------------------------------------------------------------------------
 
+void InfoPanel::ChangeAccuracy()
+{
+    const AbstractRD::Accuracy old_val = frame->GetCurrentRDSystem().GetAccuracy();
+
+    wxArrayString choices;
+    for (const wxString& label : accuracy_labels)
+    {
+        choices.Add(label);
+    }
+    wxSingleChoiceDialog dlg(this, _("Accuracy:"), _("Select accuracy:"),
+        choices);
+    dlg.SetSelection(static_cast<int>(old_val));
+    if (dlg.ShowModal() != wxID_OK) return;
+    const AbstractRD::Accuracy new_val = static_cast<AbstractRD::Accuracy>(dlg.GetSelection());
+    frame->GetCurrentRDSystem().SetAccuracy(new_val);
+    Update(frame->GetCurrentRDSystem());
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::ChangeBlockSize()
 {
     const AbstractRD& sys = frame->GetCurrentRDSystem();
@@ -691,6 +718,9 @@ void InfoPanel::ChangeInfo(const wxString& label)
 
     } else if ( label == dimensions_label ) {
         ChangeDimensions();
+
+    } else if ( label == accuracy_label ) {
+        ChangeAccuracy();
 
     } else if ( label == block_size_label ) {
         ChangeBlockSize();

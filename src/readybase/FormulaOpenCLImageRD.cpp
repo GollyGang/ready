@@ -65,12 +65,13 @@ struct InputsNeeded {
 
 // -------------------------------------------------------------------------
 
-InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality, const int block_size[3])
+InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int dimensionality, const int block_size[3],
+                                const AbstractRD::Accuracy& accuracy)
 {
     InputsNeeded inputs_needed;
 
     const vector<string> formula_tokens = tokenize_for_keywords(formula);
-    const vector<Stencil> known_stencils = GetKnownStencils(dimensionality);
+    const vector<Stencil> known_stencils = GetKnownStencils(dimensionality, accuracy);
     for (int i = 0; i < num_chemicals; i++)
     {
         const string chem = GetChemicalName(i);
@@ -570,7 +571,7 @@ string FormulaOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formu
     }
 
     const InputsNeeded inputs_needed = DetectInputsNeeded(formula, this->GetNumberOfChemicals(),
-        this->GetArenaDimensionality(), this->block_size);
+        this->GetArenaDimensionality(), this->block_size, this->GetAccuracy());
 
     const string indent = "    ";
     const KernelOptions options(this->wrap, indent, this->data_type, full_data_type_string, this->data_type_suffix, this->block_size,
@@ -616,6 +617,20 @@ void FormulaOpenCLImageRD::InitializeFromXML(vtkXMLDataElement *rd, bool &warn_t
     // number_of_chemicals:
     read_required_attribute(xml_formula,"number_of_chemicals",this->n_chemicals);
 
+    // accuracy
+    string accuracy_string;
+    read_optional_attribute(xml_formula, "accuracy", accuracy_string);
+    if (accuracy_string.size() > 0)
+    {
+        const char* accuracy_labels[3] = { "low", "medium", "high" };
+        auto it = find(accuracy_labels, accuracy_labels + 3, accuracy_string);
+        if (it == accuracy_labels + 3)
+        {
+            throw std::runtime_error("unknown accuracy attribute: " + accuracy_string);
+        }
+        this->SetAccuracy(static_cast<AbstractRD::Accuracy>(it - accuracy_labels));
+    }
+
     string formula = trim_multiline_string(xml_formula->GetCharacterData());
     //this->TestFormula(formula); // will throw on error
     this->SetFormula(formula); // (won't throw yet)
@@ -637,6 +652,8 @@ vtkSmartPointer<vtkXMLDataElement> FormulaOpenCLImageRD::GetAsXML(bool generate_
     formula->SetIntAttribute("block_size_x", this->block_size[0]);
     formula->SetIntAttribute("block_size_y", this->block_size[1]);
     formula->SetIntAttribute("block_size_z", this->block_size[2]);
+    const char* accuracy_labels[3] = { "low", "medium", "high" };
+    formula->SetAttribute("accuracy", accuracy_labels[static_cast<int>(this->accuracy)]);
     string f = this->GetFormula();
     f = ReplaceAllSubstrings(f, "\n", "\n        "); // indent the lines
     formula->SetCharacterData(f.c_str(), (int)f.length());

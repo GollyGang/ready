@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// Local:
+#include "AbstractRD.hpp"
+
 // Stdlib:
 #include <set>
 #include <string>
@@ -95,7 +98,7 @@ struct AppliedStencil
 
 // ---------------------------------------------------------------------
 
-std::vector<Stencil> GetKnownStencils(int dimensionality);
+std::vector<Stencil> GetKnownStencils(int dimensionality, const AbstractRD::Accuracy& accuracy);
 std::string GetIndexString(int x, int y, int z, bool wrap);
 std::string GetIndexString(const std::string& x, const std::string& y, const std::string& z, bool wrap);
 std::string GetCoordString(int val, const std::string& coord, const std::string& coord_capital, bool wrap);
