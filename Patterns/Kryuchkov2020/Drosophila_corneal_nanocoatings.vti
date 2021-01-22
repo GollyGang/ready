@@ -6,7 +6,7 @@
 
       Mikhail Kryuchkov, Oleksii Bilousov, Jannis Lehmann, Manfred Fiebig and Vladimir L. Katanaev (2020) &lt;a href=&quot;https://www.nature.com/articles/s41586-020-2707-9&quot;&gt;Reverse and forward engineering of Drosophila corneal nanocoatings&lt;/a&gt; Nature, volume 585, pages 383–389.
 
-      This model was developed with Ready.
+      Thanks to Mikhail Kryuchkov et al. for using Ready and letting us include their pattern file.
     </description>
     <rule name="Kryuchkov2020" type="formula" wrap="0" neighborhood_type="vertex">
       <param name="aa">
