@@ -327,7 +327,6 @@ void ImageRD::GenerateInitialPattern()
                         continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                         //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-                    double val = this->GetImage(iC)->GetScalarComponentAsDouble(x,y,z,0);
                     vector<double> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
                         vals[i] = this->GetImage(i)->GetScalarComponentAsDouble(x,y,z,0);
@@ -404,14 +403,10 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     float vertical_scale_1D = render_settings.GetProperty("vertical_scale_1D").GetFloat();
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
-    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
-    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
-    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
-    bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
@@ -440,7 +435,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
     const float image_height = this->GetX() / this->image_ratio1D; // we thicken it 
-    const float x_gap = this->x_spacing_proportion * this->GetX();
     const float y_gap = image_height;
 
     vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
@@ -618,7 +612,6 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     float vertical_scale_2D = render_settings.GetProperty("vertical_scale_2D").GetFloat();
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
-    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
@@ -1434,8 +1427,6 @@ void ImageRD::SaveFile(const char* filename,const Properties& render_settings,bo
 
 void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) const
 {
-    float low = render_settings.GetProperty("low").GetFloat();
-    float high = render_settings.GetProperty("high").GetFloat();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
 
     // create a lookup table for mapping values to colors

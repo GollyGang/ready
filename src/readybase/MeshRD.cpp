@@ -876,8 +876,6 @@ void MeshRD::SetFrom2DImage(int iChemical, vtkImageData *im)
 float MeshRD::GetValue(float x, float y, float z, const Properties& render_settings)
 {
     const double X = this->GetX();
-    const double Y = this->GetY();
-    const double Z = this->GetZ();
 
     this->CreateCellLocatorIfNeeded();
 
@@ -915,8 +913,6 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
 void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
     const double X = this->GetX();
-    const double Y = this->GetY();
-    const double Z = this->GetZ();
 
     this->CreateCellLocatorIfNeeded();
 

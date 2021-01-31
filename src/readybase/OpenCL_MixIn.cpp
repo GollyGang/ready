@@ -29,19 +29,19 @@ using namespace std;
 // ---------------------------------------------------------------------------
 
 OpenCL_MixIn::OpenCL_MixIn(int opencl_platform, int opencl_device)
-    : global_range{ 1, 1, 1 }
+    : context(NULL)
+    , device_id(NULL)
+    , program(NULL)
+    , kernel(NULL)
+    , kernel_function_name("rd_compute")
+    , global_range{ 1, 1, 1 }
     , local_work_size{ 1, 1, 1 }
-    , iPlatform(opencl_platform)
-    , iDevice(opencl_device)
+    , command_queue(NULL)
     , need_reload_context(true)
     , need_write_to_opencl_buffers(true)
-    , kernel_function_name("rd_compute")
-    , device_id(NULL)
-    , context(NULL)
-    , command_queue(NULL)
-    , kernel(NULL)
-    , program(NULL)
     , iCurrentBuffer(0)
+    , iPlatform(opencl_platform)
+    , iDevice(opencl_device)
 {
     if(LinkOpenCL()!= CL_SUCCESS)
         throw runtime_error("Failed to load dynamic library for OpenCL");

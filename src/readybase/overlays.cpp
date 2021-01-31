@@ -103,7 +103,7 @@ class Point3D : public XML_Object
 
         Point3D(vtkXMLDataElement *node);
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override;
 
         static const char* GetTypeName() { return "point3D"; }
 
@@ -140,14 +140,14 @@ class Add : public BaseOperation
 
         static const char* GetTypeName() { return "add"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Add::GetTypeName());
             return xml;
         }
 
-        virtual void Apply(double& target,double value) const { target += value; }
+        void Apply(double& target,double value) const override { target += value; }
 };
 
 class Subtract : public BaseOperation
@@ -158,14 +158,14 @@ class Subtract : public BaseOperation
 
         static const char* GetTypeName() { return "subtract"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Subtract::GetTypeName());
             return xml;
         }
 
-        virtual void Apply(double& target,double value) const { target -= value; }
+        void Apply(double& target,double value) const override { target -= value; }
 };
 
 class Overwrite : public BaseOperation
@@ -176,14 +176,14 @@ class Overwrite : public BaseOperation
 
         static const char* GetTypeName() { return "overwrite"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Overwrite::GetTypeName());
             return xml;
         }
 
-        virtual void Apply(double& target,double value) const { target = value; }
+        void Apply(double& target,double value) const override { target = value; }
 };
 
 class Multiply : public BaseOperation
@@ -194,14 +194,14 @@ class Multiply : public BaseOperation
 
         static const char* GetTypeName() { return "multiply"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Multiply::GetTypeName());
             return xml;
         }
 
-        virtual void Apply(double& target,double value) const { target *= value; }
+        void Apply(double& target,double value) const override { target *= value; }
 };
 
 class Divide : public BaseOperation
@@ -212,14 +212,14 @@ class Divide : public BaseOperation
 
         static const char* GetTypeName() { return "divide"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Divide::GetTypeName());
             return xml;
         }
 
-        virtual void Apply(double& target,double value) const { target /= value; }
+        void Apply(double& target,double value) const override { target /= value; }
 };
 
 // -------- fill methods: -----------
@@ -235,7 +235,7 @@ class Constant : public BaseFill
 
         static const char* GetTypeName() { return "constant"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Constant::GetTypeName());
@@ -243,7 +243,7 @@ class Constant : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             return this->value;
         }
@@ -266,7 +266,7 @@ class OtherChemical : public BaseFill
 
         static const char* GetTypeName() { return "other_chemical"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(OtherChemical::GetTypeName());
@@ -274,7 +274,7 @@ class OtherChemical : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system,const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system,const vector<double>& vals, float x, float y, float z) const override
         {
             if(this->iOtherChemical < 0 || this->iOtherChemical >= (int)vals.size())
                 throw runtime_error("OtherChemical:GetValue : chemical out of range");
@@ -297,7 +297,7 @@ class Parameter : public BaseFill
 
         static const char* GetTypeName() { return "parameter"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Parameter::GetTypeName());
@@ -305,7 +305,7 @@ class Parameter : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             return system.GetParameterValueByName(this->parameter_name.c_str());
         }
@@ -327,7 +327,7 @@ class WhiteNoise : public BaseFill
 
         static const char* GetTypeName() { return "white_noise"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(WhiteNoise::GetTypeName());
@@ -336,7 +336,7 @@ class WhiteNoise : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             return frand(this->low,this->high);
         }
@@ -362,7 +362,7 @@ class LinearGradient : public BaseFill
 
         static const char* GetTypeName() { return "linear_gradient"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(LinearGradient::GetTypeName());
@@ -373,7 +373,7 @@ class LinearGradient : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             double rel_x = x/system.GetX();
             double rel_y = y/system.GetY();
@@ -411,7 +411,7 @@ class RadialGradient : public BaseFill
 
         static const char* GetTypeName() { return "radial_gradient"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(RadialGradient::GetTypeName());
@@ -422,7 +422,7 @@ class RadialGradient : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             // convert p1 and p2 to absolute coordinates
             double rp1x = p1->x * system.GetX();
@@ -456,7 +456,7 @@ class Gaussian : public BaseFill
 
         static const char* GetTypeName() { return "gaussian"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Gaussian::GetTypeName());
@@ -466,7 +466,7 @@ class Gaussian : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             // convert center to absolute coordinates
             double ax = center->x * system.GetX();
@@ -499,7 +499,7 @@ class Sine : public BaseFill
 
         static const char* GetTypeName() { return "sine"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Sine::GetTypeName());
@@ -510,7 +510,7 @@ class Sine : public BaseFill
             return xml;
         }
 
-        virtual double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
         {
             double rel_x = x/system.GetX();
             double rel_y = y/system.GetY();
@@ -542,14 +542,14 @@ class Everywhere : public BaseShape
 
         static const char* GetTypeName() { return "everywhere"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Everywhere::GetTypeName());
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const override
         {
             return true;
         }
@@ -569,7 +569,7 @@ class Rectangle : public BaseShape
 
         static const char* GetTypeName() { return "rectangle"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Rectangle::GetTypeName());
@@ -578,7 +578,7 @@ class Rectangle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const override
         {
             double rel_x = x/X;
             double rel_y = y/Y;
@@ -615,7 +615,7 @@ class Circle : public BaseShape
 
         static const char* GetTypeName() { return "circle"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Circle::GetTypeName());
@@ -624,7 +624,7 @@ class Circle : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const override
         {
             // convert the center and radius to absolute coordinates
             double cx = this->c->x * X;
@@ -659,7 +659,7 @@ class Pixel : public BaseShape
 
         static const char* GetTypeName() { return "pixel"; }
 
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
         {
             vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
             xml->SetName(Pixel::GetTypeName());
@@ -669,7 +669,7 @@ class Pixel : public BaseShape
             return xml;
         }
 
-        virtual bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const
+        bool IsInside(float x,float y,float z,float X,float Y,float Z,int dimensionality) const override
         {
             switch(dimensionality)
             {

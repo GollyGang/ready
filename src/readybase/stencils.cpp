@@ -262,7 +262,7 @@ string AppliedStencil::GetCode() const
         weights[stencil_point.weight].push_back(stencil_point.point);
     }
     bool is_first_weight_list = true;
-    for(const pair<int, vector<Point>>& weight_list : weights)
+    for(const auto& weight_list : weights)
     {
         if (!is_first_weight_list)
         {
@@ -315,7 +315,7 @@ Stencil StencilFrom1DArray(const string& label, int const (&arr)[N], int divisor
     {
         if (arr[i] != 0)
         {
-            Point point{ 0, 0, 0 };
+            Point point{ { 0, 0, 0 } };
             point.xyz[dim1] = i - (N - 1) / 2;
             stencil.points.push_back({ point, arr[i] });
         }
@@ -339,7 +339,7 @@ Stencil StencilFrom2DArray(const string& label, const array<array<int, N>, M>& a
         {
             if (arr[j][i] != 0)
             {
-                Point point{ 0, 0, 0 };
+                Point point{ { 0, 0, 0 } };
                 point.xyz[dim1] = i - (N - 1) / 2;
                 point.xyz[dim2] = - j + (M - 1) / 2; // rows are in reading order, heading south, which is negative y
                 stencil.points.push_back({ point, arr[j][i] });
@@ -381,7 +381,7 @@ Stencil StencilFrom3DArray(const string& label, const array<array<array<int, N>,
             {
                 if (arr[k][j][i] != 0)
                 {
-                    Point point{ 0, 0, 0 };
+                    Point point{ { 0, 0, 0 } };
                     point.xyz[dim1] = i - (N - 1) / 2;
                     point.xyz[dim2] = -j + (M - 1) / 2; // rows are in reading order, heading south, which is negative y
                     point.xyz[dim3] = k - (L - 1) / 2;
@@ -457,7 +457,7 @@ Stencil GetGaussianStencil(int dimensionality)
     {
     case 1:
         // from OpenCV
-        return StencilFrom1DArray("gaussian", {1,4,6,4,1}, 16, 0, 0);
+        return StencilFrom1DArray("gaussian", { 1,4,6,4,1 }, 16, 0, 0);
     case 2:
         // from https://homepages.inf.ed.ac.uk/rbf/HIPR2/gsmooth.htm
         return StencilFrom2DArray<5,5>("gaussian", RotationallySymmetric5x5(1,4,7,16,26,41), 273, 0, 0, 1);

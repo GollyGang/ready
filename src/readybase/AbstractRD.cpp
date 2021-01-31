@@ -29,15 +29,15 @@ using namespace std;
 // ---------------------------------------------------------------------
 
 AbstractRD::AbstractRD(int data_type)
-    : x_spacing_proportion(0.05)
-    , y_spacing_proportion(0.1)
-    , accuracy(Accuracy::Medium)
-    , use_local_memory(false)
+    : use_local_memory(false)
     , timesteps_taken(0)
     , need_reload_formula(true)
     , is_modified(false)
     , wrap(true)
     , neighborhood_type(TNeighborhood::VERTEX_NEIGHBORS)
+    , x_spacing_proportion(0.05)
+    , y_spacing_proportion(0.1)
+    , accuracy(Accuracy::Medium)
 {
     this->InternalSetDataType(data_type);
 
