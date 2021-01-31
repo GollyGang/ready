@@ -546,7 +546,7 @@ if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND VTK_VERSION VERSION_LESS "8.90.0")
   # VTK < 9 used VTK_OVERRIDE which doesn't work on Clang
-  add_compile_options(readybase PRIVATE -Wno-inconsistent-missing-override)
+  add_compile_options(-Wno-inconsistent-missing-override)
 endif()
 
 
