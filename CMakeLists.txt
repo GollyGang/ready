@@ -538,7 +538,7 @@ endif()
 # create base library used by all executables
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND VTK_VERSION VERSION_LESS "8.90.0")
   # VTK < 9 used VTK_OVERRIDE which doesn't work on Clang
-  add_compile_definitions(VTK_OVERRIDE=override)
+  add_compile_options(-Wno-inconsistent-missing-override)
 endif()
 add_library( readybase STATIC ${BASE_SOURCES} )
 target_link_libraries( readybase ${VTK_LIBRARIES} )
