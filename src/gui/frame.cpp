@@ -2114,7 +2114,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
     switch (action.id)
     {
         case DO_NOTHING:        // any unassigned key (including escape) turns off full screen mode
-                                if (fullscreen) cmdid = ID::FullScreen; break;
+                                if (fullscreen) { cmdid = ID::FullScreen; }
+                                break;
 
         case DO_OPENFILE:       OpenFile(action.file);
                                 return;
@@ -2579,7 +2580,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
             throw runtime_error("Unsupported file type");
         }
     }
-    catch (exception e)
+    catch (const exception& e)
     {
         wxMessageBox(_("Error importing mesh: ") + e.what(), _("Error"), wxOK | wxICON_ERROR);
         all_ok = false;

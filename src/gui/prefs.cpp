@@ -2140,7 +2140,7 @@ void PrefsDialog::OnButton(wxCommandEvent& event)
 
 void PrefsDialog::OnCheckBoxClicked(wxCommandEvent& event)
 {
-    int id = event.GetId();
+    //int id = event.GetId();
 
     // no need???
 }

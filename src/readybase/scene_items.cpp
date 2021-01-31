@@ -49,7 +49,7 @@ void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)
     pRenderer->AddActor2D(scalar_bar);
 }
 
-template<size_t N>
+template<int N>
 void ColorMapFromList(vtkColorSeries* color_series, const float values[N][3])
 {
     color_series->SetNumberOfColors(N);
