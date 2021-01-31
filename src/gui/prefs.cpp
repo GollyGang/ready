@@ -1003,8 +1003,9 @@ void linereader::setfile(FILE* f) {
 
 int linereader::close() {
      if (fp) {
-        return fclose(fp);
+        int ret = fclose(fp);
         fp = 0;
+        return ret;
     }
     return 0;
 }
