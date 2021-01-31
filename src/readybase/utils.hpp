@@ -88,7 +88,7 @@ class XML_Object
 {
     public:
 
-        XML_Object(const vtkXMLDataElement* node) {}
+        XML_Object(const vtkXMLDataElement* /*node*/) {}
         virtual ~XML_Object() {}
         virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML() const =0;
 };

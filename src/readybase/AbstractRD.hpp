@@ -62,7 +62,7 @@ class AbstractRD
         /// The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that drives the system.
         std::string GetFormula() const { return this->formula; }
         /// Throws std::runtime_error with information if the formula doesn't work.
-        virtual void TestFormula(std::string program_string) {}
+        virtual void TestFormula(std::string /*program_string*/) {}
         /// Changes the system's formula. The kernel will be reloaded on the next update step.
         void SetFormula(std::string s);
         /// Some implementations (e.g. inbuilt ones) cannot have their formula edited.
@@ -118,16 +118,16 @@ class AbstractRD
         virtual float GetX() const =0;
         virtual float GetY() const =0;
         virtual float GetZ() const =0;
-        virtual void SetDimensions(int x,int y,int z) {}
+        virtual void SetDimensions(int /*x*/,int /*y*/,int /*z*/) {}
 
         /// Only some implementations (e.g. FullKernelOpenCLImageRD) can have their block size edited.
         virtual bool HasEditableBlockSize() const { return false; }
         virtual int GetBlockSizeX() const { return 1; } ///< e.g. block size may be 4x1x1 for kernels that use float4 (like FormulaOpenCLImageRD)
         virtual int GetBlockSizeY() const { return 1; }
         virtual int GetBlockSizeZ() const { return 1; }
-        virtual void SetBlockSizeX(int n) {}
-        virtual void SetBlockSizeY(int n) {}
-        virtual void SetBlockSizeZ(int n) {}
+        virtual void SetBlockSizeX(int /*n*/) {}
+        virtual void SetBlockSizeY(int /*n*/) {}
+        virtual void SetBlockSizeZ(int /*n*/) {}
 
         bool GetUseLocalMemory() const { return this->use_local_memory; }
         void SetUseLocalMemory(bool val) { this->use_local_memory = val; this->need_reload_formula = true; }

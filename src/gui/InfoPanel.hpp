@@ -40,7 +40,7 @@ class InfoPanel : public wxPanel
         InfoPanel(MyFrame* parent, wxWindowID id);
 
         // update the displayed info to reflect the state of the RD system
-        void Update(const AbstractRD& system);
+        void UpdatePanel(const AbstractRD& system);
         
         // bring up a suitable dialog for changing the given setting
         void ChangeInfo(const wxString& label);
