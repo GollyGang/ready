@@ -544,6 +544,11 @@ if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
     MODULES ${VTK_LIBRARIES}
   )
 endif()
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND VTK_VERSION VERSION_LESS "8.90.0")
+  # VTK < 9 used VTK_OVERRIDE which doesn't work on Clang
+  target_compile_options(readybase PRIVATE " -Wno-inconsistent-missing-override")
+endif()
+
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
