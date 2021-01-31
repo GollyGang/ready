@@ -219,7 +219,7 @@ void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed
         kernel_source << "global " << options.data_type_string << " *" << chem << "_in";
         kernel_source << ",";
     }
-    for (int i = 0; i < inputs_needed.chemicals_needed.size(); i++)
+    for (size_t i = 0; i < inputs_needed.chemicals_needed.size(); i++)
     {
         kernel_source << "global " << options.data_type_string << " *" << inputs_needed.chemicals_needed[i] << "_out";
         if (i < inputs_needed.chemicals_needed.size() - 1)
