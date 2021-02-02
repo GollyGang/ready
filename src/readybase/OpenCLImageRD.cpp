@@ -210,7 +210,7 @@ void OpenCLImageRD::GenerateInitialPattern()
 
 void OpenCLImageRD::BlankImage(float value)
 {
-    ImageRD::BlankImage();
+    ImageRD::BlankImage(value);
     this->need_write_to_opencl_buffers = true;
 }
 

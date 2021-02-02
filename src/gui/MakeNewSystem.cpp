@@ -654,7 +654,7 @@ unique_ptr<AbstractRD> MakeNewHyperbolicSpace(const bool is_opencl_available, co
 
     const int NUM_TESSELLATION_TYPES = 4;
     // choose the tessellation
-    int tessellationType, schlafli1, schlafli2, schlafli3;
+    int tessellationType, schlafli1=0, schlafli2=0, schlafli3=0;
     {
         wxString descriptions[NUM_TESSELLATION_TYPES] = { "{4,3,5} : order-5 cubic honeycomb", "{5,3,4} : order-4 dodecahedral honeycomb",
             "{5,3,5} : order-5 dodecahedral honeycomb",  "{3,5,3} : icosahedral honeycomb" };

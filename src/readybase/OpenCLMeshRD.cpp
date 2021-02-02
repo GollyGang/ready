@@ -316,7 +316,7 @@ void OpenCLMeshRD::GenerateInitialPattern()
 
 void OpenCLMeshRD::BlankImage(float value)
 {
-    MeshRD::BlankImage();
+    MeshRD::BlankImage(value);
     this->need_write_to_opencl_buffers = true;
 }
 

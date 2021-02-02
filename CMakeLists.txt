@@ -528,7 +528,7 @@ endif()
 if( APPLE )
   # support macOS 10.10 or later
   add_definitions( -mmacosx-version-min=10.10 )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -Wno-nullability-completeness-on-arrays")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 if( APPLE OR UNIX )
   # use same settings as in makefiles
@@ -536,6 +536,9 @@ if( APPLE OR UNIX )
 endif()
 
 # create base library used by all executables
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND VTK_VERSION VERSION_LESS "8.90.0")
+  add_compile_options(-Wno-inconsistent-missing-override)
+endif()
 add_library( readybase STATIC ${BASE_SOURCES} )
 target_link_libraries( readybase ${VTK_LIBRARIES} )
 if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
@@ -544,6 +547,7 @@ if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
     MODULES ${VTK_LIBRARIES}
   )
 endif()
+
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )

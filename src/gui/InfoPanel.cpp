@@ -124,7 +124,7 @@ void InfoPanel::ResetPosition()
 
 // -----------------------------------------------------------------------------
 
-void InfoPanel::Update(const AbstractRD& system)
+void InfoPanel::UpdatePanel(const AbstractRD& system)
 {
     // build HTML string to display current parameters
     wxString contents;
@@ -624,7 +624,7 @@ void InfoPanel::ChangeAccuracy()
     if (dlg.ShowModal() != wxID_OK) return;
     const AbstractRD::Accuracy new_val = static_cast<AbstractRD::Accuracy>(dlg.GetSelection());
     frame->GetCurrentRDSystem().SetAccuracy(new_val);
-    Update(frame->GetCurrentRDSystem());
+    UpdatePanel(frame->GetCurrentRDSystem());
 }
 
 // -----------------------------------------------------------------------------
@@ -670,7 +670,7 @@ void InfoPanel::ChangeUseLocalMemory()
 {
     AbstractRD& sys = frame->GetCurrentRDSystem();
     sys.SetUseLocalMemory(!sys.GetUseLocalMemory());
-    this->Update(sys);
+    this->UpdatePanel(sys);
 }
 
 // -----------------------------------------------------------------------------
@@ -679,7 +679,7 @@ void InfoPanel::ChangeWrapOption()
 {
     AbstractRD& sys = frame->GetCurrentRDSystem();
     sys.SetWrap(!sys.GetWrap());
-    this->Update(sys);
+    this->UpdatePanel(sys);
 }
 
 // -----------------------------------------------------------------------------

@@ -169,12 +169,10 @@ void MeshRD::GenerateInitialPattern()
                 continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                 //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-            double val;
             vector<double> vals(this->GetNumberOfChemicals());
             for(int i=0;i<this->GetNumberOfChemicals();i++)
             {
                 vals[i] = this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str())->GetComponent( iCell, 0 );
-                if(i==iC) val = vals[i];
             }
             this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent(iCell, 0, overlay.Apply(vals, *this, cp[0], cp[1], cp[2]));
         }
@@ -876,8 +874,6 @@ void MeshRD::SetFrom2DImage(int iChemical, vtkImageData *im)
 float MeshRD::GetValue(float x, float y, float z, const Properties& render_settings)
 {
     const double X = this->GetX();
-    const double Y = this->GetY();
-    const double Z = this->GetZ();
 
     this->CreateCellLocatorIfNeeded();
 
@@ -915,8 +911,6 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
 void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
     const double X = this->GetX();
-    const double Y = this->GetY();
-    const double Z = this->GetZ();
 
     this->CreateCellLocatorIfNeeded();
 

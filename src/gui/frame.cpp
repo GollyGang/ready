@@ -251,18 +251,18 @@ const float MyFrame::brush_sizes[] = {0.002f, 0.005f, 0.01f, 0.02f, 0.05f};
 
 // constructor
 MyFrame::MyFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title),
-       is_running(false),
-       speed_data_available(false),
-       i_timesteps_per_second_buffer(0),
-       time_at_last_render(0),
-       fullscreen(false),
-       render_settings("render_settings"),
-       is_recording(false),
-       CurrentCursor(TCursorType::POINTER),
-       current_paint_value(0.5f),
-       left_mouse_is_down(false),
-       right_mouse_is_down(false)
+   : wxFrame(NULL, wxID_ANY, title),
+    render_settings("render_settings"),
+    is_running(false),
+    time_at_last_render(0),
+    i_timesteps_per_second_buffer(0),
+    speed_data_available(false),
+    is_recording(false),
+    fullscreen(false),
+    CurrentCursor(TCursorType::POINTER),
+    current_paint_value(0.5f),
+    left_mouse_is_down(false),
+    right_mouse_is_down(false)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -596,7 +596,7 @@ void MyFrame::InitializeInfoPane()
 
 void MyFrame::UpdateInfoPane()
 {
-    this->info_panel->Update(*this->system);
+    this->info_panel->UpdatePanel(*this->system);
 }
 
 // ---------------------------------------------------------------------
@@ -1245,7 +1245,6 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
-            int n_cells = this->system->GetNumberOfCells();
             if (this->computation_time_since_last_render == 0.0)
                 this->computation_time_since_last_render = 0.000001;  // unlikely, but play safe
             double time_since_last_render = time_before - this->time_at_last_render;
@@ -1386,7 +1385,6 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     int iNewSelection = dlg.GetSelection();
     if(iNewSelection != iOldSelection)
         wxMessageBox(_("The selected device will be used the next time an OpenCL pattern is loaded."));
-    int dc = 0;
     for(int ip=0;ip<np;ip++)
     {
         int nd = OpenCL_utils::GetNumberOfDevices(ip);
@@ -2116,7 +2114,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
     switch (action.id)
     {
         case DO_NOTHING:        // any unassigned key (including escape) turns off full screen mode
-                                if (fullscreen) cmdid = ID::FullScreen; break;
+                                if (fullscreen) { cmdid = ID::FullScreen; }
+                                break;
 
         case DO_OPENFILE:       OpenFile(action.file);
                                 return;
@@ -2581,7 +2580,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
             throw runtime_error("Unsupported file type");
         }
     }
-    catch (exception e)
+    catch (const exception& e)
     {
         wxMessageBox(_("Error importing mesh: ") + e.what(), _("Error"), wxOK | wxICON_ERROR);
         all_ok = false;

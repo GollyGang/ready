@@ -77,7 +77,7 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
         const string chem = GetChemicalName(i);
         inputs_needed.chemicals_needed.push_back(chem);
         // assume we will need the central cell
-        inputs_needed.cells_needed.insert({{ 0, 0, 0 }, chem });
+        inputs_needed.cells_needed.insert({ { { 0, 0, 0 } }, chem });
         // assume we need delta_<chem> for the forward Euler step
         inputs_needed.deltas_needed.push_back(chem);
         // assume we need local memory for every chemical
@@ -119,7 +119,7 @@ InputsNeeded DetectInputsNeeded(const string& formula, int num_chemicals, int di
             {
                 for (int z = -MAX_RADIUS; z <= MAX_RADIUS; z++)
                 {
-                    const InputPoint input_point{ {x, y, z}, chem };
+                    const InputPoint input_point{ { {x, y, z} }, chem };
                     if (UsingKeyword(formula_tokens, input_point.GetName()))
                     {
                         inputs_needed.cells_needed.insert(input_point);
@@ -481,7 +481,7 @@ void WriteKeywords(ostringstream& kernel_source, const InputsNeeded& inputs_need
         kernel_source << options.indent << "const " << options.data_type_string << " z_pos = index_z / (" << options.data_type_string << ")(Z);\n";
     }
     // write code for gradient_mag_squared if needed
-    for (const pair<string, int>& pair : inputs_needed.gradient_mag_squared)
+    for (const auto& pair : inputs_needed.gradient_mag_squared)
     {
         const string& chem = pair.first;
         const int dimensionality = pair.second;
