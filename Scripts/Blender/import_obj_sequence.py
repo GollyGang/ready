@@ -29,8 +29,6 @@
 # Hit the 'Play animation' button in the Timeline panel and your mesh should start animating.
 # Set up the camera and lighting and use Render > Render animation.
 
-# Many thanks to: https://www.blender.org/forum/viewtopic.php?t=23355
-
 import bpy
 import glob
 
@@ -40,32 +38,32 @@ obj_files = glob.glob( path )
 
 if len(obj_files)==0:
     print('ERROR: No files in path: ' + path)
-    
+
 if bpy.data.materials.get("Material") is not None:
     mat = bpy.data.materials["Material"]
 else:
     mat = bpy.data.materials.new(name="Material")
 
+# load the objects
+objs = []
 for iObj,fn in enumerate(obj_files):
-
     bpy.ops.import_scene.obj( filepath=fn )
     ob = bpy.context.selected_editable_objects[0]
-   
-    iKeyFrame = iObj + 1
-   
-    # show the object in one frame
-    ob.hide_render = False
-    ob.hide = False
-    ob.keyframe_insert(data_path="hide_render", frame=iKeyFrame)
-    ob.keyframe_insert(data_path="hide", frame=iKeyFrame)
-   
-    # hide the object in all the other frames
-    ob.hide_render = True
-    ob.hide = True
-    ob.keyframe_insert(data_path="hide_render", frame=iKeyFrame-1)
-    ob.keyframe_insert(data_path="hide", frame=iKeyFrame-1)
-    ob.keyframe_insert(data_path="hide_render", frame=iKeyFrame+1)
-    ob.keyframe_insert(data_path="hide", frame=iKeyFrame+1)
+    objs.append(ob)
 
     # assign the same material to all frames
+    ob.data.materials.clear()
     ob.data.materials.append(mat)
+
+bpy.context.scene.frame_start = 0
+bpy.context.scene.frame_end = len(objs)-1
+
+def frame_change(self):
+    i_frame = int(self.frame_current)
+    for i_ob, ob in enumerate(objs):
+        if i_ob == i_frame:
+            ob.hide_render = ob.hide_viewport = False
+        else:
+            ob.hide_render = ob.hide_viewport = True
+
+bpy.app.handlers.frame_change_pre.append(frame_change)
