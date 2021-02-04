@@ -475,7 +475,7 @@ endif()
 
 #-------------------------------------------Boost-----------------------------------------------
 
-if(WIN32)
+if(WIN32 OR APPLE)
   set(Boost_USE_STATIC_LIBS        ON)
   set(Boost_USE_MULTITHREADED      ON)
   set(Boost_USE_STATIC_RUNTIME     ON)
@@ -527,7 +527,8 @@ endif()
 
 if( APPLE )
   # support macOS 10.10 or later
-  add_definitions( -mmacosx-version-min=10.10 )
+  ### the correct way is to add -DCMAKE_OSX_DEPLOYMENT_TARGET="10.10" to the cmake command
+  ### add_definitions( -mmacosx-version-min=10.10 )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 if( APPLE OR UNIX )
@@ -576,7 +577,8 @@ if( APPLE )
   # set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a" )
 
   # tell linker that we support macOS 10.10+
-  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.10" )
+  ### the correct way is to add -DCMAKE_OSX_DEPLOYMENT_TARGET="10.10" to the cmake command
+  ### set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.10" )
 endif()
 
 # avoid security warnings

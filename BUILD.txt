@@ -139,10 +139,10 @@ make package_source
 
 =========================== macOS =================================
 
-1. Build wxWidgets (assuming you've downloaded and unpacked the source tar ball
-   for wxWidgets 3.1.4 from https://www.wxwidgets.org/downloads/):
+1. Build wxWidgets (best to use latest source code from github):
 
-cd /path/to/wxWidgets-3.1.4
+git clone --recurse-submodules https://github.com/wxWidgets/wxWidgets.git wxWidgets
+cd /path/to/wxWidgets
 mkdir build-macos
 cd build-macos
 ../configure --enable-unicode --disable-shared --with-osx_cocoa --with-macosx-version-min=10.10
@@ -155,16 +155,15 @@ sudo make install
 cd /path/to/VTK-8.2.0
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_CXX_FLAGS:STRING=-mmacosx-version-min=10.10 ..
+cmake -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET="10.10" ..
 make   # this also takes some time
 
-3. Install Boost
+3. Build and install Boost:
 
-Follow instructions at http://boost.org or elsewhere, depending on your preferred tools.
-
-E.g. with homebrew: 
-
-brew install boost
+Download the latest source code from https://www.boost.org/users/download/ (eg. boost_1_75_0.tar.gz).
+cd /path/to/boost_1_75_0
+./bootstrap.sh
+./b2 -a cxxflags="-std=c++11 -mmacosx-version-min=10.10" variant=release link=static threading=multi runtime-link=static install
 
 4. Build Ready:
 
@@ -173,7 +172,7 @@ cd Ready
 git clone https://github.com/GollyGang/ready.git
 mkdir build
 cd build
-cmake -DVTK_DIR:PATH=/path/to/VTK-8.2.0/build -DCMAKE_BUILD_TYPE:STRING=Release ../ready
+cmake -DVTK_DIR:PATH=/path/to/VTK-8.2.0/build -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_OSX_DEPLOYMENT_TARGET="10.10" ../ready
 make
 open Ready.app
 
