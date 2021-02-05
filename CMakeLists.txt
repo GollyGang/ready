@@ -99,7 +99,7 @@ include_directories( src/gui )
 
 set( CMD_SOURCES      # code used for the command-line version
   src/cmd/main.cpp
-  src/extern/cxxopts-2.2.1/cxxopts.hpp
+  src/extern/cxxopts-2.2.1/cxxopts.hpp  # https://github.com/jarro2783/cxxopts
 )
 
 set( RESOURCES
