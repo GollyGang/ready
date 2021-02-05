@@ -99,6 +99,7 @@ include_directories( src/gui )
 
 set( CMD_SOURCES      # code used for the command-line version
   src/cmd/main.cpp
+  src/extern/cxxopts-2.2.1/cxxopts.hpp
 )
 
 set( RESOURCES
@@ -473,16 +474,6 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available
 endif()
 
-#-------------------------------------------Boost-----------------------------------------------
-
-if(WIN32 OR APPLE)
-  set(Boost_USE_STATIC_LIBS        ON)
-  set(Boost_USE_MULTITHREADED      ON)
-  set(Boost_USE_STATIC_RUNTIME     ON)
-endif()
-find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
-include_directories( ${Boost_INCLUDE_DIRS} )
-
 #---------------copy installation files to build folder (helps with testing)--------------------
 
 foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
@@ -527,8 +518,6 @@ endif()
 
 if( APPLE )
   # support macOS 10.10 or later
-  ### the correct way is to add -DCMAKE_OSX_DEPLOYMENT_TARGET="10.10" to the cmake command
-  ### add_definitions( -mmacosx-version-min=10.10 )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 if( APPLE OR UNIX )
@@ -536,10 +525,12 @@ if( APPLE OR UNIX )
   add_definitions( -D_LARGE_FILES )
 endif()
 
-# create base library used by all executables
+# workaround to suppress multiple clang warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND VTK_VERSION VERSION_LESS "8.90.0")
   add_compile_options(-Wno-inconsistent-missing-override)
 endif()
+
+# create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
 target_link_libraries( readybase ${VTK_LIBRARIES} )
 if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
@@ -552,7 +543,8 @@ endif()
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+target_include_directories( ${CMD_NAME} PRIVATE src/extern/cxxopts-2.2.1 )
+target_link_libraries( ${CMD_NAME} readybase ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
@@ -575,10 +567,6 @@ if( APPLE )
 
   # horrible hack to avoid Undefined symbol "___isPlatformVersionAtLeast" using wxMac 3.1.3 on Mojave
   # set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a" )
-
-  # tell linker that we support macOS 10.10+
-  ### the correct way is to add -DCMAKE_OSX_DEPLOYMENT_TARGET="10.10" to the cmake command
-  ### set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.10" )
 endif()
 
 # avoid security warnings
