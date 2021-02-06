@@ -15,13 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+// cxxopts:
+#include <cxxopts.hpp>
+
 // STL:
 #include <iostream>
 using namespace std;
-
-// Boost:
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
 
 // stdlib:
 #include <stdlib.h>
@@ -60,12 +59,6 @@ void printSeparator()
 
 int main(int argc,char *argv[])
 {
-    // Declare the (boost/program_options) supported options.
-    po::options_description desc("Options");
-
-    std::string vti_in;
-    std::string vti_out;
-
     std::string blurb = "Ready commandline utility that uses readybase as a processing (and data-retrieval) back-end.\n"
                         "\n"
                         "It responds to various commandline arguments to load and print out parts of the system,\n"
@@ -79,45 +72,6 @@ int main(int argc,char *argv[])
                         "Please let the Ready team (especially Dan Wills) know if there is something that you wish to print\n"
                         "that currently isn't supported.\n";
 
-    desc.add_options()
-        ("help,h", "Print the help message")
-        // Went to 0 iterations by default. Need to provide option for flags
-        ("num-iterations,n", po::value<int>()->default_value(0), "Number of iterations to run before saving")
-        ("print-kernel,k", po::bool_switch()->default_value(false), "Print (full) OpenCL kernel source (when possible)")
-        ("print-formula,f", po::bool_switch()->default_value(false), "Print kernel formula (when possible)")
-        ("print-rule-info,u", po::bool_switch()->default_value(false), "Print rule info")
-        ("print-reagent-info,r", po::bool_switch()->default_value(false), "Print reagent info")
-        ("print-parameter-info,p", po::bool_switch()->default_value(false), "Print parameter info")
-        ("print-render-settings,s", po::bool_switch()->default_value(false), "Print render Settings")
-        ("print-formula-description,d", po::bool_switch()->default_value(false), "Print formula Description")
-        ("print-initial-state-images,m", po::bool_switch()->default_value(false), "Print initial state images (Warning: May be large!)")
-        ("vti-in,i", po::value(&vti_in)->required(), "VTI file to load (required)")
-        ("vti-out,o", po::value(&vti_out), "VTI file to save (optional)")
-        // TODO don't crash if incorrect, fail more gracefully!
-        ("opencl-platform,l", po::value<int>(), "OpenCL platform number (Currently will crash if incorrect!)")
-        ("opencl-device,g", po::value<int>(), "OpenCL device number (Currently will crash if incorrect!)")
-        ("verbose,v", po::bool_switch()->default_value(false), "Verbose output.");
-
-    po::variables_map vm;
-    try {
-        po::store( po::parse_command_line( argc, argv, desc ), vm );
-        po::notify( vm );
-    } catch ( const exception& e ) {
-        if ( vm.count("help") == 0 )
-        {
-            cout << "\nIt looks like one of the required arguments is missing or malformed:\n";
-            cout << e.what() << "\n\n";
-            cout << "Here's the help:\n";
-            cout << "\n" << blurb << "\n";
-            cout << "\n" << desc << "\n";
-            return EXIT_FAILURE;
-        } else {
-            cout << "\n" << blurb << "\n";
-            cout << "\n" << desc << "\n";
-            return EXIT_SUCCESS;
-        }
-    }
-
     int numiter = 1000;
     bool print_kernel = false;
     bool print_formula = false;
@@ -125,117 +79,76 @@ int main(int argc,char *argv[])
     bool print_reagent_info = false;
     bool print_parameter_info = false;
     bool print_render_settings = false;
-    bool print_initial_state_images = false;
     bool print_formula_description = false;
-    bool verbose = false;
+    bool print_initial_state_images = false;
+    std::string vti_in;
+    std::string vti_out;
     int opencl_platform = 0;
     int opencl_device = 0;
+    bool verbose = false;
 
-    if ( vm.count("help") )
+    cxxopts::Options options("rdy", "Command-line version of Ready");
+    try
     {
-        cout << "\n" << blurb << "\n";
-        cout << "\n" << desc << "\n";
-        return EXIT_SUCCESS;
+        options.add_options()
+            ("h,help", "Print the help message")
+            // Went to 0 iterations by default. Need to provide option for flags
+            ("n,num-iterations", "Number of iterations to run before saving", cxxopts::value<int>(numiter)->default_value("0"))
+            ("k,print-kernel", "Print (full) OpenCL kernel source (when possible)", cxxopts::value<bool>(print_kernel)->default_value("false"))
+            ("f,print-formula", "Print kernel formula (when possible)", cxxopts::value<bool>(print_formula)->default_value("false"))
+            ("u,print-rule-info", "Print rule info", cxxopts::value<bool>(print_rule_info)->default_value("false"))
+            ("r,print-reagent-info", "Print reagent info", cxxopts::value<bool>(print_reagent_info)->default_value("false"))
+            ("p,print-parameter-info", "Print parameter info", cxxopts::value<bool>(print_parameter_info)->default_value("false"))
+            ("s,print-render-settings", "Print render Settings", cxxopts::value<bool>(print_render_settings)->default_value("false"))
+            ("d,print-formula-description", "Print formula Description", cxxopts::value<bool>(print_formula_description)->default_value("false"))
+            ("m,print-initial-state-images", "Print initial state images (Warning: May be large!)", cxxopts::value<bool>(print_initial_state_images)->default_value("false"))
+            ("i,vti-in", "VTI file to load (required)", cxxopts::value<string>(vti_in))
+            ("o,vti-out", "VTI file to save (optional)", cxxopts::value<string>(vti_out))
+            // TODO don't crash if incorrect, fail more gracefully!
+            ("l,opencl-platform", "OpenCL platform number (Currently will crash if incorrect!)", cxxopts::value<int>(opencl_platform))
+            ("g,opencl-device", "OpenCL device number (Currently will crash if incorrect!)", cxxopts::value<int>(opencl_device))
+            ("v,verbose", "Verbose output.", cxxopts::value<bool>(verbose)->default_value("false"))
+            ;
+    }
+    catch (const cxxopts::OptionSpecException& e)
+    {
+        cout << "Caught spec exception: " << e.what() << endl;
+        return EXIT_FAILURE;
+    }
+    catch (...)
+    {
+        cout << "Caught unknown exception" << endl;
+        return EXIT_FAILURE;
     }
 
-    if ( vm.count("verbose") )
-    {
-        verbose = vm["verbose"].as<bool>();
-        if (verbose)
+    try {
+        const cxxopts::ParseResult args = options.parse(argc, argv);
+        if (args.count("help"))
         {
-            cout << "Verbose was enabled.\n";
+            cout << blurb << endl;
+            cout << options.help() << endl;
+            return EXIT_SUCCESS;
+        }
+        if (args.count("vti-in") == 0)
+        {
+            cout << "Missing required argument: vti-in" << endl;
+            cout << options.help() << endl;
+            return EXIT_FAILURE;
         }
     }
-
-    if ( vm.count("num-iterations") )
+    catch (const cxxopts::OptionParseException& e)
     {
-        numiter = vm["num-iterations"].as<int>();
-        if (verbose)
-        {
-            cout << "Num Iterations was set to: " << vm["num-iterations"].as<int>() << ".\n";
-        }
-    } else {
-        if (verbose)
-        {
-            cout << "Num Iterations was not set (default is 1000).\n";
-        }
+        cout << "Argument error: " << e.what() << endl;
+        cout << options.help() << endl;
+        return EXIT_FAILURE;
+    }
+    catch (...)
+    {
+        cout << "Caught unknown exception" << endl;
+        return EXIT_FAILURE;
     }
 
-    if ( vm.count("print-kernel") )
-    {
-        print_kernel = vm["print-kernel"].as<bool>();
-    }
-
-    if ( vm.count("print-formula") )
-    {
-        print_formula = vm["print-formula"].as<bool>();
-    }
-
-    if ( vm.count("print-rule-info") )
-    {
-        print_rule_info = vm["print-rule-info"].as<bool>();
-    }
-
-    if ( vm.count("print-reagent-info") )
-    {
-        print_reagent_info = vm["print-reagent-info"].as<bool>();
-    }
-
-    if ( vm.count("print-parameter-info") )
-    {
-        print_parameter_info = vm["print-parameter-info"].as<bool>();
-    }
-
-    if ( vm.count("print-render-settings") )
-    {
-        print_render_settings = vm["print-render-settings"].as<bool>();
-    }
-
-    if ( vm.count("print-formula-description") )
-    {
-        print_formula_description = vm["print-formula-description"].as<bool>();
-    }
-
-    if ( vm.count("print-initial-state-images") )
-    {
-        print_initial_state_images = vm["print-initial-state-images"].as<bool>();
-    }
-
-    if ( vm.count("vti-in") )
-    {
-        if (verbose)
-        {
-            cout << "VTI-in flag detected!\n";
-        }
-    }
-
-    if ( vm.count("vti-out") )
-    {
-        if (verbose)
-        {
-            cout << "VTI-out flag detected!\n";
-        }
-    }
-
-    if ( vm.count("opencl-platform") )
-    {
-        opencl_platform = vm["opencl-platform"].as<int>();
-        if (verbose)
-        {
-            cout << "OpenCl platform was set to: " << opencl_platform << ".\n";
-        }
-    }
-
-    if ( vm.count("opencl-device") )
-    {
-        opencl_device = vm["opencl-device"].as<int>();
-        if (verbose)
-        {
-            cout << "OpenCl device was set to: " << opencl_device << ".\n";
-        }
-    }
-
-    bool is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
+    const bool is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
 
     if( is_opencl_available )
     {
@@ -431,17 +344,6 @@ int main(int argc,char *argv[])
             }
         } catch(const exception& e) {
             cout << "Error creating system!:\n" << e.what() << "\n";
-
-            /* TODO: find equivalent of backtrace that works on all supported platforms
-            void* callstack[128];
-            int i, frames = backtrace( callstack, 128 );
-            char** strs = backtrace_symbols( callstack, frames );
-            for (i = 0; i < frames; ++i)
-            {
-                printf( "%s\n", strs[i] );
-            }
-            free(strs);
-            */
             return EXIT_FAILURE;
         }
 
@@ -453,7 +355,7 @@ int main(int argc,char *argv[])
             cout << "Run the simulation for " << numiter << " steps...\n";
             system->Update( numiter );
 
-            if ( vm.count("vti-out") )
+            if ( !vti_out.empty() )
             {
                 // save something out
                 cout << "Saving file as " << vti_out << " ...\n";
