@@ -270,8 +270,14 @@ MyFrame::MyFrame(const wxString& title)
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_RECTANGLE_HINT );
     #endif
     #ifdef __WXMAC__
-        this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
+        // don't add wxAUI_MGR_ALLOW_ACTIVE_PANE below as it doesn't work correctly
+        this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT );
         this->icons_folder = _T("resources/Icons/32px/");
+        // following avoids black background in pane captions on macOS 10.11
+        wxAuiDockArt* dockart = this->aui_mgr.GetArtProvider();
+        dockart->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
+        dockart->SetColour(wxAUI_DOCKART_ACTIVE_CAPTION_COLOUR, wxColor(210,210,210));
+        dockart->SetColour(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR, wxColor(210,210,210));
     #else
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
@@ -473,7 +479,12 @@ void MyFrame::InitializeToolbars()
     const int toolbar_padding = 5;
 
     {   // file menu items
-        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
+        #ifdef __WXMAC__
+            // avoid black background on macOS 10.11
+            this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar, wxDefaultPosition, wxDefaultSize, wxAUI_TB_PLAIN_BACKGROUND);
+        #else
+            this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
+        #endif
         this->file_toolbar->AddTool(wxID_NEW,_("New Pattern..."),wxBitmap(this->icons_folder + _T("document-new.png"),wxBITMAP_TYPE_PNG),
             _("New Pattern..."));
         this->file_toolbar->AddTool(wxID_OPEN,_("Open Pattern..."),wxBitmap(this->icons_folder + _T("document-open.png"),wxBITMAP_TYPE_PNG),
@@ -490,7 +501,12 @@ void MyFrame::InitializeToolbars()
             .Position(0).Caption(_("File tools")));
     }
     {   // action menu items
-        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
+        #ifdef __WXMAC__
+            // avoid black background on macOS 10.11
+            this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar, wxDefaultPosition, wxDefaultSize, wxAUI_TB_PLAIN_BACKGROUND);
+        #else
+            this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
+        #endif
         this->action_toolbar->AddTool(ID::Step1, _("Step by 1"),wxBitmap(this->icons_folder + _T("list-add_gray.png"),wxBITMAP_TYPE_PNG),
             _("Step by 1"));
         this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
@@ -515,7 +531,12 @@ void MyFrame::InitializeToolbars()
             .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
     }
     {   // paint items
-        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
+        #ifdef __WXMAC__
+            // avoid black background on macOS 10.11
+            this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar, wxDefaultPosition, wxDefaultSize, wxAUI_TB_PLAIN_BACKGROUND);
+        #else
+            this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
+        #endif
         this->paint_toolbar->AddTool(ID::Pointer,_("Pointer"),wxBitmap(this->icons_folder + _T("icon-pointer.png"),wxBITMAP_TYPE_PNG),
             _("Pointer"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Pencil,_("Pencil"),wxBitmap(this->icons_folder + _T("draw-freehand.png"),wxBITMAP_TYPE_PNG),
