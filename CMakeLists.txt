@@ -517,7 +517,6 @@ if( USE_SSE )
 endif()
 
 if( APPLE )
-  # support macOS 10.10 or later
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 if( APPLE OR UNIX )
@@ -539,7 +538,6 @@ if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
     MODULES ${VTK_LIBRARIES}
   )
 endif()
-
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
