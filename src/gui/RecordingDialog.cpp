@@ -186,6 +186,7 @@ void RecordingDialog::OnSourceSelectionChange(wxCommandEvent& event)
     if (this->source_combo->GetValue() == this->source_3D_surface)
     {
         this->extension_combo->AppendString(_(".obj"));
+        this->extension_combo->AppendString(_(".ply"));
         this->extension_combo->AppendString(_(".vtp"));
         this->should_decimate_check->Enable(true);
         this->target_reduction_edit->Enable(true);

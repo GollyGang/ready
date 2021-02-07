@@ -68,6 +68,7 @@ using namespace std;
 // VTK:
 #include <vtkBMPReader.h>
 #include <vtkCellArray.h>
+#include <vtkCellDataToPointData.h>
 #include <vtkCellPicker.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageChangeInformation.h>
@@ -80,6 +81,7 @@ using namespace std;
 #include <vtkOBJReader.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
+#include <vtkPLYWriter.h>
 #include <vtkPointData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
@@ -2744,7 +2746,7 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
     // 3. output ImageRD 2d-image displacement-mapped surface for active chemical
 
     wxString mesh_filename = wxFileSelector(_("Export a mesh:"), wxEmptyString, wxEmptyString, wxEmptyString,
-        _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        _("Supported mesh formats (*.obj;*.ply;*.vtp)|*.obj;*.ply;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (mesh_filename.empty()) return; // user cancelled
 
     SaveCurrentMesh(mesh_filename,false,0.0);
@@ -2816,6 +2818,19 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
         writer->SetWriteToOutputString(true); // workaround because VTK doesn't yet allow unicode filepaths
         writer->Write();
         out << writer->GetOutputString();
+    }
+    else if(mesh_filename.GetExt().Lower() == _T("ply"))
+    {
+        wxBusyCursor busy;
+        vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+        to_point_data->SetInputData(pd);
+        vtkSmartPointer<vtkPLYWriter> writer = vtkSmartPointer<vtkPLYWriter>::New();
+        writer->SetInputConnection(to_point_data->GetOutputPort());
+        writer->SetFileName(mesh_filename.GetFullPath());
+        vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(this->render_settings);
+        writer->SetLookupTable(lut);
+        writer->SetArrayName(this->render_settings.GetProperty("active_chemical").GetChemical().c_str());
+        writer->Write();
     }
     else
     {

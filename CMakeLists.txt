@@ -330,7 +330,6 @@ set( OTHER_FILES
   resources/Cursors/pencil-cursor.png
   resources/Cursors/brush-cursor.png
   resources/Cursors/picker-cursor.png
-  Scripts/Blender/import_obj_sequence.py
   Scripts/Houdini/Dop_rd_object.hdanc
   Scripts/Houdini/Dop_rd_solver.hdanc
   Scripts/Houdini/Object_rd_template_object.hdanc
@@ -356,6 +355,7 @@ if( VTK_VERSION VERSION_LESS "7.0.0" )
     vtkInteractionStyle
     vtkIOImage
     vtkIOGeometry
+    vtkIOPLY
     vtkIOXML
     vtkRenderingCore
     vtkRenderingAnnotation
@@ -377,6 +377,7 @@ elseif( VTK_VERSION VERSION_LESS "8.90.0" )
     vtkInteractionStyle
     vtkIOImage
     vtkIOGeometry
+    vtkIOPLY
     vtkIOXML
     vtkRenderingCore
     vtkRenderingAnnotation
@@ -398,6 +399,7 @@ else()
     InteractionStyle
     IOImage
     IOGeometry
+    IOPLY
     IOXML
     RenderingCore
     RenderingAnnotation
