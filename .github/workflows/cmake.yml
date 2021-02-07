@@ -61,5 +61,5 @@ jobs:
       # Run a restricted suite of tests if OpenCL is not available
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      if: !(matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15')
+      if: matrix.os != 'macos-11.0' && matrix.os != 'macos-10.15'
       run: ctest -R rdy -C $BUILD_TYPE
