@@ -17,6 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install dependencies (for Windows)
+      if: matrix.os == 'windows-2019'
+      run: |
+        wget -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
+        7z x VTK-8.1.2_msvc14_x86_shared.7z
+        VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+
     - name: Install dependencies (for Ubuntu 20.04 and 18.04)
       if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
       run: |
@@ -41,7 +48,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+      run: cmake $GITHUB_WORKSPACE $VTK_HINT -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
 
     - name: Build
       # Execute the build
