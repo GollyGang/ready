@@ -72,8 +72,12 @@ jobs:
         C:\msys64\usr\bin\wget.exe -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         7z x VTK-8.1.2_msvc14_x86_shared.7z
 
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
     - name: Configure CMake
       shell: bash
+      working-directory: ${{runner.workspace}}/build
       run: |
         cmake $GITHUB_WORKSPACE -A Win32 -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
         -DVTK_DIR:PATH=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 \
@@ -84,6 +88,7 @@ jobs:
 
     - name: Build
       shell: bash
+      working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config $BUILD_TYPE
 
       # (On Windows we can't even run rdy.exe, not sure why, so no tests.)

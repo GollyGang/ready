@@ -36,25 +36,32 @@ jobs:
         brew install vtk wxmac
         echo "MACOS_QT5_HINT=$(brew --prefix qt5)" >> $GITHUB_ENV
 
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
     - name: Configure CMake
       env:
         CXX: ${{matrix.compiler}}
       shell: bash
+      working-directory: ${{runner.workspace}}/build
       run: |
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
 
     - name: Build
       shell: bash
+      working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Test (with OpenCL)
       if: contains(matrix.os, 'macos')
       # Run the full suite of tests if OpenCL is available
       shell: bash
+      working-directory: ${{runner.workspace}}/build
       run: ctest -C $BUILD_TYPE
 
     - name: Test (without OpenCL)
       # Run a restricted suite of tests if OpenCL is not available
       if: contains(matrix.os, 'ubuntu')
       shell: bash
+      working-directory: ${{runner.workspace}}/build
       run: ctest -R rdy -C $BUILD_TYPE
