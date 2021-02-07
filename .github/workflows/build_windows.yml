@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-16.04, macos-11.0, macos-10.15, windows-2019] #ubuntu-18.04, windows-2016]
+        os: [windows-2019, windows-2016]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -20,14 +20,12 @@ jobs:
     - name: git clone
       uses: actions/checkout@v2
 
-    - name: Prepare Visual Studio command prompt (Windows)
-      if: contains(matrix.os, 'windows')
+    - name: Prepare Visual Studio command prompt
       uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x86
 
-    - name: Cache wxWidgets (Windows)
-      if: contains(matrix.os, 'windows')
+    - name: Cache wxWidgets
       id: cache-wxwidgets
       uses: actions/cache@v2
       env:
@@ -36,16 +34,15 @@ jobs:
         path: wxWidgets-${{env.WXVERSION}}
         key: ${{ runner.os }}-build-${{ env.cache-name }}
 
-    - name: Compile wxWidgets (Windows)
-      if: contains(matrix.os, 'windows') && steps.cache-wxwidgets.outputs.cache-hit != 'true'
+    - name: Compile wxWidgets
+      if: steps.cache-wxwidgets.outputs.cache-hit != 'true'
       run: |
          Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip
          Expand-Archive -LiteralPath wxWidgets-${{env.WXVERSION}}.zip -DestinationPath wxWidgets-${{env.WXVERSION}}
          cd wxWidgets-${{env.WXVERSION}}/build/msw
          nmake -C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
 
-    - name: Cache OpenCL (Windows)
-      if: contains(matrix.os, 'windows')
+    - name: Cache OpenCL
       id: cache-opencl
       uses: actions/cache@v2
       env:
@@ -54,13 +51,12 @@ jobs:
         path: opencl-nug.0.777.77
         key: ${{ runner.os }}-build-${{ env.cache-name }}
 
-    - name: Install OpenCL (Windows)
-      if: contains(matrix.os, 'windows') && steps.cache-opencl.outputs.cache-hit != 'true'
+    - name: Install OpenCL
+      if: steps.cache-opencl.outputs.cache-hit != 'true'
       run: |
         nuget install opencl-nug -Version 0.777.77
 
-    - name: Cache VTK (Windows)
-      if: contains(matrix.os, 'windows')
+    - name: Cache VTK
       id: cache-vtk
       uses: actions/cache@v2
       env:
@@ -69,37 +65,14 @@ jobs:
         path: VTK
         key: ${{ runner.os }}-build-${{ env.cache-name }}
 
-    - name: Download VTK (Windows)
-      if: contains(matrix.os, 'windows') && steps.cache-vtk.outputs.cache-hit != 'true'
+    - name: Download VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
         C:\msys64\usr\bin\wget.exe -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         7z x VTK-8.1.2_msvc14_x86_shared.7z
 
-    - name: Install dependencies (Ubuntu 20.04 and 18.04)
-      if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
-      run: |
-        sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev
-
-    - name: Install dependencies (Ubuntu 16.04)
-      if: matrix.os == 'ubuntu-16.04'
-      run: |
-        sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
-
-    - name: Install dependencies (macOS)
-      if: contains(matrix.os, 'macos')
-      run: |
-        brew install vtk wxmac
-        echo "MACOS_QT5_HINT=$(brew --prefix qt5)" >> $GITHUB_ENV
-
-    - name: Configure CMake (non-Windows)
-      if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
-      shell: bash
-      run: |
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
-
-    - name: Configure CMake (Windows)
-      if: contains(matrix.os, 'windows')
+    - name: Configure CMake
       shell: bash
       run: |
         cmake $GITHUB_WORKSPACE -A Win32 -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
@@ -110,19 +83,7 @@ jobs:
         -DOPENCL_LIBRARIES:PATH=$GITHUB_WORKSPACE/opencl-nug.0.777.77/build/native/lib/x86/OpenCL.lib
 
     - name: Build
-      # Execute the build
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Test (with OpenCL)
-      if: contains(matrix.os, 'macos')
-      # Run the full suite of tests if OpenCL is available
-      shell: bash
-      run: ctest -C $BUILD_TYPE
-
-    - name: Test (without OpenCL)
-      # Run a restricted suite of tests if OpenCL is not available
-      # (on Windows we can't even run rdy.exe, not sure why)
-      if: contains(matrix.os, 'ubuntu')
-      shell: bash
-      run: ctest -R rdy -C $BUILD_TYPE
+      # (On Windows we can't even run rdy.exe, not sure why, so no tests.)
