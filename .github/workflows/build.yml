@@ -12,7 +12,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, macos-11.0, macos-10.15]
-        compiler: [g++, clang]
+        compiler:
+        - {cc: gcc, cxx: g++}
+        - {cc: clang, cxx: clang++}
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -41,7 +43,8 @@ jobs:
 
     - name: Configure CMake
       env:
-        CXX: ${{matrix.compiler}}
+        CC: ${{matrix.compiler.cc}}
+        CXX: ${{matrix.compiler.cxx}}
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
