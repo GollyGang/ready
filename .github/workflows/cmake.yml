@@ -1,6 +1,7 @@
 name: Build
 
-on: [push]
+on: push # while debugging
+#on: pull_request
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -61,4 +62,7 @@ jobs:
       shell: bash
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
+      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
+        run: ctest -C $BUILD_TYPE
+      if: !(matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15')
+        run: ctest -R rdy -C $BUILD_TYPE # just run a subset
