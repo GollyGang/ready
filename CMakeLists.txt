@@ -330,7 +330,6 @@ set( OTHER_FILES
   resources/Cursors/pencil-cursor.png
   resources/Cursors/brush-cursor.png
   resources/Cursors/picker-cursor.png
-  Scripts/Blender/import_obj_sequence.py
   Scripts/Houdini/Dop_rd_object.hdanc
   Scripts/Houdini/Dop_rd_solver.hdanc
   Scripts/Houdini/Object_rd_template_object.hdanc
