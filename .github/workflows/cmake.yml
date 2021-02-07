@@ -93,6 +93,7 @@ jobs:
 
     - name: Configure CMake (Windows)
       if: contains(matrix.os, 'windows')
+      shell: bash
       run: cmake $GITHUB_WORKSPACE -A Win32 -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
             -DVTK_DIR:PATH=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 \
             -DwxWidgets_ROOT_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/ \
