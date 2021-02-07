@@ -47,7 +47,15 @@ jobs:
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
 
-    - name: Configure CMake
+    - name: Configure CMake (non-Windows)
+      if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'ubuntu')
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+
+    - name: Configure CMake (Windows)
+      if: contains(matrix.os, 'windows')
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
