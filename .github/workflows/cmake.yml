@@ -1,7 +1,6 @@
 name: Build
 
-on: push # while debugging
-#on: pull_request
+on: pull_request
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -50,16 +49,16 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Test
+    - name: Test (with OpenCL)
+      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
       # Run the full suite of tests if OpenCL is available
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
       run: ctest -C $BUILD_TYPE
 
-    - name: Test
+    - name: Test (without OpenCL)
       # Run a restricted suite of tests if OpenCL is not available
+      if: matrix.os != 'macos-11.0' && matrix.os != 'macos-10.15'
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      if: matrix.os != 'macos-11.0' && matrix.os != 'macos-10.15'
       run: ctest -R rdy -C $BUILD_TYPE
