@@ -23,9 +23,6 @@ jobs:
       run: |
         C:\msys64\usr\bin\wget.exe -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         7z x VTK-8.1.2_msvc14_x86_shared.7z
-        echo "hello"
-        pwd
-        echo ::set-env VTK_HINT=$Env:PWD
 
     - name: Install dependencies (for Ubuntu 20.04 and 18.04)
       if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
@@ -52,7 +49,7 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE $VTK_HINT -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+        cmake $GITHUB_WORKSPACE -DVTK_DIR=${{runner.workspace}}/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
 
     - name: Build
       # Execute the build
