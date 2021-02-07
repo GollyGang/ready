@@ -1,4 +1,4 @@
-name: Ubuntu/macOS
+name: Ubuntu
 
 on: pull_request
 
@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, macos-11.0, macos-10.15]
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
         compiler:
-        - {cc: /usr/bin/gcc, cxx: /usr/bin/g++}
+        - {cc: gcc, cxx: g++}
         - {cc: clang, cxx: clang++}
     runs-on: ${{ matrix.os }}
 
@@ -32,36 +32,25 @@ jobs:
       run: |
         sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
 
-    - name: Install dependencies (macOS)
-      if: contains(matrix.os, 'macos')
-      run: |
-        brew install vtk wxmac
-        echo "MACOS_QT5_HINT=$(brew --prefix qt5)" >> $GITHUB_ENV
-
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
 
     - name: Configure CMake
+      env:
+        CC: ${{matrix.compiler.cc}}
+        CXX: ${{matrix.compiler.cxx}}
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        CC=${{matrix.compiler.cc}} CXX=${{matrix.compiler.cxx}} cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Build
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Test (with OpenCL)
-      if: contains(matrix.os, 'macos')
-      # Run the full suite of tests if OpenCL is available
-      shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: ctest -C $BUILD_TYPE
-
     - name: Test (without OpenCL)
-      # Run a restricted suite of tests if OpenCL is not available
-      if: contains(matrix.os, 'ubuntu')
+      # Run a restricted suite of tests since OpenCL is not available
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: ctest -R rdy -C $BUILD_TYPE
