@@ -19,6 +19,7 @@ jobs:
 
     - name: Install dependencies (for Windows)
       if: matrix.os == 'windows-2019'
+      shell: bash
       run: |
         wget -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         7z x VTK-8.1.2_msvc14_x86_shared.7z
