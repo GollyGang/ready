@@ -21,18 +21,18 @@ jobs:
       if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
       run: |
         sudo apt-get update
-        sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev libboost-program-options-dev
+        sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev
 
     - name: Install dependencies (for Ubuntu 16.04)
       if: matrix.os == 'ubuntu-16.04'
       run: |
         sudo apt-get update
-        sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev libboost-program-options-dev
+        sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
 
     - name: Install dependencies (for macOS)
       if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
       run: |
-        brew install vtk wxmac boost
+        brew install vtk wxmac
         echo "MACOS_QT5_HINT=$(brew --prefix qt5)" >> $GITHUB_ENV
 
     - name: Create Build Environment
