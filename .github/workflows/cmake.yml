@@ -17,13 +17,16 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
+    - name: git clone
+      uses: actions/checkout@v2
 
-    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Prepare Visual Studio command prompt (Windows)
+      if: contains(matrix.os, 'windows')
+      uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x86
 
-    - name: Cache wxWidgets (Windows)
+    - name: Check cache for wxWidgets (Windows)
       if: contains(matrix.os, 'windows')
       uses: actions/cache@v2
       env:
@@ -89,7 +92,12 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE -A Win32 -DVTK_DIR=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DwxWidgets_ROOT_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/ -DwxWidgets_LIB_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/lib/vc_lib
+        cmake $GITHUB_WORKSPACE -A Win32 -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+        -DVTK_DIR:PATH=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 \
+        -DwxWidgets_ROOT_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/ \
+        -DwxWidgets_LIB_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/lib/vc_lib \
+        -DOPENCL_INCLUDE_DIRS:PATH=$GITHUB_WORKSPACE/opencl-nug.0.777.77/build/native/include \
+        -DOPENCL_LIBRARIES:PATH=$GITHUB_WORKSPACE/opencl-nug.0.777.77/build/native/lib/x86/OpenCL.lib
 
     - name: Build
       # Execute the build
