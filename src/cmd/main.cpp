@@ -19,11 +19,9 @@
 #include <cxxopts.hpp>
 
 // STL:
+#include <cstdlib>
 #include <iostream>
 using namespace std;
-
-// stdlib:
-#include <stdlib.h>
 
 // readybase:
 #include <AbstractRD.hpp>
