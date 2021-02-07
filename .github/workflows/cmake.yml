@@ -81,7 +81,7 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE -A Win32 -DVTK_DIR=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+        cmake $GITHUB_WORKSPACE -A Win32 -DVTK_DIR=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DwxWidgets_ROOT_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/ -DwxWidgets_LIB_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/lib/vc_lib
 
     - name: Build
       # Execute the build
