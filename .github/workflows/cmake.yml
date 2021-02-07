@@ -12,16 +12,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-16.04, macos-10.15, windows-2019] #ubuntu-20.04, ubuntu-18.04, macos-11.0, windows-2019, windows-2016]
+        os: [ubuntu-20.04, ubuntu-16.04, macos-11.0, macos-10.15, windows-2019] #ubuntu-18.04, windows-2016]
     runs-on: ${{ matrix.os }}
 
     steps:
+
     - uses: actions/checkout@v2
+
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x86
 
-    - name: Cache wxWidgets
+    - name: Cache wxWidgets (Windows)
+      if: contains(matrix.os, 'windows')
       uses: actions/cache@v2
       env:
         cache-name: cache-wxWidgets
@@ -29,8 +32,8 @@ jobs:
         path: wxWidgets-${{env.WXVERSION}}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-2
 
-    - name: Compile wxWidgets (for Windows)
-      if: contains(matrix.os, 'windows')
+    - name: Compile wxWidgets (Windows)
+      if: contains(matrix.os, 'windows') # TODO: condition on cache-hit
       run: |
           if (Test-Path wxWidgets-${{env.WXVERSION}}) { echo "wxWidgets already present"} else {
              Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip
@@ -39,7 +42,12 @@ jobs:
              nmake -C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
           }
 
-    - name: Install dependencies (for Windows)
+    - name: Install OpenCL (Windows) # TODO: cache
+      if: contains(matrix.os, 'windows')
+      run: |
+        nuget install opencl-nug -Version 0.777.77
+
+    - name: Download VTK (Windows) # TODO: cache
       if: contains(matrix.os, 'windows')
       shell: pwsh
       run: |
@@ -48,19 +56,19 @@ jobs:
         echo $GITHUB_WORKSPACE
         echo ${{runner.workspace}}
 
-    - name: Install dependencies (for Ubuntu 20.04 and 18.04)
+    - name: Install dependencies (Ubuntu 20.04 and 18.04)
       if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
       run: |
         sudo apt-get update
         sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev
 
-    - name: Install dependencies (for Ubuntu 16.04)
+    - name: Install dependencies (Ubuntu 16.04)
       if: matrix.os == 'ubuntu-16.04'
       run: |
         sudo apt-get update
         sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
 
-    - name: Install dependencies (for macOS)
+    - name: Install dependencies (macOS)
       if: contains(matrix.os, 'macos')
       run: |
         brew install vtk wxmac
