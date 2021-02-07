@@ -42,13 +42,10 @@ jobs:
       run: cmake -E make_directory ${{runner.workspace}}/build
 
     - name: Configure CMake
-      env:
-        CC: ${{matrix.compiler.cc}}
-        CXX: ${{matrix.compiler.cxx}}
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }} -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX
+        CC=${{matrix.compiler.cc}} CXX=${{matrix.compiler.cxx}} cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
 
     - name: Build
       shell: bash
