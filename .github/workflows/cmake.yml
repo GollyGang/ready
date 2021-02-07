@@ -65,7 +65,7 @@ jobs:
 
     - name: Test (without OpenCL)
       # Run a restricted suite of tests if OpenCL is not available
-      if: !contains(matrix.os, 'macos')
+      if: {{ !contains(matrix.os, 'macos') }}
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: ctest -R rdy -C $BUILD_TYPE
