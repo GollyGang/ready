@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -54,7 +54,7 @@ class AbstractRD
         /// Some implementations (e.g. inbuilt ones) cannot have their number_of_chemicals edited.
         virtual bool HasEditableNumberOfChemicals() const { return true; }
         int GetNumberOfChemicals() const { return this->n_chemicals; }
-        virtual void SetNumberOfChemicals(int n) =0;
+        virtual void SetNumberOfChemicals(int n, bool reallocate_storage = false) =0;
 
         /// How many timesteps have we advanced since being initialized?
         int GetTimestepsTaken() const { return this->timesteps_taken; }
@@ -62,7 +62,7 @@ class AbstractRD
         /// The formula is a piece of code (currently either an OpenCL snippet or a full OpenCL kernel) that drives the system.
         std::string GetFormula() const { return this->formula; }
         /// Throws std::runtime_error with information if the formula doesn't work.
-        virtual void TestFormula(std::string program_string) {}
+        virtual void TestFormula(std::string /*program_string*/) {}
         /// Changes the system's formula. The kernel will be reloaded on the next update step.
         void SetFormula(std::string s);
         /// Some implementations (e.g. inbuilt ones) cannot have their formula edited.
@@ -79,10 +79,10 @@ class AbstractRD
 
         std::string GetDescription() const { return this->description; }
         void SetDescription(std::string s);
-        
+
         virtual int GetNumberOfCells() const =0;
 
-        // most implementations have parameters that can be edited and changed 
+        // most implementations have parameters that can be edited and changed
         // (will cause errors if they don't match the inbuilt names, the formula or the kernel)
         int GetNumberOfParameters() const;
         std::string GetParameterName(int iParam) const;
@@ -118,20 +118,28 @@ class AbstractRD
         virtual float GetX() const =0;
         virtual float GetY() const =0;
         virtual float GetZ() const =0;
-        virtual void SetDimensions(int x,int y,int z) {}
+        virtual void SetDimensions(int /*x*/,int /*y*/,int /*z*/) {}
 
         /// Only some implementations (e.g. FullKernelOpenCLImageRD) can have their block size edited.
         virtual bool HasEditableBlockSize() const { return false; }
         virtual int GetBlockSizeX() const { return 1; } ///< e.g. block size may be 4x1x1 for kernels that use float4 (like FormulaOpenCLImageRD)
         virtual int GetBlockSizeY() const { return 1; }
         virtual int GetBlockSizeZ() const { return 1; }
-        virtual void SetBlockSizeX(int n) {}
-        virtual void SetBlockSizeY(int n) {}
-        virtual void SetBlockSizeZ(int n) {}
+        virtual void SetBlockSizeX(int /*n*/) {}
+        virtual void SetBlockSizeY(int /*n*/) {}
+        virtual void SetBlockSizeZ(int /*n*/) {}
+
+        bool GetUseLocalMemory() const { return this->use_local_memory; }
+        void SetUseLocalMemory(bool val) { this->use_local_memory = val; this->need_reload_formula = true; }
 
         virtual bool HasEditableWrapOption() const { return false; }
         bool GetWrap() const { return this->wrap; }
         virtual void SetWrap(bool w) { this->wrap = w; }
+
+        virtual bool HasEditableAccuracyOption() const { return false; }
+        enum class Accuracy { Low, Medium, High };
+        Accuracy GetAccuracy() const { return this->accuracy; }
+        virtual void SetAccuracy(Accuracy acc) { this->accuracy = acc; }
 
         /// Retrieve the current 3D object as a vtkPolyData.
         virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const =0;
@@ -140,7 +148,7 @@ class AbstractRD
         virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const =0;
         /// Sets the values for a certain chemical from an image
         virtual void SetFrom2DImage(int iChemical, vtkImageData *im) = 0;
-        /// Indicates whether GetAs2DImage() and SetFrom2DImage() can be called. 
+        /// Indicates whether GetAs2DImage() and SetFrom2DImage() can be called.
         virtual bool Is2DImageAvailable() const =0;
 
         /// Retrieve the dimensionality of the system volume, irrespective of the cells within it.
@@ -173,9 +181,16 @@ class AbstractRD
         /// Returns the total memory size that will need to be transferred to the GPU
         virtual size_t GetMemorySize() const =0;
 
+        virtual std::vector<float> GetData(int i_chemical) const =0;
+
+        struct Parameter {
+            std::string name;
+            float value;
+        };
+
     protected: // typedefs
 
-        enum TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
+        enum class TNeighborhood { VERTEX_NEIGHBORS, EDGE_NEIGHBORS, FACE_NEIGHBORS };
         // (edge neighbors include face neighbors; vertex neighbors include edge neighbors and face neighbors)
 
     protected: // variables
@@ -188,10 +203,11 @@ class AbstractRD
         size_t data_type_size;
         std::string data_type_string;
         std::string data_type_suffix;
+        bool use_local_memory;
 
         InitialPatternGenerator initial_pattern_generator;
 
-        std::vector<std::pair<std::string,float> > parameters;
+        std::vector<Parameter> parameters;
 
         int timesteps_taken;
 
@@ -216,19 +232,28 @@ class AbstractRD
         std::map<TNeighborhood,std::string> canonical_neighborhood_type_identifiers;
         std::map<std::string,TNeighborhood> recognized_neighborhood_type_identifiers;
 
-        double xgap,ygap;           /// spatial separation for rendering multiple chemicals
+        double x_spacing_proportion;    /// spatial separation for rendering multiple chemicals, as a proportion of X
+        double y_spacing_proportion;    /// spatial separation for rendering multiple chemicals, as a proportion of Y
+
+        Accuracy accuracy;
 
     protected: // functions
 
         /// Advance the RD system by n timesteps.
         virtual void InternalUpdate(int n_steps)=0;
 
+        virtual void AddPhasePlot(vtkRenderer* pRenderer, float scaling, float low, float high, float posX, float posY, float posZ,
+            int iChemX, int iChemY, int iChemZ) =0;
         virtual void FlipPaintAction(PaintAction& cca) =0; ///< Undo/redo this paint action.
         void StorePaintAction(int iChemical,int iCell,float old_val); ///< Implementations call this when performing undo-able paint actions.
 
     private: // functions
 
         void InternalSetDataType(int type);
+
+    private: // constants
+
+        static const int ready_format_version = 6;
 };
 
-#endif 
+#endif

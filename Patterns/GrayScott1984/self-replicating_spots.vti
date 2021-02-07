@@ -2,11 +2,14 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
     <description>
-        Self-replicating spots.
+        Self-replicating spots in the Gray-Scott rule.
+
+        P. Gray, S.K. Scott (1984) &lt;a href=&quot;https://www.sciencedirect.com/science/article/pii/0009250984870177&quot;&gt;Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Oscillations and instabilities in the system A + 2B → 3B; B → C&lt;/a&gt; Chemical Engineering Science, Volume 39, Issue 6.
+
     </description>
 
     <rule type="formula" name="Gray-Scott">
-        
+
       <param name="timestep"> 1.0    </param>
       <param name="D_a">      0.082  </param>
       <param name="D_b">      0.041  </param>
@@ -17,9 +20,9 @@
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -43,11 +46,11 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
         <active_chemical value="b" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">

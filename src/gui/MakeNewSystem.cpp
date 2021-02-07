@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
 This file is part of Ready.
 
@@ -38,17 +38,17 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 #include <vector>
 using namespace std;
 
-AbstractRD* MakeNewImage1D(const bool is_opencl_available,const int opencl_platform,const int opencl_device,Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewImage1D(const bool is_opencl_available,const int opencl_platform,const int opencl_device,Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
 
     wxBusyCursor busy;
-    ImageRD *image_sys;
+    unique_ptr<ImageRD> image_sys;
     if (is_opencl_available)
-        image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
+        image_sys = make_unique<FormulaOpenCLImageRD>(opencl_platform, opencl_device, data_type);
     else
-        image_sys = new GrayScottImageRD();
+        image_sys = make_unique<GrayScottImageRD>();
     image_sys->SetDimensionsAndNumberOfChemicals(128, 1, 1, 2);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     wxMessageBox(_("Created a 128x1x1 image. The dimensions can be edited in the Info Pane."));
@@ -57,17 +57,17 @@ AbstractRD* MakeNewImage1D(const bool is_opencl_available,const int opencl_platf
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewImage2D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewImage2D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
 
     wxBusyCursor busy;
-    ImageRD *image_sys;
+    unique_ptr<ImageRD> image_sys;
     if (is_opencl_available)
-        image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
+        image_sys = make_unique<FormulaOpenCLImageRD>(opencl_platform, opencl_device, data_type);
     else
-        image_sys = new GrayScottImageRD();
+        image_sys = make_unique<GrayScottImageRD>();
     image_sys->SetDimensionsAndNumberOfChemicals(128, 128, 1, 2);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     wxMessageBox(_("Created a 128x128x1 image. The dimensions can be edited in the Info Pane."));
@@ -76,17 +76,17 @@ AbstractRD* MakeNewImage2D(const bool is_opencl_available, const int opencl_plat
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewImage3D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewImage3D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
 
     wxBusyCursor busy;
-    ImageRD *image_sys;
+    unique_ptr<ImageRD> image_sys;
     if (is_opencl_available)
-        image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
+        image_sys = make_unique<FormulaOpenCLImageRD>(opencl_platform, opencl_device, data_type);
     else
-        image_sys = new GrayScottImageRD();
+        image_sys = make_unique<GrayScottImageRD>();
     image_sys->SetDimensionsAndNumberOfChemicals(32, 32, 32, 2);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     wxMessageBox(_("Created a 32x32x32 image. The dimensions can be edited in the Info Pane."));
@@ -95,7 +95,7 @@ AbstractRD* MakeNewImage3D(const bool is_opencl_available, const int opencl_plat
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewGeodesicSphere(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewGeodesicSphere(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -118,11 +118,11 @@ AbstractRD* MakeNewGeodesicSphere(const bool is_opencl_available, const int open
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetGeodesicSphere(divs, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("slice_3D").SetBool(false);
     render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -131,7 +131,7 @@ AbstractRD* MakeNewGeodesicSphere(const bool is_opencl_available, const int open
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewTorus(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewTorus(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -156,11 +156,11 @@ AbstractRD* MakeNewTorus(const bool is_opencl_available, const int opencl_platfo
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetTorus(nx, ny, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("slice_3D").SetBool(false);
     render_settings.GetProperty("active_chemical").SetChemical("b");
@@ -169,7 +169,7 @@ AbstractRD* MakeNewTorus(const bool is_opencl_available, const int opencl_platfo
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewTriangularMesh(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewTriangularMesh(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -193,11 +193,11 @@ AbstractRD* MakeNewTriangularMesh(const bool is_opencl_available, const int open
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetTriangularMesh(n, n, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -208,7 +208,7 @@ AbstractRD* MakeNewTriangularMesh(const bool is_opencl_available, const int open
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewHexagonalMesh(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewHexagonalMesh(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -232,11 +232,11 @@ AbstractRD* MakeNewHexagonalMesh(const bool is_opencl_available, const int openc
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetHexagonalMesh(n, n, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -247,7 +247,7 @@ AbstractRD* MakeNewHexagonalMesh(const bool is_opencl_available, const int openc
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewRhombilleTiling(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewRhombilleTiling(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -271,11 +271,11 @@ AbstractRD* MakeNewRhombilleTiling(const bool is_opencl_available, const int ope
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetRhombilleTiling(n, n, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -286,7 +286,7 @@ AbstractRD* MakeNewRhombilleTiling(const bool is_opencl_available, const int ope
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewPenroseP3Tiling(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewPenroseP3Tiling(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -310,11 +310,11 @@ AbstractRD* MakeNewPenroseP3Tiling(const bool is_opencl_available, const int ope
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetPenroseTiling(divs, 0, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -325,7 +325,7 @@ AbstractRD* MakeNewPenroseP3Tiling(const bool is_opencl_available, const int ope
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewPenroseP2Tiling(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewPenroseP2Tiling(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -349,11 +349,11 @@ AbstractRD* MakeNewPenroseP2Tiling(const bool is_opencl_available, const int ope
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetPenroseTiling(divs, 1, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -365,7 +365,7 @@ AbstractRD* MakeNewPenroseP2Tiling(const bool is_opencl_available, const int ope
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewDelaunay2D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewDelaunay2D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -388,11 +388,11 @@ AbstractRD* MakeNewDelaunay2D(const bool is_opencl_available, const int opencl_p
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetRandomDelaunay2D(npts, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -403,7 +403,7 @@ AbstractRD* MakeNewDelaunay2D(const bool is_opencl_available, const int opencl_p
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewVoronoi2D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewVoronoi2D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -426,11 +426,11 @@ AbstractRD* MakeNewVoronoi2D(const bool is_opencl_available, const int opencl_pl
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetRandomVoronoi2D(npts, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -441,7 +441,7 @@ AbstractRD* MakeNewVoronoi2D(const bool is_opencl_available, const int opencl_pl
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewDelaunay3D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewDelaunay3D(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -464,11 +464,11 @@ AbstractRD* MakeNewDelaunay3D(const bool is_opencl_available, const int opencl_p
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetRandomDelaunay3D(npts, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D_axis").SetAxis("y");
@@ -477,7 +477,7 @@ AbstractRD* MakeNewDelaunay3D(const bool is_opencl_available, const int opencl_p
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewBodyCentredCubicHoneycomb(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewBodyCentredCubicHoneycomb(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -501,11 +501,11 @@ AbstractRD* MakeNewBodyCentredCubicHoneycomb(const bool is_opencl_available, con
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetBodyCentredCubicHoneycomb(side, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(true);
@@ -517,7 +517,7 @@ AbstractRD* MakeNewBodyCentredCubicHoneycomb(const bool is_opencl_available, con
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewFaceCentredCubicHoneycomb(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewFaceCentredCubicHoneycomb(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -541,11 +541,11 @@ AbstractRD* MakeNewFaceCentredCubicHoneycomb(const bool is_opencl_available, con
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetFaceCentredCubicHoneycomb(side, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(true);
@@ -557,7 +557,7 @@ AbstractRD* MakeNewFaceCentredCubicHoneycomb(const bool is_opencl_available, con
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewDiamondHoneycomb(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewDiamondHoneycomb(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -581,11 +581,11 @@ AbstractRD* MakeNewDiamondHoneycomb(const bool is_opencl_available, const int op
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetDiamondCells(side, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(true);
@@ -597,7 +597,7 @@ AbstractRD* MakeNewDiamondHoneycomb(const bool is_opencl_available, const int op
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewHyperbolicPlane(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewHyperbolicPlane(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
@@ -630,11 +630,11 @@ AbstractRD* MakeNewHyperbolicPlane(const bool is_opencl_available, const int ope
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetHyperbolicPlaneTiling(schlafli1, schlafli2, levels, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(false);
@@ -647,14 +647,14 @@ AbstractRD* MakeNewHyperbolicPlane(const bool is_opencl_available, const int ope
 
 // ---------------------------------------------------------------------
 
-AbstractRD* MakeNewHyperbolicSpace(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
+unique_ptr<AbstractRD> MakeNewHyperbolicSpace(const bool is_opencl_available, const int opencl_platform, const int opencl_device, Properties& render_settings)
 {
     // perhaps at some point we will want this to be determined by the user
     const int data_type = VTK_FLOAT;
 
     const int NUM_TESSELLATION_TYPES = 4;
     // choose the tessellation
-    int tessellationType, schlafli1, schlafli2, schlafli3;
+    int tessellationType, schlafli1=0, schlafli2=0, schlafli3=0;
     {
         wxString descriptions[NUM_TESSELLATION_TYPES] = { "{4,3,5} : order-5 cubic honeycomb", "{5,3,4} : order-4 dodecahedral honeycomb",
             "{5,3,5} : order-5 dodecahedral honeycomb",  "{3,5,3} : icosahedral honeycomb" };
@@ -700,11 +700,11 @@ AbstractRD* MakeNewHyperbolicSpace(const bool is_opencl_available, const int ope
     wxBusyCursor busy;
     vtkSmartPointer<vtkUnstructuredGrid> mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
     MeshGenerators::GetHyperbolicSpaceTessellation(schlafli1, schlafli2, schlafli3, levels, mesh, 2, data_type);
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (is_opencl_available)
-    mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-    mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(mesh);
     render_settings.GetProperty("active_chemical").SetChemical("b");
     render_settings.GetProperty("slice_3D").SetBool(true);

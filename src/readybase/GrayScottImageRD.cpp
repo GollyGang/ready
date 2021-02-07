@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -62,11 +62,7 @@ GrayScottImageRD::~GrayScottImageRD()
 
 void GrayScottImageRD::DeleteBuffers()
 {
-    for(int i=0;i<(int)this->buffer_images.size();i++)
-    {
-        if(this->buffer_images[i])
-            this->buffer_images[i]->Delete();
-    }
+    this->buffer_images.clear();
 }
 
 void GrayScottImageRD::InternalUpdate(int n_steps)

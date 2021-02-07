@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -28,24 +28,24 @@ class FullKernelOpenCLImageRD : public OpenCLImageRD
         FullKernelOpenCLImageRD(int opencl_platform,int opencl_device,int data_type);
         FullKernelOpenCLImageRD(const OpenCLImageRD& source); // copy construct from another
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
+        void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update) override;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const override;
 
-        virtual std::string GetRuleType() const { return "kernel"; }
+        std::string GetRuleType() const override { return "kernel"; }
 
-        virtual bool HasEditableBlockSize() const { return true; }
-        virtual int GetBlockSizeX() const { return this->block_size[0]; }
-        virtual int GetBlockSizeY() const { return this->block_size[1]; }
-        virtual int GetBlockSizeZ() const { return this->block_size[2]; }
-        virtual void SetBlockSizeX(int n) { this->block_size[0]=n; this->need_reload_formula=true; }
-        virtual void SetBlockSizeY(int n) { this->block_size[1]=n; this->need_reload_formula=true; }
-        virtual void SetBlockSizeZ(int n) { this->block_size[2]=n; this->need_reload_formula=true; }
+        bool HasEditableBlockSize() const override { return true; }
+        int GetBlockSizeX() const override { return this->block_size[0]; }
+        int GetBlockSizeY() const override { return this->block_size[1]; }
+        int GetBlockSizeZ() const override { return this->block_size[2]; }
+        void SetBlockSizeX(int n) override { this->block_size[0]=n; this->need_reload_formula=true; }
+        void SetBlockSizeY(int n) override { this->block_size[1]=n; this->need_reload_formula=true; }
+        void SetBlockSizeZ(int n) override { this->block_size[2]=n; this->need_reload_formula=true; }
 
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
-        
-        virtual bool HasEditableDataType() const { return false; }
+        std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
+
+        bool HasEditableDataType() const override { return false; }
 
 protected:
-    
+
         int block_size[3];
 };

@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -37,14 +37,7 @@ GrayScottMeshRD::GrayScottMeshRD()
     this->AddParameter("D_b",0.041f);
     this->AddParameter("k",0.06f);
     this->AddParameter("F",0.035f);
-    this->buffer = vtkUnstructuredGrid::New();
-}
-
-// ---------------------------------------------------------------------
-
-GrayScottMeshRD::~GrayScottMeshRD()
-{
-    this->buffer->Delete();
+    this->buffer = vtkSmartPointer<vtkUnstructuredGrid>::New();
 }
 
 // ---------------------------------------------------------------------
@@ -117,9 +110,9 @@ void GrayScottMeshRD::InternalUpdate(int n_steps)
 
 // ---------------------------------------------------------------------
 
-void GrayScottMeshRD::SetNumberOfChemicals(int n)
+void GrayScottMeshRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
-    MeshRD::SetNumberOfChemicals(n);
+    MeshRD::SetNumberOfChemicals(n, reallocate_storage);
     this->buffer->DeepCopy(this->mesh);
 }
 

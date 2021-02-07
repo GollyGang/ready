@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -34,8 +34,8 @@ class wxVTKRenderWindowInteractor;
 #include "InteractorStylePainter.hpp"
 
 // readybase
+#include "AbstractRD.hpp"
 #include "Properties.hpp"
-class AbstractRD;
 
 // VTK:
 class vtkUnstructuredGrid;
@@ -54,7 +54,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool UserWantsToCancelWhenAskedIfWantsToSave();
 
         // interface with InfoPanel
-        AbstractRD* GetCurrentRDSystem() { return system; }
+        AbstractRD& GetCurrentRDSystem() { return *this->system; }
         void SetRuleName(std::string s);
         void SetDescription(std::string s);
         void SetParameter(int iParam,float val);
@@ -63,6 +63,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void SetNumberOfChemicals(int n);
         bool SetDimensions(int x,int y,int z);
         void SetBlockSize(int x,int y,int z);
+        void SetDataType(int data_type);
         Properties& GetRenderSettings() { return this->render_settings; }
         void RenderSettingsChanged();
 
@@ -75,7 +76,7 @@ class MyFrame : public wxFrame, public IPaintHandler
         void OnChar(wxKeyEvent& event);
         void ProcessKey(int key, int modifiers);
 
-        bool IsFullScreen() { return this->fullscreen; }
+        bool IsFullScreen() const { return this->fullscreen; }
 
         // implementation of IPaintHandler interface
         virtual void LeftMouseDown(int x,int y);
@@ -201,13 +202,12 @@ class MyFrame : public wxFrame, public IPaintHandler
         void UpdateInfoPane();
         void InitializeHelpPane();
         void InitializeRenderPane();
-        static void InitializeDefaultRenderSettings(Properties& props);
         void LoadSettings();
         void SaveSettings();
         void CheckFocus();
         void EnableAllMenus(bool enable);
-       
-        void SetCurrentRDSystem(AbstractRD* system);
+
+        void SetCurrentRDSystem(std::unique_ptr<AbstractRD> system);
         void UpdateWindows();
         void UpdateWindowTitle();
         void UpdateToolbars();
@@ -229,10 +229,10 @@ class MyFrame : public wxFrame, public IPaintHandler
         wxString default_perspective;
 
         // VTK does the rendering
-        wxVTKRenderWindowInteractor *pVTKWindow;
+        vtkSmartPointer<wxVTKRenderWindowInteractor> pVTKWindow;
 
         // current system being simulated (in future we might want more than one)
-        AbstractRD *system;
+        std::unique_ptr<AbstractRD> system;
 
         // panes:
         PatternsPanel *patterns_panel;
@@ -271,8 +271,8 @@ class MyFrame : public wxFrame, public IPaintHandler
         bool is_opencl_available;
 
         // toolbar things
-        enum TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
-        wxCursor *pencil_cursor,*brush_cursor,*picker_cursor;
+        enum class TCursorType { POINTER, PENCIL, BRUSH, PICKER } CurrentCursor;
+        std::unique_ptr<wxCursor> pencil_cursor, brush_cursor, picker_cursor;
         float current_paint_value;
         bool left_mouse_is_down,right_mouse_is_down;
         wxString icons_folder;

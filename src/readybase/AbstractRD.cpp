@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -20,6 +20,7 @@
 #include "overlays.hpp"
 
 // STL:
+#include <algorithm>
 using namespace std;
 
 // SSE:
@@ -28,16 +29,17 @@ using namespace std;
 // ---------------------------------------------------------------------
 
 AbstractRD::AbstractRD(int data_type)
-    : xgap(5.0)
-    , ygap(20.0)
+    : use_local_memory(false)
+    , timesteps_taken(0)
+    , need_reload_formula(true)
+    , is_modified(false)
+    , wrap(true)
+    , neighborhood_type(TNeighborhood::VERTEX_NEIGHBORS)
+    , x_spacing_proportion(0.05)
+    , y_spacing_proportion(0.1)
+    , accuracy(Accuracy::Medium)
 {
-    this->timesteps_taken = 0;
-    this->need_reload_formula = true;
-    this->is_modified = false;
-    this->wrap = true;
     this->InternalSetDataType(data_type);
-
-    this->neighborhood_type = VERTEX_NEIGHBORS;
 
     #if defined(USE_SSE)
         // disable accurate handling of denormals and zeros, for speed
@@ -48,9 +50,9 @@ AbstractRD::AbstractRD(int data_type)
         #endif
     #endif // (USE_SSE)
 
-    this->canonical_neighborhood_type_identifiers[VERTEX_NEIGHBORS] = "vertex";
-    this->canonical_neighborhood_type_identifiers[EDGE_NEIGHBORS] = "edge";
-    this->canonical_neighborhood_type_identifiers[FACE_NEIGHBORS] = "face";
+    this->canonical_neighborhood_type_identifiers[TNeighborhood::VERTEX_NEIGHBORS] = "vertex";
+    this->canonical_neighborhood_type_identifiers[TNeighborhood::EDGE_NEIGHBORS] = "edge";
+    this->canonical_neighborhood_type_identifiers[TNeighborhood::FACE_NEIGHBORS] = "face";
     for(map<TNeighborhood,string>::const_iterator it = this->canonical_neighborhood_type_identifiers.begin();it != this->canonical_neighborhood_type_identifiers.end();it++)
         this->recognized_neighborhood_type_identifiers[it->second] = it->first;
 }
@@ -65,6 +67,7 @@ AbstractRD::~AbstractRD()
 
 void AbstractRD::SetFormula(string s)
 {
+    s.erase(s.find_last_not_of(" \t\n\r") + 1); // trim trailing whitespace
     if(s != this->formula)
         this->need_reload_formula = true;
     this->formula = s;
@@ -98,23 +101,27 @@ int AbstractRD::GetNumberOfParameters() const
 
 std::string AbstractRD::GetParameterName(int iParam) const
 {
-    return this->parameters[iParam].first;
+    return this->parameters[iParam].name;
 }
 
 // ---------------------------------------------------------------------
 
 float AbstractRD::GetParameterValue(int iParam) const
 {
-    return this->parameters[iParam].second;
+    return this->parameters[iParam].value;
 }
 
 // ---------------------------------------------------------------------
 
 float AbstractRD::GetParameterValueByName(const std::string& name) const
 {
-    for(int iParam=0;iParam<(int)this->parameters.size();iParam++)
-        if(this->parameters[iParam].first == name)
-            return this->parameters[iParam].second;
+    for (const Parameter& parameter : this->parameters)
+    {
+        if (parameter.name == name)
+        {
+            return parameter.value;
+        }
+    }
     throw runtime_error("ImageRD::GetParameterValueByName : parameter name not found: "+name);
 }
 
@@ -122,7 +129,7 @@ float AbstractRD::GetParameterValueByName(const std::string& name) const
 
 void AbstractRD::AddParameter(const std::string& name,float val)
 {
-    this->parameters.push_back(make_pair(name,val));
+    this->parameters.push_back({ name, val });
     this->is_modified = true;
 }
 
@@ -146,7 +153,7 @@ void AbstractRD::DeleteAllParameters()
 
 void AbstractRD::SetParameterName(int iParam,const string& s)
 {
-    this->parameters[iParam].first = s;
+    this->parameters[iParam].name = s;
     this->is_modified = true;
 }
 
@@ -154,7 +161,7 @@ void AbstractRD::SetParameterName(int iParam,const string& s)
 
 void AbstractRD::SetParameterValue(int iParam,float val)
 {
-    this->parameters[iParam].second = val;
+    this->parameters[iParam].value = val;
     this->is_modified = true;
 }
 
@@ -162,10 +169,8 @@ void AbstractRD::SetParameterValue(int iParam,float val)
 
 bool AbstractRD::IsParameter(const string& name) const
 {
-    for(int i=0;i<(int)this->parameters.size();i++)
-        if(this->parameters[i].first == name)
-            return true;
-    return false;
+    return find_if(this->parameters.begin(), this->parameters.end(),
+        [&](const Parameter& param) { return param.name == name; }) != this->parameters.end();
 }
 
 // ---------------------------------------------------------------------
@@ -186,17 +191,11 @@ void AbstractRD::SetFilename(const string& s)
 
 void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
 {
-    const int ready_format_version = 6;
-
-    string str;
-    const char *s;
-    float f;
-    int i;
-
     // check whether we should warn the user that they need to update Ready
     {
+        int i;
         read_required_attribute(rd,"format_version",i);
-        warn_to_update = (i > ready_format_version);
+        warn_to_update = (i > this->ready_format_version);
         // (we will still proceed and try to read the file but it might fail or give poor results)
     }
 
@@ -204,18 +203,19 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
     if(!rule) throw runtime_error("rule node not found in file");
 
     // rule_name:
+    string str;
     read_required_attribute(rule,"name",str);
     this->SetRuleName(str);
 
     // wrap-around
-    s = rule->GetAttribute("wrap");
+    const char *s = rule->GetAttribute("wrap");
     if(!s) this->wrap = true;
     else this->wrap = (string(s)=="1");
 
     // neighborhood specifiers
 
     s = rule->GetAttribute("neighborhood_type");
-    if(!s) this->neighborhood_type = VERTEX_NEIGHBORS;
+    if(!s) this->neighborhood_type = TNeighborhood::VERTEX_NEIGHBORS;
     else if(this->recognized_neighborhood_type_identifiers.find(s)==this->recognized_neighborhood_type_identifiers.end())
         throw runtime_error("Unrecognized neighborhood_type");
     else this->neighborhood_type = this->recognized_neighborhood_type_identifiers[s];
@@ -231,6 +231,7 @@ void AbstractRD::InitializeFromXML(vtkXMLDataElement* rd, bool& warn_to_update)
         if(!s) throw runtime_error("Failed to read param attribute: name");
         name = trim_multiline_string(s);
         s = node->GetCharacterData();
+        float f;
         if(!s || !from_string(s,f)) throw runtime_error("Failed to read param value");
         this->AddParameter(name,f);
     }
@@ -251,16 +252,16 @@ vtkSmartPointer<vtkXMLDataElement> AbstractRD::GetAsXML(bool generate_initial_pa
 {
     vtkSmartPointer<vtkXMLDataElement> rd = vtkSmartPointer<vtkXMLDataElement>::New();
     rd->SetName("RD");
-    rd->SetIntAttribute("format_version",5);
+    rd->SetIntAttribute("format_version", this->ready_format_version);
     // (Use this for when the format changes so much that the user will get better results if they update their Ready. File reading will still proceed but may fail.)
 
     // description
-    vtkSmartPointer<vtkXMLDataElement> description = vtkSmartPointer<vtkXMLDataElement>::New();
-    description->SetName("description");
+    vtkSmartPointer<vtkXMLDataElement> description_node = vtkSmartPointer<vtkXMLDataElement>::New();
+    description_node->SetName("description");
     string desc = this->GetDescription();
     desc = ReplaceAllSubstrings(desc, "\n", "\n      "); // indent the lines
-    description->SetCharacterData(desc.c_str(), (int)desc.length());
-    rd->AddNestedElement(description);
+    description_node->SetCharacterData(desc.c_str(), (int)desc.length());
+    rd->AddNestedElement(description_node);
 
     // rule
     vtkSmartPointer<vtkXMLDataElement> rule = vtkSmartPointer<vtkXMLDataElement>::New();
@@ -388,8 +389,10 @@ int AbstractRD::GetDataType() const
 void AbstractRD::SetDataType(int type)
 {
     this->InternalSetDataType(type);
-    this->SetNumberOfChemicals(this->n_chemicals); // we use this because it causes the data to be reallocated
-    this->GenerateInitialPattern(); // TODO: would be nice to keep current pattern somehow
+    const bool reallocate_storage = true;
+    this->SetNumberOfChemicals(this->n_chemicals, reallocate_storage);
+    this->GenerateInitialPattern();
+    // TODO: would be nice to keep current pattern somehow, instead of reallocating and reinitializing
 }
 
 // ---------------------------------------------------------------------
@@ -413,4 +416,3 @@ void AbstractRD::InternalSetDataType(int type)
 }
 
 // ---------------------------------------------------------------------
-

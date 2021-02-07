@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -77,6 +77,8 @@ PatternsPanel::PatternsPanel(MyFrame* parent,wxWindowID id)
         wxFont font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
         font.SetPointSize(12);
         treectrl->SetFont(font);
+        // ensure entire background is near white (avoids bug in wxMac 3.1.5 if bg is pure white)
+        treectrl->SetBackgroundColour(wxColour(254,254,254));
     #elif defined(__WXMSW__)
         // reduce indent a lot on Windows
         treectrl->SetIndent(4);
@@ -210,4 +212,12 @@ bool PatternsPanel::DoKey(int key, int mods)
     // finally do other keyboard shortcuts
     frame->ProcessKey(key, mods);
     return true;
+}
+
+void PatternsPanel::SelectPath(const wxString& path)
+{
+    wxFileName full_path(path);
+    full_path.MakeAbsolute();
+    this->patternctrl->ExpandPath(full_path.GetFullPath());
+    this->patternctrl->SetPath(full_path.GetFullPath());
 }

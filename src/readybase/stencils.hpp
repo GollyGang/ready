@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -14,6 +14,9 @@
 
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
+
+// Local:
+#include "AbstractRD.hpp"
 
 // Stdlib:
 #include <set>
@@ -47,8 +50,6 @@ struct StencilPoint
 {
     Point point;
     int weight;
-
-    std::string GetCode(int iSlot, const std::string& chem) const;
 };
 
 // ---------------------------------------------------------------------
@@ -71,6 +72,9 @@ struct InputPoint
     std::string chem;
 
     std::string GetName() const;
+    std::string GetDirectAccessCode(bool wrap, const int block_size[3], bool use_local_memory) const;
+    std::string GetSwizzled_Block411() const;
+    std::pair<InputPoint, InputPoint> GetAlignedBlocks_Block411() const;
 
     friend bool operator<(const InputPoint& a, const InputPoint& b)
     {
@@ -88,11 +92,16 @@ struct AppliedStencil
     std::string chem; // e.g. "a"
 
     std::string GetName() const { return stencil.label + "_" + chem; }
-    std::set<InputPoint> GetInputPoints_Block411() const;
+    std::string GetCode() const;
+    std::set<InputPoint> GetInputPoints() const;
 };
 
 // ---------------------------------------------------------------------
 
-std::vector<Stencil> GetKnownStencils(int dimensionality);
+std::vector<Stencil> GetKnownStencils(int dimensionality, const AbstractRD::Accuracy& accuracy);
+std::string GetIndexString(int x, int y, int z, bool wrap);
+std::string GetIndexString(const std::string& x, const std::string& y, const std::string& z, bool wrap);
+std::string GetCoordString(int val, const std::string& coord, const std::string& coord_capital, bool wrap);
+std::string GetCoordString(const std::string& val, const std::string& coord_capital, bool wrap);
 
 // ---------------------------------------------------------------------

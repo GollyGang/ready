@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
+  <RD format_version="6">
     <description>
       Gliders in a Generations-like rule (B2/S/C4) on a Penrose tiling.
       Discovered by Katsunobu Imai (see &lt;a href=&quot;http://youtu.be/g0g2q0hecs8&quot;&gt;http://youtu.be/g0g2q0hecs8&lt;/a&gt;).
@@ -12,7 +12,7 @@
                 __global float* a_out,
                 __global int* neighbor_indices,
                 __global float* neighbor_weights,
-                const int max_neighbors) 
+                const int max_neighbors)
         {
             const int x = get_global_id(0);
             // count neighbors of each type
@@ -20,7 +20,7 @@
             int offset = x * max_neighbors;
             for(int i=0;i &lt; max_neighbors;i++)
             {
-                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                if(neighbor_weights[offset+i]&lt;0.0001f)
                     continue; // not a neighbor
                 int y = round(a_in[neighbor_indices[offset+i]]);
                 if(y==3) n3++;
@@ -42,88 +42,89 @@
                 a_out[x] = 0.0f;
         }
       </kernel>
-      
+
     </rule>
     <initial_pattern_generator apply_when_loading="false">
       <overlay chemical="a">
         <overwrite>
-          
+
         </overwrite>
         <white_noise low="0" high="4">
-          
+
         </white_noise>
         <everywhere />
-        
+
       </overlay>
-      
+
     </initial_pattern_generator>
     <render_settings>
       <surface_color r="1" g="1" b="1">
-        
+
       </surface_color>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="1">
-        
+
       </color_low>
       <color_high r="1" g="0" b="0">
-        
+
       </color_high>
       <show_color_scale value="true">
-        
+
       </show_color_scale>
       <show_multiple_chemicals value="true">
-        
+
       </show_multiple_chemicals>
       <active_chemical value="a">
-        
+
       </active_chemical>
       <low value="0">
-        
+
       </low>
       <high value="3">
-        
+
       </high>
       <vertical_scale_1D value="30">
-        
+
       </vertical_scale_1D>
       <vertical_scale_2D value="15">
-        
+
       </vertical_scale_2D>
       <contour_level value="0.25">
-        
+
       </contour_level>
       <use_wireframe value="false">
-        
+
       </use_wireframe>
       <show_cell_edges value="true">
-        
+
       </show_cell_edges>
       <show_bounding_box value="true">
-        
+
       </show_bounding_box>
       <slice_3D value="false">
-        
+
       </slice_3D>
       <slice_3D_axis value="z">
-        
+
       </slice_3D_axis>
       <slice_3D_position value="0.5">
-        
+
       </slice_3D_position>
       <show_displacement_mapped_surface value="true">
-        
+
       </show_displacement_mapped_surface>
       <color_displacement_mapped_surface value="true">
-        
+
       </color_displacement_mapped_surface>
       <use_image_interpolation value="false">
-        
+
       </use_image_interpolation>
       <timesteps_per_render value="1">
-        
+
       </timesteps_per_render>
-      
+
     </render_settings>
-    
+
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="3126" NumberOfCells="3010">

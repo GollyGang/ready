@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -41,6 +41,8 @@ class PatternsPanel : public wxPanel
         
         // return false if key event should be passed to default handler
         bool DoKey(int key, int mods);
+
+        void SelectPath(const wxString& path);
 
     private:
 

@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <RD format_version="6">
+    <description>
+The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kuramoto%E2%80%93Sivashinsky_equation&quot;&gt;Kuramoto-Sivashinsky equation&lt;/a&gt;, with its range stabilized based on advice from &lt;a href=&quot;https://www.youtube.com/channel/UC1Mo9AoX5desRiFLW_skbEg/featured&quot;&gt;Steffen Richters&lt;/a&gt;.
+
+The stabilize parameter prevents the values from growing continuously. Set it to zero to see what happens without it.
+
+To increase the size of the blobs, try e.g.: dx = 0.3, timestep = 0.0005
+
+In 3D (try 32 x 32 x 32) use stabilize = -0.1.
+
+In 1D use stabilize = -0.025.
+
+Created by Dan Wills.
+    </description>
+    <rule name="KSE" type="formula" wrap="1">
+      <param name="dx">
+        0.500000
+      </param>
+      <param name="timestep">
+        0.005000
+      </param>
+      <param name="stabilize">
+        -0.05
+      </param>
+      <param name="gms_weight">
+        0.2
+      </param>
+      <param name="lapweight">
+        -1.0
+      </param>
+      <param name="bilapweight">
+        -1.0
+      </param>
+      <formula number_of_chemicals="1">
+delta_a = bilapweight * bilaplacian_a + lapweight * laplacian_a + gradient_mag_squared_a * gms_weight + a * stabilize;
+      </formula>
+    </rule>
+    <initial_pattern_generator apply_when_loading="true" zero_first="true">
+      <overlay chemical="a">
+        <overwrite>
+        </overwrite>
+        <white_noise low="65" high="120">
+        </white_noise>
+        <everywhere>
+        </everywhere>
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1">
+      </surface_color>
+      <colormap value="spectral" />
+      <color_low r="0" g="0" b="0">
+      </color_low>
+      <color_high r="1" g="1" b="1">
+      </color_high>
+      <show_color_scale value="true">
+      </show_color_scale>
+      <show_multiple_chemicals value="false">
+      </show_multiple_chemicals>
+      <active_chemical value="a">
+      </active_chemical>
+      <low value="65">
+      </low>
+      <high value="120">
+      </high>
+      <vertical_scale_1D value="30">
+      </vertical_scale_1D>
+      <vertical_scale_2D value="15">
+      </vertical_scale_2D>
+      <contour_level value="100">
+      </contour_level>
+      <cap_contour value="true">
+      </cap_contour>
+      <invert_contour_cap value="false">
+      </invert_contour_cap>
+      <use_wireframe value="false">
+      </use_wireframe>
+      <show_cell_edges value="false">
+      </show_cell_edges>
+      <show_bounding_box value="true">
+      </show_bounding_box>
+      <show_chemical_label value="true">
+      </show_chemical_label>
+      <slice_3D value="true">
+      </slice_3D>
+      <slice_3D_axis value="z">
+      </slice_3D_axis>
+      <slice_3D_position value="0.5">
+      </slice_3D_position>
+      <show_displacement_mapped_surface value="false">
+      </show_displacement_mapped_surface>
+      <color_displacement_mapped_surface value="true">
+      </color_displacement_mapped_surface>
+      <use_image_interpolation value="true">
+      </use_image_interpolation>
+      <timesteps_per_render value="42">
+      </timesteps_per_render>
+      <show_phase_plot value="false">
+      </show_phase_plot>
+      <phase_plot_x_axis value="a">
+      </phase_plot_x_axis>
+      <phase_plot_y_axis value="b">
+      </phase_plot_y_axis>
+      <phase_plot_z_axis value="c">
+      </phase_plot_z_axis>
+    </render_settings>
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

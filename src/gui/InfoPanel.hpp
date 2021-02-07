@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -15,21 +15,21 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// wxWidgets:
-#include <wx/wxprec.h>
-#ifdef __BORLANDC__
-    #pragma hdrstop
-#endif
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
-
 // local:
 class MyFrame;
 class HtmlInfo;
 
 // readybase:
 class AbstractRD;
+
+// wxWidgets:
+#include <wx/wxprec.h>
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 
 /// This panel allows the user to change the parameters of an RD system.
 // (it doesn't change the ImageRD itself though, MyFrame does that)
@@ -40,7 +40,7 @@ class InfoPanel : public wxPanel
         InfoPanel(MyFrame* parent, wxWindowID id);
 
         // update the displayed info to reflect the state of the RD system
-        void Update(const AbstractRD* const system);
+        void UpdatePanel(const AbstractRD& system);
         
         // bring up a suitable dialog for changing the given setting
         void ChangeInfo(const wxString& label);
@@ -74,7 +74,26 @@ class InfoPanel : public wxPanel
 
         int rownum;             // for alternating row background colors
 
-    private:
+        // labels in 1st column
+        static const wxString rule_name_label;
+        static const wxString rule_type_label;
+        static const wxString description_label;
+        static const wxString num_chemicals_label;
+        static const wxString formula_label;
+        static const wxString kernel_label;
+        static const wxString dimensions_label;
+        static const wxString block_size_label;
+        static const wxString use_local_memory_label;
+        static const wxString number_of_cells_label;
+        static const wxString wrap_label;
+        static const wxString data_type_label;
+        static const wxString neighborhood_type_label;
+        static const wxString neighborhood_range_label;
+        static const wxString neighborhood_weight_label;
+        static const wxString accuracy_label;
+        static const wxString accuracy_labels[3];
+
+private:
         
         // for building HTML table
         wxString AppendRow(const wxString& print_label, const wxString& label, const wxString& value,
@@ -90,6 +109,8 @@ class InfoPanel : public wxPanel
         void ChangeFormula();
         void ChangeDimensions();
         void ChangeBlockSize();
+        void ChangeAccuracy();
+        void ChangeUseLocalMemory();
         void ChangeWrapOption();
         void ChangeDataType();
         

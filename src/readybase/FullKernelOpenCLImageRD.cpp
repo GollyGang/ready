@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -33,7 +33,7 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(int opencl_platform,int opencl_
     : OpenCLImageRD(opencl_platform,opencl_device,data_type)
 {
     this->SetRuleName("Full kernel example");
-    this->SetFormula("__kernel void rd_compute() {}");
+    this->SetFormula("kernel void rd_compute() {}");
     this->block_size[0]=1;
     this->block_size[1]=1;
     this->block_size[2]=1;
@@ -66,9 +66,17 @@ FullKernelOpenCLImageRD::FullKernelOpenCLImageRD(const OpenCLImageRD& source)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(std::string formula) const
+string FullKernelOpenCLImageRD::AssembleKernelSourceFromFormula(const string& formula) const
 {
-    return formula; // here the formula is a full OpenCL kernel
+    ostringstream kernel_source;
+    if (this->use_local_memory)
+    {
+        kernel_source << "#define LX " << this->local_work_size[0] << "\n";
+        kernel_source << "#define LY " << this->local_work_size[1] << "\n";
+        kernel_source << "#define LZ " << this->local_work_size[2] << "\n";
+    }
+    kernel_source << formula;
+    return kernel_source.str();
 }
 
 // ---------------------------------------------------------------------------------------------------------

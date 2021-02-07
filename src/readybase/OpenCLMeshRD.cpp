@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -51,9 +51,9 @@ OpenCLMeshRD::~OpenCLMeshRD()
 
 // -------------------------------------------------------------------------
 
-void OpenCLMeshRD::SetNumberOfChemicals(int n)
+void OpenCLMeshRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
-    MeshRD::SetNumberOfChemicals(n);
+    MeshRD::SetNumberOfChemicals(n, reallocate_storage);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
@@ -246,12 +246,28 @@ void OpenCLMeshRD::WriteToOpenCLBuffersIfNeeded()
 
     // fill indices buffer
     const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;
-    ret = clEnqueueWriteBuffer(this->command_queue,this->clBuffer_cell_neighbor_indices, CL_TRUE, 0, NBORS_INDICES_SIZE, this->cell_neighbor_indices, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(
+        this->command_queue,
+        this->clBuffer_cell_neighbor_indices,
+        CL_TRUE,
+        0,
+        NBORS_INDICES_SIZE,
+        &this->cell_neighbor_indices[0],
+        0,
+        NULL,
+        NULL);
     throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : indices buffer writing failed: ");
 
     // fill weights buffer
     const size_t NBORS_WEIGHTS_SIZE = sizeof(float) * this->mesh->GetNumberOfCells() * this->max_neighbors;
-    ret = clEnqueueWriteBuffer(this->command_queue,this->clBuffer_cell_neighbor_weights, CL_TRUE, 0, NBORS_WEIGHTS_SIZE, this->cell_neighbor_weights, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(
+        this->command_queue,
+        this->clBuffer_cell_neighbor_weights,
+        CL_TRUE, 0, NBORS_WEIGHTS_SIZE,
+        &this->cell_neighbor_weights[0],
+        0,
+        NULL,
+        NULL);
     throwOnError(ret,"OpenCLMeshRD::WriteToOpenCLBuffers : weights buffer writing failed: ");
 
     this->need_write_to_opencl_buffers = false;
@@ -300,7 +316,7 @@ void OpenCLMeshRD::GenerateInitialPattern()
 
 void OpenCLMeshRD::BlankImage(float value)
 {
-    MeshRD::BlankImage();
+    MeshRD::BlankImage(value);
     this->need_write_to_opencl_buffers = true;
 }
 

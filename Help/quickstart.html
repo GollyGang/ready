@@ -59,6 +59,27 @@ You can drag the panes by their title bar to dock them into the
 Ready frame in different positions or float them as separate windows.
 
 <p>
+<font size=+1><b>Improving the speed</b></font>
+
+<p>
+Change the 'Timesteps per render' setting on the toolbar by using the buttons on either side of it to Run Faster (render
+less often) or Run Slower (render more often). These commands are also on the Action menu.
+
+<p>
+To improve the overall speed here are some things to check:
+<ul>
+<li>Select the fastest OpenCL device - use Action > Select OpenCL Device...
+<li>Avoid using the same graphics card for rendering, if possible. For example on my laptop I can tell Windows that Ready
+should use the integrated graphics chip for rendering (Graphics Settings), which leaves the NVidia card free to run OpenCL.
+<li>Change the accuracy to low in the Info Pane, if this does not introduce artifacts into the pattern. View the kernel
+to see the effect of this setting.
+<li>Set the data type to float if possible. Using double is typically slower.
+<li>Try using local memory, with the setting in the Info Pane. This is a recent feature, let us know if it makes a
+dramatic difference.
+<li>Try changing the block size. On most devices the default 4x1x1 block size is fastest.
+</ul>
+
+<p>
 <font size=+1><b>More help</b></font>
 
 <p>Visit our page at <a href="https://github.com/GollyGang/ready">https://github.com/GollyGang/ready</a> for more information and to report issues.</p>

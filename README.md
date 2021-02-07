@@ -4,14 +4,14 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.10.1 here: 
+Download Ready 0.11.0 here:
 
-[![image](https://user-images.githubusercontent.com/647092/71315570-985a5400-2458-11ea-8625-656ba47e42b5.png)](https://github.com/GollyGang/ready/releases/download/0.10.1/Ready-0.10.1-Windows-64bit.zip)
-[![image](https://user-images.githubusercontent.com/647092/71315595-33ebc480-2459-11ea-8e2f-340068b06b76.png)](https://github.com/GollyGang/ready/releases/download/0.10.1/Ready-0.10.1-Mac.dmg)
+<!-- To make the icon for this section, see resources/download_icons.html -->
+[![image](https://user-images.githubusercontent.com/647092/106070536-8edff880-60fc-11eb-8574-52d7977b7f9e.png)
+](https://github.com/GollyGang/ready/releases/download/0.11.0/Ready-0.11.0-Windows-64bit.zip)
+[![image](https://user-images.githubusercontent.com/647092/106070568-9bfce780-60fc-11eb-84f5-9699b44b3a65.png)](https://github.com/GollyGang/ready/releases/download/0.11.0/Ready-0.11.4-Mac.dmg)
 
-<!--<b>MacOS:</b> build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L139) (please ask if you want binaries)-->
-
-<b>Linux:</b> build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L112) (please ask if you want binaries)
+<b>Linux:</b> build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L112-L138) (please ask if you want binaries)
 
 [Online help](https://gollygang.github.io/ready/Help/index.html), [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
@@ -54,8 +54,8 @@ Press coverage:
 
 Please cite Ready as:
 
-    Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki, Dan Wills. 
-    "Ready, a cross-platform implementation of various reaction-diffusion systems." 
+    Tim Hutton, Robert Munafo, Andrew Trevorrow, Tom Rokicki, Dan Wills.
+    "Ready, a cross-platform implementation of various reaction-diffusion systems."
     https://github.com/GollyGang/ready
 
 Blog coverage:
@@ -71,7 +71,7 @@ Blog coverage:
 Other packages:
   * [TexRD](http://www.texrd.com/) (closed source)
   * [Visions of Chaos](http://softology.com.au/voc.htm) (closed source)
-  * [CAPOW](http://www.cs.sjsu.edu/~rucker/capow/)
+  * [CAPOW](https://github.com/rudyrucker/capow)
 
 Wanted rules: (help needed)
   * L.Decker 2003, derived from Maginu's (from TexRD)

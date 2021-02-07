@@ -1,147 +1,82 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
-  <RD format_version="5">
+  <RD format_version="6">
     <description>
     Kobayashi, R. (1993) &quot;Modeling and numerical simulations of dendritic crystal growth&quot; Physica D: Nonlinear Phenomena, 63(3-4), 410-423.
+
+    Following &lt;a href=&quot;https://softologyblog.wordpress.com/2020/03/29/dendritic-crystal-growth/&quot;&gt;https://softologyblog.wordpress.com/2020/03/29/dendritic-crystal-growth/&lt;/a&gt; - thanks!
+
+    Thanks also to Rahul Sanal for the paper linked inside.
+
+    In our implementation, a = phi, b = temperature (t).
 
     Change the value of 'anisotropy' to get snowflakes with different numbers of arms - the default is 7.
 
     Change 'k' between 0.8 and 2.0 to get more featheriness.
     </description>
-    <rule name="Dendrites" type="kernel" neighborhood_type="vertex">
-      <kernel number_of_chemicals="2" block_size_x="1" block_size_y="1" block_size_z="1">
-        __kernel void rd_compute(__global float *a_in,__global float *b_in,__global float *a_out,__global float *b_out)
-        {
-            // Following https://softologyblog.wordpress.com/2020/03/29/dendritic-crystal-growth/ - thanks!
-            // Thanks also to Rahul Sanal for the paper linked inside.
+    <rule name="Dendrites" type="formula">
+      <param name="timestep">    0.0002   </param>
+      <param name="dx">          0.03     </param>
+      <param name="dy">          0.03     </param>
+      <param name="tau">         0.0003   </param>
+      <param name="epsbar">      0.01     </param>
+      <param name="k">           1.8      </param>  <!-- how feathery should the snowflakes be? -->
+      <param name="delta">       0.01     </param>
+      <param name="anisotropy">  7.0      </param>  <!-- how many arms should the snowflakes have? -->
+      <param name="rotate">      0.1      </param>  <!-- rotate the anisotropy -->
+      <param name="alpha">       0.9      </param>
+      <param name="gamma">      10.0      </param>
+      <param name="teq">         1.0      </param>
+      <formula number_of_chemicals="2">
+float4 grad_phi_x[5]; // C,N,E,S,W
+grad_phi_x[0] = (a_e - a_w) / dx;
+grad_phi_x[1] = (a_ne - a_nw) / dx;
+grad_phi_x[2] = (a_e2 - a) / dx;
+grad_phi_x[3] = (a_se - a_sw) / dx;
+grad_phi_x[4] = (a - a_w2) / dx;
+float4 grad_phi_y[5];
+grad_phi_y[0] = (a_s - a_n) / dy;
+grad_phi_y[1] = (a - a_n2) / dy;
+grad_phi_y[2] = (a_se - a_ne) / dy;
+grad_phi_y[3] = (a_s2 - a) / dy;
+grad_phi_y[4] = (a_sw - a_nw) / dy;
 
-            // a = phi
-            // b = temperature (t)
-            
-            #define M_PI 3.14159265358979323846   // needed for MacOS
+float4 eps[5], eps_deriv[5];
+for(int i = 0; i &lt; 5; i++) {
+  float4 angle = atan2(grad_phi_y[i],
+    grad_phi_x[i]) + rotate;
+  eps[i] = epsbar * (1.0f
+    + delta * cos(anisotropy * angle));
+  eps_deriv[i] = -epsbar * anisotropy
+    * delta * sin(anisotropy * angle);
+}
+float4 grad_eps2_x = (eps[2] * eps[2]
+  - eps[4] * eps[4]) / dx; // E - W
+float4 grad_eps2_y = (eps[3] * eps[3]
+  - eps[1] * eps[1]) / dy; // S - N
 
-            const float dx = 0.03;
-            const float dy = 0.03;
-            const float dt = 0.0001;
-            const float tau = 0.0003;
-            const float epsilonbar = 0.01;
-            const float k = 1.8;               // how feathery should the snowflakes be?
-            const float delta = 0.01;
-            const float anisotropy = 7.0;      // how many arms should the snowflakes have?
-            const float rotate = 0.1;          // rotate the anisotropy
-            const float alpha = 0.9;
-            const float gamma = 10.0;
-            const float teq = 1.0;
+float4 pi = 3.14159265358979323846f;
+float4 m = alpha
+  * atan(gamma * (teq - b)) / pi;
 
-            const int index_x = get_global_id(0);
-            const int index_y = get_global_id(1);
-            const int index_z = get_global_id(2);
-            const int X = get_global_size(0);
-            const int Y = get_global_size(1);
-            const int Z = get_global_size(2);
-            const int index_here = X*(Y*index_z + index_y) + index_x;
+float4 edgp_x = (eps[4] * eps_deriv[4]
+     * grad_phi_y[4] - eps[2]
+     * eps_deriv[2] * grad_phi_y[2]
+    ) / dx;
+float4 edgp_y = (eps[3] * eps_deriv[3]
+     * grad_phi_x[3] - eps[1]
+     * eps_deriv[1] * grad_phi_x[1]
+    ) / dy;
 
-            // retrieve nearby locations
-            const int xm1 = (index_x-1+X) &amp; (X-1); // wrap (assumes X is a power of 2)
-            const int xp1 = (index_x+1) &amp; (X-1);
-            const int ym1 = (index_y-1+Y) &amp; (Y-1);
-            const int yp1 = (index_y+1) &amp; (Y-1);
-            const int xm2 = (index_x-2+X) &amp; (X-1);
-            const int xp2 = (index_x+2) &amp; (X-1);
-            const int ym2 = (index_y-2+Y) &amp; (Y-1);
-            const int yp2 = (index_y+2) &amp; (Y-1);
-            const int index_n =  X*(Y*index_z + ym1) + index_x;
-            const int index_ne = X*(Y*index_z + ym1) + xp1;
-            const int index_e =  X*(Y*index_z + index_y) + xp1;
-            const int index_se = X*(Y*index_z + yp1) + xp1;
-            const int index_s =  X*(Y*index_z + yp1) + index_x;
-            const int index_sw = X*(Y*index_z + yp1) + xm1;
-            const int index_w =  X*(Y*index_z + index_y) + xm1;
-            const int index_nw = X*(Y*index_z + ym1) + xm1;
-            const int index_n2 =  X*(Y*index_z + ym2) + index_x;
-            const int index_e2 =  X*(Y*index_z + index_y) + xp2;
-            const int index_s2 =  X*(Y*index_z + yp2) + index_x;
-            const int index_w2 =  X*(Y*index_z + index_y) + xm2;
-            float a = a_in[index_here];
-            float a_n = a_in[index_n];
-            float a_ne = a_in[index_ne];
-            float a_e = a_in[index_e];
-            float a_se = a_in[index_se];
-            float a_s = a_in[index_s];
-            float a_sw = a_in[index_sw];
-            float a_w = a_in[index_w];
-            float a_nw = a_in[index_nw];
-            float a_n2 = a_in[index_n2];
-            float a_e2 = a_in[index_e2];
-            float a_s2 = a_in[index_s2];
-            float a_w2 = a_in[index_w2];
-            float b = b_in[index_here];
-            float b_n = b_in[index_n];
-            float b_ne = b_in[index_ne];
-            float b_e = b_in[index_e];
-            float b_se = b_in[index_se];
-            float b_s = b_in[index_s];
-            float b_sw = b_in[index_sw];
-            float b_w = b_in[index_w];
-            float b_nw = b_in[index_nw];
-
-            float grad_phi_x   = (a_e - a_w)/dx;
-            float grad_phi_n_x = (a_ne - a_nw)/dx;
-            float grad_phi_e_x = (a_e2 - a)/dx;
-            float grad_phi_s_x = (a_se - a_sw)/dx;
-            float grad_phi_w_x = (a - a_w2)/dx;
-            float grad_phi_y   = (a_s - a_n)/dy;
-            float grad_phi_n_y = (a - a_n2)/dy;
-            float grad_phi_e_y = (a_se - a_ne)/dy;
-            float grad_phi_s_y = (a_s2 - a)/dy;
-            float grad_phi_w_y = (a_sw - a_nw)/dy;
-
-            float laplacian_phi = (2.0 * (a_n + a_e + a_s + a_w) + a_nw + a_ne + a_se + a_sw - 12.0*a)/(3.0*dx*dx);
-            float laplacian_t   = (2.0 * (b_n + b_e + b_s + b_w) + b_nw + b_ne + b_se + b_sw - 12.0*b)/(3.0*dx*dx);
-
-            float angl   = atan2(grad_phi_y,   grad_phi_x) + rotate;
-            float angl_n = atan2(grad_phi_n_y, grad_phi_n_x) + rotate;
-            float angl_e = atan2(grad_phi_e_y, grad_phi_e_x) + rotate;
-            float angl_s = atan2(grad_phi_s_y, grad_phi_s_x) + rotate;
-            float angl_w = atan2(grad_phi_w_y, grad_phi_w_x) + rotate;
-
-            float epsilon   = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl ) );
-            float epsilon_n = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl_n ) );
-            float epsilon_e = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl_e ) );
-            float epsilon_s = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl_s ) );
-            float epsilon_w = epsilonbar * ( 1.0 + delta * cos( anisotropy * angl_w ) );
-
-            float epsilon_derivative   = - epsilonbar * anisotropy * delta * sin( anisotropy * angl );
-            float epsilon_derivative_n = - epsilonbar * anisotropy * delta * sin( anisotropy * angl_n );
-            float epsilon_derivative_e = - epsilonbar * anisotropy * delta * sin( anisotropy * angl_e );
-            float epsilon_derivative_s = - epsilonbar * anisotropy * delta * sin( anisotropy * angl_s );
-            float epsilon_derivative_w = - epsilonbar * anisotropy * delta * sin( anisotropy * angl_w );
-
-            float grad_epsilon2_x = (epsilon_e*epsilon_e - epsilon_w*epsilon_w)/dx;
-            float grad_epsilon2_y = (epsilon_s*epsilon_s - epsilon_n*epsilon_n)/dy;
-
-            float term1 = (epsilon_s * epsilon_derivative_s * grad_phi_s_x -
-                            epsilon_n * epsilon_derivative_n * grad_phi_n_x)/dy;
-
-            float term2 = - (epsilon_e * epsilon_derivative_e * grad_phi_e_y -
-                              epsilon_w * epsilon_derivative_w * grad_phi_w_y)/dx;
-
-            float term3 = grad_epsilon2_x * grad_phi_x +
-                           grad_epsilon2_y * grad_phi_y;
-
-            float phiold = a;
-            float m = alpha / M_PI * atan(gamma *(teq-b));
-
-            float phinew = a + (term1 + term2 + epsilon*epsilon*laplacian_phi
-                + term3 + phiold*(1.0-phiold)*(phiold-0.5+m))*dt/tau;
-
-            float tnew = b + laplacian_t*dt + k*(phinew-phiold);
-
-            a_out[index_here] = phinew;
-            b_out[index_here] = tnew;
-        }
-
-      </kernel>
+delta_a = (
+  eps[0] * eps[0] * laplacian_a
+  + edgp_x + edgp_y
+  + grad_eps2_x * grad_phi_x[0]
+  + grad_eps2_y * grad_phi_y[0]
+  + a * (1.0f - a) * (a - 0.5f + m)
+  ) / tau;
+delta_b = laplacian_b + k * delta_a;
+      </formula>
     </rule>
     <initial_pattern_generator apply_when_loading="true" zero_first="false">
       <overlay chemical="a">

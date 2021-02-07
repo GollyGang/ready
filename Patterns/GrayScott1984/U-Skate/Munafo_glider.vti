@@ -2,11 +2,11 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="1">
     <description>
-        Robert Munafo's U-skater. See &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/uskate-world.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/uskate-world.html&lt;/a&gt;
+        Robert Munafo's U-skater, in the Gray-Scott rule. See &lt;a href=&quot;http://mrob.com/pub/comp/xmorphia/uskate-world.html&quot;&gt;http://mrob.com/pub/comp/xmorphia/uskate-world.html&lt;/a&gt;
     </description>
 
     <rule type="formula" name="Gray-Scott">
-        
+
       <param name="timestep"> 1.0    </param>
       <param name="D_a">      0.164  </param>
       <param name="D_b">      0.082 </param>
@@ -17,9 +17,9 @@
         delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);
         delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;
       </formula>
-      
+
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -48,7 +48,7 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
         <active_chemical value="b" />
         <show_multiple_chemicals value="false" />
@@ -57,7 +57,7 @@
         <low value="0" />
         <high value="0.45" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 127 0 63 0 0" Origin="0 0 0" Spacing="1 1 1">
     <Piece Extent="0 127 0 63 0 0">

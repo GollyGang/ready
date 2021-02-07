@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="4">
+  <RD format_version="6">
     <description>
       A variant of Stephan Rafler&apos;s &quot;SmoothLife&quot; system with neighborhoods computed with 2-pass 1D gaussian convolution.
-      
+
       Implemented by Cornus Ammonis.
     </description>
     <rule name="Gaussian SmoothLife" type="kernel" neighborhood_type="vertex">
@@ -29,22 +29,22 @@ __constant float alpha_m = 0.112f;   // sigmoid width for inner fullness
 
 
 // the logistic function is used as a smooth step function
-float sigma1(float x,float a,float alpha) 
-{ 
+float sigma1(float x,float a,float alpha)
+{
     return 1.0f / ( 1.0f + exp( -(x-a)*4.0f/alpha ) );
 }
 
 
 float sigma2(float x,float a,float b,float alpha)
 {
-    return sigma1(x,a,alpha) 
+    return sigma1(x,a,alpha)
         * ( 1.0f-sigma1(x,b,alpha) );
 }
 
 
 float sigma_m(float x,float y,float m,float alpha)
 {
-    return x * ( 1.0f-sigma1(m,0.5f,alpha) ) 
+    return x * ( 1.0f-sigma1(m,0.5f,alpha) )
         + y * sigma1(m,0.5f,alpha);
 }
 
@@ -53,7 +53,7 @@ float sigma_m(float x,float y,float m,float alpha)
 // (n = outer fullness, m = inner fullness)
 float s(float n,float m)
 {
-    return sigma2( n, sigma_m(b1,s1,m,alpha_m), 
+    return sigma2( n, sigma_m(b1,s1,m,alpha_m),
         sigma_m(b2,s2,m,alpha_m), alpha_n );
 }
 
@@ -101,7 +101,7 @@ __global float* c_in,
 __global float* a_out,
 __global float* b_out,
 __global float* c_out
-) 
+)
 {
     const int bx = get_global_id(0);
     const int by = get_global_id(1);
@@ -119,145 +119,146 @@ __global float* c_out
 
 
     a_out[i_here] = clamp( a_in[i_here] +
-        dt * (2.0f*s(outf,inf)-1.0f), 
+        dt * (2.0f*s(outf,inf)-1.0f),
         0.0f, 1.0f );
 }
       </kernel>
-      
+
     </rule>
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite>
-          
+
         </overwrite>
         <constant value="0.7">
-          
+
         </constant>
         <rectangle>
           <point3D x="0.2" y="0.2" z="0.4">
-            
+
           </point3D>
           <point3D x="0.4" y="0.8" z="0.6">
-            
+
           </point3D>
-          
+
         </rectangle>
-        
+
       </overlay>
       <overlay chemical="a">
         <overwrite>
-          
+
         </overwrite>
         <constant value="0.5">
-          
+
         </constant>
         <rectangle>
           <point3D x="0.55" y="0.2" z="0.4">
-            
+
           </point3D>
           <point3D x="0.8" y="0.3" z="0.6">
-            
+
           </point3D>
-          
+
         </rectangle>
-        
+
       </overlay>
       <overlay chemical="a">
         <overwrite>
-          
+
         </overwrite>
         <constant value="1">
-          
+
         </constant>
         <circle radius="0.1">
           <point3D x="0.7" y="0.8" z="0.6">
-            
+
           </point3D>
-          
+
         </circle>
-        
+
       </overlay>
-      
+
     </initial_pattern_generator>
     <render_settings>
       <surface_color r="1" g="1" b="1">
-        
+
       </surface_color>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="0">
-        
+
       </color_low>
       <color_high r="1" g="1" b="1">
-        
+
       </color_high>
       <show_color_scale value="false">
-        
+
       </show_color_scale>
       <show_multiple_chemicals value="false">
-        
+
       </show_multiple_chemicals>
       <active_chemical value="a">
-        
+
       </active_chemical>
       <low value="0">
-        
+
       </low>
       <high value="1">
-        
+
       </high>
       <vertical_scale_1D value="30">
-        
+
       </vertical_scale_1D>
       <vertical_scale_2D value="15">
-        
+
       </vertical_scale_2D>
       <contour_level value="0.25">
-        
+
       </contour_level>
       <use_wireframe value="false">
-        
+
       </use_wireframe>
       <show_cell_edges value="false">
-        
+
       </show_cell_edges>
       <show_bounding_box value="true">
-        
+
       </show_bounding_box>
       <slice_3D value="true">
-        
+
       </slice_3D>
       <slice_3D_axis value="z">
-        
+
       </slice_3D_axis>
       <slice_3D_position value="0.5">
-        
+
       </slice_3D_position>
       <show_displacement_mapped_surface value="false">
-        
+
       </show_displacement_mapped_surface>
       <color_displacement_mapped_surface value="true">
-        
+
       </color_displacement_mapped_surface>
       <use_image_interpolation value="true">
-        
+
       </use_image_interpolation>
       <timesteps_per_render value="8">
-        
+
       </timesteps_per_render>
       <show_phase_plot value="false">
-        
+
       </show_phase_plot>
       <phase_plot_x_axis value="a">
-        
+
       </phase_plot_x_axis>
       <phase_plot_y_axis value="b">
-        
+
       </phase_plot_y_axis>
       <phase_plot_z_axis value="c">
-        
+
       </phase_plot_z_axis>
-      
+
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 511 0 511 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 511 0 511 0 0">

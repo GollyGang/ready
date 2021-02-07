@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -25,13 +25,13 @@ class InbuiltImageRD : public ImageRD
     public:
         InbuiltImageRD(int data_type) : ImageRD(data_type) {}
 
-        std::string GetRuleType() const { return "inbuilt"; }
+        std::string GetRuleType() const override { return "inbuilt"; }
 
-        virtual bool HasEditableFormula() const { return false; }
-        virtual bool HasEditableNumberOfChemicals() const { return false; }
+        bool HasEditableFormula() const override { return false; }
+        bool HasEditableNumberOfChemicals() const override { return false; }
 
-        virtual bool HasEditableWrapOption() const { return true; }
-        virtual bool HasEditableDataType() const { return false; }
+        bool HasEditableWrapOption() const override { return true; }
+        bool HasEditableDataType() const override { return false; }
 };
 
 /// An inbuilt implementation: n-dimensional Gray-Scott.
@@ -44,13 +44,13 @@ class GrayScottImageRD : public InbuiltImageRD
 
     protected:
 
-        std::vector<vtkImageData*> buffer_images; // one for each chemical
+        std::vector<vtkSmartPointer<vtkImageData>> buffer_images; // one for each chemical
 
     protected:
 
-        virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
+        void AllocateImages(int x,int y,int z,int nc,int data_type) override;
 
-        virtual void InternalUpdate(int n_steps);
+        void InternalUpdate(int n_steps) override;
 
         void DeleteBuffers();
 };

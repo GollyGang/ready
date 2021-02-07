@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
 This file is part of Ready.
 
@@ -43,6 +43,6 @@ class InitialPatternGenerator
 
         void RemoveAllOverlays();
 
-        std::vector<Overlay*> overlays; // TODO: use unique_ptr when C++11-compatible VTK is available on target platforms
+        std::vector<std::unique_ptr<Overlay>> overlays;
         bool zero_first;
 };

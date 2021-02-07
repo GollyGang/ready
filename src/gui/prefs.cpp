@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -1003,8 +1003,9 @@ void linereader::setfile(FILE* f) {
 
 int linereader::close() {
      if (fp) {
-        return fclose(fp);
+        int ret = fclose(fp);
         fp = 0;
+        return ret;
     }
     return 0;
 }
@@ -2139,7 +2140,7 @@ void PrefsDialog::OnButton(wxCommandEvent& event)
 
 void PrefsDialog::OnCheckBoxClicked(wxCommandEvent& event)
 {
-    int id = event.GetId();
+    //int id = event.GetId();
 
     // no need???
 }

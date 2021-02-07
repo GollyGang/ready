@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -46,7 +46,7 @@ class OpenCL_MixIn
 
     protected:
 
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const =0;
+        virtual std::string AssembleKernelSourceFromFormula(const std::string& formula) const =0;
 
         void ReloadContextIfNeeded();
         virtual void ReloadKernelIfNeeded() =0;
@@ -67,6 +67,7 @@ class OpenCL_MixIn
         cl_kernel kernel;
         std::string kernel_function_name;
         size_t global_range[3];
+        size_t local_work_size[3];
 
         cl_command_queue command_queue;
 

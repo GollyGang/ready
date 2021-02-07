@@ -47,7 +47,7 @@ Imports an OBJ, VTU or VTP file as a mesh. Can either:
 
 <p>
 Exports the current mesh (surface mesh, contoured volume image or 2D displacement-mapped
-surface) as OBJ or VTP.
+surface) as OBJ, PLY or VTP.
 
 <p>
 <font size=+1><b>Import Image...</b></font><a name="File_ImportImage"></a>
@@ -94,8 +94,12 @@ in a .png or .jpg file.
 <font size=+1><b>Start Recording...</b></font><a name="File_StartRecording"></a>
 
 <p>
-Starts saving out images (one every timesteps_per_render) to disk, either from the 2D data
-or from the current view. A dialog box asks for the target folder and filename construction.
+Starts saving out images (one every timesteps_per_render) to disk, from the 2D data,
+ the current view or the 3D mesh. A dialog box asks for the target folder and filename construction.
+
+<p>
+For importing meshes into Blender, we recommend the <a href="https://github.com/neverhood311/Stop-motion-OBJ">Stop-motion-OBJ</a> add-on,
+which accepts OBJ and PLY files. (Choose the PLY format if you want to use the vertex colors.)
 
 <p>
 <font size=+1><b>Add My Patterns...</b></font>

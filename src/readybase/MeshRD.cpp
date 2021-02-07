@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -41,7 +41,6 @@
 #include <vtkGenericCell.h>
 #include <vtkGeometryFilter.h>
 #include <vtkIdList.h>
-#include <vtkLookupTable.h>
 #include <vtkMath.h>
 #include <vtkMergeFilter.h>
 #include <vtkPlane.h>
@@ -54,6 +53,7 @@
 #include <vtkRenderer.h>
 #include <vtkReverseSense.h>
 #include <vtkScalarBarActor.h>
+#include <vtkScalarsToColors.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkThreshold.h>
@@ -74,26 +74,8 @@ using namespace std;
 MeshRD::MeshRD(int data_type)
     : AbstractRD(data_type)
 {
-    this->starting_pattern = vtkUnstructuredGrid::New();
-    this->mesh = vtkUnstructuredGrid::New();
-    this->cell_neighbor_indices = NULL;
-    this->cell_neighbor_weights = NULL;
-    this->cell_locator = NULL;
-}
-
-// ---------------------------------------------------------------------
-
-MeshRD::~MeshRD()
-{
-    delete []this->cell_neighbor_indices;
-    delete []this->cell_neighbor_weights;
-
-    this->mesh->Delete();
-    this->starting_pattern->Delete();
-    this->n_chemicals = 0;
-
-    if(this->cell_locator)
-        this->cell_locator->Delete();
+    this->starting_pattern = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    this->mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
 }
 
 // ---------------------------------------------------------------------
@@ -110,8 +92,13 @@ void MeshRD::Update(int n_steps)
 
 // ---------------------------------------------------------------------
 
-void MeshRD::SetNumberOfChemicals(int n)
+void MeshRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
+    if (reallocate_storage)
+    {
+        this->mesh->GetCellData()->Initialize();
+        this->n_chemicals = 0;
+    }
     if (n == this->n_chemicals) {
         return;
     }
@@ -182,14 +169,12 @@ void MeshRD::GenerateInitialPattern()
                 continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                 //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-            double val;
             vector<double> vals(this->GetNumberOfChemicals());
             for(int i=0;i<this->GetNumberOfChemicals();i++)
             {
                 vals[i] = this->mesh->GetCellData()->GetArray(GetChemicalName(i).c_str())->GetComponent( iCell, 0 );
-                if(i==iC) val = vals[i];
             }
-            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent( iCell, 0, overlay.Apply(vals,this,cp[0],cp[1],cp[2]) );
+            this->mesh->GetCellData()->GetArray(GetChemicalName(iC).c_str())->SetComponent(iCell, 0, overlay.Apply(vals, *this, cp[0], cp[1], cp[2]));
         }
     }
     this->mesh->Modified();
@@ -240,15 +225,9 @@ void MeshRD::CopyFromMesh(vtkUnstructuredGrid* mesh2)
     this->is_modified = true;
     this->n_chemicals = this->mesh->GetCellData()->GetNumberOfArrays();
 
-    if(this->cell_locator)
-    {
-        this->cell_locator->Delete();
-        this->cell_locator = NULL;
-    }
+    this->cell_locator = NULL;
 
     this->ComputeCellNeighbors(this->neighborhood_type);
-
-    this->xgap = this->GetX() * 0.05;
 }
 
 // ---------------------------------------------------------------------
@@ -257,11 +236,6 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
@@ -281,20 +255,13 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
     if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
 
     double offset[3] = {0,0,0};
+    const float x_gap = this->x_spacing_proportion * this->GetX();
 
     for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
     {
@@ -496,7 +463,7 @@ void MeshRD::InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& r
             pRenderer->AddActor(captionActor);
         }
 
-        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
+        offset[0] += this->GetX() + x_gap; // the next chemical should appear further to the right
     }
 
     // also add a scalar bar to show how the colors correspond to values
@@ -719,7 +686,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
         vtkIdType npts = ptIds->GetNumberOfIds();
         switch(neighborhood_type)
         {
-            case VERTEX_NEIGHBORS: // neighbors share a vertex
+            case TNeighborhood::VERTEX_NEIGHBORS: // neighbors share a vertex
             {
                 vtkSmartPointer<vtkIdList> vertIds = vtkSmartPointer<vtkIdList>::New();
                 vertIds->SetNumberOfIds(1);
@@ -754,7 +721,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
                 }
             }
             break;
-            case EDGE_NEIGHBORS: // neighbors share an edge
+            case TNeighborhood::EDGE_NEIGHBORS: // neighbors share an edge
             {
                 vtkCell* pCell = this->mesh->GetCell(iCell);
                 for(int iEdge=0;iEdge<pCell->GetNumberOfEdges();iEdge++)
@@ -770,7 +737,7 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
                 }
             }
             break;
-            case FACE_NEIGHBORS:
+            case TNeighborhood::FACE_NEIGHBORS:
             {
                 vtkCell* pCell = this->mesh->GetCell(iCell);
                 for(int iEdge=0;iEdge<pCell->GetNumberOfFaces();iEdge++)
@@ -803,10 +770,8 @@ void MeshRD::ComputeCellNeighbors(TNeighborhood neighborhood_type)
     }
 
     // copy data to plain arrays
-    if(this->cell_neighbor_indices) delete []this->cell_neighbor_indices;
-    if(this->cell_neighbor_weights) delete []this->cell_neighbor_weights;
-    this->cell_neighbor_indices = new int[this->mesh->GetNumberOfCells()*this->max_neighbors];
-    this->cell_neighbor_weights = new float[this->mesh->GetNumberOfCells()*this->max_neighbors];
+    this->cell_neighbor_indices.resize(this->mesh->GetNumberOfCells() * this->max_neighbors);
+    this->cell_neighbor_weights.resize(this->mesh->GetNumberOfCells() * this->max_neighbors);
     for(int i=0;i<this->mesh->GetNumberOfCells();i++)
     {
         for(int j=0;j<(int)cell_neighbors[i].size();j++)
@@ -909,8 +874,6 @@ void MeshRD::SetFrom2DImage(int iChemical, vtkImageData *im)
 float MeshRD::GetValue(float x, float y, float z, const Properties& render_settings)
 {
     const double X = this->GetX();
-    const double Y = this->GetY();
-    const double Z = this->GetZ();
 
     this->CreateCellLocatorIfNeeded();
 
@@ -921,9 +884,10 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x-this->mesh->GetBounds()[0] + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -947,8 +911,6 @@ float MeshRD::GetValue(float x, float y, float z, const Properties& render_setti
 void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render_settings)
 {
     const double X = this->GetX();
-    const double Y = this->GetY();
-    const double Z = this->GetZ();
 
     this->CreateCellLocatorIfNeeded();
 
@@ -959,9 +921,10 @@ void MeshRD::SetValue(float x,float y,float z,float val,const Properties& render
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x-this->mesh->GetBounds()[0] + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1001,9 +964,10 @@ void MeshRD::SetValuesInRadius(float x,float y,float z,float r,float val,const P
     if(show_multiple_chemicals)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x-this->mesh->GetBounds()[0]+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x-this->mesh->GetBounds()[0] + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1046,7 +1010,7 @@ void MeshRD::CreateCellLocatorIfNeeded()
 {
     if(this->cell_locator) return;
 
-    this->cell_locator = vtkCellLocator::New();
+    this->cell_locator = vtkSmartPointer<vtkCellLocator>::New();
     this->cell_locator->SetDataSet(this->mesh);
     this->cell_locator->SetTolerance(0.0001);
     this->cell_locator->BuildLocator();
@@ -1079,6 +1043,19 @@ size_t MeshRD::GetMemorySize() const
     const size_t NBORS_INDICES_SIZE = sizeof(int) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     const size_t NBORS_WEIGHTS_SIZE = sizeof(float) * this->mesh->GetNumberOfCells() * this->max_neighbors;
     return DATA_SIZE + NBORS_INDICES_SIZE + NBORS_WEIGHTS_SIZE;
+}
+
+// --------------------------------------------------------------------------------
+
+vector<float> MeshRD::GetData(int i_chemical) const
+{
+    vtkDataArray* data = this->mesh->GetCellData()->GetArray(GetChemicalName(i_chemical).c_str());
+    vector<float> values(this->mesh->GetNumberOfCells());
+    for (int i = 0; i < this->mesh->GetNumberOfCells(); i++)
+    {
+        values[i] = data->GetComponent(i, 0);
+    }
+    return values;
 }
 
 // --------------------------------------------------------------------------------

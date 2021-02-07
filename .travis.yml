@@ -1,0 +1,215 @@
+language: cpp
+
+matrix:
+  include:
+    - os: windows
+      name: Windows_vtk8.1.2_wx3.1.3
+      before_install:
+        # Install OpenCL SDK
+        - NUGETDIR="C:/NUGET"
+        - choco install nuget.commandline
+        - nuget install opencl-nug -Version 0.777.77 -OutputDirectory $NUGETDIR
+        - OCL_ROOT="$NUGETDIR/opencl-nug.0.777.77/build/native"
+        - OCL_INCLUDE=-DOPENCL_INCLUDE_DIRS:PATH=$OCL_ROOT/include
+        - OCL_LIB=-DOPENCL_LIBRARIES:PATH=$OCL_ROOT/lib/x86/OpenCL.lib
+        - export PATH=$OCL_ROOT/bin:$PATH
+        # Set up nmake in order to build wxWidgets
+        - export VSVER=2017
+        - export MSVER=14.16.27023
+        - export SDKVER=10.0.17763.0
+        - export FRAMEVER=4.0.30319
+        - export NETFXVER=4.6.1
+        - export WKITVER=10.0.17134.0
+        - export TOOLSVER=BuildTools
+        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/VC/VCPackages:$PATH
+        - export PATH=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/$WKITVER/x64:$PATH
+        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x64:$PATH
+        - export PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/bin/HostX64/x86:$PATH
+        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/Common7/IDE/CommonExtensions/Microsoft/TestWindow
+        - export PATH=$PATH:/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/MSBuild/Current/bin/Roslyn
+        - export INCLUDE=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/$TOOLSVER/VC/Tools/MSVC/$MSVER/include
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/$WKITVER/ucrt
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/ucrt
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/shared
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/um
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/winrt
+        - export INCLUDE=$INCLUDE:/c/Program\ Files\ \(x86\)/Windows\ Kits/10/include/$WKITVER/cppwinrt
+        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/ATLMFC/lib/x86
+        - export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
+        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
+        - export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
+        # Build wxWidgets
+        - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.3/wxWidgets-3.1.3.tar.bz2
+        - tar xf wxWidgets-3.1.3.tar.bz2 > NUL
+        - cd wxWidgets-3.1.3/build/msw
+        - nmake -C -f makefile.vc BUILD=release RUNTIME_LIBS=static UNICODE=1 DEBUG_INFO=0 DEBUG_FLAG=0
+        - cd ../../..
+        - WX_ROOT_HINT=-DwxWidgets_ROOT_DIR:PATH=$PWD/wxWidgets-3.1.3/
+        - WX_LIB_HINT=-DwxWidgets_LIB_DIR:PATH=$PWD/wxWidgets-3.1.3/lib/vc_lib
+        # Install VTK binaries
+        - wget -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
+        - 7z x VTK-8.1.2_msvc14_x86_shared.7z
+        - VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+        # Specify where the output will appear
+        - BIN_FOLDER=Release/
+        # Allow the executables to load the shared VTK DLLs
+        - export PATH=$PWD/VTK/bin:$PATH
+    # disabled pending a fix for link error undefined reference to `__exp_finite' (possibly need -ffinite-math-only ?)
+    #- os: linux
+    #  name: Ubuntu_20.04_gtk3_vtk7_wx3.0.4_clang
+    #  dist: focal
+    #  compiler: clang
+    #  addons:
+    #    apt:
+    #      packages:
+    #        - libvtk7-dev
+    #        - ocl-icd-opencl-dev
+    #        - libgtk-3-dev
+    #        - libwxgtk3.0-gtk3-dev
+    - os: linux
+      name: Ubuntu_20.04_gtk3_vtk7_wx3.0.4_gcc
+      dist: focal
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk3_vtk7_wx3.0.4_clang
+      dist: bionic
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk3_vtk7_wx3.0.4_gcc
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk2_vtk7_wx3.0.4_gcc
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
+    # check that the build works when both gtk2 and 3 are installed
+    - os: linux
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG1_g2g3w2w3
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-dev
+            - libwxgtk3.0-gtk3-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG2_g2g3w2
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-dev
+    - os: linux
+      name: Ubuntu_18.04_gtk2_gtk3_vtk7_wx3.0.4_gcc_DEBUG3_g2g3w3
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk7-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libgtk-3-dev
+            - libwxgtk3.0-gtk3-dev
+    - os: linux
+      name: Ubuntu_16.04_gtk2_vtk6_wx3.0.2
+      dist: xenial
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libvtk6-dev
+            - ocl-icd-opencl-dev
+            - libgtk2.0-dev
+            - libwxgtk3.0-dev
+    # disabled pending a fix for qt5 error in cmake
+    #- os: osx
+    #  osx_image: xcode12.2
+    #  name: MacOS_10.15.7_xcode12.2_vtk9.0.1_wx3.0.5
+    #  addons:
+    #    homebrew:
+    #      packages:
+    #        - vtk
+    #        - wxmac
+    - os: osx
+      osx_image: xcode11.3
+      name: MacOS_10.14_xcode11.3_vtk8.2.0_wx3.0.4
+      addons:
+        homebrew:
+          packages:
+            - vtk
+            - wxmac
+    - os: osx
+      osx_image: xcode11.2
+      name: MacOS_10.14_xcode11.2_vtk8.2.0_wx3.0.4
+      addons:
+        homebrew:
+          packages:
+            - vtk
+            - wxmac
+    # disabled pending a fix for qt5 error in cmake
+    #- os: osx
+    #  name: MacOS_10.13_xcode9.4.1_vtk9.0.1_wx3.0.4
+    #  addons:
+    #    homebrew:
+    #      update: true
+    #      packages:
+    #        - vtk
+    #        - wxmac
+
+branches:
+  only:
+    - gh-pages
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake $VTK_HINT $WX_ROOT_HINT $WX_LIB_HINT $OCL_INCLUDE $OCL_LIB -DCMAKE_BUILD_TYPE=Release ..
+
+script:
+  # Run the build
+  - cmake --build . --config Release
+  # Run the tests
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ctest -R rdy -V; fi
+  # (No OpenCL drivers on the Linux machines so we just run a subset of the tests)
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ctest -V; fi
+  # (OSX machines have OpenCL drivers, so we can run all the tests)
+  #- if [ "$TRAVIS_OS_NAME" = "windows" ]; then ctest -C Release -V; fi
+  # (On Windows we can't run rdy.exe for some reason)

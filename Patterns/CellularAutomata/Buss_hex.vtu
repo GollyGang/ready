@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
+  <RD format_version="6">
     <description>
       Frank Buss' Hex Cellular Automaton, initialized with a glider gun and a rake.
       &lt;a href=&quot;http://www.frank-buss.de/automaton/hexautomaton.html&quot;&gt;http://www.frank-buss.de/automaton/hexautomaton.html&lt;/a&gt;
@@ -12,7 +12,7 @@
                 __global float* a_out,
                 __global int* neighbor_indices,
                 __global float* neighbor_weights,
-                const int max_neighbors) 
+                const int max_neighbors)
         {
             const int x = get_global_id(0);
             // count neighbors of each type
@@ -20,7 +20,7 @@
             int offset = x * max_neighbors;
             for(int i=0;i&lt;max_neighbors;i++)
             {
-                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                if(neighbor_weights[offset+i]&lt;0.0001f)
                     continue; // not a neighbor
                 int y = round(a_in[neighbor_indices[offset+i]]);
                 if(y==1) n1++;
@@ -35,9 +35,9 @@
             else                        a_out[x] = 0.0f;
         }
       </kernel>
-      
+
     </rule>
-    
+
     <initial_pattern_generator>
       <overlay chemical="a">
         <overwrite />
@@ -48,8 +48,9 @@
         </rectangle>
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="1" />
       <color_high r="1" g="0" b="0" />
       <show_color_scale value="true" />
@@ -61,7 +62,7 @@
       <use_image_interpolation value="false" />
       <timesteps_per_render value="1" />
     </render_settings>
-    
+
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="10000" NumberOfCells="3185" >

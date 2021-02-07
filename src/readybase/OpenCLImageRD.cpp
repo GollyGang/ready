@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -15,19 +15,20 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
 #include "OpenCLImageRD.hpp"
+
+// local:
 #include "OpenCL_utils.hpp"
 #include "utils.hpp"
 using namespace OpenCL_utils;
 
 // STL:
-#include <vector>
-#include <stdexcept>
-#include <utility>
-#include <sstream>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
+#include <stdexcept>
+#include <sstream>
+#include <utility>
+#include <vector>
 using namespace std;
 
 // VTK:
@@ -44,45 +45,94 @@ OpenCLImageRD::OpenCLImageRD(int opencl_platform,int opencl_device,int data_type
 
 // ----------------------------------------------------------------------------------------------------------------
 
+void OpenCLImageRD::BuildProgram()
+{
+    // create the program
+    this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
+    const char* source = this->kernel_source.c_str();
+    size_t source_size = this->kernel_source.length();
+    clReleaseProgram(this->program);
+    cl_int ret;
+    this->program = clCreateProgramWithSource(this->context, 1, &source, &source_size, &ret);
+    throwOnError(ret, "OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
+
+    // build the program
+    ret = clBuildProgram(this->program, 1, &this->device_id, "-cl-denorms-are-zero", NULL, NULL);
+    if (ret != CL_SUCCESS)
+    {
+        size_t build_log_length = 0;
+        cl_int ret2 = clGetProgramBuildInfo(this->program, this->device_id, CL_PROGRAM_BUILD_LOG, 0, 0, &build_log_length);
+        throwOnError(ret2, "OpenCLImageRD::ReloadKernelIfNeeded : retrieving length of program build log failed: ");
+        vector<char> build_log(build_log_length);
+        cl_int ret3 = clGetProgramBuildInfo(this->program, this->device_id, CL_PROGRAM_BUILD_LOG, build_log_length, build_log.data(), 0);
+        throwOnError(ret3, "OpenCLImageRD::ReloadKernelIfNeeded : retrieving program build log failed: ");
+        { ofstream out("kernel.txt"); out << kernel_source; }
+        ostringstream oss;
+        oss << "OpenCLImageRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << string(build_log.begin(), build_log.end());
+        throwOnError(ret, oss.str().c_str());
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------
+
 void OpenCLImageRD::ReloadKernelIfNeeded()
 {
     if(!this->need_reload_formula) return;
 
-    cl_int ret;
+    this->global_range[0] = max(1, vtkMath::Round(this->GetX()) / this->GetBlockSizeX());
+    this->global_range[1] = max(1, vtkMath::Round(this->GetY()) / this->GetBlockSizeY());
+    this->global_range[2] = max(1, vtkMath::Round(this->GetZ()) / this->GetBlockSizeZ());
 
-    // create the program
-    this->kernel_source = this->AssembleKernelSourceFromFormula(this->formula);
-    const char *source = this->kernel_source.c_str();
-    size_t source_size = this->kernel_source.length();
-    clReleaseProgram(this->program);
-    this->program = clCreateProgramWithSource(this->context,1,&source,&source_size,&ret);
-    throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : Failed to create program with source: ");
-
-    // build the program
-    ret = clBuildProgram(this->program, 1, &this->device_id, "-cl-denorms-are-zero", NULL, NULL);
-    if(ret != CL_SUCCESS)
+    if (this->use_local_memory)
     {
-        size_t build_log_length = 0;
-        cl_int ret2 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,0,0,&build_log_length);
-        throwOnError(ret2,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving length of program build log failed: ");
-        vector<char> build_log(build_log_length);
-        cl_int ret3 = clGetProgramBuildInfo(this->program,this->device_id,CL_PROGRAM_BUILD_LOG,build_log_length,build_log.data(),0);
-        throwOnError(ret3,"OpenCLImageRD::ReloadKernelIfNeeded : retrieving program build log failed: ");
-        { ofstream out("kernel.txt"); out << kernel_source; }
-        ostringstream oss;
-        oss << "OpenCLImageRD::ReloadKernelIfNeeded : build failed (kernel saved as kernel.txt):\n\n" << string( build_log.begin(), build_log.end() );
-        throwOnError(ret,oss.str().c_str());
+        cl_ulong local_memory_size;
+        clGetDeviceInfo(this->device_id, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(local_memory_size), &local_memory_size, NULL);
+        cl_ulong max_work_group_size;
+        clGetDeviceInfo(this->device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(max_work_group_size), &max_work_group_size, NULL);
+
+        int n = 1;
+        while (n <= 1024)
+        {
+            this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
+            this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
+            this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
+            try
+            {
+                // ensure that we don't hit CL_DEVICE_MAX_WORK_GROUP_SIZE
+                size_t work_group_size = this->local_work_size[0] * this->local_work_size[1] * this->local_work_size[2];
+                if (work_group_size >= max_work_group_size)  // if allow to be equal, can get errors later
+                {
+                    break;
+                }
+                // ensure that we don't hit CL_DEVICE_LOCAL_MEM_SIZE
+                int extra = 2;
+                size_t expected_mem = 4 * sizeof(float) * (this->local_work_size[0] + extra) * (this->local_work_size[1] + extra) * (this->local_work_size[2] + extra);
+                // TODO: allow for number of chemicals etc, as we allocate in the kernel
+                if (expected_mem > local_memory_size)
+                {
+                    break;
+                }
+                BuildProgram();
+            }
+            catch (...)
+            {
+                break;
+            }
+            n *= 2;
+        }
+        n /= 2; // return to last known good
+        this->local_work_size[0] = min(this->global_range[0], (size_t)4 * n / this->GetBlockSizeX());
+        this->local_work_size[1] = min(this->global_range[1], (size_t)4 * n / this->GetBlockSizeY());
+        this->local_work_size[2] = min(this->global_range[2], (size_t)4 * n / this->GetBlockSizeZ());
     }
+
+    BuildProgram();
 
     // create the kernel
     clReleaseKernel(this->kernel);
-    this->kernel = clCreateKernel(this->program,this->kernel_function_name.c_str(),&ret);
+    cl_int ret;
+    this->kernel = clCreateKernel(this->program, this->kernel_function_name.c_str(), &ret);
     throwOnError(ret,"OpenCLImageRD::ReloadKernelIfNeeded : kernel creation failed: ");
-
-    this->global_range[0] = max(1,vtkMath::Round(this->GetX()) / this->GetBlockSizeX());
-    this->global_range[1] = max(1,vtkMath::Round(this->GetY()) / this->GetBlockSizeY());
-    this->global_range[2] = max(1,vtkMath::Round(this->GetZ()) / this->GetBlockSizeZ());
-    // (we let the local work group size be automatically decided, seems to be faster and more flexible that way)
 
     this->need_reload_formula = false;
 }
@@ -160,7 +210,7 @@ void OpenCLImageRD::GenerateInitialPattern()
 
 void OpenCLImageRD::BlankImage(float value)
 {
-    ImageRD::BlankImage();
+    ImageRD::BlankImage(value);
     this->need_write_to_opencl_buffers = true;
 }
 
@@ -177,9 +227,9 @@ void OpenCLImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 
 // ----------------------------------------------------------------------------------------------------------------
 
-void OpenCLImageRD::SetNumberOfChemicals(int n)
+void OpenCLImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
-    ImageRD::SetNumberOfChemicals(n);
+    ImageRD::SetNumberOfChemicals(n, reallocate_storage);
     this->need_reload_formula = true;
     this->ReloadContextIfNeeded();
     this->ReloadKernelIfNeeded();
@@ -210,8 +260,16 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
                 throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
             }
         }
-        ret = clEnqueueNDRangeKernel(this->command_queue,this->kernel, 3, NULL, this->global_range, NULL, 0, NULL, NULL);
-        throwOnError(ret,"OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed: ");
+        ret = clEnqueueNDRangeKernel(this->command_queue, this->kernel, 3, // dimensions
+            NULL, this->global_range, this->use_local_memory ? this->local_work_size : NULL,
+            0, NULL, NULL);
+        if (ret != CL_SUCCESS)
+        {
+            ostringstream oss;
+            oss << "OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed.\n";
+            oss << "Local work size: " << this->local_work_size[0] << " x " << this->local_work_size[1] << " x " << this->local_work_size[2] << "\n";
+            throwOnError(ret, oss.str().c_str());
+        }
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
     }
 
@@ -230,16 +288,6 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::ReadFromOpenCLBuffers : buffer reading failed: ");
     }
-}
-
-// ----------------------------------------------------------------------------------------------------------------
-
-void OpenCLImageRD::GetFromOpenCLBuffers( float* dest, int chemical_id )
-{
-    // read from opencl buffers into our image
-    const unsigned long MEM_SIZE = sizeof(float) * this->GetX() * this->GetY() * this->GetZ();
-    cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][chemical_id], CL_TRUE, 0, MEM_SIZE, dest, 0, NULL, NULL);
-    throwOnError(ret,"OpenCLImageRD::GetFromOpenCLBuffers : buffer reading failed: ");
 }
 
 // ----------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#  Copyright 2011-2020 The Ready Bunch
+#  Copyright 2011-2021 The Ready Bunch
 #
 #  This file is part of Ready.
 #
@@ -31,7 +31,7 @@ endif()
 
 project( Ready )
 
-set( READY_VERSION 0.10.1 )   # check matches Help/about.html
+set( READY_VERSION 0.11.0 )   # check matches Help/about.html
 add_definitions( -D READY_VERSION=${READY_VERSION} )
 
 if( APPLE OR WIN32 )
@@ -43,7 +43,7 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -73,6 +73,7 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/SystemFactory.hpp             src/readybase/SystemFactory.cpp
   src/readybase/scene_items.hpp               src/readybase/scene_items.cpp
   src/readybase/InitialPatternGenerator.hpp   src/readybase/InitialPatternGenerator.cpp
+  src/readybase/colormaps.hpp
 )
 include_directories( src/readybase )
 
@@ -85,6 +86,7 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/frame.hpp                        src/gui/frame.cpp
   src/gui/HelpPanel.hpp                    src/gui/HelpPanel.cpp
   src/gui/InfoPanel.hpp                    src/gui/InfoPanel.cpp
+  src/gui/HtmlInfo.hpp                     src/gui/HtmlInfo.cpp
   src/gui/PatternsPanel.hpp                src/gui/PatternsPanel.cpp
   src/gui/vtk_pipeline.hpp                 src/gui/vtk_pipeline.cpp
   src/gui/InteractorStylePainter.hpp       src/gui/InteractorStylePainter.cpp
@@ -97,6 +99,7 @@ include_directories( src/gui )
 
 set( CMD_SOURCES      # code used for the command-line version
   src/cmd/main.cpp
+  src/extern/cxxopts-2.2.1/cxxopts.hpp  # https://github.com/jarro2783/cxxopts
 )
 
 set( RESOURCES
@@ -123,12 +126,10 @@ set( PATTERN_FILES
   Patterns/kernel_test.vti
   Patterns/parameter_modulation_demo.vti
   Patterns/parameter_modulation_demo2.vti  Patterns/parameter_modulation_demo2_3D.vti
-  Patterns/bunny.vtu
-  Patterns/lion.vtu
   Patterns/heat_equation_interpolation.vti
-  Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti
+  Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti                Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_1D.vti
   Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_magnitude.vti
-  Patterns/wave_equation.vti
+  Patterns/wave_equation.vti               Patterns/wave_soliton.vti
   Patterns/oregonator.vti
   Patterns/Brusselator.vti
   Patterns/SmoothLife2011/smoothglider.vti     Patterns/SmoothLife2011/smoothlifeL.vti     Patterns/SmoothLife2011/glider_3D.vti
@@ -144,15 +145,17 @@ set( PATTERN_FILES
   Patterns/FitzHugh-Nagumo/squid_axon.vti
   Patterns/FitzHugh-Nagumo/Ising_regime.vti
   Patterns/FitzHugh-Nagumo/FHN_parameter_map.vti
-  Patterns/Gray-Scott/Lesmes_noisy.vti
-  Patterns/Gray-Scott/noisy_solitons_mitosis.vti
-  Patterns/Gray-Scott/parameter-map.vti
-  Patterns/Gray-Scott/parameter-map_3D.vti
-  Patterns/Gray-Scott/Pearson1993.vti
-  Patterns/Gray-Scott/self-replicating_spots.vti
-  Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti
-  Patterns/Gray-Scott/U-Skate/Munafo_glider.vti
-  Patterns/Gray-Scott/U-Skate/o-ring_2D.vti
+  Patterns/GrayScott1984/bunny.vtu
+  Patterns/GrayScott1984/lion.vtu
+  Patterns/GrayScott1984/Lesmes_noisy.vti
+  Patterns/GrayScott1984/noisy_solitons_mitosis.vti
+  Patterns/GrayScott1984/parameter-map.vti
+  Patterns/GrayScott1984/parameter-map_3D.vti
+  Patterns/GrayScott1984/Pearson1993.vti
+  Patterns/GrayScott1984/self-replicating_spots.vti
+  Patterns/GrayScott1984/U-Skate/Hutton-and-helix-gliders.vti
+  Patterns/GrayScott1984/U-Skate/Munafo_glider.vti
+  Patterns/GrayScott1984/U-Skate/o-ring_2D.vti
   Patterns/CellularAutomata/Bays_3D.vti
   Patterns/CellularAutomata/Conway_life.vti
   Patterns/CellularAutomata/life_torus.vtu
@@ -191,6 +194,26 @@ set( PATTERN_FILES
   Patterns/Experiments/TimHutton/LifeBlur.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots.vti
   Patterns/Experiments/TimHutton/mutually-catalytic_spots_2.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_forwardEuler.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_2stepAdamsBashforth.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_3stepAdamsBashforth.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_modifiedEuler.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_midpointMethod.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_HeunsMethod.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxFriedrichs.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxWendroff.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_RungeKutta4.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_staggeredLeapfrog.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_forwardEuler_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_2stepAdamsBashforth_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_3stepAdamsBashforth_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_modifiedEuler_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_midpointMethod_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_HeunsMethod_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxFriedrichs_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxWendroff_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_RungeKutta4_double.vti
+  Patterns/Experiments/TimHutton/NumericalMethods/advection_staggeredLeapfrog_double.vti
   Patterns/Experiments/DanWills/cglrd_ramps_example.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_fuseWorms.vti
   Patterns/Experiments/DanWills/grayscott-historyWave_moreLifelike.vti
@@ -230,26 +253,6 @@ set( PATTERN_FILES
   Patterns/Experiments/TihaVonGhyczy/sobel_waves.vti
   Patterns/Agmon2014/cells.vti      Patterns/Agmon2014/cells_double.vti
   Patterns/Agmon2014/oil-water.vti
-  Patterns/NumericalMethods/advection_forwardEuler.vti
-  Patterns/NumericalMethods/advection_2stepAdamsBashforth.vti
-  Patterns/NumericalMethods/advection_3stepAdamsBashforth.vti
-  Patterns/NumericalMethods/advection_modifiedEuler.vti
-  Patterns/NumericalMethods/advection_midpointMethod.vti
-  Patterns/NumericalMethods/advection_HeunsMethod.vti
-  Patterns/NumericalMethods/advection_LaxFriedrichs.vti
-  Patterns/NumericalMethods/advection_LaxWendroff.vti
-  Patterns/NumericalMethods/advection_RungeKutta4.vti
-  Patterns/NumericalMethods/advection_staggeredLeapfrog.vti
-  Patterns/NumericalMethods/advection_forwardEuler_double.vti
-  Patterns/NumericalMethods/advection_2stepAdamsBashforth_double.vti
-  Patterns/NumericalMethods/advection_3stepAdamsBashforth_double.vti
-  Patterns/NumericalMethods/advection_modifiedEuler_double.vti
-  Patterns/NumericalMethods/advection_midpointMethod_double.vti
-  Patterns/NumericalMethods/advection_HeunsMethod_double.vti
-  Patterns/NumericalMethods/advection_LaxFriedrichs_double.vti
-  Patterns/NumericalMethods/advection_LaxWendroff_double.vti
-  Patterns/NumericalMethods/advection_RungeKutta4_double.vti
-  Patterns/NumericalMethods/advection_staggeredLeapfrog_double.vti
   Patterns/Guo2014/guo.vti
   Patterns/Maginu1975/maginu_parameter_map.vti
   Patterns/Kryuchkov2020/Drosophila_corneal_nanocoatings.vti
@@ -257,11 +260,16 @@ set( PATTERN_FILES
   Patterns/RosenzweigMacArthur1963/hm_parameter_map.vti
   Patterns/RosenzweigMacArthur1963/predator-prey.vti
   Patterns/RosenzweigMacArthur1963/predator-prey_1D.vti
-  Patterns/LotkaVolterra1926/Lotka-Volterra.vti
+  Patterns/LotkaVolterra1926/Lotka-Volterra.vti      Patterns/LotkaVolterra1926/Lotka-Volterra_1D.vti
   Patterns/Kobayashi1993/crystal.vti                 Patterns/Kobayashi1993/crystals.vti
   Patterns/Kobayashi1993/laplacian_growth.vti
   Patterns/Kobayashi1993/laplacian_growth_3D.vti     Patterns/Kobayashi1993/laplacian_growth_3D_corner.vti
   Patterns/Morozov2008/Fig2.vti      Patterns/Morozov2008/Fig4.vti      Patterns/Morozov2008/Fig5678_delta_map.vti
+  Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky.vti
+  Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_multistable.vti
+  Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves.vti
+  Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves2.vti
+  Patterns/KortewegDeVries1895/kdv.vti
 )
 
 set( HELP_FILES
@@ -322,7 +330,6 @@ set( OTHER_FILES
   resources/Cursors/pencil-cursor.png
   resources/Cursors/brush-cursor.png
   resources/Cursors/picker-cursor.png
-  Scripts/Blender/import_obj_sequence.py
   Scripts/Houdini/Dop_rd_object.hdanc
   Scripts/Houdini/Dop_rd_solver.hdanc
   Scripts/Houdini/Object_rd_template_object.hdanc
@@ -335,6 +342,7 @@ set( OTHER_FILES
 find_package( VTK NO_MODULE REQUIRED )
 if( VTK_VERSION VERSION_LESS "7.0.0" )
   set( VTK_COMPONENTS
+    vtkCommonColor
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -347,6 +355,7 @@ if( VTK_VERSION VERSION_LESS "7.0.0" )
     vtkInteractionStyle
     vtkIOImage
     vtkIOGeometry
+    vtkIOPLY
     vtkIOXML
     vtkRenderingCore
     vtkRenderingAnnotation
@@ -355,6 +364,7 @@ if( VTK_VERSION VERSION_LESS "7.0.0" )
   )
 elseif( VTK_VERSION VERSION_LESS "8.90.0" )
   set( VTK_COMPONENTS
+    vtkCommonColor
     vtkCommonCore
     vtkFiltersCore
     vtkFiltersExtraction
@@ -367,6 +377,7 @@ elseif( VTK_VERSION VERSION_LESS "8.90.0" )
     vtkInteractionStyle
     vtkIOImage
     vtkIOGeometry
+    vtkIOPLY
     vtkIOXML
     vtkRenderingCore
     vtkRenderingAnnotation
@@ -375,6 +386,7 @@ elseif( VTK_VERSION VERSION_LESS "8.90.0" )
   )
 else()
   set( VTK_COMPONENTS
+    CommonColor
     CommonCore
     FiltersCore
     FiltersExtraction
@@ -387,6 +399,7 @@ else()
     InteractionStyle
     IOImage
     IOGeometry
+    IOPLY
     IOXML
     RenderingCore
     RenderingAnnotation
@@ -463,16 +476,6 @@ if( APPLE )
   link_libraries( ${OPENCL_LIBRARIES} ) # on MacOSX we assume that OpenCL is available
 endif()
 
-#-------------------------------------------Boost-----------------------------------------------
-
-if(WIN32)
-  set(Boost_USE_STATIC_LIBS        ON)
-  set(Boost_USE_MULTITHREADED      ON)
-  set(Boost_USE_STATIC_RUNTIME     ON)
-endif()
-find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
-include_directories( ${Boost_INCLUDE_DIRS} )
-
 #---------------copy installation files to build folder (helps with testing)--------------------
 
 foreach( file ${PATTERN_FILES} ${HELP_FILES} ${RESOURCES} ${OTHER_FILES} )
@@ -516,13 +519,16 @@ if( USE_SSE )
 endif()
 
 if( APPLE )
-  # support macOS 10.10 or later
-  add_definitions( -mmacosx-version-min=10.10 )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++ -Wno-nullability-completeness-on-arrays")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 if( APPLE OR UNIX )
   # use same settings as in makefiles
   add_definitions( -D_LARGE_FILES )
+endif()
+
+# workaround to suppress multiple clang warnings
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND VTK_VERSION VERSION_LESS "8.90.0")
+  add_compile_options(-Wno-inconsistent-missing-override)
 endif()
 
 # create base library used by all executables
@@ -537,7 +543,8 @@ endif()
 
 # create command-line utility
 add_executable( ${CMD_NAME} ${CMD_SOURCES} )
-target_link_libraries( ${CMD_NAME} readybase ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+target_include_directories( ${CMD_NAME} PRIVATE src/extern/cxxopts-2.2.1 )
+target_link_libraries( ${CMD_NAME} readybase ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
@@ -560,9 +567,6 @@ if( APPLE )
 
   # horrible hack to avoid Undefined symbol "___isPlatformVersionAtLeast" using wxMac 3.1.3 on Mojave
   # set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a" )
-
-  # tell linker that we support macOS 10.10+
-  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-macosx_version_min,10.10" )
 endif()
 
 # avoid security warnings
@@ -586,6 +590,36 @@ if(DOXYGEN_FOUND)
   )
 endif()
 # (if doxygen is found then 'make doc' should produce html documentation of the source code)
+
+#------------------------------------------test-------------------------------------------------
+
+enable_testing()
+
+# Test that we can run rdy and print out the help information
+add_test(
+  NAME rdy_help
+  COMMAND ${CMD_NAME} -h
+)
+
+# Test that we can load each pattern and compile its kernel
+foreach(pattern_file ${PATTERN_FILES})
+  add_test(
+    NAME load_${pattern_file}
+    COMMAND ${CMD_NAME} -i "${pattern_file}" -v
+  )
+endforeach()
+
+# Test that we can run one pattern for 100 steps and save it out
+add_test(
+  NAME rdy_run
+  COMMAND ${CMD_NAME} -i Patterns/CPU-only/grayscott_1D.vti -n 100 -o gs_100.vti -v
+)
+
+# And then read it in again
+add_test(
+  NAME rdy_run2
+  COMMAND ${CMD_NAME} -i gs_100.vti -v
+)
 
 #----------------------------------------install------------------------------------------------
 

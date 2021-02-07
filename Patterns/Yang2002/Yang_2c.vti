@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
-  
+  <RD format_version="6">
+
     <description>
         &quot;Spatial Resonances and Superposition Patterns in a Reaction-Diffusion Model with Interacting Turing Modes&quot; (2002)&lt;br&gt;
         Lingfa Yang, Milos Dolnik, Anatol M. Zhabotinsky, and Irving R. Epstein
@@ -9,7 +9,7 @@
 
         The system referenced in Fig. 2c. Two coupled Brusselator systems a,b and c,d. The result (in chemical a) is a stable pattern of &quot;black eyes&quot;.
     </description>
-    
+
     <rule name="Yang" type="formula" wrap="1">
       <param name="timestep">       0.001         </param>
       <param name="p1">             3.0           </param>
@@ -26,7 +26,7 @@
         delta_d = Dd * laplacian_d + alpha*(b-d) + p2*c             - c*c*d;
       </formula>
     </rule>
-    
+
     <initial_pattern_generator apply_when_loading="true">
       <overlay chemical="a">
         <overwrite />
@@ -49,8 +49,9 @@
         <everywhere />
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
+      <colormap value="HSV blend" />
       <color_low r="0" g="0" b="0" />
       <color_high r="1" g="1" b="1" />
       <show_color_scale value="true" />
@@ -61,7 +62,7 @@
       <show_displacement_mapped_surface value="false" />
       <timesteps_per_render value="100" />
     </render_settings>
-    
+
   </RD>
   <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1">
   <Piece Extent="0 255 0 255 0 0">

@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -31,16 +31,17 @@
 #include "MakeNewSystem.hpp"
 
 // readybase:
-#include <utils.hpp>
-#include <OpenCL_utils.hpp>
-#include <IO_XML.hpp>
-#include <GrayScottImageRD.hpp>
-#include <GrayScottMeshRD.hpp>
 #include <FormulaOpenCLImageRD.hpp>
 #include <FormulaOpenCLMeshRD.hpp>
 #include <FullKernelOpenCLImageRD.hpp>
 #include <FullKernelOpenCLMeshRD.hpp>
+#include <GrayScottImageRD.hpp>
+#include <GrayScottMeshRD.hpp>
+#include <IO_XML.hpp>
+#include <OpenCL_utils.hpp>
+#include <scene_items.hpp>
 #include <SystemFactory.hpp>
+#include <utils.hpp>
 
 // local resources:
 #include "appicon16.xpm"
@@ -67,6 +68,7 @@ using namespace std;
 // VTK:
 #include <vtkBMPReader.h>
 #include <vtkCellArray.h>
+#include <vtkCellDataToPointData.h>
 #include <vtkCellPicker.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageChangeInformation.h>
@@ -79,10 +81,12 @@ using namespace std;
 #include <vtkOBJReader.h>
 #include <vtkPNGReader.h>
 #include <vtkPNGWriter.h>
+#include <vtkPLYWriter.h>
 #include <vtkPointData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
 #include <vtkRendererCollection.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkWindowToImageFilter.h>
@@ -221,6 +225,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_HELP, MyFrame::OnHelp)
     EVT_MENU(ID::HelpQuick, MyFrame::OnHelp)
     EVT_MENU(ID::HelpIntro, MyFrame::OnHelp)
+    EVT_MENU(ID::HelpWriting, MyFrame::OnHelp)
     EVT_MENU(ID::HelpTips, MyFrame::OnHelp)
     EVT_MENU(ID::HelpKeyboard, MyFrame::OnHelp)
     EVT_MENU(ID::HelpMouse, MyFrame::OnHelp)
@@ -248,19 +253,18 @@ const float MyFrame::brush_sizes[] = {0.002f, 0.005f, 0.01f, 0.02f, 0.05f};
 
 // constructor
 MyFrame::MyFrame(const wxString& title)
-       : wxFrame(NULL, wxID_ANY, title),
-       pVTKWindow(NULL),system(NULL),
-       is_running(false),
-       speed_data_available(false),
-       i_timesteps_per_second_buffer(0),
-       time_at_last_render(0),
-       fullscreen(false),
-       render_settings("render_settings"),
-       is_recording(false),
-       CurrentCursor(POINTER),
-       current_paint_value(0.5f),
-       left_mouse_is_down(false),
-       right_mouse_is_down(false)
+   : wxFrame(NULL, wxID_ANY, title),
+    render_settings("render_settings"),
+    is_running(false),
+    time_at_last_render(0),
+    i_timesteps_per_second_buffer(0),
+    speed_data_available(false),
+    is_recording(false),
+    fullscreen(false),
+    CurrentCursor(TCursorType::POINTER),
+    current_paint_value(0.5f),
+    left_mouse_is_down(false),
+    right_mouse_is_down(false)
 {
     this->SetIcon(wxICON(appicon16));
     #ifdef __WXGTK__
@@ -268,13 +272,19 @@ MyFrame::MyFrame(const wxString& title)
         this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_RECTANGLE_HINT );
     #endif
     #ifdef __WXMAC__
-        this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_ALLOW_ACTIVE_PANE );
+        // don't add wxAUI_MGR_ALLOW_ACTIVE_PANE below as it doesn't work correctly
+        this->aui_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT );
         this->icons_folder = _T("resources/Icons/32px/");
+        // following avoids black background in pane captions on macOS 10.11
+        wxAuiDockArt* dockart = this->aui_mgr.GetArtProvider();
+        dockart->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
+        dockart->SetColour(wxAUI_DOCKART_ACTIVE_CAPTION_COLOUR, wxColor(210,210,210));
+        dockart->SetColour(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR, wxColor(210,210,210));
     #else
         this->icons_folder = _T("resources/Icons/22px/");
     #endif
     #ifdef __WXMSW__
-        this->aui_mgr.SetFlags(wxAUI_MGR_LIVE_RESIZE);
+        this->aui_mgr.SetFlags(wxAUI_MGR_DEFAULT | wxAUI_MGR_LIVE_RESIZE);
     #endif
     this->aui_mgr.SetManagedWindow(this);
 
@@ -310,13 +320,13 @@ MyFrame::MyFrame(const wxString& title)
         this->OpenFile(initfile);
     } else {
         // create new pattern
-        this->InitializeDefaultRenderSettings(this->render_settings);
-        GrayScottImageRD *s = new GrayScottImageRD();
+        SetDefaultRenderSettings(this->render_settings);
+        unique_ptr<GrayScottImageRD> s = make_unique<GrayScottImageRD>();
         s->SetDimensionsAndNumberOfChemicals(30,25,20,2);
         s->SetModified(false);
         s->SetFilename("untitled");
         s->GenerateInitialPattern();
-        this->SetCurrentRDSystem(s);
+        this->SetCurrentRDSystem(move(s));
     }
 }
 
@@ -326,11 +336,6 @@ MyFrame::~MyFrame()
 {
     this->SaveSettings(); // save the current settings so it starts up the same next time
     this->aui_mgr.UnInit();
-    this->pVTKWindow->Delete();
-    delete this->pencil_cursor;
-    delete this->brush_cursor;
-    delete this->picker_cursor;
-    delete this->system;
 }
 
 // ---------------------------------------------------------------------
@@ -446,6 +451,7 @@ void MyFrame::InitializeMenus()
         menu->Append(wxID_HELP,        _("Contents"));
         menu->Append(ID::HelpQuick,    _("Quick Start"));
         menu->Append(ID::HelpIntro,    _("Introduction to RD"));
+        menu->Append(ID::HelpWriting,  _("Writing new rules"));
         menu->AppendSeparator();
         menu->Append(ID::HelpTips,     _("Hints and Tips"));
         menu->Append(ID::HelpKeyboard, _("Keyboard Shortcuts"));
@@ -475,7 +481,12 @@ void MyFrame::InitializeToolbars()
     const int toolbar_padding = 5;
 
     {   // file menu items
-        this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
+        #ifdef __WXMAC__
+            // avoid black background on macOS 10.11
+            this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar, wxDefaultPosition, wxDefaultSize, wxAUI_TB_PLAIN_BACKGROUND);
+        #else
+            this->file_toolbar = new wxAuiToolBar(this,ID::FileToolbar);
+        #endif
         this->file_toolbar->AddTool(wxID_NEW,_("New Pattern..."),wxBitmap(this->icons_folder + _T("document-new.png"),wxBITMAP_TYPE_PNG),
             _("New Pattern..."));
         this->file_toolbar->AddTool(wxID_OPEN,_("Open Pattern..."),wxBitmap(this->icons_folder + _T("document-open.png"),wxBITMAP_TYPE_PNG),
@@ -492,7 +503,12 @@ void MyFrame::InitializeToolbars()
             .Position(0).Caption(_("File tools")));
     }
     {   // action menu items
-        this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
+        #ifdef __WXMAC__
+            // avoid black background on macOS 10.11
+            this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar, wxDefaultPosition, wxDefaultSize, wxAUI_TB_PLAIN_BACKGROUND);
+        #else
+            this->action_toolbar = new wxAuiToolBar(this,ID::ActionToolbar);
+        #endif
         this->action_toolbar->AddTool(ID::Step1, _("Step by 1"),wxBitmap(this->icons_folder + _T("list-add_gray.png"),wxBITMAP_TYPE_PNG),
             _("Step by 1"));
         this->action_toolbar->AddTool(ID::RunStop,_("Run"),wxBitmap(this->icons_folder + _T("media-playback-start_green.png"),wxBITMAP_TYPE_PNG),
@@ -517,7 +533,12 @@ void MyFrame::InitializeToolbars()
             .Name(PaneName(ID::ActionToolbar)).Position(1).Caption(_("Action tools")));
     }
     {   // paint items
-        this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
+        #ifdef __WXMAC__
+            // avoid black background on macOS 10.11
+            this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar, wxDefaultPosition, wxDefaultSize, wxAUI_TB_PLAIN_BACKGROUND);
+        #else
+            this->paint_toolbar = new wxAuiToolBar(this,ID::PaintToolbar);
+        #endif
         this->paint_toolbar->AddTool(ID::Pointer,_("Pointer"),wxBitmap(this->icons_folder + _T("icon-pointer.png"),wxBITMAP_TYPE_PNG),
             _("Pointer"),wxITEM_RADIO);
         this->paint_toolbar->AddTool(ID::Pencil,_("Pencil"),wxBitmap(this->icons_folder + _T("draw-freehand.png"),wxBITMAP_TYPE_PNG),
@@ -551,17 +572,17 @@ void MyFrame::InitializeCursors()
     wxImage im1(cursors_folder + _T("pencil-cursor.png"),wxBITMAP_TYPE_PNG);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
     im1.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 18);
-    this->pencil_cursor = new wxCursor(im1);
+    this->pencil_cursor = make_unique<wxCursor>(im1);
 
     wxImage im2(cursors_folder + _T("brush-cursor.png"),wxBITMAP_TYPE_PNG);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 3);
     im2.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 21);
-    this->brush_cursor = new wxCursor(im2);
+    this->brush_cursor = make_unique<wxCursor>(im2);
 
     wxImage im3(cursors_folder + _T("picker-cursor.png"),wxBITMAP_TYPE_PNG);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 4);
     im3.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 14);
-    this->picker_cursor = new wxCursor(im3);
+    this->picker_cursor = make_unique<wxCursor>(im3);
 }
 
 // ---------------------------------------------------------------------
@@ -598,7 +619,7 @@ void MyFrame::InitializeInfoPane()
 
 void MyFrame::UpdateInfoPane()
 {
-    this->info_panel->Update(this->system);
+    this->info_panel->UpdatePanel(*this->system);
 }
 
 // ---------------------------------------------------------------------
@@ -664,7 +685,7 @@ void MyFrame::InitializeRenderPane()
 {
     // for now the VTK window goes in the center pane (always visible) - we got problems when had in a floating pane
     vtkObject::GlobalWarningDisplayOff(); // (can turn on for debugging)
-    this->pVTKWindow = new wxVTKRenderWindowInteractor(this,wxID_ANY);
+    this->pVTKWindow = vtkSmartPointer<wxVTKRenderWindowInteractor>::Take(new wxVTKRenderWindowInteractor(this,wxID_ANY));
     this->aui_mgr.AddPane(this->pVTKWindow,
                   wxAuiPaneInfo()
                   .Name(PaneName(ID::CanvasPane))
@@ -859,7 +880,7 @@ void MyFrame::OnWireframe(wxCommandEvent& event)
     bool wireframe = this->render_settings.GetProperty("use_wireframe").GetBool();
     wireframe = !wireframe;
     this->render_settings.GetProperty("use_wireframe").SetBool(wireframe);
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateInfoPane();
     this->Refresh(false);
 }
@@ -964,14 +985,13 @@ void MyFrame::OnAddMyPatterns(wxCommandEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::SetCurrentRDSystem(AbstractRD* sys)
+void MyFrame::SetCurrentRDSystem(unique_ptr<AbstractRD> sys)
 {
-    delete this->system;
-    this->system = sys;
+    this->system = move(sys);
     int iChem = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
     iChem = min(iChem,this->system->GetNumberOfChemicals()-1); // ensure is in valid range
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(iChem));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, true);
     this->is_running = false;
     this->i_timesteps_per_second_buffer = 0;
     this->speed_data_available = false;
@@ -1139,13 +1159,9 @@ void MyFrame::UpdateToolbars()
         this->current_paint_value) );
     // update the color swatch with the current color
     wxImage im(22,22);
-    float r1,g1,b1,r2,g2,b2,low,high,r,g,b;
-    this->render_settings.GetProperty("color_low").GetColor(r1,g1,b1);
-    this->render_settings.GetProperty("color_high").GetColor(r2,g2,b2);
-    low = this->render_settings.GetProperty("low").GetFloat();
-    high = this->render_settings.GetProperty("high").GetFloat();
-    InterpolateInHSV(r1,g1,b1,r2,g2,b2,min(1.0f,max(0.0f,(this->current_paint_value-low)/(high-low))),r,g,b);
-    im.SetRGB(wxRect(0,0,22,22),r*255,g*255,b*255);
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(this->render_settings);
+    const unsigned char* rgba = lut->MapValue(this->current_paint_value);
+    im.SetRGB(wxRect(0,0,22,22), rgba[0], rgba[1], rgba[2]);
     dynamic_cast<wxBitmapButton*>(this->paint_toolbar->FindControl(ID::CurrentValueColor))->SetBitmap(wxBitmap(im));
     this->aui_mgr.Update();
 }
@@ -1252,7 +1268,6 @@ void MyFrame::OnIdle(wxIdleEvent& event)
 
         if (steps_since_last_render >= timesteps_per_render) {
             // it's time to render what we've computed so far
-            int n_cells = this->system->GetNumberOfCells();
             if (this->computation_time_since_last_render == 0.0)
                 this->computation_time_since_last_render = 0.000001;  // unlikely, but play safe
             double time_since_last_render = time_before - this->time_at_last_render;
@@ -1393,7 +1408,6 @@ void MyFrame::OnSelectOpenCLDevice(wxCommandEvent& event)
     int iNewSelection = dlg.GetSelection();
     if(iNewSelection != iOldSelection)
         wxMessageBox(_("The selected device will be used the next time an OpenCL pattern is loaded."));
-    int dc = 0;
     for(int ip=0;ip<np;ip++)
     {
         int nd = OpenCL_utils::GetNumberOfDevices(ip);
@@ -1418,6 +1432,7 @@ void MyFrame::OnHelp(wxCommandEvent& event)
         case wxID_HELP:         this->help_panel->ShowHelp(_("Help/index.html")); break;
         case ID::HelpQuick:     this->help_panel->ShowHelp(_("Help/quickstart.html")); break;
         case ID::HelpIntro:     this->help_panel->ShowHelp(_("Help/introduction.html")); break;
+        case ID::HelpWriting:   this->help_panel->ShowHelp(_("Help/writing_new_rules.html")); break;
         case ID::HelpTips:      this->help_panel->ShowHelp(_("Help/tips.html")); break;
         case ID::HelpKeyboard:  this->help_panel->ShowHelp(SHOW_KEYBOARD_SHORTCUTS); break;
         case ID::HelpMouse:     this->help_panel->ShowHelp(_("Help/mouse.html")); break;
@@ -1481,14 +1496,36 @@ void MyFrame::OnSavePattern(wxCommandEvent& event)
 
 void MyFrame::SaveFile(const wxString& path)
 {
-    wxBusyCursor busy;
+    wxBeginBusyCursor();
 
-    this->system->SaveFile(path.mb_str(),this->render_settings,false);
+    try
+    {
+        this->system->SaveFile(path.mb_str(), this->render_settings, false);
+    }
+    catch (const exception& e)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file. Error:\n\n");
+        message += wxString(e.what(), wxConvUTF8);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+        return;
+    }
+    catch (...)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file.");
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+        return;
+    }
 
     AddRecentPattern(path);
     this->system->SetFilename(string(path.mb_str()));
     this->system->SetModified(false);
     this->UpdateWindowTitle();
+
+    wxEndBusyCursor();
 }
 
 // ---------------------------------------------------------------------
@@ -1498,7 +1535,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     if(UserWantsToCancelWhenAskedIfWantsToSave()) return;
 
     // ask user what type of dataset to generate:
-    enum GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
+    enum class GenType { Image1D, Image2D, Image3D, GeoSphere, Torus, TriMesh, HexMesh, Rhombille, PenroseP3, PenroseP2, Del2D, Vor2D, Del3D,
         BodyCentredCubic, FaceCentredCubic, Diamond, HyperbolicPlane, HyperbolicSpace }; // TODO: tetrahedral grid (different kinds)
     GenType sel;
     {
@@ -1518,31 +1555,31 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
 
     this->SetStatusText(_("Generating..."));
 
-    AbstractRD *sys;
+    unique_ptr<AbstractRD> sys;
     Properties new_render_settings("render_settings");
-    this->InitializeDefaultRenderSettings(new_render_settings);
+    SetDefaultRenderSettings(new_render_settings);
     try
     {
         switch(sel)
         {
-            case Image1D:          sys = MakeNewImage1D(this->is_opencl_available,opencl_platform,opencl_device,new_render_settings); break;
-            case Image2D:          sys = MakeNewImage2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Image3D:          sys = MakeNewImage3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case GeoSphere:        sys = MakeNewGeodesicSphere(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Torus:            sys = MakeNewTorus(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case TriMesh:          sys = MakeNewTriangularMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case HexMesh:          sys = MakeNewHexagonalMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Rhombille:        sys = MakeNewRhombilleTiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case PenroseP3:        sys = MakeNewPenroseP3Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case PenroseP2:        sys = MakeNewPenroseP2Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Del2D:            sys = MakeNewDelaunay2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Vor2D:            sys = MakeNewVoronoi2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Del3D:            sys = MakeNewDelaunay3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case BodyCentredCubic: sys = MakeNewBodyCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case FaceCentredCubic: sys = MakeNewFaceCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case Diamond:          sys = MakeNewDiamondHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case HyperbolicPlane:  sys = MakeNewHyperbolicPlane(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
-            case HyperbolicSpace:  sys = MakeNewHyperbolicSpace(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Image1D:          sys = MakeNewImage1D(this->is_opencl_available,opencl_platform,opencl_device,new_render_settings); break;
+            case GenType::Image2D:          sys = MakeNewImage2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Image3D:          sys = MakeNewImage3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::GeoSphere:        sys = MakeNewGeodesicSphere(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Torus:            sys = MakeNewTorus(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::TriMesh:          sys = MakeNewTriangularMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::HexMesh:          sys = MakeNewHexagonalMesh(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Rhombille:        sys = MakeNewRhombilleTiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::PenroseP3:        sys = MakeNewPenroseP3Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::PenroseP2:        sys = MakeNewPenroseP2Tiling(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Del2D:            sys = MakeNewDelaunay2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Vor2D:            sys = MakeNewVoronoi2D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Del3D:            sys = MakeNewDelaunay3D(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::BodyCentredCubic: sys = MakeNewBodyCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::FaceCentredCubic: sys = MakeNewFaceCentredCubicHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::Diamond:          sys = MakeNewDiamondHoneycomb(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::HyperbolicPlane:  sys = MakeNewHyperbolicPlane(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
+            case GenType::HyperbolicSpace:  sys = MakeNewHyperbolicSpace(this->is_opencl_available, opencl_platform, opencl_device, new_render_settings); break;
         }
     }
     catch(const exception& e)
@@ -1559,7 +1596,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
         return;
     }
 
-    if (sys == NULL)
+    if (!sys)
     {
         return; // user cancelled
     }
@@ -1570,7 +1607,7 @@ void MyFrame::OnNewPattern(wxCommandEvent& event)
     this->SetStatusText(_("Generating data values..."));
     sys->CreateDefaultInitialPatternGenerator(sys->GetNumberOfChemicals());
     sys->GenerateInitialPattern();
-    this->SetCurrentRDSystem(sys);
+    this->SetCurrentRDSystem(move(sys));
 
     this->system->SetFilename("untitled");
     this->system->SetModified(false);
@@ -1635,13 +1672,14 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
 
     // load pattern file
     bool warn_to_update = false;
-    AbstractRD *target_system = NULL;
+    unique_ptr<AbstractRD> target_system;
     Properties previous_render_settings = this->render_settings;
     try
     {
-        this->InitializeDefaultRenderSettings(this->render_settings);
+        SetDefaultRenderSettings(this->render_settings);
         target_system = SystemFactory::CreateFromFile(path.mb_str(),this->is_opencl_available,opencl_platform,opencl_device,this->render_settings,warn_to_update);
-        this->SetCurrentRDSystem(target_system);
+        this->patterns_panel->SelectPath(path);
+        this->SetCurrentRDSystem(move(target_system));
     }
     catch(const exception& e)
     {
@@ -1650,7 +1688,6 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
         message += _("Failed to open file. Error:\n\n");
         message += wxString(e.what(),wxConvUTF8);
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
-        delete target_system;
         this->render_settings = previous_render_settings;
         return;
     }
@@ -1660,7 +1697,6 @@ void MyFrame::OpenFile(const wxString& raw_path, bool remember)
         wxString message = warn_to_update ? _("This file is from a more recent version of Ready. You should download a newer version.\n\n") : _("");
         message += _("Failed to open file.");
         MonospaceMessageBox(message,_("Error reading file"),wxART_ERROR);
-        delete target_system;
         this->render_settings = previous_render_settings;
         return;
     }
@@ -1888,7 +1924,7 @@ void MyFrame::OnChangeActiveChemical(wxCommandEvent& event)
     dlg.SetSelection(IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical()));
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(dlg.GetSelection()));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2101,7 +2137,8 @@ void MyFrame::ProcessKey(int key, int modifiers)
     switch (action.id)
     {
         case DO_NOTHING:        // any unassigned key (including escape) turns off full screen mode
-                                if (fullscreen) cmdid = ID::FullScreen; break;
+                                if (fullscreen) { cmdid = ID::FullScreen; }
+                                break;
 
         case DO_OPENFILE:       OpenFile(action.file);
                                 return;
@@ -2304,42 +2341,6 @@ void MyFrame::OnChar(wxKeyEvent& event)
 
 // ---------------------------------------------------------------------
 
-void MyFrame::InitializeDefaultRenderSettings(Properties& props)
-{
-    props.DeleteAllProperties();
-    props.AddProperty(Property("surface_color","color",1.0f,1.0f,1.0f)); // RGB [0,1]
-    props.AddProperty(Property("color_low","color",0.0f,0.0f,1.0f));
-    props.AddProperty(Property("color_high","color",1.0f,0.0f,0.0f));
-    props.AddProperty(Property("show_color_scale",true));
-    props.AddProperty(Property("show_multiple_chemicals",true));
-    props.AddProperty(Property("active_chemical","chemical","a"));
-    props.AddProperty(Property("low",0.0f));
-    props.AddProperty(Property("high",1.0f));
-    props.AddProperty(Property("vertical_scale_1D",30.0f));
-    props.AddProperty(Property("vertical_scale_2D",15.0f));
-    props.AddProperty(Property("contour_level",0.25f));
-    props.AddProperty(Property("cap_contour",true));
-    props.AddProperty(Property("invert_contour_cap", false));
-    props.AddProperty(Property("use_wireframe",false));
-    props.AddProperty(Property("show_cell_edges",false));
-    props.AddProperty(Property("show_bounding_box",true));
-    props.AddProperty(Property("show_chemical_label",true));
-    props.AddProperty(Property("slice_3D",true));
-    props.AddProperty(Property("slice_3D_axis","axis","z"));
-    props.AddProperty(Property("slice_3D_position",0.5f)); // [0,1]
-    props.AddProperty(Property("show_displacement_mapped_surface",true));
-    props.AddProperty(Property("color_displacement_mapped_surface",true));
-    props.AddProperty(Property("use_image_interpolation",true));
-    props.AddProperty(Property("timesteps_per_render",100));
-    props.AddProperty(Property("show_phase_plot",false));
-    props.AddProperty(Property("phase_plot_x_axis","chemical","a"));
-    props.AddProperty(Property("phase_plot_y_axis","chemical","b"));
-    props.AddProperty(Property("phase_plot_z_axis","chemical","c"));
-    // TODO: allow user to change defaults
-}
-
-// ---------------------------------------------------------------------
-
 void MyFrame::SetNumberOfChemicals(int n)
 {
     try
@@ -2360,7 +2361,7 @@ void MyFrame::SetNumberOfChemicals(int n)
     int ic = IndexFromChemicalName(this->render_settings.GetProperty("active_chemical").GetChemical());
     if(ic>=n)
         this->render_settings.GetProperty("active_chemical").SetChemical(GetChemicalName(n-1));
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2409,7 +2410,7 @@ bool MyFrame::SetDimensions(int x,int y,int z)
     }
     this->system->BlankImage();
     this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,true);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, true);
     this->UpdateWindows();
     return true;
 }
@@ -2421,9 +2422,34 @@ void MyFrame::SetBlockSize(int x,int y,int z)
     this->system->SetBlockSizeX(x);
     this->system->SetBlockSizeY(y);
     this->system->SetBlockSizeZ(z);
-    this->system->GenerateInitialPattern();
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
-    this->UpdateWindows();
+    this->UpdateInfoPane();
+}
+
+// ---------------------------------------------------------------------
+
+void MyFrame::SetDataType(int data_type)
+{
+    const int old_data_type = this->system->GetDataType();
+    try
+    {
+        this->system->SetDataType(data_type);
+        InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
+        this->UpdateWindows();
+    }
+    catch (const exception& e)
+    {
+        MonospaceMessageBox(_("Failed to set data type:\n\n") + wxString(e.what(), wxConvUTF8), _("Error"), wxART_ERROR);
+        this->system->SetDataType(old_data_type);
+        InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
+        this->UpdateWindows();
+    }
+    catch (...)
+    {
+        wxMessageBox(_("Failed to set data type"));
+        this->system->SetDataType(old_data_type);
+        InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
+        this->UpdateWindows();
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -2435,7 +2461,7 @@ void MyFrame::RenderSettingsChanged()
     if (prop.GetInt() < 1) prop.SetInt(1);
     if (prop.GetInt() > MAX_TIMESTEPS_PER_RENDER) prop.SetInt(MAX_TIMESTEPS_PER_RENDER);
 
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -2445,7 +2471,7 @@ void MyFrame::OnAddParameter(wxCommandEvent& event)
 {
     StringDialog dlg(this,_("Add a parameter"),_("Name:"),wxEmptyString,wxDefaultPosition,wxDefaultSize);
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->GetCurrentRDSystem()->AddParameter(string(dlg.GetValue().mb_str()),0.0f);
+    this->GetCurrentRDSystem().AddParameter(string(dlg.GetValue().mb_str()),0.0f);
     this->UpdateWindows();
 }
 
@@ -2454,11 +2480,11 @@ void MyFrame::OnAddParameter(wxCommandEvent& event)
 void MyFrame::OnDeleteParameter(wxCommandEvent& event)
 {
     wxArrayString as;
-    for(int i=0;i<this->GetCurrentRDSystem()->GetNumberOfParameters();i++)
-        as.Add(wxString(this->GetCurrentRDSystem()->GetParameterName(i).c_str(),wxConvUTF8));
+    for(int i=0;i<this->GetCurrentRDSystem().GetNumberOfParameters();i++)
+        as.Add(wxString(this->GetCurrentRDSystem().GetParameterName(i).c_str(),wxConvUTF8));
     wxSingleChoiceDialog dlg(this,_("Select a parameter to delete:"),_("Delete a parameter"),as);
     if(dlg.ShowModal()!=wxID_OK) return;
-    this->GetCurrentRDSystem()->DeleteParameter(dlg.GetSelection());
+    this->GetCurrentRDSystem().DeleteParameter(dlg.GetSelection());
     this->UpdateWindows();
 }
 
@@ -2466,15 +2492,15 @@ void MyFrame::OnDeleteParameter(wxCommandEvent& event)
 
 void MyFrame::OnUpdateAddParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->GetRuleType()=="formula");
+    event.Enable(this->GetCurrentRDSystem().GetRuleType()=="formula");
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnUpdateDeleteParameter(wxUpdateUIEvent& event)
 {
-    event.Enable(this->GetCurrentRDSystem()->GetRuleType()=="formula" &&
-                 this->GetCurrentRDSystem()->GetNumberOfParameters() > 0);
+    event.Enable(this->GetCurrentRDSystem().GetRuleType()=="formula" &&
+                 this->GetCurrentRDSystem().GetNumberOfParameters() > 0);
 }
 
 // ---------------------------------------------------------------------
@@ -2511,6 +2537,7 @@ void MyFrame::OnChangeRunningSpeed(wxCommandEvent& event)
     if(dlg.ShowModal()!=wxID_OK) return;
     this->render_settings.GetProperty("timesteps_per_render").SetInt(dlg.GetValue());
     this->UpdateInfoPane();
+    this->UpdateToolbars(); // show the new value
 }
 
 // ---------------------------------------------------------------------
@@ -2576,7 +2603,7 @@ bool MyFrame::LoadMesh(const wxFileName& mesh_filename, vtkUnstructuredGrid* ug)
             throw runtime_error("Unsupported file type");
         }
     }
-    catch (exception e)
+    catch (const exception& e)
     {
         wxMessageBox(_("Error importing mesh: ") + e.what(), _("Error"), wxOK | wxICON_ERROR);
         all_ok = false;
@@ -2619,7 +2646,7 @@ void MyFrame::OnImportMesh(wxCommandEvent& event)
     bool ok = LoadMesh(mesh_filename, ug);
     if (!ok) return;
 
-    this->InitializeDefaultRenderSettings(this->render_settings);
+    SetDefaultRenderSettings(this->render_settings);
     this->render_settings.GetProperty("slice_3D").SetBool(false);
     this->render_settings.GetProperty("active_chemical").SetChemical("b");
 
@@ -2641,7 +2668,7 @@ void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
     float value_inside = 0.0f;
     float value_outside = 1.0f;
 
-    ImageRD *image_sys;
+    unique_ptr<ImageRD> image_sys;
     if (this->is_opencl_available)
     {
         IntegerDialog nc_dlg(this, _("Number of chemicals in new volume image"), _("Number of chemicals:"),
@@ -2676,18 +2703,18 @@ void MyFrame::MakeDefaultImageSystemFromMesh(vtkUnstructuredGrid* ug)
         // at some point we would want the user to decide what data type to use in the image
         const int data_type = VTK_FLOAT;
 
-        image_sys = new FormulaOpenCLImageRD(opencl_platform, opencl_device, data_type);
+        image_sys = make_unique<FormulaOpenCLImageRD>(opencl_platform, opencl_device, data_type);
         image_sys->SetFormula("delta_a = D_a * laplacian_a - a*b*b + F*(1.0f-a);\ndelta_b = D_b * laplacian_b + a*b*b - (F+K+c*0.035f)*b;");
     }
     else {
-        image_sys = new GrayScottImageRD();
+        image_sys = make_unique<GrayScottImageRD>();
     }
 
     image_sys->CopyFromMesh(ug, num_chemicals, target_chemical, largest_dimension, value_inside, value_outside);
     image_sys->CreateDefaultInitialPatternGenerator(2);
     image_sys->GenerateInitialPattern();
     this->render_settings.GetProperty("timesteps_per_render").SetInt(16);
-    this->SetCurrentRDSystem(image_sys);
+    this->SetCurrentRDSystem(move(image_sys));
 }
 
 // ---------------------------------------------------------------------
@@ -2697,16 +2724,16 @@ void MyFrame::MakeDefaultMeshSystemFromMesh(vtkUnstructuredGrid* ug)
     // at some point we would want the user to decide what data type to use on the imported mesh
     const int data_type = VTK_FLOAT;
 
-    MeshRD *mesh_sys;
+    unique_ptr<MeshRD> mesh_sys;
     if (this->is_opencl_available)
-        mesh_sys = new FormulaOpenCLMeshRD(opencl_platform, opencl_device, data_type);
+        mesh_sys = make_unique<FormulaOpenCLMeshRD>(opencl_platform, opencl_device, data_type);
     else
-        mesh_sys = new GrayScottMeshRD();
+        mesh_sys = make_unique<GrayScottMeshRD>();
     mesh_sys->CopyFromMesh(ug);
     mesh_sys->SetNumberOfChemicals(2);
     mesh_sys->CreateDefaultInitialPatternGenerator(2);
     mesh_sys->GenerateInitialPattern();
-    this->SetCurrentRDSystem(mesh_sys);
+    this->SetCurrentRDSystem(move(mesh_sys));
 }
 
 // ---------------------------------------------------------------------
@@ -2719,7 +2746,7 @@ void MyFrame::OnExportMesh(wxCommandEvent& event)
     // 3. output ImageRD 2d-image displacement-mapped surface for active chemical
 
     wxString mesh_filename = wxFileSelector(_("Export a mesh:"), wxEmptyString, wxEmptyString, wxEmptyString,
-        _("Supported mesh formats (*.obj;*.vtp)|*.obj;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        _("Supported mesh formats (*.obj;*.ply;*.vtp)|*.obj;*.ply;*.vtp"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (mesh_filename.empty()) return; // user cancelled
 
     SaveCurrentMesh(mesh_filename,false,0.0);
@@ -2791,6 +2818,19 @@ void MyFrame::SaveCurrentMesh(const wxFileName& mesh_filename, bool should_decim
         writer->SetWriteToOutputString(true); // workaround because VTK doesn't yet allow unicode filepaths
         writer->Write();
         out << writer->GetOutputString();
+    }
+    else if(mesh_filename.GetExt().Lower() == _T("ply"))
+    {
+        wxBusyCursor busy;
+        vtkSmartPointer<vtkCellDataToPointData> to_point_data = vtkSmartPointer<vtkCellDataToPointData>::New();
+        to_point_data->SetInputData(pd);
+        vtkSmartPointer<vtkPLYWriter> writer = vtkSmartPointer<vtkPLYWriter>::New();
+        writer->SetInputConnection(to_point_data->GetOutputPort());
+        writer->SetFileName(mesh_filename.GetFullPath());
+        vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(this->render_settings);
+        writer->SetLookupTable(lut);
+        writer->SetArrayName(this->render_settings.GetProperty("active_chemical").GetChemical().c_str());
+        writer->Write();
     }
     else
     {
@@ -2868,7 +2908,7 @@ void MyFrame::OnImportImage(wxCommandEvent &event)
     this->system->SetFrom2DImage(dlg.iTargetChemical, resize->GetOutput());
 
     this->is_running = false;
-    InitializeVTKPipeline(this->pVTKWindow,this->system,this->render_settings,false);
+    InitializeVTKPipeline(this->pVTKWindow, *this->system, this->render_settings, false);
     this->UpdateWindows();
 }
 
@@ -3042,14 +3082,14 @@ void MyFrame::OnViewFullKernel(wxCommandEvent& event)
 
 void MyFrame::OnUpdateViewFullKernel(wxUpdateUIEvent& event)
 {
-    event.Enable(this->system->GetRuleType()=="formula");
+    event.Enable(true);// this->system->GetRuleType() == "formula");
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = POINTER;
+    this->CurrentCursor = TCursorType::POINTER;
     this->pVTKWindow->SetCursor(wxCursor(wxCURSOR_ARROW));
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3062,14 +3102,14 @@ void MyFrame::OnSelectPointerTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectPointerTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==POINTER);
+    event.Check(this->CurrentCursor == TCursorType::POINTER);
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = PENCIL;
+    this->CurrentCursor = TCursorType::PENCIL;
     this->pVTKWindow->SetCursor(*this->pencil_cursor);
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3083,14 +3123,14 @@ void MyFrame::OnSelectPencilTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectPencilTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==PENCIL);
+    event.Check(this->CurrentCursor == TCursorType::PENCIL);
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = BRUSH;
+    this->CurrentCursor = TCursorType::BRUSH;
     this->pVTKWindow->SetCursor(*this->brush_cursor);
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3104,14 +3144,14 @@ void MyFrame::OnSelectBrushTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectBrushTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==BRUSH);
+    event.Check(this->CurrentCursor == TCursorType::BRUSH);
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 {
-    this->CurrentCursor = PICKER;
+    this->CurrentCursor = TCursorType::PICKER;
     this->pVTKWindow->SetCursor(*this->picker_cursor);
     this->left_mouse_is_down = false;
     this->right_mouse_is_down = false;
@@ -3125,7 +3165,7 @@ void MyFrame::OnSelectPickerTool(wxCommandEvent& event)
 
 void MyFrame::OnUpdateSelectPickerTool(wxUpdateUIEvent& event)
 {
-    event.Check(this->CurrentCursor==PICKER);
+    event.Check(this->CurrentCursor == TCursorType::PICKER);
 }
 
 // ---------------------------------------------------------------------
@@ -3144,9 +3184,9 @@ void MyFrame::LeftMouseDown(int x, int y)
     {
         switch(this->CurrentCursor)
         {
-            case POINTER:
+            case TCursorType::POINTER:
                 break; // (VTK will handle the control of the viewpoint)
-            case PENCIL:
+            case TCursorType::PENCIL:
             {
                 if (repaint_to_erase && this->current_paint_value == this->system->GetValue(p[0],p[1],p[2],this->render_settings)) {
                     // erase cell by using low value
@@ -3159,14 +3199,14 @@ void MyFrame::LeftMouseDown(int x, int y)
                 this->pVTKWindow->Refresh();
             }
             break;
-            case BRUSH:
+            case TCursorType::BRUSH:
             {
                 this->system->SetValuesInRadius(p[0],p[1],p[2],this->brush_sizes[current_brush_size],
                     this->current_paint_value,this->render_settings);
                 this->pVTKWindow->Refresh();
             }
             break;
-            case PICKER:
+            case TCursorType::PICKER:
             {
                 this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
                 this->UpdateToolbars();
@@ -3216,9 +3256,9 @@ void MyFrame::RightMouseUp(int x, int y)
     this->right_mouse_is_down = false;
     if(!this->pVTKWindow->GetShiftKey())
     {
-        if(this->CurrentCursor == PENCIL)
+        if(this->CurrentCursor == TCursorType::PENCIL)
             this->pVTKWindow->SetCursor(*this->pencil_cursor);
-        else if(this->CurrentCursor == BRUSH )
+        else if(this->CurrentCursor == TCursorType::BRUSH )
             this->pVTKWindow->SetCursor(*this->brush_cursor);
     }
 }
@@ -3239,9 +3279,9 @@ void MyFrame::MouseMove(int x, int y)
     {
         switch(this->CurrentCursor)
         {
-            case POINTER:
+            case TCursorType::POINTER:
                 break; // (VTK will handle the control of the viewpoint)
-            case PENCIL:
+            case TCursorType::PENCIL:
             {
                 if (erasing) {
                     this->system->SetValue(p[0],p[1],p[2],this->render_settings.GetProperty("low").GetFloat(),this->render_settings);
@@ -3251,14 +3291,14 @@ void MyFrame::MouseMove(int x, int y)
                 this->pVTKWindow->Refresh();
             }
             break;
-            case BRUSH:
+            case TCursorType::BRUSH:
             {
                 this->system->SetValuesInRadius(p[0],p[1],p[2],this->brush_sizes[current_brush_size],
                     this->current_paint_value,this->render_settings);
                 this->pVTKWindow->Refresh();
             }
             break;
-            case PICKER:
+            case TCursorType::PICKER:
             {
                 this->current_paint_value = this->system->GetValue(p[0],p[1],p[2],this->render_settings);
                 this->UpdateToolbars();
@@ -3278,7 +3318,7 @@ void MyFrame::MouseMove(int x, int y)
 
 void MyFrame::KeyDown()
 {
-    if(this->pVTKWindow->GetShiftKey() && ( this->CurrentCursor == PENCIL || this->CurrentCursor == BRUSH ) )
+    if(this->pVTKWindow->GetShiftKey() && ( this->CurrentCursor == TCursorType::PENCIL || this->CurrentCursor == TCursorType::BRUSH ) )
         this->pVTKWindow->SetCursor(*this->picker_cursor);
 }
 
@@ -3288,9 +3328,9 @@ void MyFrame::KeyUp()
 {
     if(!this->pVTKWindow->GetShiftKey())
     {
-        if(this->CurrentCursor == PENCIL)
+        if(this->CurrentCursor == TCursorType::PENCIL)
             this->pVTKWindow->SetCursor(*this->pencil_cursor);
-        else if(this->CurrentCursor == BRUSH )
+        else if(this->CurrentCursor == TCursorType::BRUSH )
             this->pVTKWindow->SetCursor(*this->brush_cursor);
     }
 }
@@ -3423,29 +3463,49 @@ void MyFrame::OnSaveCompact(wxCommandEvent& event)
         return;
     }
 
-    wxBusyCursor busy;
+    wxBeginBusyCursor();
 
     // TODO: might be preferable to not adopt the saved file
     this->system->BlankImage();
-    this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    try
+    {
+        this->system->SaveFile(filename.mb_str(),this->render_settings,true);
+    }
+    catch (const exception& e)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file. Error:\n\n");
+        message += wxString(e.what(), wxConvUTF8);
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+    }
+    catch (...)
+    {
+        wxEndBusyCursor();
+        string message;
+        message += _("Failed to save file.");
+        MonospaceMessageBox(message, _("Error saving file"), wxART_ERROR);
+    }
     this->is_running = false;
     this->UpdateWindows();
+
+    wxEndBusyCursor();
 }
 
 // ---------------------------------------------------------------------
 
 void MyFrame::OnConvertToFullKernel(wxCommandEvent& event)
 {
-    AbstractRD *sys;
+    unique_ptr<AbstractRD> sys;
     try
     {
         if(this->system->GetFileExtension()=="vti")
         {
-            sys = new FullKernelOpenCLImageRD(*dynamic_cast<OpenCLImageRD*>(this->system));
+            sys = make_unique<FullKernelOpenCLImageRD>(dynamic_cast<const OpenCLImageRD&>(*this->system));
         }
         else if(this->system->GetFileExtension()=="vtu")
         {
-            sys = new FullKernelOpenCLMeshRD(*dynamic_cast<OpenCLMeshRD*>(this->system));
+            sys = make_unique<FullKernelOpenCLMeshRD>(dynamic_cast<const OpenCLMeshRD&>(*this->system));
         }
         else wxMessageBox(_T("Internal error: unrecognised file extension"));
     }
@@ -3454,7 +3514,7 @@ void MyFrame::OnConvertToFullKernel(wxCommandEvent& event)
         wxMessageBox(wxString::Format(_T("Error converting rule: %s"),e.what()));
         return;
     }
-    this->SetCurrentRDSystem(sys);
+    this->SetCurrentRDSystem(move(sys));
 }
 
 // ---------------------------------------------------------------------

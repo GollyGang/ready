@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -165,16 +165,6 @@ string trim_multiline_string(const char* s)
 
 // ---------------------------------------------------------------------------------------------------------
 
-void InterpolateInHSV(const float r1,const float g1,const float b1,const float r2,const float g2,const float b2,const float u,float& r,float& g,float& b)
-{
-    float h1,s1,v1,h2,s2,v2;
-    vtkMath::RGBToHSV(r1,g1,b1,&h1,&s1,&v1);
-    vtkMath::RGBToHSV(r2,g2,b2,&h2,&s2,&v2);
-    vtkMath::HSVToRGB(h1+(h2-h1)*u,s1+(s2-s1)*u,v1+(v2-v1)*u,&r,&g,&b);
-}
-
-// ---------------------------------------------------------------------------------------------------------
-
 string ReplaceAllSubstrings(string subject, const string& search, const string& replace)
 {
     size_t pos = 0;
@@ -189,12 +179,12 @@ string ReplaceAllSubstrings(string subject, const string& search, const string& 
 
 vector<string> tokenize_for_keywords(const string& formula)
 {
-    // customized tokenize for when searching for keywords in formula rules: want case-sensitive, whole words only
+    // customized tokenize for when searching for keywords in formula rules: whole words only
     vector<string> tokens;
     string token;
     for (char c : formula)
     {
-        if ((c >= 'a' && c <= 'z') || c == '_')
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || (c >= '0' && c <= '9'))
         {
             token += c;
         }
@@ -215,3 +205,11 @@ vector<string> tokenize_for_keywords(const string& formula)
 }
 
 // ---------------------------------------------------------------------------------------------------------
+
+bool UsingKeyword(const vector<string>& formula_tokens, const string& keyword)
+{
+    return find(formula_tokens.begin(), formula_tokens.end(), keyword) != formula_tokens.end();
+    // TODO: parse properly: ignore comments, not in string, etc.
+}
+
+// -------------------------------------------------------------------------

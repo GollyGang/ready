@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -33,26 +33,27 @@ class ImageRD : public AbstractRD
     public:
 
         ImageRD(int data_type);
-        virtual ~ImageRD();
+        ~ImageRD();
 
-        virtual void SaveFile(const char* filename,const Properties& render_settings,
-            bool generate_initial_pattern_when_loading) const;
+        void SaveFile(const char* filename,
+            const Properties& render_settings,
+            bool generate_initial_pattern_when_loading) const override;
 
-        virtual void Update(int n_steps);
+        void Update(int n_steps) override;
 
-        virtual bool HasEditableDimensions() const { return true; }
-        virtual float GetX() const;
-        virtual float GetY() const;
-        virtual float GetZ() const;
-        virtual void SetDimensions(int x,int y,int z);
-        virtual void SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc);
-        
-        virtual int GetNumberOfCells() const;
+        bool HasEditableDimensions() const  override { return true; }
+        float GetX() const override;
+        float GetY() const override;
+        float GetZ() const override;
+        void SetDimensions(int x,int y,int z) override;
+        void SetDimensionsAndNumberOfChemicals(int x,int y,int z,int nc);
 
-        virtual void SetNumberOfChemicals(int n);
+        int GetNumberOfCells() const override;
 
-        virtual void GenerateInitialPattern();
-        virtual void BlankImage(float value = 0.0f);
+        void SetNumberOfChemicals(int n, bool reallocate_storage = false) override;
+
+        void GenerateInitialPattern() override;
+        void BlankImage(float value = 0.0f) override;
         void GetImage(vtkImageData* im) const;
         virtual void CopyFromImage(vtkImageData* im);
         virtual void CopyFromMesh(
@@ -62,31 +63,33 @@ class ImageRD : public AbstractRD
             const size_t largest_dimension,
             const float value_inside,
             const float value_outside);
-        virtual void SaveStartingPattern();
-        virtual void RestoreStartingPattern();
+        void SaveStartingPattern() override;
+        void RestoreStartingPattern() override;
 
-        virtual void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings);
+        void InitializeRenderPipeline(vtkRenderer* pRenderer,const Properties& render_settings) override;
 
-        virtual std::string GetFileExtension() const { return ImageRD::GetFileExtensionStatic(); }
+        std::string GetFileExtension() const override { return ImageRD::GetFileExtensionStatic(); }
         static std::string GetFileExtensionStatic() { return "vti"; }
 
-        virtual void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const;
-        virtual void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const;
-        virtual void SetFrom2DImage(int iChemical, vtkImageData *im);
-        virtual bool Is2DImageAvailable() const { return true; }
+        void GetAsMesh(vtkPolyData *out,const Properties& render_settings) const override;
+        void GetAs2DImage(vtkImageData *out,const Properties& render_settings) const override;
+        void SetFrom2DImage(int iChemical, vtkImageData *im) override;
+        bool Is2DImageAvailable() const override { return true; }
 
-        virtual float GetValue(float x,float y,float z,const Properties& render_settings);
-        virtual void SetValue(float x,float y,float z,float val,const Properties& render_settings);
-        virtual void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings);
+        float GetValue(float x,float y,float z,const Properties& render_settings) override;
+        void SetValue(float x,float y,float z,float val,const Properties& render_settings) override;
+        void SetValuesInRadius(float x,float y,float z,float r,float val,const Properties& render_settings) override;
 
-        virtual size_t GetMemorySize() const;
+        size_t GetMemorySize() const override;
+
+        std::vector<float> GetData(int i_chemical) const override;
 
     protected:
 
-        std::vector<vtkImageData*> images; ///< one for each chemical
+        std::vector<vtkSmartPointer<vtkImageData>> images; ///< one for each chemical
 
         // we save the starting pattern, to allow the user to reset
-        vtkImageData *starting_pattern;
+        vtkSmartPointer<vtkImageData> starting_pattern;
 
         double image_top1D;        /// topmost location of the 1D image strips
         double image_ratio1D;     /// proportions of the 1D image strips
@@ -95,18 +98,21 @@ class ImageRD : public AbstractRD
 
         vtkImageData* GetImage(int iChemical) const;
 
+        void AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
+                            int iChemX,int iChemY,int iChemZ) override;
+
         /// use to change the dimensions or the number of chemicals
         virtual void AllocateImages(int x,int y,int z,int nc,int data_type);
 
         void DeallocateImages();
 
-        static vtkImageData* AllocateVTKImage(int x,int y,int z,int data_type);
+        static vtkSmartPointer<vtkImageData> AllocateVTKImage(int x,int y,int z,int data_type);
 
-        virtual int GetArenaDimensionality() const;
+        int GetArenaDimensionality() const override;
 
-        virtual void FlipPaintAction(PaintAction& cca);
+        void FlipPaintAction(PaintAction& cca) override;
 
-        // some saved handles into the pipeline, for manual updated to workaround a named arrays problem
+        // some saved handles into the pipeline, for manual updates to workaround a named arrays problem
         vtkAssignAttribute *assign_attribute_filter;
         vtkRearrangeFields *rearrange_fields_filter;
 
@@ -115,8 +121,6 @@ class ImageRD : public AbstractRD
         void InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& render_settings);
         void InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& render_settings);
-        void AddPhasePlot(vtkRenderer* pRenderer,float scaling,float low,float high,float posX,float posY,float posZ,
-                            int iChemX,int iChemY,int iChemZ);
 
     private: // deliberately not implemented, to prevent use
 

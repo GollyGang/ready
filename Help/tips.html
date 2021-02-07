@@ -23,18 +23,22 @@ size using the dimensions control in the Info Pane. If you want the size of the 
 then usually some of the parameters must be altered. Some examples:
     <ul>
     <li>With
-    <a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a> there is an explicit
+    <a href="open:Patterns/GrayScott1984/Pearson1993.vti">GrayScott1984/Pearson1993.vti</a> there is an explicit
     parameter for scale, <tt>dx</tt>, which is used in the computation of <tt>laplacian_a</tt> and <tt>laplacian_b</tt>. If you double the size of the
     pattern (to 512x512x1), you can set <tt>dx</tt> to half (0.004883) to get the same size of stripes as the
     original. For numerical stability at the new size, change timestep to 0.3.
-    <li>There is no <tt>dx</tt> parameter in <a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a> but you can add one using <a href="action.html#Action_AddParameter">Add Parameter...</a> on the Action menu. Set it to 0.8 to make the glider bigger. Going larger still will need you to increase the pattern dimensions and to reduce the timestep. This combination works: 256x128, dx=0.5, timestep=0.5.
+    <li>There is no <tt>dx</tt> parameter in <a href="open:Patterns/GrayScott1984/U-Skate/Munafo_glider.vti">GrayScott1984/U-Skate/Munafo_glider.vti</a> but you can add one using <a href="action.html#Action_AddParameter">Add Parameter...</a> on the Action menu. Set it to 0.8 to make the glider bigger. Going larger still will need you to increase the pattern dimensions and to reduce the timestep. This combination works: 256x128, dx=0.5, timestep=0.5.
     <li>The initial pattern generator (that draws the rectangles in that example) works relative to the size of the image, so changing the ratio of height to width affects how it works. Notice that you need to keep the dimensions in approximately the same ratio for the glider to work.
     </ul>
 <li>To make a video, use the command on the File menu: <a href="file.html#File_StartRecording">Start
 Recording...</a> to produce a sequence of images. Then use your favorite utility to make a video
 file. For example in <a href="http://ffmpeg.org/">FFmpeg</a> the following command makes a high
 quality <a href="http://en.wikipedia.org/wiki/MPEG-4">MPEG-4</a> video at 50 frames per second:
-<br><tt>ffmpeg -r 50 -i frame_%06d.png -vb 5000k -vcodec libx264 video.mp4</tt>
+<br><tt>ffmpeg -r 50 -i frame_%06d.png -vb 5M -vcodec libx264 video.mp4</tt>
+<li>To make an animation of meshes, use the command on the File menu: <a href="file.html#File_StartRecording">Start
+Recording...</a> and select '3D surface' as the image source. With the filename extension set to .obj or .ply,
+you can then use the <a href="https://github.com/neverhood311/Stop-motion-OBJ">Stop-motion-OBJ</a> add-on in Blender to
+import the files. (And if you want to use the vertex colors then choose the .ply format.)
 <li>If your 3D mesh resolution is too low, use an external tool like
 <a href="http://meshlab.sourceforge.net">MeshLab</a> to subdivide it before importing into Ready.
 <li><a href="http://www.paraview.org">ParaView</a> can load the output of Ready (vtu and vti files)

@@ -9,7 +9,7 @@
 <font size=+1><b>Extended VTK format: *.vti, *.vtu</b></font>
 
 <p>
-The only file format currently supported by Ready is an extended version of
+Ready's file format is an extended version of
 <a href="http://vtk.org">VTK</a>'s format, which uses <a href="http://en.wikipedia.org/wiki/XML">XML</a>.
 These are the Ready-specific XML elements, in alphabetical order:
 
@@ -122,7 +122,7 @@ Used to alert the user that they might need to update their software.
 A description of the pattern.
 <p>Contains:
 <p>Plain text. HTML can also be used but must be XML-escaped as in the table below. See the description
-in <a href="edit:Patterns/Gray-Scott/U-Skate/munafo_glider.vti">munafo_glider.vti</a> for an example.
+in <a href="edit:Patterns/GrayScott1984/U-Skate/munafo_glider.vti">munafo_glider.vti</a> for an example.
 
 <p>
 <table border="1" cellpadding="8" align="center">
@@ -137,9 +137,9 @@ Attributes:
 <li><tt>name</tt> (required) : The name of this rule. If type="inbuilt" then name must match one of
 the inbuilt rules (currently just "Gray-Scott").
 <li><tt>wrap</tt> (optional) : "1" if the data should wrap around, or "0" if the data should have a
-boundary. Currently only affects images, not meshes. Default: "1".
+boundary. Currently only affects images (vti files), not meshes. Default: "1".
 <li><tt>neighborhood_type</tt> (optional) : "vertex" for vertex-neighbors, "edge" for edge-neighbors
-or "face" for face-neighbors. Default: "vertex".
+or "face" for face-neighbors. This parameter only affects meshes (vtu files). Default: "vertex".
 </ul>
 <p>Contains:
 <ul>
@@ -163,12 +163,24 @@ Attributes:
 <p>Attributes:
 <ul>
 <li><tt>number_of_chemicals</tt> (required) : The number of chemicals used.
+<li><tt>block_size_x</tt> (optional) : The x component of the dimensions of the spatial unit processed by each kernel call. Default: 4x1x1
+<li><tt>block_size_y</tt> (optional) : The y component.
+<li><tt>block_size_z</tt> (optional) : The z component.
+<li><tt>accuracy</tt> (optional) : The stencil accuracy to use. "low", "medium" or "high". Default: "medium".
 </ul>
 <p>Contains:
 <p>An OpenCL kernel snippet, where the chemicals are named a, b, c, etc.
-The formula should specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). In the <a href="#kernel">kernel</a> section below, the "<tt>delta_a = ...</tt>" lines show how the formula might be inserted at that location in a full kernel.
+
 <p>
-See the pattern files for more examples.
+The formula can specify the rate of change of each chemical (delta_a, delta_b, etc.), typically using the Laplacian of each (laplacian_a, etc.). Example: <tt>delta_a = laplacian_a;</tt>
+
+<p>Alternatively the formula can write directly into the chemicals. Example: <tt>a = x_pos;</tt>
+
+<p>For a list of the keywords you can use, see <a href="writing_new_rules.html">Writing new rules</a>.
+
+<p>In the <a href="#kernel">kernel</a> section below, the "<tt>delta_a = ...</tt>" lines show how the formula might be inserted at that location in a full kernel.
+
+<p>See the pattern files for more examples.
 
 <h4><a name="kernel"></a><b>&lt;kernel&gt;</b></h4>
 
@@ -278,7 +290,7 @@ Each overlay changes the values of a single chemical. Overlays apply in the orde
 <tt><a href="#subtract">subtract</a></tt>, <tt><a href="#multiply">multiply</a></tt> or <tt><a href="#divide">divide</a></tt>.
 <li>fill (required) : one of <tt><a href="#constant">constant</a></tt>, <tt><a href="#white_noise">white_noise</a></tt>,
 <tt><a href="#other_chemical">other_chemical</a></tt>, <tt><a href="#linear_gradient">linear_gradient</a></tt>,
-<tt><a href="#radial_gradient">radial_gradient</a></tt>, <tt></tt><a href="#gaussian">gaussian</a></tt>,
+<tt><a href="#radial_gradient">radial_gradient</a></tt>, <tt><a href="#gaussian">gaussian</a></tt>,
 <tt><a href="#sine">sine</a></tt> or <tt><a href="#parameter">parameter</a></tt>.
 <li>shape (required) : one or more of <tt><a href="#everywhere">everywhere</a></tt>, <tt><a href="#rectangle">rectangle</a></tt>,
 <tt><a href="#circle">circle</a></tt> or <tt><a href="#pixel">pixel</a></tt>. Any cell with a centroid inside the shape will be affected.
@@ -439,11 +451,11 @@ Default values are shown to illustrate the format.
 <p>
 <ul>
 <li><tt>&lt;surface_color r="1" g="1" b="1" /&gt;</tt><br>The RGB color to use for the surface (range: 0.0-1.0).
-<li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt><br>The color for low values (range: 0.0-1.0).
-<li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt><br>The color for high values (range: 0.0-1.0).
+<li><tt>&lt;colormap value="spectral" /&gt;</tt><br>The colormap to use.
+<li><tt>&lt;color_low r="0" g="0" b="1" /&gt;</tt><br>The color for low values (range: 0.0-1.0). If colormap is 'HSV blend'.
+<li><tt>&lt;color_high r="1" g="0" b="0" /&gt;</tt><br>The color for high values (range: 0.0-1.0). If colormap is 'HSV blend'.
 <li><tt>&lt;show_color_scale value="true" /&gt;</tt><br>Whether to show the color scale that maps values to colors.
-<li><tt>&lt;show_multiple_chemicals value="true" /&gt;</tt><br>Whether to show all the chemicals, or
-just the active one. Not supported in the 3D view which only shows the active chemical.
+<li><tt>&lt;show_multiple_chemicals value="true" /&gt;</tt><br>Whether to show all the chemicals, or just the active one.
 <li><tt>&lt;active_chemical value="a" /&gt;</tt><br>The chemical to show (a, b, c, etc.).
 <li><tt>&lt;low value="0" /&gt;</tt><br>The lowest value that chemicals in this system typically take.
 Used to determine the colors and the axes.
@@ -474,6 +486,8 @@ chemicals for each pixel plotted against each other).
 <li><tt>&lt;phase_plot_x value="a" /&gt;</tt><br>The chemical to show on the horizontal plot axis (a, b, c, etc.).
 <li><tt>&lt;phase_plot_y value="b" /&gt;</tt><br>The chemical to show on the vertical plot axis (a, b, c, etc.).
 <li><tt>&lt;phase_plot_z value="c" /&gt;</tt><br>The chemical to show on the inwards plot axis (a, b, c, etc.).
+<li><tt>&lt;plot_ab_orthogonally value="false" /&gt;</tt><br>If true in a 1D pattern, we plot a and b against each other
+in the line graph, allowing us to show e.g. <a href="open:Patterns/Schrodinger1926/packet.vti">Schrodinger equation wave packets</a> as a corkscrew.
 </ul>
 
 </body>

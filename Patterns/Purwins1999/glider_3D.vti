@@ -14,9 +14,9 @@
     </description>
 
     <rule name="Schenk" type="formula" wrap="1" neighborhood_type="vertex">
-      <param name="D_a">         0.00000135  </param>
-      <param name="D_b">         0.00000135  </param>
-      <param name="D_c">         0.0000864   </param>
+      <param name="D_a">         0.00015     </param>
+      <param name="D_b">         0.00015     </param>
+      <param name="D_c">         0.0096      </param>
       <param name="k3">          8.5         </param>
       <param name="lambda">      2.0         </param>
       <param name="k1">          -6.92       </param>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="3">
+  <RD format_version="6">
 
     <description>
         Gliders in the hexagonal rule B2o/S2m34, by Paul Callahan
@@ -63,6 +63,7 @@
     </initial_pattern_generator>
 
     <render_settings>
+      <colormap value="HSV blend" />
       <color_low r="0.3" g="0.3" b="0.3" />
       <color_high r="1" g="1" b="1" />
       <show_color_scale value="false" />

@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -65,7 +65,6 @@ using namespace std;
 #include <vtkImageToStructuredPoints.h>
 #include <vtkImageWrapPad.h>
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkLookupTable.h>
 #include <vtkMath.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMergeFilter.h>
@@ -84,7 +83,9 @@ using namespace std;
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkScalarBarActor.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSmartPointer.h>
+#include <vtkStripper.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkTexture.h>
@@ -92,6 +93,7 @@ using namespace std;
 #include <vtkThreshold.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkTubeFilter.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkWarpScalar.h>
@@ -105,7 +107,7 @@ ImageRD::ImageRD(int data_type)
     , image_top1D(2.0)
     , image_ratio1D(30.0)
 {
-    this->starting_pattern = vtkImageData::New();
+    this->starting_pattern = vtkSmartPointer<vtkImageData>::New();
     this->assign_attribute_filter = NULL;
     this->rearrange_fields_filter = NULL;
 }
@@ -115,18 +117,14 @@ ImageRD::ImageRD(int data_type)
 ImageRD::~ImageRD()
 {
     this->DeallocateImages();
-    this->starting_pattern->Delete();
 }
 
 // ---------------------------------------------------------------------
 
 void ImageRD::DeallocateImages()
 {
-    for(int iChem=0;iChem<(int)this->images.size();iChem++)
-    {
-        if(this->images[iChem])
-            this->images[iChem]->Delete();
-    }
+    this->images.clear();
+    this->n_chemicals = 0;
 }
 
 // ---------------------------------------------------------------------
@@ -292,10 +290,9 @@ void ImageRD::AllocateImages(int x,int y,int z,int nc,int data_type)
 
 // ---------------------------------------------------------------------
 
-/* static */ vtkImageData* ImageRD::AllocateVTKImage(int x,int y,int z,int data_type)
+/* static */ vtkSmartPointer<vtkImageData> ImageRD::AllocateVTKImage(int x,int y,int z,int data_type)
 {
-    vtkImageData *im = vtkImageData::New();
-    assert(im);
+    vtkSmartPointer<vtkImageData> im = vtkSmartPointer<vtkImageData>::New();
     im->SetDimensions(x,y,z);
     im->AllocateScalars(data_type,1);
     if(im->GetDimensions()[0]!=x || im->GetDimensions()[1]!=y || im->GetDimensions()[2]!=z)
@@ -330,11 +327,10 @@ void ImageRD::GenerateInitialPattern()
                         continue; // best for now to silently ignore this overlay, because the user has no way of editing the overlays (short of editing the file)
                         //throw runtime_error("Overlay: chemical out of range: "+GetChemicalName(iC));
 
-                    double val = this->GetImage(iC)->GetScalarComponentAsDouble(x,y,z,0);
                     vector<double> vals(this->GetNumberOfChemicals());
                     for(int i=0;i<this->GetNumberOfChemicals();i++)
                         vals[i] = this->GetImage(i)->GetScalarComponentAsDouble(x,y,z,0);
-                    this->GetImage(iC)->SetScalarComponentFromDouble(x,y,z,0,overlay.Apply(vals,this,x,y,z));
+                    this->GetImage(iC)->SetScalarComponentFromDouble(x, y, z, 0, overlay.Apply(vals, *this, x, y, z));
                 }
             }
         }
@@ -405,42 +401,45 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
     float vertical_scale_1D = render_settings.GetProperty("vertical_scale_1D").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
-    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
-    bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     bool show_color_scale = render_settings.GetProperty("show_color_scale").GetBool();
     bool show_cell_edges = render_settings.GetProperty("show_cell_edges").GetBool();
-    bool show_bounding_box = render_settings.GetProperty("show_bounding_box").GetBool();
     bool show_chemical_label = render_settings.GetProperty("show_chemical_label").GetBool();
-    bool color_displacement_mapped_surface = render_settings.GetProperty("color_displacement_mapped_surface").GetBool();
     bool show_phase_plot = render_settings.GetProperty("show_phase_plot").GetBool();
     int iPhasePlotX = IndexFromChemicalName(render_settings.GetProperty("phase_plot_x_axis").GetChemical());
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
+    bool plot_ab_orthogonally = render_settings.GetProperty("plot_ab_orthogonally").GetBool();
+    if (plot_ab_orthogonally && this->GetNumberOfChemicals() <= 1)
+    {
+        plot_ab_orthogonally = false;
+    }
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    int iFirstChem = 0;
+    int iLastChem = this->GetNumberOfChemicals() - 1;
+    if(!show_multiple_chemicals)
+    { 
+        if (plot_ab_orthogonally && iActiveChemical < 2)
+        {
+            iFirstChem = 0;
+            iLastChem = 1;
+        }
+        else
+        {
+            iFirstChem = iActiveChemical;
+            iLastChem = iFirstChem;
+        }
+    }
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+    const float image_height = this->GetX() / this->image_ratio1D; // we thicken it 
+    const float y_gap = image_height;
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
-    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
+    for(int iChem = iFirstChem; iChem <= iLastChem; ++iChem)
     {
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -448,7 +447,6 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
         image_mapper->SetInputData(this->GetImage(iChem));
 
         // will convert the x*y 2D image to a x*y grid of quads
-        const float image_height = this->GetX() / this->image_ratio1D;
         const float image_offset = this->image_top1D - image_height * 2.0f * (iChem - iFirstChem);
         vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
         plane->SetXResolution(this->GetX());
@@ -502,33 +500,71 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     }
 
     // add a line graph for all the chemicals (active one highlighted)
-    for(int iChemical=iFirstChem;iChemical<iLastChem;iChemical++)
+    const float graph_bottom = this->image_top1D + y_gap;
+    const float graph_top = graph_bottom + (high-low) * scaling;
+    for(int iChemical = iFirstChem; iChemical <= iLastChem; iChemical++)
     {
-        vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
-        plane->SetInputData(this->GetImage(iChemical));
-        vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
-        warp->SetInputConnection(plane->GetOutputPort());
-        warp->SetScaleFactor(-scaling);
+        if (plot_ab_orthogonally && iChemical == 1)
+        {
+            continue;
+        }
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(warp->GetOutputPort());
-        mapper->ScalarVisibilityOff();
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-        actor->GetProperty()->SetAmbient(1);
-        if(iChemical==iActiveChemical)
-            actor->GetProperty()->SetColor(1,1,1);
+        if (plot_ab_orthogonally && iChemical == 0)
+        {
+            // plot the merged ab pair here
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane->SetInputData(this->GetImage(0));
+            vtkSmartPointer<vtkWarpScalar> warp_y = vtkSmartPointer<vtkWarpScalar>::New();
+            warp_y->SetInputConnection(plane->GetOutputPort());
+            warp_y->SetScaleFactor(scaling);
+            warp_y->SetNormal(0, 1, 0);
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane2 = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane2->SetInputData(this->GetImage(1));
+            vtkSmartPointer<vtkMergeFilter> merge = vtkSmartPointer<vtkMergeFilter>::New();
+            merge->SetGeometryConnection(warp_y->GetOutputPort());
+            merge->SetScalarsConnection(plane2->GetOutputPort());
+            vtkSmartPointer<vtkWarpScalar> warp_z = vtkSmartPointer<vtkWarpScalar>::New();
+            warp_z->SetInputConnection(merge->GetOutputPort());
+            warp_z->SetScaleFactor(scaling);
+            warp_z->SetNormal(0, 0, -1);
+            vtkSmartPointer<vtkStripper> stripper = vtkSmartPointer<vtkStripper>::New();
+            stripper->SetInputConnection(warp_z->GetOutputPort());
+            vtkSmartPointer<vtkTubeFilter> tube = vtkSmartPointer<vtkTubeFilter>::New();
+            tube->SetInputConnection(stripper->GetOutputPort());
+            tube->SetRadius(this->GetX() / 512.0);
+            tube->SetNumberOfSides(6);
+            mapper->SetInputConnection(tube->GetOutputPort());
+            actor->GetProperty()->SetColor(1, 1, 1);
+            actor->GetProperty()->SetAmbient(0.3);
+        }
         else
-            actor->GetProperty()->SetColor(0.5,0.5,0.5);
-        actor->RotateX(90.0);
+        {
+            // plot this chemical in the normal way
+            vtkSmartPointer<vtkImageDataGeometryFilter> plane = vtkSmartPointer<vtkImageDataGeometryFilter>::New();
+            plane->SetInputData(this->GetImage(iChemical));
+            vtkSmartPointer<vtkWarpScalar> warp = vtkSmartPointer<vtkWarpScalar>::New();
+            warp->SetInputConnection(plane->GetOutputPort());
+            warp->SetScaleFactor(scaling);
+            warp->SetNormal(0, 1, 0);
+            mapper->SetInputConnection(warp->GetOutputPort());
+            actor->GetProperty()->SetAmbient(1);
+            if (iChemical == iActiveChemical)
+                actor->GetProperty()->SetColor(1, 1, 1);
+            else
+                actor->GetProperty()->SetColor(0.5, 0.5, 0.5);
+        }
+        mapper->ScalarVisibilityOff();
+        actor->SetMapper(mapper);
         actor->PickableOff();
-        actor->SetPosition(0,-low*scaling+this->ygap,0);
+        actor->SetPosition(0, graph_bottom - low * scaling,0);
         pRenderer->AddActor(actor);
     }
 
     // add an axis
     vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
     axis->SetCamera(pRenderer->GetActiveCamera());
-    axis->SetBounds(0,0,this->ygap,(high-low)*scaling+this->ygap,0,0);
+    axis->SetBounds(0,0,graph_bottom,graph_top,0,0);
     axis->SetRanges(0,0,low,high,0,0);
     axis->UseRangesOn();
     axis->XAxisVisibilityOff();
@@ -540,11 +576,30 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     axis->SetNumberOfLabels(5);
     axis->PickableOff();
     pRenderer->AddActor(axis);
+    if (plot_ab_orthogonally)
+    {
+        axis->SetYLabel("a");
+        vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
+        axis->SetCamera(pRenderer->GetActiveCamera());
+        axis->SetBounds(0, 0, graph_top, graph_top, -low * scaling, -high * scaling);
+        axis->SetRanges(0, 0, 0, 0, low, high);
+        axis->UseRangesOn();
+        axis->XAxisVisibilityOff();
+        axis->YAxisVisibilityOff();
+        axis->SetZLabel("b");
+        axis->SetLabelFormat("%.2f");
+        axis->SetInertia(10000);
+        axis->SetCornerOffset(0);
+        axis->SetNumberOfLabels(5);
+        axis->PickableOff();
+        pRenderer->AddActor(axis);
+    }
 
     // add a phase plot
+    const float phase_plot_bottom = graph_top + y_gap*2;
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f,this->ygap*2 + scaling * (high-low),0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
+        this->AddPhasePlot(pRenderer,scaling,low,high,0.0f, phase_plot_bottom,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
@@ -555,14 +610,8 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
     float vertical_scale_2D = render_settings.GetProperty("vertical_scale_2D").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
-    float contour_level = render_settings.GetProperty("contour_level").GetFloat();
     bool use_wireframe = render_settings.GetProperty("use_wireframe").GetBool();
     float surface_r,surface_g,surface_b;
     render_settings.GetProperty("surface_color").GetColor(surface_r,surface_g,surface_b);
@@ -578,24 +627,21 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+    const float scaling = vertical_scale_2D / (high-low); // vertical_scale gives the height of the graph in worldspace units
+    const float x_gap = this->x_spacing_proportion * this->GetX();
+    const float y_gap = this->y_spacing_proportion * this->GetY();
 
     double offset[3] = {0,0,0};
+    const float surface_bottom = offset[1] + 0.5 + this->GetY() + y_gap;
+    const float surface_top = surface_bottom + this->GetY();
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    int iFirstChem = 0;
+    int iLastChem = this->GetNumberOfChemicals() - 1;
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem; }
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
-    for(int iChem=iFirstChem;iChem<iLastChem;iChem++)
+    for(int iChem = iFirstChem; iChem <= iLastChem; iChem++)
     {
         // pass the image through the lookup table
         vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -659,7 +705,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             actor->GetProperty()->SetSpecularPower(3);
             if(use_wireframe)
                 actor->GetProperty()->SetRepresentationToWireframe();
-            actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
+            actor->SetPosition(offset[0]+0.5, surface_bottom, offset[2] - low*scaling);
             actor->PickableOff();
             pRenderer->AddActor(actor);
 
@@ -679,7 +725,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             if(show_bounding_box)
             {
                 vtkSmartPointer<vtkCubeSource> box = vtkSmartPointer<vtkCubeSource>::New();
-                box->SetBounds(0,this->GetX()-1,0,this->GetY()-1,low*scaling,high*scaling);
+                box->SetBounds(0,this->GetX()-1,0,this->GetY()-1,0,(high-low)*scaling);
 
                 vtkSmartPointer<vtkExtractEdges> edges = vtkSmartPointer<vtkExtractEdges>::New();
                 edges->SetInputConnection(box->GetOutputPort());
@@ -691,7 +737,7 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
                 actor->SetMapper(mapper);
                 actor->GetProperty()->SetColor(0,0,0);
                 actor->GetProperty()->SetAmbient(1);
-                actor->SetPosition(offset[0]+0.5,offset[1]+0.5+this->GetY()+this->ygap,offset[2]);
+                actor->SetPosition(offset[0]+0.5,surface_bottom,offset[2]);
                 actor->PickableOff();
 
                 pRenderer->AddActor(actor);
@@ -720,15 +766,15 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
             pRenderer->AddActor(captionActor);
         }
 
-        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
+        offset[0] += this->GetX() + x_gap; // the next chemical should appear further to the right
     }
 
+    // add an axis to the first diplacement-mapped surface
     if(show_displacement_mapped_surface)
     {
-        // add an axis
         vtkSmartPointer<vtkCubeAxesActor2D> axis = vtkSmartPointer<vtkCubeAxesActor2D>::New();
         axis->SetCamera(pRenderer->GetActiveCamera());
-        axis->SetBounds(0.5,0.5,this->GetY()-0.5+this->GetY()+this->ygap,this->GetY()-0.5+this->GetY()+this->ygap,low*scaling,high*scaling);
+        axis->SetBounds(0.5,0.5,surface_top,surface_top,0,(high-low)*scaling);
         axis->SetRanges(0,0,0,0,low,high);
         axis->UseRangesOn();
         axis->XAxisVisibilityOff();
@@ -751,11 +797,11 @@ void ImageRD::InitializeVTKPipeline_2D(vtkRenderer* pRenderer,const Properties& 
     // add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        float posY = this->ygap*2 + this->GetY();
+        float phase_plot_bottom = surface_bottom;
         if(show_displacement_mapped_surface)
-            posY += this->ygap + this->GetY();
+            phase_plot_bottom = surface_top + y_gap * 2;
 
-        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f,posY,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
+        this->AddPhasePlot(pRenderer,this->GetX()/(high-low),low,high,0.0f, phase_plot_bottom,0.0f,iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
 
@@ -765,11 +811,6 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
 {
     float low = render_settings.GetProperty("low").GetFloat();
     float high = render_settings.GetProperty("high").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     bool use_image_interpolation = render_settings.GetProperty("use_image_interpolation").GetBool();
     bool show_multiple_chemicals = render_settings.GetProperty("show_multiple_chemicals").GetBool();
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
@@ -791,22 +832,17 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     int iPhasePlotY = IndexFromChemicalName(render_settings.GetProperty("phase_plot_y_axis").GetChemical());
     int iPhasePlotZ = IndexFromChemicalName(render_settings.GetProperty("phase_plot_z_axis").GetChemical());
 
-    // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low, high);
-    lut->SetSaturationRange(low_sat, high_sat);
-    lut->SetHueRange(low_hue, high_hue);
-    lut->SetValueRange(low_val, high_val);
-    lut->Build();
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
-    int iFirstChem=0,iLastChem=this->GetNumberOfChemicals();
-    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem+1; }
+    int iFirstChem = 0;
+    int iLastChem = this->GetNumberOfChemicals() - 1;
+    if(!show_multiple_chemicals) { iFirstChem = iActiveChemical; iLastChem = iFirstChem; }
 
+    const float x_gap = this->x_spacing_proportion * this->GetX();
+    const float y_gap = this->y_spacing_proportion * this->GetY();
     double offset[3] = {0,0,0};
 
-    for(int iChem = iFirstChem; iChem < iLastChem; ++iChem)
+    for(int iChem = iFirstChem; iChem <= iLastChem; ++iChem)
     {
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 
@@ -1020,7 +1056,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             pRenderer->AddActor(captionActor);
         }
 
-        offset[0] += this->GetX()+this->xgap; // the next chemical should appear further to the right
+        offset[0] += this->GetX() + x_gap; // the next chemical should appear further to the right
     }
 
     // also add a scalar bar to show how the colors correspond to values
@@ -1032,7 +1068,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
     // add a phase plot
     if(show_phase_plot && this->GetNumberOfChemicals()>=2)
     {
-        this->AddPhasePlot( pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+this->ygap,0.0f,
+        this->AddPhasePlot( pRenderer,this->GetX()/(high-low),low,high,0.0f,this->GetY()+y_gap,0.0f,
                             iPhasePlotX,iPhasePlotY,iPhasePlotZ);
     }
 }
@@ -1230,23 +1266,27 @@ void ImageRD::SetDimensions(int x, int y, int z)
 
 // ---------------------------------------------------------------------
 
-void ImageRD::SetNumberOfChemicals(int n)
+void ImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
 {
+    const int X = this->GetX();
+    const int Y = this->GetY();
+    const int Z = this->GetZ();
+    if (reallocate_storage)
+    {
+        this->DeallocateImages();
+    }
     if (n == this->n_chemicals) {
         return;
     }
     if (n > this->n_chemicals)
     {
-        while (this->images.size() < n) {
-            this->images.push_back( AllocateVTKImage(this->GetX(), this->GetY(), this->GetZ(), this->data_type) );
+        while (static_cast<int>(this->images.size()) < n) {
+            this->images.push_back( AllocateVTKImage(X, Y, Z, this->data_type) );
             this->images.back()->GetPointData()->GetScalars()->FillComponent(0, 0.0);
         }
     }
     else {
-        while (this->images.size() > n) {
-            this->images.back()->Delete();
-            this->images.pop_back();
-        }
+        this->images.resize(n);
     }
     this->n_chemicals = n;
     this->is_modified = true;
@@ -1387,23 +1427,10 @@ void ImageRD::SaveFile(const char* filename,const Properties& render_settings,bo
 
 void ImageRD::GetAs2DImage(vtkImageData *out,const Properties& render_settings) const
 {
-    float low = render_settings.GetProperty("low").GetFloat();
-    float high = render_settings.GetProperty("high").GetFloat();
-    float r,g,b,low_hue,low_sat,low_val,high_hue,high_sat,high_val;
-    render_settings.GetProperty("color_low").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&low_hue,&low_sat,&low_val);
-    render_settings.GetProperty("color_high").GetColor(r,g,b);
-    vtkMath::RGBToHSV(r,g,b,&high_hue,&high_sat,&high_val);
     int iActiveChemical = IndexFromChemicalName(render_settings.GetProperty("active_chemical").GetChemical());
 
     // create a lookup table for mapping values to colors
-    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-    lut->SetRampToLinear();
-    lut->SetScaleToLinear();
-    lut->SetTableRange(low,high);
-    lut->SetSaturationRange(low_sat,high_sat);
-    lut->SetHueRange(low_hue,high_hue);
-    lut->SetValueRange(low_val,high_val);
+    vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
 
     // pass the image through the lookup table
     vtkSmartPointer<vtkImageMapToColors> image_mapper = vtkSmartPointer<vtkImageMapToColors>::New();
@@ -1504,9 +1531,10 @@ float ImageRD::GetValue(float x,float y,float z,const Properties& render_setting
     else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1547,9 +1575,10 @@ void ImageRD::SetValue(float x,float y,float z,float val,const Properties& rende
     else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x + x_gap / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1596,9 +1625,10 @@ void ImageRD::SetValuesInRadius(float x,float y,float z,float r,float val,const 
     else if(show_multiple_chemicals && this->GetArenaDimensionality()>=2)
     {
         // detect which chemical was drawn on from the click position
-        iChemical = int(floor((x+this->xgap/2)/(X+this->xgap)));
+        const float x_gap = this->x_spacing_proportion * this->GetX();
+        iChemical = int(floor((x + x_gap  / 2) / (X + x_gap)));
         iChemical = min(this->GetNumberOfChemicals()-1,max(0,iChemical)); // clamp to allowed range (just in case)
-        offset_x = iChemical * (X+this->xgap);
+        offset_x = iChemical * (X + x_gap);
     }
     else
     {
@@ -1655,6 +1685,25 @@ void ImageRD::FlipPaintAction(PaintAction& cca)
 size_t ImageRD::GetMemorySize() const
 {
     return this->n_chemicals * this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
+}
+
+// --------------------------------------------------------------------------------
+
+vector<float> ImageRD::GetData(int i_chemical) const
+{
+    vector<float> values(this->GetX() * this->GetY() * this->GetZ());
+    size_t i = 0;
+    for(int z = 0; z < this->GetZ(); z++)
+    {
+        for (int y = 0; y < this->GetY(); y++)
+        {
+            for (int x = 0; x < this->GetX(); x++)
+            {
+                values[i++] = this->images[i_chemical]->GetScalarComponentAsFloat(x, y, z, 0);
+            }
+        }
+    }
+    return values;
 }
 
 // --------------------------------------------------------------------------------

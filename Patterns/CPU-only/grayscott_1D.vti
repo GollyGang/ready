@@ -3,14 +3,18 @@
   <RD format_version="1">
 
     <description>
-        Self-replicating spots in one dimension. The Gray-Scott formula is:
+        Self-replicating spots in one dimension.
+
+        P. Gray, S.K. Scott (1984) &lt;a href=&quot;https://www.sciencedirect.com/science/article/pii/0009250984870177&quot;&gt;Autocatalytic reactions in the isothermal, continuous stirred tank reactor: Oscillations and instabilities in the system A + 2B → 3B; B → C&lt;/a&gt; Chemical Engineering Science, Volume 39, Issue 6.
+
+        The Gray-Scott formula is:
 
         delta_a = D_a * laplacian_a - a*b*b + F*(1-a)&lt;br&gt;
         delta_b = D_b * laplacian_b + a*b*b - (F+K)*b
 
         Change the parameters below to see how they affect the pattern.
 
-        This example uses a hard-coded implementation and so the formula cannot be edited. In other patterns you can edit the formula as well.
+        This example uses a hard-coded implementation and so the formula cannot be edited. In other patterns you can edit the formula as well. See the GrayScott1984 folder for more patterns with this formula.
     </description>
 
     <rule type="inbuilt" name="Gray-Scott">

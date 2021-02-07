@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -124,9 +124,9 @@ class ParameterDialog : public wxDialog
             void OnOneTimer(wxTimerEvent& event);
         #endif
     
-        virtual bool TransferDataFromWindow();  // called when user hits OK
+        bool TransferDataFromWindow() override;  // called when user hits OK
     
-        wxString GetName() { return name; }
+        wxString GetName() const override { return name; }
         float GetValue() { return value; }
     
     private:

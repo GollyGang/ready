@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-  <RD format_version="2">
+  <RD format_version="6">
     <description>
-      Adam Goucher&apos;s gliders on a darts-and-kites tiling run in loops. 
-      
-      His paper is to appear in the Journal of Cellular Automata: 
+      Adam Goucher&apos;s gliders on a darts-and-kites tiling run in loops.
+
+      His paper is to appear in the Journal of Cellular Automata:
       &quot;Gliders in cellular automata on Penrose tilings&quot;
     </description>
     <rule name="Goucher&apos;s loops" type="kernel">
@@ -14,7 +14,7 @@
             __global float* a_out,
             __global int* neighbor_indices,
             __global float* neighbor_weights,
-            const int max_neighbors) 
+            const int max_neighbors)
         {
             const int x = get_global_id(0);
             // count neighbors of each type
@@ -22,7 +22,7 @@
             int offset = x * max_neighbors;
             for(int i=0;i &lt; max_neighbors;i++)
             {
-                if(neighbor_weights[offset+i]&lt;0.0001f) 
+                if(neighbor_weights[offset+i]&lt;0.0001f)
                     continue; // not a neighbor
                 int y = round(a_in[neighbor_indices[offset+i]]);
                 if(y==1) n1++;
@@ -33,9 +33,9 @@
             int a = round(a_in[x]);
             if(a==0)   // (background)
             {
-                if(n1&gt;0 &amp;&amp; n2&gt;0) 
+                if(n1&gt;0 &amp;&amp; n2&gt;0)
                     a_out[x] = 3.0f;
-                else if(n1&gt;0 &amp;&amp; n3&gt;=2) 
+                else if(n1&gt;0 &amp;&amp; n3&gt;=2)
                     a_out[x] = 1.0f;
                 else
                     a_out[x] = 0.0f;
@@ -54,7 +54,7 @@
         }
       </kernel>
     </rule>
-    
+
     <initial_pattern_generator>
       <overlay chemical="a">
         <overwrite />
@@ -62,8 +62,9 @@
         <everywhere />
       </overlay>
     </initial_pattern_generator>
-    
+
     <render_settings>
+      <colormap value="HSV blend" />
       <timesteps_per_render value="1" />
       <slice_3D value="false" />
       <use_image_interpolation value="false" />
@@ -71,7 +72,7 @@
       <high value="3" />
       <show_cell_edges value="true" />
     </render_settings>
-    
+
   </RD>
   <UnstructuredGrid>
     <Piece NumberOfPoints="5041" NumberOfCells="4885">

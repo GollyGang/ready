@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -33,7 +33,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(int opencl_platform,int opencl_de
     : OpenCLMeshRD(opencl_platform,opencl_device,data_type)
 {
     this->SetRuleName("Full kernel example");
-    this->SetFormula("__kernel void rd_compute() {}");
+    this->SetFormula("kernel void rd_compute() {}");
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ FullKernelOpenCLMeshRD::FullKernelOpenCLMeshRD(const OpenCLMeshRD& source)
 
 // ---------------------------------------------------------------------------------------------------------
 
-string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string formula) const
+string FullKernelOpenCLMeshRD::AssembleKernelSourceFromFormula(const std::string& formula) const
 {
     return formula; // here the formula is a full OpenCL kernel
 }

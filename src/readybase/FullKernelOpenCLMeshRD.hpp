@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -26,12 +26,12 @@ class FullKernelOpenCLMeshRD : public OpenCLMeshRD
         FullKernelOpenCLMeshRD(int opencl_platform,int opencl_device,int data_type);
         FullKernelOpenCLMeshRD(const OpenCLMeshRD& source); // copy construct from source
 
-        virtual void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update);
-        virtual vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
+        void InitializeFromXML(vtkXMLDataElement* rd,bool& warn_to_update) override;
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const override;
 
-        virtual std::string GetRuleType() const { return "kernel"; }
+        std::string GetRuleType() const override { return "kernel"; }
 
-        virtual std::string AssembleKernelSourceFromFormula(std::string formula) const;
+        std::string AssembleKernelSourceFromFormula(const std::string& formula) const override;
 
-        virtual bool HasEditableDataType() const { return false; }
+        bool HasEditableDataType() const override { return false; }
 };

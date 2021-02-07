@@ -2,9 +2,11 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
   <RD format_version="6">
     <description>
-      Chained edge-detector feedback applied to Pearson (1993). Parameter r_s controls edge-detector isotropy. Parameters ds1, ds2, ds3 control scaling of each edge detector layer in the feedback function. If initial conditions result in a stable system, try resetting the initial conditions to see &quot;worm&quot; patterns.
+      Chained edge-detector feedback applied to Pearson (1993). Parameter r_s controls edge-detector isotropy.
+      Parameters ds1, ds2, ds3 control scaling of each edge detector layer in the feedback function. If initial
+      conditions result in a stable system, try resetting the initial conditions to see &quot;worm&quot; patterns.
 
-John E. Pearson (1993) &quot;&lt;a href=&quot;http://jaguar.biologie.hu-berlin.de/~wolfram/pages/seminar_theoretische_biologie_2007/literatur/schaber/Pearson1993Science261.pdf&quot;&gt;Complex Patterns in a Simple System&lt;/a&gt;&quot; Science 261(5118):189-192.
+      John E. Pearson (1993) &quot;&lt;a href=&quot;http://jaguar.biologie.hu-berlin.de/~wolfram/pages/seminar_theoretische_biologie_2007/literatur/schaber/Pearson1993Science261.pdf&quot;&gt;Complex Patterns in a Simple System&lt;/a&gt;&quot; Science 261(5118):189-192.
     </description>
     <rule name="Gray-Scott" type="formula" wrap="1" neighborhood_type="vertex">
       <param name="timestep">
@@ -44,60 +46,21 @@ John E. Pearson (1993) &quot;&lt;a href=&quot;http://jaguar.biologie.hu-berlin.d
         3
       </param>
       <formula number_of_chemicals="6">
-        float ratio_s = r_s.x;
-float vert_s = ratio_s;
-float s_s = 2 + vert_s;
+float4 ratio_s = r_s;
+float4 vert_s = ratio_s;
+float4 s_s = 2 + vert_s;
 
-float edge = evs.x / s_s;
-float vert = evs.x * vert_s / s_s;
+float4 edge = evs / s_s;
+float4 vert = evs * vert_s / s_s;
 
-float4 uax = (float4)(
-(edge * (-(a_nw.w + a_sw.w) + (a_n.y   + a_s.y)) + vert * (- a_w.w + a.y  )),
-(edge * (-(a_n.x  + a_s.x)  + (a_n.z   + a_s.z)) + vert * (- a.x   + a.z  )),
-(edge * (-(a_n.y  + a_s.y)  + (a_n.w   + a_s.w)) + vert * (- a.y   + a.w  )),
-(edge * (-(a_n.z  + a_s.z)  + (a_ne.x + a_se.x)) + vert * (- a.z   + a_e.x)));
-
-float4 uay = (float4)(
-(edge * ((a_nw.w + a_n.y ) - (a_sw.w +  a_s.y)) + vert * (- a_s.x + a_n.x)),
-(edge * ((a_n.x  + a_n.z ) - (a_s.x  +  a_s.z)) + vert * (- a_s.y + a_n.y)),
-(edge * ((a_n.y  + a_n.w ) - (a_s.y  +  a_s.w)) + vert * (- a_s.z + a_n.z)),
-(edge * ((a_n.z  + a_ne.x) - (a_s.z  + a_se.x)) + vert * (- a_s.w + a_n.w)));
-
-float4 ubx = (float4)(
-(edge * (-(b_nw.w + b_sw.w) + (b_n.y   + b_s.y)) + vert * (- b_w.w + b.y  )),
-(edge * (-(b_n.x  + b_s.x)  + (b_n.z   + b_s.z)) + vert * (- b.x   + b.z  )),
-(edge * (-(b_n.y  + b_s.y)  + (b_n.w   + b_s.w)) + vert * (- b.y   + b.w  )),
-(edge * (-(b_n.z  + b_s.z)  + (b_ne.x + b_se.x)) + vert * (- b.z   + b_e.x)));
-
-float4 uby = (float4)(
-(edge * ((b_nw.w + b_n.y ) - (b_sw.w +  b_s.y)) + vert * (- b_s.x + b_n.x)),
-(edge * ((b_n.x  + b_n.z ) - (b_s.x  +  b_s.z)) + vert * (- b_s.y + b_n.y)),
-(edge * ((b_n.y  + b_n.w ) - (b_s.y  +  b_s.w)) + vert * (- b_s.z + b_n.z)),
-(edge * ((b_n.z  + b_ne.x) - (b_s.z  + b_se.x)) + vert * (- b_s.w + b_n.w)));
-
-float4 ucx = (float4)(
-(edge * (-(c_nw.w + c_sw.w) + (c_n.y   + c_s.y)) + vert * (- c_w.w + c.y  )),
-(edge * (-(c_n.x  + c_s.x)  + (c_n.z   + c_s.z)) + vert * (- c.x   + c.z  )),
-(edge * (-(c_n.y  + c_s.y)  + (c_n.w   + c_s.w)) + vert * (- c.y   + c.w  )),
-(edge * (-(c_n.z  + c_s.z)  + (c_ne.x + c_se.x)) + vert * (- c.z   + c_e.x)));
-
-float4 ucy = (float4)(
-(edge * ((c_nw.w + c_n.y ) - (c_sw.w +  c_s.y)) + vert * (- c_s.x + c_n.x)),
-(edge * ((c_n.x  + c_n.z ) - (c_s.x  +  c_s.z)) + vert * (- c_s.y + c_n.y)),
-(edge * ((c_n.y  + c_n.w ) - (c_s.y  +  c_s.w)) + vert * (- c_s.z + c_n.z)),
-(edge * ((c_n.z  + c_ne.x) - (c_s.z  + c_se.x)) + vert * (- c_s.w + c_n.w)));
-
-float4 udx = (float4)(
-(edge * (-(d_nw.w + d_sw.w) + (d_n.y   + d_s.y)) + vert * (- d_w.w + d.y  )),
-(edge * (-(d_n.x  + d_s.x)  + (d_n.z   + d_s.z)) + vert * (- d.x   + d.z  )),
-(edge * (-(d_n.y  + d_s.y)  + (d_n.w   + d_s.w)) + vert * (- d.y   + d.w  )),
-(edge * (-(d_n.z  + d_s.z)  + (d_ne.x + d_se.x)) + vert * (- d.z   + d_e.x)));
-
-float4 udy = (float4)(
-(edge * ((d_nw.w + d_n.y ) - (d_sw.w +  d_s.y)) + vert * (- d_s.x + d_n.x)),
-(edge * ((d_n.x  + d_n.z ) - (d_s.x  +  d_s.z)) + vert * (- d_s.y + d_n.y)),
-(edge * ((d_n.y  + d_n.w ) - (d_s.y  +  d_s.w)) + vert * (- d_s.z + d_n.z)),
-(edge * ((d_n.z  + d_ne.x) - (d_s.z  + d_se.x)) + vert * (- d_s.w + d_n.w)));
+float4 uax = edge * (-(a_nw + a_sw) + (a_ne + a_se)) + vert * (- a_w + a_e);
+float4 uay = edge * ((a_nw + a_ne) - (a_sw +  a_se)) + vert * (- a_s + a_n);
+float4 ubx = edge * (-(b_nw + b_sw) + (b_ne + b_se)) + vert * (- b_w + b_e);
+float4 uby = edge * ((b_nw + b_ne) - (b_sw +  b_se)) + vert * (- b_s + b_n);
+float4 ucx = edge * (-(c_nw + c_sw) + (c_ne + c_se)) + vert * (- c_w + c_e);
+float4 ucy = edge * ((c_nw + c_ne) - (c_sw +  c_se)) + vert * (- c_s + c_n);
+float4 udx = edge * (-(d_nw + d_sw) + (d_ne + d_se)) + vert * (- d_w + d_e);
+float4 udy = edge * ((d_nw + d_ne) - (d_sw +  d_se)) + vert * (- d_s + d_n);
 
 float4 uam = sqrt(uax * uax + uay * uay);
 float4 ubm = sqrt(ubx * ubx + uby * uby);
@@ -177,7 +140,7 @@ f = ds1 * c + ds2 * d + ds3 * e;
       <show_color_scale value="true">
 
       </show_color_scale>
-      <show_multiple_chemicals value="true">
+      <show_multiple_chemicals value="false">
 
       </show_multiple_chemicals>
       <active_chemical value="a">

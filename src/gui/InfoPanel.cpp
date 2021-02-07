@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -15,10 +15,12 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
-// local:
 #include "InfoPanel.hpp"
+
+// local:
 #include "app.hpp"              // for wxGetApp
 #include "frame.hpp"
+#include "HtmlInfo.hpp"
 #include "IDs.hpp"
 #include "prefs.hpp"            // for readydir, etc
 #include "wxutils.hpp"          // for Warning, CopyTextToClipboard
@@ -26,285 +28,48 @@
 
 // readybase:
 #include "ImageRD.hpp"
+#include "scene_items.hpp"
 
 // wxWidgets:
 #include <wx/filename.h>        // for wxFileName
-#include <wx/html/htmlwin.h>    // for wxHtmlWindow
 #include <wx/colordlg.h>
 
 // VTK:
 #include <vtkMath.h>
 
 // STL:
+#include <algorithm>
 #include <string>
 using namespace std;
 
-const wxString change_prefix = _("change: ");
-
-// labels in 1st column
-const wxString rule_name_label = _("Rule name");
-const wxString rule_type_label = _("Rule type");
-const wxString description_label = _("Description");
-const wxString num_chemicals_label = _("Number of chemicals");
-const wxString formula_label = _("Formula");
-const wxString kernel_label = _("Kernel");
-const wxString dimensions_label = _("Dimensions");
-const wxString block_size_label = _("Block size");
-const wxString number_of_cells_label = _("Number of cells");
-const wxString wrap_label = _("Toroidal wrap-around");
-const wxString data_type_label = _("Data type");
-const wxString neighborhood_type_label = _("Neighborhood");
-const wxString neighborhood_range_label = _("Neighborhood range");
-const wxString neighborhood_weight_label = _("Neighborhood weight");
-
 // -----------------------------------------------------------------------------
 
-// define a child window for displaying HTML info
-class HtmlInfo : public wxHtmlWindow
-{
-    public:
-
-        HtmlInfo(wxWindow* parent, MyFrame* myframe, wxWindowID id = wxID_ANY,
-            const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
-            long style = wxHW_SCROLLBAR_AUTO | wxWANTS_CHARS)
-            : wxHtmlWindow(parent, id, pos, size, style)
-        {
-            frame = myframe;
-            panel = (InfoPanel*)parent;
-            editlink = false;
-            linkrect = wxRect(0,0,0,0);
-            scroll_x = scroll_y = 0;
-        }
-
-        virtual void OnLinkClicked(const wxHtmlLinkInfo& link);
-        virtual void OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y);
-
-        void ClearStatus();  // clear pane's status line
-
-        void SetFontSizes(int size);
-        void ChangeFontSizes(int size);
-
-        wxRect linkrect;     // rect for cell containing link
-
-        void SaveScrollPos() { GetViewStart(&scroll_x, &scroll_y); }
-        void RestoreScrollPos() { Scroll(scroll_x, scroll_y); }
-        void ResetScrollPos() { Scroll(0,0); }
-
-    private:
-
-        void OnSize(wxSizeEvent& event);
-        void OnMouseMotion(wxMouseEvent& event);
-        void OnMouseLeave(wxMouseEvent& event);
-        void OnMouseDown(wxMouseEvent& event);
-        void OnHtmlCellClicked(wxHtmlCellEvent& event);
-
-    private:
-
-        MyFrame* frame;
-        InfoPanel* panel;
-
-        bool editlink;          // open clicked file in editor?
-        int scroll_x,scroll_y;  // remember the scroll position
-
-        DECLARE_EVENT_TABLE()
-};
-
-BEGIN_EVENT_TABLE(HtmlInfo, wxHtmlWindow)
-    EVT_SIZE          (HtmlInfo::OnSize)
-    EVT_MOTION        (HtmlInfo::OnMouseMotion)
-    EVT_ENTER_WINDOW  (HtmlInfo::OnMouseMotion)
-    EVT_LEAVE_WINDOW  (HtmlInfo::OnMouseLeave)
-    EVT_LEFT_DOWN     (HtmlInfo::OnMouseDown)
-    EVT_RIGHT_DOWN    (HtmlInfo::OnMouseDown)
-    EVT_HTML_CELL_CLICKED (wxID_ANY, HtmlInfo::OnHtmlCellClicked)
-END_EVENT_TABLE()
+const wxString InfoPanel::rule_name_label = _("Rule name");
+const wxString InfoPanel::rule_type_label = _("Rule type");
+const wxString InfoPanel::description_label = _("Description");
+const wxString InfoPanel::num_chemicals_label = _("Number of chemicals");
+const wxString InfoPanel::formula_label = _("Formula");
+const wxString InfoPanel::kernel_label = _("Kernel");
+const wxString InfoPanel::dimensions_label = _("Dimensions");
+const wxString InfoPanel::block_size_label = _("Block size");
+const wxString InfoPanel::use_local_memory_label = _("Use local memory");
+const wxString InfoPanel::number_of_cells_label = _("Number of cells");
+const wxString InfoPanel::wrap_label = _("Toroidal wrap-around");
+const wxString InfoPanel::data_type_label = _("Data type");
+const wxString InfoPanel::neighborhood_type_label = _("Neighborhood");
+const wxString InfoPanel::neighborhood_range_label = _("Neighborhood range");
+const wxString InfoPanel::neighborhood_weight_label = _("Neighborhood weight");
+const wxString InfoPanel::accuracy_label = _("Accuracy");
+const wxString InfoPanel::accuracy_labels[3] = { _("low"), _("medium"), _("high") };
 
 // -----------------------------------------------------------------------------
-
-void HtmlInfo::OnLinkClicked(const wxHtmlLinkInfo& link)
-{
-    wxString url = link.GetHref();
-    if (url.StartsWith(wxT("http:")) || url.StartsWith(wxT("https:")) || url.StartsWith(wxT("mailto:"))) {
-        // pass http/mailto URL to user's preferred browser/emailer
-        if ( !wxLaunchDefaultBrowser(url) )
-            Warning(_("Could not open URL in browser!"));
-
-    } else if ( url.StartsWith(change_prefix) ) {
-        panel->ChangeInfo( url.Mid(change_prefix.size()) );
-        // best to reset focus after dialog closes
-        SetFocus();
-
-    } else if ( url.StartsWith(wxT("prefs:")) ) {
-        // user clicked on link to Preferences dialog
-        frame->ShowPrefsDialog( url.AfterFirst(':') );
-
-    } else if ( url.StartsWith(wxT("edit:")) ) {
-        // open clicked file in user's preferred text editor
-        wxString path = url.AfterFirst(':');
-        #ifdef __WXMSW__
-            path.Replace(wxT("/"), wxT("\\"));
-        #endif
-        wxFileName fname(path);
-        if (!fname.IsAbsolute()) path = readydir + path;
-        frame->EditFile(path);
-
-
-    } else if ( url.StartsWith(wxT("open:")) ) {
-        // open clicked file
-        wxString path = url.AfterFirst(':');
-        #ifdef __WXMSW__
-            path.Replace(wxT("/"), wxT("\\"));
-        #endif
-        wxFileName fname(path);
-        if (!fname.IsAbsolute()) path = readydir + path;
-        if (editlink) {
-            frame->EditFile(path);
-        } else {
-            frame->Raise();
-            frame->OpenFile(path);
-        }
-
-    } else {
-        // assume it's a link to a local target
-        LoadPage(url);
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::OnHtmlCellClicked(wxHtmlCellEvent& event)
-{
-    wxHtmlCell* cell = event.GetCell();
-    int x = event.GetPoint().x;
-    int y = event.GetPoint().y;
-
-    wxHtmlLinkInfo* link = cell->GetLink(x,y);
-    if (link) {
-        // set linkrect to avoid bug in wxHTML if click was in outer edge of link
-        // (bug is in htmlwin.cpp in wxHtmlWindowMouseHelper::HandleIdle;
-        // OnCellMouseHover needs to be called if cell != m_tmpLastCell)
-        wxPoint pt = ScreenToClient( wxGetMousePosition() );
-        linkrect = wxRect(pt.x-x, pt.y-y, cell->GetWidth(), cell->GetHeight());
-    }
-
-    event.Skip();   // call OnLinkClicked
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::OnCellMouseHover(wxHtmlCell* cell, wxCoord x, wxCoord y)
-{
-    wxHtmlLinkInfo* link = cell->GetLink(x,y);
-    if (link) {
-        wxString href = link->GetHref();
-        href.Replace(wxT("&"), wxT("&&"));
-        panel->SetStatus(href);
-        wxPoint pt = ScreenToClient( wxGetMousePosition() );
-        linkrect = wxRect(pt.x-x, pt.y-y, cell->GetWidth(), cell->GetHeight());
-    } else {
-        ClearStatus();
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::OnMouseMotion(wxMouseEvent& event)
-{
-    if (!linkrect.IsEmpty()) {
-        int x = event.GetX();
-        int y = event.GetY();
-        if (!linkrect.Contains(x,y)) ClearStatus();
-    }
-    event.Skip();
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::OnMouseLeave(wxMouseEvent& event)
-{
-    ClearStatus();
-    event.Skip();
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::ClearStatus()
-{
-    panel->SetStatus(wxEmptyString);
-    linkrect = wxRect(0,0,0,0);
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::OnMouseDown(wxMouseEvent& event)
-{
-    // set flag so ctrl/right-clicked file can be opened in editor
-    editlink = event.ControlDown() || event.RightDown();
-    event.Skip();
-}
-
-// -----------------------------------------------------------------------------
-
-// avoid scroll position being reset to top when wxHtmlWindow is resized
-void HtmlInfo::OnSize(wxSizeEvent& event)
-{
-    SaveScrollPos();
-
-    Freeze(); // prevent flicker
-
-    wxHtmlWindow::OnSize(event);
-
-    wxString currpage = GetOpenedPage();
-    if ( !currpage.IsEmpty() ) {
-        LoadPage(currpage);         // reload page
-    }
-
-    RestoreScrollPos();
-    Thaw();
-
-    // prevent wxHtmlWindow::OnSize being called again
-    event.Skip(false);
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::SetFontSizes(int size)
-{
-    // set font sizes for <FONT SIZE=-2> to <FONT SIZE=+4>
-    int f_sizes[7];
-    f_sizes[0] = int(size * 0.6);
-    f_sizes[1] = int(size * 0.8);
-    f_sizes[2] = size;
-    f_sizes[3] = int(size * 1.2);
-    f_sizes[4] = int(size * 1.4);
-    f_sizes[5] = int(size * 1.6);
-    f_sizes[6] = int(size * 1.8);
-    #ifdef __WXOSX_COCOA__
-        SetFonts(wxT("Lucida Grande"), wxT("Monaco"), f_sizes);
-    #else
-        SetFonts(wxEmptyString, wxEmptyString, f_sizes);
-    #endif
-}
-
-// -----------------------------------------------------------------------------
-
-void HtmlInfo::ChangeFontSizes(int size)
-{
-    // changing font sizes resets pos to top, so save and restore pos
-    SaveScrollPos();
-    SetFontSizes(size);
-    RestoreScrollPos();
-    panel->UpdateButtons();
-}
-
-// -----------------------------------------------------------------------------
-
-// define a panel that contains a HtmlInfo window
 
 BEGIN_EVENT_TABLE(InfoPanel, wxPanel)
     EVT_BUTTON (ID::SmallerButton,  InfoPanel::OnSmallerButton)
     EVT_BUTTON (ID::BiggerButton,   InfoPanel::OnBiggerButton)
 END_EVENT_TABLE()
+
+// -----------------------------------------------------------------------------
 
 InfoPanel::InfoPanel(MyFrame* parent, wxWindowID id)
     : wxPanel(parent,id), frame(parent)
@@ -359,7 +124,7 @@ void InfoPanel::ResetPosition()
 
 // -----------------------------------------------------------------------------
 
-void InfoPanel::Update(const AbstractRD* const system)
+void InfoPanel::UpdatePanel(const AbstractRD& system)
 {
     // build HTML string to display current parameters
     wxString contents;
@@ -368,27 +133,27 @@ void InfoPanel::Update(const AbstractRD* const system)
 
     rownum = 0;
 
-    wxString s(system->GetRuleName().c_str(),wxConvUTF8);
+    wxString s(system.GetRuleName().c_str(), wxConvUTF8);
     contents += AppendRow(rule_name_label, rule_name_label, s, true);
 
-    s = wxString(system->GetRuleType().c_str(),wxConvUTF8);
+    s = wxString(system.GetRuleType().c_str(), wxConvUTF8);
     contents += AppendRow(rule_type_label, rule_type_label, s, false);
 
-    s = wxString(system->GetDescription().c_str(),wxConvUTF8);
+    s = wxString(system.GetDescription().c_str(), wxConvUTF8);
     s.Replace(wxT("\n\n"), wxT("<p>"));
     contents += AppendRow(description_label, description_label, s, true, true);
 
-    contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system->GetNumberOfChemicals()),
-                          system->HasEditableNumberOfChemicals());
+    contents += AppendRow(num_chemicals_label, num_chemicals_label, wxString::Format(wxT("%d"), system.GetNumberOfChemicals()),
+        system.HasEditableNumberOfChemicals());
 
-    for(int iParam=0;iParam<(int)system->GetNumberOfParameters();iParam++)
+    for (int iParam = 0; iParam < (int)system.GetNumberOfParameters(); iParam++)
     {
-        contents += AppendRow(system->GetParameterName(iParam), system->GetParameterName(iParam),
-                              FormatFloat(system->GetParameterValue(iParam)), true);
+        contents += AppendRow(system.GetParameterName(iParam), system.GetParameterName(iParam),
+            FormatFloat(system.GetParameterValue(iParam)), true);
     }
 
-    wxString formula = system->GetFormula();
-    if(system->HasEditableFormula() || formula.size()>0)
+    wxString formula = system.GetFormula();
+    if (system.HasEditableFormula() || formula.size() > 0)
     {
         // escape HTML reserved characters
         formula.Replace(wxT("&"), wxT("&amp;")); // (the order of these is important)
@@ -405,36 +170,42 @@ void InfoPanel::Update(const AbstractRD* const system)
         //  have to use &nbsp; but this prevents wrapping. By only replacing *double* spaces we cover most usages and it's good enough for now.)
         formula = _("<code>") + formula + _("</code>");
         // (would prefer the <pre> block here but it adds a leading newline (which we can't use CSS to get rid of) and also prevents wrapping)
-        if(system->GetRuleType()=="kernel")
-            contents += AppendRow(kernel_label, kernel_label, formula, system->HasEditableFormula(), true);
+        if (system.GetRuleType() == "kernel")
+            contents += AppendRow(kernel_label, kernel_label, formula, system.HasEditableFormula(), true);
         else
-            contents += AppendRow(formula_label, formula_label, formula, system->HasEditableFormula(), true);
+            contents += AppendRow(formula_label, formula_label, formula, system.HasEditableFormula(), true);
     }
 
-    if(system->HasEditableDimensions())
+    if (system.HasEditableDimensions())
         contents += AppendRow(dimensions_label, dimensions_label, wxString::Format(wxT("%s x %s x %s"),
-                                        FormatFloat(system->GetX(),3),FormatFloat(system->GetY(),3),FormatFloat(system->GetZ(),3)),
-                                        system->HasEditableDimensions());
+            FormatFloat(system.GetX(), 3), FormatFloat(system.GetY(), 3), FormatFloat(system.GetZ(), 3)),
+            system.HasEditableDimensions());
     else
         contents += AppendRow(number_of_cells_label, number_of_cells_label, wxString::Format(wxT("%d"),
-                                        system->GetNumberOfCells()),false);
+            system.GetNumberOfCells()), false);
 
-    if(!system->HasEditableDimensions() || system->GetRuleType()!="kernel")
+    if (!system.HasEditableDimensions())
     {
-        // (hide the neighborhood for image-based kernels, which don't use it)
-        contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system->GetNeighborhoodType()+"-neighbors", false);
+        // (hide the neighborhood for vti files, which don't use it)
+        contents += AppendRow(neighborhood_type_label, neighborhood_type_label, system.GetNeighborhoodType() + "-neighbors", false);
     }
 
-    /* bit technical, leave as a file-only option
+    if (system.HasEditableAccuracyOption())
+    {
+        contents += AppendRow(accuracy_label, accuracy_label, accuracy_labels[static_cast<int>(system.GetAccuracy())], true);
+    }
+
     contents += AppendRow(block_size_label, block_size_label, wxString::Format(wxT("%d x %d x %d"),
-                                        system->GetBlockSizeX(),system->GetBlockSizeY(),system->GetBlockSizeZ()),
-                                        system->HasEditableBlockSize());*/
+                                        system.GetBlockSizeX(),system.GetBlockSizeY(),system.GetBlockSizeZ()),
+                                        system.HasEditableBlockSize());
 
-    if(system->HasEditableWrapOption())
-        contents += AppendRow(wrap_label, wrap_label, system->GetWrap()?_("on"):_("off"), true);
+    contents += AppendRow(use_local_memory_label, use_local_memory_label, system.GetUseLocalMemory() ? _("true") : _("false"), true);
 
-    contents += AppendRow(data_type_label,data_type_label,system->GetDataType()==VTK_DOUBLE?_("double"):_("float"),
-        system->HasEditableDataType());
+    if (system.HasEditableWrapOption())
+        contents += AppendRow(wrap_label, wrap_label, system.GetWrap() ? _("on") : _("off"), true);
+
+    contents += AppendRow(data_type_label, data_type_label, system.GetDataType() == VTK_DOUBLE ? _("double") : _("float"),
+        system.HasEditableDataType());
 
     contents += _T("</table>");
 
@@ -446,10 +217,23 @@ void InfoPanel::Update(const AbstractRD* const system)
     rownum = 1;     // nicer if 1st render setting has gray background
 
     const Properties& render_settings = frame->GetRenderSettings();
-    for(int i=0;i<render_settings.GetNumberOfProperties();i++)
+    const bool using_HSV_blend = render_settings.GetProperty("colormap").GetColorMap() == "HSV blend";
+    for (int i = 0; i < render_settings.GetNumberOfProperties(); i++)
     {
         const Property& prop = render_settings.GetProperty(i);
         string name = prop.GetName();
+        if (!RenderSettingAppliesToDimensionality(name, system.GetArenaDimensionality()))
+        {
+            continue;
+        }
+        if (!system.HasEditableDimensions() && RenderSettingDoesntApplyToMesh(name))
+        {
+            continue;
+        }
+        if (!using_HSV_blend && (name == "color_low" || name == "color_high"))
+        {
+            continue;
+        }
         wxString print_label(name);
         print_label.Replace(_T("_"),_T(" "));
         string type = prop.GetType();
@@ -471,6 +255,8 @@ void InfoPanel::Update(const AbstractRD* const system)
             contents += AppendRow(print_label, name, prop.GetChemical(), true);
         else if(type=="axis")
             contents += AppendRow(print_label, name, prop.GetAxis(), true);
+        else if(type=="colormap")
+            contents += AppendRow(print_label, name, prop.GetColorMap(), true);
         else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
 
@@ -493,7 +279,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
 
     if (is_editable) {
         result += _T("<td valign=top align=right><a href=\"");
-        result += change_prefix;
+        result += HtmlInfo::change_prefix;
         result += label;
         result += _T("\">");
         result += _("edit");
@@ -506,12 +292,12 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     if (is_multiline) {
         result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
         result += print_label;
-        result += _T("</b></td><td valign=top></td>");
+        result += _T("</b></td><td valign=top width=\"100%\"></td>");
         // see below for how value is formatted
     } else {
         result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
         result += print_label;
-        result += _T("</b></td><td valign=top>");
+        result += _T("</b></td><td valign=top width=\"100%\">");
         if (color.empty()) {
             result += value;
         } else {
@@ -610,7 +396,7 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
     else if(type=="chemical")
     {
         wxArrayString choices;
-        for(int i=0;i<this->frame->GetCurrentRDSystem()->GetNumberOfChemicals();i++)
+        for(int i=0;i<this->frame->GetCurrentRDSystem().GetNumberOfChemicals();i++)
             choices.Add(GetChemicalName(i));
         wxSingleChoiceDialog dlg(this,_("Chemical:"),_("Select active chemical"),
             choices);
@@ -635,6 +421,20 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
         prop.SetAxis(string(choices[dlg.GetSelection()].mb_str()));
         frame->RenderSettingsChanged();
     }
+    else if (type == "colormap")
+    {
+        wxArrayString choices;
+        for (const string& s : SupportedColorMaps)
+        {
+            choices.Add(s);
+        }
+        wxSingleChoiceDialog dlg(this, _("Color map:"), _("Select color map"), choices);
+        int iColorMap = distance(begin(SupportedColorMaps), find(begin(SupportedColorMaps), end(SupportedColorMaps), prop.GetColorMap()));
+        dlg.SetSelection(iColorMap);
+        if (dlg.ShowModal() != wxID_OK) return;
+        prop.SetColorMap(string(choices[dlg.GetSelection()].mb_str()));
+        frame->RenderSettingsChanged();
+    }
     else {
         wxMessageBox("Editing "+setting+" of type "+wxString(type.c_str(),wxConvUTF8)+" is not currently supported");
     }
@@ -644,21 +444,21 @@ void InfoPanel::ChangeRenderSetting(const wxString& setting)
 
 void InfoPanel::ChangeParameter(const wxString& parameter)
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
+    const AbstractRD& sys = frame->GetCurrentRDSystem();
     int iParam = 0;
-    while (iParam < (int)sys->GetNumberOfParameters()) {
-        if (parameter == sys->GetParameterName(iParam)) break;
+    while (iParam < (int)sys.GetNumberOfParameters()) {
+        if (parameter == sys.GetParameterName(iParam)) break;
         iParam++;
     }
-    if (iParam == (int)sys->GetNumberOfParameters()) {
+    if (iParam == (int)sys.GetNumberOfParameters()) {
         Warning(_("Bug in ChangeParameter! Unknown parameter: ") + parameter);
         return;
     }
 
     wxString newname;
     float newval;
-    float oldval = sys->GetParameterValue(iParam);
-    bool can_edit_name = sys->HasEditableFormula();
+    float oldval = sys.GetParameterValue(iParam);
+    bool can_edit_name = sys.HasEditableFormula();
 
     // position dialog box to left of linkrect
     wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
@@ -680,7 +480,7 @@ void InfoPanel::ChangeParameter(const wxString& parameter)
 
 void InfoPanel::ChangeRuleName()
 {
-    wxString oldname(frame->GetCurrentRDSystem()->GetRuleName().c_str(),wxConvUTF8);
+    wxString oldname(frame->GetCurrentRDSystem().GetRuleName().c_str(),wxConvUTF8);
     wxString newname;
 
     // position dialog box to left of linkrect
@@ -699,7 +499,7 @@ void InfoPanel::ChangeRuleName()
 
 void InfoPanel::ChangeDescription()
 {
-    wxString oldtext(frame->GetCurrentRDSystem()->GetDescription().c_str(),wxConvUTF8);
+    wxString oldtext(frame->GetCurrentRDSystem().GetDescription().c_str(),wxConvUTF8);
     wxString newtext;
 
     MultiLineDialog dialog(frame, _("Change description"), _("Enter the new description:"), oldtext);
@@ -722,10 +522,10 @@ void InfoPanel::ChangeDescription()
 
 void InfoPanel::ChangeFormula()
 {
-    wxString oldcode(frame->GetCurrentRDSystem()->GetFormula().c_str(),wxConvUTF8);
+    wxString oldcode(frame->GetCurrentRDSystem().GetFormula().c_str(),wxConvUTF8);
     wxString newcode;
 
-    wxString code_type(frame->GetCurrentRDSystem()->GetRuleType().c_str(),wxConvUTF8);
+    wxString code_type(frame->GetCurrentRDSystem().GetRuleType().c_str(),wxConvUTF8);
     MultiLineDialog dialog(frame, _("Change ")+code_type, _("Enter the new ")+code_type+_T(":"), oldcode);
 
     // best to center potentially large dialog box
@@ -748,7 +548,7 @@ void InfoPanel::ChangeNumChemicals()
 {
     const int MAX_CHEMICALS = 1000;
 
-    int oldnum = frame->GetCurrentRDSystem()->GetNumberOfChemicals();
+    int oldnum = frame->GetCurrentRDSystem().GetNumberOfChemicals();
     int newnum;
 
     // position dialog box to left of linkrect
@@ -769,10 +569,10 @@ void InfoPanel::ChangeNumChemicals()
 
 void InfoPanel::ChangeDimensions()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    int oldx = sys->GetX();
-    int oldy = sys->GetY();
-    int oldz = sys->GetZ();
+    const AbstractRD& sys = frame->GetCurrentRDSystem();
+    int oldx = sys.GetX();
+    int oldy = sys.GetY();
+    int oldz = sys.GetZ();
     int newx, newy, newz;
 
     // position dialog box to left of linkrect
@@ -789,12 +589,12 @@ void InfoPanel::ChangeDimensions()
         newz = dialog.GetZ();
         if (newx == oldx && newy == oldy && newz == oldz) break;
         const bool not_all_powers_of_two = newx&(newx - 1) || newy&(newy - 1) || newz&(newz - 1);
-        if (sys->GetRuleType() == "formula" && not_all_powers_of_two)
+        if (sys.GetRuleType() == "formula" && not_all_powers_of_two)
         {
             wxMessageBox(_("For efficient wrap-around in OpenCL we require all the dimensions to be powers of 2"));
             continue;
         }
-        else if (sys->GetRuleType() == "kernel" && not_all_powers_of_two)
+        else if (sys.GetRuleType() == "kernel" && not_all_powers_of_two)
         {
             int answer = wxMessageBox(
                 _("Check the kernel to see if it supports dimensions that are not powers of 2"),
@@ -809,52 +609,95 @@ void InfoPanel::ChangeDimensions()
 
 // -----------------------------------------------------------------------------
 
+void InfoPanel::ChangeAccuracy()
+{
+    const AbstractRD::Accuracy old_val = frame->GetCurrentRDSystem().GetAccuracy();
+
+    wxArrayString choices;
+    for (const wxString& label : accuracy_labels)
+    {
+        choices.Add(label);
+    }
+    wxSingleChoiceDialog dlg(this, _("Accuracy:"), _("Select accuracy:"),
+        choices);
+    dlg.SetSelection(static_cast<int>(old_val));
+    if (dlg.ShowModal() != wxID_OK) return;
+    const AbstractRD::Accuracy new_val = static_cast<AbstractRD::Accuracy>(dlg.GetSelection());
+    frame->GetCurrentRDSystem().SetAccuracy(new_val);
+    UpdatePanel(frame->GetCurrentRDSystem());
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::ChangeBlockSize()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    int oldx = sys->GetBlockSizeX();
-    int oldy = sys->GetBlockSizeY();
-    int oldz = sys->GetBlockSizeZ();
+    const AbstractRD& sys = frame->GetCurrentRDSystem();
+    int oldx = sys.GetBlockSizeX();
+    int oldy = sys.GetBlockSizeY();
+    int oldz = sys.GetBlockSizeZ();
     int newx, newy, newz;
 
-    // position dialog box to left of linkrect
-    wxPoint pos = ClientToScreen( wxPoint(html->linkrect.x, html->linkrect.y) );
-    int dlgwd = 300;
-    pos.x -= dlgwd + 20;
-
-    XYZIntDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd,-1));
-
-    if (dialog.ShowModal() == wxID_OK)
+    const bool allow_full_control = false;
+    if (allow_full_control)
     {
-        newx = dialog.GetX();
-        newy = dialog.GetY();
-        newz = dialog.GetZ();
-        if (newx != oldx || newy != oldy || newz != oldz)
-            frame->SetBlockSize(newx, newy, newz);
+        // position dialog box to left of linkrect
+        wxPoint pos = ClientToScreen(wxPoint(html->linkrect.x, html->linkrect.y));
+        int dlgwd = 300;
+        pos.x -= dlgwd + 20;
+
+        XYZIntDialog dialog(frame, _("Change the block size"), oldx, oldy, oldz, pos, wxSize(dlgwd, -1));
+
+        if (dialog.ShowModal() == wxID_OK)
+        {
+            newx = dialog.GetX();
+            newy = dialog.GetY();
+            newz = dialog.GetZ();
+            if (newx != oldx || newy != oldy || newz != oldz)
+                frame->SetBlockSize(newx, newy, newz);
+        }
     }
+    else
+    {
+        newx = (oldx == 4) ? 1 : 4;
+        newy = newz = 1;
+        frame->SetBlockSize(newx, newy, newz);
+    }
+}
+
+// -----------------------------------------------------------------------------
+
+void InfoPanel::ChangeUseLocalMemory()
+{
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    sys.SetUseLocalMemory(!sys.GetUseLocalMemory());
+    this->UpdatePanel(sys);
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeWrapOption()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    sys->SetWrap(!sys->GetWrap());
-    this->Update(sys);
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    sys.SetWrap(!sys.GetWrap());
+    this->UpdatePanel(sys);
 }
 
 // -----------------------------------------------------------------------------
 
 void InfoPanel::ChangeDataType()
 {
-    AbstractRD* sys = frame->GetCurrentRDSystem();
-    switch( sys->GetDataType() ) {
-        default:
-        case VTK_FLOAT: sys->SetDataType( VTK_DOUBLE ); break;
-        case VTK_DOUBLE: sys->SetDataType( VTK_FLOAT ); break;
+    const int confirm = wxMessageBox(_("This will overwrite the existing pattern, OK to continue?"), _("Confirm"), wxOK | wxCANCEL);
+    if (confirm != wxOK)
+    {
+        return;
     }
-    this->Update(sys);
-    frame->RenderSettingsChanged();
+    AbstractRD& sys = frame->GetCurrentRDSystem();
+    switch (sys.GetDataType())
+    {
+        default:
+        case VTK_FLOAT: frame->SetDataType(VTK_DOUBLE); break;
+        case VTK_DOUBLE: frame->SetDataType(VTK_FLOAT); break;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -876,8 +719,14 @@ void InfoPanel::ChangeInfo(const wxString& label)
     } else if ( label == dimensions_label ) {
         ChangeDimensions();
 
+    } else if ( label == accuracy_label ) {
+        ChangeAccuracy();
+
     } else if ( label == block_size_label ) {
         ChangeBlockSize();
+
+    } else if ( label == use_local_memory_label ) {
+        ChangeUseLocalMemory();
 
     } else if ( label == wrap_label ) {
         ChangeWrapOption();
@@ -888,7 +737,7 @@ void InfoPanel::ChangeInfo(const wxString& label)
     } else if ( frame->GetRenderSettings().IsProperty(string(label.mb_str())) ) {
         ChangeRenderSetting(label);
 
-    } else if ( frame->GetCurrentRDSystem()->IsParameter(string(label.mb_str())) ) {
+    } else if ( frame->GetCurrentRDSystem().IsParameter(string(label.mb_str())) ) {
         ChangeParameter(label);
     } else {
         Warning(_("Bug in ChangeInfo! Unexpected label: ") + label);

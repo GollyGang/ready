@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
 This file is part of Ready.
 
@@ -20,6 +20,7 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // STL:
 #include <string>
+using namespace std;
 
 InitialPatternGenerator::InitialPatternGenerator()
     : zero_first(true)
@@ -37,10 +38,6 @@ InitialPatternGenerator::~InitialPatternGenerator()
 
 void InitialPatternGenerator::RemoveAllOverlays()
 {
-    for (size_t i = 0; i < this->overlays.size(); i++)
-    {
-        delete this->overlays[i];
-    }
     this->overlays.clear();
 }
 
@@ -52,12 +49,12 @@ void InitialPatternGenerator::ReadFromXML(vtkXMLDataElement* node)
     if (node) // IPG is optional in the XML, default is none
     {
         const char *zero_first_str = node->GetAttribute("zero_first");
-        if (zero_first_str && std::string(zero_first_str) == "false")
+        if (zero_first_str && string(zero_first_str) == "false")
             this->zero_first = false;
 
         for (int i = 0; i < node->GetNumberOfNestedElements(); i++)
         {
-            this->overlays.push_back(new Overlay(node->GetNestedElement(i)));
+            this->overlays.push_back(make_unique<Overlay>(node->GetNestedElement(i)));
         }
     }
 }
@@ -100,7 +97,7 @@ void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_ch
         ov1->AddNestedElement(ow);
         ov1->AddNestedElement(c);
         ov1->AddNestedElement(ew);
-        this->overlays.push_back(new Overlay(ov1));
+        this->overlays.push_back(make_unique<Overlay>(ov1));
     }
 
     {
@@ -113,7 +110,7 @@ void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_ch
         ov1->AddNestedElement(ow);
         ov1->AddNestedElement(c);
         ov1->AddNestedElement(ew);
-        this->overlays.push_back(new Overlay(ov1));
+        this->overlays.push_back(make_unique<Overlay>(ov1));
     }
 
     vtkSmartPointer<vtkXMLDataElement> wn = vtkSmartPointer<vtkXMLDataElement>::New();
@@ -140,5 +137,5 @@ void InitialPatternGenerator::CreateDefaultInitialPatternGenerator(size_t num_ch
     ov->AddNestedElement(ow);
     ov->AddNestedElement(wn);
     ov->AddNestedElement(r);
-    this->overlays.push_back(new Overlay(ov));
+    this->overlays.push_back(make_unique<Overlay>(ov));
 }

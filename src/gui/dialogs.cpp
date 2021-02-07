@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -218,9 +218,12 @@ bool XYZFloatDialog::TransferDataFromWindow()
 {
     double x,y,z;
     bool ok = this->xbox->GetValue().ToDouble(&x) && this->ybox->GetValue().ToDouble(&y) && this->zbox->GetValue().ToDouble(&z);
-    this->xval = x;
-    this->yval = y;
-    this->zval = z;
+    if (ok)
+    {
+        this->xval = x;
+        this->yval = y;
+        this->zval = z;
+    }
     return ok;
 }
 

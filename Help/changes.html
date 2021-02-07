@@ -10,24 +10,45 @@
 <a href="https://gollygang.github.io/ready/Help/changes.html">https://gollygang.github.io/ready/Help/changes.html</a>.)
 
 <p>
-<font size=+1><b>Changes in version ??? (released ???)</b></font>
+<font size=+1><b>Changes in version 0.12 (released ???)</b></font>
+<ul>
+  <li><a href="file.html#File_ExportMesh">File > Export Mesh</a> and <a href="file.html#File_StartRecording">File > Start Recording...</a> can
+  now save meshes as .PLY format, with vertex colors.
+</ul>
+
+<p>
+<font size=+1><b>Changes in version 0.11.0 (released January 2021)</b></font>
 <ul>
 <li>Formulas now support more stencils: <b>bilaplacian_a</b>, <b>trilaplacian_a</b>, <b>gaussian_a</b>,
-<b>sobel_ne_a</b>, <b>x_gradient_a</b>, <b>y_gradient_a</b>, <b>z_gradient_a</b>, <b>gradient_mag_squared_a</b>
-(and similarly for the other chemicals). Several patterns have been converted from kernel rules to formula rules
+<b>sobelN_a</b>, <b>sobelNE_a</b>, <b>x_gradient_a</b>, <b>x_deriv2_a</b>, <b>x_deriv3_a</b>, <b>gradient_mag_squared_a</b>
+(and similarly for the other chemicals and directions). Several patterns have been converted from kernel rules to formula rules
 as a result.
 <li>Formulas now support <b>x_pos</b>, <b>y_pos</b> and <b>z_pos</b>, giving the cell location in each direction, in
 the range [0,1]. This allows a neater and more accurate way of implementing parameter maps.
+<li>Formulas now support <b>a_e</b>, <b>a_nw</b> etc. in a more natural way. Instead of accessing the float4 block that is
+the neighbor of the current block, these keywords return a float4 that has the four values that are neighbors in the specified way. Now we can do e.g. <tt>a = a_ne;</tt> in a formula to have the whole pattern shift down and left by one pixel. This is a
+<b>breaking change</b>: formula rules that accessed cells using a_w, a_e, a_nw, a_se, etc. will no longer behave as they did before.
+<li>New pattern setting: <tt>accuracy</tt>. Controls the size of the stencil. Use "low" to run fast, and "high" to run
+accurately.
 <li>Parameter <b>dx</b> is now reserved for controlling the grid spacing of the Gaussian, Laplacian, bi-Laplacian and tri-Laplacian
 stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * delta_x) and can just write laplacian_a since the value of dx is used in the stencil computation.
+<li>New <a href="formats.html#render_settings">render setting</a>: <b>colormap</b>, with 11 maps available: "HSV blend", "spectral", "spectral reversed", "inferno", "inferno reversed", "terrain", "terrain reversed", "orange-purple", "purple-orange", "brown-teal", "teal-brown". The old behavior (HSV interpolation between two colors) is still available - choose "HSV blend".
+<li>New <a href="formats.html#render_settings">render setting</a>: <b>plot_ab_orthogonally</b>. If true in a 1d pattern, we
+plot chemicals 'a' and 'b' against each other in the line graph, allowing us to show e.g. <a href="open:Patterns/Schrodinger1926/packet.vti">Schrodinger1926/packet.vti</a> or <a href="open:Patterns/Yang2006/jumping_cGL.vti">Yang2006/jumping_cGL.vti</a> in a more useful way.
 <li>Moved View Full Kernel... and Show OpenCL Diagnostics... to the View menu.
 <li>Mac app requires macOS 10.10 or later.
 <li>More smaller brush sizes.
+<li>Improved <a href="open:Patterns/wave_equation.vti">wave_equation.vti</a>
 <li>New patterns:
   <ul>
+    <li>An implementation of the Kuramoto-Sivashinsky equation, thanks to Dan Wills. Patterns: <a href="open:Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky.vti">Kuramoto-Sivashinsky.vti</a>, <a href="open:Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_multistable.vti">Kuramoto-Sivashinsky_multistable.vti</a>, <a href="open:Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves.vti">Kuramoto-Sivashinsky_travelling_waves.vti</a>, <a href="open:Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves2.vti">Kuramoto-Sivashinsky_travelling_waves2.vti</a>
     <li><a href="open:Patterns/Kobayashi1993/crystals.vti">Kobayashi1993/crystals.vti</a>
     <li>In Experiments/TihaVonGhyczy: <a href="open:Patterns/Experiments/TihaVonGhyczy/sobel_waves.vti">sobel_waves.vti</a>.
     <li>In Experiments/TimHutton: <a href="open:Patterns/Experiments/TimHutton/mutually-catalytic_spots_2.vti">mutually-catalytic_spots_2.vti</a>.
+    <li><a href="open:Patterns/wave_soliton.vti">wave_soliton.vti</a>
+    <li><a href="open:Patterns/LotkaVolterra1926/Lotka-Volterra_1D.vti">Lotka-Volterra_1D.vti</a>
+    <li><a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau_1D.vti">complex_Ginzburg-Landau_1D.vti</a>
+    <li><a href="open:Patterns/KortewegDeVries1895/kdv.vti">KortewegDeVries1895/kdv.vti</a>
   </ul>
 </ul>
 
@@ -88,7 +109,7 @@ stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * de
     <li><a href="open:Patterns/Experiments/DanWills/orbits_nova_ddd_chicken_init.vti">DanWills/orbits_nova_ddd_chicken_init.vti</a>, Orbits-fractal-based formula showing a nice looking repeated structure-formation-and-destruction behaviour on a quite long (25k timesteps) cycle.
     <li><a href="open:Patterns/Experiments/DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti">DanWills/orbits_ddd_questionSpaceships-answer_init_djw.vti</a>, Discovered while tweaking the Orbits (fractal-inspired) formula, this appears to almost emulate a discrete automata at the core of its continuous dynamics. Comparisons could be drawn to the 'star-wars' CA in golly, but a bit more spaceshippy.
     <li><a href="open:Patterns/Experiments/DanWills/orbits_ddd_epochs_init.djw.vti">DanWills/orbits_ddd_epochs_init.djw.vti</a>, This Mandelbrot/Julia-step inspired formula and parameters shows some fascinating and bizarre behaviour where over a huge time period (150k timesteps) fields of 'stars' form, merge and expire and then are eventually re-generated in complex wavefronts.
-    <li><a href="open:Patterns/Gray-Scott/parameter-map_3D.vti">Gray-Scott/parameter-map_3D.vti</a>, A 3D version of the Gray-Scott parameter map, showing how the parameters affect the patterns generated in 3D.
+    <li><a href="open:Patterns/GrayScott1984/parameter-map_3D.vti">GrayScott1984/parameter-map_3D.vti</a>, A 3D version of the Gray-Scott parameter map, showing how the parameters affect the patterns generated in 3D.
   </ul>
 </ul>
 
@@ -126,16 +147,16 @@ stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * de
     <li>And more amazing rules by Cornus Ammonis: <a href="open:Patterns/Experiments/CornusAmmonis/bz-warpsharp.vti">bz-warpsharp.vti</a> applying the warp-sharp algorithm to the Belousov-Zhabotinsky system, <a href="open:Patterns/Experiments/CornusAmmonis/smoke.vti">smoke.vti</a>, <a href="open:Patterns/Experiments/CornusAmmonis/smoke-ising.vti">smoke-ising.vti</a>, and <a href="open:Patterns/Experiments/CornusAmmonis/splats.vti">splats.vti</a>.
     <li><a href="open:Patterns/advection.vti">advection.vti</a>: the advection equation, plus some different
     methods of integrating it, for comparison:
-    <a href="open:Patterns/NumericalMethods/advection_forwardEuler.vti">forward Euler</a>,
-    <a href="open:Patterns/NumericalMethods/advection_2stepAdamsBashforth.vti">two-step Adams-Bashforth</a>,
-    <a href="open:Patterns/NumericalMethods/advection_3stepAdamsBashforth.vti">three-step Adams-Bashforth</a>,
-    <a href="open:Patterns/NumericalMethods/advection_modifiedEuler.vti">modified Euler</a>,
-    <a href="open:Patterns/NumericalMethods/advection_midpointMethod.vti">the midpoint method</a>,
-    <a href="open:Patterns/NumericalMethods/advection_HeunsMethod.vti">Heun's method</a>,
-    <a href="open:Patterns/NumericalMethods/advection_staggeredLeapfrog.vti">staggered leapfrog</a>,
-    <a href="open:Patterns/NumericalMethods/advection_LaxFriedrichs.vti">Lax-Friedrichs</a>,
-    <a href="open:Patterns/NumericalMethods/advection_LaxWendroff.vti">Lax-Wendroff</a> and
-    <a href="open:Patterns/NumericalMethods/advection_RungeKutta4.vti">fourth-order Runge-Kutta</a>.
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_forwardEuler.vti">forward Euler</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_2stepAdamsBashforth.vti">two-step Adams-Bashforth</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_3stepAdamsBashforth.vti">three-step Adams-Bashforth</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_modifiedEuler.vti">modified Euler</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_midpointMethod.vti">the midpoint method</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_HeunsMethod.vti">Heun's method</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_staggeredLeapfrog.vti">staggered leapfrog</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxFriedrichs.vti">Lax-Friedrichs</a>,
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_LaxWendroff.vti">Lax-Wendroff</a> and
+    <a href="open:Patterns/Experiments/TimHutton/NumericalMethods/advection_RungeKutta4.vti">fourth-order Runge-Kutta</a>.
     <li><a href="open:Patterns/Pennybacker2013/phyllotaxis_fibonacci.vti">Pennybacker2013/phyllotaxis_fibonacci.vti</a> and <a href="open:Patterns/Pennybacker2013/phyllotaxis_hexagons.vti">Pennybacker2013/phyllotaxis_hexagons.vti</a>
     showing a single-chemical model of phyllotaxis in plants. Also <a href="open:Patterns/Pennybacker2013/spots.vti">Pennybacker2013/spots.vti</a>, <a href="open:Patterns/Pennybacker2013/stripes.vti">Pennybacker2013/stripes.vti</a> and
     <a href="open:Patterns/Pennybacker2013/parameter_map.vti">Pennybacker2013/parameter_map.vti</a>, showing a simpler model without the gradient term.
@@ -231,7 +252,7 @@ stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * de
     <a href="open:Patterns/Ginzburg-Landau/complex_Ginzburg-Landau.vti">original</a>.
     <li><a href="open:Patterns/CellularAutomata/larger-than-life.vti">larger-than-life.vti</a>, a CA rule that uses a
     larger neighborhood.
-    <li><a href="open:Patterns/Gray-Scott/Pearson1993.vti">Gray-Scott/Pearson1993.vti</a>, following
+    <li><a href="open:Patterns/GrayScott1984/Pearson1993.vti">GrayScott1984/Pearson1993.vti</a>, following
     Pearson's 1993 Science paper.
     <li><a href="open:Patterns/SmoothLife2011/smoothglider.vti">SmoothLife2011/smoothglider.vti</a>, Stephan Rafler's
     SmoothLife is a continuous version of Conway's Game of Life. This version has a glider like the one
@@ -241,9 +262,9 @@ stencils. Formula rules no longer need to write e.g. laplacian_a / (delta_x * de
     <li><a href="open:Patterns/SmoothLife2011/glider_3D.vti">SmoothLife2011/glider_3D.vti</a>, a 3D glider in a
     SmoothLife rule.
     <li><a href="open:Patterns/Purwins1999/glider.vti">Purwins1999/glider.vti</a> and <a href="open:Patterns/Purwins1999/glider_3D.vti">glider_3D.vti</a>: self-avoiding gliders in 2D and 3D.
-    <li><a href="open:Patterns/Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti">Gray-Scott/U-Skate/Hutton-and-helix-gliders.vti</a>,
+    <li><a href="open:Patterns/GrayScott1984/U-Skate/Hutton-and-helix-gliders.vti">GrayScott1984/U-Skate/Hutton-and-helix-gliders.vti</a>,
     showing two newly discovered 3D gliders in the U-Skate World.
-    <li><a href="open:Patterns/Gray-Scott/U-Skate/o-ring_2D.vti">Gray-Scott/U-Skate/o-ring_2D.vti</a>,
+    <li><a href="open:Patterns/GrayScott1984/U-Skate/o-ring_2D.vti">GrayScott1984/U-Skate/o-ring_2D.vti</a>,
     showing another glider in the U-Skate World.
   </ul>
 <li>New Laplacian stencils for faster or more accurate time steps: 2D 9-point, 3D 19-point, 3D 27-point.
@@ -309,20 +330,20 @@ or 3D) or mesh dataset (geodesic sphere, torus, tetrahedral mesh, triangular til
 rhombille tiling or Penrose tiling).
 <li> New patterns:
   <ul>
-  <li><a href="open:Patterns/bunny.vtu">bunny.vtu</a>, <a href="open:Patterns/lion.vtu">lion.vtu</a>, showing RD systems running on the surface of polygonal
+  <li><a href="open:Patterns/GrayScott1984/bunny.vtu">bunny.vtu</a>, <a href="open:Patterns/GrayScott1984/lion.vtu">lion.vtu</a>, showing RD systems running on the surface of polygonal
   meshes.
   <li><a href="open:Patterns/CellularAutomata/Bays_3D.vti">Bays_3D.vti</a>, implements a 3D cellular automaton.
   <li><a href="open:Patterns/FitzHugh-Nagumo/Ising_regime.vti">Ising_regime.vti</a>, showing how tiny
   variation can grow into large meanders in the FitzHugh-Nagumo system.
-  <li><a href="open:Patterns/Gray-Scott/U-Skate/Munafo_glider.vti">Gray-Scott/U-Skate/Munafo_glider.vti</a>,
+  <li><a href="open:Patterns/GrayScott1984/U-Skate/Munafo_glider.vti">GrayScott1984/U-Skate/Munafo_glider.vti</a>,
   Robert Munafo's glider after which the U-Skate world is named.
-  <li><a href="open:Patterns/Gray-Scott/parameter-map.vti">Gray-Scott/parameter-map.vti</a>, showing
+  <li><a href="open:Patterns/GrayScott1984/parameter-map.vti">GrayScott1984/parameter-map.vti</a>, showing
   how the parameters affect the Gray-Scott system.
   <li><a href="open:Patterns/Turing1952/spots_noisy.vti">Turing1952/spots_noisy.vti</a>, showing
   the effect of noise on Turing patterns.
-  <li><a href="open:Patterns/Gray-Scott/Lesmes_noisy.vti">Gray-Scott/Lesmes_noisy.vti</a>, showing
+  <li><a href="open:Patterns/GrayScott1984/Lesmes_noisy.vti">GrayScott1984/Lesmes_noisy.vti</a>, showing
   how noise can change the behavior of reaction-diffusion systems.
-  <li><a href="open:Patterns/Gray-Scott/noisy_solitons_mitosis.vti">Gray-Scott/noisy_solitons_mitosis.vti</a>,
+  <li><a href="open:Patterns/GrayScott1984/noisy_solitons_mitosis.vti">GrayScott1984/noisy_solitons_mitosis.vti</a>,
   showing how noise can trigger solitons to replicate.
   <li><a href="open:Patterns/Experiments/mutually-catalytic_spots.vti">mutually-catalytic_spots.vti</a>, where
   big spots can only replicate if full of small spots.

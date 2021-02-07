@@ -1,4 +1,4 @@
-/*  Copyright 2011-2020 The Ready Bunch
+/*  Copyright 2011-2021 The Ready Bunch
 
     This file is part of Ready.
 
@@ -46,14 +46,15 @@ delta_b = D_b * laplacian_b + a*b*b - (F+K)*b;");
 
 // -------------------------------------------------------------------------
 
-std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) const
+std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(const std::string& f) const
 {
     const string indent = "    ";
     const int NC = this->GetNumberOfChemicals();
 
     ostringstream kernel_source;
     kernel_source << fixed << setprecision(6);
-    if( this->data_type == VTK_DOUBLE ) {
+    if( this->data_type == VTK_DOUBLE )
+    {
         kernel_source << "\
 #ifdef cl_khr_fp64\n\
     #pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\
@@ -64,20 +65,22 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
 #endif\n\n";
     }
     // output the function definition
-    kernel_source << "__kernel void rd_compute(";
+    kernel_source << "kernel void rd_compute(";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global " << this->data_type_string << " *" << GetChemicalName(i) << "_in,";
+        kernel_source << "global " << this->data_type_string << " *" << GetChemicalName(i) << "_in,";
     for(int i=0;i<NC;i++)
-        kernel_source << "__global " << this->data_type_string << " *" << GetChemicalName(i) << "_out,";
-    kernel_source << "__global int* neighbor_indices,__global float* neighbor_weights,const int max_neighbors)\n";
+        kernel_source << "global " << this->data_type_string << " *" << GetChemicalName(i) << "_out,";
+    kernel_source << "global int* neighbor_indices,global float* neighbor_weights,const int max_neighbors)\n";
     // output the body
     kernel_source << "{\n";
     kernel_source << indent << "const int index_x = get_global_id(0);\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << this->data_type_string << " " << GetChemicalName(i) << " = " << GetChemicalName(i) << "_in[index_x];\n";
+    kernel_source << "\n";
     // compute the laplacians
+    kernel_source << indent << "// compute the Laplacians\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << this->data_type_string << " laplacian_" << GetChemicalName(i) << " = 0.0" << this->data_type_suffix << ";\n";
+        kernel_source << indent << this->data_type_string << " laplacian_" << GetChemicalName(i) << " = -" << GetChemicalName(i) << ";\n";
     kernel_source << indent << "int _offset = index_x * max_neighbors;\n";
     kernel_source << indent << "for(int _i=0;_i<max_neighbors;_i++)\n" << indent << "{\n";
     for(int i=0;i<NC;i++)
@@ -85,23 +88,26 @@ std::string FormulaOpenCLMeshRD::AssembleKernelSourceFromFormula(std::string f) 
                       << "_in[neighbor_indices[_offset+_i]] * neighbor_weights[_offset+_i];\n";
     kernel_source << indent << "}\n";
     for(int i=0;i<NC;i++)
-        kernel_source << indent << "laplacian_" << GetChemicalName(i) << " -= " << GetChemicalName(i) << ";\n";
-    kernel_source << indent << "// scale the Laplacians to be more similar to the 2D square grid version, so the same parameters work\n";
-    for(int i=0;i<NC;i++)
         kernel_source << indent << "laplacian_" << GetChemicalName(i) << " *= 4.0" << this->data_type_suffix << ";\n"; // TODO: not sure about 3D meshes
+    kernel_source << "\n";
     // the parameters (assume all float for now)
-    kernel_source << "\n" << indent << "// parameters:\n";
-    for(int i=0;i<(int)this->parameters.size();i++)
-        kernel_source << indent << this->data_type_string << " " << this->parameters[i].first << " = " << this->parameters[i].second << this->data_type_suffix << ";\n";
+    kernel_source << indent << "// parameters:\n";
+    for (const Parameter& parameter : this->parameters)
+    {
+        kernel_source << indent << this->data_type_string << " " << parameter.name << " = " << parameter.value << this->data_type_suffix << ";\n";
+    }
     // the update step
-    kernel_source << "\n" << indent << "// update step:\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << this->data_type_string << " delta_" << GetChemicalName(i) << " = 0.0" << this->data_type_suffix << ";\n";
+    kernel_source << "\n" << indent << "// the formula:\n";
     kernel_source << f << "\n";
-    kernel_source << "\n";
+    // the forward-Euler step
+    kernel_source << indent << "// forward-Euler update step:\n";
     for(int i=0;i<NC;i++)
         kernel_source << indent << GetChemicalName(i) << "_out[index_x] = " << GetChemicalName(i) << " + timestep * delta_" << GetChemicalName(i) << ";\n";
+    // finish up
     kernel_source << "}\n";
+
     return kernel_source.str();
 }
 
