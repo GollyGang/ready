@@ -1,0 +1,45 @@
+name: macOS
+
+on: pull_request
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-11.0, macos-10.15]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: git clone
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        brew install vtk wxmac
+        echo "MACOS_QT5_HINT=$(brew --prefix qt5)" >> $GITHUB_ENV
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+
+    - name: Build
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test (with OpenCL)
+      # Run the full suite of tests since OpenCL is available
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: ctest -C $BUILD_TYPE

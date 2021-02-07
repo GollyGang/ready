@@ -29,10 +29,6 @@
 #include <stdexcept>
 using namespace std;
 
-// stdlib:
-#include <stdlib.h>
-#include <time.h>
-
 // Create a new application object: this macro will allow wxWidgets to create
 // the application object during program execution and also implements the
 // accessor function wxGetApp() which will return the reference of the correct

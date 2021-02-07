@@ -23,14 +23,10 @@
 #include "scene_items.hpp"
 #include "utils.hpp"
 
-// stdlib:
-#include <math.h>
-#include <stdlib.h>
-
 // STL:
+#include <algorithm>
 #include <cassert>
 #include <stdexcept>
-#include <algorithm>
 using namespace std;
 
 // VTK:

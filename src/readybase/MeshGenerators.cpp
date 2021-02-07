@@ -15,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
+#define _USE_MATH_DEFINES
+
 // local:
 #include "MeshGenerators.hpp"
 #include "utils.hpp"
@@ -39,12 +41,9 @@
 #include <vtkUnstructuredGrid.h>
 
 // STL:
+#include <cmath>
 #include <vector>
 using namespace std;
-
-// stdlib:
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 // ---------------------------------------------------------------------
 

@@ -19,10 +19,6 @@
 #include "GrayScottImageRD.hpp"
 #include "utils.hpp"
 
-// stdlib:
-#include <stdlib.h>
-#include <math.h>
-
 // STL:
 #include <stdexcept>
 #include <algorithm>

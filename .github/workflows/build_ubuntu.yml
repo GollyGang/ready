@@ -1,0 +1,56 @@
+name: Ubuntu
+
+on: pull_request
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        compiler:
+        - {cc: gcc, cxx: g++}
+        - {cc: clang, cxx: clang++}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: git clone
+      uses: actions/checkout@v2
+
+    - name: Install dependencies (Ubuntu 20.04 and 18.04)
+      if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
+      run: |
+        sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev
+
+    - name: Install dependencies (Ubuntu 16.04)
+      if: matrix.os == 'ubuntu-16.04'
+      run: |
+        sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure CMake
+      env:
+        CC: ${{matrix.compiler.cc}}
+        CXX: ${{matrix.compiler.cxx}}
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test (without OpenCL)
+      # Run a restricted suite of tests since OpenCL is not available
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: ctest -R rdy -C $BUILD_TYPE

@@ -55,6 +55,11 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderWindow.h"
 
+//This is needed for vtk 3.1 :
+#ifndef VTK_MAJOR_VERSION
+#include "vtkVersion.h"
+#endif
+
 #define USE_WXGLCANVAS
 
 #if defined(__WXGTK__) && defined(USE_WXGLCANVAS)

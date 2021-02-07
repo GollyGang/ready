@@ -18,25 +18,15 @@
 // local:
 #include "utils.hpp"
 
-// stdlib:
-#include <time.h>
-#include <stdlib.h>
-#include <math.h>
-#include <limits.h>
-
 // VTK:
 #include <vtkMath.h>
 
 // STL:
-#include <vector>
 #include <algorithm>
+#include <limits>
+#include <random>
+#include <vector>
 using namespace std;
-
-// ---------------------------------------------------------------------------------------------------------
-
-#ifndef SIZE_MAX
-  #define SIZE_MAX ((size_t) - 1)
-#endif
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -74,7 +64,10 @@ double get_time_in_seconds()
 
 float frand(float lower,float upper)
 {
-    return lower + rand()*(upper-lower)/RAND_MAX;
+    random_device rd;
+    default_random_engine re(rd());
+    uniform_real_distribution<float> unif(lower, upper);
+    return unif(re);
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -136,7 +129,7 @@ string trim_multiline_string(const char* s)
     istringstream iss(s);
     string item;
     vector<string> vs;
-    size_t minLeadingWhitespace = SIZE_MAX;
+    size_t minLeadingWhitespace = numeric_limits<size_t>::max();
     while(getline(iss, item, '\n'))
     {
         size_t leadingWhitespace = item.find_first_not_of(" \t");

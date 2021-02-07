@@ -20,11 +20,6 @@
 
 #include "wxVTKRenderWindowInteractor.h"
 
-//This is needed for vtk 3.1 :
-#ifndef VTK_MAJOR_VERSION
-  #include "vtkVersion.h"
-#endif
-
 #if VTK_MAJOR_VERSION > 4 || (VTK_MAJOR_VERSION == 4 && VTK_MINOR_VERSION > 0)
   #include "vtkCommand.h"
 #else
