@@ -13,8 +13,8 @@ jobs:
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, macos-11.0, macos-10.15]
         compiler:
-        - {name: GCC, cc: gcc, cxx: g++}
-        - {name: Clang, cc: clang, cxx: clang++}
+        - {cc: gcc, cxx: g++}
+        - {cc: clang, cxx: clang++}
     runs-on: ${{ matrix.os }}
 
     steps:
