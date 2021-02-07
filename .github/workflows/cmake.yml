@@ -51,9 +51,7 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        echo ${{runner.workspace}}
-        echo cmake $GITHUB_WORKSPACE -DVTK_DIR=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
-        cmake $GITHUB_WORKSPACE -DVTK_DIR=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
+        cmake $GITHUB_WORKSPACE -A Win32 -DVTK_DIR=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
 
     - name: Build
       # Execute the build
