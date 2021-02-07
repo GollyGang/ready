@@ -5,6 +5,7 @@ on: pull_request
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  WXVERSION: 3.1.4
 
 jobs:
   build:
@@ -16,6 +17,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Cache wxWidgets
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-wxWidgets
+      with:
+        path: wxWidgets-${{env.WXVERSION}}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-2
+
+    - name: Compile wxWidgets (for Windows)
+      if: contains(matrix.os, 'windows')
+      run: |
+          if (Test-Path wxWidgets-${{env.WXVERSION}}) { echo "wxWidgets already present"} else {
+             Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip
+             Expand-Archive -LiteralPath wxWidgets-${{env.WXVERSION}}.zip -DestinationPath wxWidgets-${{env.WXVERSION}}
+             cd wxWidgets-${{env.WXVERSION}}
+             cd build
+             cd msw
+             mingw32-make -f makefile.gcc SHELL=cmd.exe SHARED=0 BUILD=release
+             cd ..
+             cd ..
+             cd ..
+          }
 
     - name: Install dependencies (for Windows)
       if: contains(matrix.os, 'windows')
