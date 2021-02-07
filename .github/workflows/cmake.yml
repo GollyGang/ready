@@ -18,11 +18,11 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install dependencies (for Windows)
-      if: matrix.os == 'windows-2019'
+      if: contains(matrix.os, 'windows')
       run: |
         C:\msys64\usr\bin\wget.exe -q https://github.com/GollyGang/ready/releases/download/0.8/VTK-8.1.2_msvc14_x86_shared.7z
         7z x VTK-8.1.2_msvc14_x86_shared.7z
-        VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
+      #VTK_HINT=-DVTK_DIR=$PWD/VTK/lib/cmake/vtk-8.1
 
     - name: Install dependencies (for Ubuntu 20.04 and 18.04)
       if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
@@ -37,7 +37,7 @@ jobs:
         sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
 
     - name: Install dependencies (for macOS)
-      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
+      if: contains(matrix.os, 'macos')
       run: |
         brew install vtk wxmac
         echo "MACOS_QT5_HINT=$(brew --prefix qt5)" >> $GITHUB_ENV
@@ -57,7 +57,7 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Test (with OpenCL)
-      if: matrix.os == 'macos-11.0' || matrix.os == 'macos-10.15'
+      if: contains(matrix.os, 'macos')
       # Run the full suite of tests if OpenCL is available
       working-directory: ${{runner.workspace}}/build
       shell: bash
@@ -65,7 +65,7 @@ jobs:
 
     - name: Test (without OpenCL)
       # Run a restricted suite of tests if OpenCL is not available
-      if: matrix.os != 'macos-11.0' && matrix.os != 'macos-10.15'
+      if: !contains(matrix.os, 'macos')
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: ctest -R rdy -C $BUILD_TYPE
