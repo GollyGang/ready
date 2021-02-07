@@ -17,6 +17,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
 
     - name: Cache wxWidgets
       uses: actions/cache@v2
@@ -28,9 +31,6 @@ jobs:
 
     - name: Compile wxWidgets (for Windows)
       if: contains(matrix.os, 'windows')
-      #uses: ilammy/msvc-dev-cmd@v1
-      #with:
-      #  arch: x86
       run: |
           if (Test-Path wxWidgets-${{env.WXVERSION}}) { echo "wxWidgets already present"} else {
              Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip
