@@ -12,6 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, macos-11.0, macos-10.15, windows-2019, windows-2016]
+        compiler: [gcc, clang]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -89,6 +90,8 @@ jobs:
 
     - name: Configure CMake (non-Windows)
       if: contains(matrix.os, 'ubuntu') || contains(matrix.os, 'macos')
+      env:
+        CC: ${{ matrix.compiler }}
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=${{ env.MACOS_QT5_HINT }}
 
     - name: Configure CMake (Windows)
