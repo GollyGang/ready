@@ -64,8 +64,9 @@ double get_time_in_seconds()
 
 float frand(float lower,float upper)
 {
+    random_device rd;
+    default_random_engine re(rd());
     uniform_real_distribution<float> unif(lower, upper);
-    default_random_engine re;
     return unif(re);
 }
 
