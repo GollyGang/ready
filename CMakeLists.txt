@@ -17,17 +17,11 @@
 #
 #--------------------------------------------------------------------------
 
-cmake_minimum_required( VERSION 2.6 )
-cmake_policy( SET CMP0003 NEW )
-if(POLICY CMP0043)
-  cmake_policy(SET CMP0043 NEW)
-endif()
-if(POLICY CMP0074)
-  cmake_policy(SET CMP0074 NEW)
-endif()
-if(POLICY CMP0057)
-  cmake_policy(SET CMP0057 NEW)
-endif()
+cmake_minimum_required( VERSION 2.8.12...3.5 )
+# - The min version is enforced (older versions of CMake will give an error). Update it when we get
+#   deprecation warnings on any platform - CMake can't maintain backward compatibility indefinitely.
+# - The max version ensures we don't use any CMake features newer than this, in case they break something.
+#   Keep it updated to the newest version that we know works on all platforms.
 
 project( Ready )
 
@@ -49,7 +43,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 #-------------------------------------------source files----------------------------------------------
 
-set( BASE_SOURCES      # low-level code used in all executables
+set( BASE_SOURCES      # core code used in all executables
   src/readybase/AbstractRD.hpp                src/readybase/AbstractRD.cpp
   src/readybase/ImageRD.hpp                   src/readybase/ImageRD.cpp
   src/readybase/GrayScottImageRD.hpp          src/readybase/GrayScottImageRD.cpp
@@ -75,9 +69,8 @@ set( BASE_SOURCES      # low-level code used in all executables
   src/readybase/InitialPatternGenerator.hpp   src/readybase/InitialPatternGenerator.cpp
   src/readybase/colormaps.hpp
 )
-include_directories( src/readybase )
 
-set( GUI_SOURCES      # high-level GUI code used only in Ready
+set( GUI_SOURCES      # GUI code used only in Ready
   src/gui/IDs.hpp
   src/gui/wxutils.hpp                      src/gui/wxutils.cpp
   src/gui/dialogs.hpp                      src/gui/dialogs.cpp
@@ -95,9 +88,8 @@ set( GUI_SOURCES      # high-level GUI code used only in Ready
   src/gui/ImportImageDialog.hpp            src/gui/ImportImageDialog.cpp
   src/gui/MakeNewSystem.hpp                src/gui/MakeNewSystem.cpp
 )
-include_directories( src/gui )
 
-set( CMD_SOURCES      # code used for the command-line version
+set( CMD_SOURCES      # code used only in the command-line version
   src/cmd/main.cpp
   src/extern/cxxopts-2.2.1/cxxopts.hpp  # https://github.com/jarro2783/cxxopts
 )
@@ -113,7 +105,6 @@ set( RESOURCES
   resources/app.icns
   resources/file.icns
 )
-include_directories( resources )
 
 set( PATTERN_FILES
   Patterns/Meinhardt1982/stripes.vti       Patterns/Meinhardt1982/zebra.vtu
@@ -533,6 +524,7 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
+target_include_directories( readybase PUBLIC src/readybase )
 target_link_libraries( readybase ${VTK_LIBRARIES} )
 if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
   vtk_module_autoinit(
@@ -548,6 +540,7 @@ target_link_libraries( ${CMD_NAME} readybase ${CMAKE_DL_LIBS})
 
 # create GUI application
 add_executable( ${APP_NAME} ${GUI_EXECUTABLE} ${GUI_SOURCES} ${RESOURCES} )
+target_include_directories( ${APP_NAME} PRIVATE src/gui resources )
 target_link_libraries( ${APP_NAME} readybase ${wxWidgets_LIBRARIES} )
 
 if( APPLE )
