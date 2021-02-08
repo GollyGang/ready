@@ -421,8 +421,10 @@ endif()
 FIND_PACKAGE( wxWidgets COMPONENTS html aui ${WXGLCANVASLIBS} core adv base REQUIRED)
 INCLUDE( ${wxWidgets_USE_FILE} )
 
-if( WIN32 )
-  # prevent link errors with wxMSW 2.9.x
+if( MSVC )
+  # To avoid link errors in Release build in Visual Studio: unresolved external symbol onAssert
+  # Possibly because we build wxWidgets with static linking?
+  # This flag still allows debugging into wxWidgets code.
   add_definitions( -DwxDEBUG_LEVEL=0 )
 endif()
 
