@@ -5,6 +5,8 @@ on:
     branches:
       - $default-branch
   pull_request:
+    branches:
+      - $default-branch
 
 env:
   WXVERSION: 3.1.4
