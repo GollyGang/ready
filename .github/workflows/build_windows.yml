@@ -3,8 +3,6 @@ name: Windows
 on: pull_request
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: [Debug, Release]
   WXVERSION: 3.1.4
 
 jobs:
@@ -13,6 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2019, windows-2016]
+        build_type: [Debug, Release]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -79,7 +78,7 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE -A Win32 -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+        cmake $GITHUB_WORKSPACE -A Win32 -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
         -DVTK_DIR:PATH=$GITHUB_WORKSPACE/VTK/lib/cmake/vtk-8.1 \
         -DwxWidgets_ROOT_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/ \
         -DwxWidgets_LIB_DIR:PATH=$GITHUB_WORKSPACE/wxWidgets-${{env.WXVERSION}}/lib/vc_lib \
@@ -89,6 +88,6 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config ${{matrix.build_type}}
 
       # (On Windows we can't even run rdy.exe, not sure why, so no tests.)
