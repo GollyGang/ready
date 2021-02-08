@@ -19,9 +19,9 @@
 
 cmake_minimum_required( VERSION 2.6...3.5 )
 # - The min version is enforced (older versions of CMake will give an error). It should be set to the oldest
-#   version that we know works on every platform.
+#   version that we know works with our build on every platform.
 # - The max version tells CMake not to use any CMake features newer than this, in case they break something.
-#   Keep it updated to the newest version that we know works on all platforms.
+#   Keep it updated to the newest version that we know works with our build on all platforms.
 
 project( Ready )
 
