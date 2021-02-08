@@ -3,10 +3,10 @@ name: Windows
 on:
   push:
     branches:
-      - $default-branch
+      - gh-pages
   pull_request:
     branches:
-      - $default-branch
+      - gh-pages
 
 env:
   WXVERSION: 3.1.4

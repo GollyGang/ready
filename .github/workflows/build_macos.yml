@@ -3,10 +3,10 @@ name: macOS
 on:
   push:
     branches:
-      - $default-branch
+      - gh-pages
   pull_request:
     branches:
-      - $default-branch
+      - gh-pages
 
 jobs:
   build:
