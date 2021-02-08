@@ -1,6 +1,10 @@
 name: Windows
 
-on: pull_request
+on:
+  push:
+    branches:
+      - $default-branch
+  pull_request:
 
 env:
   WXVERSION: 3.1.4
