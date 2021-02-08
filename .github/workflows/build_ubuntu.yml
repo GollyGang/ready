@@ -1,10 +1,10 @@
 name: Ubuntu
 
-on: pull_request
-
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+on:
+  push:
+    branches:
+      - $default-branch
+  pull_request:
 
 jobs:
   build:
@@ -12,10 +12,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04]
+        build_type: [Debug, Release]
         compiler:
         - {cc: gcc, cxx: g++}
         - {cc: clang, cxx: clang++}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
 
     steps:
 
@@ -42,15 +43,15 @@ jobs:
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
 
     - name: Build
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config ${{matrix.build_type}}
 
     - name: Test (without OpenCL)
       # Run a restricted suite of tests since OpenCL is not available
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: ctest -R rdy -C $BUILD_TYPE
+      run: ctest -R rdy -C ${{matrix.build_type}}
