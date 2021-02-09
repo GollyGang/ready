@@ -33,7 +33,7 @@ jobs:
     - name: Install dependencies (Ubuntu 16.04)
       if: matrix.os == 'ubuntu-16.04'
       run: |
-        sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev libpocl2
+        sudo apt-get install libvtk6-dev ocl-icd-opencl-dev libgtk2.0-dev libwxgtk3.0-dev
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
@@ -53,7 +53,15 @@ jobs:
       run: cmake --build . --config ${{matrix.build_type}}
 
     - name: Test (with OpenCL)
+      if: matrix.os == 'ubuntu-20.04' || matrix.os == 'ubuntu-18.04'
       # Run the full suite of tests since OpenCL is available
       shell: bash
       working-directory: ${{runner.workspace}}/build
       run: ctest -C ${{matrix.build_type}}
+
+    - name: Test (without OpenCL)
+      if: matrix.os == 'ubuntu-16.04'
+      # Run a restricted suite of tests since OpenCL is not available
+      shell: bash
+      working-directory: ${{runner.workspace}}/build
+      run: ctest -R rdy -C ${{matrix.build_type}}
