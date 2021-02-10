@@ -57,6 +57,8 @@ void printSeparator()
 
 int main(int argc,char *argv[])
 {
+    vtkObject::GlobalWarningDisplayOff();
+
     std::string blurb = "Ready commandline utility that uses readybase as a processing (and data-retrieval) back-end.\n"
                         "\n"
                         "It responds to various commandline arguments to load and print out parts of the system,\n"
@@ -146,8 +148,14 @@ int main(int argc,char *argv[])
         return EXIT_FAILURE;
     }
 
-    const bool is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
+    const bool file_exists = static_cast<bool>(std::ifstream(vti_in));
+    if (!file_exists)
+    {
+        cout << "File does not exist: " << vti_in << endl;
+        return EXIT_FAILURE;
+    }
 
+    const bool is_opencl_available = OpenCL_utils::IsOpenCLAvailable();
     if( is_opencl_available )
     {
         if (verbose)
