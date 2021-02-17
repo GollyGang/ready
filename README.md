@@ -1,10 +1,10 @@
-## Ready &emsp; &emsp; &emsp; [![Windows](https://github.com/GollyGang/ready/workflows/Windows/badge.svg?branch=gh-pages)](https://github.com/GollyGang/ready/actions?query=workflow%3AWindows+branch%3Agh-pages) [![macOS](https://github.com/GollyGang/ready/workflows/macOS/badge.svg?branch=gh-pages)](https://github.com/GollyGang/ready/actions?query=workflow%3AmacOS+branch%3Agh-pages) [![Ubuntu](https://github.com/GollyGang/ready/workflows/Ubuntu/badge.svg?branch=gh-pages)](https://github.com/GollyGang/ready/actions?query=workflow%3AUbuntu+branch%3Agh-pages)
+## Ready ##
 
 Ready is a program for exploring [continuous](http://www.wolframscience.com/nksonline/section-4.8) and discrete cellular automata, including [reaction-diffusion](http://mrob.com/pub/comp/xmorphia/) systems, on grids and arbitrary meshes. [OpenCL](http://en.wikipedia.org/wiki/OpenCL) is used as the computation engine, to take advantage of the [many-core architectures](http://herbsutter.com/welcome-to-the-jungle/) on graphics cards and modern CPUs. OpenCL also allows rules to be written in a text format and compiled on the fly. Ready supports a compact [XML](http://en.wikipedia.org/wiki/XML)-based file format so that images and rules can be shared easily.
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.11.0 here:
+Download Ready 0.11 here:
 
 <!-- To make the icon for this section, see resources/download_icons.html -->
 [![image](https://user-images.githubusercontent.com/647092/106070536-8edff880-60fc-11eb-8574-52d7977b7f9e.png)
@@ -13,7 +13,10 @@ Download Ready 0.11.0 here:
 
 <b>Linux:</b> build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L112-L138) (please ask if you want binaries)
 
-[Online help](https://gollygang.github.io/ready/Help/index.html), [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
+[Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
+
+Build status on the main branch: 
+[![Windows](https://github.com/GollyGang/ready/workflows/Windows/badge.svg?branch=gh-pages)](https://github.com/GollyGang/ready/actions?query=workflow%3AWindows+branch%3Agh-pages) [![macOS](https://github.com/GollyGang/ready/workflows/macOS/badge.svg?branch=gh-pages)](https://github.com/GollyGang/ready/actions?query=workflow%3AmacOS+branch%3Agh-pages) [![Ubuntu](https://github.com/GollyGang/ready/workflows/Ubuntu/badge.svg?branch=gh-pages)](https://github.com/GollyGang/ready/actions?query=workflow%3AUbuntu+branch%3Agh-pages)
 
 For questions, [join our mailing list](https://groups.google.com/forum/#!forum/reaction-diffusion). Or you can email [tim.hutton@gmail.com](mailto:tim.hutton@gmail.com).
 
