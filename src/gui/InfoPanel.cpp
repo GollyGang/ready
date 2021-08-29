@@ -278,7 +278,7 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     rownum++;
 
     if (is_editable) {
-        result += _T("<td valign=top align=right><a href=\"");
+        result += _T("<td valign=top><a href=\"");
         result += HtmlInfo::change_prefix;
         result += label;
         result += _T("\">");
@@ -290,12 +290,12 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     }
 
     if (is_multiline) {
-        result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
+        result += _T("<td width=3></td><td valign=top width=\"40%\"><b>");
         result += print_label;
         result += _T("</b></td><td valign=top width=\"100%\"></td>");
         // see below for how value is formatted
     } else {
-        result += _T("<td width=3></td><td valign=top width=\"45%\"><b>");
+        result += _T("<td width=3></td><td valign=top width=\"40%\"><b>");
         result += print_label;
         result += _T("</b></td><td valign=top width=\"100%\">");
         if (color.empty()) {
@@ -316,11 +316,18 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
     result += _T("<td width=3></td></tr>");
 
     if (is_multiline) {
+        // end above table and start another; this avoids formatting problems
+        // due to use of colspan (probably due to bug in wxHTML)
+        result += _T("</table><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
+        
         // put text in a new row that spans all columns
         result += (rownum & 1) ? _T("<tr>") : _T("<tr bgcolor=\"#F0F0F0\">");
-        result += _T("<td width=3></td><td colspan=3>");
+        result += _T("<td width=3></td><td>");
         result += value;
         result += _T("<br></td><td width=3></td></tr>");
+        
+        // end above table and start another
+        result += _T("</table><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
     }
 
     return result;
