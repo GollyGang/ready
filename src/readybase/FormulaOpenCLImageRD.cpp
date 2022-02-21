@@ -22,6 +22,7 @@
 
 // STL:
 #include <algorithm>
+#include <cmath>
 #include <set>
 #include <sstream>
 #include <string>
