@@ -11,7 +11,15 @@ Download Ready 0.11 here:
 ](https://github.com/GollyGang/ready/releases/download/0.11.0/Ready-0.11.0-Windows-64bit.zip)
 [![image](https://user-images.githubusercontent.com/647092/106070568-9bfce780-60fc-11eb-84f5-9699b44b3a65.png)](https://github.com/GollyGang/ready/releases/download/0.11.0/Ready-0.11.4-Mac.dmg)
 
-<b>Linux:</b> build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L95-L122) (please ask if you want binaries)
+<b>Linux:</b>
+```
+sudo apt-get install libgtk-3-dev libxt-dev ocl-icd-opencl-dev libglu1-mesa-dev libvtk7-dev libwxgtk3.0-gtk3-dev cmake-curses-gui build-essential git
+git clone https://github.com/GollyGang/ready.git
+cd ready
+cmake -DCMAKE_BUILD_TYPE=Release .
+make
+```
+Full build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L95-L122) (please ask if you want binaries)
 
 [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
