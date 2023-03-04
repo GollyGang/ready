@@ -4,7 +4,7 @@ Ready is a program for exploring [continuous](http://www.wolframscience.com/nkso
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
-Download Ready 0.11 here:
+### Download Ready 0.11: ###
 
 <!-- To make the icon for this section, see resources/download_icons.html -->
 [![image](https://user-images.githubusercontent.com/647092/106070536-8edff880-60fc-11eb-8574-52d7977b7f9e.png)
@@ -20,6 +20,8 @@ cmake -DCMAKE_BUILD_TYPE=Release .
 make
 ```
 Full build instructions in [BUILD.txt](https://github.com/GollyGang/ready/blob/gh-pages/BUILD.txt#L95-L122) (please ask if you want binaries)
+
+### About Ready: ###
 
 [Changes](https://GollyGang.github.io/ready/Help/changes.html), [To-do list](https://GollyGang.github.io/ready/TODO.txt), [Credits](https://GollyGang.github.io/ready/Help/credits.html)
 
