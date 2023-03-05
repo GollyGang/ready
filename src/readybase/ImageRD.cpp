@@ -416,7 +416,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     int iFirstChem = 0;
     int iLastChem = this->GetNumberOfChemicals() - 1;
     if(!show_multiple_chemicals)
-    { 
+    {
         if (plot_ab_orthogonally && iActiveChemical < 2)
         {
             iFirstChem = 0;
@@ -430,7 +430,7 @@ void ImageRD::InitializeVTKPipeline_1D(vtkRenderer* pRenderer,const Properties& 
     }
 
     float scaling = vertical_scale_1D / (high-low); // vertical_scale gives the height of the graph in worldspace units
-    const float image_height = this->GetX() / this->image_ratio1D; // we thicken it 
+    const float image_height = this->GetX() / this->image_ratio1D; // we thicken it
     const float y_gap = image_height;
 
     vtkSmartPointer<vtkScalarsToColors> lut = GetColorMap(render_settings);
@@ -937,7 +937,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             threshold->SetInputArrayToProcess(0, 0, 0,
                 vtkDataObject::FIELD_ASSOCIATION_CELLS,
                 vtkDataSetAttributes::SCALARS);
-            threshold->ThresholdByUpper(contour_level);
+            threshold->SetUpperThreshold(contour_level);
 
             vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
             geometry->SetInputConnection(threshold->GetOutputPort());
@@ -1374,7 +1374,7 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
                 threshold->SetInputArrayToProcess(0, 0, 0,
                     vtkDataObject::FIELD_ASSOCIATION_CELLS,
                     vtkDataSetAttributes::SCALARS);
-                threshold->ThresholdByUpper(contour_level);
+                threshold->SetUpperThreshold(contour_level);
 
                 vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
                 transform->Translate (-.5, -.5, -.5);
