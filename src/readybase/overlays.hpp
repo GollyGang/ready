@@ -19,6 +19,7 @@
 #define __OVERLAYS__
 
 // STL:
+#include <memory>
 #include <string>
 #include <vector>
 
