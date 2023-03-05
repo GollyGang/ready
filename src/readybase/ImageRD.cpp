@@ -937,7 +937,7 @@ void ImageRD::InitializeVTKPipeline_3D(vtkRenderer* pRenderer,const Properties& 
             threshold->SetInputArrayToProcess(0, 0, 0,
                 vtkDataObject::FIELD_ASSOCIATION_CELLS,
                 vtkDataSetAttributes::SCALARS);
-            threshold->SetUpperThreshold(contour_level);
+            threshold->ThresholdByUpper(contour_level);
 
             vtkSmartPointer<vtkGeometryFilter> geometry = vtkSmartPointer<vtkGeometryFilter>::New();
             geometry->SetInputConnection(threshold->GetOutputPort());
@@ -1374,7 +1374,7 @@ void ImageRD::GetAsMesh(vtkPolyData *out, const Properties &render_settings) con
                 threshold->SetInputArrayToProcess(0, 0, 0,
                     vtkDataObject::FIELD_ASSOCIATION_CELLS,
                     vtkDataSetAttributes::SCALARS);
-                threshold->SetUpperThreshold(contour_level);
+                threshold->ThresholdByUpper(contour_level);
 
                 vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
                 transform->Translate (-.5, -.5, -.5);
