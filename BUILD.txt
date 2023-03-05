@@ -15,9 +15,7 @@ A) Build VTK:
    to whichever version you have installed (e.g. 2019 x64).
  - Ensure BUILD_SHARED_LIBS is off.
  - Ensure BUILD_TESTING is off (saves time).
- - Check the Advanced checkbox. Look for CMAKE_CXX_* and CMAKE_C_*. Change all
-   occurences of /MD to /MT, and /MDd to /MTd. This ensures that the C runtime
-   is statically-linked, so we don't need to distribute it.
+ - Add Entry: CMAKE_MSVC_RUNTIME_LIBRARY (string) = MultiThreaded$<$<CONFIG:Debug>:Debug>
  - Hit Configure again.
  - Hit Generate, then open the resulting VTK.sln and build the Debug and
    Release targets.
@@ -55,13 +53,10 @@ A) Build VTK:
  - Type: cmake-gui
  - Create a target build folder, and select NMake Makefiles as the
    generator.
- - Ensure BUILD_SHARED_LIBS is off.
- - Ensure BUILD_TESTING to off (saves time).
- - Check the Advanced checkbox. Look for CMAKE_CXX_FLAGS_RELEASE and
-   similar. Change all occurences of /MD to /MT, and /MDd to /MTd.
-   This ensures that the C runtime is statically-linked, so we don't
-   need to distribute it.
  - Set CMAKE_BUILD_TYPE to Release
+ - Ensure BUILD_SHARED_LIBS is off.
+ - Ensure BUILD_TESTING is off (saves time).
+ - Add Entry: CMAKE_MSVC_RUNTIME_LIBRARY (string) = MultiThreaded$<$<CONFIG:Debug>:Debug>
  - Configure, Generate, then close CMake and build with NMake from
    the build folder: nmake
 
