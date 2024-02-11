@@ -3,23 +3,27 @@
   <RD format_version="6">
 
     <description>
-        A model of hydraulic erosion by Ricky Reusser
+        A model of hydraulic erosion by Ricky Reusser.
 
         https://mathstodon.xyz/@rreusser/111913990129998428
+
+        Parameter h controls how much noise to add to the gradient.
     </description>
 
     <rule name="erosion" type="formula" wrap="0">
       <param name="timestep">   0.4    </param>
       <param name="dx">         1.0    </param>
+      <param name="e">          1.5   </param>
       <param name="f">          0.02   </param>
       <param name="g">          1.0    </param>
-      <param name="h">          1.0    </param>
+      <param name="h">          0.5    </param>
       <formula number_of_chemicals="2">
-        delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), 1.5) * b;
+        delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e) * (1.0f + h * (b - 1.0f));
       </formula>
     </rule>
 
     <initial_pattern_generator apply_when_loading="true">
+      <!-- We start with a smooth terrain made from sines and cosines -->
       <overlay chemical="a">
         <overwrite />
         <constant value="0.2" />
@@ -27,7 +31,14 @@
       </overlay>
       <overlay chemical="a">
         <add />
-        <sine amplitude="0.04" phase="0.0">
+        <gaussian height="1" sigma="0.2">
+          <point3d x="0.5" y="0.5" z="0.5" />
+        </gaussian>
+        <everywhere />
+      </overlay>
+      <overlay chemical="a">
+        <add />
+        <sine amplitude="0.1" phase="0.0">
           <point3d x="0" y="0.5" z="0" />
           <point3d x="0.5" y="0.5" z="0" />
         </sine>
@@ -35,25 +46,19 @@
       </overlay>
       <overlay chemical="a">
         <add />
-        <sine amplitude="0.04" phase="0.0">
+        <sine amplitude="0.1" phase="0.0">
           <point3d x="0.5" y="0" z="0" />
           <point3d x="0.5" y="0.5" z="0" />
         </sine>
         <everywhere />
       </overlay>
-      <overlay chemical="a">
-        <add />
-        <gaussian height="0.2" sigma="0.3">
-          <point3d x="0.5" y="0.5" z="0.5" />
-        </gaussian>
-        <everywhere />
-      </overlay>
-      <overlay chemical="b"> <add /> <white_noise low="0.0" high="0.9" /> <everywhere /> </overlay>
+      <!-- A second chemical stores a white noise image that doesn't change -->
+      <overlay chemical="b"> <add /> <white_noise low="0.0" high="1.0" /> <everywhere /> </overlay>
     </initial_pattern_generator>
 
     <render_settings>
       <low value="0" />
-      <high value="0.5" />
+      <high value="1.5" />
       <timesteps_per_render value="32" />
       <show_displacement_mapped_surface value="true" />
       <vertical_scale_2D value="150" />
