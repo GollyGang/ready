@@ -9,26 +9,55 @@
     </description>
 
     <rule name="erosion" type="formula" wrap="0">
-      <param name="timestep">   0.001  </param>
+      <param name="timestep">   0.4    </param>
       <param name="dx">         1.0    </param>
-      <param name="f">          1.0    </param>
-      <param name="g">          8.0    </param>
-      <param name="e">          1.5    </param>
-      <formula number_of_chemicals="1">
-        delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e);
+      <param name="f">          0.02   </param>
+      <param name="g">          1.0    </param>
+      <param name="h">          1.0    </param>
+      <formula number_of_chemicals="2">
+        delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), 1.5) * b;
       </formula>
     </rule>
 
     <initial_pattern_generator apply_when_loading="true">
-      <overlay chemical="a"> <add /> <white_noise low="-2.0" high="0.0" /> <everywhere /> </overlay>
+      <overlay chemical="a">
+        <overwrite />
+        <constant value="0.2" />
+        <everywhere />
+      </overlay>
+      <overlay chemical="a">
+        <add />
+        <sine amplitude="0.04" phase="0.0">
+          <point3d x="0" y="0.5" z="0" />
+          <point3d x="0.5" y="0.5" z="0" />
+        </sine>
+        <everywhere />
+      </overlay>
+      <overlay chemical="a">
+        <add />
+        <sine amplitude="0.04" phase="0.0">
+          <point3d x="0.5" y="0" z="0" />
+          <point3d x="0.5" y="0.5" z="0" />
+        </sine>
+        <everywhere />
+      </overlay>
+      <overlay chemical="a">
+        <add />
+        <gaussian height="0.2" sigma="0.3">
+          <point3d x="0.5" y="0.5" z="0.5" />
+        </gaussian>
+        <everywhere />
+      </overlay>
+      <overlay chemical="b"> <add /> <white_noise low="0.0" high="0.9" /> <everywhere /> </overlay>
     </initial_pattern_generator>
 
     <render_settings>
-      <low value="-5" />
-      <high value="-2" />
-      <timesteps_per_render value="256" />
+      <low value="0" />
+      <high value="0.5" />
+      <timesteps_per_render value="32" />
       <show_displacement_mapped_surface value="true" />
       <vertical_scale_2D value="150" />
+      <show_multiple_chemicals value="false" />
     </render_settings>
 
   </RD>
@@ -36,6 +65,9 @@
   <Piece Extent="0 255 0 255 0 0">
     <PointData>
       <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
         CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
       </DataArray>
     </PointData>
