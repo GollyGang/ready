@@ -32,7 +32,7 @@
         delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e) * (1.0f + h * (b - 1.0f));
       </formula>
     </rule>
-    <initial_pattern_generator apply_when_loading="false" zero_first="false">
+    <initial_pattern_generator apply_when_loading="true" zero_first="false">
       <overlay chemical="a">
         <overwrite/>
         <constant value="0.2"/>
@@ -59,11 +59,6 @@
           <point3D x="0.5" y="0" z="0"/>
           <point3D x="0.5" y="0.5" z="0"/>
         </sine>
-        <everywhere/>
-      </overlay>
-      <overlay chemical="b">
-        <overwrite/>
-        <white_noise low="0" high="1"/>
         <everywhere/>
       </overlay>
     </initial_pattern_generator>
