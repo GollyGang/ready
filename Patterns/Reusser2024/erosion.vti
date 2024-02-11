@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
+  <RD format_version="6">
+
+    <description>
+        A model of hydraulic erosion by Ricky Reusser
+
+        https://mathstodon.xyz/@rreusser/111913990129998428
+    </description>
+
+    <rule name="erosion" type="formula" wrap="0">
+      <param name="timestep">   0.001  </param>
+      <param name="dx">         1.0    </param>
+      <param name="f">          1.0    </param>
+      <param name="g">          8.0    </param>
+      <param name="e">          2.0    </param>
+      <formula number_of_chemicals="1">
+        delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e);
+      </formula>
+    </rule>
+
+    <initial_pattern_generator apply_when_loading="true">
+      <overlay chemical="a"> <add /> <white_noise low="-2.0" high="0.0" /> <everywhere /> </overlay>
+    </initial_pattern_generator>
+
+    <render_settings>
+      <low value="-5" />
+      <high value="-2" />
+      <timesteps_per_render value="256" />
+      <show_displacement_mapped_surface value="true" />
+      <vertical_scale_2D value="150" />
+    </render_settings>
+
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1" Direction="1 0 0 0 1 0 0 0 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>
+
