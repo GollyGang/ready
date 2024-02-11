@@ -13,7 +13,7 @@
       <param name="dx">         1.0    </param>
       <param name="f">          1.0    </param>
       <param name="g">          8.0    </param>
-      <param name="e">          2.0    </param>
+      <param name="e">          1.5    </param>
       <formula number_of_chemicals="1">
         delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e);
       </formula>
