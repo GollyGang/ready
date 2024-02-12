@@ -9,7 +9,7 @@ on:
       - gh-pages
 
 env:
-  WXVERSION: 3.1.4
+  WXVERSION: 3.2.4
 
 jobs:
   build:
