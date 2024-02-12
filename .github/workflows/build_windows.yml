@@ -33,7 +33,7 @@ jobs:
     - name: Cache wxWidgets (Release)
       if: matrix.build_type == 'Release'
       id: cache-wxwidgets-release
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: wxWidgets-${{env.WXVERSION}}
         key: ${{runner.os}}-build-wxWidgets-release
