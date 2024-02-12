@@ -50,4 +50,4 @@ jobs:
     - name: Test
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: ctest -C ${{matrix.build_type}}
+      run: ctest -C ${{matrix.build_type}} --rerun-failed --output-on-failure
