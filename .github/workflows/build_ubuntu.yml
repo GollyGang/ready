@@ -49,6 +49,6 @@ jobs:
 
     - name: Test (without OpenCL)
       shell: bash
-      working-directory: ${{runner.workspace}}/buildrun
+      working-directory: ${{runner.workspace}}/build
       # run: ctest -C ${{matrix.build_type}} --rerun-failed --output-on-failure # OpenCL tests (disabled for now)
       run: ctest -R rdy -C ${{matrix.build_type}} --rerun-failed --output-on-failure
