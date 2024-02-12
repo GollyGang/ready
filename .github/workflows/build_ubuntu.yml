@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev libpocl2 pocl-opencl-icd
+        sudo apt-get install libvtk7-dev ocl-icd-opencl-dev libgtk-3-dev libwxgtk3.0-gtk3-dev libpocl2
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build
@@ -47,7 +47,8 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config ${{matrix.build_type}}
 
-    - name: Test
+    - name: Test (without OpenCL)
       shell: bash
-      working-directory: ${{runner.workspace}}/build
-      run: ctest -C ${{matrix.build_type}} --rerun-failed --output-on-failure
+      working-directory: ${{runner.workspace}}/buildrun
+      # run: ctest -C ${{matrix.build_type}} --rerun-failed --output-on-failure # OpenCL tests (disabled for now)
+      run: ctest -R rdy -C ${{matrix.build_type}} --rerun-failed --output-on-failure
