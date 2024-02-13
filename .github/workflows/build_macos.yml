@@ -22,7 +22,7 @@ jobs:
     - name: git clone
       uses: actions/checkout@v4
 
-    - name: Workaround: Remove links before installing python3
+    - name: Remove links before installing python3
       run: |
         rm '/usr/local/bin/2to3-3.12'
         rm '/usr/local/bin/2to3'
