@@ -22,8 +22,11 @@ jobs:
     - name: git clone
       uses: actions/checkout@v4
 
-    - name: Unlink 2to3 before installing python3
-      run: rm '/usr/local/bin/2to3-3.12'
+    - name: Workaround: Remove links before installing python3
+      run: |
+        rm '/usr/local/bin/2to3-3.12'
+        rm '/usr/local/bin/2to3'
+        rm '/usr/local/bin/idle3.12'
 
     - name: Install dependencies
       run: |
