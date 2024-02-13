@@ -22,11 +22,13 @@ jobs:
     - name: git clone
       uses: actions/checkout@v4
 
-    - name: Remove links before installing python3
+    - name: Remove links before installing python3, else get brew install errors sometimes
       run: |
-        rm '/usr/local/bin/2to3-3.12'
         rm '/usr/local/bin/2to3'
+        rm '/usr/local/bin/2to3-3.11'
+        rm '/usr/local/bin/2to3-3.12'
         rm '/usr/local/bin/idle3.12'
+        rm '/usr/local/bin/pydoc3.12'
 
     - name: Install dependencies
       run: |
