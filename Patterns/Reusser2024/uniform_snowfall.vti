@@ -2,11 +2,10 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="6">
     <description>
-      A model of hydraulic erosion by Ricky Reusser.
+      In this example, 'b' has -0.4 everywhere. Now the height increases in areas of higher gradient, producing
+      rounded mounds. See these lecture notes on the KPZ equation: &lt;a href=&quot;https://www.mit.edu/~kardar/research/seminars/Growth/talks/Kyoto/KPZ.html&quot;&gt;https://www.mit.edu/~kardar/research/seminars/Growth/talks/Kyoto/KPZ.html&lt;/a&gt;
 
-      https://mathstodon.xyz/@rreusser/111913990129998428
-
-      Parameter h controls how much noise to add to the gradient.
+      Compare to the heat equation by setting parameter 'g' to zero.
 
     </description>
     <rule name="erosion" type="formula" wrap="0" neighborhood_type="vertex">
