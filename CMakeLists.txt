@@ -263,6 +263,7 @@ set( PATTERN_FILES
   Patterns/KortewegDeVries1895/kdv.vti
   Patterns/Reusser2024/erosion.vti
   Patterns/Reusser2024/uniform_snowfall.vti
+  Patterns/Reusser2024/drainage_erosion.vti
 )
 
 set( HELP_FILES
