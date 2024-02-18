@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <RD format_version="6">
+    <description>
+      Erosion weighted by the drainage area, by simulating runoff. This method is discussed here: &lt;a href=&quot;https://hal.science/hal-04049125v1/document&quot;&gt;https://hal.science/hal-04049125v1/document&lt;/a&gt;
+
+      See &lt;a href=&quot;open:Patterns/KardarParisiZhang1986/erosion.vti&quot;&gt;erosion.vti&lt;/a&gt; for a simpler implementation of erosion.
+
+      Channel a is the height of the surface.
+
+      Channel b is the estimate of the drainage area (the area of the watershed) of each point.
+
+      Channel c is the uplift pattern.
+
+      Channel d is a noise image used to add randomness to the result.
+    </description>
+    <rule name="drainage" type="kernel" neighborhood_type="vertex">
+      <kernel number_of_chemicals="4" block_size_x="1" block_size_y="1" block_size_z="1">
+        float slope(float h_i, float h_j, int ix, int iy, int jx, int jy)
+        {
+            const float d_i_j = sqrt( pow(ix - jx, 2.0f) + pow(iy - jy, 2.0f));
+            return (h_i - h_j) / d_i_j;
+        }
+
+        kernel void rd_compute(global float *a_in,global float *b_in,global float *c_in,global float *d_in,
+                               global float *a_out,global float *b_out,global float *c_out,global float *d_out)
+        {
+            // parameters:
+            const float timestep = 0.4f;
+            const float dx = 1.0f;
+            const float e = 1.5f;
+            const float f = 0.02f;
+            const float g = 1.0f;
+            const float h = 1.0f;
+            const float p = 2.0f;
+
+            // indices:
+            const int ix = get_global_id(0);
+            const int iy = get_global_id(1);
+            const int iz = get_global_id(2);
+            const int X = get_global_size(0);
+            const int Y = get_global_size(1);
+            const int Z = get_global_size(2);
+            const int index_i = X*(Y*iz + iy) + ix;
+            float a = a_in[index_i];
+
+            // cells needed:
+            const float a_sw = a_in[X* (Y * iz + min(Y-1, max(0, iy-1))) + min(X-1, max(0, ix-1))];
+            const float a_w = a_in[X* (Y * iz + iy) + min(X-1, max(0, ix-1))];
+            const float a_nw = a_in[X* (Y * iz + min(Y-1, max(0, iy+1))) + min(X-1, max(0, ix-1))];
+            const float a_s = a_in[X* (Y * iz + min(Y-1, max(0, iy-1))) + ix];
+            const float a_n = a_in[X* (Y * iz + min(Y-1, max(0, iy+1))) + ix];
+            const float a_se = a_in[X* (Y * iz + min(Y-1, max(0, iy-1))) + min(X-1, max(0, ix+1))];
+            const float a_e = a_in[X* (Y * iz + iy) + min(X-1, max(0, ix+1))];
+            const float a_ne = a_in[X* (Y * iz + min(Y-1, max(0, iy+1))) + min(X-1, max(0, ix+1))];
+
+            // keywords needed:
+            const float x_gradient_a = (-1 * a_w + a_e) / (2 * dx);
+            const float y_gradient_a = (-1 * a_s + a_n) / (2 * dx);
+            const float laplacian_a = (-20 * a + a_nw + a_ne + a_sw + a_se + 4 * (a_n + a_w + a_e + a_s)) / (6 * dx * dx);
+            const float gradient_mag_squared_a = pow(x_gradient_a, 2.0f) + pow(y_gradient_a, 2.0f);
+            float delta_a = 0.0f;
+
+            float new_b = 0.00025f; // rainfall
+            const float h_i = a;
+            // for each 8-neighbor j that is higher than i:
+            for(int jx = max(0, ix-1); jx &lt;= min(X-1, ix+1); jx++) {
+                for(int jy = max(0, iy-1); jy &lt;= min(Y-1, iy+1); jy++) {
+                    const int index_j = X * jy + jx;
+                    const float h_j = a_in[index_j];
+                    if(h_j &gt; h_i) {
+                        // compute w_i_j, the fraction of j&apos;s water that flows to i
+                        const float s_j_i_p = pow( slope( h_j, h_i, jx, jy, ix, iy), p );
+                        // for each 8-neighbor k of j that is lower than j:
+                        float sumbelow_s_j_k_p = 0.0f;
+                        for(int kx = max(0, jx-1); kx &lt;= min(X-1, jx+1); kx++) {
+                            for(int ky = max(0, jy-1); ky &lt;= min(Y-1, jy+1); ky++) {
+                                const int index_k = X * ky + kx;
+                                const float h_k = a_in[index_k];
+                                if(h_k &lt; h_j) {
+                                    const float s_j_k_p = pow( slope( h_j, h_k, jx, jy, kx, ky), p );
+                                    sumbelow_s_j_k_p += s_j_k_p;
+                                }
+                            }
+                        }
+                        const float w_i_j = s_j_i_p / sumbelow_s_j_k_p;
+                        // add to our central cell the amount of water that flows from j
+                        new_b += w_i_j * b_in[index_j];
+                    }
+                }
+            }
+            new_b = min(new_b, 0.4f);
+
+            // the PDE for erosion:
+            const float uplift = 0.0005f * c_in[index_i];
+            delta_a = uplift + f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e) * (1.0f + h * (new_b + d_in[index_i]*0.4f - 1.0f));
+
+            a_out[index_i] = a + timestep * delta_a;   // forward-Euler update step
+            b_out[index_i] = new_b;
+
+            // TODO: if() -&gt; multiply to zero instead
+            // TODO: find a PDE formulation for the drainage model
+        }
+      </kernel>
+    </rule>
+    <initial_pattern_generator apply_when_loading="true" zero_first="true">
+      <!-- c is the uplift image -->
+      <overlay chemical="c">
+        <overwrite/>
+        <constant value="-0.05" />
+        <everywhere/>
+      </overlay>
+      <overlay chemical="c">
+        <add/>
+        <gaussian height="1.1" sigma="0.3">
+          <point3D x="0.6" y="0.6" z="0.5"/>
+        </gaussian>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="c">
+        <add/>
+        <sine phase="0" amplitude="0.1">
+          <point3D x="0" y="0.5" z="0"/>
+          <point3D x="0.6" y="0.5" z="0"/>
+        </sine>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="c">
+        <add/>
+        <sine phase="0" amplitude="0.1">
+          <point3D x="0.5" y="0" z="0"/>
+          <point3D x="0.5" y="0.6" z="0"/>
+        </sine>
+        <everywhere/>
+      </overlay>
+      <!-- a is initialized with a copy of the uplift pattern -->
+      <overlay chemical="a">
+        <overwrite />
+        <other_chemical chemical="c" />
+        <everywhere />
+      </overlay>
+      <!-- d is a noise image -->
+      <overlay chemical="d">
+        <overwrite />
+        <perlin_noise scale="16" num_octaves="8" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1"/>
+      <colormap value="spectral"/>
+      <color_low r="0" g="0" b="1"/>
+      <color_high r="1" g="0" b="0"/>
+      <show_color_scale value="true"/>
+      <show_multiple_chemicals value="true"/>
+      <active_chemical value="a"/>
+      <low value="0"/>
+      <high value="1.5"/>
+      <vertical_scale_1D value="30"/>
+      <vertical_scale_2D value="150"/>
+      <contour_level value="0.25"/>
+      <cap_contour value="true"/>
+      <invert_contour_cap value="false"/>
+      <use_wireframe value="false"/>
+      <show_cell_edges value="false"/>
+      <show_bounding_box value="true"/>
+      <show_chemical_label value="true"/>
+      <slice_3D value="true"/>
+      <slice_3D_axis value="z"/>
+      <slice_3D_position value="0.5"/>
+      <show_displacement_mapped_surface value="true"/>
+      <color_displacement_mapped_surface value="false"/>
+      <use_image_interpolation value="true"/>
+      <timesteps_per_render value="32"/>
+      <show_phase_plot value="false"/>
+      <phase_plot_x_axis value="a"/>
+      <phase_plot_y_axis value="b"/>
+      <phase_plot_z_axis value="c"/>
+      <plot_ab_orthogonally value="false"/>
+    </render_settings>
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1" Direction="1 0 0 0 1 0 0 0 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="c" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="d" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

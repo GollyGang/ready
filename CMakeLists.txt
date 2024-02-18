@@ -262,9 +262,9 @@ set( PATTERN_FILES
   Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves.vti
   Patterns/KuramotoSivashinsky1978/Kuramoto-Sivashinsky_travelling_waves2.vti
   Patterns/KortewegDeVries1895/kdv.vti
-  Patterns/Reusser2024/erosion.vti
-  Patterns/Reusser2024/uniform_snowfall.vti
-  Patterns/Reusser2024/drainage_erosion.vti
+  Patterns/KardarParisiZhang1986/erosion.vti
+  Patterns/KardarParisiZhang1986/uniform_snowfall.vti
+  Patterns/KardarParisiZhang1986/drainage_erosion.vti
 )
 
 set( HELP_FILES
