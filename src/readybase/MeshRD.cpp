@@ -147,6 +147,11 @@ void MeshRD::GenerateInitialPattern()
         this->BlankImage();
     }
 
+    for (size_t iOverlay = 0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
+    {
+        this->initial_pattern_generator.GetOverlay(iOverlay).Reseed();
+    }
+
     float cp[3];
     double *bounds = this->mesh->GetBounds();
     for(vtkIdType iCell=0;iCell<this->mesh->GetNumberOfCells();iCell++)

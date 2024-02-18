@@ -18,6 +18,7 @@
 // local:
 #include "overlays.hpp"
 #include "ImageRD.hpp"
+#include "PerlinNoise.hpp"
 #include "utils.hpp"
 
 // VTK:
@@ -344,6 +345,45 @@ class WhiteNoise : public BaseFill
     protected:
 
         double low,high;
+};
+
+class PerlinNoise: public BaseFill
+{
+    public:
+
+        PerlinNoise(vtkXMLDataElement* node) : BaseFill(node), scale(64.0), num_octaves(8)
+        {
+            read_optional_attribute(node, "scale", this->scale);
+            read_optional_attribute(node, "num_octaves", this->num_octaves);
+        }
+
+        void Reseed()
+        {
+            this->perlin.reseed(static_cast<unsigned int>(time(NULL)));
+        }
+
+        static const char* GetTypeName() { return "perlin_noise"; }
+
+        vtkSmartPointer<vtkXMLDataElement> GetAsXML() const override
+        {
+            vtkSmartPointer<vtkXMLDataElement> xml = vtkSmartPointer<vtkXMLDataElement>::New();
+            xml->SetName(PerlinNoise::GetTypeName());
+            xml->SetFloatAttribute("scale",this->scale);
+            xml->SetIntAttribute("num_octaves",this->num_octaves);
+            return xml;
+        }
+
+        double GetValue(const AbstractRD& system, const vector<double>& vals, float x, float y, float z) const override
+        {
+            return this->perlin.octave3D_01((x / this->scale), (y / this->scale), (z / this->scale), this->num_octaves);
+        }
+
+    protected:
+
+        double scale;
+        int num_octaves;
+
+        siv::PerlinNoise perlin;
 };
 
 class LinearGradient : public BaseFill
@@ -705,6 +745,7 @@ class Pixel : public BaseShape
     string name(node->GetName());
     if(name==Constant::GetTypeName())             return make_unique<Constant>(node);
     else if(name==WhiteNoise::GetTypeName())      return make_unique<WhiteNoise>(node);
+    else if(name==PerlinNoise::GetTypeName())     return make_unique<PerlinNoise>(node);
     else if(name==OtherChemical::GetTypeName())   return make_unique<OtherChemical>(node);
     else if(name==Parameter::GetTypeName())       return make_unique<Parameter>(node);
     else if(name==LinearGradient::GetTypeName())  return make_unique<LinearGradient>(node);

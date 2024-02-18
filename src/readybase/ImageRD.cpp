@@ -308,6 +308,11 @@ void ImageRD::GenerateInitialPattern()
     const int Y = this->images.front()->GetDimensions()[1];
     const int Z = this->images.front()->GetDimensions()[2];
 
+    for (size_t iOverlay = 0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
+    {
+        this->initial_pattern_generator.GetOverlay(iOverlay).Reseed();
+    }
+
     for(int z=0;z<Z;z++)
     {
         for(int y=0;y<Y;y++)

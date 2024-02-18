@@ -37,7 +37,7 @@ else()
 endif()
 set( CMD_NAME rdy ) # command-line version
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -68,6 +68,7 @@ set( BASE_SOURCES      # core code used in all executables
   src/readybase/scene_items.hpp               src/readybase/scene_items.cpp
   src/readybase/InitialPatternGenerator.hpp   src/readybase/InitialPatternGenerator.cpp
   src/readybase/colormaps.hpp
+  src/extern/PerlinNoise.hpp
 )
 
 set( GUI_SOURCES      # GUI code used only in Ready
@@ -529,7 +530,7 @@ endif()
 
 # create base library used by all executables
 add_library( readybase STATIC ${BASE_SOURCES} )
-target_include_directories( readybase PUBLIC src/readybase )
+target_include_directories( readybase PUBLIC src/readybase src/extern )
 target_link_libraries( readybase ${VTK_LIBRARIES} )
 if( VTK_VERSION VERSION_GREATER_EQUAL "8.90.0" )
   vtk_module_autoinit(
