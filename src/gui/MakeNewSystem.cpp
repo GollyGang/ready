@@ -36,6 +36,7 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // STL:
 #include <vector>
+
 using namespace std;
 
 unique_ptr<AbstractRD> MakeNewImage1D(const bool is_opencl_available,const int opencl_platform,const int opencl_device,Properties& render_settings)

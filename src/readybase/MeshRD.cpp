@@ -67,6 +67,7 @@
 // STL:
 #include <stdexcept>
 #include <algorithm>
+
 using namespace std;
 
 // ---------------------------------------------------------------------

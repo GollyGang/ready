@@ -40,6 +40,7 @@
 // STL:
 #include <algorithm>
 #include <string>
+
 using namespace std;
 
 // -----------------------------------------------------------------------------
@@ -319,13 +320,13 @@ wxString InfoPanel::AppendRow(const wxString& print_label, const wxString& label
         // end above table and start another; this avoids formatting problems
         // due to use of colspan (probably due to bug in wxHTML)
         result += _T("</table><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
-        
+
         // put text in a new row that spans all columns
         result += (rownum & 1) ? _T("<tr>") : _T("<tr bgcolor=\"#F0F0F0\">");
         result += _T("<td width=3></td><td>");
         result += value;
         result += _T("<br></td><td width=3></td></tr>");
-        
+
         // end above table and start another
         result += _T("</table><table border=0 cellspacing=0 cellpadding=4 width=\"100%\">");
     }

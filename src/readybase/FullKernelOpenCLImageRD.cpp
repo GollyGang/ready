@@ -21,11 +21,12 @@
 
 // STL:
 #include <string>
-using namespace std;
 
 // VTK:
 #include <vtkXMLUtilities.h>
 #include <vtkImageData.h>
+
+using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 

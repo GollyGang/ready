@@ -23,6 +23,7 @@
 #include <exception>
 #include <map>
 #include <sstream>
+
 using namespace std;
 
 // ---------------------------------------------------------------------
@@ -251,7 +252,7 @@ string AppliedStencil::GetCode() const
 {
     ostringstream oss;
     oss << GetName() << " = ";
-    const string divisor_code = stencil.GetDivisorCode(); 
+    const string divisor_code = stencil.GetDivisorCode();
     if (!divisor_code.empty())
     {
         oss << "(";

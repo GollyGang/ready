@@ -21,10 +21,11 @@
 
 // STL:
 #include <algorithm>
-using namespace std;
 
 // SSE:
 #include <xmmintrin.h>
+
+using namespace std;
 
 // ---------------------------------------------------------------------
 

@@ -22,12 +22,13 @@ using namespace OpenCL_utils;
 // STL:
 #include <sstream>
 #include <stdexcept>
-using namespace std;
 
 // SSE:
 #if (defined(_WIN32) || defined(_WIN64))
   #include <intrin.h>
 #endif
+
+using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 

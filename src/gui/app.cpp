@@ -27,6 +27,7 @@
 
 // STL:
 #include <stdexcept>
+
 using namespace std;
 
 // Create a new application object: this macro will allow wxWidgets to create
@@ -90,7 +91,7 @@ bool MyApp::OnInit()
         return false;
 
     SetAppName(_("Ready"));    // for use in Warning/Fatal dialogs
-    
+
 #if defined(__WXMAC__) && wxCHECK_VERSION(3,1,4)
     // avoid Show Tab Bar etc appearing in View menu
     OSXEnableAutomaticTabbing(false);

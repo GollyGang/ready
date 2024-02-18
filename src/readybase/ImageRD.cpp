@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
-using namespace std;
 
 // VTK:
 #include <vtkActor.h>
@@ -95,6 +94,8 @@ using namespace std;
 #include <vtkWarpScalar.h>
 #include <vtkWarpVector.h>
 #include <vtkXMLUtilities.h>
+
+using namespace std;
 
 // -------------------------------------------------------------------
 

@@ -24,6 +24,7 @@ using namespace OpenCL_utils;
 #include <stdexcept>
 #include <fstream>
 #include <sstream>
+
 using namespace std;
 
 // ---------------------------------------------------------------------------

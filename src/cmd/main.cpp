@@ -21,7 +21,6 @@
 // STL:
 #include <cstdlib>
 #include <iostream>
-using namespace std;
 
 // readybase:
 #include <AbstractRD.hpp>
@@ -30,6 +29,8 @@ using namespace std;
 #include <Properties.hpp>
 #include <scene_items.hpp>
 #include <SystemFactory.hpp>
+
+using namespace std;
 
 // -------------------------------------------------------------------------------------------------------------
 
