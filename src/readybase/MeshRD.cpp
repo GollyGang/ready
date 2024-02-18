@@ -67,6 +67,7 @@
 // STL:
 #include <stdexcept>
 #include <algorithm>
+
 using namespace std;
 
 // ---------------------------------------------------------------------
@@ -145,6 +146,11 @@ void MeshRD::GenerateInitialPattern()
 {
     if (this->initial_pattern_generator.ShouldZeroFirst()) {
         this->BlankImage();
+    }
+
+    for (size_t iOverlay = 0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
+    {
+        this->initial_pattern_generator.GetOverlay(iOverlay).Reseed();
     }
 
     float cp[3];

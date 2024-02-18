@@ -22,10 +22,11 @@
 // STL:
 #include <stdexcept>
 #include <algorithm>
-using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
+
+using namespace std;
 
 GrayScottImageRD::GrayScottImageRD()
     : InbuiltImageRD(VTK_FLOAT)

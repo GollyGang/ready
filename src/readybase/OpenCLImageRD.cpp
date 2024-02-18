@@ -29,11 +29,12 @@ using namespace OpenCL_utils;
 #include <sstream>
 #include <utility>
 #include <vector>
-using namespace std;
 
 // VTK:
 #include <vtkImageData.h>
 #include <vtkMath.h>
+
+using namespace std;
 
 // ----------------------------------------------------------------------------------------------------------------
 

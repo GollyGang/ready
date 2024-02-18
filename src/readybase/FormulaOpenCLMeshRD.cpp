@@ -22,10 +22,11 @@
 // STL:
 #include <string>
 #include <sstream>
-using namespace std;
 
 // VTK:
 #include <vtkXMLUtilities.h>
+
+using namespace std;
 
 // -------------------------------------------------------------------------
 

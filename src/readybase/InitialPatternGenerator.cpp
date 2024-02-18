@@ -20,6 +20,7 @@ along with Ready. If not, see <http://www.gnu.org/licenses/>.         */
 
 // STL:
 #include <string>
+
 using namespace std;
 
 InitialPatternGenerator::InitialPatternGenerator()

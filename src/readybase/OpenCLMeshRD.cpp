@@ -24,12 +24,13 @@ using namespace OpenCL_utils;
 // STL:
 #include <string>
 #include <sstream>
-using namespace std;
 
 // VTK:
 #include <vtkMath.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkCellData.h>
+
+using namespace std;
 
 // -------------------------------------------------------------------------
 

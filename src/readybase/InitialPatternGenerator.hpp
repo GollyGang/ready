@@ -33,6 +33,7 @@ class InitialPatternGenerator
         vtkSmartPointer<vtkXMLDataElement> GetAsXML(bool generate_initial_pattern_when_loading) const;
 
         size_t GetNumberOfOverlays() const { return this->overlays.size(); }
+        Overlay& GetOverlay(size_t i) { return *this->overlays[i]; }
         const Overlay& GetOverlay(size_t i) const { return *this->overlays[i]; }
 
         /// Create a generator suitable for Gray-Scott, so that new patterns can start working immediately.

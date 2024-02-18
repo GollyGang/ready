@@ -21,11 +21,12 @@
 
 // STL:
 #include <string>
-using namespace std;
 
 // VTK:
 #include <vtkXMLUtilities.h>
 #include <vtkUnstructuredGrid.h>
+
+using namespace std;
 
 // ---------------------------------------------------------------------------------------------------------
 

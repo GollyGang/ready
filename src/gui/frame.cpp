@@ -63,7 +63,6 @@
 // STL:
 #include <string>
 #include <algorithm>
-using namespace std;
 
 // VTK:
 #include <vtkBMPReader.h>
@@ -106,6 +105,8 @@ using namespace std;
     #define GetText GetItemLabel
     #define SetText SetItemLabel
 #endif
+
+using namespace std;
 
 // ---------------------------------------------------------------------
 

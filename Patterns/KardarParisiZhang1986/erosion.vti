@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <RD format_version="6">
+    <description>
+      A model of hydraulic erosion by Ricky Reusser.
+
+      https://mathstodon.xyz/@rreusser/111913990129998428
+
+      Parameter h controls how much noise to add to the gradient.
+
+    </description>
+    <rule name="erosion" type="formula" wrap="0" neighborhood_type="vertex">
+      <param name="timestep">
+        0.400000
+      </param>
+      <param name="dx">
+        1.000000
+      </param>
+      <param name="e">
+        1.500000
+      </param>
+      <param name="f">
+        0.020000
+      </param>
+      <param name="g">
+        1.000000
+      </param>
+      <param name="h">
+        0.800000
+      </param>
+      <formula number_of_chemicals="2" block_size_x="4" block_size_y="1" block_size_z="1" accuracy="medium">
+        delta_a = f * laplacian_a - g * pow(sqrt(gradient_mag_squared_a), e) * (1.0f + h * (b - 1.0f));
+      </formula>
+    </rule>
+    <initial_pattern_generator apply_when_loading="true" zero_first="false">
+      <overlay chemical="a">
+        <overwrite/>
+        <constant value="0.2"/>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="a">
+        <add/>
+        <gaussian height="1" sigma="0.2">
+          <point3D x="0.5" y="0.5" z="0.5"/>
+        </gaussian>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="a">
+        <add/>
+        <sine phase="0" amplitude="0.1">
+          <point3D x="0" y="0.5" z="0"/>
+          <point3D x="0.5" y="0.5" z="0"/>
+        </sine>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="a">
+        <add/>
+        <sine phase="0" amplitude="0.1">
+          <point3D x="0.5" y="0" z="0"/>
+          <point3D x="0.5" y="0.5" z="0"/>
+        </sine>
+        <everywhere/>
+      </overlay>
+      <overlay chemical="b">
+        <overwrite />
+        <perlin_noise scale="16" num_octaves="8" />
+        <everywhere />
+      </overlay>
+    </initial_pattern_generator>
+    <render_settings>
+      <surface_color r="1" g="1" b="1"/>
+      <colormap value="spectral"/>
+      <color_low r="0" g="0" b="1"/>
+      <color_high r="1" g="0" b="0"/>
+      <show_color_scale value="true"/>
+      <show_multiple_chemicals value="true"/>
+      <active_chemical value="a"/>
+      <low value="0"/>
+      <high value="1.5"/>
+      <vertical_scale_1D value="30"/>
+      <vertical_scale_2D value="150"/>
+      <contour_level value="0.25"/>
+      <cap_contour value="true"/>
+      <invert_contour_cap value="false"/>
+      <use_wireframe value="false"/>
+      <show_cell_edges value="false"/>
+      <show_bounding_box value="true"/>
+      <show_chemical_label value="true"/>
+      <slice_3D value="true"/>
+      <slice_3D_axis value="z"/>
+      <slice_3D_position value="0.5"/>
+      <show_displacement_mapped_surface value="true"/>
+      <color_displacement_mapped_surface value="false"/>
+      <use_image_interpolation value="true"/>
+      <timesteps_per_render value="32"/>
+      <show_phase_plot value="false"/>
+      <phase_plot_x_axis value="a"/>
+      <phase_plot_y_axis value="b"/>
+      <phase_plot_z_axis value="c"/>
+      <plot_ab_orthogonally value="false"/>
+    </render_settings>
+  </RD>
+  <ImageData WholeExtent="0 255 0 255 0 0" Origin="0 0 0" Spacing="1 1 1" Direction="1 0 0 0 1 0 0 0 1">
+  <Piece Extent="0 255 0 255 0 0">
+    <PointData>
+      <DataArray type="Float32" Name="a" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+      <DataArray type="Float32" Name="b" format="binary" RangeMin="0" RangeMax="0">
+        CAAAAACAAAAAAAAANAAAADQAAAA0AAAANAAAADQAAAA0AAAANAAAADQAAAA=eJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAF4nO3BAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABiAAAABeJztwQEBAAAAgJD+r+4ICgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYgAAAAXic7cEBAQAAAICQ/q/uCAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGIAAAAE=
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

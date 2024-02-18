@@ -31,6 +31,7 @@
 
 // STL:
 #include <set>
+
 using namespace std;
 
 void AddScalarBar(vtkRenderer* pRenderer,vtkScalarsToColors* lut)

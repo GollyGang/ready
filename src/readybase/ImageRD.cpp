@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
-using namespace std;
 
 // VTK:
 #include <vtkActor.h>
@@ -95,6 +94,8 @@ using namespace std;
 #include <vtkWarpScalar.h>
 #include <vtkWarpVector.h>
 #include <vtkXMLUtilities.h>
+
+using namespace std;
 
 // -------------------------------------------------------------------
 
@@ -307,6 +308,11 @@ void ImageRD::GenerateInitialPattern()
     const int X = this->images.front()->GetDimensions()[0];
     const int Y = this->images.front()->GetDimensions()[1];
     const int Z = this->images.front()->GetDimensions()[2];
+
+    for (size_t iOverlay = 0; iOverlay < this->initial_pattern_generator.GetNumberOfOverlays(); iOverlay++)
+    {
+        this->initial_pattern_generator.GetOverlay(iOverlay).Reseed();
+    }
 
     for(int z=0;z<Z;z++)
     {

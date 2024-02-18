@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <string>
 #include <stdexcept>
+
 using namespace std;
 
 void Property::ReadFromXML(vtkXMLDataElement* node)

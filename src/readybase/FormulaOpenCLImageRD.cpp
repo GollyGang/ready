@@ -26,10 +26,11 @@
 #include <set>
 #include <sstream>
 #include <string>
-using namespace std;
 
 // VTK:
 #include <vtkXMLUtilities.h>
+
+using namespace std;
 
 // -------------------------------------------------------------------------
 
@@ -233,7 +234,7 @@ void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed
 
 // -------------------------------------------------------------------------
 
-void WriteParameters(ostringstream& kernel_source, const vector<AbstractRD::Parameter>& parameters, 
+void WriteParameters(ostringstream& kernel_source, const vector<AbstractRD::Parameter>& parameters,
                      const InputsNeeded& inputs_needed, const KernelOptions& options)
 {
     kernel_source << options.indent << "// parameters:\n";

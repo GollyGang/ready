@@ -67,6 +67,9 @@ public:
     /// what value would this fill type be at the given location, given the existing data
     virtual double GetValue(const AbstractRD& system, const std::vector<double>& vals, float x, float y, float z) const = 0;
 
+    /// cause the fill to give different results next time, for those fills that use randomness
+    virtual void Reseed() {}
+
 protected:
 
     /// can construct from an XML node
@@ -114,6 +117,9 @@ class Overlay : public XML_Object
         /// given a vector of values (one for each chemical) at a location in a system,
         /// apply all the operations and return the new value
         double Apply(const std::vector<double>& vals, const AbstractRD& system,float x,float y,float z) const;
+
+        /// cause the overlay to give different results next time, for those overlays that use randomness
+        void Reseed() { this->fill->Reseed(); }
 
     protected:
 
