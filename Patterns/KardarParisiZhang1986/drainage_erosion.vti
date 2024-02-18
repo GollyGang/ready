@@ -2,17 +2,17 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="6">
     <description>
-      Erosion weighted by the drainage area, by simulating runoff. This method is discussed here: &lt;a href=&quot;https://hal.science/hal-04049125v1/document&quot;&gt;https://hal.science/hal-04049125v1/document&lt;/a&gt;
-
-      See &lt;a href=&quot;open:Patterns/KardarParisiZhang1986/erosion.vti&quot;&gt;erosion.vti&lt;/a&gt; for a simpler implementation of erosion.
+      Erosion weighted by the drainage area. This method is discussed here: &lt;a href=&quot;https://hal.science/hal-04049125v1/document&quot;&gt;https://hal.science/hal-04049125v1/document&lt;/a&gt;
 
       Channel a is the height of the surface.
 
-      Channel b is the estimate of the drainage area (the area of the watershed) of each point.
+      Channel b is the estimate of the drainage area (the area of the watershed) of each point. It is found by simulating the flow of surface water.
 
-      Channel c is the uplift pattern.
+      Channel c is the uplift pattern, added to keep things in an approximate steady-state.
 
       Channel d is a noise image used to add randomness to the result.
+
+      See &lt;a href=&quot;open:Patterns/KardarParisiZhang1986/erosion.vti&quot;&gt;erosion.vti&lt;/a&gt; for a simpler implementation of erosion.
     </description>
     <rule name="drainage" type="kernel" neighborhood_type="vertex">
       <kernel number_of_chemicals="4" block_size_x="1" block_size_y="1" block_size_z="1">

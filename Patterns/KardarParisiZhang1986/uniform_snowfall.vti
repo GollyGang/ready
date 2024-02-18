@@ -2,9 +2,9 @@
 <VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
   <RD format_version="6">
     <description>
-      The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kardar%E2%80%93Parisi%E2%80%93Zhang_equation&quot;&gt;KPZ equation&lt;/a&gt;:
+      The &lt;a href=&quot;https://en.wikipedia.org/wiki/Kardar%E2%80%93Parisi%E2%80%93Zhang_equation&quot;&gt;KPZ equation&lt;/a&gt; is:
 
-      da/dt = laplacian_a + gradient_mag_a
+      da/dt = laplacian_a + gradient_mag_squared_a
 
       The height increases in areas of higher gradient, producing
       rounded mounds. This is a simple model of surface deposition, such as uniform snowfall.
@@ -52,7 +52,7 @@
       <show_multiple_chemicals value="true"/>
       <active_chemical value="a"/>
       <low value="0.4"/>
-      <high value="2"/>
+      <high value="1.7"/>
       <vertical_scale_1D value="30"/>
       <vertical_scale_2D value="150"/>
       <contour_level value="0.25"/>
