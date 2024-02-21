@@ -16,7 +16,7 @@ before 0.x release:
 
 - allow operations on chemicals: swap, duplicate
 - fix panning issue on complex scenes (e.g. Bays_3D.vti)
-- new fill types: perlin noise (vtkPerlinNoise), conical gradient
+- new fill types: conical gradient
 - choice of log or linear color palette
 - NKS rules from pp 163-166
 - floating-point speed reporting
