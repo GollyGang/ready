@@ -265,6 +265,7 @@ set( PATTERN_FILES
   Patterns/KardarParisiZhang1986/erosion.vti
   Patterns/KardarParisiZhang1986/uniform_snowfall.vti
   Patterns/KardarParisiZhang1986/drainage_erosion.vti
+  Patterns/shallow_water_equations.vti
 )
 
 set( HELP_FILES
