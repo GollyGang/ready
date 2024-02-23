@@ -1,6 +1,6 @@
 ## Ready ##
 
-Ready is a program for exploring [continuous](http://www.wolframscience.com/nksonline/section-4.8) and discrete cellular automata, including [reaction-diffusion](http://mrob.com/pub/comp/xmorphia/) systems, on grids and arbitrary meshes. [OpenCL](http://en.wikipedia.org/wiki/OpenCL) is used as the computation engine, to take advantage of the [many-core architectures](http://herbsutter.com/welcome-to-the-jungle/) on graphics cards and modern CPUs. OpenCL also allows rules to be written in a text format and compiled on the fly. Ready supports a compact [XML](http://en.wikipedia.org/wiki/XML)-based file format so that images and rules can be shared easily.
+Ready is a program for exploring [continuous](http://www.wolframscience.com/nksonline/section-4.8) and discrete cellular automata, including [reaction-diffusion](http://mrob.com/pub/comp/xmorphia/) systems and PDEs, on grids and arbitrary meshes. [OpenCL](http://en.wikipedia.org/wiki/OpenCL) is used as the computation engine, to take advantage of the [many-core architectures](http://herbsutter.com/welcome-to-the-jungle/) on graphics cards and modern CPUs. OpenCL also allows rules to be written in a text format and compiled on the fly. Ready supports a compact [XML](http://en.wikipedia.org/wiki/XML)-based file format so that images and rules can be shared easily.
 
 Ready supports 1D, 2D and 3D data, as well as polygonal and polyhedral meshes.
 
