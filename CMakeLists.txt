@@ -17,7 +17,7 @@
 #
 #--------------------------------------------------------------------------
 
-cmake_minimum_required( VERSION 2.6...3.5 )
+cmake_minimum_required( VERSION 2.6...4.0 )
 # - The min version is enforced (older versions of CMake will give an error). It should be set to the oldest
 #   version that we know works with our build on every platform.
 # - The max version tells CMake not to use any CMake features newer than this, in case they break something.
