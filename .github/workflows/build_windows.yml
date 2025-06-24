@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022]
+        os: [windows-2025, windows-2022]
         build_type: [Debug, Release]
     runs-on: ${{ matrix.os }}
 
