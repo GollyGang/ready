@@ -17,7 +17,7 @@
 #
 #--------------------------------------------------------------------------
 
-cmake_minimum_required( VERSION 2.6...4.0 )
+cmake_minimum_required( VERSION 3.15...4.0 )
 # - The min version is enforced (older versions of CMake will give an error). It should be set to the oldest
 #   version that we know works with our build on every platform.
 # - The max version tells CMake not to use any CMake features newer than this, in case they break something.
@@ -40,6 +40,7 @@ set( CMD_NAME rdy ) # command-line version
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 #-------------------------------------------source files----------------------------------------------
 
