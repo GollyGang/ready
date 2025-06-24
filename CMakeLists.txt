@@ -482,16 +482,6 @@ add_custom_target( CopyFiles ALL DEPENDS ${files_dest} )
 
 #-------------------------------- build ------------------------------------------------------
 
-# link the C runtime statically
-set( FLAG_VARS
-  CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
-  CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-)
-foreach( flag_var ${FLAG_VARS} )
-  string( REGEX REPLACE "/MD" "/MT" new_flags "${${flag_var}}" )
-  set( ${flag_var} "${new_flags}" CACHE STRING "" FORCE )
-endforeach()
-
 set( USE_SSE "YES" CACHE BOOL "Set to false if your CPU doesn't have SSE support.")
 if( USE_SSE )
   # enable SSE to allow us to set flags to avoid denormals, and relax the floating-point accuracy for speed
