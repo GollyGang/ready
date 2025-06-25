@@ -2961,8 +2961,8 @@ void MyFrame::RecordFrame()
     else
     {
         vtkSmartPointer<vtkImageWriter> writer;
-        if (this->recording_extension == _T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
-        else if (this->recording_extension == _T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+        if (this->recording_extension == ".png") writer = vtkSmartPointer<vtkPNGWriter>::New();
+        else if (this->recording_extension == ".jpg") writer = vtkSmartPointer<vtkJPEGWriter>::New();
 
         // store the currently active chemical, in the case of multi-reagent output it needs to be restored later.
         std::string remember_chemical = this->render_settings.GetProperty("active_chemical").GetChemical();
@@ -2989,8 +2989,8 @@ void MyFrame::RecordFrame()
                     {
                         writer->SetFileName(oss.str().c_str());
                         writer->Write();
-                        if (this->recording_extension == _T(".png")) writer = vtkSmartPointer<vtkPNGWriter>::New();
-                        else if (this->recording_extension == _T(".jpg")) writer = vtkSmartPointer<vtkJPEGWriter>::New();
+                        if (this->recording_extension == ".png") writer = vtkSmartPointer<vtkPNGWriter>::New();
+                        else if (this->recording_extension == ".jpg") writer = vtkSmartPointer<vtkJPEGWriter>::New();
                     }
                 }
             }
