@@ -15,6 +15,7 @@ A) Build VTK:
    to whichever version you have installed (e.g. 2019 x64).
  - Ensure BUILD_SHARED_LIBS is off.
  - Ensure BUILD_TESTING is off (saves time).
+ - Hit 'Add Entry' and add name "CMAKE_MSVC_RUNTIME_LIBRARY" as type STRING and value "MultiThreaded"
  - Hit Configure again.
  - Hit Generate, then open the resulting VTK.sln and build the Debug and
    Release targets.
@@ -55,6 +56,7 @@ A) Build VTK:
  - Ensure BUILD_SHARED_LIBS is off.
  - Ensure BUILD_TESTING to off (saves time).
  - Set CMAKE_BUILD_TYPE to Release
+ - Hit 'Add Entry' and add name "CMAKE_MSVC_RUNTIME_LIBRARY" as type STRING and value "MultiThreaded"
  - Configure, Generate, then close CMake and build with NMake from
    the build folder: nmake
 
