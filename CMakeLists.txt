@@ -287,7 +287,6 @@ set( OTHER_FILES
   ./TODO.txt
   ./BUILD.txt
   ./CMakeLists.txt
-  src/FindOpenCL.cmake
   src/Doxyfile.in
   resources/logo.png
   resources/Icons/22px/icon-pointer.png
