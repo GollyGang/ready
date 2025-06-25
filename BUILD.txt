@@ -1,7 +1,7 @@
 Dependencies:
-0) CMake (latest version, or at least 3.3): www.cmake.org
+0) CMake (latest version): www.cmake.org
 1) VTK (latest version, or at least 6.2): www.vtk.org
-2) wxWidgets (latest version, or at least 2.9.2): www.wxwidgets.org
+2) wxWidgets (at least 2.9.2 or latest known good is 3.2.8): www.wxwidgets.org
 3) any OpenCL SDK (e.g. NVidia GPU Computing Toolkit)
 
 Ready uses CMake for pre-build setup. You might need to read some CMake
@@ -15,7 +15,7 @@ A) Build VTK:
    to whichever version you have installed (e.g. 2019 x64).
  - Ensure BUILD_SHARED_LIBS is off.
  - Ensure BUILD_TESTING is off (saves time).
- - Hit 'Add Entry' and add name "CMAKE_MSVC_RUNTIME_LIBRARY" as type STRING and value "MultiThreaded"
+ - Hit 'Add Entry' and add CMAKE_MSVC_RUNTIME_LIBRARY as type: STRING and value: MultiThreaded
  - Hit Configure again.
  - Hit Generate, then open the resulting VTK.sln and build the Debug and
    Release targets.
@@ -56,7 +56,7 @@ A) Build VTK:
  - Ensure BUILD_SHARED_LIBS is off.
  - Ensure BUILD_TESTING to off (saves time).
  - Set CMAKE_BUILD_TYPE to Release
- - Hit 'Add Entry' and add name "CMAKE_MSVC_RUNTIME_LIBRARY" as type STRING and value "MultiThreaded"
+ - Hit 'Add Entry' and add CMAKE_MSVC_RUNTIME_LIBRARY as type: STRING and value: MultiThreaded
  - Configure, Generate, then close CMake and build with NMake from
    the build folder: nmake
 
