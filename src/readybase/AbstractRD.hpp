@@ -209,6 +209,9 @@ class AbstractRD
 
         std::vector<Parameter> parameters;
 
+        //vector for integrals calculation
+        std::vector<float> integrals;
+
         int timesteps_taken;
 
         std::string formula;

@@ -29,6 +29,15 @@ using namespace OpenCL_utils;
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <vtkSmartPointer.h>
+
+//=====================
+//for testing integration values in temporary file
+#include <iostream>
+#include <fstream>
+//=====================
+
+
 
 // VTK:
 #include <vtkImageData.h>
@@ -161,16 +170,79 @@ void OpenCLImageRD::CreateOpenCLBuffers()
         }
     }
 
+    this->intergral_buffers[0].resize(NC);
+    for(int ic=0;ic<NC;ic++)
+    {
+        this->intergral_buffers[0][ic] = clCreateBuffer(this->context, CL_MEM_READ_WRITE, MEM_SIZE, NULL, &ret);
+        throwOnError(ret,"OpenCLImageRD::CreateOpenCLBuffers : buffer creation failed: ");
+    }
+
     this->need_write_to_opencl_buffers = true;
 }
 
 // ----------------------------------------------------------------------------------------------------------------
 
+std::vector<vtkSmartPointer<vtkImageData>> OpenCLImageRD::SumImageScalars(const std::vector<vtkSmartPointer<vtkImageData>>& images) {
+    
+    double totalSum = 0.0;
+    int X = this->GetX();
+    int Y = this->GetY();
+    int Z = this->GetZ();
+    const int NC = this->GetNumberOfChemicals();
+    
+    //===================
+    //Lines for debug
+    //std::ofstream file("testing_sum_values.txt", std::ios::app);
+    //file << "Sum Values" << std::endl;
+    //===================
+    std::vector<vtkSmartPointer<vtkImageData>> copied_images(NC, nullptr);
+    for (int ic=0; ic < NC; ic++) {
+        copied_images[ic] = vtkSmartPointer<vtkImageData>::New();
+    }
+    for(int ic=0; ic < NC; ic++) {
+        copied_images[ic]->DeepCopy(images[ic]);
+    }
+
+    
+    for (int ic=0; ic < NC; ic++) {
+        float iSum = 0.0;
+        for(int ix = 0; ix < X; ix++)
+        {
+            for(int iy = 0; iy < Y; iy++)
+            {
+                for(int iz = 0; iz < Z; iz++) {
+                    float val = this->GetImage(ic)->GetScalarComponentAsFloat(ix,iy,iz,0);
+                    iSum += val; 
+                    //file <<"chemical: "<<ic <<" X: "<< ix << " Y: "<< iy << " Z: "<< iz << " val: "<<val << std::endl;
+                    std::cout<<val<<std::endl;
+                }
+            }
+        }
+        
+     
+        //file<<"Sum: "<< iSum << std::endl;
+        
+        for ( int ix =0; ix < X; ix++){
+            for ( int iy =0; iy < Y; iy++){
+                for ( int iz =0; iz < Z; iz++){
+                    copied_images[ic]->SetScalarComponentFromFloat(ix,iy,iz,0,iSum);
+                }
+            }
+        }
+    float eps = 1e-5;
+    }
+    //file.close();
+    return copied_images;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
 void OpenCLImageRD::WriteToOpenCLBuffersIfNeeded()
 {
     if(!this->need_write_to_opencl_buffers) return;
 
     const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
+
+    std::vector<vtkSmartPointer<vtkImageData>> data_integrals = this->SumImageScalars(this->images);
 
     this->iCurrentBuffer = 0;
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
@@ -178,6 +250,11 @@ void OpenCLImageRD::WriteToOpenCLBuffersIfNeeded()
         void* data = this->images[ic]->GetScalarPointer();
         cl_int ret = clEnqueueWriteBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
+
+        void * temp = data_integrals[ic]->GetScalarPointer();
+        cl_int ret1 = clEnqueueWriteBuffer(this->command_queue,this->intergral_buffers[0][ic], CL_TRUE, 0, MEM_SIZE, temp, 0, NULL, NULL);
+        throwOnError(ret1,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
+
     }
 
     this->need_write_to_opencl_buffers = false;
@@ -237,7 +314,13 @@ void OpenCLImageRD::SetNumberOfChemicals(int n, bool reallocate_storage)
     this->CreateOpenCLBuffers();
 }
 
+
 // ----------------------------------------------------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------------------------------------
+// --------------------
 
 void OpenCLImageRD::InternalUpdate(int n_steps)
 {
@@ -245,22 +328,39 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
     this->ReloadKernelIfNeeded();
     this->WriteToOpenCLBuffersIfNeeded();
 
+
     cl_int ret;
     int iBuffer;
-    const int NC = this->GetNumberOfChemicals();
+    
 
+    const int NC = this->GetNumberOfChemicals();
+    
     for(int it=0;it<n_steps;it++)
     {
+        string temp_buffer_values = "";
+        for(int ic=0;ic<NC;ic++){
+            // temp_buffer_values += std::to_string(*reinterpret_cast<uint64_t*>(intergral_buffers[0][ic])) + " ";
+
+            ret = clSetKernelArg(this->kernel, ic, sizeof(cl_mem), (void *)&this->intergral_buffers[0][ic]);
+            throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
+        }
+        // throwOnError(1,temp_buffer_values.c_str());
+
+
         for(int io=0;io<2;io++) // first input buffers (io=0) then output buffers (io=1)
         {
             iBuffer = (this->iCurrentBuffer+io)%2;
             for(int ic=0;ic<NC;ic++)
             {
                 // a_in, b_in, ... a_out, b_out ...
-                ret = clSetKernelArg(this->kernel, io*NC+ic, sizeof(cl_mem), (void *)&this->buffers[iBuffer][ic]);
+                ret = clSetKernelArg(this->kernel, NC*( io + 1 ) + ic, sizeof(cl_mem), (void *)&this->buffers[iBuffer][ic]);
                 throwOnError(ret,"OpenCLImageRD::InternalUpdate : clSetKernelArg failed: ");
             }
         }
+        cl_uint num_args;
+        clGetKernelInfo(kernel, CL_KERNEL_NUM_ARGS, sizeof(num_args), &num_args, NULL);
+        
+        
         ret = clEnqueueNDRangeKernel(this->command_queue, this->kernel, 3, // dimensions
             NULL, this->global_range, this->use_local_memory ? this->local_work_size : NULL,
             0, NULL, NULL);
@@ -269,6 +369,34 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
             ostringstream oss;
             oss << "OpenCLImageRD::InternalUpdate : clEnqueueNDRangeKernel failed.\n";
             oss << "Local work size: " << this->local_work_size[0] << " x " << this->local_work_size[1] << " x " << this->local_work_size[2] << "\n";
+//--------
+            oss<<"Global range: ["<< global_range[0]<<" "<< global_range[1]<<" "<< global_range[2]<<"]\n";
+            oss<<"Local work size: ["<< local_work_size[0]<<" "<< local_work_size[1]<<" "<< local_work_size[2]<<"]\n";
+//--------
+            oss <<"Kernel expects arguments" << num_args<<" "<<NC<<"\n";
+            //-------------------------------------------
+            for (cl_uint i = 0; i < num_args; i++) {
+                size_t size;
+                char* value;
+                //===================================
+                // IMPORTANT
+                // P.S. If you want to build it on windows and you obtain an error, you can try to comment the following lines in this function that contain clGetKernelArgInfo (4 lines below) 
+                //===================================
+                // Тип аргумента
+                clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_TYPE_NAME, 0, NULL, &size);
+                value = (char*)malloc(size);
+                clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_TYPE_NAME, size, value, NULL);
+                oss<< "Arg:" << i <<" type: "<< value<<"\n";
+                free(value);
+
+                // Имя аргумента
+                clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_NAME, 0, NULL, &size);
+                value = (char*)malloc(size);
+                clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_NAME, size, value, NULL);
+                oss<< "Arg:" << i <<" type: "<< value<<"\n";
+                free(value);
+            }
+            //-------------------------------------------
             throwOnError(ret, oss.str().c_str());
         }
         this->iCurrentBuffer = 1 - this->iCurrentBuffer;
@@ -278,17 +406,38 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
 }
 
 // ----------------------------------------------------------------------------------------------------------------
+// -----------------------
+        //these are the variables that are used for monitoring the frequency of calculating integrals.
+        //if the code works too slow, make FREQUENCY_OF_INTEGRAL_COUNTING bigger.  
+const int FREQUENCY_OF_INTEGRAL_COUNTING = 35;
+int temporalcnt = 0;
+        // -----------------------
 
 void OpenCLImageRD::ReadFromOpenCLBuffers()
 {
     // read from opencl buffers into our image
     const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
+    bool fl =false;
+    std::vector<vtkSmartPointer<vtkImageData>> data_integrals;
+    if (FREQUENCY_OF_INTEGRAL_COUNTING == temporalcnt){
+        fl =true;
+        data_integrals = this->SumImageScalars(this->images);
+        temporalcnt=0;
+    }
     for(int ic=0;ic<this->GetNumberOfChemicals();ic++)
     {
         void* data = this->images[ic]->GetScalarPointer();
         cl_int ret = clEnqueueReadBuffer(this->command_queue,this->buffers[this->iCurrentBuffer][ic], CL_TRUE, 0, MEM_SIZE, data, 0, NULL, NULL);
         throwOnError(ret,"OpenCLImageRD::ReadFromOpenCLBuffers : buffer reading failed: ");
+
+        if (fl){
+            void * temp = data_integrals[ic]->GetScalarPointer();
+            cl_int ret1 = clEnqueueWriteBuffer(this->command_queue,this->intergral_buffers[0][ic], CL_TRUE, 0, MEM_SIZE, temp, 0, NULL, NULL);
+            throwOnError(ret1,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
+        }
     }
+    temporalcnt ++;
+    
 }
 
 // ----------------------------------------------------------------------------------------------------------------

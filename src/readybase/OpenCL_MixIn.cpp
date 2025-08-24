@@ -56,9 +56,15 @@ OpenCL_MixIn::~OpenCL_MixIn()
     clFinish(this->command_queue);
     clReleaseKernel(this->kernel);
     clReleaseProgram(this->program);
+    
     for(int i=0;i<2;i++)
         for(vector<cl_mem>::const_iterator it = this->buffers[i].begin();it!=this->buffers[i].end();it++)
             clReleaseMemObject(*it);
+    
+    for(int i=0;i<1;i++)
+        for(vector<cl_mem>::const_iterator it = this->intergral_buffers[i].begin();it!=this->intergral_buffers[i].end();it++)
+            clReleaseMemObject(*it);
+    
     clReleaseCommandQueue(this->command_queue);
     clReleaseContext(this->context);
 }
@@ -192,6 +198,11 @@ void OpenCL_MixIn::ReleaseOpenCLBuffers()
     for(int i=0;i<2;i++)
         for(vector<cl_mem>::const_iterator it = this->buffers[i].begin();it!=this->buffers[i].end();it++)
             clReleaseMemObject(*it);
+    
+    for(int i=0;i<1;i++)
+        for(vector<cl_mem>::const_iterator it = this->intergral_buffers[i].begin();it!=this->intergral_buffers[i].end();it++)
+            clReleaseMemObject(*it);
+    
 }
 
 // -----------------------------------------------------------------------

@@ -216,6 +216,15 @@ void WriteHeader(ostringstream& kernel_source, const InputsNeeded& inputs_needed
     }
     // output the function declaration
     kernel_source << "kernel void rd_compute(";
+
+    // integrals reading from formula      
+    for (const string& chem : inputs_needed.chemicals_needed)
+    {
+        kernel_source << "global " << options.data_type_string << " *integral_" << chem;
+        kernel_source << ",";
+    }
+
+
     for (const string& chem : inputs_needed.chemicals_needed)
     {
         kernel_source << "global " << options.data_type_string << " *" << chem << "_in";
