@@ -84,6 +84,10 @@ class ImageRD : public AbstractRD
 
         std::vector<float> GetData(int i_chemical) const override;
 
+        void SetFrequencyCounter(int frequency_counter);
+
+        int GetFrequencyCounter() const;
+
     protected:
 
         std::vector<vtkSmartPointer<vtkImageData>> images; ///< one for each chemical
@@ -93,6 +97,11 @@ class ImageRD : public AbstractRD
 
         double image_top1D;        /// topmost location of the 1D image strips
         double image_ratio1D;     /// proportions of the 1D image strips
+        
+        //this is a variable that is used for monitoring the frequency of integrals calculation.
+        //So, if the code works too slow, make FREQUENCY_OF_INTEGRAL_COUNTING bigger.
+        //If you do not need to calculate integrals, set it to 0  
+        int FREQUENCY_OF_INTEGRAL_COUNTING;
 
     protected:
 

@@ -405,13 +405,8 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
     this->ReadFromOpenCLBuffers();
 }
 
-// ----------------------------------------------------------------------------------------------------------------
-// -----------------------
-        //these are the variables that are used for monitoring the frequency of calculating integrals.
-        //if the code works too slow, make FREQUENCY_OF_INTEGRAL_COUNTING bigger.  
-const int FREQUENCY_OF_INTEGRAL_COUNTING = 35;
-int temporalcnt = 0;
-        // -----------------------
+
+int temporalcnt = 0; //this is a temporal counter that is used in the function below for integral counting. 
 
 void OpenCLImageRD::ReadFromOpenCLBuffers()
 {
@@ -419,7 +414,7 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
     const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
     bool fl =false;
     std::vector<vtkSmartPointer<vtkImageData>> data_integrals;
-    if (FREQUENCY_OF_INTEGRAL_COUNTING == temporalcnt){
+    if (this->FREQUENCY_OF_INTEGRAL_COUNTING == temporalcnt){
         fl =true;
         data_integrals = this->SumImageScalars(this->images);
         temporalcnt=0;
@@ -436,7 +431,7 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
             throwOnError(ret1,"OpenCLImageRD::WriteToOpenCLBuffers : buffer writing failed: ");
         }
     }
-    temporalcnt ++;
+    if (this->FREQUENCY_OF_INTEGRAL_COUNTING>0) temporalcnt ++;
     
 }
 

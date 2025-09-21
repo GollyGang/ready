@@ -53,6 +53,7 @@ const wxString InfoPanel::formula_label = _("Formula");
 const wxString InfoPanel::kernel_label = _("Kernel");
 const wxString InfoPanel::dimensions_label = _("Dimensions");
 const wxString InfoPanel::block_size_label = _("Block size");
+const wxString InfoPanel::integration_frequency_label = _("Integration frequency");
 const wxString InfoPanel::use_local_memory_label = _("Use local memory");
 const wxString InfoPanel::number_of_cells_label = _("Number of cells");
 const wxString InfoPanel::wrap_label = _("Toroidal wrap-around");
@@ -238,6 +239,16 @@ void InfoPanel::UpdatePanel(const AbstractRD& system)
         wxString print_label(name);
         print_label.Replace(_T("_"),_T(" "));
         string type = prop.GetType();
+
+        if (const ImageRD* img = dynamic_cast<const ImageRD*>(&system)) {
+            contents += AppendRow(
+                integration_frequency_label,
+                integration_frequency_label,
+                wxString::Format(wxT("%d"), img->GetFrequencyCounter()),
+                true // если оно редактируемое
+            );
+        }
+
         if(type=="float")
             contents += AppendRow(print_label, name, FormatFloat(prop.GetFloat()), true);
         else if(type=="bool")
@@ -637,6 +648,32 @@ void InfoPanel::ChangeAccuracy()
 
 // -----------------------------------------------------------------------------
 
+void InfoPanel::ChangeIntegrationFrequency()
+{
+    ImageRD* img = dynamic_cast<ImageRD*>(&frame->GetCurrentRDSystem());
+    if (!img) return;
+
+    int oldval = img->GetFrequencyCounter();
+    int newval;
+
+    wxPoint pos = ClientToScreen(wxPoint(html->linkrect.x, html->linkrect.y));
+    int dlgwd = 300;
+    pos.x -= dlgwd + 20;
+
+    if ( GetInteger(_("Change integration frequency"),
+                    _("Enter the new integration frequency:"),
+                    oldval, 1, 10000, &newval,
+                    pos, wxSize(dlgwd, wxDefaultCoord)) )
+    {
+        if (newval != oldval) {
+            img->SetFrequencyCounter(newval);
+            UpdatePanel(*img);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+
 void InfoPanel::ChangeBlockSize()
 {
     const AbstractRD& sys = frame->GetCurrentRDSystem();
@@ -729,6 +766,9 @@ void InfoPanel::ChangeInfo(const wxString& label)
 
     } else if ( label == accuracy_label ) {
         ChangeAccuracy();
+
+    } else if ( label == integration_frequency_label ) {
+        ChangeIntegrationFrequency();
 
     } else if ( label == block_size_label ) {
         ChangeBlockSize();

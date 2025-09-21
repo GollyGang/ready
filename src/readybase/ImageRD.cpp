@@ -107,6 +107,8 @@ ImageRD::ImageRD(int data_type)
     this->starting_pattern = vtkSmartPointer<vtkImageData>::New();
     this->assign_attribute_filter = NULL;
     this->rearrange_fields_filter = NULL;
+    this->FREQUENCY_OF_INTEGRAL_COUNTING = 35;
+    
 }
 
 // ---------------------------------------------------------------------
@@ -1718,3 +1720,17 @@ vector<float> ImageRD::GetData(int i_chemical) const
 }
 
 // --------------------------------------------------------------------------------
+
+
+void ImageRD::SetFrequencyCounter(int frequency_counter)
+{
+    this->FREQUENCY_OF_INTEGRAL_COUNTING = frequency_counter;
+    
+}
+
+// --------------------------------------------------------------------------------
+
+int ImageRD::GetFrequencyCounter() const
+{
+    return this->FREQUENCY_OF_INTEGRAL_COUNTING;
+}
