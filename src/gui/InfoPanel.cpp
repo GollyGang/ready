@@ -667,7 +667,7 @@ void InfoPanel::ChangeIntegrationFrequency()
     {
         if (newval != oldval) {
             img->SetFrequencyCounter(newval);
-            UpdatePanel(*img);
+            if (img->GetFrequencyCounter() == newval) UpdatePanel(*img);
         }
     }
 }

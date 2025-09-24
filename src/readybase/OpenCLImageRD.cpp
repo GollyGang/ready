@@ -397,6 +397,7 @@ int temporalcnt = 0; //this is a temporal counter that is used in the function b
 
 void OpenCLImageRD::ReadFromOpenCLBuffers()
 {
+    if (temporalcnt > FREQUENCY_OF_INTEGRAL_COUNTING) temporalcnt =0;
     // read from opencl buffers into our image
     const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
     bool fl =false;
