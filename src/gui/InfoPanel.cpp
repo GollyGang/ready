@@ -268,7 +268,7 @@ void InfoPanel::UpdatePanel(const AbstractRD& system)
                 integration_frequency_label,
                 integration_frequency_label,
                 wxString::Format(wxT("%d"), img->GetFrequencyCounter()),
-                true // если оно редактируемое
+                true
             );
         }
 
