@@ -240,15 +240,6 @@ void InfoPanel::UpdatePanel(const AbstractRD& system)
         print_label.Replace(_T("_"),_T(" "));
         string type = prop.GetType();
 
-        if (const ImageRD* img = dynamic_cast<const ImageRD*>(&system)) {
-            contents += AppendRow(
-                integration_frequency_label,
-                integration_frequency_label,
-                wxString::Format(wxT("%d"), img->GetFrequencyCounter()),
-                true // если оно редактируемое
-            );
-        }
-
         if(type=="float")
             contents += AppendRow(print_label, name, FormatFloat(prop.GetFloat()), true);
         else if(type=="bool")
@@ -271,6 +262,15 @@ void InfoPanel::UpdatePanel(const AbstractRD& system)
             contents += AppendRow(print_label, name, prop.GetColorMap(), true);
         else throw runtime_error("InfoPanel::Update : unrecognised type: "+type);
     }
+
+    if (const ImageRD* img = dynamic_cast<const ImageRD*>(&system)) {
+            contents += AppendRow(
+                integration_frequency_label,
+                integration_frequency_label,
+                wxString::Format(wxT("%d"), img->GetFrequencyCounter()),
+                true // если оно редактируемое
+            );
+        }
 
     contents += _T("</table></body></html>");
 
@@ -661,7 +661,7 @@ void InfoPanel::ChangeIntegrationFrequency()
     pos.x -= dlgwd + 20;
 
     if ( GetInteger(_("Change integration frequency"),
-                    _("Enter the new integration frequency:"),
+                    _("Enter frequency: (0 disables integration)"),
                     oldval, 0, 10000, &newval,
                     pos, wxSize(dlgwd, wxDefaultCoord)) )
     {

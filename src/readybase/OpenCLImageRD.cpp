@@ -414,7 +414,7 @@ void OpenCLImageRD::ReadFromOpenCLBuffers()
     const size_t MEM_SIZE = this->data_type_size * this->GetX() * this->GetY() * this->GetZ();
     bool fl =false;
     std::vector<vtkSmartPointer<vtkImageData>> data_integrals;
-    if (this->FREQUENCY_OF_INTEGRAL_COUNTING == temporalcnt){
+    if (this->FREQUENCY_OF_INTEGRAL_COUNTING == temporalcnt && FREQUENCY_OF_INTEGRAL_COUNTING>0){
         fl =true;
         data_integrals = this->SumImageScalars(this->images);
         temporalcnt=0;
