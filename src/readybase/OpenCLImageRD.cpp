@@ -31,11 +31,6 @@ using namespace OpenCL_utils;
 #include <vector>
 #include <vtkSmartPointer.h>
 
-//=====================
-//for testing integration values in temporary file
-#include <iostream>
-#include <fstream>
-//=====================
 
 
 
@@ -190,11 +185,7 @@ std::vector<vtkSmartPointer<vtkImageData>> OpenCLImageRD::SumImageScalars(const 
     int Z = this->GetZ();
     const int NC = this->GetNumberOfChemicals();
     
-    //===================
-    //Lines for debug
-    //std::ofstream file("testing_sum_values.txt", std::ios::app);
-    //file << "Sum Values" << std::endl;
-    //===================
+ 
     std::vector<vtkSmartPointer<vtkImageData>> copied_images(NC, nullptr);
     for (int ic=0; ic < NC; ic++) {
         copied_images[ic] = vtkSmartPointer<vtkImageData>::New();
@@ -213,14 +204,12 @@ std::vector<vtkSmartPointer<vtkImageData>> OpenCLImageRD::SumImageScalars(const 
                 for(int iz = 0; iz < Z; iz++) {
                     float val = this->GetImage(ic)->GetScalarComponentAsFloat(ix,iy,iz,0);
                     iSum += val; 
-                    //file <<"chemical: "<<ic <<" X: "<< ix << " Y: "<< iy << " Z: "<< iz << " val: "<<val << std::endl;
+                
                     std::cout<<val<<std::endl;
                 }
             }
         }
         
-     
-        //file<<"Sum: "<< iSum << std::endl;
         
         for ( int ix =0; ix < X; ix++){
             for ( int iy =0; iy < Y; iy++){
@@ -382,14 +371,12 @@ void OpenCLImageRD::InternalUpdate(int n_steps)
                 // IMPORTANT
                 // P.S. If you want to build it on windows and you obtain an error, you can try to comment the following lines in this function that contain clGetKernelArgInfo (4 lines below) 
                 //===================================
-                // Тип аргумента
                 clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_TYPE_NAME, 0, NULL, &size);
                 value = (char*)malloc(size);
                 clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_TYPE_NAME, size, value, NULL);
                 oss<< "Arg:" << i <<" type: "<< value<<"\n";
                 free(value);
 
-                // Имя аргумента
                 clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_NAME, 0, NULL, &size);
                 value = (char*)malloc(size);
                 clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_NAME, size, value, NULL);
