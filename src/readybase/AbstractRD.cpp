@@ -24,7 +24,7 @@
 
 // SSE:
 #if USE_SSE
-//#include <xmmintrin.h>
+#include <xmmintrin.h>
 #endif
 
 using namespace std;
