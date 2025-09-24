@@ -662,7 +662,7 @@ void InfoPanel::ChangeIntegrationFrequency()
 
     if ( GetInteger(_("Change integration frequency"),
                     _("Enter the new integration frequency:"),
-                    oldval, 1, 10000, &newval,
+                    oldval, 0, 10000, &newval,
                     pos, wxSize(dlgwd, wxDefaultCoord)) )
     {
         if (newval != oldval) {
