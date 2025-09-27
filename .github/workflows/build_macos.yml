@@ -7,13 +7,14 @@ on:
   pull_request:
     branches:
       - gh-pages
+  workflow_dispatch:
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-14, macos-13]
+        os: [macos-15]
         build_type: [Debug, Release]
     runs-on: ${{ matrix.os }}
 
