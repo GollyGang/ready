@@ -74,6 +74,7 @@ class OpenCL_MixIn
         bool need_reload_context,need_write_to_opencl_buffers;
 
         std::vector<cl_mem> buffers[2];
+        std::vector<cl_mem> intergral_buffers[1]; // this step was create when we started to use integrals
         int iCurrentBuffer;
 
         std::string kernel_source;
